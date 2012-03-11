@@ -29,7 +29,7 @@ public:
 	int      m_sprite_offy;
 	int      m_old_mcu_mode;
 	int      m_waiting_msb;
-	
+
 	required_device<buffered_spriteram16_device> m_spriteram;
 };
 

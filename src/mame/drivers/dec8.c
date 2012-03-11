@@ -339,7 +339,7 @@ static WRITE8_HANDLER( csilver_i8751_w )
 static WRITE8_HANDLER( srdarwin_i8751_w )
 {
 	dec8_state *state = space->machine().driver_data<dec8_state>();
-	
+
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
 	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
 	int lcred1[2][4] = {{1, 2, 3, 1}, {2, 3, 4, 6}};   /* slot 1 : credits awarded */
@@ -398,8 +398,8 @@ static WRITE8_HANDLER( srdarwin_i8751_w )
 	if (state->m_i8751_value == 0x5000) { state->m_i8751_return = ((state->m_credits / 10) << 4) | (state->m_credits % 10); } /* Credits request */
 	if (state->m_i8751_value == 0x6000 && state->m_credits) { state->m_i8751_value = -1; state->m_credits--; }     /* Credits clear */
 
-/* 
-	This next value is the index to a series of tables,
+/*
+    This next value is the index to a series of tables,
     each table controls the end of level bad guy,
     wrong values crash the cpu right away via a bogus jump.
 
@@ -2065,7 +2065,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	
+
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
@@ -2114,7 +2114,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	
+
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
@@ -2163,7 +2163,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	
+
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
@@ -2213,7 +2213,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	
+
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
@@ -2263,7 +2263,7 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	
+
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
 
@@ -2318,7 +2318,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	
+
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
 	deco_karnovsprites_device::set_gfx_region(*device, 1);
 
@@ -2372,7 +2372,7 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	
+
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
 
@@ -2421,7 +2421,7 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(58)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529) /* 58Hz, 529ms Vblank duration */)
@@ -2464,7 +2464,7 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
-	
+
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
 	deco_bac06_device::set_gfx_region_wide(*device, 2,2,0);
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)

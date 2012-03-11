@@ -28,7 +28,7 @@ public:
 	int            m_objon;
 	int            m_sc1on;
 	int            m_sc2on;
-	
+
 	required_device<buffered_spriteram8_device> m_spriteram;
 };
 

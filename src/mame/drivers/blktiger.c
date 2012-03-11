@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(blktiger)
-	
+
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	/* sound hardware */

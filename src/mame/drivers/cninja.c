@@ -932,7 +932,7 @@ static MACHINE_CONFIG_START( cninja, cninja_state )
 
 	MCFG_GFXDECODE(cninja)
 	MCFG_PALETTE_LENGTH(2048)
-	
+
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_DECOCOMN_ADD("deco_common", cninja_decocomn_intf)

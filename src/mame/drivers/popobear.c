@@ -1,17 +1,17 @@
 /*******************************************************************************************
 
-	Popo Bear (c) 2000 BMC
+    Popo Bear (c) 2000 BMC
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- auto-animation speed is erratic (way too fast);
-	- sprites;
-	- tilemap effects (scrolling, colscroll, linescroll);
-	- BGM seems quite off, YM2413 core bug?
-	- I/Os;
-	- IRQ generation;
-	- Port 0x620000 is quite a mystery, some silly protection?
+    TODO:
+    - auto-animation speed is erratic (way too fast);
+    - sprites;
+    - tilemap effects (scrolling, colscroll, linescroll);
+    - BGM seems quite off, YM2413 core bug?
+    - I/Os;
+    - IRQ generation;
+    - Port 0x620000 is quite a mystery, some silly protection?
 
 ============================================================================================
 Popo Bear - BMC-A00211
@@ -106,8 +106,8 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 	const UINT8 vreg_base[] = { 0x10/2, 0x14/2 };
 	int xscroll,yscroll;
 
-//	count = (state->m_vregs[vreg_base[layer_n]]<<5);
-//	count &= 0xfc000;
+//  count = (state->m_vregs[vreg_base[layer_n]]<<5);
+//  count &= 0xfc000;
 	count = (0xf0000+layer_n*0x4000);
 	if(layer_n & 2)
 	{
@@ -153,7 +153,7 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 						bitmap.pix16(yoffs+512, xoffs+1) = machine.pens[color];
 
 					//if(cliprect.contains(xoffs+1, yoffs+256) && color)
-					//	bitmap.pix16(yoffs+512, xoffs+1) = machine.pens[color];
+					//  bitmap.pix16(yoffs+512, xoffs+1) = machine.pens[color];
 
 					color = (vram[((xi+1+yi*1024)+xtile+ytile) & 0xfffff] & 0xff);
 
@@ -188,14 +188,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	#endif
 
 	/*
-	???? ---- ---- ---- unused?
-	---- xxxx ---- ---- priority?
-	---- ---- x--- ---- Y direction
-	---- ---- -x-- ---- X direction
-	---- ---- --xx ---- width
-	---- ---- ---- xx-- color bank
-	---- ---- ---- --xx height?
-	*/
+    ???? ---- ---- ---- unused?
+    ---- xxxx ---- ---- priority?
+    ---- ---- x--- ---- Y direction
+    ---- ---- -x-- ---- X direction
+    ---- ---- --xx ---- width
+    ---- ---- ---- xx-- color bank
+    ---- ---- ---- --xx height?
+    */
 
 	/* 0x106 = 8 x 8 */
 	/* 0x*29 = 32 x 32 */
@@ -218,7 +218,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			continue;
 
 		//if(param & bank_test)
-		//	continue;
+		//  continue;
 
 		spr_num <<= 3;
 
@@ -251,7 +251,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 SCREEN_UPDATE_IND16( popobear )
 {
-//	popobear_state *state = screen.machine().driver_data<popobear_state>();
+//  popobear_state *state = screen.machine().driver_data<popobear_state>();
 
 	bitmap.fill(0, cliprect);
 
@@ -295,9 +295,9 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_BASE_MEMBER(popobear_state, m_vregs)
 	AM_RANGE(0x480020, 0x480023) AM_RAM
 	AM_RANGE(0x480028, 0x48002d) AM_RAM
-//	AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(popo_480020_r) AM_WRITE(popo_480020_w)
-//	AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(popo_480028_w)
-//	AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(popo_48002c_w)
+//  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ(popo_480020_r) AM_WRITE(popo_480020_w)
+//  AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE(popo_480028_w)
+//  AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE(popo_48002c_w)
 	AM_RANGE(0x480030, 0x480031) AM_WRITE8(popobear_irq_ack_w, 0x00ff)
 	AM_RANGE(0x480034, 0x480035) AM_RAM // coin counter or coin lockout
 	AM_RANGE(0x48003a, 0x48003b) AM_RAM //AM_READ(popo_48003a_r) AM_WRITE(popo_48003a_w)
@@ -461,7 +461,7 @@ static MACHINE_CONFIG_START( popobear, popobear_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_STATIC(popobear)
 
-//	MCFG_GFXDECODE(popobear)
+//  MCFG_GFXDECODE(popobear)
 
 	MCFG_SCREEN_SIZE(128*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)

@@ -161,7 +161,7 @@ void nscsi_harddisk_device::scsi_command()
 				scsi_cmdbuf[pos++] = 0x00; // Meh
 				scsi_cmdbuf[pos++] = 0x00; // Double meh
 				break;
-				
+
 			case 0x03:  { // Format parameters page
 				scsi_cmdbuf[pos++] = 0x83; // PS, page id
 				scsi_cmdbuf[pos++] = 0x16; // Page length

@@ -2270,9 +2270,9 @@ static void generate_compute_flags(powerpc_state *ppc, drcuml_block *block, cons
 	if (xermask & XER_OV)
 	{
 		UML_ROLAND(block, I0, I0, 31, 1);								// roland  i0,i0,31,0x0001
-		UML_OR(block, XERSO32, XERSO32, I0);		 					// or      [xerso],i0
+		UML_OR(block, XERSO32, XERSO32, I0);							// or      [xerso],i0
         UML_AND(block, CR32(0), CR32(0), 0xfffffffe);                   // and  [cr0], [cr0], 0xfffffffe (clear SO copy in CR32)
-		UML_OR(block, CR32(0), I1, XERSO32);		 					// or      [cr0],i1,[xerso]
+		UML_OR(block, CR32(0), I1, XERSO32);							// or      [cr0],i1,[xerso]
 	}
 	else
     {

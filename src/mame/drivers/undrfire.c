@@ -457,7 +457,7 @@ static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
 	output_set_value("Lamp_5", (data >> 4) & 1 );
 	output_set_value("Lamp_6", (data >> 5) & 1 );
 	output_set_value("Wheel_vibration", (data >> 6) & 1 );
-	
+
 	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 

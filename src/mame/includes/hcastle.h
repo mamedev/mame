@@ -32,7 +32,7 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_k007121_1;
 	device_t *m_k007121_2;
-	
+
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_device<buffered_spriteram8_device> m_spriteram2;
 };

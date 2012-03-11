@@ -272,7 +272,7 @@ static MACHINE_CONFIG_START( commando, commando_state )
 
 	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MCFG_VIDEO_START(commando)
-	
+
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	/* sound hardware */

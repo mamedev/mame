@@ -157,7 +157,7 @@ void lr35902_cpu_device::device_start()
 
 	state_add(STATE_GENPC, "curpc", m_PC).callimport().callexport().formatstr("%8s").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_F).mask(0xf0).formatstr("%8s").noshow();
-	
+
 	m_icountptr = &m_icount;
 }
 

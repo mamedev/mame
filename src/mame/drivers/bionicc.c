@@ -387,7 +387,7 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_PALETTE_LENGTH(1024)
 
 	MCFG_VIDEO_START(bionicc)
-	
+
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")

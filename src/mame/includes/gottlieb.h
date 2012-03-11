@@ -62,7 +62,7 @@ extern const device_type GOTTLIEB_SOUND_REV2;
 // ======================> gottlieb_sound_r1_device
 
 // rev 1 sound board, with unpopulated VOTRAX
-class gottlieb_sound_r1_device : 	public device_t,
+class gottlieb_sound_r1_device :	public device_t,
 									public device_mixer_interface
 {
 public:
@@ -72,7 +72,7 @@ public:
 
 	// read/write
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 	// internal communications
 	DECLARE_WRITE_LINE_MEMBER( snd_interrupt );
 	DECLARE_WRITE8_MEMBER( r6532_portb_w );
@@ -88,14 +88,14 @@ protected:
 
 private:
 	// devices
-	required_device<m6502_device> 		m_audiocpu;
-	required_device<riot6532_device> 	m_riot;
+	required_device<m6502_device>		m_audiocpu;
+	required_device<riot6532_device>	m_riot;
 	required_device<dac_device> 		m_dac;
 	optional_device<votrax_sc01_device>	m_votrax;
 
 	// internal state
 	bool			m_populate_votrax;
-	UINT8 			m_last_speech_clock;
+	UINT8			m_last_speech_clock;
 
 #if USE_FAKE_VOTRAX
 protected:
@@ -128,7 +128,7 @@ protected:
 // ======================> gottlieb_sound_r2_device
 
 // fully populated rev 2 sound board
-class gottlieb_sound_r2_device : 	public device_t,
+class gottlieb_sound_r2_device :	public device_t,
 									public device_mixer_interface
 {
 public:
@@ -140,7 +140,7 @@ public:
 
 	// read/write
 	DECLARE_WRITE8_MEMBER( write );
-	
+
 	// internal communications
 	DECLARE_READ8_MEMBER( speech_data_r );
 	DECLARE_READ8_MEMBER( audio_data_r );
@@ -171,27 +171,27 @@ private:
 		TID_NMI_CLEAR,
 		TID_SOUND_LATCH_WRITE
 	};
-	
+
 	// devices
-	required_device<m6502_device> 	m_audiocpu;
-	required_device<m6502_device> 	m_speechcpu;
+	required_device<m6502_device>	m_audiocpu;
+	required_device<m6502_device>	m_speechcpu;
 	required_device<dac_device> 	m_dac;
-	required_device<ay8913_device> 	m_ay1;
-	required_device<ay8913_device> 	m_ay2;
-	optional_device<sp0250_device> 	m_sp0250;
+	required_device<ay8913_device>	m_ay1;
+	required_device<ay8913_device>	m_ay2;
+	optional_device<sp0250_device>	m_sp0250;
 
 	// internal state
 	bool		m_cobram3_mod;
 	emu_timer *	m_nmi_timer;
-	UINT8 		m_nmi_rate;
-	UINT8 		m_nmi_state;
+	UINT8		m_nmi_rate;
+	UINT8		m_nmi_state;
 	UINT8		m_audiocpu_latch;
 	UINT8		m_speechcpu_latch;
-	UINT8 		m_speech_control;
-	UINT8 		m_last_command;
-	UINT8 		m_dac_data[2];
+	UINT8		m_speech_control;
+	UINT8		m_last_command;
+	UINT8		m_dac_data[2];
 	UINT8		m_psg_latch;
-	UINT8 		m_psg_data_latch;
+	UINT8		m_psg_data_latch;
 	UINT8		m_sp0250_latch;
 };
 

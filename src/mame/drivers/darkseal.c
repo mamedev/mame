@@ -279,7 +279,7 @@ static MACHINE_CONFIG_START( darkseal, darkseal_state )
 
 	MCFG_GFXDECODE(darkseal)
 	MCFG_PALETTE_LENGTH(2048)
-	
+
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_DECO16IC_ADD("tilegen1", darkseal_deco16ic_tilegen1_intf)

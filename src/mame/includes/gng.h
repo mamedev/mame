@@ -24,7 +24,7 @@ public:
 	tilemap_t    *m_fg_tilemap;
 	UINT8      m_scrollx[2];
 	UINT8      m_scrolly[2];
-	
+
 	required_device<buffered_spriteram8_device> m_spriteram;
 };
 

@@ -191,7 +191,7 @@ public:
 	~legacy_floppy_image_device();
 
 	virtual bool call_load();
-	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) { 	return load_software(swlist, swname, start_entry); }
+	virtual bool call_softlist_load(char *swlist, char *swname, rom_entry *start_entry) {	return load_software(swlist, swname, start_entry); }
 	virtual bool call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
 	virtual void call_display_info();
@@ -206,14 +206,14 @@ public:
 	virtual const char *image_interface() const;
 	virtual const char *file_extensions() const { return m_extension_list; }
 	virtual const option_guide *create_option_guide() const { return floppy_option_guide; }
-	
+
 	// access to legacy token
-	void *token() const { assert(m_token != NULL); return m_token; }	
+	void *token() const { assert(m_token != NULL); return m_token; }
 protected:
 	// device overrides
 	virtual void device_config_complete();
 	virtual void device_start();
-	
+
 	void *m_token;
 	char			m_extension_list[256];
 };

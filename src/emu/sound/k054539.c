@@ -123,7 +123,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		else
 			lval = rval = 0;
 		rbase[reverb_pos] = 0;
-		
+
 		for(int ch=0; ch<8; ch++)
 			if(regs[0x22c] & (1<<ch)) {
 				unsigned char *base1 = regs + 0x20*ch;
@@ -165,7 +165,7 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				rdelta = (rdelta + reverb_pos) & 0x3fff;
 
 				int cur_pos = (base1[0x0c] | (base1[0x0d] << 8) | (base1[0x0e] << 16)) & rom_mask;
-			
+
 				int fdelta, pdelta;
 				if(base2[0] & 0x20) {
 					delta = -delta;
@@ -281,12 +281,12 @@ void k054539_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 				lval += cur_val * lvol;
 				rval += cur_val * rvol;
 				rbase[(rdelta + reverb_pos) & 0x1fff] += INT16(cur_val*rbvol);
-			
+
 				chan->pos = cur_pos;
 				chan->pfrac = cur_pfrac;
 				chan->pval = cur_pval;
 				chan->val = cur_val;
-			
+
 				if(regupdate()) {
 					base1[0x0c] = cur_pos     & 0xff;
 					base1[0x0d] = cur_pos>> 8 & 0xff;
@@ -349,11 +349,11 @@ WRITE8_MEMBER(k054539_device::write)
 		int voice, reg;
 
 		/* The K054539 has behavior like many other wavetable chips including
-		   the Ensoniq 550x and Gravis GF-1: if a voice is active, writing
-		   to it's current position is silently ignored.
+           the Ensoniq 550x and Gravis GF-1: if a voice is active, writing
+           to it's current position is silently ignored.
 
-		   Dadandaan depends on this or the vocals go wrong.
-		*/
+           Dadandaan depends on this or the vocals go wrong.
+        */
 		if (offset < 8*0x20)
 		{
 			voice = offset / 0x20;

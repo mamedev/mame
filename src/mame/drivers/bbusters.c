@@ -696,7 +696,7 @@ static MACHINE_CONFIG_START( bbusters, bbusters_state )
 	MCFG_PALETTE_LENGTH(2048)
 
 	MCFG_VIDEO_START(bbuster)
-	
+
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 

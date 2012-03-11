@@ -52,7 +52,7 @@
 #define MCFG_VOTRAX_SC01_ADD(_tag, _clock, _interface) \
 	MCFG_DEVICE_ADD(_tag, VOTRAX_SC01, _clock) \
 	votrax_sc01_device::static_set_interface(*device, _interface); \
-	
+
 
 
 //**************************************************************************
@@ -117,7 +117,7 @@ private:
 	devcb_resolved_write_line	m_request_func;			// request callback
 	UINT8						m_request_state;		// request as seen to the outside world
 	UINT8						m_internal_request;		// request managed by stream timing
-	
+
 	// timing circuit
 	UINT32						m_master_clock_freq;	// frequency of the master clock
 	UINT8						m_master_clock;			// master clock
@@ -137,14 +137,14 @@ private:
 	UINT8						m_latch_42;				// D flip-flop @ 42
 	UINT8						m_counter_84;			// 4-bit phoneme counter @ 84
 	UINT8						m_latch_92;				// 2-bit latch @ 92
-	
+
 	// low parameter clocking
 	UINT8						m_srff_132;				// S/R flip-flop @ 132
 	UINT8						m_srff_114;				// S/R flip-flop @ 114
 	UINT8						m_srff_112;				// S/R flip-flop @ 112
 	UINT8						m_srff_142;				// S/R flip-flop @ 142
 	UINT8						m_latch_80;				// phoneme timing latch @ 80
-	
+
 	// glottal circuit
 	UINT8						m_counter_220;			// 4-bit counter @ 220
 	UINT8						m_counter_222;			// 4-bit counter @ 222
@@ -153,7 +153,7 @@ private:
 	UINT8						m_counter_236;			// 4-bit counter @ 236
 	UINT8						m_fgate;				// FGATE signal
 	UINT8						m_glottal_sync;			// Glottal Sync signal
-	
+
 	// transition circuit
 	UINT8						m_0625_clock;			// state of 0.625kHz clock
 	UINT8						m_counter_46;			// 4-bit counter in block @ 46
@@ -168,24 +168,24 @@ private:
 	UINT8						m_f2q;					// latched 4-bit F2Q value
 	UINT8						m_va;					// latched 4-bit VA value
 	UINT8						m_fa;					// latched 4-bit FA value
-	
+
 	// noise generator circuit
 	UINT8						m_noise_clock;			// clock input to noise generator
 	UINT32						m_shift_252;			// shift register @ 252
 	UINT8						m_counter_250;			// 4-bit counter @ 250
 
 	// stages outputs history
-	double 						m_ni_hist[4];
-	double 						m_no_hist[4];
-	double 						m_va_hist[4];
-	double 						m_s1_hist[4];
-	double 						m_s2g_hist[4];
-	double 						m_s2ni_hist[4];
-	double 						m_s2n_hist[4];
-	double 						m_s2_hist[4];
-	double 						m_s3_hist[4];
-	double 						m_s4i_hist[4];
-	double 						m_s4_hist[4];
+	double						m_ni_hist[4];
+	double						m_no_hist[4];
+	double						m_va_hist[4];
+	double						m_s1_hist[4];
+	double						m_s2g_hist[4];
+	double						m_s2ni_hist[4];
+	double						m_s2n_hist[4];
+	double						m_s2_hist[4];
+	double						m_s3_hist[4];
+	double						m_s4i_hist[4];
+	double						m_s4_hist[4];
 
 	// static tables
 	static const char *const s_phoneme_table[64];

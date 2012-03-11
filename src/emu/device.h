@@ -365,7 +365,7 @@ protected:
 		optional_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, false>(base, tag), m_bytes(0) { }
 		virtual void findit(device_t &base) { this->set_target(reinterpret_cast<_PointerType *>(this->find_shared_ptr(base, this->m_tag, m_bytes))); }
 		UINT32 bytes() const { return m_bytes; }
-	
+
 	private:
 		// internal state
 		size_t m_bytes;
@@ -379,7 +379,7 @@ protected:
 		required_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, true>(base, tag), m_bytes(0) { }
 		virtual void findit(device_t &base) { this->set_target(reinterpret_cast<_PointerType *>(this->find_shared_ptr(base, this->m_tag, m_bytes))); }
 		UINT32 bytes() const { return m_bytes; }
-	
+
 	private:
 		// internal state
 		size_t m_bytes;

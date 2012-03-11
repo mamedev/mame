@@ -427,8 +427,8 @@
     -- SNKPLAYMORE --
     . NEO-MVS CHAFIO (2003.7.24) - used only with NEO-CMC 90G06C7050
 
-	-- SNK development boards --
-	. NEO-MVS CHAMC2
+    -- SNK development boards --
+    . NEO-MVS CHAMC2
 
     MVS PROG:
     -- SNK --
@@ -463,8 +463,8 @@
     . NEO-MVS PROGBK3S (2003.10.1)
     . NEO-MVS PROGBK2S (2003.10.18)
 
-	-- SNK development boards --
-	. NEO-MVS PROGMC2
+    -- SNK development boards --
+    . NEO-MVS PROGMC2
 
 
     AES CHA:

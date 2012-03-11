@@ -487,7 +487,7 @@ static MACHINE_CONFIG_START( crshrace, crshrace_state )
 
 	MCFG_GFXDECODE(crshrace)
 	MCFG_PALETTE_LENGTH(2048)
-	
+
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 

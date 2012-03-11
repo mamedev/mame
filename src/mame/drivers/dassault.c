@@ -593,7 +593,7 @@ static MACHINE_CONFIG_START( dassault, dassault_state )
 
 	MCFG_GFXDECODE(dassault)
 	MCFG_PALETTE_LENGTH(4096)
-	
+
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 

@@ -4,7 +4,7 @@
 
     Gottlieb 6502-based sound hardware implementations.
 
-	Dedicated to Warren Davis, Jeff Lee, Tim Skelly & David Thiel
+    Dedicated to Warren Davis, Jeff Lee, Tim Skelly & David Thiel
 
 ****************************************************************************
 
@@ -361,7 +361,7 @@ WRITE_LINE_MEMBER( gottlieb_sound_r1_device::snd_interrupt )
 
 //-------------------------------------------------
 //  r6532_portb_w - handle writes to the RIOT's
-//	port B
+//  port B
 //-------------------------------------------------
 
 WRITE8_MEMBER( gottlieb_sound_r1_device::r6532_portb_w )
@@ -372,7 +372,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::r6532_portb_w )
 
 
 //-------------------------------------------------
-//  votrax_data_w - write data to the Votrax SC-01 
+//  votrax_data_w - write data to the Votrax SC-01
 //  speech chip
 //-------------------------------------------------
 
@@ -392,7 +392,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::votrax_data_w )
 
 //-------------------------------------------------
 //  speech_clock_dac_w - modify the clock driving
-// 	the Votrax SC-01 speech chip
+//  the Votrax SC-01 speech chip
 //-------------------------------------------------
 
 WRITE8_MEMBER( gottlieb_sound_r1_device::speech_clock_dac_w )
@@ -403,7 +403,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::speech_clock_dac_w )
 		if (data != m_last_speech_clock)
 		{
 			mame_printf_debug("clock = %02X\n", data);
-			
+
 			// totally random guesswork; would like to get real measurements on a board
 			if (m_votrax != NULL)
 				m_votrax->set_unscaled_clock(600000 + (data - 0xa0) * 10000);
@@ -415,7 +415,7 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::speech_clock_dac_w )
 
 //-------------------------------------------------
 //  votrax_request - map the VOTRAX SC-01 request
-//	line to the NMI pin on the sound chip
+//  line to the NMI pin on the sound chip
 //-------------------------------------------------
 
 WRITE_LINE_MEMBER( gottlieb_sound_r1_device::votrax_request )
@@ -483,7 +483,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( gottlieb_sound_r1_with_votrax )
 	MCFG_FRAGMENT_ADD(gottlieb_sound_r1)
-	
+
 	// add the VOTRAX
 	MCFG_VOTRAX_SC01_ADD("votrax", 720000, gottlieb_votrax_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.50)
@@ -552,8 +552,8 @@ void gottlieb_sound_r1_device::device_start()
 //**************************************************************************
 
 //-------------------------------------------------
-//  gottlieb_sound_r1_with_votrax_device - 
-//	constructor
+//  gottlieb_sound_r1_with_votrax_device -
+//  constructor
 //-------------------------------------------------
 
 gottlieb_sound_r1_with_votrax_device::gottlieb_sound_r1_with_votrax_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
@@ -618,7 +618,7 @@ gottlieb_sound_r2_device::gottlieb_sound_r2_device(const machine_config &mconfig
 
 //-------------------------------------------------
 //  static_enable_cobram3_mods - enable changes
-//	for cobram3
+//  for cobram3
 //-------------------------------------------------
 
 void gottlieb_sound_r2_device::static_enable_cobram3_mods(device_t &device)
@@ -652,7 +652,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::write )
 
 //-------------------------------------------------
 //  nmi_timer_adjust - adjust the NMI timer to
-//	fire based on its configured rate
+//  fire based on its configured rate
 //-------------------------------------------------
 
 inline void gottlieb_sound_r2_device::nmi_timer_adjust()
@@ -664,7 +664,7 @@ inline void gottlieb_sound_r2_device::nmi_timer_adjust()
 
 //-------------------------------------------------
 //  nmi_state_update - update the NMI state based
-//	on the timer firing and the enable control
+//  on the timer firing and the enable control
 //-------------------------------------------------
 
 inline void gottlieb_sound_r2_device::nmi_state_update()
@@ -676,7 +676,7 @@ inline void gottlieb_sound_r2_device::nmi_state_update()
 
 //-------------------------------------------------
 //  speech_data_r - read the input command latch
-//	from the audio CPU
+//  from the audio CPU
 //-------------------------------------------------
 
 READ8_MEMBER( gottlieb_sound_r2_device::audio_data_r )
@@ -688,7 +688,7 @@ READ8_MEMBER( gottlieb_sound_r2_device::audio_data_r )
 
 //-------------------------------------------------
 //  speech_data_r - read the input command latch
-//	from the speech CPU
+//  from the speech CPU
 //-------------------------------------------------
 
 READ8_MEMBER( gottlieb_sound_r2_device::speech_data_r )
@@ -700,7 +700,7 @@ READ8_MEMBER( gottlieb_sound_r2_device::speech_data_r )
 
 //-------------------------------------------------
 //  signal_audio_nmi_w - signal an NMI from the
-//	speech CPU to the audio CPU
+//  speech CPU to the audio CPU
 //-------------------------------------------------
 
 WRITE8_MEMBER( gottlieb_sound_r2_device::signal_audio_nmi_w )
@@ -712,7 +712,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::signal_audio_nmi_w )
 
 //-------------------------------------------------
 //  nmi_rate_w - adjust the NMI rate on the speech
-//	CPU
+//  CPU
 //-------------------------------------------------
 
 WRITE8_MEMBER( gottlieb_sound_r2_device::nmi_rate_w )
@@ -723,8 +723,8 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::nmi_rate_w )
 
 
 //-------------------------------------------------
-//  speech_drq_custom_r - return the SP0250 
-//	request line as an input port bit
+//  speech_drq_custom_r - return the SP0250
+//  request line as an input port bit
 //-------------------------------------------------
 
 CUSTOM_INPUT_MEMBER( gottlieb_sound_r2_device::speech_drq_custom_r )
@@ -735,7 +735,7 @@ CUSTOM_INPUT_MEMBER( gottlieb_sound_r2_device::speech_drq_custom_r )
 
 //-------------------------------------------------
 //  dac_w - write to one of the two DACs on the
-//	board
+//  board
 //-------------------------------------------------
 
 WRITE8_MEMBER( gottlieb_sound_r2_device::dac_w )
@@ -748,8 +748,8 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::dac_w )
 
 
 //-------------------------------------------------
-//  speech_control_w - primary audio control 
-//	register on the speech board
+//  speech_control_w - primary audio control
+//  register on the speech board
 //-------------------------------------------------
 
 WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
@@ -761,7 +761,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 	nmi_state_update();
 
 	// bit 1 controls a LED on the sound board
-	
+
 	// bits 2-4 control the AY-8913, but act differently between the
 	// standard sound board and the modified Cobra Command board
 	if (!m_cobram3_mod)
@@ -805,7 +805,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 
 //-------------------------------------------------
 //  psg_latch_w - store an 8-bit value in the PSG
-//	latch register
+//  latch register
 //-------------------------------------------------
 
 WRITE8_MEMBER( gottlieb_sound_r2_device::psg_latch_w )
@@ -815,8 +815,8 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::psg_latch_w )
 
 
 //-------------------------------------------------
-//  psg_latch_w - store an 8-bit value in the 
-//	SP0250 latch register
+//  psg_latch_w - store an 8-bit value in the
+//  SP0250 latch register
 //-------------------------------------------------
 
 WRITE8_MEMBER( gottlieb_sound_r2_device::sp0250_latch_w )
@@ -935,7 +935,7 @@ void gottlieb_sound_r2_device::device_start()
 
 	// reset the DACs
 	m_dac_data[0] = m_dac_data[1] = 0xff;
-	
+
 	// disable the non-speech CPU for cobram3
 	if (m_cobram3_mod)
 		m_audiocpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -967,13 +967,13 @@ void gottlieb_sound_r2_device::device_timer(emu_timer &timer, device_timer_id id
 			// adjust the NMI timer for the next time
 			nmi_timer_adjust();
 			break;
-		
+
 		case TID_NMI_CLEAR:
 			// update state
 			m_nmi_state = 0;
 			nmi_state_update();
 			break;
-		
+
 		case TID_SOUND_LATCH_WRITE:
 			// each CPU has its own latch
 			m_audiocpu_latch = param;

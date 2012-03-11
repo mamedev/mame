@@ -361,7 +361,7 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_GFXDECODE(boogwing)
 
 	MCFG_VIDEO_START(boogwing)
-	
+
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram2")
 

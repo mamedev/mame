@@ -406,7 +406,7 @@ static int i386_limit_check(i386_state *cpustate, int seg, UINT32 offset)
 		if((cpustate->sreg[seg].flags & 0x0018) == 0x0010 && cpustate->sreg[seg].flags & 0x0004) // if expand-down data segment
 		{
 			// compare if greater then 0xffffffff when we're passed the access size
-			if((offset <= cpustate->sreg[seg].limit) || ((cpustate->sreg[seg].d)?0:(offset > 0xffff))) 
+			if((offset <= cpustate->sreg[seg].limit) || ((cpustate->sreg[seg].d)?0:(offset > 0xffff)))
 			{
 				logerror("Limit check at 0x%08x failed. Segment %04x, limit %08x, offset %08x (expand-down)\n",cpustate->pc,cpustate->sreg[seg].selector,cpustate->sreg[seg].limit,offset);
 				return 1;

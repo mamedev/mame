@@ -27,7 +27,7 @@ public:
 	UINT32 m_hcount_191;
 	UINT32 m_vcount_191;
 	UINT32 m_latch_374;
-	
+
 	required_device<buffered_spriteram8_device> m_spriteram;
 };
 

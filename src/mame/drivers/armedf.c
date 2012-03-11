@@ -1265,7 +1265,7 @@ static MACHINE_CONFIG_START( terrafb, armedf_state )
 
 	MCFG_GFXDECODE(armedf)
 	MCFG_PALETTE_LENGTH(2048)
-	
+
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	/* sound hardware */

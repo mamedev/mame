@@ -963,8 +963,8 @@ void legacy_floppy_image_device::device_config_complete()
 			cnt++;
 		}
 		image_specify_extension( m_extension_list, 256, floppy_options[i].extensions );
-	}	
-	
+	}
+
 	// set brief and instance name
 	update_names();
 }

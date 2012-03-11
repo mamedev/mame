@@ -692,7 +692,7 @@ static INTERRUPT_GEN( gottlieb_interrupt )
  *  Main CPU memory handlers
  *
  *************************************/
- 
+
 static WRITE8_HANDLER( gottlieb_sh_w )
 {
 	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
@@ -2485,12 +2485,12 @@ static DRIVER_INIT( vidvince )
 
 /* games using rev 1 sound board */
 GAME( 1982, reactor,   0,        reactor,   		reactor,  ramtiles, ROT0,   "Gottlieb", "Reactor", GAME_IMPERFECT_SOUND )
-GAME( 1982, qbert,     0,        qbert,  			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 1)", GAME_IMPERFECT_SOUND )
+GAME( 1982, qbert,     0,        qbert, 			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 1)", GAME_IMPERFECT_SOUND )
 GAME( 1982, qberta,    qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (US set 2)", GAME_IMPERFECT_SOUND )
-GAME( 1982, qbertj,    qbert,    qbert,  			qbert,    romtiles, ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1982, myqbert,   qbert,    qbert,  			qbert,    romtiles, ROT270, "Gottlieb", "Mello Yello Q*bert", GAME_IMPERFECT_SOUND )
-GAME( 1982, qberttst,  qbert,    qbert,  			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", GAME_IMPERFECT_SOUND )
-GAME( 1982, qbtrktst,  qbert,    qbert,  			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", GAME_IMPERFECT_SOUND )
+GAME( 1982, qbertj,    qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb (Konami license)", "Q*bert (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1982, myqbert,   qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb", "Mello Yello Q*bert", GAME_IMPERFECT_SOUND )
+GAME( 1982, qberttst,  qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", GAME_IMPERFECT_SOUND )
+GAME( 1982, qbtrktst,  qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", GAME_IMPERFECT_SOUND )
 GAME( 1982, insector,  0,        gottlieb1, 		insector, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
 GAME( 1982, tylz,      0,        gottlieb1_votrax,	tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
 GAME( 1984, argusg,    0,        gottlieb1, 		argusg,   ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
@@ -2498,8 +2498,8 @@ GAME( 1983, mplanets,  0,        gottlieb1, 		mplanets, romtiles, ROT270, "Gottl
 GAME( 1983, mplanetsuk,mplanets, gottlieb1, 		mplanets, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )
 GAME( 1983, krull,     0,        gottlieb1, 		krull,    ramtiles, ROT270, "Gottlieb", "Krull", 0 )
 GAME( 1983, kngtmare,  0,        gottlieb1, 		kngtmare, romtiles, ROT0,   "Gottlieb", "Knightmare (prototype)", GAME_NO_SOUND )
-GAME( 1983, sqbert,    0,        qbert,   			qbert,    romtiles, ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", GAME_IMPERFECT_SOUND )
-GAME( 1983, qbertqub,  0,        qbert,  			qbertqub, romtiles, ROT270, "Mylstar", "Q*bert's Qubes", GAME_IMPERFECT_SOUND )
+GAME( 1983, sqbert,    0,        qbert, 			qbert,    romtiles, ROT270, "Mylstar", "Faster, Harder, More Challenging Q*bert (prototype)", GAME_IMPERFECT_SOUND )
+GAME( 1983, qbertqub,  0,        qbert, 			qbertqub, romtiles, ROT270, "Mylstar", "Q*bert's Qubes", GAME_IMPERFECT_SOUND )
 GAME( 1984, curvebal,  0,        gottlieb1, 		curvebal, romtiles, ROT270, "Mylstar", "Curve Ball", 0 )
 
 /* games using rev 2 sound board */

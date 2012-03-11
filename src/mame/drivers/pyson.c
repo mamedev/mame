@@ -3,19 +3,19 @@
 Konami Pyson Hardware Overview
 Konami 2001-2005
 
-This system uses a standard GH-006 PS2 main board (the older Playstation 2 square type) with a 
-Sony-supplied PS2 power supply which bolts onto the top of the main board. This power supply 
-has a single 12 volt power input and creates all of the voltages for the PS2. The same 12 volt input 
-extends via a splitter to the Konami interface PCB into CN3. The PS2 main board is connected to the 
-custom Konami interface PCB via the PS2 main board AV connector and the IEEE 1394 'i.LINK' connector. 
+This system uses a standard GH-006 PS2 main board (the older Playstation 2 square type) with a
+Sony-supplied PS2 power supply which bolts onto the top of the main board. This power supply
+has a single 12 volt power input and creates all of the voltages for the PS2. The same 12 volt input
+extends via a splitter to the Konami interface PCB into CN3. The PS2 main board is connected to the
+custom Konami interface PCB via the PS2 main board AV connector and the IEEE 1394 'i.LINK' connector.
 A security dongle with no label on the top which looks like a PS2 memory card is plugged into the left
 PS2 memory card slot. This card is identical to the dongles used in Namco System 246/256. Note that the
-two games dumped so far have the same label on the security dongle (KN00002) but the ROM inside is not 
-identical. So far all the Konami game software resides on a 128M CF card. However there are probably 
+two games dumped so far have the same label on the security dongle (KN00002) but the ROM inside is not
+identical. So far all the Konami game software resides on a 128M CF card. However there are probably
 HDD/CDROM/DVDROM-based games too since the Konami interface board has connectors for IDE drives.
 
 Games known to run on this system include....                      DIN5
-                                                       CF Card     Dongle                 PS2 Cart   
+                                                       CF Card     Dongle                 PS2 Cart
 Game Title                                             Label       Label                  Label (bottom)
 ---------------------------------------------------------------------------------------------------------
 *Baseball Heroes 2005
@@ -30,12 +30,12 @@ Game Title                                             Label       Label        
 *Paintball Mania
 *Perfect Pool
 *Pool Pocket Fortunes
-*R.P.M. Red 
+*R.P.M. Red
 World Soccer Winning Eleven Arcade Game Style          C18JAA03    DIN5 dongle GCC27JA    KN00002
 World Soccer Winning Eleven Arcade Game Style 2003     C27JAA03    not used               KN00002
 ---------------------------------------------------------------------------------------------------------
 
-* denotes not dumped. If you can help with the remaining undumped games 
+* denotes not dumped. If you can help with the remaining undumped games
 please contact us via http://mamedev.org or http://guru.mameworld.info
 
 
@@ -90,12 +90,12 @@ Notes:
       TMPR3927   - Toshiba TMPR3927 32-bit R3000A-based RISC micro-controller (QFP240)
       48LC2M32B2 - Micron 48LC2M32B2 512k x32-bit x4-banks (64MBit) SDRAM (TSOP86)
       XC9536     - Xilinx XC9536XL CPLD stamped 'QB22A1' (PLCC44)
-      B22A01.U42 - Fujitsu MBM29F400 512k x8-bit flash ROM stamped 'B22A01' (TSOP48). This is probably 
+      B22A01.U42 - Fujitsu MBM29F400 512k x8-bit flash ROM stamped 'B22A01' (TSOP48). This is probably
                    the common-to-all-games Pyson BIOS for the TMPR3927
       XCS10XL    - Xilinx Spartan XCS10XL FPGA (TQFP144)
       M48T58Y    - ST Microelectronics M48T58Y 8k Timekeeper/NVRAM (DIP28). As well as being used for protection
-                   with the Konami game code/year etc (the usual first 16 bytes) it also seems to contain code 
-                   or other data in some of the games, meaning it's not possible to hand-create the NVRAMs. 
+                   with the Konami game code/year etc (the usual first 16 bytes) it also seems to contain code
+                   or other data in some of the games, meaning it's not possible to hand-create the NVRAMs.
                    The same 'extended usage' of this chip is also present on Konami Viper PCBs.
       DS2430     - Dallas DS2430 256-bit EEPROM and silicon serial number (3 pin TO-92 package)
       CN2        - RJ45 network connector
@@ -107,13 +107,13 @@ Notes:
       CN15       - 28 way edge connector which connects to the filter board along with the JAMMA edge connector
       CN16       - 40 pin standard IDE connector (for CDROM/DVDROM or 3.5" IDE HDD)
       CN17       - 44 pin standard IDE connector (for 2.5" IDE HDD)
-      CN19       - DIN5 connector for plug-in security module. The module contains a Dallas DS2430 which 
+      CN19       - DIN5 connector for plug-in security module. The module contains a Dallas DS2430 which
                    effectively replaces the common-to-most-games one on the main board (same a Viper h/w)
       CN20       - 4 pin connector
       CN21       - Standard Compact Flash card slot
       SW4        - 4 position DIP switch
-                   
-      
+
+
 Filter Board
 ------------
 
@@ -133,7 +133,7 @@ PWB0000121667 2002 KONAMI
 |-------------------------------------------------------------------------|
 Notes:
       CN4      - 8-pin mini-DIN connector
-      CN5/7    - 15-pin VGA connectors 
+      CN5/7    - 15-pin VGA connectors
       CN14     - Standard USB connector. This connects to a standard JVS I/O board. It was tested with
                  a common Sega JVS I/O and works fine however Konami probably have their own JVS I/O board
                  for use with this system

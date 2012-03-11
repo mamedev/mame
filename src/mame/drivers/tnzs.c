@@ -2138,7 +2138,7 @@ ROM_END
 
 ROM_START( arknoid2b )
 	ROM_REGION( 0x30000, "maincpu", 0 )				/* Region 0 - main cpu */
-    ROM_LOAD( "boot.11c",  0x00000, 0x08000, CRC(3847dfb0) SHA1(993c8af3df7a4d5a2523f0e31a6df1c07ba13c7d) ) 
+    ROM_LOAD( "boot.11c",  0x00000, 0x08000, CRC(3847dfb0) SHA1(993c8af3df7a4d5a2523f0e31a6df1c07ba13c7d) )
 	ROM_CONTINUE(           0x18000, 0x08000 )			/* banked at 8000-bfff */
 	/* 20000-2ffff empty */
 

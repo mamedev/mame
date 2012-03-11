@@ -33,7 +33,7 @@ public:
 	UINT16 m_pf_master_control[4];
 	INT32 m_sprite_list;
 	UINT8 m_palette_bank;
-	
+
 	required_device<buffered_spriteram16_device> m_spriteram;
 };
 

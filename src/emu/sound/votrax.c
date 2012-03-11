@@ -95,21 +95,21 @@ const char *const votrax_sc01_device::s_phoneme_table[64] =
 // it is only an approximation
 const double votrax_sc01_device::s_glottal_wave[16] =
 {
-	0,  
-	16.0/22.0, 
-	-22.0/22.0, 
-	-17.0/22.0, 
-	-15.0/22.0, 
-	-10.0/22.0,  
-	-7.0/22.0,  
+	0,
+	16.0/22.0,
+	-22.0/22.0,
+	-17.0/22.0,
+	-15.0/22.0,
+	-10.0/22.0,
+	-7.0/22.0,
 	-4.0/22.0,
-	0,   
-	0,   
-	0,   
-	0,   
-	0,   
-	0,   
-	0,   
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
+	0,
 	0
 };
 
@@ -161,14 +161,14 @@ WRITE8_MEMBER( votrax_sc01_device::write )
 	// only 6 bits matter
 	m_phoneme = data & 0x3f;
 const UINT8 *rom = m_rom + (m_phoneme << 3);
-mame_printf_debug("%s: STROBE %s (F1=%X F2=%X FC=%X F3=%X F2Q=%X VA=%X FA=%X CL=%X CLD=%X VD=%X PAC=%X PH=%02X)\n", 
+mame_printf_debug("%s: STROBE %s (F1=%X F2=%X FC=%X F3=%X F2Q=%X VA=%X FA=%X CL=%X CLD=%X VD=%X PAC=%X PH=%02X)\n",
 		machine().time().as_string(3), s_phoneme_table[m_phoneme],
 		rom[0] >> 4, rom[1] >> 4, rom[2] >> 4, rom[3] >> 4, rom[4] >> 4, rom[5] >> 4, rom[6] >> 4,
 		rom[3] & 0xf, rom[4] & 0xf, rom[5] & 0xf, rom[6] & 0xf, rom[7]);
-	
+
 	// the STROBE signal resets the phoneme counter
 	m_counter_84 = 0xf;
-	
+
 	// not in the schematics, but necessary to fully reset the request latch
 	m_latch_92 = 0;
 
@@ -179,8 +179,8 @@ mame_printf_debug("%s: STROBE %s (F1=%X F2=%X FC=%X F3=%X F2Q=%X VA=%X FA=%X CL=
 
 
 //-------------------------------------------------
-//  inflection_w - handle a write to the 
-//	inflection bits
+//  inflection_w - handle a write to the
+//  inflection bits
 //-------------------------------------------------
 
 WRITE8_MEMBER( votrax_sc01_device::inflection_w )
@@ -189,7 +189,7 @@ WRITE8_MEMBER( votrax_sc01_device::inflection_w )
 	data &= 3;
 	if (m_inflection == data)
 		return;
-	
+
 	// append an inflection marker
 	m_stream->update();
 	m_inflection = data;
@@ -202,83 +202,83 @@ WRITE8_MEMBER( votrax_sc01_device::inflection_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  update_subphoneme_clock_period - re-compute the 
-//  period of the sub-phoneme clock, as a multiple 
+//  update_subphoneme_clock_period - re-compute the
+//  period of the sub-phoneme clock, as a multiple
 //  of the master clock
 //-------------------------------------------------
 
 void votrax_sc01_device::update_subphoneme_clock_period()
 {
 	assert(m_latch_80 < 128);
-	
+
 /*
-	The sub-phoneme timing circuit is based off the switching capacitor
-	technique described in the Votrax patent. Replacing the capacitor
-	ladder with [Rx] representing the effective resistance, the circuit
-	becomes essentially a pair of op-amps:
+    The sub-phoneme timing circuit is based off the switching capacitor
+    technique described in the Votrax patent. Replacing the capacitor
+    ladder with [Rx] representing the effective resistance, the circuit
+    becomes essentially a pair of op-amps:
 
-		 VM
-		 | i1
-		[R1]
-		 |                       Vc
-		 +----------------------+
-		 |        +---|C1|---+  |
-		[R2]      |          |  |  |\
-		 |Vb i2   |    |\    |  +--++\
-		 +--[Rx]--+----+-\   |     |  >
-		 |             |  >--+-----+-/
-		[R3]      +----++/   Vc    |/
-		 |i3      |    |/
-		 +--------+ Va
-		 |
-		[R4]
-		 |
-		 0
+         VM
+         | i1
+        [R1]
+         |                       Vc
+         +----------------------+
+         |        +---|C1|---+  |
+        [R2]      |          |  |  |\
+         |Vb i2   |    |\    |  +--++\
+         +--[Rx]--+----+-\   |     |  >
+         |             |  >--+-----+-/
+        [R3]      +----++/   Vc    |/
+         |i3      |    |/
+         +--------+ Va
+         |
+        [R4]
+         |
+         0
 
-	We have two op-amps, the left used as a standard amplifier, the right
-	one as a comparator.  The circuit triggers when the two inputs of the
-	right op-amp are equal.
+    We have two op-amps, the left used as a standard amplifier, the right
+    one as a comparator.  The circuit triggers when the two inputs of the
+    right op-amp are equal.
 
-	The left part of the circuit (before C1) is simply a current injector.
-	It's all made of resistors, there's no modulated input, so everything
-	is going to be constant.  If you don't know about op-amps used as
-	amplifiers, you just need to know that it forces its two inputs to
-	have the same voltage while not sending or providing any current
-	through there (only though its output in fact).
+    The left part of the circuit (before C1) is simply a current injector.
+    It's all made of resistors, there's no modulated input, so everything
+    is going to be constant.  If you don't know about op-amps used as
+    amplifiers, you just need to know that it forces its two inputs to
+    have the same voltage while not sending or providing any current
+    through there (only though its output in fact).
 
-	In the schema, the injected current is i2.  Basic equations apply:
-	  Va = R4.i3
-	  Vb = Va + R3.i3
-	  Vb = Va + Rx.i2
-	  Vc = Vb + R2.i1
-	  VM = Vc + R1.i1
-	  i1 = i2 + i3
+    In the schema, the injected current is i2.  Basic equations apply:
+      Va = R4.i3
+      Vb = Va + R3.i3
+      Vb = Va + Rx.i2
+      Vc = Vb + R2.i1
+      VM = Vc + R1.i1
+      i1 = i2 + i3
 
-	And the tipping happens when the voltage on the right of C1 reaches
-	Vc, so:
-	  Vc = Va + i2.T/C1
+    And the tipping happens when the voltage on the right of C1 reaches
+    Vc, so:
+      Vc = Va + i2.T/C1
 
-	(i2 being a constant, the integration is kinda easy)
+    (i2 being a constant, the integration is kinda easy)
 
-	Some maths later:
-	  R3.i3 = Rx.i2 -> i3 = Rx/R3.i2
-	  i1 = (1+Rx/R3).i2
-	  Va + (Rx + R2 + R2.Rx/R3).i2 = Va + T/C1.i2
-	  T = C1*(Rx*(1+R2/R3) + R2)
+    Some maths later:
+      R3.i3 = Rx.i2 -> i3 = Rx/R3.i2
+      i1 = (1+Rx/R3).i2
+      Va + (Rx + R2 + R2.Rx/R3).i2 = Va + T/C1.i2
+      T = C1*(Rx*(1+R2/R3) + R2)
 
-	Which isn't, interestingly though not surprisingly, dependant on Vm,
-	R1 or R4.  And you have to round it to the next multiple of
-	0.2ms+0.1ms due to the clocking on p2 and its offset to p1 (charging
-	only happens on p1 active), and add one p1/p2 cycle (0.2ms) for the
-	discharge.
+    Which isn't, interestingly though not surprisingly, dependant on Vm,
+    R1 or R4.  And you have to round it to the next multiple of
+    0.2ms+0.1ms due to the clocking on p2 and its offset to p1 (charging
+    only happens on p1 active), and add one p1/p2 cycle (0.2ms) for the
+    discharge.
 
-	So now you have your base clock, which you have to multiply by 16 to
-	get the phoneme length.
+    So now you have your base clock, which you have to multiply by 16 to
+    get the phoneme length.
 
-	r2 = 9e3
-	r3 = 1e3
-	c1 = 1000e-12
-	rx = 1/(5KHz * cx)
+    r2 = 9e3
+    r3 = 1e3
+    c1 = 1000e-12
+    rx = 1/(5KHz * cx)
 */
 
 	// determine total capacitance
@@ -290,7 +290,7 @@ void votrax_sc01_device::update_subphoneme_clock_period()
 	if ((m_latch_80 & 0x10) != 0) cx += 86e-12;
 	if ((m_latch_80 & 0x20) != 0) cx += 173e-12;
 	if ((m_latch_80 & 0x40) != 0) cx += 345e-12;
-	
+
 	// apply the equation above to determine charging time
 	// note that the 5kHz listed above for P1 is for a nominal master
 	// clock frequency of 1.28MHz, meaning it is master clock / 128
@@ -298,7 +298,7 @@ void votrax_sc01_device::update_subphoneme_clock_period()
 	double p1_frequency = double(m_master_clock_freq) / double(1 << (P_CLOCK_BIT + 2));
 	double rx = 1.0 / (p1_frequency * cx);
 	double period = 1000e-12 * (rx * (1.0 + 9e3 / 1e3) + 9e3);
-	
+
 	// convert to master clock cycles and round up
 	m_subphoneme_period = UINT32(ceil(period * double(m_master_clock_freq)));
 }
@@ -489,9 +489,9 @@ void votrax_sc01_device::filter_s_to_z(const double *k, double fs, double *a, do
 	double fpeak = sqrt(fabs(k[0]*k[1]-k[2]))/(2*M_PI*k[2]);
 	double zc = 2*M_PI*fpeak/tan(M_PI*fpeak/fs);
 
- 	double m0 = zc*k[0];
- 	double m1 = zc*k[1];
- 	double m2 = zc*zc*k[2];
+	double m0 = zc*k[0];
+	double m1 = zc*k[1];
+	double m2 = zc*zc*k[2];
 
 	a[0] = 1+m0;
 	a[1] = 3+m0;
@@ -578,7 +578,7 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 
 			// update master clock
 			m_master_clock ^= 1;
-			
+
 			// on the falling edge of the master clock, advance the 10-bit counter at 34
 			UINT8 old_latch_72 = m_latch_72;
 			if (m_master_clock == 0)
@@ -590,41 +590,41 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 			}
 
 			// derive beta 1 clock:
-			//	set if m_latch_70.0 == 1
-			//	reset if m_latch_70.0 == 0 
-//			UINT8 old_beta1 = m_beta1;
+			//  set if m_latch_70.0 == 1
+			//  reset if m_latch_70.0 == 0
+//          UINT8 old_beta1 = m_beta1;
 			m_beta1 = BIT(m_latch_70, 0);
 
 			// derive p2 clock:
-			//	set if (m_counter_34.P_CLOCK_BIT & clock) == 1
-			//	reset if (m_counter_34.P_CLOCK_BIT == 0)
+			//  set if (m_counter_34.P_CLOCK_BIT & clock) == 1
+			//  reset if (m_counter_34.P_CLOCK_BIT == 0)
 			UINT8 old_p2 = m_p2;
 			if (BIT(m_counter_34, P_CLOCK_BIT) & m_master_clock)
 				m_p2 = 1;
 			else if (!BIT(m_counter_34, P_CLOCK_BIT))
 				m_p2 = 0;
-			
+
 			// derive p1 clock:
-			//	set if (!m_counter_34.P_CLOCK_BIT & clock) == 1
-			//	reset if (m_counter_34.P_CLOCK_BIT == 1)
-//			UINT8 old_p1 = m_p1;
+			//  set if (!m_counter_34.P_CLOCK_BIT & clock) == 1
+			//  reset if (m_counter_34.P_CLOCK_BIT == 1)
+//          UINT8 old_p1 = m_p1;
 			if (BIT(~m_counter_34, P_CLOCK_BIT) & m_master_clock)
 				m_p1 = 1;
 			else if (BIT(m_counter_34, P_CLOCK_BIT))
 				m_p1 = 0;
-			
+
 			// derive phi2 clock:
-			//	set if (m_counter_34.PHI_CLOCK_BIT & clock) == 1
-			//	reset if (m_counter_34.PHI_CLOCK_BIT == 0)
+			//  set if (m_counter_34.PHI_CLOCK_BIT & clock) == 1
+			//  reset if (m_counter_34.PHI_CLOCK_BIT == 0)
 			UINT8 old_phi2 = m_phi2;
 			if (BIT(m_counter_34, PHI_CLOCK_BIT) & m_master_clock)
 				m_phi2 = 1;
 			else if (!BIT(m_counter_34, PHI_CLOCK_BIT))
 				m_phi2 = 0;
-			
+
 			// derive phi1 clock:
-			//	set if (!m_counter_34.PHI_CLOCK_BIT & clock) == 1
-			//	reset if (m_counter_34.PHI_CLOCK_BIT == 1)
+			//  set if (!m_counter_34.PHI_CLOCK_BIT & clock) == 1
+			//  reset if (m_counter_34.PHI_CLOCK_BIT == 1)
 			UINT8 old_phi1 = m_phi1;
 			if (BIT(~m_counter_34, PHI_CLOCK_BIT) & m_master_clock)
 				m_phi1 = 1;
@@ -632,31 +632,31 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 				m_phi1 = 0;
 
 			// derive alternate phi2 clock:
-			//	set if (m_counter_34.PHI_CLOCK_BIT & clock) == 1
-			//	reset if (m_counter_34.PHI_CLOCK_BIT == 0)
+			//  set if (m_counter_34.PHI_CLOCK_BIT & clock) == 1
+			//  reset if (m_counter_34.PHI_CLOCK_BIT == 0)
 			UINT8 old_phi2_20 = m_phi2_20;
 			if (BIT(m_counter_34, PHI_CLOCK_BIT + 2) & m_master_clock)
 				m_phi2_20 = 1;
 			else if (!BIT(m_counter_34, PHI_CLOCK_BIT + 2))
 				m_phi2_20 = 0;
-			
+
 			// derive alternate phi1 clock:
-			//	set if (!m_counter_34.PHI_CLOCK_BIT & clock) == 1
-			//	reset if (m_counter_34.PHI_CLOCK_BIT == 1)
-//			UINT8 old_phi1_20 = m_phi1_20;
+			//  set if (!m_counter_34.PHI_CLOCK_BIT & clock) == 1
+			//  reset if (m_counter_34.PHI_CLOCK_BIT == 1)
+//          UINT8 old_phi1_20 = m_phi1_20;
 			if (BIT(~m_counter_34, PHI_CLOCK_BIT + 2) & m_master_clock)
 				m_phi1_20 = 1;
 			else if (BIT(m_counter_34, PHI_CLOCK_BIT + 2))
 				m_phi1_20 = 0;
 
 			// determine rising edges of each clock of interest
-//			UINT8 beta1_rising = (old_beta1 ^ m_beta1) & m_beta1;
+//          UINT8 beta1_rising = (old_beta1 ^ m_beta1) & m_beta1;
 			UINT8 p2_rising = (old_p2 ^ m_p2) & m_p2;
-//			UINT8 p1_rising = (old_p1 ^ m_p1) & m_p1;
+//          UINT8 p1_rising = (old_p1 ^ m_p1) & m_p1;
 			UINT8 phi2_rising = (old_phi2 ^ m_phi2) & m_phi2;
 			UINT8 phi1_rising = (old_phi1 ^ m_phi1) & m_phi1;
 			UINT8 phi2_20_rising = (old_phi2_20 ^ m_phi2_20) & m_phi2_20;
-//			UINT8 phi1_20_rising = (old_phi1_20 ^ m_phi1_20) & m_phi1_20;
+//          UINT8 phi1_20_rising = (old_phi1_20 ^ m_phi1_20) & m_phi1_20;
 			UINT8 a0_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 0);
 			UINT8 a2_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 2);
 			UINT8 _125k_rising = BIT((old_latch_72 ^ m_latch_72) & m_latch_72, 3);
@@ -673,7 +673,7 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 			UINT8 old_clock_88 = m_clock_88;
 			m_clock_88 = !m_latch_42;	//!(m_latch_42 | m_phi1); -- figure 7 seems to be wrong here
 			UINT8 clock_88_rising = (old_clock_88 ^ m_clock_88) & m_clock_88;
-			
+
 			// the A/R line holds the counter in reset except during phoneme processing,
 			// when it is clocked on the rising edge of the subphoneme timer clock
 			if (m_internal_request != CLEAR_LINE)
@@ -683,11 +683,11 @@ if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 				m_counter_84 = (m_counter_84 - 1) & 0x0f;
 mame_printf_debug("counter=%d\n", m_counter_84);
 			}
-			
+
 			// clock the zero count latch
 			if (p2_rising)
 				m_latch_92 = ((m_counter_84 == 0) | (m_latch_92 << 1)) & 3;
-			
+
 			// once both bits are set, the request line goes high
 			if (m_latch_92 == 3)
 			{
@@ -708,15 +708,15 @@ mame_printf_debug("counter=%d\n", m_counter_84);
 			UINT8 romdata = m_rom[(m_phoneme << 3) | ((m_counter_34 >> 4) & 7)];
 
 			// update the ROM data; ROM format is (upper nibble/lower nibble)
-			//	+00 = F1 parameter / 0
-			//	+01 = F2 parameter / 0
-			//	+02 = FC parameter / 0
-			//	+03 = F3 parameter / CL
-			//	+04 = F2Q Parameter / CLD
-			//	+05 = VA Parameter / VD
-			//	+06 = FA Parameter / PAC
-			//	+07 = Phoneme timing (full 7 bits)
-			
+			//  +00 = F1 parameter / 0
+			//  +01 = F2 parameter / 0
+			//  +02 = FC parameter / 0
+			//  +03 = F3 parameter / CL
+			//  +04 = F2Q Parameter / CLD
+			//  +05 = VA Parameter / VD
+			//  +06 = FA Parameter / PAC
+			//  +07 = Phoneme timing (full 7 bits)
+
 			// latch a new value from ROM on phi2
 			UINT8 a = m_latch_72 & 7;
 			UINT8 romdata_swapped;
@@ -728,26 +728,26 @@ mame_printf_debug("counter=%d\n", m_counter_84);
 					case 3:
 						m_srff_132 = m_srff_114 & BIT(~romdata, 3);
 						break;
-				
+
 					// update CLD
 					case 4:
 						romdata_swapped = (BIT(romdata, 0) << 3) | (BIT(romdata, 1) << 2) | (BIT(romdata, 2) << 1) | (BIT(romdata, 3) << 0);
 						if (m_counter_84 != 0 && romdata_swapped == (m_counter_84 ^ 0xf))
 							m_srff_114 = 1;
 						break;
-				
+
 					// update VD
 					case 5:
 						romdata_swapped = (BIT(romdata, 0) << 3) | (BIT(romdata, 1) << 2) | (BIT(romdata, 2) << 1) | (BIT(romdata, 3) << 0);
 						if (m_counter_84 != 0 && romdata_swapped == (m_counter_84 ^ 0xf))
 							m_srff_112 = 1;
 						break;
-				
+
 					// update FF == PAC & (VA | FA)
 					case 6:
 						m_srff_142 = BIT(romdata, 3);
 						break;
-					
+
 					// update PH
 					case 7:
 						if (m_latch_80 != (romdata & 0x7f))
@@ -762,7 +762,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 						break;
 				}
 			}
-			
+
 			//==============================================
 			//
 			// Glottal circuit (patent figure 6)
@@ -787,7 +787,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 						m_counter_224 = (m_counter_224 + 1) & 0xf;
 				}
 			}
-			
+
 			// clock remaining glottal counters (220, 222, 236) on rising edge of phi2
 			if (phi2_20_rising)
 			{
@@ -800,7 +800,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 					else
 						m_counter_220 = (m_counter_220 + 1) & 0xf;
 				}
-				
+
 				// counter 222 is always enabled
 				if (1)
 				{
@@ -810,12 +810,12 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 					else
 						m_counter_222 = (m_counter_222 + 1) & 0xf;
 				}
-				
+
 				// counter 236 is always enabled
 				if (1)
 				{
 					m_counter_236 = (m_counter_236 + 1) & 0xf;
-				
+
 					// rising edge of Q1 from counter 236 clocks counter 234
 					if ((m_counter_236 & 0x3) == 0x2)
 					{
@@ -825,36 +825,36 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 					}
 				}
 			}
-			
+
 			// update FGATE state
 			if (counter_220_tc)
 				m_fgate = 0;
 			if (counter_224_tc)
 				m_fgate = 1;
-			
+
 			// apply asynchronous clear to counters 234/236
 			if (counter_220_tc && m_phi1_20)
 				m_counter_236 = m_counter_234 = 0;
-				
+
 			// derive glottal circuit output signals
 #if !TEMP_HACKS
 			UINT8 old_glottal_sync = m_glottal_sync;
 #endif
 			m_glottal_sync = (m_counter_234 == 0);
 			glottal_out = s_glottal_wave[m_counter_234];
-			
+
 			//==============================================
 			//
 			// Transition circuit (patent figure 3a/3b)
 			//
 			//==============================================
-			
+
 			// divide 1.25k clock by 2 (lower-left of 46)
 			UINT8 old_0625_clock = m_0625_clock;
 			if (_125k_rising)
 				m_0625_clock = !m_0625_clock;
 			UINT8 _0625_rising = (old_0625_clock ^ m_0625_clock) & m_0625_clock;
-			
+
 			// update counter above
 			if (_0625_rising)
 			{
@@ -863,7 +863,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 				else
 					m_counter_46 = (m_counter_46 + 1) & 0xf;
 			}
-			
+
 			// and then the latch to the right
 			if (a2_rising)
 				m_latch_46 = (BIT(m_counter_46, 1) << 0) |
@@ -885,21 +885,21 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 					if (!(m_srff_142 & !((m_fa == 0) & (m_va == 0))) && (m_latch_46 & 0x3) == 0x3)
 						ram_write = 1;
 					break;
-				
+
 				case 5:
 					if ((m_latch_46 & 0xc) == 0xc && m_srff_112)
 						ram_write = 1;
 					break;
-				
+
 				case 6:
 					if ((m_latch_46 & 0xc) == 0xc && m_srff_114)
 						ram_write = 1;
 					break;
 			}
-			
+
 			// gate on the phi2 clock (OR gate @ 172)
 			ram_write &= m_phi2;
-			
+
 			// write the transitioned values to RAM if requested
 			// (note we consolidate the serial addition and clocking steps here)
 			if (ram_write)
@@ -907,7 +907,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 				UINT8 old = (m_latch_168 << 4) | m_latch_170;
 				m_ram[a] = old - (old >> 3) + ((romdata & 0xf0) >> 3);
 			}
-			
+
 			// latch some parameter values on rising edge of phi2
 			if (phi2_rising)
 			{
@@ -916,17 +916,17 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 					case 2:
 						m_fc = m_latch_168;
 						break;
-					
+
 					case 5:
 						m_va = m_latch_168;
 						break;
-					
+
 					case 6:
 						m_fa = m_latch_168;
 						break;
 				}
 			}
-			
+
 			// latch remaining parameter values on rising edge of (phi2 & glottal sync)
 #if TEMP_HACKS
 			if (phi2_rising)
@@ -940,20 +940,20 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 					case 0:
 						m_f1 = m_latch_168;
 						break;
-					
+
 					case 1:
 						m_f2 = (m_latch_168 << 1) | (m_latch_170 >> 3);
 						break;
-					
+
 					case 3:
 						m_f3 = m_latch_168;
 						break;
-					
+
 					case 4:
 						m_f2q = m_latch_168;
 						break;
 				}
-			
+
 			// latch value from RAM on rising edge of phi1
 			if (phi1_rising)
 			{
@@ -966,13 +966,13 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 			// Noise generator circuit (patent figure 8)
 			//
 			//==============================================
-			
+
 			// nose is clocked by the NOR of /FA and P1
 			UINT8 old_noise_clock = m_noise_clock;
 			m_noise_clock = !((m_fa == 0) | m_p1);
 			UINT8 noise_clock_rising = (old_noise_clock ^ m_noise_clock) & m_noise_clock;
 			UINT8 noise_clock_falling = (old_noise_clock ^ m_noise_clock) & old_noise_clock;
-			
+
 			// falling edge clocks the shift register
 			if (noise_clock_falling)
 			{
@@ -981,20 +981,20 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 				// XOR'ed input goes into d4, which shifts in to d2, then d3, then d1
 				// thus the full 18-bit value is effectively
 				//
-				//	d4 = (m_shift_252 >> 0) & 0x1f;
-				//	d2 = (m_shift_252 >> 5) & 0x1f;
-				//	d3 = (m_shift_252 >> 10) & 0xf;
-				//	d1 = (m_shift_252 >> 14) & 0xf;
+				//  d4 = (m_shift_252 >> 0) & 0x1f;
+				//  d2 = (m_shift_252 >> 5) & 0x1f;
+				//  d3 = (m_shift_252 >> 10) & 0xf;
+				//  d1 = (m_shift_252 >> 14) & 0xf;
 				//
 				// input at the low end is ((d1+4 ^ d2+5) ^ (d4+4 ^ d4+5)) ^ !(counter2 | counter3)
 				// output is tapped at d3+4
 
 				UINT32 old_shift = m_shift_252;
 				m_shift_252 <<= 1;
-				m_shift_252 |= ((BIT(old_shift, 17) ^ BIT(old_shift, 9)) ^ (BIT(old_shift, 3) ^ BIT(old_shift, 4))) ^ 
+				m_shift_252 |= ((BIT(old_shift, 17) ^ BIT(old_shift, 9)) ^ (BIT(old_shift, 3) ^ BIT(old_shift, 4))) ^
 								 ((m_counter_250 & 0xc) == 0);
 			}
-			
+
 			// rising edge clocks the counter
 			if (noise_clock_rising)
 			{
@@ -1004,7 +1004,7 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 				else
 					m_counter_250 = (m_counter_250 + 1) & 0xf;
 			}
-			
+
 			// compute final noise out signal
 			noise_out_digital = !(BIT(m_shift_252, 13) & (m_fgate | (m_va == 0)));
 		}
@@ -1132,9 +1132,9 @@ mame_printf_debug("[PH=%02X]\n", m_latch_80);
 		double s4_out = apply_filter(m_s4i_hist, m_s4_hist, a, b);
 		shift_hist(s4_out, m_s4_hist, 4);
 
-		
+
 		// TODO: apply closure circuit (undocumented)
-		
+
 		// output the current result
 		*dest++ = INT16(s4_out * 4000);
 	}
@@ -1168,24 +1168,24 @@ void votrax_sc01_device::device_start()
 	m_stream = stream_alloc(0, 1, m_master_clock_freq / 16);
 	m_phoneme_timer = timer_alloc();
 	m_rom = subregion("phoneme")->base();
-	
+
 	// reset inputs
 	m_inflection = 0;
 	m_phoneme = 0x3f;
-	
+
 	// reset outputs
 	m_request_func.resolve(m_request_cb, *this);
 	m_request_state = ASSERT_LINE;
 	m_internal_request = ASSERT_LINE;
-	
+
 	// save inputs
 	save_item(NAME(m_inflection));
 	save_item(NAME(m_phoneme));
-	
+
 	// save outputs
 	save_item(NAME(m_request_state));
 	save_item(NAME(m_internal_request));
-	
+
 	// save timing circuit
 	save_item(NAME(m_master_clock_freq));
 	save_item(NAME(m_master_clock));
@@ -1203,14 +1203,14 @@ void votrax_sc01_device::device_start()
 	save_item(NAME(m_latch_42));
 	save_item(NAME(m_counter_84));
 	save_item(NAME(m_latch_92));
-	
+
 	// save low parameter clocking
 	save_item(NAME(m_srff_132));
 	save_item(NAME(m_srff_114));
 	save_item(NAME(m_srff_112));
 	save_item(NAME(m_srff_142));
 	save_item(NAME(m_latch_80));
-	
+
 	// save glottal circuit
 	save_item(NAME(m_counter_220));
 	save_item(NAME(m_counter_222));
@@ -1234,7 +1234,7 @@ void votrax_sc01_device::device_start()
 	save_item(NAME(m_f2q));
 	save_item(NAME(m_va));
 	save_item(NAME(m_fa));
-	
+
 	// save noise generator circuit
 	save_item(NAME(m_noise_clock));
 	save_item(NAME(m_shift_252));
@@ -1263,11 +1263,11 @@ void votrax_sc01_device::device_reset()
 {
 	// set the initial state
 	m_stream->update();
-	
+
 	// reset inputs
 	m_phoneme = 0x3f;
 	m_request_func(m_internal_request = m_request_state = ASSERT_LINE);
-	
+
 	// reset timing circuit
 	m_master_clock = 0;
 	m_counter_34 = 0;
@@ -1284,7 +1284,7 @@ void votrax_sc01_device::device_reset()
 	m_latch_42 = 0;
 	m_counter_84 = 0;
 	m_latch_92 = 0;
-	
+
 	// reset low parameter clocking
 	m_srff_132 = 0;
 	m_srff_114 = 0;
@@ -1292,7 +1292,7 @@ void votrax_sc01_device::device_reset()
 	m_srff_142 = 0;
 	m_latch_80 = 50;
 	update_subphoneme_clock_period();
-	
+
 	// reset glottal circuit
 	m_counter_220 = 0;
 	m_counter_222 = 0;
@@ -1301,7 +1301,7 @@ void votrax_sc01_device::device_reset()
 	m_counter_236 = 0;
 	m_fgate = 0;
 	m_glottal_sync = 0;
-	
+
 	// reset transition circuit
 	m_0625_clock = 0;
 	m_counter_46 = 0;
@@ -1316,7 +1316,7 @@ void votrax_sc01_device::device_reset()
 	m_f2q = 0;
 	m_va = 0;
 	m_fa = 0;
-	
+
 	// reset noise circuit
 	m_noise_clock = 0;
 	m_shift_252 = 0;
@@ -1339,7 +1339,7 @@ void votrax_sc01_device::device_reset()
 
 //-------------------------------------------------
 //  device_clock_changed - handle dynamic clock
-//	changes by altering our output frequency
+//  changes by altering our output frequency
 //-------------------------------------------------
 
 void votrax_sc01_device::device_clock_changed()
@@ -1354,10 +1354,10 @@ void votrax_sc01_device::device_clock_changed()
 			m_stream->update();
 			m_stream->set_sample_rate(newfreq / 16);
 		}
-		
+
 		// determine how many clock ticks remained on the phoneme timer
 		UINT64 remaining = m_phoneme_timer->remaining().as_ticks(m_master_clock_freq);
-		
+
 		// recompute the master clock
 		m_master_clock_freq = newfreq;
 
@@ -1376,11 +1376,11 @@ void votrax_sc01_device::device_timer(emu_timer &timer, device_timer_id id, int 
 {
 	// force a stream update
 	m_stream->update();
-	
+
 	// if we're requesting more data, no need for timing
 	if (m_request_state == ASSERT_LINE)
 		return;
-	
+
 	// if we're supposed to have fired, do it now
 	if (m_internal_request == ASSERT_LINE)
 	{
@@ -1397,7 +1397,7 @@ mame_printf_debug("%s: REQUEST\n", timer.machine().time().as_string(3));
 			clocks_until_request += m_subphoneme_period - m_subphoneme_count;
 		clocks_until_request += m_subphoneme_period * (m_counter_84 - 1);
 	}
-			
+
 	// plus 1/2
 	clocks_until_request = MAX(clocks_until_request, (1 << P_CLOCK_BIT) / 2);
 	timer.adjust(attotime::from_ticks(clocks_until_request, m_master_clock_freq));

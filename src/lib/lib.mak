@@ -295,7 +295,7 @@ else
 ARCHFLAGS = -m32 -arch i386 -DWORDS_BIGENDIAN=0
 endif
 endif	# BIGENDIAN
-else    # ifeq ($(TARGETOS),macosx) 
+else    # ifeq ($(TARGETOS),macosx)
 ARCHFLAGS = -DWORDS_BIGENDIAN=0
 endif   # ifeq ($(TARGETOS),macosx)
 

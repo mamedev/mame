@@ -1965,7 +1965,7 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(dragngun)
 	MCFG_SCREEN_VBLANK_STATIC(dragngun)
-	
+
 	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
 
 	MCFG_DECO16IC_ADD("tilegen1", dragngun_deco16ic_tilegen1_intf)
@@ -2038,7 +2038,7 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(dragngun)
 	MCFG_SCREEN_VBLANK_STATIC(dragngun)
-	
+
 	MCFG_BUFFERED_SPRITERAM32_ADD("spriteram")
 
 	MCFG_DECO16IC_ADD("tilegen1", lockload_deco16ic_tilegen1_intf)

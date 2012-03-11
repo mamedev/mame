@@ -27,7 +27,7 @@ public:
 
 	UINT16    m_inp[3];
 	UINT16    m_soundcommand;
-	
+
 	required_device<buffered_spriteram16_device> m_spriteram;
 };
 

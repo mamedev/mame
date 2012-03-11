@@ -29,7 +29,7 @@ public:
 	UINT8    m_soundstate;
 	UINT8    m_adpcm;
 	UINT8    m_nmi_mask;
-	
+
 	required_device<buffered_spriteram8_device> m_spriteram;
 };
 

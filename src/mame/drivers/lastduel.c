@@ -521,7 +521,7 @@ static MACHINE_CONFIG_START( lastduel, lastduel_state )
 	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(lastduel)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
-	
+
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
 	MCFG_GFXDECODE(lastduel)

@@ -307,7 +307,7 @@ inline void save_manager::save_item(const char *module, const char *tag, int ind
 
 
 //-------------------------------------------------
-//  save_item - specialized save_item for 
+//  save_item - specialized save_item for
 //  dynamic_arrays
 //-------------------------------------------------
 

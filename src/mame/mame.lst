@@ -2356,7 +2356,7 @@ batlgear		// E68 (c) 1999 Taito
 pwrshovl        // E74 (c) 1999 Taito
 landhigh		// E82 (c) 1999 Taito
 batlgr2			// E87 (c) 2000 Taito (2.04J)
-batlgr2a   		// E87 (c) 2000 Taito (2.01J)
+batlgr2a		// E87 (c) 2000 Taito (2.01J)
 
 // Toaplan games
 perfrman		// (c) 1985 Data East Corporation (Japan)
@@ -11900,8 +11900,11 @@ sc1bartk
 sc1barcd
 sc1barcda
 sc1bigmt
+sc1btclka
+sc1btclkb
 sc1calyp
 sc1carro
+sc1cdmp
 sc1cshat
 sc1cshata
 sc1cshatb
@@ -11964,6 +11967,7 @@ sc1dblcha
 sc1dream	// Dream Machine (Bellfruit)
 sc1final	// Final Touch (Bellfruit)
 sc1flash	// Flash (Bellfruit)
+sc1frpusa
 sc1fruit	// Fruit Lines (Bellfruit)
 sc1frtln	// Fruitlines (Bellfruit)
 sc1funh		// Fun House Club (Bellfruit)
@@ -11975,6 +11979,7 @@ sc1tiara	// Tiara (Elam)
 sc1gprix	// Grand Prix (Bellfruit)
 sc1gslam	// Grand Slam (Bellfruit) (Dutch)
 sc1happy	// Happy Hour (Bellfruit - Elam)
+sc1hfccp
 sc1impc		// Impact (Bellfruit)
 sc1kings	// Kings Club (Bellfruit)
 sc1linx		// Linx (Bellfruit)

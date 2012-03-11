@@ -1911,7 +1911,7 @@ CPU_GET_INFO( m68000 )
 
 static CPU_INIT( m68301 )
 {
-//	m68ki_cpu_core *m68k = get_safe_token(device);
+//  m68ki_cpu_core *m68k = get_safe_token(device);
 
 	CPU_INIT_CALL(m68000);
 
@@ -1941,8 +1941,8 @@ static CPU_INIT( m68307 )
 	CPU_INIT_CALL(m68000);
 
 	/* basic CS logic, timers, mbus, serial logic
-	   set via remappable register
-	*/
+       set via remappable register
+    */
 	new(&m68k->memory) m68k_memory_interface;
 	m68k->memory.init16_68307(*m68k->program);
 

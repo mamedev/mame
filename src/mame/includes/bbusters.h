@@ -25,7 +25,7 @@ public:
 	UINT16 *m_pf2_data;
 	UINT16 *m_pf1_scroll_data;
 	UINT16 *m_pf2_scroll_data;
-	
+
 	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram2;
 };

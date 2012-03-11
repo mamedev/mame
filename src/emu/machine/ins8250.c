@@ -21,7 +21,7 @@ the BIOS dependent on the flaws being present, so subsequent parts like the
 
 The original 8250 pulses the interrupt line if a higher priority interrupt is
 cleared but a lower priority one is still active.  It also clears the tsre bit
-for a moment before loading the tsr from the thr.  These may be the bugs the 
+for a moment before loading the tsr from the thr.  These may be the bugs the
 PC and XT depend on as the 8250A and up fix them.
 
 INS8250-B
@@ -140,7 +140,7 @@ void ins8250_uart_device::update_interrupt()
 		{
 			m_regs.iir |=0x04;
 			if ((m_int_pending & COM_INT_PENDING_CHAR_TIMEOUT) == 0x11)
-				m_regs.iir |= 0x08; 
+				m_regs.iir |= 0x08;
 		}
 		else if (m_regs.ier & m_int_pending & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY)
 			m_regs.iir |=0x02;
@@ -390,16 +390,16 @@ void ns16550_device::rcv_complete()
 {
 	if(!(m_regs.fcr & 1))
 		return ins8250_uart_device::rcv_complete();
-	
+
 	receive_register_extract();
-	
+
 	if(m_rnum == 16)
 	{
 		m_regs.lsr |= 0x02; //overrun
 		trigger_int(COM_INT_PENDING_RECEIVER_LINE_STATUS);
 		return;
 	}
-		
+
 	m_regs.lsr |= 0x01;
 	m_rfifo[m_rhead] = get_received_char();
 	++m_rhead &= 0x0f;
@@ -568,7 +568,7 @@ UINT8 ns16550_device::pop_rx()
 {
 	UINT8 data = m_rfifo[m_rtail];
 	clear_int(COM_INT_PENDING_CHAR_TIMEOUT & ~1); // don't clear bit 1 yet
-	
+
 	if(m_rnum)
 	{
 		++m_rtail &= 0x0f;
@@ -576,13 +576,13 @@ UINT8 ns16550_device::pop_rx()
 	}
 	else
 		data = 0;
-	
+
 	if(m_rnum < m_rintlvl)
 		clear_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 
 	if(m_rnum)
 		set_timer();
-	else 
+	else
 	{
 		m_timeout->adjust(attotime::never);
 		m_regs.lsr &= ~1;
