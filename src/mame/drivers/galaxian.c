@@ -2166,7 +2166,6 @@ MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( fantastc, galaxian_base )
-//	MCFG_WATCHDOG_VBLANK_INIT(0)
 
 	/* alternate memory map */
 	MCFG_CPU_MODIFY("maincpu")

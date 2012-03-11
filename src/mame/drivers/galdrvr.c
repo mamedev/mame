@@ -6346,7 +6346,7 @@ GAME( 198?, thepitm,  thepit,   mooncrst, thepitm,  thepitm,  ROT90,  "bootleg (
 GAME( 1982, skybase,  0,        mooncrst, skybase,  skybase,  ROT90,  "Omori Electric Co., Ltd.", "Sky Base", GAME_SUPPORTS_SAVE )
 
 /* larger romspace, 2*AY8910, based on Super Star Crest board? */
-GAME( 1980?,fantastc, 0,        fantastc, fantastc, fantastc, ROT90,  "Taito do Brasil", "Fantastic", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 198?, fantastc, 0,        fantastc, fantastc, fantastc, ROT90,  "Taito do Brasil", "Fantastic", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
 
 /* extra ROMs, protection, and sound hardware replaced with AY8910 */
 GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug,  jumpbug,  ROT90,  "Hoei (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE ) // or by Alpha Denshi Co. under contract from Hoei?
