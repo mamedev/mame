@@ -284,9 +284,9 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 				else
 				{
 					m_out_dtr_func(m_regs.mcr & 1);
-					m_out_rts_func((m_regs.mcr & 2) && 1);
-					m_out_out1_func((m_regs.mcr & 4) && 1);
-					m_out_out2_func((m_regs.mcr & 8) && 1);
+					m_out_rts_func(m_regs.mcr & 2);
+					m_out_out1_func(m_regs.mcr & 4);
+					m_out_out2_func(m_regs.mcr & 8);
 				}
 			}
             break;
@@ -476,22 +476,22 @@ void ins8250_uart_device::update_msr(int bit, UINT8 state)
 
 WRITE_LINE_MEMBER(ins8250_uart_device::dcd_w)
 {
-	update_msr(3, (state&&1));
+	update_msr(3, (state&1));
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::dsr_w)
 {
-	update_msr(1, (state&&1));
+	update_msr(1, (state&1));
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::ri_w)
 {
-	update_msr(2, (state&&1));
+	update_msr(2, (state&1));
 }
 
 WRITE_LINE_MEMBER(ins8250_uart_device::cts_w)
 {
-	update_msr(0, (state&&1));
+	update_msr(0, (state&1));
 }
 
 void ins8250_uart_device::device_start()
