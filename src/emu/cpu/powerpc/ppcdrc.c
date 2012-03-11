@@ -3190,17 +3190,46 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);					// <update flags>
 			return TRUE;
 
-		case 0x018:	/* SLWx */
+        case 0x018:	/* SLWx */
+            UML_AND(block, I0, R32(G_RB(op)), 0x3f);            // and i0, rb, 0x3f
+            UML_CMP(block, I0, 31);                             // cmp i0, #31
+            UML_JMPc(block, COND_BE, compiler->labelnum);       // be 0:
+
+            UML_MOV(block, R32(G_RA(op)), 0x0);                 // mov ra, #0
+            if (op & M_RC)
+            {
+                UML_MOV(block, CR32(0), 0x2);                   // CR = EQ
+                UML_AND(block, CR32(0), CR32(0), ~0x1);
+                UML_OR(block, CR32(0), CR32(0), XERSO32);
+            }
+            UML_JMP(block, compiler->labelnum+1);               // jmp 1:
+
+            UML_LABEL(block, compiler->labelnum++);             // 0:
 			UML_SHL(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));					// shl     ra,rs,rb
 			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);					// <update flags>
-			return TRUE;
+
+            UML_LABEL(block, compiler->labelnum++);             // 1:
+            return TRUE;
 
 		case 0x218:	/* SRWx */
-			UML_MOV(block, I0, R32(G_RS(op)));											// mov     i0,rs
-			UML_TEST(block, R32(G_RB(op)), 0x20);										// test    rb,0x20
-			UML_MOVc(block, COND_NZ, I0, 0);										// mov     i0,0,nz
-			UML_SHR(block, R32(G_RA(op)), I0, R32(G_RB(op)));							// shr     ra,i0,rb
+            UML_AND(block, I0, R32(G_RB(op)), 0x3f);            // and i0, rb, 0x3f
+            UML_CMP(block, I0, 31);                             // cmp i0, #31
+            UML_JMPc(block, COND_BE, compiler->labelnum);       // be 0:
+
+            UML_MOV(block, R32(G_RA(op)), 0x0);                 // mov ra, #0
+            if (op & M_RC)
+            {
+                UML_MOV(block, CR32(0), 0x2);                   // CR = EQ
+                UML_AND(block, CR32(0), CR32(0), ~0x1);
+                UML_OR(block, CR32(0), CR32(0), XERSO32);
+            }
+            UML_JMP(block, compiler->labelnum+1);               // jmp 1:
+
+            UML_LABEL(block, compiler->labelnum++);             // 0:
+			UML_SHR(block, R32(G_RA(op)), R32(G_RS(op)), R32(G_RB(op)));							// shr     ra,i0,rb
 			generate_compute_flags(ppc, block, desc, op & M_RC, 0, FALSE);					// <update flags>
+
+            UML_LABEL(block, compiler->labelnum++);             // 1:
 			return TRUE;
 
 		case 0x318:	/* SRAWx */
