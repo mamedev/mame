@@ -955,7 +955,7 @@ ROM_START( dynablstb2 )
     ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "bbm-sp.23",    0x0000, 0x10000, CRC(251090cd) SHA1(9245072c1afbfa3e4a1d1549942765d58bd78ed3) )
+	ROM_LOAD( "db1-17.bin",    0x0000, 0x10000, CRC(e693c32f) SHA1(b6f228d26318718eedae765de9479706a3e4c38d) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "bbm-c0.66",    0x000000, 0x40000, CRC(695d2019) SHA1(3537e9fb0e7dc13d6113b4af71cba3c73392335a) )
