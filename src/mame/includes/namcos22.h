@@ -28,6 +28,8 @@ enum
 	NAMCOS22_DIRT_DASH
 };
 
+typedef void (*namcos22_output_callback)(int offset, UINT16 data);
+
 class namcos22_state : public driver_device
 {
 public:
@@ -106,6 +108,8 @@ public:
 	UINT8 *m_dirtypal;
 	bitmap_ind16 *m_mix_bitmap;
 	tilemap_t *m_bgtilemap;
+	namcos22_output_callback m_sw1_output;
+	namcos22_output_callback m_sw2_output;
 };
 
 

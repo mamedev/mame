@@ -2459,8 +2459,26 @@ static READ32_HANDLER( namcos22_mcuram_r )
 static WRITE32_HANDLER( namcos22_mcuram_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+		
+	if ( ACCESSING_BITS_0_15 )
+	{
+		if (state->m_sw1_output)
+		{
+			state->m_sw1_output(offset, data);
+		}
+	}
+	else
+	{
+		if (state->m_sw2_output)
+		{			
+			state->m_sw2_output(offset, data>>16);
+		}
+	}
+	
 	COMBINE_DATA(&state->m_shareram[offset]);
+	
 }
+
 
 static READ32_HANDLER( namcos22_gun_r )
 {
@@ -2686,16 +2704,6 @@ static WRITE8_HANDLER( mcu_port7_w )
 static READ8_HANDLER( mcu_port7_r )
 {
 	return 0;
-}
-
-static WRITE8_HANDLER( propcycle_mcu_port5_w )
-{
-	// prop cycle outputs:
-	// bit 1 = fan
-	// bit 2 = button light
-
-	output_set_value("fan0", data & 1);
-	set_led_status(space->machine(), 0, data & 2);
 }
 
 static READ8_HANDLER( propcycle_mcu_adc_r )
@@ -5508,6 +5516,175 @@ static void install_141_speedup(running_machine &machine)
 		machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(mcu141_speedup_r), FUNC(mcu_speedup_w));
 }
 
+/*****************************************************************************************************/
+// Some of the data is stored visually, with the leftmost bit corresponding to the least significant bit.
+// As a result the values must be un-reversed before being used.
+// Taken from http://www-graphics.stanford.edu/~seander/bithacks.html#ReverseByteWith64BitsDiv
+static unsigned char reverse(UINT16 b)
+{
+	return ((unsigned char)b * 0x0202020202ULL & 0x010884422010ULL) % 1023;
+}
+
+static void acedrvr_sw1_output( int offset , UINT16 data )
+{
+	if (offset == 16)
+	{		
+		//These LEDs are arranged in a figure 8.
+		output_set_value("Uknown_led", BIT(data,0) ^ 0x01);			
+		output_set_value("Middle_led", BIT(data,1) ^ 0x01);
+		output_set_value("Top_left_led", BIT(data,2) ^ 0x01);
+		output_set_value("Bottom_left_led", BIT(data,3) ^ 0x01);
+		output_set_value("Bottom_led", BIT(data,4) ^ 0x01);
+		output_set_value("Bottom_right_led", BIT(data,5) ^ 0x01);
+		output_set_value("Top_led", BIT(data,6) ^ 0x01);
+		output_set_value("Top_right_led", BIT(data,7) ^ 0x01);				
+	}
+}
+
+static void acedrvr_sw2_output( int offset , UINT16 data )
+{
+	switch ( offset )
+	{		
+		case 8:			
+			output_set_value("Signal_Green_lamp", BIT(data,0));
+			output_set_value("Base_vibration", BIT(data,2));
+			output_set_value("Wheel_force", BIT(data,3));
+			output_set_value("Top_lamp", BIT(data,4));
+			output_set_value("Signal_Red_lamp", BIT(data,5));			
+			break;		
+		case 16:			
+			output_set_value("Wheel_force_direction", BIT(data,1));
+			output_set_value("Wheel_force_magnitude",((reverse(data) & 0x3F) ^ 0x3F));			
+			break;			
+		default:
+			break;
+	}
+}
+
+static void airco22_sw1_output( int offset , UINT16 data )
+{
+	if ( offset == 8011)
+		output_set_value("Start_lamp", BIT(data,1));
+
+}
+
+static void cybrcomm_sw2_output( int offset , UINT16 data )
+{
+	if ( offset == 8)
+		output_set_value("View_switch_lamp", BIT(data,4));
+
+}
+
+static void propcycl_sw1_output( int offset , UINT16 data )
+{
+	if ( offset == 8011)
+	{
+		output_set_value("Fan_motor", BIT(data,1));
+		output_set_value("Button_lamp", BIT(data,2));
+	}
+}
+
+static void raveracw_sw2_output( int offset , UINT16 data )
+{
+	if ( offset == 16)
+	{							    
+		output_set_value("Wheel_force_direction", BIT(data,1));
+		output_set_value("Wheel_force_magnitude",((reverse(data) & 0x3F) ^ 0x3F));	
+	}
+}
+
+static void dirtdash_sw1_output( int offset , UINT16 data )
+{
+	if ( offset >= 7680 && offset <= 7695)
+	{
+			/*
+			The wheel force direction and magnitude interact with the wheel 
+			position in a way that isn't fully understood.  This causes 
+			what appear to be spurious changes in direction and magnitude.
+			*/
+			output_set_value("Wheel_force_direction", BIT(data,1));
+			output_set_value("Wheel_force_magnitude",((reverse(data) & 0x3F) ^ 0x3F));	
+	}
+	else if ( offset == 8011)
+	{			
+			output_set_value("Wheel_force", BIT(data,1));
+			output_set_value("Valve_front_left", BIT(data,4));
+			output_set_value("Valve_front_right", BIT(data,5));
+			output_set_value("Valve_rear_left", BIT(data,6));
+			output_set_value("Valve_rear_right", BIT(data,7));				
+	}
+}
+
+static void alpiner_sw1_output( int offset , UINT16 data )
+{
+	if ( offset == 8011)
+	{
+		//Direction 0 is locking and 1 is freeing.
+		output_set_value("Motor_direction", BIT(data,1));
+		output_set_value("Motor_power", BIT(data,2));
+		output_set_value("Decision_lamp", BIT(data,4));
+		output_set_value("Left_selection_lamp", BIT(data,5));
+		output_set_value("Right_selection_lamp", BIT(data,6));
+	}
+}
+
+static void alpiner2_sw1_output( int offset , UINT16 data )
+{
+	if ( offset == 8011)
+	{
+		//Direction 0 is locking and 1 is freeing.
+		output_set_value("Motor_direction", BIT(data,1));
+		output_set_value("Motor_power", BIT(data,2));
+		output_set_value("View_switch_lamp", BIT(data,4));
+		output_set_value("Left_selection_lamp", BIT(data,5));
+		output_set_value("Right_selection_lamp", BIT(data,6));
+	}
+}
+
+static void aquajet_sw1_output( int offset , UINT16 data )
+{
+	if ( offset == 8011)
+	{
+		output_set_value("Start_lamp", BIT(data,1));
+		output_set_value("Fan_motor", BIT(data,2));
+		output_set_value("Air_spring", BIT(data,7));
+	}
+}
+
+static void cybrcyc_sw1_output( int offset , UINT16 data )
+{
+	if ( offset == 8011)
+	{
+		output_set_value("bit0", BIT(data,0));
+		output_set_value("1_lamp", BIT(data,1));
+		output_set_value("2_lamp", BIT(data,2));
+		output_set_value("3_lamp", BIT(data,3));
+		output_set_value("4_lamp", BIT(data,4));
+		output_set_value("Red_lamp", BIT(data,5));
+		output_set_value("Yellow_lamp", BIT(data,6));
+		output_set_value("Blue_lamp", BIT(data,7));
+		output_set_value("Green_lamp", BIT(data,8));
+		output_set_value("View_switch_lamp", BIT(data,9));
+	}
+}
+
+static void timecris_sw1_output( int offset , UINT16 data )
+{
+	if ( offset == 8011)
+		output_set_value("Gun_recoil", BIT(data,1));
+}
+
+static void tokyowar_sw1_output( int offset , UINT16 data )
+{
+	if ( offset == 8011)
+	{
+		output_set_value("View_switch_lamp", BIT(data,1));
+		output_set_value("Credit_available_lamp", BIT(data,2));
+	}
+}
+
+/*****************************************************************************************************/
+
 static void namcos22_init( running_machine &machine, int game_type )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
@@ -5519,6 +5696,8 @@ static void namcos22_init( running_machine &machine, int game_type )
 	state->m_p4 = 0;
 	state->m_old_coin_state = 0;
 	state->m_credits1 = state->m_credits2 = 0;
+	state->m_sw1_output = NULL;
+	state->m_sw2_output = NULL;
 
 	state->m_mpPointRAM = auto_alloc_array(machine, UINT32, 0x20000);
 }
@@ -5544,6 +5723,7 @@ static DRIVER_INIT( alpiner )
 	install_130_speedup(machine);
 
 	state->m_keycus_id = 0x0187;
+	state->m_sw1_output = alpiner_sw1_output;
 }
 
 static DRIVER_INIT( alpiner2 )
@@ -5554,6 +5734,7 @@ static DRIVER_INIT( alpiner2 )
 	install_130_speedup(machine);
 
 	state->m_keycus_id = 0x0187;
+	state->m_sw1_output = alpiner2_sw1_output;
 }
 
 static DRIVER_INIT( alpinesa )
@@ -5566,19 +5747,24 @@ static DRIVER_INIT( alpinesa )
 	install_141_speedup(machine);
 
 	state->m_keycus_id = 0x01a9;
+	state->m_sw1_output = alpiner2_sw1_output;
 }
 
 static DRIVER_INIT( airco22 )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, NAMCOS22_AIR_COMBAT22);
 
 	// S22-BIOS ver1.20 namco all rights reserved 94/12/21
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(airco22_mcu_adc_r));
+	
+	state->m_sw1_output = airco22_sw1_output;
 }
 
 static DRIVER_INIT( propcycl )
 {
-   UINT32 *pROM = (UINT32 *)machine.region("maincpu")->base();
+	namcos22_state *state = machine.driver_data<namcos22_state>();
+	UINT32 *pROM = (UINT32 *)machine.region("maincpu")->base();
 
 	/* patch out strange routine (uninitialized-eprom related?) */
 	pROM[0x1992C/4] = 0x4E754E75;
@@ -5597,9 +5783,9 @@ static DRIVER_INIT( propcycl )
 
 	namcos22_init(machine, NAMCOS22_PROP_CYCLE);
 
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(propcycle_mcu_adc_r));
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_write_handler(M37710_PORT5, M37710_PORT5, FUNC(propcycle_mcu_port5_w));
+	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(propcycle_mcu_adc_r));	
 	install_141_speedup(machine);
+	state->m_sw1_output = propcycl_sw1_output;
 }
 
 static DRIVER_INIT( ridgeraj )
@@ -5630,6 +5816,8 @@ static DRIVER_INIT( acedrvr )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0173;
+	state->m_sw1_output = acedrvr_sw1_output;
+	state->m_sw2_output = acedrvr_sw2_output;
 }
 
 static DRIVER_INIT( victlap )
@@ -5640,13 +5828,17 @@ static DRIVER_INIT( victlap )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0188;
+	state->m_sw2_output = acedrvr_sw2_output;
+	state->m_sw1_output = acedrvr_sw1_output;
 }
 
 static DRIVER_INIT( raveracw )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, NAMCOS22_RAVE_RACER);
 
 	install_c74_speedup(machine);
+	state->m_sw2_output = raveracw_sw2_output;
 }
 
 static DRIVER_INIT( cybrcomm )
@@ -5657,6 +5849,7 @@ static DRIVER_INIT( cybrcomm )
 	install_c74_speedup(machine);
 
 	state->m_keycus_id = 0x0185;
+	state->m_sw2_output = cybrcomm_sw2_output;
 }
 
 static DRIVER_INIT( cybrcyc )
@@ -5668,13 +5861,16 @@ static DRIVER_INIT( cybrcyc )
 	install_130_speedup(machine);
 
 	state->m_keycus_id = 0x0387;
+	state->m_sw1_output = cybrcyc_sw1_output;
 }
 
 static DRIVER_INIT( timecris )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, NAMCOS22_TIME_CRISIS);
 
 	install_130_speedup(machine);
+	state->m_sw1_output = timecris_sw1_output;
 }
 
 static DRIVER_INIT( tokyowar )
@@ -5686,14 +5882,18 @@ static DRIVER_INIT( tokyowar )
 	install_141_speedup(machine);
 
 	state->m_keycus_id = 0x01a8;
+	state->m_sw1_output = tokyowar_sw1_output;
 }
 
 static DRIVER_INIT( aquajet )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, NAMCOS22_AQUA_JET);
 
 	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(aquajet_mcu_adc_r));
 	install_141_speedup(machine);
+	state->m_sw1_output = aquajet_sw1_output;
+	
 }
 
 static DRIVER_INIT( dirtdash )
@@ -5705,6 +5905,7 @@ static DRIVER_INIT( dirtdash )
 	install_141_speedup(machine);
 
 	state->m_keycus_id = 0x01a2;
+	state->m_sw1_output = dirtdash_sw1_output;
 }
 
 /************************************************************************************/
