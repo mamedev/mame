@@ -1979,7 +1979,7 @@
         <rom loadflag="load16_word_swap" name="040-p1.p1" offset="0x000000" size="0x100000" crc="6dde02c2" sha1="e432e63feb88c71629ec96aa84650dcfe356a551" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="040-s1.s1" crc="cd9802a3" sha1="f685d4638f4f68e7e3f101c0c39128454536721b" />
+        <rom offset="0x000000" size="0x020000" name="040-s1.s1" crc="cd9802a3" sha1="f685d4638f4f68e7e3f101c0c39128454536721b" />        <!-- TC531000 -->
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="040-m1.m1" crc="d4de4bca" sha1="ecf604d06f01d40b04e285facef66a6ae2d35661" />
@@ -3496,22 +3496,23 @@
       <!-- MVS ONLY RELEASE -->
       <feature name="crypt" value="zupapa_prot" />
       <dataarea name="maincpu" size="0x100000">
-        <rom loadflag="load16_word_swap" name="070-p1.p1" offset="0x000000" size="0x100000" crc="5a96203e" sha1="49cddec9ca6cc51e5ecf8a34e447a23e1f8a15a1" />
+        <rom loadflag="load16_word_swap" name="070-p1.p1" offset="0x000000" size="0x100000" crc="5a96203e" sha1="49cddec9ca6cc51e5ecf8a34e447a23e1f8a15a1" />        <!-- TC5316200 -->
       </dataarea>
       <dataarea name="fixed" size="0x20000">
         <!-- The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs -->
         <rom value="0" size="0x20000" offset="0x000000" loadflag="fill" />
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="070-m1.m1" crc="5a3b3191" sha1="fa9a9930e18c64e598841fb344c4471d3d2c1964" />
+        <rom offset="0x000000" size="0x020000" name="070-epr.m1" crc="5a3b3191" sha1="fa9a9930e18c64e598841fb344c4471d3d2c1964" />        <!-- M27C1001 -->
+        <!-- M1 on eprom, correct chip label unknown -->
       </dataarea>
       <dataarea name="ymsnd" size="0x200000">
-        <rom name="070-v1.v1" offset="0x000000" size="0x200000" crc="d3a7e1ff" sha1="4a4a227e10f4af58168f6c26011ea1d414253f92" />
+        <rom name="070-v1.v1" offset="0x000000" size="0x200000" crc="d3a7e1ff" sha1="4a4a227e10f4af58168f6c26011ea1d414253f92" />        <!-- TC5316200 -->
       </dataarea>
       <dataarea name="sprites" size="0x1000000">
         <!-- Encrypted -->
-        <rom loadflag="load16_byte" name="070-c1.c1" offset="0x000000" size="0x800000" crc="f8ad02d8" sha1="9be54532332a8e963ec35ff1e518947bb11ebade" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="070-c2.c2" offset="0x000001" size="0x800000" crc="70156dde" sha1="06286bf043d50199b47df9a76ca91f39cb28cb90" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="070-c1.c1" offset="0x000000" size="0x800000" crc="f8ad02d8" sha1="9be54532332a8e963ec35ff1e518947bb11ebade" />        <!-- Plane 0,1 -->        <!-- TC5364205 -->
+        <rom loadflag="load16_byte" name="070-c2.c2" offset="0x000001" size="0x800000" crc="70156dde" sha1="06286bf043d50199b47df9a76ca91f39cb28cb90" />        <!-- Plane 2,3 -->        <!-- TC5364205 -->
       </dataarea>
     </part>
   </software>
@@ -4797,24 +4798,24 @@
     <sharedfeat name="aescompatible" value="yes" />
     <part name="cart" interface="neo_cart">
       <dataarea name="maincpu" size="0x200000">
-        <rom loadflag="load16_word_swap" name="201-p1.p1" offset="0x100000" size="0x100000" crc="08d8daa5" sha1="b888993dbb7e9f0a28a01d7d2e1da00ef9cf6f38" />
+        <rom loadflag="load16_word_swap" name="201-p1.p1" offset="0x100000" size="0x100000" crc="08d8daa5" sha1="b888993dbb7e9f0a28a01d7d2e1da00ef9cf6f38" />        <!-- TC5316200 -->
         <rom size="0x100000" offset="0x000000" loadflag="continue" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="201-s1.s1" crc="2f55958d" sha1="550b53628daec9f1e1e11a398854092d90f9505a" />
+        <rom offset="0x000000" size="0x020000" name="201-s1.s1" crc="2f55958d" sha1="550b53628daec9f1e1e11a398854092d90f9505a" />        <!-- TC531000 -->
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="201-m1.m1" crc="c28b3253" sha1="fd75bd15aed30266a8b3775f276f997af57d1c06" />
+        <rom offset="0x000000" size="0x020000" name="201-m1.m1" crc="c28b3253" sha1="fd75bd15aed30266a8b3775f276f997af57d1c06" />        <!-- TC531001 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x800000">
-        <rom name="201-v1.v1" offset="0x000000" size="0x400000" crc="23d22ed1" sha1="cd076928468ad6bcc5f19f88cb843ecb5e660681" />
-        <rom name="201-v2.v2" offset="0x400000" size="0x400000" crc="472cf9db" sha1="5f79ea9286d22ed208128f9c31ca75552ce08b57" />
+        <rom name="201-v1.v1" offset="0x000000" size="0x400000" crc="23d22ed1" sha1="cd076928468ad6bcc5f19f88cb843ecb5e660681" />        <!-- TC5332204 -->
+        <rom name="201-v2.v2" offset="0x400000" size="0x400000" crc="472cf9db" sha1="5f79ea9286d22ed208128f9c31ca75552ce08b57" />        <!-- TC5332204 -->
       </dataarea>
       <dataarea name="sprites" size="0x1000000">
-        <rom loadflag="load16_byte" name="201-c1.c1" offset="0x000000" size="0x400000" crc="72813676" sha1="7b045d1a48980cb1a140699011cb1a3d4acdc4d1" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="201-c2.c2" offset="0x000001" size="0x400000" crc="96f62574" sha1="cb7254b885989223bba597b8ff0972dfa5957816" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="201-c3.c3" offset="0x800000" size="0x400000" crc="5121456a" sha1="0a7a27d603d1bb2520b5570ebf5b34a106e255a6" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="201-c4.c4" offset="0x800001" size="0x400000" crc="f4ad59a3" sha1="4e94fda8ee63abf0f92afe08060a488546e5c280" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="201-c1.c1" offset="0x000000" size="0x400000" crc="72813676" sha1="7b045d1a48980cb1a140699011cb1a3d4acdc4d1" />        <!-- Plane 0,1 -->        <!-- TC5332205 -->
+        <rom loadflag="load16_byte" name="201-c2.c2" offset="0x000001" size="0x400000" crc="96f62574" sha1="cb7254b885989223bba597b8ff0972dfa5957816" />        <!-- Plane 2,3 -->        <!-- TC5332205 -->
+        <rom loadflag="load16_byte" name="201-c3.c3" offset="0x800000" size="0x400000" crc="5121456a" sha1="0a7a27d603d1bb2520b5570ebf5b34a106e255a6" />        <!-- Plane 0,1 -->        <!-- TC5332205 -->
+        <rom loadflag="load16_byte" name="201-c4.c4" offset="0x800001" size="0x400000" crc="f4ad59a3" sha1="4e94fda8ee63abf0f92afe08060a488546e5c280" />        <!-- Plane 2,3 -->        <!-- TC5332205 -->
       </dataarea>
     </part>
   </software>
@@ -5119,7 +5120,7 @@
         <rom size="0x100000" offset="0x000000" loadflag="continue" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="213-s1.s1" crc="b76b61bc" sha1="5fdb407d16ab9e33c4f26ee09ff70891ae1d2bd0" />
+        <rom offset="0x000000" size="0x020000" name="213-s1.s1" crc="b76b61bc" sha1="5fdb407d16ab9e33c4f26ee09ff70891ae1d2bd0" />        <!-- TC531000 -->
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
         <rom offset="0x000000" size="0x020000" name="213-m1.m1" crc="200045f1" sha1="7a6cd1c8d4447ea260d7ff4520c676b8d685f2e4" />
@@ -6969,23 +6970,23 @@
     <part name="cart" interface="neo_cart">
       <!-- MVS ONLY RELEASE -->
       <dataarea name="maincpu" size="0x100000">
-        <rom loadflag="load16_word_swap" name="248-p1.p1" offset="0x000000" size="0x100000" crc="9d6c0754" sha1="95c70c2d51fc4de01e768e03cc800a850aaad5dc" />
+        <rom loadflag="load16_word_swap" name="248-p1.p1" offset="0x000000" size="0x100000" crc="9d6c0754" sha1="95c70c2d51fc4de01e768e03cc800a850aaad5dc" />        <!-- TC538200 -->
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="248-s1.s1" crc="0a3fee41" sha1="0ab2120e462086be942efcf6ffb37f58ea966ca3" />
+        <rom offset="0x000000" size="0x020000" name="248-s1.s1" crc="0a3fee41" sha1="0ab2120e462086be942efcf6ffb37f58ea966ca3" />        <!-- TC531000DP -->
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="248-m1.m1" crc="883097a9" sha1="677bf9684c0c7977a9a3f0c1288e430040a53b49" />
+        <rom offset="0x000000" size="0x020000" name="248-m1.m1" crc="883097a9" sha1="677bf9684c0c7977a9a3f0c1288e430040a53b49" />        <!-- TC531001 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x800000">
-        <rom name="248-v1.v1" offset="0x000000" size="0x400000" crc="57fde1fa" sha1="af39bc141fc35b78dcacfd42b3abb29d7e5c2c89" />
-        <rom name="248-v2.v2" offset="0x400000" size="0x400000" crc="4b966ef3" sha1="083c0e9fd7b8e506087648cdd8ec4206103984cd" />
+        <rom name="248-v1.v1" offset="0x000000" size="0x400000" crc="57fde1fa" sha1="af39bc141fc35b78dcacfd42b3abb29d7e5c2c89" />        <!-- TC5332204 -->
+        <rom name="248-v2.v2" offset="0x400000" size="0x400000" crc="4b966ef3" sha1="083c0e9fd7b8e506087648cdd8ec4206103984cd" />        <!-- TC5332204 -->
       </dataarea>
       <dataarea name="sprites" size="0xa00000">
-        <rom loadflag="load16_byte" name="248-c1.c1" offset="0x000000" size="0x400000" crc="d9115327" sha1="a49aa836a902326cfe785428e1699fefcf8566d4" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="248-c2.c2" offset="0x000001" size="0x400000" crc="77f9fdac" sha1="4642d71d32b6a05dc8bfa0f95c936a77c7cef05e" />        <!-- Plane 2,3 -->
-        <rom loadflag="load16_byte" name="248-c3.c3" offset="0x800000" size="0x100000" crc="8890bf7c" sha1="a52f6bafd60e72003bfe38c80c1dde24b4983b2a" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="248-c4.c4" offset="0x800001" size="0x100000" crc="8efead3f" sha1="f577d2f7c6f850b3d100c36947ad15e33dfa0bed" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="248-c1.c1" offset="0x000000" size="0x400000" crc="d9115327" sha1="a49aa836a902326cfe785428e1699fefcf8566d4" />        <!-- Plane 0,1 -->        <!-- TC5332205 -->
+        <rom loadflag="load16_byte" name="248-c2.c2" offset="0x000001" size="0x400000" crc="77f9fdac" sha1="4642d71d32b6a05dc8bfa0f95c936a77c7cef05e" />        <!-- Plane 2,3 -->        <!-- TC5332205 -->
+        <rom loadflag="load16_byte" name="248-c3.c3" offset="0x800000" size="0x100000" crc="8890bf7c" sha1="a52f6bafd60e72003bfe38c80c1dde24b4983b2a" />        <!-- Plane 0,1 -->        <!-- TC538200 -->
+        <rom loadflag="load16_byte" name="248-c4.c4" offset="0x800001" size="0x100000" crc="8efead3f" sha1="f577d2f7c6f850b3d100c36947ad15e33dfa0bed" />        <!-- Plane 2,3 -->        <!-- TC538200 -->
       </dataarea>
     </part>
   </software>
@@ -7008,22 +7009,22 @@
     <part name="cart" interface="neo_cart">
       <!-- MVS ONLY RELEASE -->
       <dataarea name="maincpu" size="0x200000">
-        <rom loadflag="load16_word_swap" name="249-p1.p1" offset="0x100000" size="0x100000" crc="c9386118" sha1="5554662c7bc8605889cac4a67fee05bbb4eb786f" />
+        <rom loadflag="load16_word_swap" name="249-p1.p1" offset="0x100000" size="0x100000" crc="c9386118" sha1="5554662c7bc8605889cac4a67fee05bbb4eb786f" />        <!-- TC5316200 -->
         <rom size="0x100000" offset="0x000000" loadflag="continue" />
       </dataarea>
       <dataarea name="fixed" size="0x040000">
-        <rom offset="0x000000" size="0x020000" name="249-s1.s1" crc="dc9eb372" sha1="b8aa142243ba303799554479bfc88eb49260f3b1" />
+        <rom offset="0x000000" size="0x020000" name="249-s1.s1" crc="dc9eb372" sha1="b8aa142243ba303799554479bfc88eb49260f3b1" />        <!-- TC531000DP -->
       </dataarea>
       <dataarea name="audiocpu" size="0x020000">
-        <rom offset="0x000000" size="0x020000" name="249-m1.m1" crc="80328a47" sha1="34b6b1a81eab1cf38834b2eea55454ce1b6100e2" />
+        <rom offset="0x000000" size="0x020000" name="249-m1.m1" crc="80328a47" sha1="34b6b1a81eab1cf38834b2eea55454ce1b6100e2" />        <!-- TC531001 -->
       </dataarea>
       <dataarea name="ymsnd" size="0x500000">
-        <rom name="249-v1.v1" offset="0x000000" size="0x400000" crc="de7c8f27" sha1="3681a68a702ab5da8f509b8301d6cada75959332" />
-        <rom name="249-v2.v2" offset="0x400000" size="0x100000" crc="c8e40119" sha1="738f525c381ed68c0b8a89318a3e4d0089473c45" />
+        <rom name="249-v1.v1" offset="0x000000" size="0x400000" crc="de7c8f27" sha1="3681a68a702ab5da8f509b8301d6cada75959332" />        <!-- TC5332204 -->
+        <rom name="249-v2.v2" offset="0x400000" size="0x100000" crc="c8e40119" sha1="738f525c381ed68c0b8a89318a3e4d0089473c45" />        <!-- TC538200 -->
       </dataarea>
       <dataarea name="sprites" size="0x800000">
-        <rom loadflag="load16_byte" name="249-c1.c1" offset="0x000000" size="0x400000" crc="041fb8ee" sha1="dacc84d713d76818d89a26358374afaa22fa82a2" />        <!-- Plane 0,1 -->
-        <rom loadflag="load16_byte" name="249-c2.c2" offset="0x000001" size="0x400000" crc="74f3cdf4" sha1="55ddabaf77f4d575f4deb24fe63e4bdc2c6f31e1" />        <!-- Plane 2,3 -->
+        <rom loadflag="load16_byte" name="249-c1.c1" offset="0x000000" size="0x400000" crc="041fb8ee" sha1="dacc84d713d76818d89a26358374afaa22fa82a2" />        <!-- Plane 0,1 -->        <!-- TC5332205 -->
+        <rom loadflag="load16_byte" name="249-c2.c2" offset="0x000001" size="0x400000" crc="74f3cdf4" sha1="55ddabaf77f4d575f4deb24fe63e4bdc2c6f31e1" />        <!-- Plane 2,3 -->        <!-- TC5332205 -->
       </dataarea>
     </part>
   </software>
@@ -8762,7 +8763,7 @@
 
 
   <!--***************************************
- ID-0008 (official?)
+ B-J-02
  . ???-????
  MVS PROGV (2000.11.17) / NEO-MVS CHAFIO (1999.6.14)
 ***************************************-->
@@ -8770,7 +8771,7 @@
   <!-- jockeygp requires very specific hardware and is loaded in neodrvr.c -->
 
   <!--***************************************
- ID-03E7 (incorrect ID-code)
+ B-V-01
  . ???-????
  MVS PROGV (2000.11.17) / MVS CHAV (2000.10.26)
 ***************************************-->
