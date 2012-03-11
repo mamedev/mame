@@ -5,6 +5,7 @@
 	preliminary driver by Angelo Salese
 
 	TODO:
+	- auto-animation speed is erratic (way too fast);
 	- sprites;
 	- tilemap effects (scrolling, colscroll, linescroll);
 	- BGM seems quite off, YM2413 core bug?
@@ -179,9 +180,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		int param = vram[i+0x7f800+0]|(vram[i+0x7f800+1]<<8);
 		int width = 8 << ((param & 0x30)>>4);
 		int height = 32;
-		int color_bank = (param & 0xc)<<4;
+		int color_bank = ((param & 0xc)<<4);
 		int x_dir = param & 0x40;
 		int y_dir = param & 0x80;
+
+		if((param & 0x3) == 3) // actually sprite mode?
+			color_bank |= 0x20;
 
 		if(param == 0)
 			continue;
@@ -405,13 +409,14 @@ static TIMER_DEVICE_CALLBACK( popobear_irq )
 	popobear_state *state = timer.machine().driver_data<popobear_state>();
 	int scanline = param;
 
-	/* TODO: one of those is a timer irq, tied with YM2413 */
+	/* Order is trusted (5 as vblank-out makes the title screen logo spinning to behave wrongly) */
 	if(scanline == 240)
-		device_set_input_line(state->m_maincpu, 5, ASSERT_LINE);
-
-	if(scanline == 0)
 		device_set_input_line(state->m_maincpu, 3, ASSERT_LINE);
 
+	if(scanline == 0)
+		device_set_input_line(state->m_maincpu, 5, ASSERT_LINE);
+
+	/* TODO: actually a timer irq, tied with YM2413 sound chip (controls BGM tempo) */
 	if(scanline == 64 || scanline == 192)
 		device_set_input_line(state->m_maincpu, 2, ASSERT_LINE);
 }
