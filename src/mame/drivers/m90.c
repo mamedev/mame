@@ -948,6 +948,24 @@ ROM_START( dynablstb )
 	/* the samples are in the Z80 ROM in this bootleg */
 ROM_END
 
+ROM_START( dynablstb2 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )
+    ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x020000, CRC(9c3e996a) SHA1(9244f6a8b498d0f488bbfc68465916ea0560f3be) ) 
+    ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x020000, CRC(697a2ed9) SHA1(d329987f7a0321414347b8e6a6dfc4304fbe4987) ) 
+    ROM_COPY( "maincpu", 0x3fff0,  0xffff0, 0x10 )	/* start vector */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "bbm-sp.23",    0x0000, 0x10000, CRC(251090cd) SHA1(9245072c1afbfa3e4a1d1549942765d58bd78ed3) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "bbm-c0.66",    0x000000, 0x40000, CRC(695d2019) SHA1(3537e9fb0e7dc13d6113b4af71cba3c73392335a) )
+	ROM_LOAD( "bbm-c1.67",    0x040000, 0x40000, CRC(4c7c8bbc) SHA1(31ab5557d96c4184a9c02ed1c309f3070d148e25) )
+	ROM_LOAD( "bbm-c2.68",    0x080000, 0x40000, CRC(0700d406) SHA1(0d43a31a726b0de0004beef41307de2508106b69) )
+	ROM_LOAD( "bbm-c3.69",    0x0c0000, 0x40000, CRC(3c3613af) SHA1(f9554a73e95102333e449f6e81f2bb817ec00881) )
+
+	ROM_REGION( 0x20000, "samples", 0 )	/* samples */
+	ROM_LOAD( "bbm-v0.20",    0x0000, 0x20000, CRC(0fa803fe) SHA1(d2ac1e624de38bed385442ceae09a76f203fa084) )
+ROM_END
 
 /*
 New Dyna Blaster Global Quest
@@ -1192,7 +1210,8 @@ GAME( 1991, hasamu,   0,        hasamu,   hasamu,   0,        ROT0, "Irem", "Has
 GAME( 1991, dynablst, 0,        bombrman, dynablst, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Dynablaster / Bomber Man", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1991, bombrman, dynablst, bombrman, bombrman, 0,        ROT0, "Irem (licensed from Hudson Soft)", "Bomber Man (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1991, atompunk, dynablst, bombrman, atompunk, 0,        ROT0, "Irem America (licensed from Hudson Soft)", "Atomic Punk (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1991, dynablstb,dynablst, dynablsb, dynablsb, 0,        ROT0, "bootleg", "Dynablaster / Bomber Man (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, dynablstb,dynablst, dynablsb, dynablsb, 0,        ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, dynablstb2,dynablst,dynablsb, bombrman, 0,        ROT0, "bootleg (Seitu)", "Dynablaster / Bomber Man (bootleg, alt)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1992, bbmanw,   0,        bbmanw,   bbmanw,   0,        ROT0, "Irem", "Bomber Man World / New Dyna Blaster - Global Quest", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1992, bbmanwj,  bbmanw,   bbmanwj,  bbmanwj,  0,        ROT0, "Irem", "Bomber Man World (Japan)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
