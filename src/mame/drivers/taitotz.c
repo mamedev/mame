@@ -533,7 +533,7 @@ ROM_END
 GAME( 1999, taitotz,  0, taitotz, taitotz, 0, ROT0, "Taito", "Type Zero BIOS", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT)
 GAME( 1999, landhigh, taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Landing High Japan", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1999, batlgear, taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Battle Gear", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1999, pwrshovl, taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Power Shovel Simulator", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1999, pwrshovl, taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Power Shovel ni Norou!! - Power Shovel Simulator", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, batlgr2,  taitotz, taitotz, taitotz, 0, ROT0, "Taito", "Battle Gear 2 (v2.04J)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 2000, batlgr2a, batlgr2, taitotz, taitotz, 0, ROT0, "Taito", "Battle Gear 2 (v2.01J)", GAME_NOT_WORKING | GAME_NO_SOUND )
 
