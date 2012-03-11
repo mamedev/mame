@@ -3074,15 +3074,16 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 		case 0x1eb:	/* DIVWx */
         case 0x3eb:	/* DIVWOx */
             UML_CMP(block, R32(G_RB(op)), 0x0);                 // cmp rb, #0
-            UML_JMPc(block, COND_NE, compiler->labelnum);       // bne 0:
+            UML_JMPc(block, COND_NZ, compiler->labelnum);       // bne 0:
             UML_CMP(block, R32(G_RA(op)), 0x80000000);          // cmp rb, #80000000
             UML_JMPc(block, COND_AE, compiler->labelnum);       // bae 0:
 
-            UML_MOV(block, I0, 0x0);                 // move i0, #0 (generate_flags needs result in i0)
+            UML_MOV(block, I0, 0x0);                            // move i0, #0
             if (op & M_OE)
             {
                 UML_OR(block, XERSO32, XERSO32, 0x1);           // SO |= 1
             }
+            UML_CMP(block, I0, 0x0);                            // force a flags update
             UML_JMP(block, compiler->labelnum+3);               // jmp 3:
 
             UML_LABEL(block, compiler->labelnum++);             // 0:
@@ -3091,21 +3092,22 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
             UML_JMPc(block, COND_Z, compiler->labelnum);        // beq 1:
 
             UML_CMP(block, R32(G_RB(op)), 0xffffffff);          // cmp rb, #ffffffff
-            UML_JMPc(block, COND_NE, compiler->labelnum+1);     // bne 2:
+            UML_JMPc(block, COND_NZ, compiler->labelnum+1);     // bne 2:
             UML_CMP(block, R32(G_RA(op)), 0x80000000);          // cmp ra, #80000000
-            UML_JMPc(block, COND_NE, compiler->labelnum+1);     // bne 2:
+            UML_JMPc(block, COND_NZ, compiler->labelnum+1);     // bne 2:
 
             UML_LABEL(block, compiler->labelnum++);             // 1:
             // do second branch
-            UML_MOV(block, I0, 0xffffffff);                 // move i0, #ffffffff (generate_flags needs result in i0)
+            UML_MOV(block, I0, 0xffffffff);                     // move i0, #ffffffff
             if (op & M_OE)
             {
                 UML_OR(block, XERSO32, XERSO32, 0x1);           // SO |= 1
             }
+            UML_CMP(block, I0, 0x0);                            // force a flags update
             UML_JMP(block, compiler->labelnum+1);               // jmp 3:
 
             UML_LABEL(block, compiler->labelnum++);             // 2:
-			UML_DIVS(block, I0, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));	// divs    rd,rd,ra,rb
+			UML_DIVS(block, I0, R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));	// divs    i0,rd,ra,rb
 
             UML_LABEL(block, compiler->labelnum++);             // 3:
             UML_MOV(block, R32(G_RD(op)), I0);                  // mov rd, I0
