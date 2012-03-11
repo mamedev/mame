@@ -174,6 +174,7 @@ static const struct
 	{ "sfex2p",   cp10, cp12 }, /* OK */
 	{ "sfex2pa",  cp10, cp12 }, /* OK */
 	{ "sfex2pj",  cp10, cp12 }, /* OK */
+	{ "sfex2ph",  cp10, cp12 }, /* OK */
 	{ "strider2", cp10, cp13 }, /* OK ( random crashes on bosses ) */
 	{ "strider2a",cp10, cp13 }, /* OK ( random crashes on bosses ) */
 	{ "shiryu2",  cp10, cp13 }, /* OK ( random crashes on bosses ) */
@@ -3526,6 +3527,30 @@ ROM_START( sfex2pa )
 ROM_END
 
 /* 97695-1 */
+ROM_START( sfex2ph )
+	CPZN2_BIOS
+
+	ROM_REGION32_LE( 0x80000, "user3", 0 )
+	ROM_LOAD( "x2ph_04.2h", 0x0000000, 0x080000, CRC(a4f07439) SHA1(630be537062134da2d01866b9587e5c119c198bb) )
+
+	ROM_REGION32_LE( 0x3000000, "user2", 0 )
+	ROM_LOAD( "x2p-05m.3h", 0x0000000, 0x800000, CRC(4ee3110f) SHA1(704f8dca7d0b698659af9e3271ea5072dfd42b8b) )
+	ROM_LOAD( "x2p-06m.4h", 0x0800000, 0x800000, CRC(4cd53a45) SHA1(39499ea6c9aa51c71f4fe44cc02f93d5a39e14ec) )
+	ROM_LOAD( "x2p-07m.5h", 0x1000000, 0x800000, CRC(11207c2a) SHA1(0182652819f1c3a36e7b42e34ef86d2455a2dd90) )
+	ROM_LOAD( "x2p-08m.2k", 0x1800000, 0x800000, CRC(3560c2cc) SHA1(8b0ce22d954387f7bb032b5220d1014ef68741e8) )
+	ROM_LOAD( "x2p-09m.3k", 0x2000000, 0x800000, CRC(344aa227) SHA1(69dc6f511939bf7fa25c2531ecf307a7565fe7a8) )
+	ROM_LOAD( "x2p-10m.4k", 0x2800000, 0x800000, CRC(2eef5931) SHA1(e5227529fb68eeb1b2f25813694173a75d906b52) )
+
+	ROM_REGION( 0x50000, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "x2p_02.2e",  0x00000, 0x08000, CRC(3705de5e) SHA1(847007ca271da64bf13ffbf496d4291429eee27a) )
+	ROM_CONTINUE(           0x10000, 0x18000 )
+	ROM_LOAD( "x2p_03.3e",  0x28000, 0x20000, CRC(6ae828f6) SHA1(41c54165e87b846a845da581f408b96979288158) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* Q Sound Samples */
+	ROM_LOAD16_WORD_SWAP( "x2p-01m.3a", 0x0000000, 0x400000, CRC(14a5bb0e) SHA1(dfe3c3a53bd4c58743d8039b5344d3afbe2a9c24) )
+ROM_END
+
+/* 97695-1 */
 ROM_START( sfex2pj )
 	CPZN2_BIOS
 
@@ -4646,6 +4671,7 @@ GAME( 1998, techromnu, techromn, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Tech
 GAME( 1998, kikaioh,   techromn, coh3002c, zn6b, coh3002c, ROT0, "Capcom", "Choukou Senki Kikaioh (Japan 980914)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, sfex2p,    cpzn2,    coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (USA 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, sfex2pa,   sfex2p,   coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Asia 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, sfex2ph,   sfex2p,   coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Hipanic 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, sfex2pj,   sfex2p,   coh3002c, zn6b, coh3002c, ROT0, "Capcom / Arika", "Street Fighter EX2 Plus (Japan 990611)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, strider2,  cpzn2,    coh3002c, zn,   coh3002c, ROT0, "Capcom", "Strider 2 (USA 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, strider2a, strider2, coh3002c, zn,   coh3002c, ROT0, "Capcom", "Strider 2 (Asia 991213)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
