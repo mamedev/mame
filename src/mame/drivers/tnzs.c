@@ -2136,6 +2136,30 @@ ROM_START( arknoid2j )
 	ROM_LOAD( "b08-07.16f",	0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )	/* lo bytes, AM27S29 or compatible like MB7124 */
 ROM_END
 
+ROM_START( arknoid2b )
+	ROM_REGION( 0x30000, "maincpu", 0 )				/* Region 0 - main cpu */
+    ROM_LOAD( "boot.11c",  0x00000, 0x08000, CRC(3847dfb0) SHA1(993c8af3df7a4d5a2523f0e31a6df1c07ba13c7d) ) 
+	ROM_CONTINUE(           0x18000, 0x08000 )			/* banked at 8000-bfff */
+	/* 20000-2ffff empty */
+
+	ROM_REGION( 0x18000, "sub", 0 )				/* Region 2 - sound cpu */
+	ROM_LOAD( "b08_13.3e", 0x00000, 0x08000, CRC(e8035ef1) SHA1(9a54e952cff0036c4b6affd9ffb1097cdccbe255) )
+	ROM_CONTINUE(          0x10000, 0x08000 )			/* banked at 8000-9fff */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* M-Chip (i8742 internal ROM) */
+	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x80000, "gfx1", 0 )
+	ROM_LOAD( "b08-01.13a",	0x00000, 0x20000, CRC(2ccc86b4) SHA1(eced1d7e687db0331507726946b6a19a690a7604) )
+	ROM_LOAD( "b08-02.10a",	0x20000, 0x20000, CRC(056a985f) SHA1(6333b71c631d3307929aae633760870451830e10) )
+	ROM_LOAD( "b08-03.7a",	0x40000, 0x20000, CRC(274a795f) SHA1(49353590e1a418843f57c715185e407a20021936) )
+	ROM_LOAD( "b08-04.4a",	0x60000, 0x20000, CRC(9754f703) SHA1(0018ebf7da3f501345f3f5085d98d7614f8ce1b6) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "b08-08.15f",	0x00000, 0x200, CRC(a4f7ebd9) SHA1(094eb63c18898c6ee8d722492bdfd28091c61773) )	/* hi bytes, AM27S29 or compatible like MB7124 */
+	ROM_LOAD( "b08-07.16f",	0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )	/* lo bytes, AM27S29 or compatible like MB7124 */
+ROM_END
+
 ROM_START( drtoppel )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b19-09.11c", 0x00000, 0x08000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
@@ -2724,6 +2748,7 @@ GAME( 1987, extrmatnj, extrmatn, arknoid2, extrmatn, extrmatn, ROT270, "Taito Co
 GAME( 1987, arknoid2,  0,        arknoid2, arknoid2, arknoid2, ROT270, "Taito Corporation Japan", "Arkanoid - Revenge of DOH (World)", 0 )
 GAME( 1987, arknoid2u, arknoid2, arknoid2, arknid2u, arknoid2, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)", 0 )
 GAME( 1987, arknoid2j, arknoid2, arknoid2, arknid2u, arknoid2, ROT270, "Taito Corporation", "Arkanoid - Revenge of DOH (Japan)", 0 )
+GAME( 1987, arknoid2b, arknoid2, arknoid2, arknid2u, arknoid2, ROT270, "bootleg", "Arkanoid - Revenge of DOH (Japan bootleg)", 0 )
 GAME( 1987, drtoppel,  0,        drtoppel, drtoppel, drtoppel, ROT90,  "Kaneko / Taito Corporation Japan", "Dr. Toppel's Adventure (World)", 0 ) /* Possible region hack */
 GAME( 1987, drtoppelu, drtoppel, drtoppel, drtopplu, drtoppel, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)", 0 ) /* Possible region hack */
 GAME( 1987, drtoppelj, drtoppel, drtoppel, drtopplu, drtoppel, ROT90,  "Kaneko / Taito Corporation", "Dr. Toppel's Tankentai (Japan)", 0 )
