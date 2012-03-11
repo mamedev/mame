@@ -3400,6 +3400,35 @@ ROM_START( rfjets )	/* Single board version SXX2G */
 	ROM_LOAD16_WORD( "93c46-rfjets.bin", 0x0000, 0x0080, CRC(8fe8063b) SHA1(afb0141580e1b2bd149092a9cc9e8b4072b1ef10) )
 ROM_END
 
+ROM_START( rfjett ) /* SPI Cart, Taiwan */
+	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
+    ROM_LOAD32_BYTE( "prg0.u0211",   0x000000, 0x080000, CRC(a4734579) SHA1(dfbd8e2a3178c7cfd7bd3698999f14bc80f5212f) ) 
+    ROM_LOAD32_BYTE( "prg1.u0212",   0x000001, 0x080000, CRC(5e4ad3a4) SHA1(ff66e16f48978b88b298c78e21309208ccb3ff15) ) 
+    ROM_LOAD32_BYTE( "prg2.u0221",   0x000002, 0x080000, CRC(21c9942e) SHA1(ededa05a4b5dae2dec5c4409f22e9a66d2c8e98e) ) 
+    ROM_LOAD32_BYTE( "prg3.u0220",   0x000003, 0x080000, CRC(ea3657f4) SHA1(2291e31243af7d2e79ae727d9b5484e8d49cc7d9) ) 
+
+	ROM_REGION( 0x30000, "gfx1", ROMREGION_ERASEFF)
+	ROM_LOAD24_BYTE("fix0.u0524", 0x000001, 0x10000, CRC(8bc080be) SHA1(ad296fb98242c963072346a8de289e704b445ad4) )
+	ROM_LOAD24_BYTE("fix1.u0518", 0x000000, 0x10000, CRC(bded85e7) SHA1(ccb8c438ce6b9a742e3ab15be970b1e636783626) )
+	ROM_LOAD24_BYTE("fixp.u0514", 0x000002, 0x10000, CRC(015d0748) SHA1(b1e8eaeba63a7914f1dc27d7e3ca5d0b6db202ed) )
+
+	ROM_REGION( 0x900000, "gfx2", 0)	/* background layer roms */
+	ROM_LOAD24_WORD("bg-1d.u0543", 0x000000, 0x400000, CRC(edfd96da) SHA1(4813267f104619f569e5777e75b75304321abb49) )
+	ROM_LOAD24_BYTE("bg-1p.u0544", 0x000002, 0x200000, CRC(a4cc4631) SHA1(cc1c4f4de8a078ca774f5a328a9a58291949b1fb) )
+	ROM_LOAD24_WORD("bg-2d.u0545", 0x600000, 0x200000, CRC(731fbb59) SHA1(13cd29ec4d4c73582c5fb363218e737886826e5f) )
+	ROM_LOAD24_BYTE("bg-2p.u0546", 0x600002, 0x100000, CRC(03652c25) SHA1(c0d77285111bc84e008362981ac02a246678ed0a) )
+
+	ROM_REGION( 0x1800000, "gfx3", 0)	/* sprites */
+	ROM_LOAD("obj-1.u0442", 0x0000000, 0x800000, CRC(58a59896) SHA1(edeaaa69987bd5d08c47ed9bf47a3901e2dcc892) )
+	ROM_LOAD("obj-2.u0443", 0x0800000, 0x800000, CRC(a121d1e3) SHA1(1851ae81f2ae9d3404aadd9fbc0ed7f9230290b9) )
+	ROM_LOAD("obj-3.u0444", 0x1000000, 0x800000, CRC(bc2c0c63) SHA1(c8d395722f7012c3be366a0fc9b224c537afabae) )
+
+	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
+
+	ROM_REGION(0x280000, "user2", ROMREGION_ERASE00)	/* sound roms */
+	ROM_LOAD("pcm-d.u0227",  0x000000, 0x200000, CRC(8ee3ff45) SHA1(2801b23495866c91c8f8bebd37d5fcae7a625838) )
+	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
+ROM_END
 
 
 /*******************************************************************/
@@ -3663,6 +3692,7 @@ GAME( 1998, rfjet,     0,       spi,      spi_2button, rfjet,  ROT270, "Seibu Ka
 GAME( 1998, rfjetu,    rfjet,   spi,      spi_2button, rfjet,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1998, rfjeta,    rfjet,   spi,      spi_2button, rfjet,  ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters Jet (Asia)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1998, rfjetj,    rfjet,   spi,      spi_2button, rfjet,  ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1998, rfjett,    rfjet,   spi,      spi_2button, rfjet,  ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Taiwan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 /* there is another rf dump rf_spi_asia.zip but it seems strange, 1 program rom, cart pic seems to show others as a different type of rom */
 
