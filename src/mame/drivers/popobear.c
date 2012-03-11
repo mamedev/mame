@@ -101,14 +101,28 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 {
 	popobear_state *state = machine.driver_data<popobear_state>();
 	UINT8* vram = (UINT8 *)state->m_vram;
+	UINT16* vreg = (UINT16 *)state->m_vregs;
 	int count;
-//	const UINT8 vreg_base[] = { 0x6/2, 0xa/2, 0x10/2, 0x14/2 };
+	const UINT8 vreg_base[] = { 0x10/2, 0x14/2 };
+	int xscroll,yscroll;
 
 //	count = (state->m_vregs[vreg_base[layer_n]]<<5);
 //	count &= 0xfc000;
 	count = (0xf0000+layer_n*0x4000);
+	if(layer_n & 2)
+	{
+		xscroll = vreg[vreg_base[(layer_n & 1) ^ 1]+2/2] & 0x1ff;
+		yscroll = vreg[vreg_base[(layer_n & 1) ^ 1]+0/2] & 0x1ff;
+	}
+	else
+	{
+		xscroll = 0;
+		yscroll = 0;
+	}
 
-	for(int y=0;y<32;y++)
+	popmessage("%04x %04x",vreg[vreg_base[0]+0/2],vreg[vreg_base[1]+0/2]);
+
+	for(int y=0;y<64;y++)
 	{
 		for(int x=0;x<128;x++)
 		{
@@ -125,16 +139,29 @@ static void draw_layer(running_machine &machine, bitmap_ind16 &bitmap,const rect
 				for(int xi=0;xi<8;xi+=2)
 				{
 					UINT8 color;
+					int xoffs,yoffs;
+
+					xoffs = x*8+xi - xscroll;
+					yoffs = y*8+yi - yscroll;
 
 					color = (vram[((xi+yi*1024)+xtile+ytile) & 0xfffff] & 0xff);
 
-					if(cliprect.contains(x*8+xi+1, y*8+yi) && color)
-						bitmap.pix16(y*8+yi, x*8+xi+1) = machine.pens[color];
+					if(cliprect.contains(xoffs+1, yoffs) && color)
+						bitmap.pix16(yoffs, xoffs+1) = machine.pens[color];
+
+					if(cliprect.contains(xoffs+1, yoffs+512) && color)
+						bitmap.pix16(yoffs+512, xoffs+1) = machine.pens[color];
+
+					//if(cliprect.contains(xoffs+1, yoffs+256) && color)
+					//	bitmap.pix16(yoffs+512, xoffs+1) = machine.pens[color];
 
 					color = (vram[((xi+1+yi*1024)+xtile+ytile) & 0xfffff] & 0xff);
 
-					if(cliprect.contains(x*8+xi, y*8+yi) && color)
-						bitmap.pix16(y*8+yi, x*8+xi) = machine.pens[color];
+					if(cliprect.contains(xoffs, yoffs) && color)
+						bitmap.pix16(yoffs, xoffs) = machine.pens[color];
+
+					if(cliprect.contains(xoffs, yoffs+512) && color)
+						bitmap.pix16(yoffs+512, xoffs) = machine.pens[color];
 				}
 			}
 
