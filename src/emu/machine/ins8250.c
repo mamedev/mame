@@ -210,8 +210,7 @@ WRITE8_MEMBER( ins8250_uart_device::ins8250_w )
 				m_regs.lsr &= ~0x20;
 				if ( m_regs.mcr & 0x10 )
 				{
-					m_regs.lsr &= ~0x40;
-					m_regs.lsr |= 1;
+					m_regs.lsr |= 0x61;
 					m_regs.rbr = data;
 					trigger_int(COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
 				}
