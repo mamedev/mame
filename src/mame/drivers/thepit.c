@@ -885,6 +885,26 @@ ROM_START( intrepid2 )
 	ROM_LOAD( "ic3.prm",      0x0000, 0x0020, CRC(927ff40a) SHA1(3d699d981851989e9190505b0dede5202d688f2b) )
 ROM_END
 
+ROM_START( intrepidb )
+    ROM_REGION( 0x10000, "maincpu", 0 )
+    ROM_LOAD( "ic38.bin",       0x0000, 0x1000, CRC(b23e632a) SHA1(c0ccc958a99f35f25a1853f618f3e008ce0247a7) )
+    ROM_LOAD( "ic39.bin",       0x1000, 0x1000, CRC(fd75b90e) SHA1(33d2a3c10be2266760a8341a4238a8734fc9c4c8) )
+    ROM_LOAD( "ic40.bin",       0x2000, 0x1000, CRC(86a9b6de) SHA1(458f8019ac0ca192e74bbc908c8d326d561a0b30) )
+    ROM_LOAD( "ic41.bin",       0x3000, 0x1000, CRC(fb6373c2) SHA1(235b7735cc68ec89b6f32b37d01d7ead21d13f64) )
+    ROM_LOAD( "ic33.bin",       0x4000, 0x1000, CRC(7c868725) SHA1(dca370c835fdd0564d42ecca69b9ad2600b1ce31) )
+
+    ROM_REGION( 0x10000, "audiocpu", 0 )
+    ROM_LOAD( "ic22.bin",       0x0000, 0x0800, CRC(f85ead07) SHA1(72479a9b49dd9c629480a2ce72bdd09fbb12b25d) )
+    ROM_LOAD( "ic23.bin",       0x0800, 0x0800, CRC(9eb6c61b) SHA1(a168fa634b6909c2ea484c2bbaa5afee2a5fe616) )
+
+    ROM_REGION( 0x2000, "gfx1", 0 ) /* chars and sprites */
+    ROM_LOAD( "ic9.9",        0x0000, 0x1000, CRC(8c70d18d) SHA1(785099c947ee1fe19196dfb02752cc849640fe21) )
+    ROM_LOAD( "ic8.8",        0x1000, 0x1000, CRC(04d067d3) SHA1(aeb763e658cd3d0bd849cdae6af55cb1008b2143) )
+
+    ROM_REGION( 0x0020, "proms", 0 )
+    ROM_LOAD( "82s123.ic4",      0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
+ROM_END
+
 ROM_START( zaryavos )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "zv1.rom",      0x0000, 0x1000, CRC(b7eec75d) SHA1(cf7ab3a411cf126f01b8ed96c3bd4dfb3d76886a) )
@@ -1095,5 +1115,6 @@ GAME( 1982, funnymou, suprmous, suprmous, suprmous, 0,     ROT90, "bootleg? (Chu
 GAME( 1982, machomou, 0,        suprmous, suprmous, 0,     ROT90, "Techstar", "Macho Mouse", 0 )
 GAME( 1983, intrepid, 0,        intrepid, intrepid, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 1)", 0 )
 GAME( 1983, intrepid2,intrepid, intrepid, intrepid, 0,     ROT90, "Nova Games Ltd.", "Intrepid (set 2)", 0 )
+GAME( 1984, intrepidb,intrepid, intrepid, intrepid, 0,     ROT90, "bootleg (Elsys)", "Intrepid (bootleg)", 0 )
 GAME( 1984, zaryavos, 0,        intrepid, intrepid, 0,     ROT90, "Nova Games of Canada", "Zarya Vostoka", GAME_NOT_WORKING )
 GAME( 198?, rtriv,    0,        intrepid, rtriv,    rtriv, ROT90, "Romar", "Romar Triv", GAME_WRONG_COLORS )

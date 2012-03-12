@@ -1508,6 +1508,45 @@ ROM_START( cninjabl )
 	ROM_LOAD( "joe mac 6.samples",  0x00000,  0x80000, CRC(dbecad83) SHA1(de34653606f12d2c606ff7d1cbce993521772884) ) // 1ST AND 2ND HALF IDENTICAL
 ROM_END
 
+ROM_START( cninjabl2 ) 
+    ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
+    ROM_LOAD16_BYTE( "6.bin", 0x00001, 0x40000, CRC(a86ccfb7) SHA1(c4ac331d5750a35cd48e5d75f0247758b892b034) )
+    ROM_LOAD16_BYTE( "4.bin", 0x00000, 0x40000, CRC(88c7043a) SHA1(9981d10f6c88556ceda083158d9835fdeb191511) )
+    ROM_LOAD16_BYTE( "gn-00.rom",  0x80000, 0x20000, CRC(0b110b16) SHA1(a967c8aeae3f0cee1f354583cf26ee736636aaf8) )
+    ROM_LOAD16_BYTE( "gn-03.rom",  0x80001, 0x20000, CRC(1e28e697) SHA1(2313e97f3a34892dfdc338944c0f00538fcae800) )
+
+    ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU */
+    ROM_LOAD( "audio-prg.3",  0x00000,  0x10000,  CRC(3eb65b6d) SHA1(e6d94223a7b98d33470ad4e387d6ce399b76ea4a) )
+
+    ROM_REGION( 0x020000, "gfx1", 0 )
+    ROM_LOAD16_BYTE( "gl-08.rom",  0x00001,  0x10000,  CRC(33a2b400) SHA1(fdb8de315f33705719c0ac03a61fb56ffbfdf597) )       /* chars */
+    ROM_LOAD16_BYTE( "gl-09.rom",  0x00000,  0x10000,  CRC(5a2d4752) SHA1(617dd10a99b5b55ca64dcdd22a0f133b0d6b770d) )
+
+    ROM_REGION( 0x080000, "gfx2", 0 )
+    ROM_LOAD( "mag-02.rom", 0x000000, 0x80000,  CRC(de89c69a) SHA1(b41bdf859854b5541c7eae7cd541b910cea1f839) )      /* tiles 3 */
+
+    ROM_REGION( 0x100000, "gfx3", 0 )
+    ROM_LOAD( "mag-00.rom", 0x000000, 0x40000,  CRC(a8f05d33) SHA1(a1330bc9ca4648219403db087622badfc632b47d) )      /* tiles 1 */
+    ROM_CONTINUE(           0x080000, 0x40000 )
+    ROM_LOAD( "mag-01.rom", 0x040000, 0x40000,  CRC(5b399eed) SHA1(490f8f9c0c557b0ba94c6019e3fe680641a0787e) )      /* tiles 2 */
+    ROM_CONTINUE(           0x0c0000, 0x40000 )
+
+    ROM_REGION( 0x200000, "gfx4", 0 )
+    ROM_LOAD16_BYTE( "mag-03.rom", 0x000000, 0x80000,  CRC(2220eb9f) SHA1(bdf0bd6e6ba375f0770b9d08a7efa32201cbb6ef) )       /* sprites */
+    ROM_LOAD16_BYTE( "mag-05.rom", 0x000001, 0x80000,  CRC(56a53254) SHA1(10940cfdc6fbe9013865107de3394ca7f782d9c7) )
+    ROM_LOAD16_BYTE( "mag-04.rom", 0x100000, 0x80000,  CRC(144b94cc) SHA1(d982508608942a714b428a2b721bf24e1627cbb6) )
+    ROM_LOAD16_BYTE( "mag-06.rom", 0x100001, 0x80000,  CRC(82d44749) SHA1(c471fa573e00c2f8ae44068439ba6d849a124c68) )
+
+    ROM_REGION( 0x40000, "oki1", 0 ) /* Oki samples */
+    ROM_LOAD( "audio-samp.2",  0x00000,  0x20000,  CRC(c6638568) SHA1(b5e38d807146b033d1a0b5fb013ac755cd4a2699) )
+    ROM_LOAD( "audio-samp.1",  0x00000,  0x10000,  CRC(7815e6ab) SHA1(3112b4e8a4008b519f73e6f2d1393ef1e620a0c5) )
+
+    ROM_REGION( 0x80000, "oki2", 0 ) /* Extra Oki samples */
+    ROM_LOAD( "audio-samp.18", 0x00000,  0x80000,  CRC(06f1bc18) SHA1(fe551d78466dc5b098263520f0ab00200d651593) )   /* banked */
+
+    ROM_REGION( 1024, "proms", 0 )
+    ROM_LOAD( "mb7122h.7v", 0x00000,  0x400,  CRC(a1267336) SHA1(d11ea9d78526ac3c0dc6e57a2da5914273ad1e3f) )        /* Priority  Unused */
+ROM_END
 
 ROM_START( edrandy ) /* World ver 3 */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 code */
@@ -2099,6 +2138,7 @@ GAME( 1991, cninjau,  cninja,  cninja,   cninjau, cninja,   ROT0, "Data East Cor
 GAME( 1991, joemac,   cninja,  cninja,   cninja,  cninja,   ROT0, "Data East Corporation", "Tatakae Genshizin Joe & Mac (Japan ver 1)", GAME_SUPPORTS_SAVE )
 GAME( 1991, stoneage, cninja,  stoneage, cninja,  stoneage, ROT0, "bootleg", "Stoneage (bootleg of Caveman Ninja)", GAME_SUPPORTS_SAVE )
 GAME( 1991, cninjabl, cninja,  cninjabl, cninja,  0,        ROT0, "bootleg",               "Caveman Ninja (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1991, cninjabl2,cninja,  cninjabl, cninja,  0,        ROT0, "bootleg",               "Caveman Ninja (bootleg, alt)", GAME_NOT_WORKING )
 GAME( 1991, robocop2, 0,       robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (Euro/Asia v0.10)", GAME_SUPPORTS_SAVE )
 GAME( 1991, robocop2u,robocop2,robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (US v0.05)", GAME_SUPPORTS_SAVE )
 GAME( 1991, robocop2j,robocop2,robocop2, robocop2,0,        ROT0, "Data East Corporation", "Robocop 2 (Japan v0.11)", GAME_SUPPORTS_SAVE )
