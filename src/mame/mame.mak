@@ -1875,6 +1875,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/extrema.o \
 	$(DRIVERS)/tmspoker.o \
 	$(DRIVERS)/manohman.o \
+	$(DRIVERS)/jankenmn.o \
 
 
 #-------------------------------------------------
@@ -1995,6 +1996,8 @@ $(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
 $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
 
 $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
+
+$(DRIVERS)/jankenmn.o:	$(LAYOUT)/jankenmn.lh
 
 $(DRIVERS)/kas89.o:	$(LAYOUT)/kas89.lh
 

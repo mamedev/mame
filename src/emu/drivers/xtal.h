@@ -52,6 +52,7 @@ enum
 	XTAL_2MHz   		= 2000000,
 	XTAL_2_01216MHz		= 2012160,		/* Cidelsa Draco sound board */
 	XTAL_2_4576MHz		= 2457600,		/* Atari ST MFP */
+	XTAL_2_5MHz			= 2500000,		/* Janken Man units */
 	XTAL_3MHz   		= 3000000,		/* Probably only used to drive 68705 or similar MCUs on 80's Taito PCBs */
 	XTAL_3_12MHz		= 3120000,		/* SP0250 clock on Gottlieb games */
 	XTAL_3_52128MHz		= 3521280,		/* RCA COSMAC VIP */
