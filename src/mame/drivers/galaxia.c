@@ -1,4 +1,4 @@
-/* Galxaia
+/* Galaxia
 
 Galaxia by Zaccaria (1979)
 
@@ -20,6 +20,8 @@ do contain Galaxian-like graphics...
 TS 2008.08.12:
 - fixed rom loading
 - added preliminary video emulation
+
+HW seems to have many similarities with quasar.c / cvs.c
 
 */
 
@@ -147,7 +149,7 @@ static READ8_HANDLER(galaxia_collision_clear)
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM // bullet ram?
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
@@ -158,13 +160,14 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(galaxia_collision_r, galaxia_scroll_w)
-	AM_RANGE(0x01, 0x01) AM_READ(galaxia_collision_clear) // ?
+	AM_RANGE(0x00, 0x00) AM_WRITE(galaxia_scroll_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN5")
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN6")
 	AM_RANGE(0xac, 0xac) AM_READ_PORT("IN3")
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(galaxia_collision_r)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(galaxia_collision_clear) // ?
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
@@ -234,6 +237,9 @@ static INPUT_PORTS_START( galaxia )
 
 	PORT_START("IN7")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SENSE")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
 static const gfx_layout tiles8x8x1_layout =
@@ -308,7 +314,7 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(galaxia)
