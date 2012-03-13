@@ -1986,7 +1986,8 @@ $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 			$(LAYOUT)/pulltabs.lh
 
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
-			$(LAYOUT)/pmpoker.lh
+			$(LAYOUT)/pmpoker.lh \
+			$(LAYOUT)/upndown.lh
 
 $(DRIVERS)/goldstar.o:	$(LAYOUT)/lucky8.lh \
 			$(LAYOUT)/bingowng.lh

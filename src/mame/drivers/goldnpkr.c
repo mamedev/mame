@@ -8,75 +8,77 @@
 
   Games running on this hardware:
 
-  * Golden Poker Double Up (Big Boy).         1981, Bonanza Enterprises, Ltd.
-  * Golden Poker Double Up (Mini Boy).        1981, Bonanza Enterprises, Ltd.
-  * Jack Potten's Poker (set 1).              198?, Bootleg.
-  * Jack Potten's Poker (set 2).              198?, Bootleg in Coinmaster H/W.
-  * Jack Potten's Poker (set 3).              198?, Bootleg.
-  * Jack Potten's Poker (set 4).              198?, Bootleg.
-  * Jack Potten's Poker (set 5).              198?, Bootleg.
-  * Jack Potten's Poker (set 6).              198?, Bootleg.
-  * Good Luck.                                198?, Unknown.
-  * Super Double (french).                    198?, Karateco.
-  * Jack Potten's Poker (NGold, set 1).       198?, Unknown.
-  * Jack Potten's Poker (NGold, set 2).       198?, Unknown.
-  * Jack Potten's Poker (NGold, set 3).       198?, Unknown.
-  * Witch Card (Video Klein CPU box, set 1).  1991, Video Klein.
-  * Witch Card (Video Klein CPU box, set 2).  1991, Video Klein.
-  * Witch Card (Spanish, witch game, set 1).  1991, Unknown.
-  * Witch Card (Spanish, witch game, set 2).  1991, Unknown.
-  * Witch Card (English, no witch game).      1991, Unknown.
-  * Witch Card (German, WC3050, set 1 ).      1994, Proma.
-  * Witch Card (English, witch game, lamps).  1985, PM / Beck Elektronik.
-  * Witch Card (Falcon, enhanced sound).      199?, Falcon.
-  * Witch Card (German, WC3050, set 2 ).      1994, Proma.
-  * Witch Card (German, WC3050, 27-4-94),     1994, Proma.
-  * Witch Game (Video Klein, set 1).          1991, Video Klein.
-  * Witch Game (Video Klein, set 2).          1991, Video Klein.
-  * Jolli Witch (Export, 6T/12T ver 1.57D).   1994, Video Klein?.
-  * Wild Witch (Export, 6T/12T ver 1.74A).    1994, Video Klein.
-  * Buena Suerte (Spanish, set 1).            1990, Unknown.
-  * Buena Suerte (Spanish, set 2).            1991, Unknown.
-  * Buena Suerte (Spanish, set 3).            1991, Unknown.
-  * Buena Suerte (Spanish, set 4).            1991, Unknown.
-  * Buena Suerte (Spanish, set 5).            1991, Unknown.
-  * Buena Suerte (Spanish, set 6).            1991, Unknown.
-  * Buena Suerte (Spanish, set 7).            1991, Unknown.
-  * Buena Suerte (Spanish, set 8).            1991, Unknown.
-  * Buena Suerte (Spanish, set 9).            1991, Unknown.
-  * Buena Suerte (Spanish, set 10).           1991, Unknown.
-  * Buena Suerte (Spanish, set 11).           1991, Unknown.
-  * Buena Suerte (Spanish, set 12).           1991, Unknown.
-  * Buena Suerte (Spanish, set 13).           1991, Unknown.
-  * Buena Suerte (Spanish, set 14).           1991, Unknown.
-  * Buena Suerte (Spanish, set 15).           1991, Unknown.
-  * Buena Suerte (Spanish, set 16).           1991, Unknown.
-  * Buena Suerte (Spanish, set 17).           1991, Unknown.
-  * Buena Suerte (Spanish, set 18).           1991, Unknown.
-  * Buena Suerte (Spanish, set 19).           1991, Unknown.
-  * Buena Suerte (Spanish, set 20).           1991, Unknown.
-  * Buena Suerte (Spanish, set 21).           1991, Unknown.
-  * Buena Suerte (Spanish, set 22).           1991, Unknown.
-  * Falcons Wild - World Wide Poker.          1983, Falcon.
-  * Falcons Wild - World Wide Poker.          1990, Video Klein.
-  * Falcons Wild - Wild Card 1991.            1991, TVG.
-  * PlayMan Poker (german).                   1981, PM / Beck Elektronik.
-  * Super Loco 93 (Spanish, set 1).           1993, Unknown.
-  * Super Loco 93 (Spanish, set 2).           1993, Unknown.
-  * Royale (set 1).                           198?, Unknown.
-  * Royale (set 2).                           198?, Unknown.
-  * Maverik.                                  198?, Unknown.
-  * Brasil 86.                                1986, Unknown.
-  * Brasil 87.                                1987, Unknown.
-  * Brasil 89 (set 1).                        1989, Unknown.
-  * Brasil 89 (set 2).                        1989, Unknown.
-  * Brasil 93.                                1993, Unknown.
-  * Poker 91.                                 1991, Unknown.
-  * Genie.                                    198?, Video Fun Games Ltd.
-  * Silver Game.                              1983, Unknown.
-  * Casino Poker (Ver PM86LO-35-5, German).   1987, PM / Beck Elektronik.
-  * "Unknown french poker game".              198?, Unknown.
-  * "Unknown encrypted poker game".           198?, Unknown.
+  * Golden Poker Double Up (Big Boy).           1981, Bonanza Enterprises, Ltd.
+  * Golden Poker Double Up (Mini Boy).          1981, Bonanza Enterprises, Ltd.
+  * Jack Potten's Poker (set 1).                198?, Bootleg.
+  * Jack Potten's Poker (set 2).                198?, Bootleg in Coinmaster H/W.
+  * Jack Potten's Poker (set 3).                198?, Bootleg.
+  * Jack Potten's Poker (set 4).                198?, Bootleg.
+  * Jack Potten's Poker (set 5).                198?, Bootleg.
+  * Jack Potten's Poker (set 6).                198?, Bootleg.
+  * Good Luck.                                  198?, Unknown.
+  * Super Double (french).                      198?, Karateco.
+  * Jack Potten's Poker (NGold, set 1).         198?, Unknown.
+  * Jack Potten's Poker (NGold, set 2).         198?, Unknown.
+  * Jack Potten's Poker (NGold, set 3).         198?, Unknown.
+  * Witch Card (Video Klein CPU box, set 1).    1991, Video Klein.
+  * Witch Card (Video Klein CPU box, set 2).    1991, Video Klein.
+  * Witch Card (Spanish, witch game, set 1).    1991, Unknown.
+  * Witch Card (Spanish, witch game, set 2).    1991, Unknown.
+  * Witch Card (English, no witch game).        1991, Unknown.
+  * Witch Card (German, WC3050, set 1 ).        1994, Proma.
+  * Witch Card (English, witch game, lamps).    1985, PM / Beck Elektronik.
+  * Witch Card (Falcon, enhanced sound).        199?, Falcon.
+  * Witch Card (German, WC3050, set 2 ).        1994, Proma.
+  * Witch Card (German, WC3050, 27-4-94),       1994, Proma.
+  * Witch Game (Video Klein, set 1).            1991, Video Klein.
+  * Witch Game (Video Klein, set 2).            1991, Video Klein.
+  * Jolli Witch (Export, 6T/12T ver 1.57D).     1994, Video Klein?.
+  * Wild Witch (Export, 6T/12T ver 1.74A).      1994, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 0.99).  1998, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 1.02).  1998, Video Klein.
+  * Buena Suerte (Spanish, set 1).              1990, Unknown.
+  * Buena Suerte (Spanish, set 2).              1991, Unknown.
+  * Buena Suerte (Spanish, set 3).              1991, Unknown.
+  * Buena Suerte (Spanish, set 4).              1991, Unknown.
+  * Buena Suerte (Spanish, set 5).              1991, Unknown.
+  * Buena Suerte (Spanish, set 6).              1991, Unknown.
+  * Buena Suerte (Spanish, set 7).              1991, Unknown.
+  * Buena Suerte (Spanish, set 8).              1991, Unknown.
+  * Buena Suerte (Spanish, set 9).              1991, Unknown.
+  * Buena Suerte (Spanish, set 10).             1991, Unknown.
+  * Buena Suerte (Spanish, set 11).             1991, Unknown.
+  * Buena Suerte (Spanish, set 12).             1991, Unknown.
+  * Buena Suerte (Spanish, set 13).             1991, Unknown.
+  * Buena Suerte (Spanish, set 14).             1991, Unknown.
+  * Buena Suerte (Spanish, set 15).             1991, Unknown.
+  * Buena Suerte (Spanish, set 16).             1991, Unknown.
+  * Buena Suerte (Spanish, set 17).             1991, Unknown.
+  * Buena Suerte (Spanish, set 18).             1991, Unknown.
+  * Buena Suerte (Spanish, set 19).             1991, Unknown.
+  * Buena Suerte (Spanish, set 20).             1991, Unknown.
+  * Buena Suerte (Spanish, set 21).             1991, Unknown.
+  * Buena Suerte (Spanish, set 22).             1991, Unknown.
+  * Falcons Wild - World Wide Poker.            1983, Falcon.
+  * Falcons Wild - World Wide Poker.            1990, Video Klein.
+  * Falcons Wild - Wild Card 1991.              1991, TVG.
+  * PlayMan Poker (german).                     1981, PM / Beck Elektronik.
+  * Super Loco 93 (Spanish, set 1).             1993, Unknown.
+  * Super Loco 93 (Spanish, set 2).             1993, Unknown.
+  * Royale (set 1).                             198?, Unknown.
+  * Royale (set 2).                             198?, Unknown.
+  * Maverik.                                    198?, Unknown.
+  * Brasil 86.                                  1986, Unknown.
+  * Brasil 87.                                  1987, Unknown.
+  * Brasil 89 (set 1).                          1989, Unknown.
+  * Brasil 89 (set 2).                          1989, Unknown.
+  * Brasil 93.                                  1993, Unknown.
+  * Poker 91.                                   1991, Unknown.
+  * Genie.                                      198?, Video Fun Games Ltd.
+  * Silver Game.                                1983, Unknown.
+  * Casino Poker (Ver PM86LO-35-5, German).     1987, PM / Beck Elektronik.
+  * "Unknown french poker game".                198?, Unknown.
+  * "Unknown encrypted poker game".             198?, Unknown.
 
 
 ************************************************************************************
@@ -276,7 +278,7 @@
 
 
   * Casino Poker
-
+  
   Bipolar PROM 24sa10 is filled with 0x09, so has at least
   fixed bits 0 and 3 along the whole data. Needs a redump using a supported
   EEPROM programmer.
@@ -797,8 +799,20 @@
   - Added Casino Poker (Ver PM86LO-35-5, German).
   - Inputs from the scratch.
   - Switched manufacturer 'Playman' to PM / Beck Elektronik, since
-     it's PM and Beck Elektronik/Computer/etc...
+     it's PM and Beck Elektronik/Computer/etc... 
   - Added technical and game notes.
+
+
+  [2012-03-12]
+
+  - Emulated the Video Klein extended hardware, with Dallas Timekeeper,
+     and the insane 16 graphics banks scheme.
+  - Added Witch Up & Down (Export, 6T/12T ver 0.99).
+  - Added Witch Up & Down (Export, 6T/12T ver 1.02).
+  - Switched Wild Witch and Jolli Witch to the extended hardware.
+  - Accurate colors.
+  - Inputs and lamps from the scratch.
+  - Added technical notes.
 
 
 
@@ -828,6 +842,7 @@
 
 #include "pmpoker.lh"
 #include "goldnpkr.lh"
+#include "upndown.lh"
 
 
 class goldnpkr_state : public driver_device
@@ -882,21 +897,20 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(bank, code, color, 0);
 }
 
-static TILE_GET_INFO( xtnd_get_bg_tile_info )
+static TILE_GET_INFO( wcrdxtnd_get_bg_tile_info )
 {
 	goldnpkr_state *state = machine.driver_data<goldnpkr_state>();
-/* 3 graphics banks system for VK extended cards
+/* 16 graphics banks system for VK extended (up & down) PCB's
 
     - bits -
     7654 3210
     --xx xx--   tiles color.
-    x--- --x-   tiles bank.
-    -x-- ---x   unused.
+    xx-- --xx   tiles bank.
 */
 
 	int attr = state->m_colorram[tile_index];
 	int code = ((attr & 1) << 8) | state->m_videoram[tile_index];
-	int bank = ((attr & 0x02) >> 1) + ((attr & 0x80) >> 7);	/* bit 1 & 7 switch the gfx banks */
+	int bank = (attr & 0x03) + ((attr & 0xc0) >> 4);	/* bits 0, 1, 6 & 7 switch the gfx banks */
 	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 
 	SET_TILE_INFO(bank, code, color, 0);
@@ -911,7 +925,7 @@ static VIDEO_START( goldnpkr )
 static VIDEO_START( wcrdxtnd )
 {
 	goldnpkr_state *state = machine.driver_data<goldnpkr_state>();
-	state->m_bg_tilemap = tilemap_create(machine, xtnd_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap = tilemap_create(machine, wcrdxtnd_get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
 static SCREEN_UPDATE_IND16( goldnpkr )
@@ -1160,6 +1174,16 @@ static WRITE8_DEVICE_HANDLER( wcfalcon_snd_w )
   ------------------
   NONE. Just they lack of lamps...
 
+  --------
+  wupndown
+  --------
+
+  7654 3210
+  ---- ---x  Bet Lamp.
+  ---- --x-  Deal Lamp.
+  ---- -x--  Holds+Cancel Lamps.
+  ---- x---  Take Lamp.
+
 */
 
 static WRITE8_DEVICE_HANDLER( lamps_a_w )
@@ -1173,6 +1197,8 @@ static WRITE8_DEVICE_HANDLER( lamps_a_w )
 	coin_counter_w(device->machine(), 0, data & 0x40);	/* counter1 */
 	coin_counter_w(device->machine(), 1, data & 0x80);	/* counter2 */
 	coin_counter_w(device->machine(), 2, data & 0x20);	/* counter3 */
+
+//	popmessage("written : %02X", (0xff - data));
 
 /*  Counters:
 
@@ -2224,10 +2250,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( wldwitch )
 	/* Multiplexed - 4x5bits */
 	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Meters")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet (Setzen)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Bookkeeping / Test")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double Up")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal (Geben)")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2236,7 +2262,7 @@ static INPUT_PORTS_START( wldwitch )
 	PORT_START("IN0-1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_IMPULSE(3) PORT_NAME("Manual Collect") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_NAME("Take")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2254,8 +2280,8 @@ static INPUT_PORTS_START( wldwitch )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	// service F2?
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN3-2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note In")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Weight (Coupon In)")
@@ -2343,7 +2369,7 @@ static INPUT_PORTS_START( wldwitch )
 	PORT_DIPNAME( 0x04, 0x04, "Game Type" )			PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "Wild Witch" )
 	PORT_DIPSETTING(    0x00, "Witch Game" )
-	PORT_DIPNAME( 0x08, 0x08, "Taster?" )			PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x08, 0x08, "Control Type" )		PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x00, "6 Taster" )
 	PORT_DIPSETTING(    0x08, "12 Taster" )
 	PORT_DIPNAME( 0x10, 0x00, "Minimal Hand" )		PORT_DIPLOCATION("SW2:5")
@@ -2358,6 +2384,101 @@ static INPUT_PORTS_START( wldwitch )
 	PORT_DIPNAME( 0x80, 0x00, "Royal Flush" )		PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( wupndown )
+	/* Multiplexed - 4x5bits */
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet (Setzen)")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Bookkeeping / Test")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal (Geben)")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )    PORT_NAME("Take")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1 / Take")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Double-Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_F2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Weight (Coupon In)")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Minimal Hand" )		PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "2 Paar" )
+	PORT_DIPSETTING(    0x00, "Hohes Paar" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sloco93 )
@@ -2831,11 +2952,23 @@ static GFXDECODE_START( goldnpkr )
 GFXDECODE_END
 
 static GFXDECODE_START( wcrdxtnd )
+	GFXDECODE_ENTRY( "gfx0", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx5", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx6", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx7", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx8", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx9", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx10", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx11", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx12", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx13", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx14", 0, tilelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx15", 0, tilelayout, 0, 16 )
 GFXDECODE_END
-
 
 /*******************************************
 *              PIA Interfaces              *
@@ -4791,37 +4924,105 @@ ROM_START( pokerduc )
 ROM_END
 
 
-/*  Jolli Witch (german)
-    Epoxy CPU box.
+/************************************
 
-    Using the whole addressing
-*/
+  Jolli Witch (german)
+  Epoxy CPU box.
+
+  Using the whole addressing
+
+************************************/
+
 ROM_START( witchjol )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* inside epoxy block with the CPU */
 	ROM_LOAD( "27c256.bin",	0x8000, 0x8000, CRC(14f05e3b) SHA1(83578f6a82b0974dd0325903926b2fd0d8e5c236) )
 
-	ROM_REGION( 0x6000, "temp", 0 )
-	ROM_LOAD( "iii.5a",	0x0000, 0x2000, CRC(5ea338da) SHA1(5e55e17689541ffb9c23e45f689dda98a79bf789) )
-	ROM_LOAD( "ii.4a",	0x2000, 0x2000, CRC(044dfac0) SHA1(721f8f57e05ddcbdb838d12fd3e81a45346ee6db) )
-	ROM_LOAD( "i.2a",	0x4000, 0x2000, CRC(d467f6e2) SHA1(6aaf4cdfb76f5efeeee45635fea120711483648e) )
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "iii.5a",	0x00000, 0x2000, CRC(5ea338da) SHA1(5e55e17689541ffb9c23e45f689dda98a79bf789) )
+	ROM_LOAD( "ii.4a",	0x10000, 0x2000, CRC(044dfac0) SHA1(721f8f57e05ddcbdb838d12fd3e81a45346ee6db) )
+	ROM_LOAD( "i.2a",	0x08000, 0x2000, CRC(d467f6e2) SHA1(6aaf4cdfb76f5efeeee45635fea120711483648e) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling bitplanes */
+	ROM_COPY( "temp",	0x0000, 0x1000, 0x0800 )	/* 0000-07ff of iii.5a - char rom, bitplane 3 */
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling bitplanes */
-	ROM_COPY( "temp",	0x0000, 0x1000, 0x0800 )	/* 0000-07ff of 03.a3 - char rom, bitplane 3*/
+	ROM_COPY( "temp",	0x08800, 0x0000, 0x0800 )	/* 0800-0fff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x10800, 0x0800, 0x0800 )	/* 0800-0fff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x01000, 0x1000, 0x0800 )	/* 1000-17ff of iii.5a - empty, bitplane 3 */
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",	0x4000, 0x0000, 0x0800 )	/* 0800-0fff of 03.a3 - regular cards gfx, bitplane 3 */
-	ROM_COPY( "temp",	0x2000, 0x0800, 0x0800 )	/* 0000-07ff of 02.a2 - regular cards gfx, bitplane 2 */
-	ROM_COPY( "temp",	0x0800, 0x1000, 0x0800 )	/* 0000-07ff of 01.a1 - regular cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x08000, 0x0000, 0x0800 )	/* 0000-07ff of i.2a - regular cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x10000, 0x0800, 0x0800 )	/* 0000-07ff of ii.4a - regular cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x00800, 0x1000, 0x0800 )	/* 0800-0fff of iii.5a - regular cards gfx, bitplane 3 */
 
 	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",	0x05000, 0x0000, 0x0800 )	/* 1800-1fff of 03.a3 - extended cards gfx, bitplane 3 */
-	ROM_COPY( "temp",	0x03000, 0x0800, 0x0800 )	/* 1000-17ff of 02.a2 - extended cards gfx, bitplane 2 */
-	ROM_COPY( "temp",	0x01800, 0x1000, 0x0800 )	/* 1000-17ff of 01.a1 - extended cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x0c000, 0x0000, 0x0800 )	/* 4000-47ff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x14000, 0x0800, 0x0800 )	/* 4000-47ff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x04800, 0x1000, 0x0800 )	/* 4800-4fff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",	0x09800, 0x0000, 0x0800 )	/* 1800-1fff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x11800, 0x0800, 0x0800 )	/* 1800-1fff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x02000, 0x1000, 0x0800 )	/* 1800-1fff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",	0x0a000, 0x0000, 0x0800 )	/* 2000-27ff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x12000, 0x0800, 0x0800 )	/* 2000-27ff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x02800, 0x1000, 0x0800 )	/* 2800-2fff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",	0x0a800, 0x0000, 0x0800 )	/* 2800-2fff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x12800, 0x0800, 0x0800 )	/* 2800-2fff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03000, 0x1000, 0x0800 )	/* 3000-37ff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",	0x0b800, 0x0000, 0x0800 )	/* 3800-3fff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13800, 0x0800, 0x0800 )	/* 3800-3fff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x04000, 0x1000, 0x0800 )	/* 3800-3fff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",	0x0c800, 0x0000, 0x0800 )	/* 4800-4fff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x14800, 0x0800, 0x0800 )	/* 4800-4fff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x05000, 0x1000, 0x0800 )	/* 4000-47ff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",	0x09000, 0x0000, 0x0800 )	/* 1000-17ff of i.2a - extended cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x11000, 0x0800, 0x0800 )	/* 1000-17ff of ii.4a - extended cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x01800, 0x1000, 0x0800 )	/* 1800-1fff of iii.5a - extended cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",	0x0d000, 0x0000, 0x0800 )	/* 5000-57ff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x15000, 0x0800, 0x0800 )	/* 5000-57ff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x05800, 0x1000, 0x0800 )	/* 5800-5fff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",	0x0d800, 0x0000, 0x0800 )	/* 5800-5fff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x15800, 0x0800, 0x0800 )	/* 5800-5fff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06000, 0x1000, 0x0800 )	/* 6000-67ff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",	0x0e000, 0x0000, 0x0800 )	/* 6000-67ff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x16000, 0x0800, 0x0800 )	/* 6000-67ff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06800, 0x1000, 0x0800 )	/* 6800-6fff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of iii.5a - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",	0x0f000, 0x0000, 0x0800 )	/* 7000-77ff of i.2a - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x17000, 0x0800, 0x0800 )	/* 7000-77ff of ii.4a - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x07800, 0x1000, 0x0800 )	/* 7800-7fff of iii.5a - empty, bitplane 3 */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-//  ROM_LOAD( "24s10.bin",  0x0000, 0x0100, BAD_DUMP CRC(d5018fc0) SHA1(05c67d84da0a4053bcd3b9d144643d83892470ef) )
-	ROM_LOAD( "24s10.clr",	0x0000, 0x0100, BAD_DUMP CRC(560aafa5) SHA1(a85a72f7616146eae0d00b2fedf7b053a4794d10) )
+	ROM_LOAD( "witchjol_tbp.bin",	0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
 ROM_END
 
 /******************************************
@@ -4843,26 +5044,90 @@ ROM_START( wldwitch )
 
 	ROM_REGION( 0x18000, "temp", 0 )
 	ROM_LOAD( "03.a3",	0x00000, 0x8000, CRC(ae474414) SHA1(6dee760cee18e125791c17b562ca8aabe1f4593e) )
-	ROM_LOAD( "02.a2",	0x08000, 0x8000, CRC(f6450111) SHA1(8b44c90c62d5026ccfba88b31e1113e01c6bcf85) )
-	ROM_LOAD( "01.a1",	0x10000, 0x8000, CRC(6d644987) SHA1(26243abe051f3266e2d1743ec599d4e8bbb692e4) )
+	ROM_LOAD( "02.a2",	0x10000, 0x8000, CRC(f6450111) SHA1(8b44c90c62d5026ccfba88b31e1113e01c6bcf85) )
+	ROM_LOAD( "01.a1",	0x08000, 0x8000, CRC(6d644987) SHA1(26243abe051f3266e2d1743ec599d4e8bbb692e4) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling bitplanes */
+	ROM_COPY( "temp",	0x0000, 0x1000, 0x0800 )	/* 0000-07ff of 03.a3 - char rom, bitplane 3 */
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
-	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling bitplanes */
-	ROM_COPY( "temp",	0x0000, 0x1000, 0x0800 )	/* 0000-07ff of 03.a3 - char rom, bitplane 3*/
+	ROM_COPY( "temp",	0x08800, 0x0000, 0x0800 )	/* 0800-0fff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x10800, 0x0800, 0x0800 )	/* 0800-0fff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x01000, 0x1000, 0x0800 )	/* 1000-17ff of 03.a3 - empty, bitplane 3 */
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
-	ROM_COPY( "temp",	0x10000, 0x0000, 0x0800 )	/* 0000-07ff of 01.a1 - regular cards gfx, bitplane 1 */
-	ROM_COPY( "temp",	0x08000, 0x0800, 0x0800 )	/* 0000-07ff of 02.a2 - regular cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x08000, 0x0000, 0x0800 )	/* 0000-07ff of 01.a1 - regular cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x10000, 0x0800, 0x0800 )	/* 0000-07ff of 02.a2 - regular cards gfx, bitplane 2 */
 	ROM_COPY( "temp",	0x00800, 0x1000, 0x0800 )	/* 0800-0fff of 03.a3 - regular cards gfx, bitplane 3 */
 
 	ROM_REGION( 0x1800, "gfx3", 0 )
-	ROM_COPY( "temp",	0x11000, 0x0000, 0x0800 )	/* 1000-17ff of 01.a1 - extended cards gfx, bitplane 1 */
-	ROM_COPY( "temp",	0x09000, 0x0800, 0x0800 )	/* 1000-17ff of 02.a2 - extended cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x0c000, 0x0000, 0x0800 )	/* 4000-47ff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x14000, 0x0800, 0x0800 )	/* 4000-47ff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x04800, 0x1000, 0x0800 )	/* 4800-4fff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",	0x09800, 0x0000, 0x0800 )	/* 1800-1fff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x11800, 0x0800, 0x0800 )	/* 1800-1fff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x02000, 0x1000, 0x0800 )	/* 1800-1fff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",	0x0a000, 0x0000, 0x0800 )	/* 2000-27ff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x12000, 0x0800, 0x0800 )	/* 2000-27ff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x02800, 0x1000, 0x0800 )	/* 2800-2fff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",	0x0a800, 0x0000, 0x0800 )	/* 2800-2fff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x12800, 0x0800, 0x0800 )	/* 2800-2fff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03000, 0x1000, 0x0800 )	/* 3000-37ff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",	0x0b800, 0x0000, 0x0800 )	/* 3800-3fff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13800, 0x0800, 0x0800 )	/* 3800-3fff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x04000, 0x1000, 0x0800 )	/* 3800-3fff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",	0x0c800, 0x0000, 0x0800 )	/* 4800-4fff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x14800, 0x0800, 0x0800 )	/* 4800-4fff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x05000, 0x1000, 0x0800 )	/* 4000-47ff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",	0x09000, 0x0000, 0x0800 )	/* 1000-17ff of 01.a1 - extended cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x11000, 0x0800, 0x0800 )	/* 1000-17ff of 02.a2 - extended cards gfx, bitplane 2 */
 	ROM_COPY( "temp",	0x01800, 0x1000, 0x0800 )	/* 1800-1fff of 03.a3 - extended cards gfx, bitplane 3 */
 
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",	0x0d000, 0x0000, 0x0800 )	/* 5000-57ff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x15000, 0x0800, 0x0800 )	/* 5000-57ff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x05800, 0x1000, 0x0800 )	/* 5800-5fff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",	0x0d800, 0x0000, 0x0800 )	/* 5800-5fff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x15800, 0x0800, 0x0800 )	/* 5800-5fff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06000, 0x1000, 0x0800 )	/* 6000-67ff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",	0x0e000, 0x0000, 0x0800 )	/* 6000-67ff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x16000, 0x0800, 0x0800 )	/* 6000-67ff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06800, 0x1000, 0x0800 )	/* 6800-6fff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of 03.a3 - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",	0x0f000, 0x0000, 0x0800 )	/* 7000-77ff of 01.a1 - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x17000, 0x0800, 0x0800 )	/* 7000-77ff of 02.a2 - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x07800, 0x1000, 0x0800 )	/* 7800-7fff of 03.a3 - empty, bitplane 3 */
+
 	ROM_REGION( 0x0100, "proms", 0 )
-//  ROM_LOAD( "24s10.bin",  0x0000, 0x0100, BAD_DUMP CRC(d5018fc0) SHA1(05c67d84da0a4053bcd3b9d144643d83892470ef) )
-	ROM_LOAD( "24s10.clr",	0x0000, 0x0100, BAD_DUMP CRC(560aafa5) SHA1(a85a72f7616146eae0d00b2fedf7b053a4794d10) )
+	ROM_LOAD( "wldwitch_tbp.bin",	0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
 
 	ROM_REGION( 0x0400, "proms2", 0 )
 	ROM_LOAD( "82s137.box",	0x0000, 0x0400, CRC(4ae3ecf5) SHA1(e1e540ae13e7ce5ac6391f325160ec997ea6cc2f) )
@@ -4917,6 +5182,201 @@ ROM_START( caspoker )
 
 	ROM_REGION( 0x0100, "proms", 0 )	/* from other games */
 	ROM_LOAD( "24sa10.bin",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
+/************************************************
+
+  Witch Up & Down
+  (1988, Video Klein)
+
+  16 gfx banks!!!.
+  an insane work :)
+
+************************************************/
+
+ROM_START( wupndown )	/* Witch Up & Down (Export, 6T/12T ver 1.02) */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "updown_19981024.bin",	0x8000, 0x8000, CRC(cea0dcbd) SHA1(732ec0c60529f4a4a6c3d7a9bfcab741f3cb4787) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "updown1.bin",	0x00000, 0x8000, CRC(c37aad3e) SHA1(1c957838a0d50bb8a5808a58c87d22dfc13c645d) )
+	ROM_LOAD( "updown2.bin",	0x08000, 0x8000, CRC(47cdd068) SHA1(fe641c66915153ae6e8e5492c225157cbd02bd4c) )
+	ROM_LOAD( "updown3.bin",	0x10000, 0x8000, CRC(905c3224) SHA1(6356f2bd8a1f8952b186dc6f9ed1705d1e918a64) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling bitplanes */
+	ROM_COPY( "temp",	0x0000, 0x1000, 0x0800 )	/* 0000-07ff of updown1.bin - char rom, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",	0x08800, 0x0000, 0x0800 )	/* 0800-0fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x10800, 0x0800, 0x0800 )	/* 0800-0fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x01000, 0x1000, 0x0800 )	/* 1000-17ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",	0x08000, 0x0000, 0x0800 )	/* 0000-07ff of updown2.bin - regular cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x10000, 0x0800, 0x0800 )	/* 0000-07ff of updown3.bin - regular cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x00800, 0x1000, 0x0800 )	/* 0800-0fff of updown1.bin - regular cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",	0x0c000, 0x0000, 0x0800 )	/* 4000-47ff of updown2.bin - upper-left box tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x14000, 0x0800, 0x0800 )	/* 4000-47ff of updown3.bin - upper-left box tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x04800, 0x1000, 0x0800 )	/* 4800-4fff of updown1.bin - upper-left box tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",	0x09800, 0x0000, 0x0800 )	/* 1800-1fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x11800, 0x0800, 0x0800 )	/* 1800-1fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x02000, 0x1000, 0x0800 )	/* 1800-1fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",	0x0a000, 0x0000, 0x0800 )	/* 2000-27ff of updown2.bin - giant 'Video Klein' logo tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x12000, 0x0800, 0x0800 )	/* 2000-27ff of updown3.bin - giant 'Video Klein' logo tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x02800, 0x1000, 0x0800 )	/* 2800-2fff of updown1.bin - giant 'Video Klein' logo tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",	0x0a800, 0x0000, 0x0800 )	/* 2800-2fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x12800, 0x0800, 0x0800 )	/* 2800-2fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03000, 0x1000, 0x0800 )	/* 3000-37ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of updown2.bin - D-UP ladder tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of updown3.bin - D-UP ladder tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - D-UP ladder tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",	0x0b800, 0x0000, 0x0800 )	/* 3800-3fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13800, 0x0800, 0x0800 )	/* 3800-3fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x04000, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",	0x0c800, 0x0000, 0x0800 )	/* 4800-4fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x14800, 0x0800, 0x0800 )	/* 4800-4fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x05000, 0x1000, 0x0800 )	/* 4000-47ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",	0x09000, 0x0000, 0x0800 )	/* 1000-17ff of updown2.bin - extended cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x11000, 0x0800, 0x0800 )	/* 1000-17ff of updown3.bin - extended cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x01800, 0x1000, 0x0800 )	/* 1800-1fff of updown1.bin - extended cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",	0x0d000, 0x0000, 0x0800 )	/* 5000-57ff of updown2.bin - 'Up & Down' logo tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x15000, 0x0800, 0x0800 )	/* 5000-57ff of updown3.bin - 'Up & Down' logo tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x05800, 0x1000, 0x0800 )	/* 5800-5fff of updown1.bin - 'Up & Down' logo tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",	0x0d800, 0x0000, 0x0800 )	/* 5800-5fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x15800, 0x0800, 0x0800 )	/* 5800-5fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06000, 0x1000, 0x0800 )	/* 6000-67ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",	0x0e000, 0x0000, 0x0800 )	/* 6000-67ff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x16000, 0x0800, 0x0800 )	/* 6000-67ff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06800, 0x1000, 0x0800 )	/* 6800-6fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of updown2.bin - D-UP ladder tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of updown3.bin - D-UP ladder tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - D-UP ladder tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",	0x0f000, 0x0000, 0x0800 )	/* 7000-77ff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x17000, 0x0800, 0x0800 )	/* 7000-77ff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x07800, 0x1000, 0x0800 )	/* 7800-7fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "updown_tbp.bin",	0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wupndowna )	/* Witch Up & Down (Export, 6T/12T ver 0.99) */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "updown_19980409.bin",	0x8000, 0x8000, CRC(f0f0da16) SHA1(06d89881347d9bf2a09734ec4d405ff1c9fea0a8) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "updown1.bin",	0x00000, 0x8000, CRC(c37aad3e) SHA1(1c957838a0d50bb8a5808a58c87d22dfc13c645d) )
+	ROM_LOAD( "updown2.bin",	0x08000, 0x8000, CRC(47cdd068) SHA1(fe641c66915153ae6e8e5492c225157cbd02bd4c) )
+	ROM_LOAD( "updown3.bin",	0x10000, 0x8000, CRC(905c3224) SHA1(6356f2bd8a1f8952b186dc6f9ed1705d1e918a64) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling bitplanes */
+	ROM_COPY( "temp",	0x0000, 0x1000, 0x0800 )	/* 0000-07ff of updown1.bin - char rom, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",	0x08800, 0x0000, 0x0800 )	/* 0800-0fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x10800, 0x0800, 0x0800 )	/* 0800-0fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x01000, 0x1000, 0x0800 )	/* 1000-17ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",	0x08000, 0x0000, 0x0800 )	/* 0000-07ff of updown2.bin - regular cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x10000, 0x0800, 0x0800 )	/* 0000-07ff of updown3.bin - regular cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x00800, 0x1000, 0x0800 )	/* 0800-0fff of updown1.bin - regular cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",	0x0c000, 0x0000, 0x0800 )	/* 4000-47ff of updown2.bin - upper-left box tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x14000, 0x0800, 0x0800 )	/* 4000-47ff of updown3.bin - upper-left box tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x04800, 0x1000, 0x0800 )	/* 4800-4fff of updown1.bin - upper-left box tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",	0x09800, 0x0000, 0x0800 )	/* 1800-1fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x11800, 0x0800, 0x0800 )	/* 1800-1fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x02000, 0x1000, 0x0800 )	/* 1800-1fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",	0x0a000, 0x0000, 0x0800 )	/* 2000-27ff of updown2.bin - giant 'Video Klein' logo tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x12000, 0x0800, 0x0800 )	/* 2000-27ff of updown3.bin - giant 'Video Klein' logo tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x02800, 0x1000, 0x0800 )	/* 2800-2fff of updown1.bin - giant 'Video Klein' logo tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",	0x0a800, 0x0000, 0x0800 )	/* 2800-2fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x12800, 0x0800, 0x0800 )	/* 2800-2fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03000, 0x1000, 0x0800 )	/* 3000-37ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of updown2.bin - D-UP ladder tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of updown3.bin - D-UP ladder tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - D-UP ladder tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",	0x0b800, 0x0000, 0x0800 )	/* 3800-3fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13800, 0x0800, 0x0800 )	/* 3800-3fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x04000, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",	0x0c800, 0x0000, 0x0800 )	/* 4800-4fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x14800, 0x0800, 0x0800 )	/* 4800-4fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x05000, 0x1000, 0x0800 )	/* 4000-47ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",	0x09000, 0x0000, 0x0800 )	/* 1000-17ff of updown2.bin - extended cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x11000, 0x0800, 0x0800 )	/* 1000-17ff of updown3.bin - extended cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x01800, 0x1000, 0x0800 )	/* 1800-1fff of updown1.bin - extended cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",	0x0d000, 0x0000, 0x0800 )	/* 5000-57ff of updown2.bin - 'Up & Down' logo tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x15000, 0x0800, 0x0800 )	/* 5000-57ff of updown3.bin - 'Up & Down' logo tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x05800, 0x1000, 0x0800 )	/* 5800-5fff of updown1.bin - 'Up & Down' logo tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",	0x0d800, 0x0000, 0x0800 )	/* 5800-5fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x15800, 0x0800, 0x0800 )	/* 5800-5fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06000, 0x1000, 0x0800 )	/* 6000-67ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",	0x0e000, 0x0000, 0x0800 )	/* 6000-67ff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x16000, 0x0800, 0x0800 )	/* 6000-67ff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06800, 0x1000, 0x0800 )	/* 6800-6fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of updown2.bin - D-UP ladder tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of updown3.bin - D-UP ladder tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - D-UP ladder tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",	0x0f000, 0x0000, 0x0800 )	/* 7000-77ff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x17000, 0x0800, 0x0800 )	/* 7000-77ff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x07800, 0x1000, 0x0800 )	/* 7800-7fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "updown_tbp.bin",	0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
 ROM_END
 
 
@@ -5129,85 +5589,87 @@ static DRIVER_INIT( icp1db )
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
-GAMEL( 1981, goldnpkr, 0,        goldnpkr, goldnpkr, 0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
-GAMEL( 1981, goldnpkb, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",       0,                layout_goldnpkr )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
+GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, 0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
+GAMEL( 1981, goldnpkb,  goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Mini Boy)",       0,                layout_goldnpkr )
 
-GAMEL( 198?, pottnpkr, 0,        pottnpkr, pottnpkr, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 1)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkra, pottnpkr, pottnpkr, potnpkra, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 2)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrb, pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 3)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrc, pottnpkr, pottnpkr, potnpkrc, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 4)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkrd, pottnpkr, pottnpkr, potnpkrc, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 5)",             0,                layout_goldnpkr )
-GAMEL( 198?, potnpkre, pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
-GAMEL( 198?, superdbl, pottnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
-GAMEL( 198?, ngold,    pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",      0,                layout_goldnpkr )
-GAMEL( 198?, ngolda,   pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",      0,                layout_goldnpkr )
-GAMEL( 198?, ngoldb,   pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",      GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )
+GAMEL( 198?, pottnpkr,  0,        pottnpkr, pottnpkr, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 1)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkra,  pottnpkr, pottnpkr, potnpkra, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 2)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrb,  pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 3)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrc,  pottnpkr, pottnpkr, potnpkrc, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 4)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkrd,  pottnpkr, pottnpkr, potnpkrc, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 5)",             0,                layout_goldnpkr )
+GAMEL( 198?, potnpkre,  pottnpkr, pottnpkr, pottnpkr, 0,        ROT0,   "bootleg",                  "Jack Potten's Poker (set 6)",             0,                layout_goldnpkr )
+GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
+GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",      0,                layout_goldnpkr )
+GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",      0,                layout_goldnpkr )
+GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngold,    0,        ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",      GAME_IMPERFECT_GRAPHICS, layout_goldnpkr )
 
-GAMEL( 1991, witchcrd, 0,        witchcrd, witchcrd, vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)", 0,                layout_goldnpkr )
-GAME(  1991, witchcda, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)", 0 )
-GAME(  1991, witchcdb, witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)", 0 )
-GAME(  1991, witchcdc, witchcrd, witchcrd, witchcdc, 0,        ROT0,   "<unknown>",                "Witch Card (English, no witch game)",     0 )
-GAMEL( 1994, witchcdd, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",     0,                layout_goldnpkr )
-GAMEL( 1991, witchcde, witchcrd, witchcrd, witchcrd, vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)", 0,                layout_goldnpkr )
-GAMEL( 1985, witchcdf, witchcrd, witchcrd, witchcdf, 0,        ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)", 0,                layout_goldnpkr )
-GAMEL( 199?, witchcdg, witchcrd, wcfalcon, witchcrd, 0,        ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",     0,                layout_goldnpkr )
-GAMEL( 1994, witchcdh, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",     0,                layout_goldnpkr )
-GAMEL( 1994, witchcdi, witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",    0,                layout_goldnpkr )
-GAMEL( 1991, witchgme, witchcrd, witchcrd, witchcrd, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",         0,                layout_goldnpkr )
-GAMEL( 1997, witchcdk, witchcrd, witchcrd, witchcrd, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",         GAME_NOT_WORKING, layout_goldnpkr )
-GAMEL( 1994, witchjol, witchcrd, wcrdxtnd, witchjol, vkdlsa,   ROT0,   "Video Klein?",             "Jolli Witch (Export, 6T/12T ver 1.57D)",  GAME_IMPERFECT_COLORS, layout_goldnpkr )
-GAMEL( 1994, wldwitch, witchcrd, wcrdxtnd, wldwitch, vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",   GAME_IMPERFECT_COLORS, layout_goldnpkr )
+GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)", 0,                layout_goldnpkr )
+GAME(  1991, witchcda,  witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)", 0 )
+GAME(  1991, witchcdb,  witchcrd, witchcrd, witchcda, 0,        ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)", 0 )
+GAME(  1991, witchcdc,  witchcrd, witchcrd, witchcdc, 0,        ROT0,   "<unknown>",                "Witch Card (English, no witch game)",     0 )
+GAMEL( 1994, witchcdd,  witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",     0,                layout_goldnpkr )
+GAMEL( 1991, witchcde,  witchcrd, witchcrd, witchcrd, vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)", 0,                layout_goldnpkr )
+GAMEL( 1985, witchcdf,  witchcrd, witchcrd, witchcdf, 0,        ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)", 0,                layout_goldnpkr )
+GAMEL( 199?, witchcdg,  witchcrd, wcfalcon, witchcrd, 0,        ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",     0,                layout_goldnpkr )
+GAMEL( 1994, witchcdh,  witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",     0,                layout_goldnpkr )
+GAMEL( 1994, witchcdi,  witchcrd, witchcrd, witchcdd, 0,        ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",    0,                layout_goldnpkr )
+GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",         0,                layout_goldnpkr )
+GAMEL( 1997, witchcdk,  witchgme, witchcrd, witchcrd, 0,        ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",         GAME_NOT_WORKING, layout_goldnpkr )
+GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",  0,                layout_goldnpkr )
+GAMEL( 1994, wldwitch,  0,        wcrdxtnd, wldwitch, vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",   0,                layout_goldnpkr )
+GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)", 0,              layout_upndown )
+GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99)", 0,              layout_upndown )
 
-GAMEL( 1990, bsuerte,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertea, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteb, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 3)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertec, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 4)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuerted, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 5)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertee, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 6)",           0,                layout_goldnpkr )
-GAMEL( 1991, bsuertef, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 7)",           0,                layout_goldnpkr )
-GAME(  1991, bsuerteg, bsuerte,  witchcrd, bsuertew, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 8)",           0 )
-GAME(  1991, bsuerteh, bsuerte,  witchcrd, bsuertew, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 9)",           0 )
-GAMEL( 1991, bsuertei, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 10)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertej, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 11)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertek, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 12)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertel, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 13)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertem, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 14)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerten, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 15)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteo, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 16)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertep, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 17)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteq, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 18)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 19)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertes, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 20)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuertet, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 21)",          0,                layout_goldnpkr )
-GAMEL( 1991, bsuerteu, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 22)",          0,                layout_goldnpkr )
-GAMEL( 1991, goodluck, bsuerte,  witchcrd, goodluck, 0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
+GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteb,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 3)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertec,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 4)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuerted,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 5)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertee,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 6)",           0,                layout_goldnpkr )
+GAMEL( 1991, bsuertef,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 7)",           0,                layout_goldnpkr )
+GAME(  1991, bsuerteg,  bsuerte,  witchcrd, bsuertew, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 8)",           0 )
+GAME(  1991, bsuerteh,  bsuerte,  witchcrd, bsuertew, 0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 9)",           0 )
+GAMEL( 1991, bsuertei,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 10)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertej,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 11)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertek,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 12)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertel,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 13)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertem,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 14)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerten,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 15)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteo,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 16)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertep,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 17)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteq,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 18)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerter,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 19)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertes,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 20)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuertet,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 21)",          0,                layout_goldnpkr )
+GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 22)",          0,                layout_goldnpkr )
+GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, 0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
 
-GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, 0,       ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",     0,                layout_goldnpkr )
-GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, 0,       ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein)",     GAME_UNEMULATED_PROTECTION, layout_goldnpkr )
-GAME(  1983, falcnwldb, falcnwld, wildcrdb, wildcard, flcnw,   ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)", GAME_NOT_WORKING )
+GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, 0,        ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",     0,                layout_goldnpkr )
+GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, 0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein)",     GAME_UNEMULATED_PROTECTION, layout_goldnpkr )
+GAME(  1983, falcnwldb, falcnwld, wildcrdb, wildcard, flcnw,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)", GAME_NOT_WORKING )
 
 /*************************************** OTHER SETS ***************************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
-GAMEL( 1981, pmpoker,  0,        goldnpkr, pmpoker,  0,        ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                layout_pmpoker  )
-GAMEL( 198?, royale,   0,        goldnpkr, royale,   royale,   ROT0,   "<unknown>",                "Royale (set 1)",                          GAME_NOT_WORKING, layout_goldnpkr )
-GAMEL( 198?, royalea,  royale,   goldnpkr, royale,   royale,   ROT0,   "<unknown>",                "Royale (set 2)",                          GAME_NOT_WORKING, layout_goldnpkr )
-GAME(  1993, sloco93,  0,        witchcrd, sloco93,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
-GAME(  1993, sloco93a, sloco93,  witchcrd, sloco93,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 2)",          0 )
-GAME(  198?, maverik,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Maverik",                                 0 )
-GAMEL( 1986, brasil86, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 86",                               0,                layout_goldnpkr )
-GAMEL( 1987, brasil87, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 87",                               0,                layout_goldnpkr )
-GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 1)",                       0,                layout_goldnpkr )
-GAMEL( 1989, brasil89a,brasil89, witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 2)",                       0,                layout_goldnpkr )
-GAME(  1993, brasil93, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 93",                               0 )				// no lamps
-GAME(  1991, poker91,  0,        witchcrd, poker91,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
-GAME(  198?, genie,    0,        genie,    genie,    0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
-GAMEL( 1983, silverga, 0,        goldnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
-GAME(  1987, caspoker, 0,        goldnpkr, caspoker, 0,        ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  GAME_IMPERFECT_COLORS )
+/*     YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                     FULLNAME                                  FLAGS             LAYOUT  */
+GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker,  0,        ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                layout_pmpoker  )
+GAMEL( 198?, royale,    0,        goldnpkr, royale,   royale,   ROT0,   "<unknown>",                "Royale (set 1)",                          GAME_NOT_WORKING, layout_goldnpkr )
+GAMEL( 198?, royalea,   royale,   goldnpkr, royale,   royale,   ROT0,   "<unknown>",                "Royale (set 2)",                          GAME_NOT_WORKING, layout_goldnpkr )
+GAME(  1993, sloco93,   0,        witchcrd, sloco93,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
+GAME(  1993, sloco93a,  sloco93,  witchcrd, sloco93,  0,        ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 2)",          0 )
+GAME(  198?, maverik,   0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Maverik",                                 0 )
+GAMEL( 1986, brasil86,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 86",                               0,                layout_goldnpkr )
+GAMEL( 1987, brasil87,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 87",                               0,                layout_goldnpkr )
+GAMEL( 1989, brasil89,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 1)",                       0,                layout_goldnpkr )
+GAMEL( 1989, brasil89a, brasil89, witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 89 (set 2)",                       0,                layout_goldnpkr )
+GAME(  1993, brasil93,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 93",                               0 )				// no lamps
+GAME(  1991, poker91,   0,        witchcrd, poker91,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
+GAME(  198?, genie,     0,        genie,    genie,    0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
+GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
+GAME(  1987, caspoker,  0,        goldnpkr, caspoker, 0,        ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  GAME_IMPERFECT_COLORS )
 
-GAME(  198?, pokerdub, 0,        pottnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )	// lacks of 2nd program ROM.
-GAME(  198?, pokerduc, 0,        goldnpkr, goldnpkr, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )	// encrypted.
+GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )	// lacks of 2nd program ROM.
+GAME(  198?, pokerduc,  0,        goldnpkr, goldnpkr, icp1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )	// encrypted.
 
 
 

@@ -4101,6 +4101,7 @@ src/mame/layout/topspeed.lay svneol=native#text/plain
 src/mame/layout/turbo.lay svneol=native#text/plain
 src/mame/layout/turbotag.lay svneol=native#text/plain
 src/mame/layout/tx1.lay svneol=native#text/plain
+src/mame/layout/upndown.lay svneol=native#text/plain
 src/mame/layout/victor21.lay svneol=native#text/plain
 src/mame/layout/victor5.lay svneol=native#text/plain
 src/mame/layout/videocba.lay svneol=native#text/plain
