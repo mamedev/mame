@@ -1370,6 +1370,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 			REG_FP(m68k)[dst] = double_to_fx80((double)temp2);
 			SET_CONDITION_CODES(m68k, REG_FP(m68k)[dst]);
 			m68k->remaining_cycles -= 6;
+			break;
 		}
 		case 0x20:		// FDIV
 		{
