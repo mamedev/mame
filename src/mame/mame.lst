@@ -12132,12 +12132,20 @@ qosb			// 1992 BFM
 // Scorpion 2 / 3
 
 sc2brkfs	// The Big Breakfast
+sc2brkfsp	//
 sc2brkfs1	//
+sc2brkfs1p	//
 sc2brkfs2	//
 sc2brkfs3	//
+sc2brkfs3p	//
 sc2brkfs4	//
+sc2brkfs4p	//
 sc2brkfs5	//
+sc2brkfs5p	//
 sc2brkfsm	//
+sc2brkfsm1	//
+sc2brkfsm2	//
+
 sc2drwho	// Dr.Who The Timelord
 sc2drwho1	//
 sc2drwho2	//
@@ -12161,56 +12169,315 @@ sc2drwho19	// (Mazooma set)
 sc2drwho20	// (Deluxe)
 sc2focus	// Focus (Dutch, Game Card 95-750-347)
 sc2gslam	// Club Grandslam (UK, Game Card 95-750-843)
+sc2gslamp
+sc2gslam1
+sc2gslam1p
+sc2gslam2
 sc2cshcl	// Cashino Club (Bellfruit)
+sc2cshclp
+sc2cshcl1
+sc2cshcl1p
 sc2catms	// Cat & Mouse (Bellfruit)
+sc2catms1
+sc2catms1p
+sc2catms2
+sc2catms2p
+sc2catms3
+sc2catms4
+
+sc2ctms2	// Cat & Mouse (Mark 2 - Bellfruit)
+sc2ctms21
+sc2ctms21p
+sc2ctms22
+sc2ctms22p
+sc2ctms23
+sc2ctms23p
+sc2ctms24p
+sc2ctms25
+
 sc2eggs		// Eggs On Legs Tour (Bellfruit)
+sc2eggsp
+sc2eggs1
+sc2eggs1p
 sc2gsclb	// The Game Show Club (Bellfruit)
+sc2gsclbp
+sc2gsclb1
+sc2gsclb1p
+sc2gsclb2
+sc2gsclb2p
+sc2gsclb3
+sc2gsclb3p
+sc2gsclb4
+sc2gsclb4p
+sc2gsclb5
+sc2gsclb6
+sc2gsclb7p
 sc2suprz	// Surprise Surprize (Bellfruit)
+sc2suprzp
+sc2suprz1
+sc2suprz1p
+sc2suprz2
+sc2suprz2p
+sc2suprz3
 sc2cpg		// Pharaoh's Gold Club (Bellfruit)
+sc2cpgp
+sc2cpg1
+sc2cpg1p
+sc2cpg2
+sc2cpg2p
 sc2motd		// Match Of The Day (Bellfruit)
+sc2motdp
+sc2motd1
+sc2motd1p
+sc2motd2
+sc2motd2p
+sc2motd3
+sc2motd3p
+sc2motd4
+sc2motd4p
+sc2motd5
+sc2motd5p
+sc2motd6
+sc2motd6p
+sc2motd7
+sc2motd7p
+sc2motd8
+sc2motd8p
+sc2motd9
+sc2motd10p
 sc2easy		// Easy Money (Bellfruit)
+sc2easyp
+sc2easy1
+sc2easy1p
+sc2easy2
+sc2easy2p
 sc2majes	// Majestic Bells (Bellfruit)
 sc2dels		// Del's Millions (Bellfruit)
+sc2delsp
+sc2dels1
+sc2dels1p
+sc2dels2
+sc2dels2p
+sc2dels3
+sc2dels3p
+sc2dels4
+sc2dels4p
+sc2dels5
+sc2dels6
+sc2dels7
+sc2dels8
+sc2dels9
+sc2delsd
+sc2delsm	// (Mazooma set)
+sc2delsmp
+sc2delsm1
+sc2delsm1p
+sc2delsm2
+sc2delsm2p
+sc2delsm3
+sc2delsm3p
 sc2wembl	// Road To Wembley (Bellfruit)
+sc2wemblp
+sc2wembl1
+sc2wembl1p
+sc2wembl2
+sc2wembl2p
+sc2wembl3
+sc2wembl4p
+sc2wembl5a
+sc2wembl5ap
+sc2wembl6ap
+sc2wembl7a
+sc2wembl7ap
+sc2wembl8
+sc2wembl9
+sc2wembl10
 sc2wemblm	// (Mazooma set)
 sc2downt	// Down Town (Bellfruit)
+sc2downtp
+sc2downt1
+sc2downt1p
+sc2downt2
+sc2downt2p
+sc2downt3
+sc2downt3p
+sc2downt3a
+sc2downt3ap
+sc2downt4
+sc2downt4p
+sc2downt4a
+sc2downt4ap
+sc2downt5
+sc2downt6
+sc2downt7
+sc2downt8a
+sc2downt8ap
 sc2goldr	// Gold Reserve (Mdm)
+sc2goldrp
+sc2goldr1
 sc2hifly	// High Flyer (Mdm)
+sc2hifly2
+sc2hifly3
+sc2hifly4
 sc2inst		// Instant Jackpot (Bellfruit)
+sc2instp
+sc2inst1
+sc2inst1p
+sc2inst2
+sc2inst2p
+sc2inst3
+sc2inst3p
+sc2inst4
+sc2inst4p
+sc2inst5
+sc2inst6
 sc2mam		// Make A Million (Bellfruit)
+sc2mamp
+sc2mam1
+sc2mam1p
+sc2mam2
+sc2mam2p
+sc2mam3
+sc2mam3p
+sc2mam4
+sc2mam4p
+sc2mam5
 sc2mamcl	// Make A Million Club (Bellfruit)
+sc2mamclp
+sc2mamcl1
+sc2mamcl1p
+sc2mamcl2
+sc2mamcl2p
+sc2mamcl3
 sc2scc		// Safe Cracker Club (Mdm)
 sc2showt	// Showtime Spectacular (Bellfruit)
+sc2showtp
+sc2showt1
+sc2showt1p
+sc2showt2
+sc2showt2p
+sc2showt3
+sc2showt3p
+sc2showt4
+sc2showt4p
 sc2sstar	// Superstar (Bellfruit)
+sc2sstarp
+sc2sstar1
+sc2sstar1p
+sc2sstar2
+sc2sstar2p
+sc2sstar3
+sc2sstar3p
+sc2sstar4
 sc2pe1g		// Public Enemy No1 (Bellfruit) [German]
 sc2wwcl		// Wild West Club (Bellfruit)
+sc2wwclp
+sc2wwcl1
+sc2wwcl1p
 sc2dick		// Spotted Dick (Global)
+sc2dickp
+sc2dick1
+sc2dick2
+sc2dick2p
+sc2dick2e
+sc2dick2eu
 sc2pick		// Pick Of The Bunch (Global)
+sc2pickp
+sc2pickc
+sc2pickcp
 sc2rock		// How Big's Your Rock? (Global)
-sc2call		// It's Your Call (Glonal)
+sc2rockp
+sc2rock1
+sc2rock1p
+sc2rocke
+sc2call		// It's Your Call (Global)
+sc2callp
+sc2callc
+sc2callcp
 sc2prom		// Along The Prom
 sc2payr		// Pay Roll (Mazooma)
 sc2cgc		// Carrot Gold Club (Bellfruit)
 sc2cnile	// Cash On The Nile Club (Bellfruit)
+sc2cnile1
+sc2cnile2
+sc2cnile2p
+sc2cnile3p
 sc2casr		// Casino Royale (Bellfruit)
+sc2casrp
+sc2casr1
+sc2casr1p
+sc2casr2
+sc2casr2p
+sc2casr3
+sc2casr3p
+sc2casr4
+sc2casr4p
 sc2cmbt		// Cat & Mouse & Bonzo Too (Bellfruit)
-sc2dbl		// Double Diamond (Bellfruit)
+sc2cmbtp
+sc2dbl		// Double Diamond (Bellfruit
+sc2dblp
+sc2dbl1
+sc2dbl1p
 sc2flaca	// Flash Cash (Bellfruit)
+sc2flacap
+sc2flaca1
+sc2flaca1p
+sc2flaca2
+sc2flaca2p
 sc2foot		// Football Club (Bellfruit)
+sc2footp
+sc2foot1
+sc2foot1p
+sc2foot2
+sc2foot2p
 sc2gcclb	// Golden Casino Club (Bellfruit)
+sc2gcclbp
+sc2gcclb1
+sc2gcclb1p
+sc2gcclb2
+sc2gcclb2p
+sc2gcclb3
 sc2groul	// Golden Roulette (Bellfruit)
+sc2groulp
 sc2gldsh	// Golden Shot (Bellfruit)
 sc2gtr		// Great Train Robbery (Bellfruit)
 sc2heypr	// Hey Presto (Bellfruit)
+sc2heyprp
 sc2hypr		// Hyperactive (Bellfruit)
+sc2hyprp
+sc2hypr1
+sc2hypr1p
 sc2kcclb	// King Cash Club (Bellfruit)
+sc2kcclbp
+sc2kcclb1
+sc2kcclb1p
 sc2maina	// Main Attraction (Bellfruit)
 sc2olgld	// Olympic Gold (Bellfruit)
+sc2olgldp
+sc2olgld1
+sc2olgld1p
 sc2relgm	// Reel Gems (Bellfruit)
+sc2relgmp
+sc2relgm1p
 sc2topwk	// Top Wack (Bellfruit)
+sc2topwkp
 sc2cb7		// Casino Bar 7 (Bellfruit)
+sc2cb7p
+sc2cb71
+sc2cb72
+sc2cb72p
 sc2cgcas	// Club Grand Casino
+sc2cgcasp
+sc2cgcas1
+sc2cgcas1p
 sc2cvega	// Cash Vegas
+sc2cvega1
+sc2cvega1p
+sc2cvega2
+sc2cvega2p
+sc2cvega3
+sc2cvega3p
+sc2cvega4p
 sc2bar7		// Bar 7 (Concept)
 sc2bbar7	// Big Bar 7 (Concept)
 sc2flutr	// Flutter (Concept)
@@ -12224,15 +12491,92 @@ sc2scshxcas // Super Casino Cash X (Concept)
 // Scorpion 2 + Dot Matrix Display
 
 sc2luvv		// Luvvly Jubbly (UK Multisite 10/25p, Game Card 95-750-808)
+sc2luvv1
+sc2luvv1p
+sc2luvv2
+sc2luvv2p
+sc2luvv3
+sc2luvv4
+sc2luvv5p
+sc2luvv6p
+sc2luvv7p
 sc2cpe		// Club Public Enemy No.1 (UK, Game Card 95-750-846)
+sc2cpep
+sc2cpe1
+sc2cpe1p
+sc2cpe2
+sc2cpe2p
+sc2cpe3p
+sc2cpe4
+sc2cpe5p
 sc2town		// Round The Town (Bellfruit)
+sc2townp
+sc2town1
+sc2town1p
+sc2town2
+sc2town3
+sc2town3p
+sc2town4
+sc2town5
 sc2ofool	// Only Fools & Horses (Bellfruit)
+sc2ofool1
+sc2ofool2
+sc2ofool3
+sc2ofool4
 sc2ptytm	// Party Time (Bellfruit)
+sc2ptytm1
+sc2ptytm1p
 sc2cops		// Cops 'n' Robbers (Bellfruit)
+sc2copsp
+sc2cops1
+sc2cops1p
+sc2cops2
+sc2cops3
+sc2cops3p
+sc2cops4
+sc2cops5
+sc2copsc // Casino Cops 'n' Robbers (Bellfruit)
+sc2copscp
+sc2copsc1
+sc2copsc1p
+sc2copsc2
 sc2copcl	//
-sc2copdc	//
+sc2copclp
+sc2copcl1
+sc2copcl1p
+sc2copcl2
+sc2copcl3
+sc2copcl3p
+sc2copcl4
+sc2copcl5
+sc2copcl6
+sc2copcl6p
+sc2copcl7
+sc2copcl8
+sc2copcl8p
+sc2copcl9
+sc2copcl9p
+sc2copcl10
+sc2copcl11
+sc2copcl11p
+sc2copdc	// Cops 'n' Robbers Club Deluxe (Bellfruit)
+sc2copdcp
+sc2copdc1
+sc2copdc1p
+sc2copdc2
+sc2copdc2p
+sc2copdc3
+sc2copdc3p
+sc2copdc4
+sc2copdc4p
+sc2copdc5
+sc2copdc5p
+sc2copdc6
 sc2prem		// Premier Club Manager (Bellfruit)
-
+sc2premp
+sc2prem1
+sc2prem1p
+sc2prem2
 // Scorpion 2 + Adder 2 Video Board
 qntoondo		// 1993
 quintoon		// 1993
