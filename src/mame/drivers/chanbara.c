@@ -39,9 +39,11 @@ Notes:
 ------------------------
 
  Driver by Tomasz Slanina & David Haywood
+ Inputs and Dip Switches by stephh
 
 ToDo:
  there might still be some sprite banking issues
+ support screen flipping for sprites
 
 
 ****************************************************************************************/
@@ -203,16 +205,19 @@ static SCREEN_UPDATE_IND16( chanbara )
 	return 0;
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+/***************************************************************************/
+
+static ADDRESS_MAP_START( chanbara_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_BASE_MEMBER(chanbara_state, m_videoram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_BASE_MEMBER(chanbara_state, m_colorram)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_MEMBER(chanbara_state, m_spriteram)
 	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(chanbara_videoram2_w) AM_BASE_MEMBER(chanbara_state, m_videoram2)
 	AM_RANGE(0x1a00, 0x1bff) AM_RAM_WRITE(chanbara_colorram2_w) AM_BASE_MEMBER(chanbara_state, m_colorram2)
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW0")
+	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("JOY")
+	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P2")
+	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P1")
 	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -220,49 +225,43 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
+/* verified from M6809 code */
 static INPUT_PORTS_START( chanbara )
-	PORT_START ("DSW0")
-	PORT_DIPNAME( 0x01,   0x01, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04,   0x04, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_START ("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Difficulty ) )       /* code at 0xedc0 */
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )       /* table at 0xc249 (2 * 2 words) */
+	PORT_DIPSETTING(    0x40, "50k and 70k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START ("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2	 )
-	PORT_DIPNAME( 0x04,   0x04, "2" )
-	PORT_DIPSETTING(      0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )           /* same coinage as COIN1 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	/* System Port */
-	PORT_START ("JOY")
+	PORT_START ("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )
@@ -271,6 +270,16 @@ static INPUT_PORTS_START( chanbara )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT )
+
+	PORT_START ("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )   PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )     PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )   PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT )  PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN )  PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )    PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT )  PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_COCKTAIL
 INPUT_PORTS_END
 
 /***************************************************************************/
@@ -338,7 +347,9 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 	chanbara_state *state = device->machine().driver_data<chanbara_state>();
 	//printf("chanbara_ay_out_1_w %02x\n",data);
 
-	state->m_scrollhi = data & 0x03;
+	state->m_scrollhi = data & 0x01;
+
+	flip_screen_set(device->machine(), data & 0x02);
 
 	memory_set_bank(device->machine(), "bank1", (data & 0x04) >> 2);
 
@@ -387,7 +398,7 @@ static MACHINE_RESET( chanbara )
 static MACHINE_CONFIG_START( chanbara, chanbara_state )
 
 	MCFG_CPU_ADD("maincpu", M6809, 12000000/8)
-	MCFG_CPU_PROGRAM_MAP(memmap)
+	MCFG_CPU_PROGRAM_MAP(chanbara_map)
 
 	MCFG_MACHINE_START(chanbara)
 	MCFG_MACHINE_RESET(chanbara)
@@ -470,4 +481,4 @@ static DRIVER_INIT(chanbara )
 	memory_configure_bank(machine, "bank1", 0, 2, &bg[0x0000], 0x4000);
 }
 
-GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara, ROT270, "Data East", "Chanbara", GAME_SUPPORTS_SAVE )
+GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara, ROT270, "Data East", "Chanbara", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
