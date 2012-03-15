@@ -3155,6 +3155,14 @@ static DRIVER_INIT( fantastc )
 		memcpy(romdata + i * 0x400, buf + lut_am_unscramble[i] * 0x1000 + (i & 3) * 0x400, 0x400);
 }
 
+static DRIVER_INIT( kong )
+{
+	/* video extensions */
+	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, upper_extend_sprite_info);
+}
+
+
+
 
 static DRIVER_INIT( kingball )
 {
