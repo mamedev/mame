@@ -250,8 +250,8 @@ ROM_END
 
 
 GAME(1984,	agent777,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Agents 777",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,	andromep,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Andromeda",				GAME_IS_SKELETON_MECHANICAL)
-GAME(1985,	andromepa,	andromep,	gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Andromeda (alternate set)",GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,	andromep,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Andromeda (set 1)",		GAME_IS_SKELETON_MECHANICAL)
+GAME(1985,	andromepa,	andromep,	gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Andromeda (set 2)",        GAME_IS_SKELETON_MECHANICAL)
 GAME(1984,	attila,		0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Attila The Hun",			GAME_IS_SKELETON_MECHANICAL)
 GAME(1985,	cpthook,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Captain Hook",				GAME_IS_SKELETON_MECHANICAL)
 GAME(1985,	cyclopes,	0,			gp_2,	gp_2,	gp_2,	ROT0,	"Game Plan",	"Cyclopes",					GAME_IS_SKELETON_MECHANICAL)

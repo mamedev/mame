@@ -6360,9 +6360,9 @@ GAME( 1983, dingo,    0,        checkmaj, dingo,    dingo,    ROT90,  "Ashby Com
 GAME( 1983, dingoe,   dingo,    checkman, dingo,    dingoe,   ROT90,  "Ashby Computers and Graphics Ltd.", "Dingo (encrypted)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* Crazy Climber sound plus AY8910 instead of galaxian sound, plus INT instead of NMI */
-GAME( 1981, mshuttle,  0,        mshuttle, mshuttle, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US?)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mshuttle,  0,        mshuttle, mshuttle, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US? set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mshuttle2, mshuttle, mshuttle, mshuttle, mshuttle, ROT0,   "Nichibutsu", "Moon Shuttle (US? set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mshuttlej, mshuttle, mshuttle, mshuttle, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mshuttlej, mshuttle, mshuttle, mshuttle, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mshuttlej2,mshuttle, mshuttle, mshuttle, mshuttlj, ROT0,   "Nichibutsu", "Moon Shuttle (Japan set 2)", GAME_SUPPORTS_SAVE )
 
 /* 2nd CPU driving DAC for sound */
@@ -6515,7 +6515,7 @@ GAME( 1985, superbon,  0,        scobra,   superbon,  superbon, ROT90,  "Signatr
 //GAME( 1983, newsin7,  0,        theend  /*newsin7*/,  newsin7,  mars,         ROT90, "ATW USA, Inc.", "New Sinbad 7", GAME_SUPPORTS_SAVE )
 //GAME( 1984, mrkougar, 0,        theend  /*mrkougar*/, mrkougar, mrkougar,     ROT90, "ATW", "Mr. Kougar", GAME_SUPPORTS_SAVE )
 //GAME( 1983, mrkougr2, mrkougar, theend  /*mrkougar*/, mrkougar, mrkougar,     ROT90, "ATW", "Mr. Kougar (earlier)", GAME_SUPPORTS_SAVE )
-//GAME( 1983, mrkougb,  mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg)", GAME_SUPPORTS_SAVE )
+//GAME( 1983, mrkougb,  mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 1)", GAME_SUPPORTS_SAVE )
 //GAME( 1983, mrkougb2, mrkougar, theend  /*mrkougb*/,  mrkougar, mrkougb,      ROT90, "bootleg", "Mr. Kougar (bootleg set 2)", GAME_SUPPORTS_SAVE )
 //GAME( 1982, hotshock, 0,        theend  /*hotshock*/, hotshock, hotshock,     ROT90, "E.G. Felaco", "Hot Shocker", GAME_SUPPORTS_SAVE )
 //GAME( 1982, conquer,  0,        theend  /*hotshock*/, hotshock, 0,            ROT90, "<unknown>", "Conquer", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)

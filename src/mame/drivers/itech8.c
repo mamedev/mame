@@ -2706,8 +2706,8 @@ static DRIVER_INIT( rimrockn )
  *************************************/
 
 /* Wheel of Fortune-style PCB */
-GAME( 1989, wfortune, 0,        wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune", 0 )
-GAME( 1989, wfortunea,wfortune, wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune (alternate)", 0 )
+GAME( 1989, wfortune, 0,        wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune (set 1)", 0 )
+GAME( 1989, wfortunea,wfortune, wfortune,          wfortune, 0,        ROT0,   "GameTek", "Wheel Of Fortune (set 2)", 0 )
 
 /* Grudge Match-style PCB */
 GAME( 1989, grmatch,  0,        grmatch,           grmatch,  grmatch,  ROT0,   "Yankee Game Technology", "Grudge Match (Yankee Game Technology)", 0 )

@@ -5786,8 +5786,8 @@ GAME( 1999, vs299,    vs2v991, model3_20, model3,      vs299, ROT0, "Sega", "Vir
 /* Model 3 Step 2.1 */
 GAME( 1998, daytona2,         0, model3_21, daytona2, daytona2, ROT0, "Sega", "Daytona USA 2 (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, dayto2pe,         0, model3_21, daytona2, dayto2pe, ROT0, "Sega", "Daytona USA 2 Power Edition", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, dirtdvls,         0, model3_21, model3,   dirtdvls, ROT0, "Sega", "Dirt Devils (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1998, dirtdvlsa, dirtdvls, model3_21, model3,   dirtdvls, ROT0, "Sega", "Dirt Devils (alt) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dirtdvls,         0, model3_21, model3,   dirtdvls, ROT0, "Sega", "Dirt Devils (set 1) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1998, dirtdvlsa, dirtdvls, model3_21, model3,   dirtdvls, ROT0, "Sega", "Dirt Devils (set 2) (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, swtrilgy,         0, model3_21, swtrilgy, swtrilgy, ROT0, "Sega / LucasArts", "Star Wars Trilogy (Revision A)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, swtrilgya, swtrilgy, model3_21, swtrilgy, swtrilga, ROT0, "Sega / LucasArts", "Star Wars Trilogy", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, spikeout,         0, model3_21, model3,   spikeout, ROT0, "Sega", "Spikeout (Revision C)", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

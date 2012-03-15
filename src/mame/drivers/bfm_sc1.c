@@ -3088,7 +3088,7 @@ GAME( 1990, sc1clatta		, sc1clatt	, scorpion1			, clatt		, clatt			, 0,       "B
 GAME( 198?, sc1actv8		, 0			, scorpion1_viper	, scorpion1	, nocrypt		, 0,       "BFM",      "Active 8 (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1armad		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Armada (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1bartk		, 0			, scorpion1_viper	, clatt		, lotse			, 0,       "BFM",      "Bar Trek (Bellfruit) (Scorpion 1)", GAME_FLAGS )
-GAME( 198?, sc1barcd		, 0			, scorpion1_viper	, clatt		, lotse			, 0,       "BFM",      "Barcode (Bellfruit) (Scorpion 1)", GAME_FLAGS )
+GAME( 198?, sc1barcd		, 0			, scorpion1_viper	, clatt		, lotse			, 0,       "BFM",      "Barcode (Bellfruit) (set 1) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1barcda		, sc1barcd	, scorpion1_viper	, clatt		, lotse			, 0,       "BFM",      "Barcode (Bellfruit) (set 2) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1bigmt		, 0			, scorpion1_viper	, clatt		, nocrypt		, 0,       "BFM",      "The Big Match (Bellfruit) (Scorpion 1)", GAME_FLAGS )
 GAME( 198?, sc1calyp		, 0			, scorpion1			, scorpion1	, lotse			, 0,       "BFM/ELAM", "Calypso (Bellfruit) (Dutch) (Scorpion 1)", GAME_FLAGS )

@@ -3354,8 +3354,8 @@ GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb,btlfieldb,ROT90, "boo
 
 GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr, skysoldr, ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", GAME_SUPPORTS_SAVE )
 
-GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl, goldmedl, ROT0,  "SNK",                                               "Gold Medalist", GAME_SUPPORTS_SAVE )
-GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, goldmedla,ROT0,  "SNK",                                               "Gold Medalist (alt)", GAME_SUPPORTS_SAVE )
+GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl, goldmedl, ROT0,  "SNK",                                               "Gold Medalist (set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, goldmedla,ROT0,  "SNK",                                               "Gold Medalist (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl, goldmedla,ROT0,  "bootleg",                                           "Gold Medalist (bootleg)", GAME_NOT_WORKING )
 
 GAME( 1989, skyadvnt,  0,        alpha68k_V,     skyadvnt, skyadvnt, ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", GAME_SUPPORTS_SAVE )

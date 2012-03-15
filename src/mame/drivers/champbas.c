@@ -1241,7 +1241,7 @@ GAME( 1983, champbb2j,  champbb2, champmcu, champbas, champbas, ROT0,   "Alpha D
 
 GAME( 1983, exctsccr,   0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", GAME_SUPPORTS_SAVE )
 GAME( 1983, exctsccra,  exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", GAME_SUPPORTS_SAVE )
-GAME( 1983, exctsccrj,  exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1983, exctsccrj,  exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1983, exctsccrj2, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1983, exctsccrb,  exctsccr, exctsccrb,exctsccr, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1984, exctscc2,   0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", GAME_SUPPORTS_SAVE )

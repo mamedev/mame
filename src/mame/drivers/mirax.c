@@ -502,5 +502,5 @@ static DRIVER_INIT( mirax )
 
 }
 
-GAME( 1985, mirax,  0,     mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax",         0 )
+GAME( 1985, mirax,  0,     mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax (set 1)", 0 )
 GAME( 1985, miraxa, mirax, mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax (set 2)", 0 )

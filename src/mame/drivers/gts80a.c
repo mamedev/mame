@@ -672,5 +672,5 @@ ROM_END
 /* disp3 */GAME(1984,	touchdn,	0,		gts80a_s,	gts80a,	gts80a,	ROT0,	"Gottlieb",		"Touchdown",			GAME_IS_SKELETON_MECHANICAL)
 
 /* custom (+video) */
-GAME(1981,	caveman,	0,			caveman,	caveman,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo)",		GAME_IS_SKELETON_MECHANICAL)
+GAME(1981,	caveman,	0,			caveman,	caveman,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo, set 1)",	GAME_IS_SKELETON_MECHANICAL)
 GAME(1981,	cavemana,	caveman,	caveman,	caveman,	gts80a,	ROT0,	"Gottlieb",		"Caveman (Pinball/Video Combo, set 2)",	GAME_IS_SKELETON_MECHANICAL)
