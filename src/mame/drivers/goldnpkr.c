@@ -825,6 +825,14 @@
   - Added technical notes.
 
 
+  [2012-03-15]
+
+  - Found and patched the Witch Strike protection scheme.
+  - Proper inputs and lamps support for Witch Strike.
+  - Promoted both Witch Strike sets to working state.
+  - Added technical notes.
+
+
 
   TODO:
 
@@ -2496,7 +2504,7 @@ static INPUT_PORTS_START( wstrike )
 	PORT_START("IN0-0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )  PORT_NAME("Bet (Setzen)")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Bookkeeping / Test")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double Up")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME("Deal (Geben)")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2504,28 +2512,30 @@ static INPUT_PORTS_START( wstrike )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )  PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )    PORT_NAME("Take")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN1-1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )   PORT_NAME("Take")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )   PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )    PORT_NAME("Small")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1 / Take")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Double-Up")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN3-2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note In")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Weight (Coupon In)")
@@ -5883,6 +5893,57 @@ static DRIVER_INIT( icp1db )
 	/* nothing yet... */
 }
 
+/**********************************************
+
+  Witch Strike protection
+
+  (a default Dallas TK NVRAM should be made)
+
+  Each time the DEAL button is pressed, the program
+  do the following execution....
+
+  C9F5:  JSR $F2D4
+
+  and then...
+
+  F2D4: 48            pha  
+  F2D5: 8A            txa  
+  F2D6: 48            pha  
+  F2D7: A2 00         ldx  #$00
+  F2D9: BD EE F2      lda  $F2EE,x    ; read a char.
+  F2DC: F0 08         beq  $F2E6      ; if 0 (end of string), branch to end.
+  F2DE: DD E0 2F      cmp  $2FE0,x    ; compare with dallas offset.
+  F2E1: D0 07         bne  $F2EA      ; if different, go to $F2EA (kill)
+  F2E3: E8            inx             ; increment X-register.
+  F2E4: D0 F3         bne  $F2D9      ; loop to read the next char....
+  F2E6: 68            pla             ; end.
+  F2E7: AA            tax  
+  F2E8: 68            pla  
+  F2E9: 60            rts  
+
+  F2EA: 02            kil  $02        ; kill.
+  F2EB: 4C EA F2      jmp  $F2EA      ; just in case the 1st time fails, go to kill again.
+
+  The following string is tested...
+
+  F2EE:  76 69 64 65 6F 20 6B 6C 65 69 6E 20 74 65 73 74 64 61 74 61 00  |  video klein testdata.
+
+  So nasty... and unneccessary.
+
+***********************************************/
+
+static DRIVER_INIT( wstrike )
+{
+    /* NOPing the BNE --> $F2EA (KILL)
+       after compare with a string inside the Dallas TK RAM
+    */
+
+	UINT8 *ROM = machine.region("maincpu")->base();
+
+	ROM[0xf2e1] = 0xea;
+	ROM[0xf2e2] = 0xea;
+}
+
 
 /*********************************************
 *                Game Drivers                *
@@ -5919,8 +5980,8 @@ GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, vkdlsa,   ROT0,   "Video K
 GAMEL( 1994, wldwitch,  0,        wcrdxtnd, wldwitch, vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",   0,                layout_goldnpkr )
 GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)", 0,              layout_upndown )
 GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99)", 0,              layout_upndown )
-GAMEL( 1992, wstrike,   0,        wcrdxtnd, wstrike,  0,        ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01A)", GAME_NOT_WORKING, layout_upndown )
-GAMEL( 1992, wstrikea,  wstrike,  wcrdxtnd, wstrike,  0,        ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01B)", GAME_NOT_WORKING, layout_upndown )
+GAMEL( 1992, wstrike,   0,        wcrdxtnd, wstrike,  wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01A)", 0,                layout_goldnpkr )
+GAMEL( 1992, wstrikea,  wstrike,  wcrdxtnd, wstrike,  wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01B)", 0,                layout_goldnpkr )
 
 GAMEL( 1990, bsuerte,   0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 1)",           0,                layout_goldnpkr )
 GAMEL( 1991, bsuertea,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Buena Suerte (Spanish, set 2)",           0,                layout_goldnpkr )
