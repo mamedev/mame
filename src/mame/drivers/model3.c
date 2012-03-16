@@ -2389,7 +2389,7 @@ ROM_START( scudj )	/* step 1.5 */
 	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
 ROM_END
 
-ROM_START( scuda )	/* step 1.5, Sega game ID# is 834-13042, ROM board ID# 833-13041 */
+ROM_START( scuda )	/* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-13042 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-19688.17",  0x0600006,  0x80000,  CRC(a4c85103) SHA1(b2e57f86d0a49e3e88fa7d6a77bbd99039c034bb) )
@@ -2545,7 +2545,7 @@ ROM_START( scudp )	/* step 1.5 */
 	ROM_LOAD( "epr-19338.bin", 0x000000, 0x010000, CRC(dbf88de6) SHA1(8f5c83e82c26a37a1ed0476d7dfeb698b8417899) )
 ROM_END
 
-ROM_START( vf3 )	/* step 1.0 */
+ROM_START( vf3 )	/* step 1.0, Sega game ID# is 833-12712, ROM board ID# 834-12821 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-19227c.17",  0x600006, 0x080000, CRC(a7df4d75) SHA1(1b1186227f830556c5e2b6ca4c2bf20673b22f94) )
@@ -4656,7 +4656,7 @@ ROM_START( spikeout )	/* Step 2.1 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
-ROM_START( spikeofe )	/* Step 2.1, Sega game ID# is 834-13747 */
+ROM_START( spikeofe )	/* Step 2.1, Sega game ID# is 833-13746, ROM board ID# 834-13747 SPK F/E */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21653.17", 0x000006, 0x200000, CRC(f4bd9c3c) SHA1(de509c25226939d7a9c1b402ab6923844c12314e) )
