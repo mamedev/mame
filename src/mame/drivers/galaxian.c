@@ -3049,6 +3049,21 @@ static DRIVER_INIT( skybase )
 }
 
 
+static DRIVER_INIT( kong )
+{
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+
+	/* video extensions */
+	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, upper_extend_sprite_info);
+
+	/* needs a full 2k of RAM */
+	space->install_ram(0x8000, 0x87ff);
+
+	/* extend ROM */
+	space->install_rom(0x0000, 0x7fff, machine.region("maincpu")->base());
+}
+
+
 static void mshuttle_decode(running_machine &machine, const UINT8 convtable[8][16])
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -3154,14 +3169,6 @@ static DRIVER_INIT( fantastc )
 	for (int i = 0; i < 32; i++)
 		memcpy(romdata + i * 0x400, buf + lut_am_unscramble[i] * 0x1000 + (i & 3) * 0x400, 0x400);
 }
-
-static DRIVER_INIT( kong )
-{
-	/* video extensions */
-	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, upper_extend_sprite_info);
-}
-
-
 
 
 static DRIVER_INIT( kingball )
