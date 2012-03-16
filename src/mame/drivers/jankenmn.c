@@ -7,6 +7,11 @@
 
   Coin-operated Z80-CTC + DAC system. No screen, just artwork with lamps + LEDs.
   Janken man is coming from Jankenpon, the rock-paper-scissors game.
+  There are several versions of this game, the most notable difference being in
+  the artwork and bonus lamps. The kid's voice and hand are the same among all.
+
+  info: http://dgm.hmc6.net/museum/jyankenman.html
+  (and many videos on Youtube)
 
   It's all a challenge. Even once emulated, the game will need a lot of
   artwork and lamps work...
@@ -127,17 +132,21 @@
   -----------
 
 
-  Main Z80
+  PCG1, Main Z80(?)
   
   0000-3fff  ; ROM Space.
   4000-47ff  ; Work RAM
+  
+  58-5b  : must be CTC
+  ..
 
 
-  Audio Z80?... or main program?
+  PCG2, Audio Z80?... or main program?
 
   0000-bfff  ; ROM Space.
   c000-c7ff  ; Work RAM
 
+  00-03  : CTC? or is CTC mapped at 30-33?
   10-13  : PPI1: A & B input, high C & low C output.
   20-23  : PPI2: A, B, high C & low C output.
 
@@ -395,13 +404,6 @@ ROM_START( jankenmn )
 
 	ROM_REGION( 0x10000, "temp", 0 )	// this should be the program ROM, but there's not PPI code and seems odd
 	ROM_LOAD( "pcg1.bin",   0x0000, 0x4000,  CRC(a9c5aa2e) SHA1(c3b81eeefa5c442231cd26615aaf6c682063b26f) )
-
-//	ROM_REGION( 0x10000, "maincpu", 0 )
-//	ROM_LOAD( "pcg1.bin",   0x0000, 0x4000,  CRC(a9c5aa2e) SHA1(c3b81eeefa5c442231cd26615aaf6c682063b26f) )
-
-//	ROM_REGION( 0x40000, "audiocpu", 0 )	// second CPU or some sort of banking?
-//	ROM_LOAD( "pcg2.bin",   0x0000, 0x40000, CRC(48a8f769) SHA1(656346ca0a83fd8ff5c8683152e4c5e1a1c797fa) )	// this one has valid z80 code, plus the PPI inits
-
 ROM_END
 
 
@@ -414,5 +416,5 @@ static DRIVER_INIT( jankenmn )
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY    FULLNAME                       FLAGS...                                                  LAYOUT */
-GAMEL( 1985, jankenmn, 0,      jankenmn, jankenmn, jankenmn, ROT0, "Sunwise", "Janken Man (Pretty Carnival)", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_REQUIRES_ARTWORK, layout_jankenmn )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY    FULLNAME                       FLAGS...          LAYOUT */
+GAMEL( 1985, jankenmn, 0,      jankenmn, jankenmn, jankenmn, ROT0, "Sunwise", "Janken Man (Pretty Carnival)", GAME_NOT_WORKING, layout_jankenmn )
