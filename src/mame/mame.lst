@@ -4873,7 +4873,7 @@ deathcox		// 2000.10 Death Crimson OX
 cspike			// 2000.10 Gun Spike / Cannon Spike
 sstrkfgt		// 2000.10 Sega Strike Fighter (Rev A)
 confmiss		// 2000.11 Confidential Mission												// First GD-ROM game?
-				// 2000.11 Ninja Assault
+                // 2000.11 Ninja Assault
 				// 2000.11 Shakatto Tambourine
 wwfroyal		// 2000.11 WWF Royal Rumble
 pjustic			// 2000.12 Moero Justice Gakuen / Project Justice
@@ -7885,6 +7885,7 @@ soldam			// (c) 1992
 soldamj			// (c) 1992 (Japan)
 bigstrik		// (c) 1992
 bigstrkb		// bootleg on different hardware
+bigstrkba       // alt set of 'bigstrkb' with Italian teams
 bestleag		// bootleg, by Playmark?
 bestleaw		// bootleg
 chimerab		// (c) 1993
