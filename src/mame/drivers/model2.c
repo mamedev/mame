@@ -490,7 +490,8 @@ static CUSTOM_INPUT( _1c0001c_r )
 /*
     Rail Chase 2 "Drive I/O BD" documentation
 
-    I'm fairly sure that this is actually controlled by a CPU with undumped program code.
+    Controlled by a CPU with undumped program code.
+    Aux board 837-11694, Z80 (4Mhz) with program rom EPR-1785 (undumped)
 
     commands 0x2* are for device status bits (all of them active low)
 
