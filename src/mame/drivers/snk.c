@@ -6117,6 +6117,42 @@ ROM_START( fsoccerb )
 	ROM_LOAD( "fs4.bin",  0x00000, 0x10000, CRC(435c3716) SHA1(42053741f60594e7ae8516b3ba600f5badb3620f) )
 ROM_END
 
+ROM_START( fsoccerba )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+    ROM_LOAD( "fs3.c6", 0x00000, 0x10000, CRC(e644d207) SHA1(efd5a6cf99461a0dc6cec6c8e2c16d82c6630132) ) 
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "fs1_ver4.bin",  0x00000, 0x10000, CRC(97830108) SHA1(dab241baf8d889c768e1fbe25f1e5059b3cbbab6) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "fs2.3j",  0x00000, 0x10000, CRC(9ee54ea1) SHA1(4e3bbacaa0e247eb8c4043f394e763817a4f9a28) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "2.8e", 0x000, 0x400, CRC(bf4ac706) SHA1(b5015563d88dbd93ba2838f01b189812958f142b) ) /* red */
+	ROM_LOAD( "1.8d", 0x400, 0x400, CRC(1bac8010) SHA1(16854b1b6f3d1be48a247796d65aeb90547099b6) ) /* green */
+	ROM_LOAD( "3.9e", 0x800, 0x400, CRC(dbeddb14) SHA1(6053b587a3c8272aefe728a7198a15aa7fb9b2fa) ) /* blue */
+
+	ROM_REGION( 0x8000, "tx_tiles", 0 )
+	ROM_LOAD( "fs13.4n",  0x0000, 0x08000, CRC(0de7b7ad) SHA1(4fa54b2acf83f03d09d16fc054ad6623cafe0f4a) )
+
+	ROM_REGION( 0x50000, "bg_tiles", 0 )
+	ROM_LOAD( "fs14.8d",  0x00000, 0x10000, CRC(38c38b40) SHA1(c4580add0946720441f5ef751d0d4a944cd92ad5) )
+	ROM_LOAD( "fs15.8e",  0x10000, 0x10000, CRC(a614834f) SHA1(d73930e4bd780915e1b0d7f3fe7cbeaad19c233f) )
+
+	ROM_REGION( 0x80000, "sp32_tiles", 0 )
+	ROM_LOAD( "fs12.2t", 0x00000, 0x10000, CRC(b2442c30) SHA1(ba9331810659726389494ddc7c94c5a02ba80747) )
+	ROM_LOAD( "fs11.2s", 0x10000, 0x10000, CRC(022f3e96) SHA1(57aa423b8f62015566bc3021300ac7e9682ed500) )
+	ROM_LOAD( "fs10.2r", 0x20000, 0x10000, CRC(e42864d8) SHA1(fe18f58e5507676780fe181e2fb0e0e9d72e276e) )
+	ROM_LOAD( "fs9.2p",  0x30000, 0x10000, CRC(d8112aa6) SHA1(575dd6dff2f00901603768f2c121eb0ea5afa444) )
+	ROM_LOAD( "fs8.2n",  0x40000, 0x10000, CRC(11156a7d) SHA1(f298a54fa4c118bf8e7c7cccb6c95a4b97daf4d4) )
+	ROM_LOAD( "fs7.2l",  0x50000, 0x10000, CRC(d584964b) SHA1(7c806fc40dcce700ed0c268abbd2704938b65ff2) )
+	ROM_LOAD( "fs6.2k",  0x60000, 0x10000, CRC(588d14b3) SHA1(c0489b061503677a38e4c5800ea8be17aabf4039) )
+	ROM_LOAD( "fs5.2j",  0x70000, 0x10000, CRC(def2f1d8) SHA1(b72e4dec3306d8afe461ac812b2de67ee85f9dd9) )
+
+	ROM_REGION( 0x10000, "ym2", 0 )
+	ROM_LOAD( "fs4.7p",  0x00000, 0x10000, CRC(435c3716) SHA1(42053741f60594e7ae8516b3ba600f5badb3620f) )
+ROM_END
+
 /***********************************************************************/
 
 ROM_START( tdfever )
@@ -6302,3 +6338,4 @@ GAME( 1988, tdfever2, tdfever,  tdfever2, tdfever,  0,        ROT90,  "SNK", "To
 GAME( 1988, fsoccer,  0,        tdfever2, fsoccer,  0,        ROT0,   "SNK", "Fighting Soccer (version 4)", 0 )
 GAME( 1988, fsoccerj, fsoccer,  tdfever2, fsoccer,  0,        ROT0,   "SNK", "Fighting Soccer (Japan)", 0 )
 GAME( 1988, fsoccerb, fsoccer,  tdfever2, fsoccerb, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg)", 0 )
+GAME( 1988, fsoccerba,fsoccer,  tdfever2, fsoccerb, 0,        ROT0,   "bootleg", "Fighting Soccer (Joystick hack bootleg, alt)", 0 )
