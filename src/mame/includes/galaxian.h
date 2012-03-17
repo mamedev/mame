@@ -40,6 +40,8 @@ public:
 		  m_spriteram(*this, "spriteram") { }
 
 	UINT8 *m_videoram;
+	int m_bullets_base;
+	int m_numspritegens;
 	int m_counter_74ls161[2];
 	int m_direction[2];
 	UINT8 m_gmgalax_selected_game;
@@ -87,7 +89,6 @@ PALETTE_INIT( moonwar );
 
 VIDEO_START( galaxian );
 SCREEN_UPDATE_RGB32( galaxian );
-SCREEN_UPDATE_RGB32( zigzag );
 
 WRITE8_HANDLER( galaxian_videoram_w );
 WRITE8_HANDLER( galaxian_objram_w );

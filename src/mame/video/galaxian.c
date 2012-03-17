@@ -461,24 +461,13 @@ SCREEN_UPDATE_RGB32( galaxian )
 	/* draw the tilemap characters over top */
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	/* render the sprites next */
-	sprites_draw(screen.machine(), bitmap, cliprect, &state->m_spriteram[0x40]);
+	/* render the sprites next. Some custom pcbs (eg. zigzag, fantastc) have more than one sprite generator (ideally, this should be rendered in parallel) */
+	for (int i = 0; i < state->m_numspritegens; i++)
+		sprites_draw(screen.machine(), bitmap, cliprect, &state->m_spriteram[0x40 + i * 0x20]);
 
 	/* if we have bullets to draw, render them following */
 	if (state->m_draw_bullet_ptr != NULL)
-		bullets_draw(screen.machine(), bitmap, cliprect, &state->m_spriteram[0x60]);
-
-	return 0;
-}
-
-
-SCREEN_UPDATE_RGB32( zigzag )
-{
-	SCREEN_UPDATE32_CALL(galaxian);
-
-	/* zigzag has an extra sprite generator instead of bullets (note: ideally, this should be rendered in parallel) */
-	galaxian_state *state = screen.machine().driver_data<galaxian_state>();
-	sprites_draw(screen.machine(), bitmap, cliprect, &state->m_spriteram[0x60]);
+		bullets_draw(screen.machine(), bitmap, cliprect, &state->m_spriteram[state->m_bullets_base]);
 
 	return 0;
 }

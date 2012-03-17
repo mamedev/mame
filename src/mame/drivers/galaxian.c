@@ -2136,10 +2136,6 @@ static MACHINE_CONFIG_DERIVED( zigzag, galaxian_base )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(galaxian_map_base)  /* no discrete sound */
 
-	/* video hardware */
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(zigzag)
-
 	/* sound hardware */
 	MCFG_SOUND_ADD("aysnd", AY8910, 1789750)
 
@@ -2651,6 +2647,8 @@ static void common_init(
 	galaxian_state *state = machine.driver_data<galaxian_state>();
 	state->m_irq_enabled = 0;
 	state->m_irq_line = INPUT_LINE_NMI;
+	state->m_numspritegens = 1;
+	state->m_bullets_base = 0x60;
 	state->m_frogger_adjust = FALSE;
 	state->m_sfx_tilemap = FALSE;
 	state->m_draw_bullet_ptr = (draw_bullet != NULL) ? draw_bullet : galaxian_draw_bullet;
@@ -2926,6 +2924,9 @@ static DRIVER_INIT( zigzag )
 	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
 	state->m_draw_bullet_ptr = NULL;
 
+	/* two sprite generators */
+	state->m_numspritegens = 2;
+
 	/* make ROMs 2 & 3 swappable */
 	space->install_read_bank(0x2000, 0x2fff, "bank1");
 	space->install_read_bank(0x3000, 0x3fff, "bank2");
@@ -3146,8 +3147,16 @@ static DRIVER_INIT( mshuttlj )
 
 static DRIVER_INIT( fantastc )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
+
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, upper_extend_sprite_info);
+
+	/* two sprite generators */
+	state->m_numspritegens = 2;
+
+	/* bullets moved from $60 to $c0 */
+	state->m_bullets_base = 0xc0;
 
 	/* decode code */
 	static const UINT16 lut_am_unscramble[32] = {

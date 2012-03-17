@@ -6381,8 +6381,8 @@ GAME( 1982, tenspot,  0,        tenspot,  tenspot,  tenspot,  ROT270, "Thomas Au
 GAME( 1984, devilfsg, devilfsh, pacmanbl, devilfsg, devilfsg, ROT270, "Vision / Artic", "Devil Fish (Galaxian hardware, bootleg?)", GAME_SUPPORTS_SAVE )
 
 /* sound hardware replaced with AY8910 */
-GAME( 1982, zigzag,   0,        zigzag,   zigzag,   zigzag,   ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
-GAME( 1982, zigzag2,  zigzag,   zigzag,   zigzag,   zigzag,   ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1982, zigzag,   0,        zigzag,   zigzag,   zigzag,   ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE ) // maybe by Taito do Brasil?
+GAME( 1982, zigzag2,  zigzag,   zigzag,   zigzag,   zigzag,   ROT90,  "bootleg (LAX)", "Zig Zag (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE ) // "
 
 /* multi-game select via external switch */
 GAME( 1981, gmgalax,  0,        gmgalax,  gmgalax,  gmgalax,  ROT90,  "bootleg", "Ghostmuncher Galaxian (bootleg)", GAME_SUPPORTS_SAVE )
@@ -6435,7 +6435,7 @@ GAME( 1982, skybase,  0,        mooncrst, skybase,  skybase,  ROT90,  "Omori Ele
 GAME( 198?, kong,     0,        mooncrst, kong,     kong,     ROT90,  "Taito do Brasil", "Kong (Brazil)", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ) // rewrite of Donkey Kong (!) not a clone
 
 /* larger romspace, 2*AY8910, based on Super Star Crest board? */
-GAME( 198?, fantastc, 0,        fantastc, fantastc, fantastc, ROT90,  "Taito do Brasil", "Fantastic", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // rewrite of Galaga (!) not a clone
+GAME( 198?, fantastc, 0,        fantastc, fantastc, fantastc, ROT90,  "Taito do Brasil", "Fantastic", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS ) // rewrite of Galaga (!) not a clone
 
 /* extra ROMs, protection, and sound hardware replaced with AY8910 */
 GAME( 1981, jumpbug,  0,        jumpbug,  jumpbug,  jumpbug,  ROT90,  "Hoei (Rock-Ola license)", "Jump Bug", GAME_SUPPORTS_SAVE ) // or by Alpha Denshi Co. under contract from Hoei?
