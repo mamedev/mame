@@ -3133,7 +3133,7 @@ ROM_START( vs215 )	/* Step 1.5 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
-ROM_START( vs298 )	/* Step 2.0 */
+ROM_START( vs298 )	/* Step 2.0, Sega ID# 833-13346, ROM board ID# 834-13347 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20917.17",  0x400006, 0x100000, CRC(c3bbb270) SHA1(16b2342031ff72408f2290e775df5c8aa344c2e4) )
