@@ -77,38 +77,6 @@ static const UINT32 xmap_high_10[8] = { 0xc04f0362, 0x44fa6936, 0xc048b0db, 0x70
 static const UINT32 xmap_high_11[8] = { 0xd88e9b92, 0xda49726b, 0xc13f86b7, 0x6ce2a1b0, 0xb3adc6e9, 0xd83c2f64, 0xa14c1efc, 0xe98a3c19 };
 static const UINT32 xmap_high_13[8] = { 0x03f8a061, 0x19f39b5a, 0x13a17ae2, 0x85c06682, 0x42118566, 0x78e4ff8a, 0xbee64f97, 0x5eecb443 };
 static const UINT32 xmap_high_15[8] = { 0x1c6f2b4f, 0x9eebe281, 0x784b85d8, 0x401d6412, 0x0370ae0a, 0xa791d0b3, 0x89d290ea, 0x4666f009 };
-static const UINT32 xmap_high_16[8] = { 0xbe2beb93, 0xac9284fb, 0xa629fdbf, 0x82fe33dc, 0x75f1a31b, 0xee1f4f24, 0xaecc7e1e, 0xcd9b419e };
-
-#ifdef UNUSED_DEFINITION
-static const UINT32 zmap_0[8] = { 0x08b01003, 0xed4037ec, 0x9a3a3044, 0x0daf5851, 0xa7725210, 0x0c1822ed, 0xbf726fe6, 0x6e783ea0 };
-static const UINT32 zmap_1[8] = { 0xc6783a02, 0x1e8239df, 0xa53d108b, 0xcc5784a1, 0x9bbb0123, 0xcc2c11dd, 0xbfb9bfda, 0x5db43f53 };
-#endif
-
-static const UINT32 zmap_2[32] = {
-  0x1b301017, 0x02310910, 0x04404644, 0x08042024, 0x050a3aa4, 0xb6087024, 0xa2204208, 0x1c9d9228,
-  0x00c04200, 0xe0821041, 0x0018a803, 0x6402d208, 0x3a104109, 0x005082c0, 0x00920910, 0x20404007,
-  0xc006a4c0, 0x1c48e006, 0xf8871010, 0x83510440, 0x80600410, 0x00040c0a, 0x510590e6, 0x40200910,
-  0x24090928, 0x010406a8, 0x032001a8, 0x10a80993, 0x40858042, 0x49a30111, 0x0c482401, 0x830224c0
-};
-
-static const UINT32 zmap_3[32] = {
-  0xd46b6286, 0x2da93768, 0xf95f5b47, 0x657b472e, 0x05ed940f, 0x86364f88, 0x863d5fed, 0xe3f1ef82,
-  0x2b949d79, 0xd256c897, 0x06a0a4b8, 0x9a84b8d1, 0xfa126bf0, 0x79c9b077, 0x79c2a012, 0x1c0e107d,
-  0x146dc646, 0x31e1d76e, 0x01d84b57, 0xe62a436e, 0x858d901f, 0x86324382, 0xd738cf0b, 0xa3d1e692,
-  0x0f9d9451, 0xd352ce3f, 0x0580a510, 0x8a2cb142, 0xba97ebb2, 0x306ab166, 0x758a8413, 0x9f0c34bd,
-};
-
-static const UINT32 zmap_4[16] = {
-  0xdb36b4d7, 0x1e79e916, 0xfcc75654, 0x8b552464, 0x856a3eb4, 0xb60c7c2e, 0xf325d2ee, 0x5cbd9b38,
-  0x24c94b28, 0xe18616e9, 0x0338a9ab, 0x74aadb9b, 0x7a95c14b, 0x49f383d1, 0x0cda2d11, 0xa34264c7,
-};
-
-static const UINT32 zmap_5[32] = {
-  0x1bf05217, 0xe2b31951, 0x0458ee47, 0x6c06f22c, 0x3f1a7bad, 0xb658f2e4, 0xa2b24b18, 0x3cddd22f,
-  0x1bf05217, 0xe2b31951, 0x0458ee47, 0x6c06f22c, 0x3f1a7bad, 0xb658f2e4, 0xa2b24b18, 0x3cddd22f,
-  0x3f39193f, 0x03350fb8, 0x076047ec, 0x18ac29b7, 0x458fbae6, 0xffab7135, 0xae686609, 0x9f9fb6e8,
-  0xc0c6e6c0, 0xfccaf047, 0xf89fb813, 0xe753d648, 0xba704519, 0x00548eca, 0x519799f6, 0x60604917,
-};
 
 #if 0
 static UINT32 xrot(UINT32 v, int r)
@@ -139,11 +107,10 @@ static UINT32 gr(int i)
 
 static UINT32 gm(int i)
 {
-  UINT32 x;
+  unsigned int x;
   int idx = i & 0xff;
-  int idx2 = ((i>>8) & 0x1ff) | ((i>>9) & 0x200);
   int i1, i2;
-
+  
   if(i & 0x008000)
     idx ^= 1;
   if(i & 0x100000)
@@ -152,33 +119,32 @@ static UINT32 gm(int i)
   i1 = idx & 0xff;
   i2 = (i >> 8) & 0xff;
 
-  x    = 0x41135012;
+  x = 0x4c435012;
 
   if(bt(xmap_low_01, i1))
-    x ^= 0x00c01000;
+    x ^= 0x00401000;
   if(bt(xmap_low_03, i1))
-    x ^= 0x03000800;
+    x ^= 0x01000800;
   if(bt(xmap_low_07, i1))
     x ^= 0x00044000;
   if(bt(xmap_low_23, i1))
     x ^= 0x00102000;
   if(bt(xmap_low_31, i1))
     x ^= 0x00008000;
-
   if(bt(xmap_high_00, i2))
-    x ^= 0x00000400;
+    x ^= 0x0c000400;
   if(bt(xmap_high_02, i2))
     x ^= 0x00200020;
   if(bt(xmap_high_03, i2))
     x ^= 0x02000008;
   if(bt(xmap_high_04, i2))
     x ^= 0x10000200;
-  if(bt(xmap_high_06, i2))
-    x ^= 0x00000004;
+ if(bt(xmap_high_06, i2))
+    x ^= 0x08000004;
   if(bt(xmap_high_21, i2))
     x ^= 0x80000001;
   if(bt(xmap_high_20, i2))
-    x ^= 0x00100040;
+    x ^= 0x00080040;
   if(bt(xmap_high_10, i2))
     x ^= 0x40000100;
   if(bt(xmap_high_11, i2))
@@ -187,65 +153,100 @@ static UINT32 gm(int i)
     x ^= 0x00020080;
   if(bt(xmap_high_15, i2))
     x ^= 0x20000002;
-  if(bt(xmap_high_16, i2))
-    x ^= 0x00080000;
-
+  
   if(i & 0x010000)
-    x ^= 0xa200000f;
+    x ^= 0xaa00000f;
   if(i & 0x020000)
-    x ^= 0x00ba00f0;
+    x ^= 0x00aa00f0;
   if(i & 0x040000)
-    x ^= 0x53000f00;
+    x ^= 0x5d000f00;
   if(i & 0x080000)
-    x ^= 0x00d4f000;
-
-  if(bt(zmap_2, idx2) && bt(xmap_low_03, i1))
-    x ^= 0x08000000;
-
-  if(bt(zmap_3, idx2))
-    x ^= 0x08000000;
-
-  if(bt(zmap_4, idx2&0x1ff) && bt(xmap_low_03, i1))
-    x ^= 0x04000000;
-
-  if(bt(zmap_5, idx2))
-    x ^= 0x04000000;
+    x ^= 0x0054f000;
 
   return x;
 }
 
 static UINT32 trans(UINT32 v, UINT32 x)
 {
-  UINT32 R = v^x, r = R;
+  unsigned y,r2,v2;
+  
+  v2 = (BIT(v,30)<<8)|(BIT(v,22)<<12)|(BIT(v,18)<<18)|(BIT(v,19)<<19)|(BIT(v,22)<<22)|(BIT(v,24)<<24)|(BIT(v,3)<<25)|(BIT(v,26)<<26)|(BIT(v,28)<<28);
+  v2 ^= 0x01000000;
+  
+  r2 = 0;
+  y = 0;
 
-  if((R & (1<<8)) && (v & (1<<30)))
-    r ^= 1<<9;
+  y |= ((                              0 ^ BIT(x, 0) ^ BIT(v, 0))<< 0);
+  y |= ((                              0 ^ BIT(x, 1) ^ BIT(v, 1))<< 1);
+  y |= ((                              0 ^ BIT(x, 2) ^ BIT(v, 2))<< 2);
+  y |= ((                              0 ^ BIT(x, 3) ^ BIT(v, 3))<< 3);
+  y |= ((                              0 ^ BIT(x, 4) ^ BIT(v, 4))<< 4);
+  y |= ((                              0 ^ BIT(x, 5) ^ BIT(v, 5))<< 5);
+  y |= ((                              0 ^ BIT(x, 6) ^ BIT(v, 6))<< 6);
+  y |= ((                              0 ^ BIT(x, 7) ^ BIT(v, 7))<< 7);
+  y |= ((                              0 ^ BIT(x, 8) ^ BIT(v, 8))<< 8);
+  y |= ((                              0 ^ BIT(x, 9) ^ BIT(v, 9))<< 9);
+  y |= ((                              0 ^ BIT(x,10) ^ BIT(v,10))<<10);
+  y |= ((                              0 ^ BIT(x,11) ^ BIT(v,11))<<11);
+  y |= ((                              0 ^ BIT(x,12) ^ BIT(v,12))<<12);
+  y |= ((                              0 ^ BIT(x,13) ^ BIT(v,13))<<13);
+  y |= ((                              0 ^ BIT(x,14) ^ BIT(v,14))<<14);
+  y |= ((                              0 ^ BIT(x,15) ^ BIT(v,15))<<15);
+  y |= ((                              0 ^ BIT(x,16) ^ BIT(v,16))<<16);
+  y |= ((                              0 ^ BIT(x,17) ^ BIT(v,17))<<17);
+  y |= ((                              0 ^ BIT(x,18) ^ BIT(v,18))<<18);
+  y |= ((                              1 ^ BIT(x,19) ^ BIT(v,19))<<19);
+  y |= ((                      BIT(x,19) ^ BIT(x,20) ^ BIT(v,20))<<20);
+  y |= ((                              0 ^ BIT(x,21) ^ BIT(v,21))<<21);
+  y |= ((                              0 ^ BIT(x,22) ^ BIT(v,22))<<22);
+  y |= ((                              0 ^ BIT(x,23) ^ BIT(v,23))<<23);
+  y |= ((                              1 ^ BIT(x,24) ^ BIT(v,24))<<24);
+  y |= ((                      BIT(x,24) ^ BIT(x,25) ^ BIT(v,25))<<25);
+  y |= ((          (BIT(x,24)&BIT(x,25)) ^ BIT(x,26) ^ BIT(v,26))<<26);
+  y |= (((BIT(x,24)&BIT(x,25)&BIT(x,26)) ^ BIT(x,27) ^ BIT(v,27))<<27);
+  y |= ((                              0 ^ BIT(x,28) ^ BIT(v,28))<<28);
+  y |= ((                              0 ^ BIT(x,29) ^ BIT(v,29))<<29);
+  y |= ((                              0 ^ BIT(x,30) ^ BIT(v,30))<<30);
+  y |= ((                              0 ^ BIT(x,31) ^ BIT(v,31))<<31);
+  
+  
+  r2 |= (                     0<< 0);
+  r2 |= (                     0<< 1);
+  r2 |= (                     0<< 2);
+  r2 |= (                     0<< 3);
+  r2 |= (                     0<< 4);
+  r2 |= (                     0<< 5);
+  r2 |= (                     0<< 6);
+  r2 |= (                     0<< 7);
+  r2 |= (                     0<< 8);
+  r2 |= ((BIT(v2, 8)&BIT(y, 8))<< 9);
+  r2 |= (                     0<<10);
+  r2 |= (                     0<<11);
+  r2 |= (                     0<<12);
+  r2 |= ((BIT(v2,12)&BIT(y,12))<<13);
+  r2 |= (                     0<<14);
+  r2 |= (                     0<<15);
+  r2 |= (                     0<<16);
+  r2 |= (                     0<<17);
+  r2 |= (                     0<<18);
+  r2 |= ((BIT(v2,18)&BIT(y,18))<<19);
+  r2 |= ((BIT(v2,19)&BIT(y,19))<<20);
+  r2 |= (                     0<<21);
+  r2 |= (                     0<<22);
+  r2 |= ((BIT(v2,22)&BIT(y,22))<<23);
+  r2 |= (                     0<<24);
+  r2 |= ((BIT(v2,24)&BIT(y,24))<<25);
+  r2 |= ((BIT(v2,25)&BIT(y,25))<<26);
+  r2 |= ((BIT(v2,26)&BIT(y,26))<<27);
+  r2 |= (                     0<<28);
+  r2 |= ((BIT(v2,28)&BIT(y,28))<<29);
+  r2 |= (                     0<<30);
+  r2 |= (                     0<<31);
+  
+  r2 ^= y;
+  r2 ^= 0x0c500000;
 
-  if((R & (1<<12)) && (v & (1<<22)))
-    r ^= 1<<13;
-
-  if((v & (1<<18)) && (x & (1<<14)))
-    r ^= 1<<19;
-
-  if((v & (1<<19)) && (x & (1<<6)))
-    r ^= 1<<20;
-
-  if((R & (1<<22)) && (x & (1<<22)))
-    r ^= 1<<23;
-
-  if((R & (1<<24)) && (x & (1<<24)))
-    r ^= 1<<25;
-
-  if((R & (1<<25)) && (v & (1<<3)))
-    r ^= 1<<26;
-
-  if((R & (1<<26)) && (x & (1<<26)))
-    r ^= 1<<27;
-
-  if((R & (1<<28)) && (v & (1<<28)))
-    r ^= 1<<29;
-
-  return r;
+  return r2;
 }
 
 void raiden2_decrypt_sprites(running_machine &machine)
