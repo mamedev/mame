@@ -2908,7 +2908,7 @@ ROM_START( getbass )	/* step 1.0 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
-ROM_START( lostwsga )	/* Step 1.5 */
+ROM_START( lostwsga )	/* Step 1.5, PCB cage labeled 834-13172 THE LOST WORLD U/R   Rev A known to exist, but not dumped */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-19939.17",  0x600006, 0x080000, CRC(8788b939) SHA1(30932057f763545568526f85977aa0afc4b66e7d) )
