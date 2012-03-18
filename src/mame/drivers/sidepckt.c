@@ -11,6 +11,116 @@ Thanks must go to Mirko Buffoni for testing the music.
 
 i8751 protection simluation and other fixes by Bryan McPhail, 15/10/00.
 
+
+ToDo:
+ support screen flipping for sprites
+
+
+Stephh's notes (based on the games M6809 code and some tests) :
+
+1) 'sidepckt'
+
+  - World version.
+  - Credits are BCD coded on 1 byte (range 0x00-0x99) at location 0x0007.
+  - Bonus lives settings don't match the Dip Switches page : even if the table at 0x40af (4 * 2 words) is good,
+    there's a ingame bug in code at 0x4062 :
+
+      4062: CE 40 AF         LDU   #$40AF         U = 40AF
+      4065: F6 30 03         LDB   $3003
+      4068: 53               COMB  
+      4069: 54               LSRB  
+      406A: 54               LSRB  
+      406B: C4 0C            ANDB  #$0C
+      406D: EC C5            LDD   B,U            U still = 40AF
+      406F: 33 42            LEAU  $2,U           U ALWAYS = 40B1
+
+    So 2nd and next extra lives are ALWAYS set to 50k+ regardless of the Dip Switches settings !
+  - Player 2 controls are never used ingame for player 2 due to extra code at 0x5a35 :
+
+      5A2E: 96 1A            LDA   $1A
+      5A30: 84 01            ANDA  #$01           A = 00 for player 1 and 01 for player 2
+      5A32: 8E 30 00         LDX   #$3000
+      5A35: D6 CA            LDB   $CA            B ALWAYS = 01 due to initialisation of $CA at 0x43f4
+      5A37: C5 01            BITB  #$01
+      5A39: 26 02            BNE   $5A3D          always jumps to 0x53ad
+      5A3B: 30 86            LEAX  A,X            this instruction is NEVER executed
+      5A3D: A6 84            LDA   ,X
+
+  - Player 2 controls are also never used for player 2 when entering initials due to extra code at 0x8baf :
+
+      8BAF: 96 1A            LDA   $1A
+      8BB1: 84 01            ANDA  #$01           A = 00 for player 1 and 01 for player 2
+      8BB3: D6 CA            LDB   $CA            B ALWAYS = 01 due to initialisation of $CA at 0x43f4
+      8BB5: 27 02            BEQ   $8BB9          never jumps to 0x8bb9
+      8BB7: 86 00            LDA   #$00
+      8BB9: 8E 30 00         LDX   #$3000
+      8BBC: A6 86            LDA   A,X
+
+  - Screen never flips ingame or in "continue" screen for player 2 due to code at 0x662f :
+
+      662F: 0F 0A            CLR   $0A            $CA = 0
+      6631: D6 1A            LDB   $1A
+      6633: 27 00            BEQ   $6635          continue regardless of player
+      6635: CC 00 00         LDD   #$0000
+
+      75DF: D6 0A            LDB   $0A
+      75E1: F7 30 0C         STB   $300C
+
+    Surprinsingly, the screen might flip for player 2 after GAME OVER due to original code at 0x4de8 :
+
+      4DE8: D6 1A            LDB   $1A            A = 00 for player 1 and 01 for player 2
+      4DEA: 27 03            BEQ   $4DEF
+      4DEC: F7 30 0C         STB   $300C
+      4DEF: C6 20            LDB   #$20
+
+
+2) 'sidepcktj'
+
+  - Japan version.
+  - Credits are coded on 1 byte (range 0x00-0xff) at location 0x0007, but their display is limited to 9.
+  - Same bonus lives ingame bug as in 'sidepckt'.
+  - Player 2 controls are always used ingame for player 2 due to code at 0x58ab :
+
+      58AB: 96 1A            LDA   $1A
+      58AD: 84 01            ANDA  #$01           A = 00 for player 1 and 01 for player 2
+      58AF: 8E 30 00         LDX   #$3000
+      58B2: A6 86            LDA   A,X
+
+  - Player 2 controls are also always used for player 2 when entering initials due to extra code at 0x8b9f :
+
+      8B9F: 96 1A            LDA   $1A
+      8BA1: 84 01            ANDA  #$01           A = 00 for player 1 and 01 for player 2
+      8BA3: 8E 30 00         LDX   #$3000
+      8BA6: A6 86            LDA   A,X
+
+  - Screen always flips ingame or in "continue" screen for player 2 due to code at 0x662f :
+
+      6473: 0F 0A            CLR   $0A            $CA = 0
+      6475: D6 1A            LDB   $1A            A = 00 for player 1 and 01 for player 2
+      6477: 27 04            BEQ   $647D          jumps if player 1
+      6479: 86 20            LDA   #$20
+      647B: 97 0A            STA   $0A            $CA = 0x20
+      647D: CC 00 00         LDD   #$0000
+
+      75A0: D6 0A            LDB   $0A
+      75A2: F7 30 0C         STB   $300C
+
+    After GAME OVER, code at 0x4d16 is slightly different than in 'sidepckt' :
+
+      4D16: D6 1A            LDB   $1A            A = 00 for player 1 and 01 for player 2
+      4D18: 27 07            BEQ   $4D21          jumps if player 1
+      4D1A: C6 20            LDB   #$20
+      4D1C: D7 0A            STB   $0A            $CA = 0x20
+      4D1E: F7 30 0C         STB   $300C          flip screen
+      4D21: C6 20            LDB   #$20
+
+3) 'sidepcktb'
+
+  - Bootleg heavily based on the World version, so ingame bugs about bonus lives, player 2 inputs and screen flipping are still there.
+  - 2 little differences :
+      * Lives settings (table at 0x4696) : 06 03 02 instead of 06 03 09
+      * Timer settings (table at 0x9d99) : 30 20 18 instead of 40 30 20, so the timer is faster
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -96,7 +206,7 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 		case 1: /* ID Check */
 			state->m_current_table=1; state->m_current_ptr=0; state->m_i8751_return=table_1[state->m_current_ptr++]; break;
 
-		case 2: /* Protection data */
+		case 2: /* Protection data (executable code) */
 			state->m_current_table=2; state->m_current_ptr=0; state->m_i8751_return=table_2[state->m_current_ptr++]; break;
 
 		case 3: /* Protection data (executable code) */
@@ -147,23 +257,23 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
+/* verified from M6809 code */
 static INPUT_PORTS_START( sidepckt )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("P2")
-	/* I haven't found a way to make the game use the 2p controls */
+	PORT_START("P2")     /* see notes */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -180,39 +290,65 @@ static INPUT_PORTS_START( sidepckt )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unused?" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unused?" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unused?" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, "Timer Speed" )               /* table at 0x9d99 */
+	PORT_DIPSETTING(    0x00, "Stopped (Cheat)")
+	PORT_DIPSETTING(    0x03, "Slow" )                      /* 0x40 - "Normal" in the Dip Switches page */
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )           /* 0x30 - "Bit fast" in the Dip Switches page */
+	PORT_DIPSETTING(    0x01, "Fast" )                      /* 0x20 - "Fast" in the Dip Switches page */
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x0c, "6" )
+	PORT_DIPSETTING(    0x04, "9" )
+	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")           /* always gives 6 balls */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       /* table at 0x40af (4 * 2 words) - see notes */
+	PORT_DIPSETTING(    0x30, "10k 60k 50k+" )              /* "10000, after each 50000" in the Dip Switches page */
+	PORT_DIPSETTING(    0x20, "20k 70k 50k+" )              /* "20000, after each 70000" in the Dip Switches page */
+	PORT_DIPSETTING(    0x10, "30k 80k 50k+" )              /* "30000, after each 100000" in the Dip Switches page */
+//	PORT_DIPSETTING(    0x00, "20k 70k 50k+" )              /* "20000" in the Dip Switches page */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
+/* verified from M6809 code */
+static INPUT_PORTS_START( sidepcktj )
+	PORT_INCLUDE(sidepckt)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+INPUT_PORTS_END
+
+/* verified from M6809 code */
+static INPUT_PORTS_START( sidepcktb )
+	PORT_INCLUDE(sidepckt)
+
+	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Timer Speed" )
 	PORT_DIPSETTING(    0x00, "Stopped (Cheat)")
-	PORT_DIPSETTING(    0x03, "Slow" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, "Fast" )
+	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )           /* 0x30 */
+	PORT_DIPSETTING(    0x02, "Fast" )                      /* 0x20 */
+	PORT_DIPSETTING(    0x01, "Fastest" )                   /* 0x18 */
 	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x04, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x0c, "6" )
-	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, "0" )
-	PORT_DIPSETTING(    0x10, "1" )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_DIPNAME( 0x80, 0x80, "Unused?" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")           /* always gives 6 balls */
 INPUT_PORTS_END
 
 
@@ -382,6 +518,6 @@ static DRIVER_INIT( sidepctj )
 }
 
 
-GAME( 1986, sidepckt, 0,        sidepckt, sidepckt, sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)", 0 )
-GAME( 1986, sidepcktj,sidepckt, sidepckt, sidepckt, sidepctj, ROT0, "Data East Corporation", "Side Pocket (Japan)", 0 )
-GAME( 1986, sidepcktb,sidepckt, sidepckt, sidepckt, 0,        ROT0, "bootleg", "Side Pocket (bootleg)", 0 )
+GAME( 1986, sidepckt,  0,        sidepckt, sidepckt,  sidepckt, ROT0, "Data East Corporation", "Side Pocket (World)", GAME_NO_COCKTAIL )
+GAME( 1986, sidepcktj, sidepckt, sidepckt, sidepcktj, sidepctj, ROT0, "Data East Corporation", "Side Pocket (Japan)", GAME_NO_COCKTAIL )
+GAME( 1986, sidepcktb, sidepckt, sidepckt, sidepcktb, 0,        ROT0, "bootleg", "Side Pocket (bootleg)", GAME_NO_COCKTAIL )
