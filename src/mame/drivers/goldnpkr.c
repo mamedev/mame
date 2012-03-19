@@ -98,7 +98,8 @@
   * Buena Suerte (Spanish, set 21),                   1991, Unknown.
   * Buena Suerte (Spanish, set 22),                   1991, Unknown.
   * Falcons Wild - World Wide Poker,                  1983, Falcon.
-  * Falcons Wild - World Wide Poker,                  1990, Video Klein.
+  * Falcons Wild - World Wide Poker (VK set 1),       1990, Video Klein.
+  * Falcons Wild - World Wide Poker (VK set 2),       1990, Video Klein.
   * Falcons Wild - Wild Card 1991,                    1991, TVG.
   * PlayMan Poker (german),                           1981, PM / Beck Elektronik.
   * Super Loco 93 (Spanish, set 1),                   1993, Unknown.
@@ -921,6 +922,7 @@
   - Added Witch Up & Down (Export, 6T/12T ver 0.99, set 2).
   - Added Witch Up & Down (Export, 6T/12T ver 0.99, set 3).
   - Added Witch Up & Down (Export, 6T/12T ver 0.99T).
+  - Added Falcons Wild - World Wide Poker (Video Klein, set 2).
   - Fixed a bug in the coinage input.
 
 
@@ -4797,7 +4799,26 @@ ROM_START( falcnwlda )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
 	ROM_FILL(			0x0000, 0x1000, 0 ) /* filling bitplanes */
-	ROM_LOAD( "fw4.7a",	0x1000, 0x0800, CRC(f0517b0d) SHA1(474bcf429f2539ff1f3d7d32d259c5973ccb0234) )  /* text layer */
+	ROM_LOAD( "fw4.7a",	0x1000, 0x0800, CRC(f0517b0d) SHA1(474bcf429f2539ff1f3d7d32d259c5973ccb0234) )  /* chars gfx */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "fw1.2a(__baddump)",	0x0000, 0x0800, BAD_DUMP CRC(229cedde) SHA1(5b6d0b900714924c7a2390151ee65f36bdb02e8b) )  /* cards deck gfx, bitplane1 */
+	ROM_IGNORE(                 0x0800)
+	ROM_LOAD( "fw2.4a(__baddump)",	0x0800, 0x0800, BAD_DUMP CRC(9ad3c578) SHA1(a69385a807e3270d90040c44721bfff21e95706a) )  /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "fw3.5a(__baddump)",	0x1000, 0x0800, BAD_DUMP CRC(87abebe5) SHA1(5950082b563718476576dbc9f45439019209493e) )  /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+ROM_START( falcnwldb )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* World Wide Poker / 1992-11-04 */
+	ROM_LOAD( "fw12t1_19921104.bin",	0x0000, 0x8000, CRC(8b4f8cac) SHA1(e3bcbadaa157db48a41369a3fcdba536f8ca679e) )
+	ROM_RELOAD(							0x8000, 0x8000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 ) /* filling bitplanes */
+	ROM_LOAD( "fw4.7a",	0x1000, 0x0800, CRC(f0517b0d) SHA1(474bcf429f2539ff1f3d7d32d259c5973ccb0234) )  /* chars gfx */
 
 	ROM_REGION( 0x1800, "gfx2", 0 )
 	ROM_LOAD( "fw1.2a(__baddump)",	0x0000, 0x0800, BAD_DUMP CRC(229cedde) SHA1(5b6d0b900714924c7a2390151ee65f36bdb02e8b) )  /* cards deck gfx, bitplane1 */
@@ -4825,7 +4846,7 @@ ROM_END
 
 ***********************************************/
 
-ROM_START( falcnwldb )
+ROM_START( falcnwldc )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* Falcons Wild, Falcon original */
 //  ROM_LOAD( "nosticker.12a",  0x0000, 0x10000, CRC(54ae4a8a) SHA1(0507098b53d807059b78ec098203d095d19028f8) )
 	ROM_LOAD( "4.b6",			0x3000, 0x1000, CRC(88684a8f) SHA1(5ffa0808b502e93ddcb8f13929008aec2836a773) )
@@ -9815,8 +9836,9 @@ GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknow
 GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, 0,        ROT0,   "<unknown>",                "Good Luck",                               0,                layout_goldnpkr )
 
 GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, 0,        ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",     0,                layout_goldnpkr )
-GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, 0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein)",     GAME_UNEMULATED_PROTECTION, layout_goldnpkr )
-GAME(  1983, falcnwldb, falcnwld, wildcrdb, wildcard, flcnw,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)", GAME_NOT_WORKING )
+GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, 0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,   layout_goldnpkr )
+GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, 0,        ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,   layout_goldnpkr )
+GAME(  1983, falcnwldc, falcnwld, wildcrdb, wildcard, flcnw,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)",    GAME_NOT_WORKING )
 
 /*************************************** OTHER SETS ***************************************/
 
