@@ -8,112 +8,115 @@
 
   Games running on this hardware:
 
-  * Golden Poker Double Up (Big Boy).                1981, Bonanza Enterprises, Ltd.
-  * Golden Poker Double Up (Mini Boy).               1981, Bonanza Enterprises, Ltd.
-  * Jack Potten's Poker (set 1).                     198?, Bootleg.
-  * Jack Potten's Poker (set 2).                     198?, Bootleg in Coinmaster H/W.
-  * Jack Potten's Poker (set 3).                     198?, Bootleg.
-  * Jack Potten's Poker (set 4).                     198?, Bootleg.
-  * Jack Potten's Poker (set 5).                     198?, Bootleg.
-  * Jack Potten's Poker (set 6).                     198?, Bootleg.
-  * Good Luck.                                       198?, Unknown.
-  * Super Double (french).                           198?, Karateco.
-  * Jack Potten's Poker (NGold, set 1).              198?, Unknown.
-  * Jack Potten's Poker (NGold, set 2).              198?, Unknown.
-  * Jack Potten's Poker (NGold, set 3).              198?, Unknown.
-  * Witch Card (Video Klein CPU box, set 1).         1991, Video Klein.
-  * Witch Card (Video Klein CPU box, set 2).         1991, Video Klein.
-  * Witch Card (Spanish, witch game, set 1).         1991, Unknown.
-  * Witch Card (Spanish, witch game, set 2).         1991, Unknown.
-  * Witch Card (English, no witch game).             1991, Unknown.
-  * Witch Card (German, WC3050, set 1 ).             1994, Proma.
-  * Witch Card (English, witch game, lamps).         1985, PM / Beck Elektronik.
-  * Witch Card (Falcon, enhanced sound).             199?, Falcon.
-  * Witch Card (German, WC3050, set 2 ).             1994, Proma.
-  * Witch Card (German, WC3050, 27-4-94),            1994, Proma.
-  * Witch Game (Video Klein, set 1).                 1991, Video Klein.
-  * Witch Game (Video Klein, set 2).                 1991, Video Klein.
-  * Jolli Witch (Export, 6T/12T ver 1.57D).          1994, Video Klein?.
-  * Wild Witch (Export, 6T/12T ver 1.57-SP).         1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.57-TE).         1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.62A).           1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.62B).           1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.62A-F).         1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.62A alt).       1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.62B alt).       1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.65A).           1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.65A-S).         1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.65A-S alt).     1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.65A-N).         1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.70A beta).      1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.70A).           1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.70A alt).       1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG).   1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.74A).           1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.74A alt).       1992-2001, Video Klein.
-  * Wild Witch (Export, 6B/12B ver 1.75A-E English). 1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.76A).           1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.77A).           1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.79A).           1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.83A).           1992-2001, Video Klein.
-  * Wild Witch (Export, 6T/12T ver 1.84A).           1992-2001, Video Klein.
-  * Witch Up & Down (Export, 6T/12T ver 0.99).       1998, Video Klein.
-  * Witch Up & Down (Export, 6T/12T ver 1.02).       1998, Video Klein.
-  * Witch Strike (Export, 6T/12T ver 1.01A).         1992, Video Klein.
-  * Witch Strike (Export, 6T/12T ver 1.01B).         1992, Video Klein.
-  * Witch Jackpot (Export, 6T/12T ver 0.25),         1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.40),            1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.40T),           1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.62),            1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.64),            1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.65)             1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.70S)            1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.70P)            1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.87)             1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.87-88)          1992-1996, Video Klein.
-  * Witch Jack (Export, 6T/12T ver 0.87-89),         1992-1996, Video Klein.
-  * Buena Suerte (Spanish, set 1).                   1990, Unknown.
-  * Buena Suerte (Spanish, set 2).                   1991, Unknown.
-  * Buena Suerte (Spanish, set 3).                   1991, Unknown.
-  * Buena Suerte (Spanish, set 4).                   1991, Unknown.
-  * Buena Suerte (Spanish, set 5).                   1991, Unknown.
-  * Buena Suerte (Spanish, set 6).                   1991, Unknown.
-  * Buena Suerte (Spanish, set 7).                   1991, Unknown.
-  * Buena Suerte (Spanish, set 8).                   1991, Unknown.
-  * Buena Suerte (Spanish, set 9).                   1991, Unknown.
-  * Buena Suerte (Spanish, set 10).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 11).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 12).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 13).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 14).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 15).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 16).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 17).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 18).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 19).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 20).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 21).                  1991, Unknown.
-  * Buena Suerte (Spanish, set 22).                  1991, Unknown.
-  * Falcons Wild - World Wide Poker.                 1983, Falcon.
-  * Falcons Wild - World Wide Poker.                 1990, Video Klein.
-  * Falcons Wild - Wild Card 1991.                   1991, TVG.
-  * PlayMan Poker (german).                          1981, PM / Beck Elektronik.
-  * Super Loco 93 (Spanish, set 1).                  1993, Unknown.
-  * Super Loco 93 (Spanish, set 2).                  1993, Unknown.
-  * Royale (set 1).                                  198?, Unknown.
-  * Royale (set 2).                                  198?, Unknown.
-  * Maverik.                                         198?, Unknown.
-  * Brasil 86.                                       1986, Unknown.
-  * Brasil 87.                                       1987, Unknown.
-  * Brasil 89 (set 1).                               1989, Unknown.
-  * Brasil 89 (set 2).                               1989, Unknown.
-  * Brasil 93.                                       1993, Unknown.
-  * Poker 91.                                        1991, Unknown.
-  * Genie.                                           198?, Video Fun Games Ltd.
-  * Silver Game.                                     1983, Unknown.
-  * Casino Poker (Ver PM86LO-35-5, German).          1987, PM / Beck Elektronik.
-  * "Unknown french poker game".                     198?, Unknown.
-  * "Unknown encrypted poker game".                  198?, Unknown.
+  * Golden Poker Double Up (Big Boy),                 1981, Bonanza Enterprises, Ltd.
+  * Golden Poker Double Up (Mini Boy),                1981, Bonanza Enterprises, Ltd.
+  * Jack Potten's Poker (set 1),                      198?, Bootleg.
+  * Jack Potten's Poker (set 2),                      198?, Bootleg in Coinmaster H/W.
+  * Jack Potten's Poker (set 3),                      198?, Bootleg.
+  * Jack Potten's Poker (set 4),                      198?, Bootleg.
+  * Jack Potten's Poker (set 5),                      198?, Bootleg.
+  * Jack Potten's Poker (set 6),                      198?, Bootleg.
+  * Good Luck,                                        198?, Unknown.
+  * Super Double (french),                            198?, Karateco.
+  * Jack Potten's Poker (NGold, set 1),               198?, Unknown.
+  * Jack Potten's Poker (NGold, set 2),               198?, Unknown.
+  * Jack Potten's Poker (NGold, set 3),               198?, Unknown.
+  * Witch Card (Video Klein CPU box, set 1),          1991, Video Klein.
+  * Witch Card (Video Klein CPU box, set 2),          1991, Video Klein.
+  * Witch Card (Spanish, witch game, set 1),          1991, Unknown.
+  * Witch Card (Spanish, witch game, set 2),          1991, Unknown.
+  * Witch Card (English, no witch game),              1991, Unknown.
+  * Witch Card (German, WC3050, set 1 ),              1994, Proma.
+  * Witch Card (English, witch game, lamps),          1985, PM / Beck Elektronik.
+  * Witch Card (Falcon, enhanced sound),              199?, Falcon.
+  * Witch Card (German, WC3050, set 2 ),              1994, Proma.
+  * Witch Card (German, WC3050, 27-4-94),             1994, Proma.
+  * Witch Game (Video Klein, set 1),                  1991, Video Klein.
+  * Witch Game (Video Klein, set 2),                  1991, Video Klein.
+  * Jolli Witch (Export, 6T/12T ver 1.57D),           1994, Video Klein?.
+  * Wild Witch (Export, 6T/12T ver 1.57-SP),          1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.57-TE),          1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.62A),            1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.62B),            1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.62A-F),          1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.62A alt),        1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.62B alt),        1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.65A),            1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.65A-S),          1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.65A-S alt),      1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.65A-N),          1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.70A beta),       1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.70A),            1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.70A alt),        1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG),    1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.74A),            1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.74A alt),        1992-2001, Video Klein.
+  * Wild Witch (Export, 6B/12B ver 1.75A-E English),  1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.76A),            1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.77A),            1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.79A),            1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.83A),            1992-2001, Video Klein.
+  * Wild Witch (Export, 6T/12T ver 1.84A),            1992-2001, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 0.99, set 1), 1998, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 0.99, set 2), 1998, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 0.99, set 3), 1998, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 0.99T),       1998, Video Klein.
+  * Witch Up & Down (Export, 6T/12T ver 1.02),        1998, Video Klein.
+  * Witch Strike (Export, 6T/12T ver 1.01A),          1992, Video Klein.
+  * Witch Strike (Export, 6T/12T ver 1.01B),          1992, Video Klein.
+  * Witch Jackpot (Export, 6T/12T ver 0.25),          1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.40),             1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.40T),            1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.62),             1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.64),             1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.65),             1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.70S),            1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.70P),            1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.87),             1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.87-88),          1992-1996, Video Klein.
+  * Witch Jack (Export, 6T/12T ver 0.87-89),          1992-1996, Video Klein.
+  * Buena Suerte (Spanish, set 1),                    1990, Unknown.
+  * Buena Suerte (Spanish, set 2),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 3),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 4),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 5),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 6),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 7),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 8),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 9),                    1991, Unknown.
+  * Buena Suerte (Spanish, set 10),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 11),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 12),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 13),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 14),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 15),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 16),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 17),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 18),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 19),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 20),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 21),                   1991, Unknown.
+  * Buena Suerte (Spanish, set 22),                   1991, Unknown.
+  * Falcons Wild - World Wide Poker,                  1983, Falcon.
+  * Falcons Wild - World Wide Poker,                  1990, Video Klein.
+  * Falcons Wild - Wild Card 1991,                    1991, TVG.
+  * PlayMan Poker (german),                           1981, PM / Beck Elektronik.
+  * Super Loco 93 (Spanish, set 1),                   1993, Unknown.
+  * Super Loco 93 (Spanish, set 2),                   1993, Unknown.
+  * Royale (set 1),                                   198?, Unknown.
+  * Royale (set 2),                                   198?, Unknown.
+  * Maverik,                                          198?, Unknown.
+  * Brasil 86,                                        1986, Unknown.
+  * Brasil 87,                                        1987, Unknown.
+  * Brasil 89 (set 1),                                1989, Unknown.
+  * Brasil 89 (set 2),                                1989, Unknown.
+  * Brasil 93,                                        1993, Unknown.
+  * Poker 91,                                         1991, Unknown.
+  * Genie,                                            198?, Video Fun Games Ltd.
+  * Silver Game,                                      1983, Unknown.
+  * Casino Poker (Ver PM86LO-35-5, German),           1987, PM / Beck Elektronik.
+  * "Unknown french poker game",                      198?, Unknown.
+  * "Unknown encrypted poker game",                   198?, Unknown.
 
 
 ************************************************************************************
@@ -899,19 +902,26 @@
 
   [2012-03-18]
 
-  - Added Witch Jackpot (Export, 6T/12T ver 0.25)
-  - Added Witch Jack (Export, 6T/12T ver 0.40)
-  - Added Witch Jack (Export, 6T/12T ver 0.40T)
-  - Added Witch Jack (Export, 6T/12T ver 0.62)
-  - Added Witch Jack (Export, 6T/12T ver 0.64)
-  - Added Witch Jack (Export, 6T/12T ver 0.65)
-  - Added Witch Jack (Export, 6T/12T ver 0.70S)
-  - Added Witch Jack (Export, 6T/12T ver 0.70P)
-  - Added Witch Jack (Export, 6T/12T ver 0.87)
-  - Added Witch Jack (Export, 6T/12T ver 0.87-88)
-  - Added Witch Jack (Export, 6T/12T ver 0.87-89)
+  - Added Witch Jackpot (Export, 6T/12T ver 0.25).
+  - Added Witch Jack (Export, 6T/12T ver 0.40).
+  - Added Witch Jack (Export, 6T/12T ver 0.40T).
+  - Added Witch Jack (Export, 6T/12T ver 0.62).
+  - Added Witch Jack (Export, 6T/12T ver 0.64).
+  - Added Witch Jack (Export, 6T/12T ver 0.65).
+  - Added Witch Jack (Export, 6T/12T ver 0.70S).
+  - Added Witch Jack (Export, 6T/12T ver 0.70P).
+  - Added Witch Jack (Export, 6T/12T ver 0.87).
+  - Added Witch Jack (Export, 6T/12T ver 0.87-88).
+  - Added Witch Jack (Export, 6T/12T ver 0.87-89).
   - Proper inputs and lamps.
 
+
+  [2012-03-19]
+
+  - Added Witch Up & Down (Export, 6T/12T ver 0.99, set 2).
+  - Added Witch Up & Down (Export, 6T/12T ver 0.99, set 3).
+  - Added Witch Up & Down (Export, 6T/12T ver 0.99T).
+  - Fixed a bug in the coinage input.
 
 
   TODO:
@@ -2519,9 +2529,9 @@ static INPUT_PORTS_START( wupndown )
 	PORT_START("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_F2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note In")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Weight (Coupon In)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Note In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin 1 In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_IMPULSE(3) PORT_NAME("Coin 2 In")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -7689,7 +7699,7 @@ ROM_START( wupndown )	/* Witch Up & Down (Export, 6T/12T ver 1.02) */
 ROM_END
 
 
-ROM_START( wupndowna )	/* Witch Up & Down (Export, 6T/12T ver 0.99) */
+ROM_START( wupndowna )	/* Witch Up & Down (Export, 6T/12T ver 0.99, set 1) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "updown_19980409.bin",	0x8000, 0x8000, CRC(f0f0da16) SHA1(06d89881347d9bf2a09734ec4d405ff1c9fea0a8) )
 
@@ -7780,6 +7790,286 @@ ROM_START( wupndowna )	/* Witch Up & Down (Export, 6T/12T ver 0.99) */
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "updown_tbp.bin",	0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
 ROM_END
+
+
+ROM_START( wupndownb )	/* Witch Up & Down (Export, 6T/12T ver 0.99, set 2) */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x5099.bin",	0x8000, 0x8000, CRC(b0e9ac64) SHA1(31496ddea75cf9512661f049ddab50ebdb518a44) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "updown1.bin",	0x00000, 0x8000, CRC(c37aad3e) SHA1(1c957838a0d50bb8a5808a58c87d22dfc13c645d) )
+	ROM_LOAD( "updown2.bin",	0x08000, 0x8000, CRC(47cdd068) SHA1(fe641c66915153ae6e8e5492c225157cbd02bd4c) )
+	ROM_LOAD( "updown3.bin",	0x10000, 0x8000, CRC(905c3224) SHA1(6356f2bd8a1f8952b186dc6f9ed1705d1e918a64) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling bitplanes */
+	ROM_COPY( "temp",	0x0000, 0x1000, 0x0800 )	/* 0000-07ff of updown1.bin - char rom, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",	0x08800, 0x0000, 0x0800 )	/* 0800-0fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x10800, 0x0800, 0x0800 )	/* 0800-0fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x01000, 0x1000, 0x0800 )	/* 1000-17ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",	0x08000, 0x0000, 0x0800 )	/* 0000-07ff of updown2.bin - regular cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x10000, 0x0800, 0x0800 )	/* 0000-07ff of updown3.bin - regular cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x00800, 0x1000, 0x0800 )	/* 0800-0fff of updown1.bin - regular cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",	0x0c000, 0x0000, 0x0800 )	/* 4000-47ff of updown2.bin - upper-left box tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x14000, 0x0800, 0x0800 )	/* 4000-47ff of updown3.bin - upper-left box tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x04800, 0x1000, 0x0800 )	/* 4800-4fff of updown1.bin - upper-left box tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",	0x09800, 0x0000, 0x0800 )	/* 1800-1fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x11800, 0x0800, 0x0800 )	/* 1800-1fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x02000, 0x1000, 0x0800 )	/* 1800-1fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",	0x0a800, 0x0000, 0x0800 )	/* 2800-2fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x12800, 0x0800, 0x0800 )	/* 2800-2fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03000, 0x1000, 0x0800 )	/* 3000-37ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",	0x0a000, 0x0000, 0x0800 )	/* 2000-27ff of updown2.bin - giant 'Video Klein' logo tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x12000, 0x0800, 0x0800 )	/* 2000-27ff of updown3.bin - giant 'Video Klein' logo tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x02800, 0x1000, 0x0800 )	/* 2800-2fff of updown1.bin - giant 'Video Klein' logo tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",	0x0e800, 0x0000, 0x0800 )	/* 6800-6fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x16800, 0x0800, 0x0800 )	/* 6800-6fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x07000, 0x1000, 0x0800 )	/* 7000-77ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",	0x0b800, 0x0000, 0x0800 )	/* 3800-3fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13800, 0x0800, 0x0800 )	/* 3800-3fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x04000, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",	0x0c800, 0x0000, 0x0800 )	/* 4800-4fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x14800, 0x0800, 0x0800 )	/* 4800-4fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x05000, 0x1000, 0x0800 )	/* 4000-47ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",	0x09000, 0x0000, 0x0800 )	/* 1000-17ff of updown2.bin - extended cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x11000, 0x0800, 0x0800 )	/* 1000-17ff of updown3.bin - extended cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x01800, 0x1000, 0x0800 )	/* 1800-1fff of updown1.bin - extended cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",	0x0d000, 0x0000, 0x0800 )	/* 5000-57ff of updown2.bin - 'Up & Down' logo tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x15000, 0x0800, 0x0800 )	/* 5000-57ff of updown3.bin - 'Up & Down' logo tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x05800, 0x1000, 0x0800 )	/* 5800-5fff of updown1.bin - 'Up & Down' logo tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",	0x0d800, 0x0000, 0x0800 )	/* 5800-5fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x15800, 0x0800, 0x0800 )	/* 5800-5fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06000, 0x1000, 0x0800 )	/* 6000-67ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",	0x0e000, 0x0000, 0x0800 )	/* 6000-67ff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x16000, 0x0800, 0x0800 )	/* 6000-67ff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06800, 0x1000, 0x0800 )	/* 6800-6fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of updown2.bin - D-UP ladder tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of updown3.bin - D-UP ladder tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - D-UP ladder tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",	0x0f000, 0x0000, 0x0800 )	/* 7000-77ff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x17000, 0x0800, 0x0800 )	/* 7000-77ff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x07800, 0x1000, 0x0800 )	/* 7800-7fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "updown_tbp.bin",	0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wupndownc )	/* Witch Up & Down (Export, 6T/12T ver 0.99, set 3) */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x5099alt.bin",	0x8000, 0x8000, CRC(2355afbd) SHA1(f511375ca12dc71497601ca5b0a74deb0977d85e) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "updown1.bin",	0x00000, 0x8000, CRC(c37aad3e) SHA1(1c957838a0d50bb8a5808a58c87d22dfc13c645d) )
+	ROM_LOAD( "updown2.bin",	0x08000, 0x8000, CRC(47cdd068) SHA1(fe641c66915153ae6e8e5492c225157cbd02bd4c) )
+	ROM_LOAD( "updown3.bin",	0x10000, 0x8000, CRC(905c3224) SHA1(6356f2bd8a1f8952b186dc6f9ed1705d1e918a64) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling bitplanes */
+	ROM_COPY( "temp",	0x0000, 0x1000, 0x0800 )	/* 0000-07ff of updown1.bin - char rom, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",	0x08800, 0x0000, 0x0800 )	/* 0800-0fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x10800, 0x0800, 0x0800 )	/* 0800-0fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x01000, 0x1000, 0x0800 )	/* 1000-17ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",	0x08000, 0x0000, 0x0800 )	/* 0000-07ff of updown2.bin - regular cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x10000, 0x0800, 0x0800 )	/* 0000-07ff of updown3.bin - regular cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x00800, 0x1000, 0x0800 )	/* 0800-0fff of updown1.bin - regular cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",	0x0c000, 0x0000, 0x0800 )	/* 4000-47ff of updown2.bin - upper-left box tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x14000, 0x0800, 0x0800 )	/* 4000-47ff of updown3.bin - upper-left box tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x04800, 0x1000, 0x0800 )	/* 4800-4fff of updown1.bin - upper-left box tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",	0x09800, 0x0000, 0x0800 )	/* 1800-1fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x11800, 0x0800, 0x0800 )	/* 1800-1fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x02000, 0x1000, 0x0800 )	/* 1800-1fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",	0x0a800, 0x0000, 0x0800 )	/* 2800-2fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x12800, 0x0800, 0x0800 )	/* 2800-2fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03000, 0x1000, 0x0800 )	/* 3000-37ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",	0x0a000, 0x0000, 0x0800 )	/* 2000-27ff of updown2.bin - giant 'Video Klein' logo tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x12000, 0x0800, 0x0800 )	/* 2000-27ff of updown3.bin - giant 'Video Klein' logo tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x02800, 0x1000, 0x0800 )	/* 2800-2fff of updown1.bin - giant 'Video Klein' logo tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",	0x0e800, 0x0000, 0x0800 )	/* 6800-6fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x16800, 0x0800, 0x0800 )	/* 6800-6fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x07000, 0x1000, 0x0800 )	/* 7000-77ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",	0x0b800, 0x0000, 0x0800 )	/* 3800-3fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13800, 0x0800, 0x0800 )	/* 3800-3fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x04000, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",	0x0c800, 0x0000, 0x0800 )	/* 4800-4fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x14800, 0x0800, 0x0800 )	/* 4800-4fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x05000, 0x1000, 0x0800 )	/* 4000-47ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",	0x09000, 0x0000, 0x0800 )	/* 1000-17ff of updown2.bin - extended cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x11000, 0x0800, 0x0800 )	/* 1000-17ff of updown3.bin - extended cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x01800, 0x1000, 0x0800 )	/* 1800-1fff of updown1.bin - extended cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",	0x0d000, 0x0000, 0x0800 )	/* 5000-57ff of updown2.bin - 'Up & Down' logo tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x15000, 0x0800, 0x0800 )	/* 5000-57ff of updown3.bin - 'Up & Down' logo tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x05800, 0x1000, 0x0800 )	/* 5800-5fff of updown1.bin - 'Up & Down' logo tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",	0x0d800, 0x0000, 0x0800 )	/* 5800-5fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x15800, 0x0800, 0x0800 )	/* 5800-5fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06000, 0x1000, 0x0800 )	/* 6000-67ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",	0x0e000, 0x0000, 0x0800 )	/* 6000-67ff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x16000, 0x0800, 0x0800 )	/* 6000-67ff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06800, 0x1000, 0x0800 )	/* 6800-6fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of updown2.bin - D-UP ladder tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of updown3.bin - D-UP ladder tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - D-UP ladder tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",	0x0f000, 0x0000, 0x0800 )	/* 7000-77ff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x17000, 0x0800, 0x0800 )	/* 7000-77ff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x07800, 0x1000, 0x0800 )	/* 7800-7fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "updown_tbp.bin",	0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
+
+ROM_START( wupndownd )	/* Witch Up & Down (Export, 6T/12T ver 0.99T) */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wj5x5099t.bin",	0x8000, 0x8000, CRC(a722c659) SHA1(41f43133992b012754577d788745ff8223d88077) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "updown1.bin",	0x00000, 0x8000, CRC(c37aad3e) SHA1(1c957838a0d50bb8a5808a58c87d22dfc13c645d) )
+	ROM_LOAD( "updown2.bin",	0x08000, 0x8000, CRC(47cdd068) SHA1(fe641c66915153ae6e8e5492c225157cbd02bd4c) )
+	ROM_LOAD( "updown3.bin",	0x10000, 0x8000, CRC(905c3224) SHA1(6356f2bd8a1f8952b186dc6f9ed1705d1e918a64) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 )			/* filling bitplanes */
+	ROM_COPY( "temp",	0x0000, 0x1000, 0x0800 )	/* 0000-07ff of updown1.bin - char rom, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",	0x08800, 0x0000, 0x0800 )	/* 0800-0fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x10800, 0x0800, 0x0800 )	/* 0800-0fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x01000, 0x1000, 0x0800 )	/* 1000-17ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",	0x08000, 0x0000, 0x0800 )	/* 0000-07ff of updown2.bin - regular cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x10000, 0x0800, 0x0800 )	/* 0000-07ff of updown3.bin - regular cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x00800, 0x1000, 0x0800 )	/* 0800-0fff of updown1.bin - regular cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",	0x0c000, 0x0000, 0x0800 )	/* 4000-47ff of updown2.bin - upper-left box tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x14000, 0x0800, 0x0800 )	/* 4000-47ff of updown3.bin - upper-left box tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x04800, 0x1000, 0x0800 )	/* 4800-4fff of updown1.bin - upper-left box tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",	0x09800, 0x0000, 0x0800 )	/* 1800-1fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x11800, 0x0800, 0x0800 )	/* 1800-1fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x02000, 0x1000, 0x0800 )	/* 1800-1fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",	0x0a800, 0x0000, 0x0800 )	/* 2800-2fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x12800, 0x0800, 0x0800 )	/* 2800-2fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x03000, 0x1000, 0x0800 )	/* 3000-37ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",	0x0a000, 0x0000, 0x0800 )	/* 2000-27ff of updown2.bin - giant 'Video Klein' logo tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x12000, 0x0800, 0x0800 )	/* 2000-27ff of updown3.bin - giant 'Video Klein' logo tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x02800, 0x1000, 0x0800 )	/* 2800-2fff of updown1.bin - giant 'Video Klein' logo tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",	0x0e800, 0x0000, 0x0800 )	/* 6800-6fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x16800, 0x0800, 0x0800 )	/* 6800-6fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x07000, 0x1000, 0x0800 )	/* 7000-77ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",	0x0b800, 0x0000, 0x0800 )	/* 3800-3fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x13800, 0x0800, 0x0800 )	/* 3800-3fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x04000, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",	0x0c800, 0x0000, 0x0800 )	/* 4800-4fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x14800, 0x0800, 0x0800 )	/* 4800-4fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x05000, 0x1000, 0x0800 )	/* 4000-47ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",	0x09000, 0x0000, 0x0800 )	/* 1000-17ff of updown2.bin - extended cards gfx, bitplane 1 */
+	ROM_COPY( "temp",	0x11000, 0x0800, 0x0800 )	/* 1000-17ff of updown3.bin - extended cards gfx, bitplane 2 */
+	ROM_COPY( "temp",	0x01800, 0x1000, 0x0800 )	/* 1800-1fff of updown1.bin - extended cards gfx, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",	0x0d000, 0x0000, 0x0800 )	/* 5000-57ff of updown2.bin - 'Up & Down' logo tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x15000, 0x0800, 0x0800 )	/* 5000-57ff of updown3.bin - 'Up & Down' logo tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x05800, 0x1000, 0x0800 )	/* 5800-5fff of updown1.bin - 'Up & Down' logo tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",	0x0d800, 0x0000, 0x0800 )	/* 5800-5fff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x15800, 0x0800, 0x0800 )	/* 5800-5fff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06000, 0x1000, 0x0800 )	/* 6000-67ff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",	0x0e000, 0x0000, 0x0800 )	/* 6000-67ff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x16000, 0x0800, 0x0800 )	/* 6000-67ff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x06800, 0x1000, 0x0800 )	/* 6800-6fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",	0x0b000, 0x0000, 0x0800 )	/* 3000-37ff of updown2.bin - D-UP ladder tiles, bitplane 1 */
+	ROM_COPY( "temp",	0x13000, 0x0800, 0x0800 )	/* 3000-37ff of updown3.bin - D-UP ladder tiles, bitplane 2 */
+	ROM_COPY( "temp",	0x03800, 0x1000, 0x0800 )	/* 3800-3fff of updown1.bin - D-UP ladder tiles, bitplane 3 */
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",	0x0f000, 0x0000, 0x0800 )	/* 7000-77ff of updown2.bin - empty, bitplane 1 */
+	ROM_COPY( "temp",	0x17000, 0x0800, 0x0800 )	/* 7000-77ff of updown3.bin - empty, bitplane 2 */
+	ROM_COPY( "temp",	0x07800, 0x1000, 0x0800 )	/* 7800-7fff of updown1.bin - empty, bitplane 3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "updown_tbp.bin",	0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+ROM_END
+
 
 /*********************************************
 
@@ -9479,8 +9769,11 @@ GAMEL( 1999, wldwitcht, wldwitch, wcrdxtnd, wldwitch, vkdlswwt, ROT0,   "Video K
 GAMEL( 2000, wldwitchu, wldwitch, wcrdxtnd, wldwitch, vkdlswwu, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.79A)",       0,                layout_goldnpkr )	/* Ver 179A, 2000-05-10 */
 GAMEL( 2001, wldwitchv, wldwitch, wcrdxtnd, wldwitch, vkdlswwv, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.83A)",       0,                layout_goldnpkr )	/* Ver 183A, 2001-06-13 */
 
-GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)",   0,                layout_upndown )
-GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99)",   0,                layout_upndown )
+GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)",        0,           layout_upndown )	/* Ver 1.02, 1998-10-26 */
+GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 1)", 0,           layout_upndown )	/* Ver 0.99, 1998-04-09 */
+GAMEL( 1998, wupndownb, wupndown, wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 2)", 0,           layout_upndown )	/* Ver 0.99, 1998-03-23 */
+GAMEL( 1998, wupndownc, wupndown, wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 3)", 0,           layout_upndown )	/* Ver 0.99 alt, 1998-05-11 */
+GAMEL( 1998, wupndownd, wupndown, wcrdxtnd, wupndown, 0,        ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99T)",       0,           layout_upndown )	/* Ver 0.99T, 1998-03-23 */
 
 GAMEL( 1992, wstrike,   0,        wcrdxtnd, wstrike,  wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01A)",     0,                layout_goldnpkr )
 GAMEL( 1992, wstrikea,  wstrike,  wcrdxtnd, wstrike,  wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01B)",     0,                layout_goldnpkr )
