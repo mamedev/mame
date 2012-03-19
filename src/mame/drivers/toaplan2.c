@@ -4696,6 +4696,26 @@ ROM_START( bgareggacn )
 	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
 ROM_END
 
+
+ROM_START( bgareggabl )
+	ROM_REGION( 0x100000, "maincpu", 0 )			/* Main 68K code */
+	ROM_LOAD16_WORD_SWAP( "xt-8m.bin", 0x000000, 0x100000, CRC(4a6657cb) SHA1(1838956e7597eaa78ea5ee58d0ccc79cbbd7ded5) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 )			/* Sound Z80 code + bank */
+	ROM_LOAD( "snd.bin", 0x00000, 0x20000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
+
+	ROM_REGION( 0x800000, "gfx1", 0 )
+	ROM_LOAD( "6#-322",  0x000000, 0x400000, CRC(37fe48ed) SHA1(ded5d13c33b4582310cdfb3dd52c052f741c00c5) ) /* == rom4.bin+rom3.bin */
+	ROM_LOAD( "5#-322",  0x400000, 0x400000, CRC(5a06c031) SHA1(ee241ff90117cec1f33ab163601a9d5c75609739) ) /* == rom2.bin+rom1.bin */
+
+	ROM_REGION( 0x010000, "gfx2", 0 )
+	ROM_LOAD( "1#-256", 0x00000, 0x08000, CRC(760dcd14) SHA1(e151e5d7ca5557277f306b9484ec021f4edf1e07) )
+	ROM_LOAD( "2#-256", 0x08000, 0x08000, CRC(456dd16e) SHA1(84779ee64d3ea33ba1ba4dee39b504a81c6811a1) )
+
+	ROM_REGION( 0x140000, "oki", 0 )		/* ADPCM Samples */
+	ROM_LOAD( "rom5.bin", 0x040000, 0x100000, CRC(f6d49863) SHA1(3a3c354852adad06e8a051511abfab7606bce382) )
+ROM_END
+
 /*
    The region of Batrider is controlled by the first byte of rom prg0.u22
    only sets which have been dumped from original PCBs are supported
@@ -5128,6 +5148,7 @@ GAME( 1996, bgareggatw, bgaregga, bgaregga, bgareggatw, bgaregga, ROT270, "Raizi
 GAME( 1996, bgaregganv, bgaregga, bgaregga, bgareggahk, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays New Version only when set to HK
 GAME( 1996, bgareggat2, bgaregga, bgaregga, bgaregga,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
 GAME( 1996, bgareggacn, bgaregga, bgaregga, bgareggacn, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
+GAME( 1996, bgareggabl, bgaregga, bgaregga, bgareggacn, bgaregga, ROT270, "hack", "1945 2 - Battle Garegga Chinese hack", GAME_SUPPORTS_SAVE )
 
 // these are all based on Version B, even if only the Japan version states 'version B'
 GAME( 1998, batrider,   0,        batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
