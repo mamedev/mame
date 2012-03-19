@@ -200,10 +200,10 @@
 
 	<element name="led" defstate="0">
 		<disk state="1">
-			<color red="1.0" green="0.0" blue="0.0" />
+			<color red="1.0" green="0.05" blue="0.0" />
 		</disk>
 		<disk state="0">
-			<color red="0.3" green="0.0" blue="0.0" />
+			<color red="0.15" green="0.0" blue="0.0" />
 		</disk>
 	</element>
 
@@ -379,9 +379,12 @@
 			<bounds x="77.5" y="23.5" width="12" height="9" />
 		</bezel>
 
+
 <!-- placing hands LED's -->
 
-<!-- base hand LED's (base)-->
+<!-- lamp8 for ROCK or SCISSORS or PAPER -->
+
+<!-- base-->
 
 		<bezel name="lamp8" element="led">
 			<bounds x="29.75" y="73.875" width="1.5" height="1.5" />
@@ -469,7 +472,7 @@
 			<bounds x="72.5" y="65.75" width="1.5" height="1.5" />
 		</bezel>
 
-<!-- base hand LED's (palm stripes)-->
+<!-- palm stripes-->
 
 		<bezel name="lamp8" element="led">
 			<bounds x="45.625" y="61" width="1.5" height="1.5" />
@@ -503,7 +506,7 @@
 			<bounds x="54.125" y="72.75" width="1.5" height="1.5" />
 		</bezel>
 
-<!-- base hand LED's (wristle)-->
+<!-- wrist-->
 
 		<bezel name="lamp8" element="led">
 			<bounds x="44.2" y="92" width="1.5" height="1.5" />
@@ -519,9 +522,25 @@
 			<bounds x="55.4" y="94.8" width="1.5" height="1.5" />
 		</bezel>
 
-<!-- paper component LED's -->
+<!-- webbing-->
 
-<!-- paper component LED's (thumb finger) -->
+		<bezel name="lamp8" element="led">
+			<bounds x="27.625" y="61.375" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp8" element="led">
+			<bounds x="30.125" y="60.375" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp8" element="led">
+			<bounds x="31.875" y="58.25" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp8" element="led">
+			<bounds x="32.25" y="55.875" width="1.5" height="1.5" />
+		</bezel>
+
+
+<!-- lamp9 for PAPER -->
+
+<!-- thumb -->
 
 		<bezel name="lamp9" element="led">
 			<bounds x="26.75" y="74.125" width="1.5" height="1.5" />
@@ -550,14 +569,8 @@
 		<bezel name="lamp9" element="led">
 			<bounds x="25.25" y="61.625" width="1.5" height="1.5" />
 		</bezel>
-		<bezel name="lamp9" element="led">
-			<bounds x="27.625" y="61.375" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp9" element="led">
-			<bounds x="30.125" y="60.375" width="1.5" height="1.5" />
-		</bezel>
 
-<!-- paper component LED's (ring finger) -->
+<!-- ring finger -->
 
 		<bezel name="lamp9" element="led">
 			<bounds x="58.875" y="49" width="1.5" height="1.5" />
@@ -590,7 +603,7 @@
 			<bounds x="69.375" y="53.75" width="1.5" height="1.5" />
 		</bezel>
 
-<!-- paper component LED's (little finger) -->
+<!-- little finger -->
 
 		<bezel name="lamp9" element="led">
 			<bounds x="71.75" y="55.625" width="1.5" height="1.5" />
@@ -617,16 +630,10 @@
 			<bounds x="75" y="64.5" width="1.5" height="1.5" />
 		</bezel>
 
-<!-- scissors component LED's -->
 
-<!-- scissors component LED's (index finger) -->
+<!-- lamp10 for SCISSORS or PAPER -->
 
-		<bezel name="lamp10" element="led">
-			<bounds x="31.875" y="58.25" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="32.25" y="55.875" width="1.5" height="1.5" />
-		</bezel>
+<!-- index finger -->
 
 		<bezel name="lamp10" element="led">
 			<bounds x="31.125" y="52.875" width="1.5" height="1.5" />
@@ -668,7 +675,7 @@
 			<bounds x="42.75" y="48.75" width="1.5" height="1.5" />
 		</bezel>
 
-<!-- scissors component LED's (middle finger) -->
+<!-- middle finger -->
 
 		<bezel name="lamp10" element="led">
 			<bounds x="45.625" y="47.5" width="1.5" height="1.5" />
@@ -703,63 +710,12 @@
 		<bezel name="lamp10" element="led">
 			<bounds x="56.625" y="48.125" width="1.5" height="1.5" />
 		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="55.875" y="50.875" width="1.5" height="1.5" />
-		</bezel>
 
-<!-- scissors component LED's (thumb finger hidden) -->
 
-		<bezel name="lamp10" element="led">
-			<bounds x="26.8" y="64.3" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="26.6" y="67.2" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="27.3" y="69.7" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="28.6" y="72.1" width="1.5" height="1.5" />
-		</bezel>
+<!-- lamp11 for ROCK -->
 
-<!-- scissors component LED's (ring and little fingers hidden) -->
+<!-- index finger and middle finger hidden -->
 
-		<bezel name="lamp10" element="led">
-			<bounds x="55.5" y="54.2" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="58.5" y="53.6" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="61.2" y="53.1" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="64.1" y="54.3" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="65.2" y="56.6" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="66.5" y="59.1" width="1.5" height="1.5" />
-		</bezel>
-
-		<bezel name="lamp10" element="led">
-			<bounds x="69.4" y="59.2" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="71.7" y="60.4" width="1.5" height="1.5" />
-		</bezel>
-		<bezel name="lamp10" element="led">
-			<bounds x="72.6" y="62.9" width="1.5" height="1.5" />
-		</bezel>
-
-<!-- rock component LED's -->
-
-<!-- rock component LED's (index and middle fingers hidden) -->
-
-		<bezel name="lamp11" element="led">
-			<bounds x="32" y="58.8" width="1.5" height="1.5" />
-		</bezel>
 		<bezel name="lamp11" element="led">
 			<bounds x="33.6" y="53.9" width="1.5" height="1.5" />
 		</bezel>
@@ -787,9 +743,65 @@
 		<bezel name="lamp11" element="led">
 			<bounds x="53.6" y="52.5" width="1.5" height="1.5" />
 		</bezel>
-		<bezel name="lamp11" element="led">
+
+
+<!-- lamp12 for SCISSORS -->
+
+<!-- middle finger -->
+
+		<bezel name="lamp12" element="led">
+			<bounds x="55.875" y="50.875" width="1.5" height="1.5" />
+		</bezel>
+
+
+<!-- lamp13 for SCISSORS or ROCK -->
+
+<!-- thumb hidden -->
+
+		<bezel name="lamp13" element="led">
+			<bounds x="26.8" y="64.3" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp13" element="led">
+			<bounds x="26.6" y="67.2" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp13" element="led">
+			<bounds x="27.3" y="69.7" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp13" element="led">
+			<bounds x="28.6" y="72.1" width="1.5" height="1.5" />
+		</bezel>
+
+<!-- ring finger and little finger hidden -->
+
+		<bezel name="lamp13" element="led">
 			<bounds x="55.5" y="54.2" width="1.5" height="1.5" />
 		</bezel>
+		<bezel name="lamp13" element="led">
+			<bounds x="58.5" y="53.6" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp13" element="led">
+			<bounds x="61.2" y="53.1" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp13" element="led">
+			<bounds x="64.1" y="54.3" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp13" element="led">
+			<bounds x="65.2" y="56.6" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp13" element="led">
+			<bounds x="66.5" y="59.1" width="1.5" height="1.5" />
+		</bezel>
+
+		<bezel name="lamp13" element="led">
+			<bounds x="69.4" y="59.2" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp13" element="led">
+			<bounds x="71.7" y="60.4" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp13" element="led">
+			<bounds x="72.6" y="62.9" width="1.5" height="1.5" />
+		</bezel>
+
 
 	</view>
 </mamelayout>
