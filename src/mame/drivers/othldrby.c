@@ -6,6 +6,9 @@ driver by Nicola Salmoria
 
 Video IC is S951060-VGP
 
+TODO:
+- a PCB pic is needed in order to identify the RTC used by this.
+
 Notes:
 - Sprite/tile priorities are NOT orthogonal to sprite/sprite priorities:
   sprites with a higher priority appear over sprites with a lower priority,
@@ -20,15 +23,10 @@ Notes:
 #include "includes/othldrby.h"
 
 
-static READ16_HANDLER( pip )
+/* Guess: reads when doing r/w to video device */
+static READ16_HANDLER( othldrby_scanline_r )
 {
-	othldrby_state *state = space->machine().driver_data<othldrby_state>();
-	return state->m_toggle ^= 1;
-}
-
-static READ16_HANDLER( pap )
-{
-	return space->machine().rand();
+	return space->machine().primary_screen->vpos();
 }
 
 
@@ -89,11 +87,11 @@ static ADDRESS_MAP_START( othldrby_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(othldrby_videoram_addr_w)
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE(othldrby_videoram_r, othldrby_videoram_w)
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(othldrby_vreg_addr_w)
-	AM_RANGE(0x30000c, 0x30000d) AM_READ(pip)	// vblank?
+	AM_RANGE(0x30000c, 0x30000d) AM_READ_PORT("VBLANK")
 	AM_RANGE(0x30000c, 0x30000f) AM_WRITE(othldrby_vreg_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x700000, 0x700001) AM_READ(pap)	// scanline???
+	AM_RANGE(0x700000, 0x700001) AM_READ(othldrby_scanline_r)
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("P1")
@@ -105,6 +103,9 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( othldrby )
+	PORT_START("VBLANK")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -250,7 +251,7 @@ static MACHINE_CONFIG_START( othldrby, othldrby_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
 	MCFG_SCREEN_UPDATE_STATIC(othldrby)
