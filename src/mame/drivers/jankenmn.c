@@ -203,6 +203,12 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
 	// d0, d6, d7: N/C?
 }
 
+static CUSTOM_INPUT( jankenmn_payout_sensor_r )
+{
+	// temp workaround, needs hopper
+	return field.machine().rand();
+}
+
 
 /*********************************************
 *           Memory Map Definition            *
@@ -234,7 +240,7 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) // sensor, not a button (wait too long and it gives an error)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(jankenmn_payout_sensor_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 
