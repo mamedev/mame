@@ -3,6 +3,7 @@
   JANKENMAN UNIT
 
   Preliminary driver by Roberto Fresca.
+  With further improvements by MAME Team.
 
 
   Coin-operated Z80-CTC + DAC system. No screen, just artwork with lamps + LEDs.
@@ -14,12 +15,8 @@
   Guu (rock), Choki (scissors), Paa (paper).
   Some cabs have a Start button and/or Payout button too.
 
-
   info: http://dgm.hmc6.net/museum/jyankenman.html
   (and many videos on Youtube)
-
-  It's all a challenge. Even once emulated, the game will need a lot of
-  artwork and lamps work...
 
 
   Games working on this hardware:
@@ -70,32 +67,23 @@
 
 ****************************************************************************
 
-  Dev Notes...
-
-  Run the second program, then BP to 0x97b.
-  the instruction 'ld a,($c000)' throw the code flow to $f3c0 (IM2?)  ---> YES. The CTC implementation fixed it.
-
-  Later, the code flow (pc=9f7) is branch to 0xfc1d, where there is no code,
-  ROM offset $db00-$de0c should be at Z80 address space $fb00-$fe0c.
-  Is this a hardwired bank, or done by software?
-
-****************************************************************************
-
   The waveform is 8bit mono unsigned at 8192Hz.
   Sampleset has sounds, music and voice at approximate rom offsets:
 
   $00c58-$038a4: "jan ken pon!"                   --> Is the call for rock paper and scissors.
-  $04d2e-$05a4b: "zuko"                           --> Is just used for sound effect.
+  $04d2e-$05a4b: "zuko"                           --> Is just used for sound effect when player loses.
   $05b2d-$08207: "ai ko desho"                    --> Is the call for rematch when you've drawn.
   $08410-$0a9ec: "ooatari"                        --> "you got it! / perfect!".
   $0a9ec-$0c008: "yappii"                         --> Is just an exclamation of happiness.
   $0c008-$0dac0: "attarii"                        --> "you got it".
+
+  unused PCM data:
+
   $15db7-$18628: "kakariin o oyobi kudasai"       --> "please call the attendant".
   $18628-$1a4f3: "keihin ga deru yo"              --> "your prize is incoming".
   $3c26d-$3f677: "keihin o sentaku shite kudasai" --> "please select your prize".
-  
-  Is $10000-$3ffff even used in this game?
-  
+
+
 ****************************************************************************
 
   About lamps...
@@ -130,36 +118,6 @@ lamps:
 Not implemented in internal .lay:
 
   15 = Rotating blue lamp
-
-****************************************************************************
-
-  Memory Map:
-  -----------
-
-  16KB PCG1, Main Z80(?)
-  Z80 code/data in $0000-$2b4f, rest is empty
-  Can't find any sign of 8255 PPI. Is this a leftover or testrom?
-  
-  0000-3fff  ; ROM Space.
-  4000-47ff  ; Work RAM
-  
-  40-45  : outputs
-  50-53  : inputs
-  58-5b  : must be CTC
-  ..
-
-
-  256KB PCG2, Audio Z80?... or main program?
-  Z80 code/data in $0000-$0bff and $db00-$de0c, rest is PCM
-
-  0000-bfff  ; ROM Space.
-  c000-c7ff  ; Work RAM
-  c800-ffff  ; more ROM?
-
-  00-03  : CTC
-  10-13  : PPI1: A & B input, high C & low C output.
-  20-23  : PPI2: A, B, high C & low C output.
-  30     : ?
 
 
 ***************************************************************************/
@@ -392,7 +350,9 @@ ROM_START( jankenmn )
 	ROM_CONTINUE(           0xe000, 0x2000 )
 	ROM_IGNORE( 0x32000 ) // lots of unused PCM data
 
-	ROM_REGION( 0x4000, "temp", 0 ) // leftover ROM?
+	// Z80 code/data in $0000-$2b4f, rest is empty. CTC probably at 58-5b.
+	// Can't find any sign of 8255 PPI. Is this an unused leftover or testrom?
+	ROM_REGION( 0x4000, "temp", 0 )
 	ROM_LOAD( "pcg1.bin",   0x0000, 0x4000,  CRC(a9c5aa2e) SHA1(c3b81eeefa5c442231cd26615aaf6c682063b26f) )
 ROM_END
 
