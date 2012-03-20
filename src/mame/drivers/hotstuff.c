@@ -11,6 +11,10 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT16* m_bitmapram;
+	struct
+	{
+		UINT8 index;
+	}m_ioboard;
 };
 
 
@@ -62,10 +66,51 @@ SCREEN_UPDATE_RGB32( hotstuff )
 	return 0;
 }
 
+/* TODO: identify this ... */
+static READ8_HANDLER( ioboard_status_r )
+{
+	hotstuff_state *state = space->machine().driver_data<hotstuff_state>();
+	UINT8 res;
+
+	printf("STATUS R\n");
+
+	switch(state->m_ioboard.index)
+	{
+		case 0x0c: res = 0x80|0x10; break;
+		default: res = 0; break;//space->machine().rand(); break;
+	}
+
+	return res;
+}
+
+static READ8_HANDLER( ioboard_unk_r )
+{
+	printf("UNK R\n");
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( ioboard_data_w )
+{
+	printf("DATA %02x\n",data);
+}
+
+static WRITE8_HANDLER( ioboard_reg_w )
+{
+	hotstuff_state *state = space->machine().driver_data<hotstuff_state>();
+
+	state->m_ioboard.index = data;
+	printf("REG %02x\n",data);
+}
+
 static ADDRESS_MAP_START( hotstuff_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x080000, 0x0fffff) AM_NOP //ROM AM_REGION("data", 0)
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
+
+	AM_RANGE(0x680000, 0x680001) AM_READWRITE8(ioboard_status_r,ioboard_data_w,0xff00)
+	AM_RANGE(0x680000, 0x680001) AM_READWRITE8(ioboard_unk_r,ioboard_reg_w,0x00ff)
 
 	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE_MEMBER(hotstuff_state, m_bitmapram)
 ADDRESS_MAP_END
