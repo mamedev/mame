@@ -223,12 +223,20 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps2_w )
 
 static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
 {
-	// TODO: multiplier lamps (doesn't look like the one in the .lay)
+	// d1: blue rotating lamp on top of cab
+	output_set_lamp_value(2, data >> 1 & 1);
 
-	//$10=left(1)
-	//$08=right(2)
-	
-	//printf("%02X  ",data);
+	// d2: payout (waits for payout sensor)
+	// TODO
+
+	// d3: right multiplier lamp(2), d4: left multiplier lamp(1)
+	output_set_lamp_value(0, data >> 4 & 1);
+	output_set_lamp_value(1, data >> 3 & 1);
+
+	// d5: assume coin lockout
+	coin_lockout_global_w(device->machine(), ~data & 0x20);
+
+	// d0, d6, d7: N/C?
 }
 
 
