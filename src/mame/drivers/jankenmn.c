@@ -10,6 +10,11 @@
   There are several versions of this game, the most notable difference being in
   the artwork and bonus lamps. The kid's voice and hand are the same among all.
 
+  Control panel is composed of buttons:
+  Guu (rock), Choki (scissors), Paa (paper) and Payout.
+  Some cabs have a Start button too.
+
+
   info: http://dgm.hmc6.net/museum/jyankenman.html
   (and many videos on Youtube)
 
@@ -26,7 +31,6 @@
 
   Hardware Notes...
 
-
   1x LH0080A          ; Sharp, Z80A CPU.
   1x LH0082A          ; Sharp, Z80 CTC Counter Timer Circuit.
   2x M5L8255AP-5      ; Mitsubishi, PPI 8255 (I/O).
@@ -36,7 +40,7 @@
   1x 27C020           ; Waveform (8bit mono unsigned 8192Hz), labeled 'PCG2'.
 
   1x AD7523JN         ; InterSil, D/A Converter, 8-Bit, Multiplying, 6.7MHz.
-  1x LA8358           ; Sanyo, ???.
+  1x LA8358           ; Sanyo, ???. (near volume knob)
   1x 386D NJR         ; New Japan Radio, LM386D IC (500mW, 1-Channel Mono Audio AMP).
   3x M54562P          ; 8-Unit 500mA source type Darlington Transistor Array with clamp diode.
 
@@ -70,36 +74,26 @@
   Run the second program, then BP to 0x97b.
   the instruction 'ld a,($c000)' throw the code flow to $f3c0 (IM2?)  ---> YES. The CTC implementation fixed it.
 
-
-  Later, the code flow (pc=9f7) is branch to 0xfc1d, where there is no code...
+  Later, the code flow (pc=9f7) is branch to 0xfc1d, where there is no code,
+  ROM offset $db00-$de0c should be at Z80 address space $fb00-$fe0c.
+  Is this a hardwired bank, or done by software?
 
 ****************************************************************************
 
   The waveform is 8bit mono unsigned at 8192Hz.
-  Sampleset has sounds, music and...
+  Sampleset has sounds, music and voice at approximate rom offsets:
 
-  "jan ken pon!"                   --> Is the call for rock paper and scissors.
-  "zuko"                           --> Is just used for sound effect.
-  "ai ko desho"                    --> Is the call for rematch when you've drawn.
-  "ooatari"                        --> "you got it! / perfect!".
-  "yappii"                         --> Is just an exclamation of happiness.
-  "attarii"                        --> "you got it".
-  "kakariin o oyobi kudasai"       --> "please call the attendant".
-  "keihin ga deru yo"              --> "your prize is incoming".
-  "keihin o sentaku shite kudasai" --> "please select your prize".
-
-
-  Control panel is composed of 5 buttons:
-  Start, Guu (rock), Choki (scissors), Paa (paper) and Payout.
-
-
-  5 lamps for numbers 2, 4, 8, 16 and 32.
-  3 states lamps for  LOSE (left), DRAW (middle) and WIN (right).
-
-  Unknown lamps for hands (seems 3 wires, so up to 7 components)
-
-  3 LEDs in the control panel. One for each hand button.
+  $00c58-$038a4: "jan ken pon!"                   --> Is the call for rock paper and scissors.
+  $04d2e-$05a4b: "zuko"                           --> Is just used for sound effect.
+  $05b2d-$08207: "ai ko desho"                    --> Is the call for rematch when you've drawn.
+  $08410-$0a9ec: "ooatari"                        --> "you got it! / perfect!".
+  $0a9ec-$0c008: "yappii"                         --> Is just an exclamation of happiness.
+  $0c008-$0dac0: "attarii"                        --> "you got it".
+  $15db7-$18628: "kakariin o oyobi kudasai"       --> "please call the attendant".
+  $18628-$1a4f3: "keihin ga deru yo"              --> "your prize is incoming".
+  $3c26d-$3f677: "keihin o sentaku shite kudasai" --> "please select your prize".
   
+  Is $10000-$3ffff even used in this game?
   
 ****************************************************************************
 
@@ -113,42 +107,52 @@
   Lamp3 = Multiplier 16
   Lamp4 = Multiplier 32
 
-  Lamp5 = Win
+  Lamp5 = Lose
   Lamp6 = Draw
-  Lamp7 = Lose
+  Lamp7 = Win
 
   Lamp8 = Base Hand
   Lamp9 = Paper components
-  Lamp10 = Scissors components
+  Lamp10 = Paper/Scissors components
   Lamp11 = Rock components
+  Lamp12 = Scissors components
+  Lamp13 = Rock/Scissors components
 
-  The Hand lamps should be splitted into more segments/components, due to
-  some of them are shared between states.
+Not implemented yet in internal .lay:
 
+  Lamp14 = Rock button LED
+  Lamp15 = Scissors button LED
+  Lamp16 = Paper button LED
 
 ****************************************************************************
 
   Memory Map:
   -----------
 
-
-  PCG1, Main Z80(?)
+  16KB PCG1, Main Z80(?)
+  Z80 code/data in $0000-$2b4f, rest is empty
+  Can't find any sign of 8255 PPI. Is this a leftover or testrom?
   
   0000-3fff  ; ROM Space.
   4000-47ff  ; Work RAM
   
+  40-45  : outputs
+  50-53  : inputs
   58-5b  : must be CTC
   ..
 
 
-  PCG2, Audio Z80?... or main program?
+  256KB PCG2, Audio Z80?... or main program?
+  Z80 code/data in $0000-$0bff and $db00-$de0c, rest is PCM
 
   0000-bfff  ; ROM Space.
   c000-c7ff  ; Work RAM
+  c800-ffff  ; more ROM?
 
-  00-03  : CTC? or is CTC mapped at 30-33?
+  00-03  : CTC
   10-13  : PPI1: A & B input, high C & low C output.
   20-23  : PPI2: A, B, high C & low C output.
+  30     : ?
 
 
 ***************************************************************************/
@@ -178,53 +182,39 @@ public:
 *            Read/Write Handlers             *
 *********************************************/
 
-static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
+static WRITE8_DEVICE_HANDLER( jankenmn_lamps1_w )
 {
-/*  PPI-0 (10h-13h); PortC OUT.
-    unknown:
+	// hand state: d0: rock, d1: scissors, d2: paper
+	output_set_lamp_value(8, (data & 7) != 0);
+	output_set_lamp_value(11, data & 1);
+	output_set_lamp_value(12, data >> 1 & 1);
+	output_set_lamp_value(9, data >> 2 & 1);
+	output_set_lamp_value(10, (data & 6) != 0);
+	output_set_lamp_value(13, (data & 3) != 0);
 
-  7654 3210
-  xxxx xxxx  * unknown.
-
-*/
-	logerror("ppi0_portc: %02x\n", data);
+	// d3: ? (only set if game is over)
+	// d4-d7: coincounter or led7seg of number of remaining credits?
 }
 
-//static WRITE8_DEVICE_HANDLER( ppi1_porta_w )
-//{
-/*  PPI-1 (20h-23h); PortA OUT.
-    unknown:
-
-  7654 3210
-  xxxx xxxx  * unknown.
-
-*/
-	// DAC??
-//	logerror("ppi1_porta: %02x\n", data);
-//}
-
-static WRITE8_DEVICE_HANDLER( ppi1_portb_w )
+static WRITE8_DEVICE_HANDLER( jankenmn_lamps2_w )
 {
-/*  PPI-1 (20h-23h); PortB OUT.
-    unknown:
+	// button LEDs: d1: paper, d2: scissors, d3: rock
+	output_set_lamp_value(14, data >> 3 & 1);
+	output_set_lamp_value(15, data >> 2 & 1);
+	output_set_lamp_value(16, data >> 1 & 1);
 
-  7654 3210
-  xxxx xxxx  * unknown.
+	// lamps: d5: draw, d6: lose, d7: win
+	output_set_lamp_value(5, data >> 6 & 1);
+	output_set_lamp_value(6, data >> 5 & 1);
+	output_set_lamp_value(7, data >> 7 & 1);
 
-*/
-	logerror("ppi1_portb: %02x\n", data);
+	// d0: led7seg high byte?
+	// d4: N/C?
 }
 
-static WRITE8_DEVICE_HANDLER( ppi1_portc_w )
+static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
 {
-/*  PPI-1 (20h-23h); PortC OUT.
-    unknown:
-
-  7654 3210
-  xxxx xxxx  * unknown.
-
-*/
-	logerror("ppi1_portc: %02x\n", data);
+	// TODO: multiplier lamps (doesn't look like the one in the .lay)
 }
 
 
@@ -232,11 +222,10 @@ static WRITE8_DEVICE_HANDLER( ppi1_portc_w )
 *           Memory Map Definition            *
 *********************************************/
 
-
 static ADDRESS_MAP_START( jankenmn_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-//	AM_RANGE(0xf000, 0xffff) AM_ROM
+	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank07")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jankenmn_port_map, AS_IO, 8 )
@@ -244,36 +233,9 @@ static ADDRESS_MAP_START( jankenmn_port_map, AS_IO, 8 )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x30, 0x30) AM_WRITENOP // ???
 ADDRESS_MAP_END
 
-/*
-
-  RW
-
-  10-13  : PPI1 --> ctrl 0x92 : A & B input, high C & low C output.
-  20-23  : PPI2 --> ctrl 0x90 : A, B, high C & low C output.
-
-':audiocpu' (000C): unmapped i/o memory write to 0030 = 00 & FF
-
-':audiocpu' (0018): unmapped i/o memory write to 0000 = 57 & FF \
-':audiocpu' (001C): unmapped i/o memory write to 0000 = 01 & FF  |
-':audiocpu' (0020): unmapped i/o memory write to 0001 = 57 & FF  |
-':audiocpu' (0024): unmapped i/o memory write to 0001 = 01 & FF  |
-':audiocpu' (0028): unmapped i/o memory write to 0002 = 97 & FF  |> Seems CTC mapped 00-03.
-':audiocpu' (002C): unmapped i/o memory write to 0002 = 14 & FF  |
-':audiocpu' (0030): unmapped i/o memory write to 0003 = 97 & FF  |
-':audiocpu' (0034): unmapped i/o memory write to 0003 = FF & FF  |
-':audiocpu' (0038): unmapped i/o memory write to 0000 = 48 & FF /
-
-':audiocpu' (003A): unmapped i/o memory write to 0030 = 48 & FF --> CTC defined vector (48) is written here.
-':audiocpu' (0978): unmapped i/o memory write to 0030 = 00 & FF
-':audiocpu' (0978): unmapped i/o memory write to 0030 = 00 & FF
-':audiocpu' (0978): unmapped i/o memory write to 0030 = 00 & FF
-':audiocpu' (0978): unmapped i/o memory write to 0030 = 00 & FF
-
-  A lot of info is passing through port 30h, when a sound is triggered (press key T)
-
-*/
 
 /*********************************************
 *          Input Ports Definitions           *
@@ -281,23 +243,22 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jankenmn )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Q) PORT_NAME("IN1-1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_W) PORT_NAME("IN1-2")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_E) PORT_NAME("IN1-3")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_R) PORT_NAME("IN1-4")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_T) PORT_NAME("IN1-5")	// trigger a sample
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_Y) PORT_NAME("IN1-6")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_U) PORT_NAME("IN1-7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_I) PORT_NAME("IN1-8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Rock")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Scissors")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Paper")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:8")	// trigger a sample
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:7")	// trigger a sample
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:6")	// seems to mute the sound system...
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )	PORT_DIPLOCATION("DSW:7,8")
+	PORT_DIPSETTING( 0x00, "Lamp Test" )
+	PORT_DIPSETTING( 0x02, DEF_STR( 3C_1C ) )		// or 4 credits on 100 yen
+	PORT_DIPSETTING( 0x01, DEF_STR( 2C_1C ) )		// or 6 credits on 100 yen
+	PORT_DIPSETTING( 0x03, DEF_STR( 1C_1C ) )		// or 11 credits on 100 yen
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:6")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:5")
@@ -306,13 +267,13 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:4")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:3")	// change the sample
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:3")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:2")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:1")	// change the sample
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("DSW:1")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -322,6 +283,7 @@ INPUT_PORTS_END
 /*********************************************
 *   CTC & Daisy Chain Interrupts Interface   *
 *********************************************/
+
 static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,              	/* timer disables */
@@ -345,24 +307,23 @@ static const z80_daisy_config daisy_chain[] =
 static I8255_INTERFACE (ppi8255_intf_0)
 {
 	/* (10-13) Mode 0 - Ports A & B set as input, high C & low C as output. */
-	DEVCB_INPUT_PORT("DSW"),		/* Port A read */
-	DEVCB_NULL,						/* Port A write */
-	DEVCB_INPUT_PORT("IN0"),		/* Port B read */
-	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(ppi0_portc_w)		/* Port C write */
+	DEVCB_INPUT_PORT("DSW"),
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("IN0"),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(jankenmn_lamps3_w)
 };
 
 static I8255_INTERFACE (ppi8255_intf_1)
 {
 	/* (20-23) Mode 0 - Ports A, B, high C & low C set as output. */
-	DEVCB_NULL,									/* Port A read */
-	DEVCB_DEVICE_HANDLER("dac", dac_signed_w),	/* Port A write */	// is really the DAC here?
-//	DEVCB_HANDLER(ppi1_porta_w),				/* Port A write */
-	DEVCB_NULL,									/* Port B read */
-	DEVCB_HANDLER(ppi1_portb_w),				/* Port B write */
-	DEVCB_NULL,									/* Port C read */
-	DEVCB_HANDLER(ppi1_portc_w)					/* Port C write */
+	DEVCB_NULL,
+	DEVCB_DEVICE_HANDLER("dac", dac_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(jankenmn_lamps1_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(jankenmn_lamps2_w)
 };
 
 
@@ -398,17 +359,18 @@ MACHINE_CONFIG_END
 *********************************************/
 
 ROM_START( jankenmn )
-	ROM_REGION( 0x40000, "maincpu", 0 )		// this one has valid z80 code, plus the PPI inits
-	ROM_LOAD( "pcg2.bin",   0x0000, 0x10000, CRC(48a8f769) SHA1(656346ca0a83fd8ff5c8683152e4c5e1a1c797fa) )
-    ROM_IGNORE(                     0x30000)	// need a banking
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "pcg2.bin",   0x0000, 0x40000, CRC(48a8f769) SHA1(656346ca0a83fd8ff5c8683152e4c5e1a1c797fa) )
 
-	ROM_REGION( 0x10000, "temp", 0 )	// this should be the program ROM, but there's not PPI code and seems odd
+	ROM_REGION( 0x10000, "temp", 0 )
 	ROM_LOAD( "pcg1.bin",   0x0000, 0x4000,  CRC(a9c5aa2e) SHA1(c3b81eeefa5c442231cd26615aaf6c682063b26f) )
 ROM_END
 
 
 static DRIVER_INIT( jankenmn )
 {
+	// $c000 hardwired to $e000?
+	memory_set_bankptr(machine, "bank07", machine.region("maincpu")->base() + 0xc000);
 }
 
 
