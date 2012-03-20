@@ -132,12 +132,15 @@ protected:
     virtual void device_reset();
     virtual void device_post_load() { }
     virtual void device_clock_changed() { }
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	static TIMER_CALLBACK( timer_proc );
 	static TIMER_CALLBACK( clock_tod_callback );
 
 private:
+	static const device_timer_id TIMER_PC = 0;
 
+    inline attotime cycles_to_time(int c);
 	void update_pc();
 	void update_interrupts();
 	void timer_bump(int timer);
@@ -201,6 +204,8 @@ private:
 	UINT8			m_cnt;
 	UINT8			m_shift;
 	UINT8			m_serial;
+
+	emu_timer *m_pc_timer;
 };
 
 class mos6526r1_device : public mos6526_device

@@ -10,9 +10,11 @@
 #include "emu.h"
 #include "6526cia.h"
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
 
 /* CIA registers */
 #define CIA_PRA			0
@@ -41,19 +43,33 @@
 #define	CIA_CRA_SPMODE	0x40
 #define	CIA_CRA_TODIN	0x80
 
+
+
 //**************************************************************************
 //  DEVICE CONFIGURATION
-//**************************************************************************
-
-
-//**************************************************************************
-//  LIVE DEVICE
 //**************************************************************************
 
 // device type definition
 const device_type MOS6526R1 = &device_creator<mos6526r1_device>;
 const device_type MOS6526R2 = &device_creator<mos6526r2_device>;
 const device_type MOS8520 = &device_creator<mos8520_device>;
+
+
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+inline attotime mos6526_device::cycles_to_time(int c)
+{
+	return attotime::from_hz(clock()) * c;
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
 
 //-------------------------------------------------
 //  mos6526_device - constructor
@@ -174,6 +190,8 @@ void mos6526_device::device_start()
 	}
 
 	/* setup timers */
+	m_pc_timer = timer_alloc(TIMER_PC);
+
 	for (int t = 0; t < (sizeof(m_timer) / sizeof(m_timer[0])); t++)
 	{
 		cia_timer *timer = &m_timer[t];
@@ -225,6 +243,21 @@ void mos6526_device::device_start()
 }
 
 
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void mos6526_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_PC:
+		m_out_pc_func(1);
+		break;
+	}
+}
+
+
 /*-------------------------------------------------
     set_port_mask_value
 -------------------------------------------------*/
@@ -240,9 +273,9 @@ void mos6526_device::set_port_mask_value(int port, int data)
 
 void mos6526_device::update_pc()
 {
-	/* this should really be one cycle long */
 	m_out_pc_func(0);
-	m_out_pc_func(1);
+
+	m_pc_timer->adjust(cycles_to_time(1));
 }
 
 /*-------------------------------------------------
