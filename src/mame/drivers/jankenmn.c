@@ -11,8 +11,8 @@
   the artwork and bonus lamps. The kid's voice and hand are the same among all.
 
   Control panel is composed of buttons:
-  Guu (rock), Choki (scissors), Paa (paper) and Payout.
-  Some cabs have a Start button too.
+  Guu (rock), Choki (scissors), Paa (paper).
+  Some cabs have a Start button and/or Payout button too.
 
 
   info: http://dgm.hmc6.net/museum/jyankenman.html
@@ -123,6 +123,7 @@ Not implemented yet in internal .lay:
   Lamp14 = Rock button LED
   Lamp15 = Scissors button LED
   Lamp16 = Paper button LED
+  Lamp17 = Payout error LED
 
 ****************************************************************************
 
@@ -182,6 +183,9 @@ public:
 *            Read/Write Handlers             *
 *********************************************/
 
+static const UINT8 led_map[16] = // 7748 IC?
+	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
+
 static WRITE8_DEVICE_HANDLER( jankenmn_lamps1_w )
 {
 	// hand state: d0: rock, d1: scissors, d2: paper
@@ -192,8 +196,10 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps1_w )
 	output_set_lamp_value(10, (data & 6) != 0);
 	output_set_lamp_value(13, (data & 3) != 0);
 
+	// d4-d7: led7seg (remaining credits) right digit
+	output_set_digit_value(1, led_map[data >> 4 & 0xf]);
+
 	// d3: ? (only set if game is over)
-	// d4-d7: coincounter or led7seg of number of remaining credits?
 }
 
 static WRITE8_DEVICE_HANDLER( jankenmn_lamps2_w )
@@ -208,13 +214,21 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps2_w )
 	output_set_lamp_value(6, data >> 5 & 1);
 	output_set_lamp_value(7, data >> 7 & 1);
 
-	// d0: led7seg high byte?
-	// d4: N/C?
+	// d4: payout error LED
+	output_set_lamp_value(17, data >> 4 & 1);
+
+	// d0: led7seg (remaining credits) left digit
+	output_set_digit_value(0, led_map[data & 1]);
 }
 
 static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
 {
 	// TODO: multiplier lamps (doesn't look like the one in the .lay)
+
+	//$10=left(1)
+	//$08=right(2)
+	
+	//printf("%02X  ",data);
 }
 
 
@@ -225,7 +239,7 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
 static ADDRESS_MAP_START( jankenmn_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank07")
+	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jankenmn_port_map, AS_IO, 8 )
@@ -243,12 +257,12 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jankenmn )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Rock")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Scissors")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Paper")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Guu (Rock)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Choki (Scissors)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT ) // sensor, not a button (wait too long and it gives an error)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 
@@ -360,23 +374,18 @@ MACHINE_CONFIG_END
 
 ROM_START( jankenmn )
 	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD( "pcg2.bin",   0x0000, 0x40000, CRC(48a8f769) SHA1(656346ca0a83fd8ff5c8683152e4c5e1a1c797fa) )
+	ROM_LOAD( "pcg2.bin",   0x0000, 0xc000, CRC(48a8f769) SHA1(656346ca0a83fd8ff5c8683152e4c5e1a1c797fa) )
+	ROM_CONTINUE(           0xe000, 0x2000 )
+	ROM_IGNORE( 0x32000 ) // lots of unused PCM data
 
-	ROM_REGION( 0x10000, "temp", 0 )
+	ROM_REGION( 0x4000, "temp", 0 ) // leftover ROM?
 	ROM_LOAD( "pcg1.bin",   0x0000, 0x4000,  CRC(a9c5aa2e) SHA1(c3b81eeefa5c442231cd26615aaf6c682063b26f) )
 ROM_END
-
-
-static DRIVER_INIT( jankenmn )
-{
-	// $c000 hardwired to $e000?
-	memory_set_bankptr(machine, "bank07", machine.region("maincpu")->base() + 0xc000);
-}
 
 
 /*********************************************
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT      ROT    COMPANY    FULLNAME                       FLAGS...          LAYOUT */
-GAMEL( 1985, jankenmn, 0,      jankenmn, jankenmn, jankenmn, ROT0, "Sunwise", "Janken Man (Pretty Carnival)", GAME_NOT_WORKING, layout_jankenmn )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY    FULLNAME                       FLAGS...          LAYOUT */
+GAMEL( 1985, jankenmn, 0,      jankenmn, jankenmn, 0,    ROT0, "Sunwise", "Janken Man (Pretty Carnival)", GAME_NOT_WORKING, layout_jankenmn )
