@@ -174,7 +174,7 @@
 	</element>
 
 
-<!-- define LED's for hands -->
+<!-- define LEDs -->
 
 	<element name="led" defstate="0">
 		<disk state="1">
@@ -246,7 +246,24 @@
 		</bezel>
 
 
-<!-- placing hands LED's -->
+<!-- placing control panel LEDs -->
+
+		<bezel name="lamp14" element="led">
+			<bounds x="96" y="96" width="1.5" height="1.5" />
+		</bezel>
+
+		<bezel name="lamp2" element="led">
+			<bounds x="88" y="96" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp3" element="led">
+			<bounds x="90" y="96" width="1.5" height="1.5" />
+		</bezel>
+		<bezel name="lamp4" element="led">
+			<bounds x="92" y="96" width="1.5" height="1.5" />
+		</bezel>
+
+
+<!-- placing hands LEDs -->
 
 <!-- lamp8 for ROCK or SCISSORS or PAPER -->
 

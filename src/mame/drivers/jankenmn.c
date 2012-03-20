@@ -25,6 +25,7 @@
   Games working on this hardware:
   
   * Janken Man (Pretty Carnival) (3 station prize game),  (c) 1985, Sunwise.
+    (revision unknown, probably later than 1985)
 
 
 ****************************************************************************
@@ -101,29 +102,34 @@
 
   The internal layout has lamps mapped the following way:
 
-  Lamp0 = Multiplier 2
-  Lamp1 = Multiplier 4
-  Lamp2 = Multiplier 8
-  Lamp3 = Multiplier 16
-  Lamp4 = Multiplier 32
+digits:
+  0 = Left
+  1 = Right
 
-  Lamp5 = Lose
-  Lamp6 = Draw
-  Lamp7 = Win
+lamps: 
+  0 = Multiplier 1 "attarii"
+  1 = Multiplier 2 "ooatari"
 
-  Lamp8 = Base Hand
-  Lamp9 = Paper components
-  Lamp10 = Paper/Scissors components
-  Lamp11 = Rock components
-  Lamp12 = Scissors components
-  Lamp13 = Rock/Scissors components
+  2 = Rock button LED
+  3 = Scissors button LED
+  4 = Paper button LED
 
-Not implemented yet in internal .lay:
+  5 = Lose
+  6 = Draw
+  7 = Win
 
-  Lamp14 = Rock button LED
-  Lamp15 = Scissors button LED
-  Lamp16 = Paper button LED
-  Lamp17 = Payout error LED
+  8 = Base Hand
+  9 = Paper components
+  10 = Paper/Scissors components
+  11 = Rock components
+  12 = Scissors components
+  13 = Rock/Scissors components
+
+  14 = Payout error LED
+
+Not implemented in internal .lay:
+
+  15 = Rotating blue lamp
 
 ****************************************************************************
 
@@ -205,9 +211,9 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps1_w )
 static WRITE8_DEVICE_HANDLER( jankenmn_lamps2_w )
 {
 	// button LEDs: d1: paper, d2: scissors, d3: rock
-	output_set_lamp_value(14, data >> 3 & 1);
-	output_set_lamp_value(15, data >> 2 & 1);
-	output_set_lamp_value(16, data >> 1 & 1);
+	output_set_lamp_value(2, data >> 3 & 1);
+	output_set_lamp_value(3, data >> 2 & 1);
+	output_set_lamp_value(4, data >> 1 & 1);
 
 	// lamps: d5: draw, d6: lose, d7: win
 	output_set_lamp_value(5, data >> 6 & 1);
@@ -215,7 +221,7 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps2_w )
 	output_set_lamp_value(7, data >> 7 & 1);
 
 	// d4: payout error LED
-	output_set_lamp_value(17, data >> 4 & 1);
+	output_set_lamp_value(14, data >> 4 & 1);
 
 	// d0: led7seg (remaining credits) left digit
 	output_set_digit_value(0, led_map[data & 1]);
@@ -224,7 +230,7 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps2_w )
 static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
 {
 	// d1: blue rotating lamp on top of cab
-	output_set_lamp_value(2, data >> 1 & 1);
+	output_set_lamp_value(15, data >> 1 & 1);
 
 	// d2: payout (waits for payout sensor)
 	// TODO
@@ -395,5 +401,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY    FULLNAME                       FLAGS...          LAYOUT */
-GAMEL( 1985, jankenmn, 0,      jankenmn, jankenmn, 0,    ROT0, "Sunwise", "Janken Man (Pretty Carnival)", GAME_NOT_WORKING, layout_jankenmn )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY    FULLNAME     FLAGS...  LAYOUT */
+GAMEL( 1985, jankenmn, 0,      jankenmn, jankenmn, 0,    ROT0, "Sunwise", "Janken Man", 0,        layout_jankenmn )
