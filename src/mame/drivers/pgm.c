@@ -916,115 +916,15 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ddp2 )
 	PORT_INCLUDE ( pgm )
 
-/*  // probably not dsw related anyway
-    PORT_START("UNK0")
-    PORT_DIPNAME( 0x0001, 0x0001, "4" )
-    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0000, DEF_STR( Unknown ) )  // Freezes if off?
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-    PORT_START("UNK1")
-    PORT_DIPNAME( 0x0001, 0x0001, "5" )
-    PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-*/
-	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
+	PORT_START("RegionHack")	/* Region - actually supplied by protection device */
+	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
 	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
 	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
 	PORT_CONFSETTING(      0x0002, "Japan (Cave license)" )
 	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
 	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
 	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
+	PORT_CONFSETTING(      0x00ff, "Untouched" ) // don't hack the region
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( oldsplus )
@@ -3296,7 +3196,7 @@ ROM_START( ddp2 )
 	ROM_LOAD16_WORD_SWAP( "v102.u8", 0x100000, 0x200000, CRC(5a9ea040) SHA1(51eaec46c368f7cfc5245e64896092f52b1193e0) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "ddp2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_LOAD( "ddp2_igs027a_japan.bin", 0x000000, 0x04000, CRC(742d34d2) SHA1(4491c08f3cefef2933ad5a741f4bb05cc2f3e1a0) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
@@ -3323,7 +3223,7 @@ ROM_START( ddp2101 )
 	ROM_LOAD16_WORD_SWAP( "v101_16m.u8", 0x100000, 0x200000, CRC(5e5786fd) SHA1(c6fc2956b5dc6a97c0d7d808a8c58aa21fa023b9) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "ddp2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_LOAD( "ddp2_igs027a_japan.bin", 0x000000, 0x04000, CRC(742d34d2) SHA1(4491c08f3cefef2933ad5a741f4bb05cc2f3e1a0) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
@@ -3350,7 +3250,7 @@ ROM_START( ddp2100 )
 	ROM_LOAD16_WORD_SWAP( "v100.u8", 0x100000, 0x200000, CRC(0c8aa8ea) SHA1(57e33224622607a1df8daabf26ba063cf8a6d3fc) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "ddp2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+	ROM_LOAD( "ddp2_igs027a_japan.bin", 0x000000, 0x04000, CRC(742d34d2) SHA1(4491c08f3cefef2933ad5a741f4bb05cc2f3e1a0) )
 
 	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
@@ -4618,69 +4518,23 @@ static DRIVER_INIT( martmast )
 }
 
 
-static UINT16 *ddp2_protram;
-static int ddp2_asic27_0xd10000 = 0;
-
-// ARM comms latch
-static WRITE16_HANDLER ( ddp2_asic27_0xd10000_w )
+static WRITE32_HANDLER( ddp2_arm_region_w )
 {
-	//int pc = cpu_get_pc(&space->device());
-
-	//logerror("%06x: ddp2_asic27_0xd10000_w %04x, %04x\n", pc, offset*2,data);
-
-	ddp2_asic27_0xd10000=data;
-}
-
-// ARM comms latch
-static READ16_HANDLER ( ddp2_asic27_0xd10000_r )
-{
-	//int pc = cpu_get_pc(&space->device());
-
-	//logerror("%06x: d100000_prot_r %04x, %04x\n", pc, offset*2,ddp2_asic27_0xd10000);
-
-	ddp2_asic27_0xd10000++;
-	ddp2_asic27_0xd10000&=0x7f;
-	return ddp2_asic27_0xd10000;
-}
-
-// Shared with ARM
-static READ16_HANDLER(ddp2_protram_r)
-{
-	//int pc = cpu_get_pc(&space->device());
-
-	//logerror("%06x prot_r %04x, %04x\n", pc, offset*2,ddp2_protram[offset]);
-
-	if (offset == 0x02/2) return input_port_read(space->machine(), "Region");
-
-	if (offset == 0x1f00/2) return 0;
-
-	return ddp2_protram[offset];
-}
-
-// Shared with ARM
-static WRITE16_HANDLER(ddp2_protram_w)
-{
-	//int pc = cpu_get_pc(&space->device());
-
-	//logerror("%06x: prot_w %04x, %02x\n", pc, offset*2,data);
-
-	COMBINE_DATA(&ddp2_protram[offset]);
-
-	ddp2_protram[0x10/2] = 0;
-	ddp2_protram[0x20/2] = 1;
+	pgm_state *state = space->machine().driver_data<pgm_state>();
+	int pc = cpu_get_pc(&space->device());
+	int regionhack = input_port_read(space->machine(), "RegionHack");
+	if (pc==0x0174 && regionhack != 0xff) data = (data & 0x0000ffff) | (regionhack << 16);
+	COMBINE_DATA(&state->m_arm7_shareram[0x0]);
 }
 
 static DRIVER_INIT( ddp2 )
 {
 	pgm_basic_init(machine);
 	pgm_ddp2_decrypt(machine);
-	//kov2_latch_init(machine);
+	kov2_latch_init(machine);
 
-	// should actually be kov2-like, but keep this simulation for now just to demonstrate it.  It will need the internal ARM rom to work properly.
-	ddp2_protram = auto_alloc_array(machine, UINT16, 0x10000);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xd00000, 0xd0ffff, FUNC(ddp2_protram_r), FUNC(ddp2_protram_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xd10000, 0xd10001, FUNC(ddp2_asic27_0xd10000_r), FUNC(ddp2_asic27_0xd10000_w));
-
+	// we only have a Japan internal ROM dumped for now, allow us to override that for debugging purposes.
+	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000000, 0x48000003, FUNC(ddp2_arm_region_w));
 }
 
 static void svg_basic_init(running_machine &machine)
@@ -5956,15 +5810,18 @@ GAME( 1997, dw2v100x,     drgw2,     pgm,     pgm,      dw2v100x,   ROT0,   "IGS
 GAME( 1997, drgw2j,       drgw2,     pgm,     pgm,      drgw2j,     ROT0,   "IGS", "Chuugokuryuu II (ver. 100J, Japan)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // This set still has protection issues!
 GAME( 1997, drgw2c,       drgw2,     pgm,     pgm,      drgw2c,     ROT0,   "IGS", "Zhong Guo Long II (ver. 100C, China)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
+// region provided by internal ARM rom
 GAME( 1999, photoy2k,     pgm,       kov,     photoy2k, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 105)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
 GAME( 1999, photoy2k104,  photoy2k,  kov,     photoy2k, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
 GAME( 1999, photoy2k102,  photoy2k,  kov,     photoy2k, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 102, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
 
+// region provided by internal ARM rom
 GAME( 1999, kovsh,        pgm,       kov,     sango,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 104, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, China internal ROM
 GAME( 1999, kovsh103,     kovsh,     kov,     sango,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 103, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V103, China internal ROM
 // nasty modern asian bootleg of Knights of Valour Super Heroes with characters ripped from SNK's The King of Fighters series!
 GAME( 1999, kovqhsgs,     kovsh,     kov,     sango,	kovqhsgs,   ROT0,   "bootleg", "Knights of Valour: Quan Huang San Guo Special / Sangoku Senki: Quan Huang San Guo Special (ver. 303CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
+// region provided by internal ARM rom
 GAME( 2000, kov2,         pgm,       kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 107, 102, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 05/10/01 14:24:08 V107 (Ext. Arm V102, Int. Arm V100HK)
 GAME( 2000, kov2106,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 106, 102, 100KH)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 02/27/01 13:26:46 V106 (Ext. Arm V102, Int. Arm V100HK)
 GAME( 2000, kov2103,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 103, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 12/28/00 15:09:31 V103 (Ext. Arm V101, Int. Arm V100HK)
@@ -5972,12 +5829,34 @@ GAME( 2000, kov2102,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS
 GAME( 2000, kov2101,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 101, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
 GAME( 2000, kov2100,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 100, 100, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
 
+// region provided by internal ARM rom
 GAME( 2001, kov2p,        pgm,       kov2,    sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2001, kov2p205,     kov2p,     kov2,    sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
+// region provided by internal ARM rom
 GAME( 2001, martmast,     pgm,       kov2,    sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 102US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 102US
 GAME( 2001, martmastc,    martmast,  kov2,    sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 101CN
 GAME( 2001, martmastc102, martmast,  kov2,    sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 102, 101, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V102, Ext Arm 101, Int Arm 101CN
+
+// region provided by internal ARM rom
+GAME( 2001, ddp2,         pgm,       kov2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 102)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, ddp2101,      ddp2,      kov2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 101)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, ddp2100,      ddp2,      kov2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 100)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+
+/* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
+
+GAME( 2002, ddpdoj,       0,         cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou V101 (2002.04.05.Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
+GAME( 2002, ddpdoja,    ddpdoj,      cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou V100 (2002.04.05.Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, ddpdojb,    ddpdoj,      cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (2002.04.05 Master Ver)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, ddpdojblk,  ddpdoj,      cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)",                GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+
+// the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
+GAME( 2002, ket,          0,         cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, keta,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, ketb,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+
+GAME( 2003, espgal,       0,         cavepgm,    pgm,     espgal,    ROT270, "Cave", "Espgaluda (2003/10/15 Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+
 
 /* -----------------------------------------------------------------------------------------------------------------------
    Partially Working, playable, but some imperfections
@@ -6021,10 +5900,6 @@ GAME( 1999, puzlstar,     pgm,       kov_disabled_arm,     sango,    pstar,     
 
 GAME( 2001, py2k2,        pgm,       kov_disabled_arm,     photoy2k, py2k2,      ROT0,   "IGS", "Photo Y2K 2", GAME_NOT_WORKING )  /* need internal rom of IGS027A */
 
-GAME( 2001, ddp2,         pgm,       kov2_disabled_arm,    ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2001, ddp2101,      ddp2,      kov2_disabled_arm,    ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 101)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2001, ddp2100,      ddp2,      kov2_disabled_arm,    ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-
 GAME( 2001, dw2001,       pgm,       kov2_disabled_arm,     sango,    dw2001,    ROT0,   "IGS", "Dragon World 2001", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // V0000 02/21/01 16:05:16
 
 GAME( 2001, puzzli2,      pgm,       puzzli2_disabled_arm,  sango,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
@@ -6061,17 +5936,5 @@ GAME( 2004, happy6,       pgm,       svg,     sango,    svg,        ROT0,   "IGS
 GAME( 2005, svg,          pgm,       svg,     sango,    svg,        ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // label was 200, but it's code rev 201? // ARM time: 10:07:20
 GAME( 2005, svgpcb,       svg,       svg,     sango,    svgpcb,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V100JP) (ARM label V100JP ROM 05/12/05  S.V.G V100) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 15:31:35
 
-/* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
 
-GAME( 2002, ddpdoj,       0,         cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou V101 (2002.04.05.Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
-GAME( 2002, ddpdoja,    ddpdoj,      cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou V100 (2002.04.05.Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2002, ddpdojb,    ddpdoj,      cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (2002.04.05 Master Ver)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2002, ddpdojblk,  ddpdoj,      cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)",                GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
-
-// the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
-GAME( 2002, ket,          0,         cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2002, keta,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2002, ketb,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-
-GAME( 2003, espgal,       0,         cavepgm,    pgm,     espgal,    ROT270, "Cave", "Espgaluda (2003/10/15 Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
