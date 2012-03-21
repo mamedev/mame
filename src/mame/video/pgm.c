@@ -637,8 +637,7 @@ VIDEO_START( pgm )
 	for (i = 0; i < 0x1200 / 2; i++)
 		palette_set_color(machine, i, MAKE_RGB(0, 0, 0));
 
-	state->m_spritebufferram = auto_alloc_array(machine, UINT16, 0xa00/2);
-
+	state->m_spritebufferram = auto_alloc_array_clear(machine, UINT16, 0xa00/2);
 
 	state->save_pointer(NAME(state->m_spritebufferram), 0xa00/2);
 }
