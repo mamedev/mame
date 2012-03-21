@@ -2,7 +2,7 @@
 
   JANKENMAN UNIT
 
-  Preliminary driver by Roberto Fresca.
+  Driver by Roberto Fresca.
   With further improvements by MAME Team.
 
 
@@ -15,14 +15,23 @@
   Guu (rock), Choki (scissors), Paa (paper).
   Some cabs have a Start button and/or Payout button too.
 
-  info: http://dgm.hmc6.net/museum/jyankenman.html
+  Info:
+  http://dgm.hmc6.net/museum/jyankenman.html
+  http://dgm.hmc6.net/museum/jyankenman_kattaraageru.html
   (and many videos on Youtube)
 
 
-  Games working on this hardware:
-  
-  * Janken Man (Pretty Carnival) (3 station prize game),  (c) 1985, Sunwise.
-    (revision unknown, probably later than 1985)
+  Janken Man series (working on this hardware):
+
+  * Janken Man (Pretty Carnival) (3 station prize game), (c) 1985, Sunwise.
+  * New Janken Man,                                      (c) 1986, Sunwise.
+  * Janken Man Fever,                                    (c) 1988, Sunwise.
+  * Janken Man Fever JP,                                 (c) 1991, Sunwise.
+  * Janken Man JP,                                       (c) 1991, Sunwise.
+  * Janken Man Kattara Ageru,                            (c) 1991, Sunwise.
+  * Janken Man Bubbles,                                  (c) 1992, Sunwise.
+  * Janken Man Big,                                      (c) 19??, Sunwise.
+  * Janken Man Lucky!,                                   (c) 199?, Sunwise.
 
 
 ****************************************************************************
@@ -90,34 +99,36 @@
 
   The internal layout has lamps mapped the following way:
 
-digits:
-  0 = Left
-  1 = Right
+  digits:
 
-lamps: 
-  0 = Multiplier 1 "attarii"
-  1 = Multiplier 2 "ooatari"
+    0 = Left
+    1 = Right
 
-  2 = Rock button LED
-  3 = Scissors button LED
-  4 = Paper button LED
+  lamps:
+  
+    0 = Multiplier 1 "attarii" (pays x1)
+    1 = Multiplier 2 "ooatari" (pays x2)
 
-  5 = Lose
-  6 = Draw
-  7 = Win
+    2 = Rock button LED
+    3 = Scissors button LED
+    4 = Paper button LED
 
-  8 = Base Hand
-  9 = Paper components
-  10 = Paper/Scissors components
-  11 = Rock components
-  12 = Scissors components
-  13 = Rock/Scissors components
+    5 = Lose
+    6 = Draw
+    7 = Win
 
-  14 = Payout error LED
+    8 = Base Hand
+    9 = Paper components
+    10 = Paper/Scissors components
+    11 = Rock components
+    12 = Scissors components
+    13 = Rock/Scissors components
 
-Not implemented in internal .lay:
+    14 = Payout error LED
 
-  15 = Rotating blue lamp
+  Not implemented in internal .lay:
+
+    15 = Rotating blue lamp
 
 
 ***************************************************************************/
@@ -190,8 +201,8 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
 	// d1: blue rotating lamp on top of cab
 	output_set_lamp_value(15, data >> 1 & 1);
 
-	// d2: payout (waits for payout sensor)
-	// TODO
+	// d2: payout (waits for hopper status)
+	coin_counter_w(device->machine(), 2, data & 0x04);
 
 	// d3: right multiplier lamp(2), d4: left multiplier lamp(1)
 	output_set_lamp_value(0, data >> 4 & 1);
@@ -203,7 +214,7 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
 	// d0, d6, d7: N/C?
 }
 
-static CUSTOM_INPUT( jankenmn_payout_sensor_r )
+static CUSTOM_INPUT( jankenmn_hopper_status_r )
 {
 	// temp workaround, needs hopper
 	return field.machine().rand();
@@ -235,12 +246,12 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( jankenmn )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Guu (Rock)")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Choki (Scissors)")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Paa (Paper)")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_Z) PORT_NAME("Guu (Rock)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_X) PORT_NAME("Choki (Scissors)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(jankenmn_payout_sensor_r, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(jankenmn_hopper_status_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 
@@ -367,5 +378,5 @@ ROM_END
 *                Game Drivers                *
 *********************************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY    FULLNAME     FLAGS...  LAYOUT */
-GAMEL( 1985, jankenmn, 0,      jankenmn, jankenmn, 0,    ROT0, "Sunwise", "Janken Man", 0,        layout_jankenmn )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY    FULLNAME                   FLAGS...  LAYOUT */
+GAMEL( 1991, jankenmn, 0,      jankenmn, jankenmn, 0,    ROT0, "Sunwise", "Janken Man Kattara Ageru", 0,        layout_jankenmn )
