@@ -34,7 +34,7 @@ these four paragraphs for those parts of this code that are retained.
 static const floatx80 floatx80_one = packFloatx80(0, 0x3fff, U64(0x8000000000000000));
 static const floatx80 floatx80_default_nan = packFloatx80(0, 0xffff, U64(0xffffffffffffffff));
 
-#define packFloat2x128m(zHi, zLo) {(zLo), (zHi)}
+#define packFloat2x128m(zHi, zLo) {(zHi), (zLo)}
 #define PACK_FLOAT_128(hi,lo) packFloat2x128m(LIT64(hi),LIT64(lo))
 
 #define EXP_BIAS 0x3FFF
@@ -268,7 +268,7 @@ static floatx80 sincos_approximation(int neg, float128 r, UINT64 quotient)
         neg = ! neg;
 
     if (neg)
-        floatx80_chs(result);
+        result = floatx80_chs(result);
 
     return result;
 }
@@ -486,7 +486,7 @@ int floatx80_ftan(floatx80 &a)
 
     a = float128_to_floatx80(r);
     if (zSign)
-        floatx80_chs(a);
+        a = floatx80_chs(a);
 
     return 0;
 }
