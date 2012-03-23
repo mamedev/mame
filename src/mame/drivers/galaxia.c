@@ -7,21 +7,26 @@ Taken from an untested board.
 1K byte files were 2708 or equivalent.
 512 byte file is the 82S130 colour PROM.
 
-This is not a direct pirate of Galaxians as you might think from the name.
-The game uses a Signetics 2650A CPU with three 40-pin 2636 chips. I have
-no idea what 2636's are but I am hoping they are something to do with the
-sound since the board has no apparent sound circuitry. The video hardware
-looks like it's similar to Galaxians (2 x 2114, 2 x 2101, 2 x EPROM) but
-there is no attack RAM and the graphics EPROMS are 2708. The graphics EPROMS
-do contain Galaxian-like graphics...
+This is not a direct pirate of Galaxian as you might think from the name.
+The game uses a Signetics 2650A CPU with three 40-pin 2636 chips, which are
+responsible for sound and some video functions.
+
+Other than that, the video hardware looks like it's similar to Galaxian
+(2 x 2114, 2 x 2101, 2 x EPROM) but there is no attack RAM and the graphics
+EPROMS are 2708. The graphics EPROMS do contain Galaxian-like graphics...
+
+Astro Wars (port of Astro Fighter) is on a stripped down board of Galaxia,
+using only one 2636 chip.
 
 ---
 
 HW seems to have many similarities with quasar.c / cvs.c
 
 TODO:
-- galaxia level 2 collision detection
+- better collision detection
+- colors are probably wrong
 - astrowar I/O
+- starfield hardware?
 - eventually merge/share with quasar.c or cvs.c?
 
 */
@@ -41,9 +46,9 @@ public:
 	UINT8 m_collision;
 	UINT8 m_scroll;
 	UINT8 *m_video;
+	UINT8 *m_bullet;
 	UINT8 *m_color;
 };
-
 
 
 static SCREEN_UPDATE_IND16( galaxia )
@@ -55,18 +60,41 @@ static SCREEN_UPDATE_IND16( galaxia )
 	device_t *s2636_1 = screen.machine().device("s2636_1");
 	device_t *s2636_2 = screen.machine().device("s2636_2");
 
+	bitmap.fill(0, cliprect);
+
 	// draw background
 	for (x = 0; x < 32; x++)
 	{
 		// fixed scrolling area
 		int y_offs = 0;
 		if (x >= 4 && x < 24)
-			y_offs = 0xff - state->m_scroll;
+			y_offs = state->m_scroll ^ 0xff;
 
 		for (y = 0; y < 32; y++)
 		{
 			int tile = state->m_video[y << 5 | x];
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,0,0,0,x*8,(y_offs+y*8)&0xff);
+			int color = state->m_color[y << 5 | x];
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0], tile, color, 0, 0, x*8, (y_offs + y*8) & 0xff, 0);
+		}
+	}
+
+	// draw bullets (guesswork)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		if (state->m_bullet[y])
+		{
+			int pos = state->m_bullet[y] ^ 0xff;
+			if (bitmap.pix16(y, pos))
+			{
+				// collision with background
+//				state->m_collision |= 0xff; * no effect, even if setting all bits.. must be another register?
+			}
+			else
+			{
+				// bullet size and color is guessed
+				bitmap.pix16(y, pos) = 7;
+				bitmap.pix16(y, pos + 1) = 7;
+			}
 		}
 	}
 
@@ -75,48 +103,43 @@ static SCREEN_UPDATE_IND16( galaxia )
 	bitmap_ind16 &s2636_2_bitmap = s2636_update(s2636_2, cliprect);
 
 	/* copy the S2636 images into the main bitmap and check collision */
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		int y;
-
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			int x;
-
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			int pixel0 = s2636_0_bitmap.pix16(y, x);
+			int pixel1 = s2636_1_bitmap.pix16(y, x);
+			int pixel2 = s2636_2_bitmap.pix16(y, x);
+			
+			int pixel = pixel0 | pixel1 | pixel2;
+			
+			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
-				int pixel0 = s2636_0_bitmap.pix16(y, x);
-				int pixel1 = s2636_1_bitmap.pix16(y, x);
-				int pixel2 = s2636_2_bitmap.pix16(y, x);
-				
-				int pixel = pixel0 | pixel1 | pixel2;
-				
-				if (S2636_IS_PIXEL_DRAWN(pixel))
+				/* S2636 vs. S2636 collision detection */
+				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision |= 0x01;
+				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision |= 0x02;
+				if (S2636_IS_PIXEL_DRAWN(pixel2) && S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x04;
+
+				/* S2636 vs. background collision detection */
+				if (bitmap.pix16(y, x))
 				{
-					/* S2636 vs. S2636 collision detection */
-					if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision |= 0x01;
-					if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision |= 0x02;
-					if (S2636_IS_PIXEL_DRAWN(pixel2) && S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x04;
-
-					/* S2636 vs. background collision detection */
-					if (bitmap.pix16(y, x))
-					{
-						if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x10;
-						if (S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision |= 0x20;
-						if (S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision |= 0x40;
-					}
-
-					bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
+//					if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x10; * problem in level 2
+					if (S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision |= 0x20;
+					if (S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision |= 0x40;
 				}
+
+				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
 			}
 		}
 	}
+
 	return 0;
 }
 
 static WRITE8_HANDLER(galaxia_video_w)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+//	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	if (cpu_get_reg(&space->device(), S2650_FO))
 	{
 		state->m_video[offset]=data;
@@ -157,11 +180,11 @@ static READ8_HANDLER(galaxia_collision_clear)
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM // bullet ram?
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet)
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE_MEMBER(galaxia_state, m_video)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w) AM_BASE_MEMBER(galaxia_state, m_video)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x7214, 0x7214) AM_READ_PORT("IN0")
@@ -174,7 +197,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN6")
 	AM_RANGE(0xac, 0xac) AM_READ_PORT("IN3")
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(galaxia_collision_r)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(galaxia_collision_clear) // ?
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(galaxia_collision_clear)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
