@@ -17,11 +17,12 @@ do contain Galaxian-like graphics...
 
 ---
 
-TS 2008.08.12:
-- fixed rom loading
-- added preliminary video emulation
-
 HW seems to have many similarities with quasar.c / cvs.c
+
+TODO:
+- galaxia level 2 collision detection
+- astrowar I/O
+- eventually merge/share with quasar.c or cvs.c?
 
 */
 
@@ -38,6 +39,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_collision;
+	UINT8 m_scroll;
 	UINT8 *m_video;
 	UINT8 *m_color;
 };
@@ -47,21 +49,24 @@ public:
 static SCREEN_UPDATE_IND16( galaxia )
 {
 	galaxia_state *state = screen.machine().driver_data<galaxia_state>();
-	int x,y, count;
+	int x, y;
 
 	device_t *s2636_0 = screen.machine().device("s2636_0");
 	device_t *s2636_1 = screen.machine().device("s2636_1");
 	device_t *s2636_2 = screen.machine().device("s2636_2");
 
-	count = 0;
-
-	for (y=0;y<256/8;y++)
+	// draw background
+	for (x = 0; x < 32; x++)
 	{
-		for (x=0;x<256/8;x++)
+		// fixed scrolling area
+		int y_offs = 0;
+		if (x >= 4 && x < 24)
+			y_offs = 0xff - state->m_scroll;
+
+		for (y = 0; y < 32; y++)
 		{
-			int tile = state->m_video[count];
-			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,0,0,0,x*8,y*8);
-			count++;
+			int tile = state->m_video[y << 5 | x];
+			drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],tile,0,0,0,x*8,(y_offs+y*8)&0xff);
 		}
 	}
 
@@ -111,6 +116,7 @@ static SCREEN_UPDATE_IND16( galaxia )
 static WRITE8_HANDLER(galaxia_video_w)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	if (cpu_get_reg(&space->device(), S2650_FO))
 	{
 		state->m_video[offset]=data;
@@ -129,7 +135,9 @@ static READ8_HANDLER(galaxia_video_r)
 
 static WRITE8_HANDLER(galaxia_scroll_w)
 {
-	// TODO: scroll bg enemy swarm
+	galaxia_state *state = space->machine().driver_data<galaxia_state>();
+	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+	state->m_scroll = data;
 }
 
 static READ8_HANDLER(galaxia_collision_r)
@@ -316,7 +324,7 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(galaxia)
 
 	MCFG_GFXDECODE(galaxia)
