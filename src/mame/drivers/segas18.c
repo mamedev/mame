@@ -1461,6 +1461,9 @@ ROM_END
     Clutch Hitter, Sega System 18
     CPU: FD1094 (317-0176)
     ROM Board: 171-5873B
+
+    game No. 833-7916-01 CLUTCH HITTER
+    rom  No. 834-7917-01
 */
 ROM_START( cltchitr )
 	ROM_REGION( 0x300000, "maincpu", 0 ) /* 68000 code */
