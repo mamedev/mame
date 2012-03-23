@@ -69,6 +69,17 @@ Versions known to exist but not dumped:
      PCBs were shown running (and could be played) at a Cave fan show known as Cave Festival 2006. There are
      videos of the game being played floating around the internet and on YouTube. AKA DDP-CV or DDP BLUE ROM
 
+  Dodonpachi Arrange: This version is a hack by trap15 and ment to be a tribute to the game. It is neither a
+                      long lost version or official release from Cave and therefore not suitable for MAME.
+
+     Known rom version 1.1:
+        File     CRC32    SHA1
+       ---------------------------------------------------------
+       u27.bin 44b899ae 798ec437d861b94fcd90c99a7015dd420887c788
+       u26.bin 727a09a8 91876386855f19e8a3d8d1df71dfe9b3d98e9ea9
+       u51.bin 0f3e5148 3016f4d075940feae691389606cd2aa7ac53849e
+       u62.bin 42e4c6c5 4d282f7592f5fc5e11839c57f39cae20b8422aa1
+
 ***************************************************************************/
 
 #include "emu.h"
