@@ -3700,6 +3700,7 @@ src/mame/includes/punchout.h svneol=native#text/plain
 src/mame/includes/pushman.h svneol=native#text/plain
 src/mame/includes/qdrmfgp.h svneol=native#text/plain
 src/mame/includes/qix.h svneol=native#text/plain
+src/mame/includes/quasar.h svneol=native#text/plain
 src/mame/includes/quizdna.h svneol=native#text/plain
 src/mame/includes/quizpani.h svneol=native#text/plain
 src/mame/includes/raiden.h svneol=native#text/plain

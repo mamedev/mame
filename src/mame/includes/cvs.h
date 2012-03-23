@@ -2,8 +2,6 @@
 
     Century CVS System
 
-    (and Quasar)
-
 ****************************************************************************/
 
 
@@ -67,18 +65,6 @@ public:
                                                we can use the same gfx_layout */
 };
 
-class quasar_state : public cvs_state
-{
-public:
-	quasar_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cvs_state(mconfig, type, tag) { }
-
-	UINT8 *    m_effectram;
-	UINT8      m_effectcontrol;
-	UINT8      m_page;
-	UINT8      m_io_page;
-};
-
 
 /*----------- defined in drivers/cvs.c -----------*/
 
@@ -111,9 +97,3 @@ void cvs_scroll_stars(running_machine &machine);
 PALETTE_INIT( cvs );
 SCREEN_UPDATE_IND16( cvs );
 VIDEO_START( cvs );
-
-/*----------- defined in video/quasar.c -----------*/
-
-PALETTE_INIT( quasar );
-SCREEN_UPDATE_IND16( quasar );
-VIDEO_START( quasar );

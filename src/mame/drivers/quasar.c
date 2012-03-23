@@ -32,7 +32,7 @@ I8085 Sound Board
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "video/s2636.h"
-#include "includes/cvs.h"
+#include "includes/quasar.h"
 
 /************************************************************************
 
