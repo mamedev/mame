@@ -213,7 +213,7 @@ Notes:
 */
 
 #define PGMLOGERROR 0
-#define PGMARM7LOGERROR 1
+#define PGMARM7LOGERROR 0
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -262,6 +262,8 @@ static READ16_HANDLER ( z80_ram_r )
 static READ32_HANDLER( arm7_latch_arm_r )
 {
 	pgm_state *state = space->machine().driver_data<pgm_state>();
+
+	device_set_input_line(state->m_prot, ARM7_FIRQ_LINE, CLEAR_LINE ); // guess
 
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->m_kov2_latchdata_68k_w, mem_mask, cpu_get_pc(&space->device()));
@@ -313,9 +315,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
 	COMBINE_DATA(&state->m_kov2_latchdata_68k_w);
 
-	generic_pulse_irq_line(state->m_prot, ARM7_FIRQ_LINE, 1);
-	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
-	device_spin_until_time(&space->device(), state->m_prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
+	device_set_input_line(state->m_prot, ARM7_FIRQ_LINE, ASSERT_LINE ); // guess
 }
 
 static READ16_HANDLER( arm7_ram_r )
@@ -563,8 +563,6 @@ static WRITE16_HANDLER( svg_68k_nmi_w )
 {
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 	generic_pulse_irq_line(state->m_prot, ARM7_FIRQ_LINE, 1);
-	space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(200));
-	device_spin_until_time(&space->device(), state->m_prot->cycles_to_attotime(200)); // give the arm time to respond (just boosting the interleave doesn't help)
 }
 
 static WRITE16_HANDLER( svg_latch_68k_w )
@@ -694,7 +692,7 @@ static ADDRESS_MAP_START( 55857F_arm7_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08000000, 0x083fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
-	AM_RANGE(0x18000000, 0x1800ffff) AM_RAM
+	AM_RANGE(0x18000000, 0x1800ffff) AM_RAM AM_BASE_MEMBER(pgm_state, m_arm_ram)
 	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE(arm7_latch_arm_r, arm7_latch_arm_w) /* 68k Latch */
 	AM_RANGE(0x48000000, 0x4800ffff) AM_READWRITE(arm7_shareram_r, arm7_shareram_w) AM_BASE_MEMBER(pgm_state, m_arm7_shareram)
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
@@ -705,7 +703,7 @@ static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
-	AM_RANGE(0x18000000, 0x1803ffff) AM_RAM
+	AM_RANGE(0x18000000, 0x1803ffff) AM_RAM AM_BASE_MEMBER(pgm_state, m_arm_ram)
 	AM_RANGE(0x38000000, 0x3801ffff) AM_READWRITE(svg_arm7_shareram_r, svg_arm7_shareram_w)
 	AM_RANGE(0x48000000, 0x48000003) AM_READWRITE(arm7_latch_arm_r, arm7_latch_arm_w) /* 68k Latch */
 	AM_RANGE(0x40000018, 0x4000001b) AM_WRITE(svg_arm7_ram_sel_w) /* RAM SEL */
@@ -1153,8 +1151,9 @@ static MACHINE_CONFIG_DERIVED( svg, pgm )
 	MCFG_CPU_PROGRAM_MAP(svg_68k_mem)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857G
+	MCFG_CPU_ADD("prot", ARM7, 33333333)	// 55857G
 	MCFG_CPU_PROGRAM_MAP(55857G_arm7_map)
+
 MACHINE_CONFIG_END
 
 
@@ -1163,7 +1162,7 @@ static MACHINE_CONFIG_DERIVED( svg_disabled_arm, pgm ) // for simulated cases
 	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857G
+	MCFG_CPU_ADD("prot", ARM7, 33333333)	// 55857G
 	MCFG_CPU_PROGRAM_MAP(55857G_arm7_map)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
@@ -3631,7 +3630,7 @@ ROM_START( dmnfrnt )
 	ROM_LOAD( "a04502.u4",    0x0800000, 0x0800000, CRC(e104f405) SHA1(124b3deed3e838f8bae6c7d78bdd788859597585) )
 	ROM_LOAD( "a04503.u6",    0x1000000, 0x0800000, CRC(bfd5cfe3) SHA1(fbe4c0a2987c2036df707b86597d78124ee2e665) )
 
-	ROM_REGION( 0xc00000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b04501.u9",    0x0000000, 0x0800000,  CRC(29320b7d) SHA1(59c78805e666f912df201c34616744f46057937b) )
 	ROM_LOAD( "b04502.u11",   0x0800000, 0x0200000,  CRC(578c00e9) SHA1(14235cc8b0f8c7dd659512f017a2d4aacd91d89d) )
 
@@ -3689,7 +3688,7 @@ ROM_START( dmnfrntpcb )
 	ROM_LOAD( "a04502.u4",    0x0800000, 0x0800000, CRC(e104f405) SHA1(124b3deed3e838f8bae6c7d78bdd788859597585) )
 	ROM_LOAD( "a04503.u6",    0x1000000, 0x0800000, CRC(bfd5cfe3) SHA1(fbe4c0a2987c2036df707b86597d78124ee2e665) )
 
-	ROM_REGION( 0xc00000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
 	ROM_LOAD( "b04501.u9",    0x0000000, 0x0800000,  CRC(29320b7d) SHA1(59c78805e666f912df201c34616744f46057937b) )
 	ROM_LOAD( "b04502.u11",   0x0800000, 0x0200000,  CRC(578c00e9) SHA1(14235cc8b0f8c7dd659512f017a2d4aacd91d89d) )
 
@@ -4527,6 +4526,30 @@ static WRITE32_HANDLER( ddp2_arm_region_w )
 	COMBINE_DATA(&state->m_arm7_shareram[0x0]);
 }
 
+static READ32_HANDLER( ddp2_speedup_r )
+{
+	pgm_state *state = space->machine().driver_data<pgm_state>();
+	int pc = cpu_get_pc(&space->device());
+	UINT32 data = state->m_arm_ram[0x300c/4];
+
+	if (pc==0x080109b4)
+	{
+		/* if we've hit the loop where this is read and both values are 0 then the only way out is an interrupt */
+		int r4 = (cpu_get_reg(&space->device(), ARM7_R4));
+		r4 += 0xe;
+		
+		if (r4==0x18002f9e)
+		{
+			UINT32 data2 =  state->m_arm_ram[0x2F9C/4]&0xffff0000;
+			if ((data==0x00000000) && (data2==0x00000000)) device_spin_until_interrupt(&space->device());
+		}
+	}
+
+	return data;
+}
+
+
+
 static DRIVER_INIT( ddp2 )
 {
 	pgm_basic_init(machine);
@@ -4535,6 +4558,10 @@ static DRIVER_INIT( ddp2 )
 
 	// we only have a Japan internal ROM dumped for now, allow us to override that for debugging purposes.
 	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000000, 0x48000003, FUNC(ddp2_arm_region_w));
+
+	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1800300c, 0x1800300f, FUNC(ddp2_speedup_r));
+
+
 }
 
 static void svg_basic_init(running_machine &machine)
@@ -4579,11 +4606,42 @@ static DRIVER_INIT( killbldp )
 	kov2_latch_init(machine);
 }
 
+static READ32_HANDLER( dmnfrnt_speedup_r )
+{
+	pgm_state *state = space->machine().driver_data<pgm_state>();
+	int pc = cpu_get_pc(&space->device());
+	if (pc == 0x8000fea) device_eat_cycles(&space->device(), 500);
+//	else printf("dmn_speedup_r %08x\n", pc);
+	return state->m_arm_ram[0x000444/4];
+}
+
+
 static DRIVER_INIT( dmnfrnt )
 {
+	pgm_state *state = machine.driver_data<pgm_state>();
+
 	svg_basic_init(machine);
 	pgm_dfront_decrypt(machine);
 	kov2_latch_init(machine);
+
+	/* put some fake code for the ARM here ... */
+	UINT16 *temp16 = (UINT16 *)machine.region("prot")->base();
+	temp16[(0x0000)/2] = 0xd088;
+	temp16[(0x0002)/2] = 0xe59f;
+	temp16[(0x0004)/2] = 0x0680;
+	temp16[(0x0006)/2] = 0xe3a0;
+	temp16[(0x0008)/2] = 0xff10;
+	temp16[(0x000a)/2] = 0xe12f;
+	temp16[(0x0090)/2] = 0x0400;
+	temp16[(0x0092)/2] = 0x1000;
+
+	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x18000444, 0x18000447, FUNC(dmnfrnt_speedup_r));
+
+	// the internal rom probably also supplies the region here
+	UINT16 *share16 = (UINT16 *)(state->m_svg_shareram[0]);
+	share16[0x158/2] = 0x0005;
+
+
 }
 
 
@@ -5789,6 +5847,14 @@ static DRIVER_INIT( kov2p )
 	mem8[0x1FFFFD] = 0x99;
 }
 
+static DRIVER_INIT( happy6 )
+{
+	svg_basic_init(machine);
+	pgm_happy6_decrypt(machine);
+	kov2_latch_init(machine);
+}
+
+
 /*** GAME ********************************************************************/
 
 GAME( 1997, pgm,          0,         pgm,     pgm,      pgm,        ROT0,   "IGS", "PGM (Polygame Master) System BIOS", GAME_IS_BIOS_ROOT )
@@ -5843,6 +5909,14 @@ GAME( 2001, ddp2,         pgm,       kov2,    ddp2,     ddp2,       ROT270, "IGS
 GAME( 2001, ddp2101,      ddp2,      kov2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 101)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 2001, ddp2100,      ddp2,      kov2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 100)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
+// we bypass the internal ARM rom on these, ideally it should still be dumped tho!
+// ARM version strings don't match 100% with labels... for 68k ROMs I'm using the build time / date stamp from near the start of the rom, there are some slightly different time stamps later
+GAME( 2002, dmnfrnt,      pgm,       svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V105, ROM M105XX 08/05/02) (ARM label V105, ROM 08/05/02 S105XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 10:24:11 ARM time: 10:33:23
+GAME( 2002, dmnfrnta,     dmnfrnt,   svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V102, ROM M102XX 06/19/02) (ARM label V102, ROM 05/24/02 S101XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 13:44:08 ARM time: 13:04:31
+GAME( 2002, dmnfrntpcb,   dmnfrnt,   svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V107KR, ROM M107KR 11/03/03) (ARM label V107KR, ROM 10/16/03 S106KR) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // works but reports version mismatch (wants internal rom version and region to match external?)
+
+
+
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
 
 GAME( 2002, ddpdoj,       0,         cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou V101 (2002.04.05.Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
@@ -5856,6 +5930,8 @@ GAME( 2002, keta,         ket,       cavepgm,    pgm,     ket,       ROT270, "Ca
 GAME( 2002, ketb,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 2003, espgal,       0,         cavepgm,    pgm,     espgal,    ROT270, "Cave", "Espgaluda (2003/10/15 Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+
+
 
 
 /* -----------------------------------------------------------------------------------------------------------------------
@@ -5908,10 +5984,6 @@ GAME( 2001, puzzli2,      pgm,       puzzli2_disabled_arm,  sango,    puzzli2,  
 
 /* Games below this point are known to have an 'execute only' internal ROM area covering an area at the start of the internal ROM.  This can't be read when running code from either internal or external ROM space. */
 
-// ARM version strings don't match 100% with labels... for 68k ROMs I'm using the build time / date stamp from near the start of the rom, there are some slightly different time stamps later
-GAME( 2002, dmnfrnt,      pgm,       svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V105, ROM M105XX 08/05/02) (ARM label V105, ROM 08/05/02 S105XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // 68k time: 10:24:11 ARM time: 10:33:23
-GAME( 2002, dmnfrnta,     dmnfrnt,   svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V102, ROM M102XX 06/19/02) (ARM label V102, ROM 05/24/02 S101XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // 68k time: 13:44:08 ARM time: 13:04:31
-GAME( 2002, dmnfrntpcb,   dmnfrnt,   svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V107, ROM M107KR 11/03/03) (ARM label V107, ROM 10/16/03 S106KR) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // 68k time: 17:12:29 ARM time: 14:16:52
 
 // all 3 68k roms still have V100 strings, but are clearly different builds, there don't appear to be build string dates in them.  Two of the external ARM roms are marked V100 but are different builds, it's possible the single PCB version 100 is based on a later main revision
 GAME( 2003, theglad,      pgm,       svg,     sango,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 01/16/03 SHEN JIAN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 10:39:25
@@ -5931,7 +6003,7 @@ GAME( 2004, kovlsjba,     kovshp,     kov,     sango,	kovlsqh2,   ROT0,   "bootl
 
 GAME( 2005, killbldp,     pgm,       svg,     sango,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (ver. 300)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2004, happy6,       pgm,       svg,     sango,    svg,        ROT0,   "IGS", "Happy 6-in-1 (ver. 101CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, happy6,       pgm,       svg,     sango,    happy6,     ROT0,   "IGS", "Happy 6-in-1 (ver. 101CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 GAME( 2005, svg,          pgm,       svg,     sango,    svg,        ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // label was 200, but it's code rev 201? // ARM time: 10:07:20
 GAME( 2005, svgpcb,       svg,       svg,     sango,    svgpcb,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V100JP) (ARM label V100JP ROM 05/12/05  S.V.G V100) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 15:31:35

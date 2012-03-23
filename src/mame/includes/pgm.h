@@ -103,6 +103,7 @@ public:
 	UINT16        m_oldsplus_ram[0x100];
 	UINT32        m_oldsplus_regs[0x100];
 
+	UINT32*       m_arm_ram;
 
 };
 
@@ -136,6 +137,7 @@ void pgm_svg_decrypt(running_machine &machine);
 void pgm_svgpcb_decrypt(running_machine &machine);
 void pgm_ket_decrypt(running_machine &machine);
 void pgm_espgal_decrypt(running_machine &machine);
+void pgm_happy6_decrypt(running_machine &machine);
 
 /*----------- defined in machine/pgmprot.c -----------*/
 
