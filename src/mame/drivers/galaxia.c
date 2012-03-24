@@ -87,7 +87,7 @@ static SCREEN_UPDATE_IND16( galaxia )
 			if (bitmap.pix16(y, pos))
 			{
 				// collision with background
-//				state->m_collision |= 0xff; * no effect, even if setting all bits.. must be another register?
+				state->m_collision |= 0x80;
 			}
 			else
 			{
@@ -191,11 +191,12 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x00) AM_WRITE(galaxia_scroll_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN5")
+	AM_RANGE(0x05, 0x05) AM_READNOP
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN6")
-	AM_RANGE(0xac, 0xac) AM_READ_PORT("IN3")
+	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN7")
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(galaxia_collision_r)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(galaxia_collision_clear)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
@@ -204,7 +205,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( astrowar_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet)
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
@@ -267,7 +268,7 @@ static INPUT_PORTS_START( galaxia )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN7")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
