@@ -6387,7 +6387,7 @@ GAME( 1980, spacbatt, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg",
 GAME( 1980, spacbat2, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Battle (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, spacempr, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Empire (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, skyraidr, uniwars,  galaxian, superg,   pisces,   ROT90,  "bootleg", "Sky Raider (Uniwars bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1980, galemp,   uniwars,  galaxian, superg,   pisces,   ROT90,  "Irem (Taito do Brasil license)", "Galactic Empire", GAME_SUPPORTS_SAVE ) // clearly a hack, but was it licensed?
+GAME( 1980, galemp,   uniwars,  galaxian, superg,   pisces,   ROT90,  "bootleg (Taito do Brasil)", "Galaxy Empire (bootleg?)", GAME_SUPPORTS_SAVE ) // clearly a hack, but was it licensed?
 
 
 /* Artic Multi-System games - separate tile/sprite ROMs */
