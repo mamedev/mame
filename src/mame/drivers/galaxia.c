@@ -20,13 +20,12 @@ using only one 2636 chip.
 
 ---
 
-HW seems to have many similarities with quasar.c / cvs.c
+HW has many similarities with quasar.c / cvs.c / zac2650.c
 
 TODO:
 - colors are wrong
-- astrowar sprites (offset and collision detection) -- maybe similar hw to zac2650.c?
+- accurate astrowar sprite/bg sync
 - starfield hardware?
-- eventually merge/share with quasar.c or cvs.c?
 
 */
 
@@ -48,6 +47,8 @@ public:
 
 	UINT8 *m_fo_state;
 
+	bitmap_ind16 m_collision_bitmap;
+
 	UINT8 m_collision;
 	UINT8 m_scroll;
 };
@@ -64,6 +65,15 @@ static INTERRUPT_GEN( galaxia_interrupt )
   Video
 
 ***************************************************************************/
+
+VIDEO_START( galaxia )
+{
+	galaxia_state *state = machine.driver_data<galaxia_state>();
+	state->m_color = auto_alloc_array(machine, UINT8, 0x400);
+
+	machine.primary_screen->register_screen_bitmap(state->m_collision_bitmap);
+}
+
 
 static SCREEN_UPDATE_IND16( galaxia )
 {
@@ -164,20 +174,32 @@ static SCREEN_UPDATE_IND16( astrowar )
 		}
 	}
 
+	copybitmap(state->m_collision_bitmap, bitmap, 0, 0, 0, 0, cliprect);
+
+	// copy the S2636 bitmap into the main bitmap and check collision
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			// copy the S2636 bitmap into the main bitmap and check collision
-			int pixel = s2636_0_bitmap.pix16(y, x);
+			// NOTE: similar to zac2650.c, the sprite chip runs at a different frequency than the background generator
+			// the exact timing is unknown, so we'll have to do with guesswork (s_offset and s_ratio)
+			int s_offset = 7;
+			float s_ratio = 256.0 / 196.0;
+
+			float sx = x * s_ratio;
+			if ((int)(sx + 0.5) > cliprect.max_x)
+				break;
+
+			int pixel = s2636_0_bitmap.pix16(y, x + s_offset);
 			
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
 				// S2636 vs. background collision detection
-				if (bitmap.pix16(y, x))
+				if (state->m_collision_bitmap.pix16(y, (int)(sx)) || state->m_collision_bitmap.pix16(y, (int)(sx + 0.5)))
 					state->m_collision |= 0x01;
 
-				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
+				bitmap.pix16(y, (int)(sx)) = S2636_PIXEL_COLOR(pixel);
+				bitmap.pix16(y, (int)(sx + 0.5)) = S2636_PIXEL_COLOR(pixel);
 			}
 		}
 	}
@@ -410,7 +432,7 @@ static const s2636_interface astrowar_s2636_config =
 {
 	"screen",
 	0x100,
-	3, 43,
+	3, 0,
 	"s2636snd_0"
 };
 
@@ -433,6 +455,8 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 
 	MCFG_GFXDECODE(galaxia)
 	MCFG_PALETTE_LENGTH(0x100)
+
+	MCFG_VIDEO_START(galaxia)
 
 	MCFG_S2636_ADD("s2636_0", galaxia_s2636_config[0])
 	MCFG_S2636_ADD("s2636_1", galaxia_s2636_config[1])
@@ -470,6 +494,8 @@ static MACHINE_CONFIG_START( astrowar, galaxia_state )
 
 	MCFG_GFXDECODE(astrowar)
 	MCFG_PALETTE_LENGTH(0x100)
+
+	MCFG_VIDEO_START(galaxia)
 
 	MCFG_S2636_ADD("s2636_0", astrowar_s2636_config)
 
@@ -510,28 +536,22 @@ ROM_END
 
 ROM_START( astrowar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "astro8h.rom",  0x00000, 0x0400, CRC(b0ec246c) SHA1(f9123b5e317938655f5e8b3f8a5810d0b2b7c7af) )
-	ROM_LOAD( "astro10h.rom", 0x00400, 0x0400, CRC(090d360f) SHA1(528ddcdc30a5a291bd8850ff6f134fcc19af562f) )
-	ROM_LOAD( "astro11h.rom", 0x00800, 0x0400, CRC(72ab1378) SHA1(50743c64c4775076aa6f1d8ab2e05c14884bf0ba) )
-	ROM_LOAD( "astro13h.rom", 0x00c00, 0x0400, CRC(2dc4c895) SHA1(831afbfd4ebfd6522ab0758222bc6f9826148a5d) )
-	ROM_LOAD( "astro8i.rom",  0x01000, 0x0400, CRC(ab87fbfc) SHA1(34b670f96c260f186c643e588995ae5d80377784) )
-	ROM_LOAD( "astro10i.rom", 0x02000, 0x0400, CRC(533675c1) SHA1(69cc066e1874a135a53a21b7b2461bda456504f1) )
-	ROM_LOAD( "astro11i.rom", 0x02400, 0x0400, CRC(59cf8901) SHA1(e849d4c99350b7e3453c156d91618b71b5be1163) )
-	ROM_LOAD( "astro13i.rom", 0x02800, 0x0400, CRC(5149c121) SHA1(232ba594e283fb25c31d8ae0b7d8315a81852a71) )
-	ROM_LOAD( "astro11l.rom", 0x02c00, 0x0400, CRC(29f52f57) SHA1(5cb50b82e09c537eeaeae167351fca686fde8228) )
-	ROM_LOAD( "astro13l.rom", 0x03000, 0x0400, CRC(882cdb87) SHA1(062ee8d296316cbce2eb62e72774aa4181e9847d) )
+	ROM_LOAD( "astro.8h",  0x00000, 0x0400, CRC(b0ec246c) SHA1(f9123b5e317938655f5e8b3f8a5810d0b2b7c7af) )
+	ROM_LOAD( "astro.10h", 0x00400, 0x0400, CRC(090d360f) SHA1(528ddcdc30a5a291bd8850ff6f134fcc19af562f) )
+	ROM_LOAD( "astro.11h", 0x00800, 0x0400, CRC(72ab1378) SHA1(50743c64c4775076aa6f1d8ab2e05c14884bf0ba) )
+	ROM_LOAD( "astro.13h", 0x00c00, 0x0400, CRC(2dc4c895) SHA1(831afbfd4ebfd6522ab0758222bc6f9826148a5d) )
+	ROM_LOAD( "astro.8i",  0x01000, 0x0400, CRC(ab87fbfc) SHA1(34b670f96c260f186c643e588995ae5d80377784) )
+	ROM_LOAD( "astro.10i", 0x02000, 0x0400, CRC(533675c1) SHA1(69cc066e1874a135a53a21b7b2461bda456504f1) )
+	ROM_LOAD( "astro.11i", 0x02400, 0x0400, CRC(59cf8901) SHA1(e849d4c99350b7e3453c156d91618b71b5be1163) )
+	ROM_LOAD( "astro.13i", 0x02800, 0x0400, CRC(5149c121) SHA1(232ba594e283fb25c31d8ae0b7d8315a81852a71) )
+	ROM_LOAD( "astro.11l", 0x02c00, 0x0400, CRC(29f52f57) SHA1(5cb50b82e09c537eeaeae167351fca686fde8228) )
+	ROM_LOAD( "astro.13l", 0x03000, 0x0400, CRC(882cdb87) SHA1(062ee8d296316cbce2eb62e72774aa4181e9847d) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
-	ROM_LOAD( "astro1d.rom",  0x00000, 0x0400, CRC(6053f834) SHA1(e0b76800c241b3c8010c09869cecbc109b25310a) )
-	ROM_LOAD( "astro3d.rom",  0x00400, 0x0400, CRC(822505aa) SHA1(f9d3465e14bb850a286f8b4f42aa0a4044413b67) )
+	ROM_LOAD( "astro.1d",  0x00000, 0x0400, CRC(6053f834) SHA1(e0b76800c241b3c8010c09869cecbc109b25310a) )
+	ROM_LOAD( "astro.3d",  0x00400, 0x0400, CRC(822505aa) SHA1(f9d3465e14bb850a286f8b4f42aa0a4044413b67) )
 ROM_END
 
 
-static DRIVER_INIT(galaxia)
-{
-	galaxia_state *state = machine.driver_data<galaxia_state>();
-	state->m_color=auto_alloc_array(machine, UINT8, 0x400);
-}
-
-GAME( 1979, galaxia,  0, galaxia,  galaxia, galaxia, ROT90, "Zaccaria / Zelco", "Galaxia",    GAME_WRONG_COLORS )
-GAME( 1980, astrowar, 0, astrowar, galaxia, galaxia, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_WRONG_COLORS|GAME_NOT_WORKING )
+GAME( 1979, galaxia,  0, galaxia,  galaxia, 0, ROT90, "Zaccaria / Zelco", "Galaxia",    GAME_WRONG_COLORS )
+GAME( 1980, astrowar, 0, astrowar, galaxia, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_WRONG_COLORS )
