@@ -388,6 +388,23 @@ ROM_START( driblingo )
 	ROM_LOAD( "prom_2d.bin", 0x0500, 0x0100, CRC(5d8c57c6) SHA1(abfb54812d66a36e797be47653dadda4843e8a90) )
 ROM_END
 
+ROM_START( driblingbr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1",  0x0000, 0x1000, CRC(35d97f4f) SHA1(c82b1d2a91e25cf3e3f049e0127d300572f0f54c) )
+	ROM_LOAD( "2",  0x1000, 0x1000, CRC(bd0f223a) SHA1(f9fbc5670a8723c091d61012e545774d315eb18f) )
+	ROM_LOAD( "3",  0x4000, 0x1000, CRC(1fccfc85) SHA1(c0365ad54144414218f52209173b858b927c9626) )
+	ROM_LOAD( "4",  0x5000, 0x1000, CRC(3ed4073a) SHA1(dec36e9dda07ea5f50163b98051955783131773d) )
+	ROM_LOAD( "5",  0x6000, 0x1000, CRC(c21a1d32) SHA1(6e919f1416e6c4df133d3140f7331f65f65d4942) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "6",  0x0000, 0x1000, CRC(208971b8) SHA1(f91f3ea04d75beb58a61c844472b4dba53d84c0f) )
+	ROM_LOAD( "7",  0x1000, 0x1000, CRC(356c9803) SHA1(8e2ce52f32b33886f4747dadf3aeb78148538173) )
+
+	ROM_REGION( 0x600, "proms", 0 )
+	ROM_LOAD( "prom_3c.bin", 0x0000, 0x0400, CRC(25f068de) SHA1(ea4c56c47fe8153069acb9df80df0b099f3b81f1) )
+	ROM_LOAD( "prom_3e.bin", 0x0400, 0x0100, CRC(73eba798) SHA1(7be0e253624df53092e26c28eb18afdcf71434aa) )
+	ROM_LOAD( "prom_2d.bin", 0x0500, 0x0100, CRC(5d8c57c6) SHA1(abfb54812d66a36e797be47653dadda4843e8a90) )
+ROM_END
 
 
 /*************************************
@@ -398,3 +415,4 @@ ROM_END
 
 GAME( 1983, dribling, 0,        dribling, dribling, 0, ROT0, "Model Racing", "Dribbling", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1983, driblingo,dribling, dribling, dribling, 0, ROT0, "Model Racing (Olympia license)", "Dribbling (Olympia)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, driblingbr,dribling, dribling, dribling, 0, ROT0, "bootleg (Videomac)", "Dribbling (bootleg, Brazil)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )

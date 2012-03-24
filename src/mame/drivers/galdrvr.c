@@ -3634,6 +3634,28 @@ ROM_START( gteikob2 )
 	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
 ROM_END
 
+ROM_START( galemp )
+	ROM_REGION( 0x4000, "maincpu", 0 )
+	ROM_LOAD( "1",  0x0000, 0x0800, CRC(d975af10) SHA1(a2e2a36a75db8fd09441308b08b6ae073c68b8cf) )
+	ROM_LOAD( "2",  0x0800, 0x0800, CRC(b2ed14c3) SHA1(7668df11f64b8e296eedfee53437777dc53a56d5) )
+	ROM_LOAD( "3",  0x1000, 0x0800, CRC(945f4160) SHA1(5fbe879f51e14c4c7ae551e5b3089f8e148770a4) )
+	ROM_LOAD( "4",  0x1800, 0x0800, CRC(df7a13ea) SHA1(9d07cdfde84c9243719092234cfa362bf2878a95) )
+	ROM_LOAD( "5",  0x2000, 0x0800, CRC(ff6128a2) SHA1(64cc17b6cab8d8fd8358840beb13baa76262c6aa) )
+	ROM_LOAD( "6",  0x2800, 0x0800, CRC(d915a389) SHA1(0e2ff6eec9453856a1276889946b463cfae58eba) )
+	ROM_LOAD( "7",  0x3000, 0x0800, CRC(c9245346) SHA1(239bad3fe64eaab2dfc3febd06d1124103a10504) )
+	ROM_LOAD( "8",  0x3800, 0x0800, CRC(797d45c7) SHA1(76fb8b45fcce3622c59c04af32cfa001ef7bf71d) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "10",    0x0000, 0x0800, CRC(30177b93) SHA1(b91740b573eadb9a0df23f55594d22b10ea93555) )
+	ROM_LOAD( "12",    0x0800, 0x0800, CRC(c26132af) SHA1(7ae125a911dfd47aeca4f129f580762ce4d8d91a) )
+	ROM_LOAD( "9",     0x1000, 0x0800, CRC(7e8dcc13) SHA1(56450cb3a9c77a578a12f664d07dbfbbcb82bc07) )
+	ROM_LOAD( "11",    0x1800, 0x0800, CRC(dcc2b33b) SHA1(c3a5ac935c519400dfabb28909f7e460769d1837) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "l06_prom.bin", 0x0000, 0x0020, CRC(6a0c7d87) SHA1(140335d85c67c75b65689d4e76d29863c209cf32) )
+ROM_END
+
+
 ROM_START( spacbatt )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	ROM_LOAD( "sb1",    0x0000, 0x0800, CRC(d975af10) SHA1(a2e2a36a75db8fd09441308b08b6ae073c68b8cf) ) /* Same as f07_1a.bin above */
@@ -6365,6 +6387,7 @@ GAME( 1980, spacbatt, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg",
 GAME( 1980, spacbat2, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Battle (bootleg set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, spacempr, uniwars,  galaxian, spacbatt, pisces,   ROT90,  "bootleg", "Space Empire (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, skyraidr, uniwars,  galaxian, superg,   pisces,   ROT90,  "bootleg", "Sky Raider (Uniwars bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1980, galemp,   uniwars,  galaxian, superg,   pisces,   ROT90,  "Irem (Taito do Brasil license)", "Galactic Empire", GAME_SUPPORTS_SAVE ) // clearly a hack, but was it licensed?
 
 
 /* Artic Multi-System games - separate tile/sprite ROMs */

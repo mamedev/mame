@@ -3209,6 +3209,7 @@ ROM_START( polarisa )
 	ROM_LOAD( "ps07.2c", 0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) ) /* MB7052 or compatible BPROM (82S129) */
 ROM_END
 
+
 ROM_START( polariso )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ps01.30",     0x0000, 0x0800, CRC(c04ce5a9) SHA1(62cc9b3b682ebecfb7600393862c65e26ff5263f) )
@@ -3217,6 +3218,23 @@ ROM_START( polariso )
 	ROM_LOAD( "ps04.37",     0x1800, 0x0800, CRC(65694948) SHA1(de92a7f3e3ef732b573254baa60df60f8e068a5d) )
 	ROM_LOAD( "ps05.32",     0x4000, 0x0800, CRC(772e31f3) SHA1(fa0b866b6df1a9217e286ca880b3bb3fb0644bf3) )
 	ROM_LOAD( "ps06.38",     0x4800, 0x0800, CRC(f577cb72) SHA1(7a931b5ebaf0d6941191f21afb9ed670d0251e07) )
+
+	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
+	ROM_LOAD( "ps08.1b", 0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) ) /* NEC B406 or compatible BPROM (82S137) */
+
+	ROM_REGION( 0x0100, "user1", 0 )		/* cloud graphics */
+	ROM_LOAD( "ps07.2c", 0x0000, 0x0100, CRC(2953253b) SHA1(2fb851bc9652ca4e51d473b484ede6dab05f1b51) ) /* MB7052 or compatible BPROM (82S129) */
+ROM_END
+
+ROM_START( polarisbr ) /* aka Polaris II on flyers? */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1",   0x0000, 0x0800, CRC(17015f52) SHA1(8beb4d927c08420f9990fac787a81d4bd6dd419c) )
+	ROM_LOAD( "2",   0x0800, 0x0800, CRC(9a5c8cb2) SHA1(7a8c5d74f8b431072d9476d3ef65a3fe1d639813) )
+	ROM_LOAD( "3",   0x1000, 0x0800, CRC(60118368) SHA1(e1189fd88b943fcf77a5c41c519cccdb8196910c) )
+	ROM_LOAD( "4",   0x1800, 0x0800, CRC(65694948) SHA1(de92a7f3e3ef732b573254baa60df60f8e068a5d) )
+	ROM_LOAD( "5",   0x4000, 0x0800, CRC(6cb21b31) SHA1(f9d435a3aa905f124cb87c139b047e1585d0997b) )
+	ROM_LOAD( "6",   0x4800, 0x0800, CRC(3df77bac) SHA1(b3275c34b8d42df83df2c404c5b7d220aae651fa) )
+	ROM_LOAD( "7",   0x5000, 0x0800, CRC(0d811b92) SHA1(09af62997e1e0da0525ab4f6ced775d3673d8f35) )
 
 	ROM_REGION( 0x0400, "proms", 0 )		/* background color map */
 	ROM_LOAD( "ps08.1b", 0x0000, 0x0400, CRC(164aa05d) SHA1(41c699ce45c76a60c71294f25d8df6c6e6c1280a) ) /* NEC B406 or compatible BPROM (82S137) */
@@ -3444,6 +3462,7 @@ GAME( 1980, lupin3a,  lupin3,   lupin3a,  lupin3a,  0, ROT270, "Taito", "Lupin I
 GAME( 1980, polaris,  0,        polaris,  polaris,  0, ROT270, "Taito", "Polaris (Latest version)", GAME_SUPPORTS_SAVE )
 GAME( 1980, polarisa, polaris,  polaris,  polaris,  0, ROT270, "Taito", "Polaris (First revision)", GAME_SUPPORTS_SAVE )
 GAME( 1980, polariso, polaris,  polaris,  polaris,  0, ROT270, "Taito", "Polaris (Original version)", GAME_SUPPORTS_SAVE )
+GAME( 1981, polarisbr,polaris,  polaris,  polaris,  0, ROT270, "Taito do Brasil", "Polaris (Brazil)", GAME_SUPPORTS_SAVE )
 GAME( 1980, ballbomb, 0,        ballbomb, ballbomb, 0, ROT270, "Taito", "Balloon Bomber", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )	/* missing clouds */
 GAME( 1980, indianbt, 0,        indianbt, indianbt, 0, ROT270, "Taito", "Indian Battle", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, steelwkr, 0,        steelwkr, steelwkr, 0, ROT0  , "Taito", "Steel Worker", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
