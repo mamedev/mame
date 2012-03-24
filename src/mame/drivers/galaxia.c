@@ -5,7 +5,7 @@ Galaxia by Zaccaria (1979)
 Taken from an untested board.
 
 1K byte files were 2708 or equivalent.
-512 byte file is the 82S130 colour PROM.
+512 byte file is a 82S130 PROM.
 
 This is not a direct pirate of Galaxian as you might think from the name.
 The game uses a Signetics 2650A CPU with three 40-pin 2636 chips, which are
@@ -23,7 +23,7 @@ using only one 2636 chip.
 HW has many similarities with quasar.c / cvs.c / zac2650.c
 
 TODO:
-- colors are wrong
+- fix colors (and use MAME tilemaps)
 - accurate astrowar sprite/bg sync
 - starfield hardware?
 
@@ -553,5 +553,5 @@ ROM_START( astrowar )
 ROM_END
 
 
-GAME( 1979, galaxia,  0, galaxia,  galaxia, 0, ROT90, "Zaccaria / Zelco", "Galaxia",    GAME_WRONG_COLORS )
-GAME( 1980, astrowar, 0, astrowar, galaxia, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_WRONG_COLORS )
+GAME( 1979, galaxia,  0, galaxia,  galaxia, 0, ROT90, "Zaccaria / Zelco", "Galaxia",    GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1980, astrowar, 0, astrowar, galaxia, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
