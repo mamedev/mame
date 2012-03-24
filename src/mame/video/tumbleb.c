@@ -567,7 +567,7 @@ SCREEN_UPDATE_IND16( fncywld )
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, -16, offs, 0);
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, 0, offs, 0);
 
 	return 0;
 }
@@ -590,7 +590,7 @@ SCREEN_UPDATE_IND16( pangpang )
 	else
 		offs2 = -5;
 
-	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, -16, offs, 0);
+	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, 0, offs, 0);
 	return 0;
 }
 
