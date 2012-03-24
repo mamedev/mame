@@ -23,9 +23,8 @@ using only one 2636 chip.
 HW seems to have many similarities with quasar.c / cvs.c
 
 TODO:
-- better collision detection
-- colors are probably wrong
-- astrowar I/O
+- colors are wrong
+- astrowar sprites (offset and collision detection) -- maybe similar hw to zac2650.c?
 - starfield hardware?
 - eventually merge/share with quasar.c or cvs.c?
 
@@ -43,22 +42,37 @@ public:
 	galaxia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	UINT8 *m_video;
+	UINT8 *m_color;
+	UINT8 *m_bullet;
+
+	UINT8 *m_fo_state;
+
 	UINT8 m_collision;
 	UINT8 m_scroll;
-	UINT8 *m_video;
-	UINT8 *m_bullet;
-	UINT8 *m_color;
 };
 
+
+static INTERRUPT_GEN( galaxia_interrupt )
+{
+	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
+}
+
+
+/***************************************************************************
+
+  Video
+
+***************************************************************************/
 
 static SCREEN_UPDATE_IND16( galaxia )
 {
 	galaxia_state *state = screen.machine().driver_data<galaxia_state>();
 	int x, y;
 
-	device_t *s2636_0 = screen.machine().device("s2636_0");
-	device_t *s2636_1 = screen.machine().device("s2636_1");
-	device_t *s2636_2 = screen.machine().device("s2636_2");
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(screen.machine().device("s2636_0"), cliprect);
+	bitmap_ind16 &s2636_1_bitmap = s2636_update(screen.machine().device("s2636_1"), cliprect);
+	bitmap_ind16 &s2636_2_bitmap = s2636_update(screen.machine().device("s2636_2"), cliprect);
 
 	bitmap.fill(0, cliprect);
 
@@ -78,35 +92,24 @@ static SCREEN_UPDATE_IND16( galaxia )
 		}
 	}
 
-	// draw bullets (guesswork)
-	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
-	{
-		if (state->m_bullet[y])
-		{
-			int pos = state->m_bullet[y] ^ 0xff;
-			if (bitmap.pix16(y, pos))
-			{
-				// collision with background
-				state->m_collision |= 0x80;
-			}
-			else
-			{
-				// bullet size and color is guessed
-				bitmap.pix16(y, pos) = 7;
-				bitmap.pix16(y, pos + 1) = 7;
-			}
-		}
-	}
-
-	bitmap_ind16 &s2636_0_bitmap = s2636_update(s2636_0, cliprect);
-	bitmap_ind16 &s2636_1_bitmap = s2636_update(s2636_1, cliprect);
-	bitmap_ind16 &s2636_2_bitmap = s2636_update(s2636_2, cliprect);
-
-	/* copy the S2636 images into the main bitmap and check collision */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
+			// draw bullets (guesswork)
+			bool bullet = state->m_bullet[y] && x == (state->m_bullet[y] ^ 0xff);
+			bool background = bitmap.pix16(y, x) != 0;
+			if (bullet)
+			{
+				// background vs. bullet collision detection
+				if (background) state->m_collision |= 0x80;
+				
+				// bullet size/color/priority is guessed
+				bitmap.pix16(y, x) = 7;
+				if (x) bitmap.pix16(y, x-1) = 7;
+			}
+			
+			// copy the S2636 images into the main bitmap and check collision
 			int pixel0 = s2636_0_bitmap.pix16(y, x);
 			int pixel1 = s2636_1_bitmap.pix16(y, x);
 			int pixel2 = s2636_2_bitmap.pix16(y, x);
@@ -115,15 +118,19 @@ static SCREEN_UPDATE_IND16( galaxia )
 			
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
-				/* S2636 vs. S2636 collision detection */
+				// S2636 vs. S2636 collision detection
 				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision |= 0x01;
 				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision |= 0x02;
 				if (S2636_IS_PIXEL_DRAWN(pixel2) && S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x04;
+				
+				// S2636 vs. bullet collision detection
+				if (bullet) state->m_collision |= 0x08;
 
-				/* S2636 vs. background collision detection */
-				if (bitmap.pix16(y, x))
+				// S2636 vs. background collision detection
+				if (background)
 				{
-//					if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x10; * problem in level 2
+					/* bit4 causes problems on 2nd level
+					if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x10; */
 					if (S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision |= 0x20;
 					if (S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision |= 0x40;
 				}
@@ -136,24 +143,72 @@ static SCREEN_UPDATE_IND16( galaxia )
 	return 0;
 }
 
+
+static SCREEN_UPDATE_IND16( astrowar )
+{
+	galaxia_state *state = screen.machine().driver_data<galaxia_state>();
+	int x, y;
+
+	bitmap_ind16 &s2636_0_bitmap = s2636_update(screen.machine().device("s2636_0"), cliprect);
+
+	bitmap.fill(0, cliprect);
+
+	// draw background (no scroll?)
+	for (x = 0; x < 32; x++)
+	{
+		for (y = 0; y < 32; y++)
+		{
+			int tile = state->m_video[y << 5 | x];
+			int color = state->m_color[y << 5 | x];
+			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0], tile, color, 0, 0, x*8, y*8, 0);
+		}
+	}
+
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			// copy the S2636 bitmap into the main bitmap and check collision
+			int pixel = s2636_0_bitmap.pix16(y, x);
+			
+			if (S2636_IS_PIXEL_DRAWN(pixel))
+			{
+				// S2636 vs. background collision detection
+				if (bitmap.pix16(y, x))
+					state->m_collision |= 0x01;
+
+				bitmap.pix16(y, x) = S2636_PIXEL_COLOR(pixel);
+			}
+		}
+	}
+
+	return 0;
+}
+
+
+/***************************************************************************
+
+  I/O
+
+***************************************************************************/
+
 static WRITE8_HANDLER(galaxia_video_w)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
 //	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	if (cpu_get_reg(&space->device(), S2650_FO))
-	{
-		state->m_video[offset]=data;
-	}
+	if (*state->m_fo_state)
+		state->m_video[offset] = data;
 	else
-	{
-		state->m_color[offset]=data;
-	}
+		state->m_color[offset] = data;
 }
 
 static READ8_HANDLER(galaxia_video_r)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
-	return state->m_video[offset];
+	if (*state->m_fo_state)
+		return state->m_video[offset];
+	else
+		return state->m_color[offset];
 }
 
 static WRITE8_HANDLER(galaxia_scroll_w)
@@ -161,6 +216,17 @@ static WRITE8_HANDLER(galaxia_scroll_w)
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	state->m_scroll = data;
+}
+
+static WRITE8_HANDLER(galaxia_ctrlport_w)
+{
+	// d0/d1: maybe coincounter
+	// other bits: unknown
+}
+
+static WRITE8_HANDLER(galaxia_dataport_w)
+{
+	// cvs-style video fx? or lamps?
 }
 
 static READ8_HANDLER(galaxia_collision_r)
@@ -175,10 +241,10 @@ static READ8_HANDLER(galaxia_collision_clear)
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	state->m_collision = 0;
-	return 0;
+	return 0xff;
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( galaxia_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet)
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
@@ -190,38 +256,35 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7214, 0x7214) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00, 0x00) AM_WRITE(galaxia_scroll_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x05, 0x05) AM_READNOP
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN6")
-	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN7")
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ(galaxia_collision_r)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(galaxia_collision_clear)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( astrowar_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( astrowar_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet) // but no bullet hw?
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE_MEMBER(galaxia_state, m_video)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( astrowar_io, AS_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN6")
-	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN7")
+static ADDRESS_MAP_START( galaxia_io_map, AS_IO, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00, 0x00) AM_WRITE(galaxia_scroll_w) AM_READ_PORT("IN0")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
+	AM_RANGE(0x05, 0x05) AM_READNOP
+	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW0")
+	AM_RANGE(0x07, 0x07) AM_READ_PORT("DSW1")
+	AM_RANGE(0xac, 0xac) AM_READNOP
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(galaxia_collision_r, galaxia_ctrlport_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(galaxia_collision_clear, galaxia_dataport_w)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
+	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE_MEMBER(galaxia_state, m_fo_state)
 ADDRESS_MAP_END
+
+
+/***************************************************************************
+
+  Inputs
+
+***************************************************************************/
 
 static INPUT_PORTS_START( galaxia )
 	PORT_START("IN0")
@@ -229,30 +292,18 @@ static INPUT_PORTS_START( galaxia )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x43, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0xc3, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN5")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("IN6")
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, "A 1C_1C B 2C_1C" )
 	PORT_DIPSETTING(    0x01, "A 1C_2C B 2C_1C" )
@@ -265,14 +316,57 @@ static INPUT_PORTS_START( galaxia )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "5" )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("IN7")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_DIPNAME( 0x10, 0x00, "UNK04" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "UNK05" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "UNK06" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "UNK07" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "UNK10" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "UNK11" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, "UNK12" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "UNK13" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x10, 0x00, "UNK14" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "UNK15" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "UNK16" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "UNK17" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
+
+
+/***************************************************************************
+
+  Machine Configs
+
+***************************************************************************/
 
 static const gfx_layout tiles8x8x1_layout =
 {
@@ -305,41 +399,27 @@ static GFXDECODE_START( astrowar )
 GFXDECODE_END
 
 
-static INTERRUPT_GEN( galaxia_interrupt )
+static const s2636_interface galaxia_s2636_config[3] =
 {
-	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
-}
+	{ "screen", 0x100, 3, -27, "s2636snd_0" },
+	{ "screen", 0x100, 3, -27, "s2636snd_1" },
+	{ "screen", 0x100, 3, -27, "s2636snd_2" }
+};
 
-
-static const s2636_interface s2636_0_config =
+static const s2636_interface astrowar_s2636_config =
 {
 	"screen",
 	0x100,
-	3, -27,
+	3, 43,
 	"s2636snd_0"
 };
 
-static const s2636_interface s2636_1_config =
-{
-	"screen",
-	0x100,
-	3, -27,
-	"s2636snd_1"
-};
-
-static const s2636_interface s2636_2_config =
-{
-	"screen",
-	0x100,
-	3, -27,
-	"s2636snd_2"
-};
 
 static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", S2650,2000000)		 /* ? MHz */
-	MCFG_CPU_PROGRAM_MAP(mem_map)
-	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_ADD("maincpu", S2650, 2000000)		 /* ? MHz */
+	MCFG_CPU_PROGRAM_MAP(galaxia_mem_map)
+	MCFG_CPU_IO_MAP(galaxia_io_map)
 	MCFG_CPU_VBLANK_INT("screen", galaxia_interrupt)
 
 	/* video hardware */
@@ -354,10 +434,11 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_GFXDECODE(galaxia)
 	MCFG_PALETTE_LENGTH(0x100)
 
-	MCFG_S2636_ADD("s2636_0", s2636_0_config)
-	MCFG_S2636_ADD("s2636_1", s2636_1_config)
-	MCFG_S2636_ADD("s2636_2", s2636_2_config)
+	MCFG_S2636_ADD("s2636_0", galaxia_s2636_config[0])
+	MCFG_S2636_ADD("s2636_1", galaxia_s2636_config[1])
+	MCFG_S2636_ADD("s2636_2", galaxia_s2636_config[2])
 
+	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("s2636snd_0", S2636_SOUND, 0)
@@ -370,12 +451,41 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( astrowar, galaxia )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(astrowar_mem)
-	MCFG_CPU_IO_MAP(astrowar_io)
+
+static MACHINE_CONFIG_START( astrowar, galaxia_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", S2650, 2000000)		 /* ? MHz */
+	MCFG_CPU_PROGRAM_MAP(astrowar_mem_map)
+	MCFG_CPU_IO_MAP(galaxia_io_map)
+	MCFG_CPU_VBLANK_INT("screen", galaxia_interrupt)
+
+	/* video hardware */
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_UPDATE_STATIC(astrowar)
+
 	MCFG_GFXDECODE(astrowar)
+	MCFG_PALETTE_LENGTH(0x100)
+
+	MCFG_S2636_ADD("s2636_0", astrowar_s2636_config)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("s2636snd_0", S2636_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
+
+
+/***************************************************************************
+
+  Game drivers
+
+***************************************************************************/
 
 ROM_START( galaxia )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -394,10 +504,9 @@ ROM_START( galaxia )
 	ROM_LOAD( "01d.bin", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) )
 	ROM_LOAD( "03d.bin", 0x00400, 0x0400, CRC(1dc30185) SHA1(e3c75eecb80b376ece98f602e1b9587487841824) )
 
-	ROM_REGION( 0x80000, "proms", 0 )
+	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "11o", 0x00000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
 ROM_END
-
 
 ROM_START( astrowar )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -416,7 +525,7 @@ ROM_START( astrowar )
 	ROM_LOAD( "astro1d.rom",  0x00000, 0x0400, CRC(6053f834) SHA1(e0b76800c241b3c8010c09869cecbc109b25310a) )
 	ROM_LOAD( "astro3d.rom",  0x00400, 0x0400, CRC(822505aa) SHA1(f9d3465e14bb850a286f8b4f42aa0a4044413b67) )
 
-	ROM_REGION( 0x80000, "proms", 0 )
+	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "11o.rom", 0x00000, 0x0200, NO_DUMP ) /* a rom is missing */
 ROM_END
 
@@ -427,5 +536,5 @@ static DRIVER_INIT(galaxia)
 	state->m_color=auto_alloc_array(machine, UINT8, 0x400);
 }
 
-GAME( 1979, galaxia, 0, galaxia, galaxia, galaxia, ROT90, "Zaccaria", "Galaxia", GAME_NOT_WORKING )
-GAME( 1980, astrowar, 0, astrowar, galaxia, galaxia, ROT90, "Zaccaria", "Astro Wars", GAME_NOT_WORKING|GAME_WRONG_COLORS )
+GAME( 1979, galaxia,  0, galaxia,  galaxia, galaxia, ROT90, "Zaccaria / Zelco", "Galaxia",    GAME_WRONG_COLORS )
+GAME( 1980, astrowar, 0, astrowar, galaxia, galaxia, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_WRONG_COLORS|GAME_NOT_WORKING )

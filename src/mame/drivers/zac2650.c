@@ -311,6 +311,6 @@ ROM_START( dodgem )
 ROM_END
 
 
-GAME( 1978, sia2650,  0,       tinvader, sinvader, 0, ROT270, "Zelco / Zaccaria", "Super Invader Attack", 0 )
-GAMEL(1978, tinv2650, sia2650, tinvader, tinvader, 0, ROT270, "Zelco / Zaccaria", "The Invaders",         0, layout_tinv2650 )
+GAME( 1978, sia2650,  0,       tinvader, sinvader, 0, ROT270, "Zaccaria / Zelco", "Super Invader Attack", 0 )
+GAMEL(1978, tinv2650, sia2650, tinvader, tinvader, 0, ROT270, "Zaccaria / Zelco", "The Invaders",         0, layout_tinv2650 )
 GAME( 1979, dodgem,   0,       tinvader, dodgem,   0, ROT0,   "Zaccaria",         "Dodgem",               0 )
