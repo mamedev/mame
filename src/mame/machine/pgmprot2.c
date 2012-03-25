@@ -256,7 +256,7 @@ static READ32_HANDLER( ddp2_speedup_r )
 		/* if we've hit the loop where this is read and both values are 0 then the only way out is an interrupt */
 		int r4 = (cpu_get_reg(&space->device(), ARM7_R4));
 		r4 += 0xe;
-		
+
 		if (r4==0x18002f9e)
 		{
 			UINT32 data2 =  state->m_arm_ram[0x2F9C/4]&0xffff0000;

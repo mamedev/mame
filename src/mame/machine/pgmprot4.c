@@ -17,7 +17,7 @@
  IGS025 is some kind of state machine / logic device which the game
  uses for various securit checks, and to determine the region of the
  game based on string sequences.
- 
+
  ***********************************************************************/
 
 #include "emu.h"

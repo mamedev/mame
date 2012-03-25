@@ -9,10 +9,10 @@
  Puzzli 2 Super (puzzli2)
  Photo Y2k2 (py2k2)
  Puzzle Star (puzlstar)
- 
+
  the following appear to use this scheme but are post 2001 so
  might use a newer revision of the chip with EO area
- 
+
  DoDonPachi Dai-ou-jou (ddpdoj)
  Espgaluda (espgal)
  Ketsui (ket)
@@ -33,10 +33,10 @@
  games have no table accesses.
 
  ----
- 
+
  The basic protection communication is the same between all games
  however the commands differ
- 
+
  None of these games have an external ARM rom, although it appears
  the program code does check for the possibility of one existing.
 
@@ -599,11 +599,11 @@ void command_handler_puzzli2(pgm_kovarmsim_state *state, int pc)
 		break;
 
 		case 0x63: // used as a read address by the 68k code (related to previous uploaded values like cave?) should point at a table of ~0x80 in size? seems to use values as further pointers?
-			state->m_valueresponse = 0x00600000; 
+			state->m_valueresponse = 0x00600000;
 		break;
 
-		case 0x67: // used as a read address by the 68k code (related to previous uploaded values like cave?) directly reads ~0xDBE from the address.. 
-			state->m_valueresponse = 0x00400000; 
+		case 0x67: // used as a read address by the 68k code (related to previous uploaded values like cave?) directly reads ~0xDBE from the address..
+			state->m_valueresponse = 0x00400000;
 		break;
 
 		default:

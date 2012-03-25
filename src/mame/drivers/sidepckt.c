@@ -27,9 +27,9 @@ Stephh's notes (based on the games M6809 code and some tests) :
 
       4062: CE 40 AF         LDU   #$40AF         U = 40AF
       4065: F6 30 03         LDB   $3003
-      4068: 53               COMB  
-      4069: 54               LSRB  
-      406A: 54               LSRB  
+      4068: 53               COMB
+      4069: 54               LSRB
+      406A: 54               LSRB
       406B: C4 0C            ANDB  #$0C
       406D: EC C5            LDD   B,U            U still = 40AF
       406F: 33 42            LEAU  $2,U           U ALWAYS = 40B1
@@ -312,7 +312,7 @@ static INPUT_PORTS_START( sidepckt )
 	PORT_DIPSETTING(    0x30, "10k 60k 50k+" )              /* "10000, after each 50000" in the Dip Switches page */
 	PORT_DIPSETTING(    0x20, "20k 70k 50k+" )              /* "20000, after each 70000" in the Dip Switches page */
 	PORT_DIPSETTING(    0x10, "30k 80k 50k+" )              /* "30000, after each 100000" in the Dip Switches page */
-//	PORT_DIPSETTING(    0x00, "20k 70k 50k+" )              /* "20000" in the Dip Switches page */
+//  PORT_DIPSETTING(    0x00, "20k 70k 50k+" )              /* "20000" in the Dip Switches page */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END

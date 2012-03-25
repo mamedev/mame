@@ -784,30 +784,30 @@ ROM_END
 /*
 Lucky Boom (c)1996 Playmark
 
-QTY		Type 					clock 			position 	function
-1x		MC68000P12 								u24			16/32-bit Microprocessor - main
-1x 		M6295 									u146 		4-Channel Mixing ADCPM Voice Synthesis LSI - sound
-1x 		KA358 									u155 		Dual Operational Amplifier - sound
-1x 		TDA2003 								TD1 		Audio Amplifier - sound
-1x 		oscillator 				24.000000MHz	XL1 	
-1x 		oscillator 				28.000000MHz	XL2 	
-1x 		blu resonator 	1000J					Y1 	
+QTY     Type                    clock           position    function
+1x      MC68000P12                              u24         16/32-bit Microprocessor - main
+1x      M6295                                   u146        4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x      KA358                                   u155        Dual Operational Amplifier - sound
+1x      TDA2003                                 TD1         Audio Amplifier - sound
+1x      oscillator              24.000000MHz    XL1
+1x      oscillator              28.000000MHz    XL2
+1x      blu resonator   1000J                   Y1
 
 ROMs
-QTY 	Type		position 	status
-1x 		TMS27C020 	1 			dumped
-2x 		AM27C010 	2,3 		dumped
-5x 		TMS27C010 	4-8 		dumped
+QTY     Type        position    status
+1x      TMS27C020   1           dumped
+2x      AM27C010    2,3         dumped
+5x      TMS27C010   4-8         dumped
 
 RAMs
-QTY 	Type 			position
-8x 		HM3-65728BK-5 	u42,u73,u74,u75,u80,u81,u124,u125
-2x 		HY62256ALP-10 	u2,u6
-2x 		KM6264BL-7L 	u36,u37
+QTY     Type            position
+8x      HM3-65728BK-5   u42,u73,u74,u75,u80,u81,u124,u125
+2x      HY62256ALP-10   u2,u6
+2x      KM6264BL-7L     u36,u37
 PLDs
-QTY 	Type 				position 			status
-2x		A1020B-PL84C 		u110,u137 			read protected
-4x 		TIBPAL22V10ACNT 	u1,u77,u111,u112 	read protected 
+QTY     Type                position            status
+2x      A1020B-PL84C        u110,u137           read protected
+4x      TIBPAL22V10ACNT     u1,u77,u111,u112    read protected
 */
 
 

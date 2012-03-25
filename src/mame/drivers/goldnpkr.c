@@ -317,7 +317,7 @@
 
 
   * Casino Poker
-  
+
   Bipolar PROM 24sa10 is filled with 0x09, so has at least
   fixed bits 0 and 3 along the whole data. Needs a redump using a supported
   EEPROM programmer.
@@ -838,7 +838,7 @@
   - Added Casino Poker (Ver PM86LO-35-5, German).
   - Inputs from the scratch.
   - Switched manufacturer 'Playman' to PM / Beck Elektronik, since
-     it's PM and Beck Elektronik/Computer/etc... 
+     it's PM and Beck Elektronik/Computer/etc...
   - Added technical and game notes.
 
 
@@ -897,7 +897,7 @@
   - Added Wild Witch (Export, 6T/12T ver 1.84A).
   - Worked each game to temporarily bypass the protection,
      laying in the Dallas Timekeeper RAM.
-  - Reworked the parent/clones relationship. 
+  - Reworked the parent/clones relationship.
   - Added technical notes.
 
 
@@ -1308,7 +1308,7 @@ static WRITE8_DEVICE_HANDLER( lamps_a_w )
 	coin_counter_w(device->machine(), 1, data & 0x80);	/* counter2 */
 	coin_counter_w(device->machine(), 2, data & 0x20);	/* counter3 */
 
-//	popmessage("written : %02X", (0xff - data));
+//  popmessage("written : %02X", (0xff - data));
 
 /*  Counters:
 
@@ -2604,7 +2604,7 @@ static INPUT_PORTS_START( wstrike )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN0-1")
-//	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//  PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("IN1-1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Payout") PORT_CODE(KEYCODE_W)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )   PORT_NAME("Take")
@@ -2626,7 +2626,7 @@ static INPUT_PORTS_START( wstrike )
 
 	PORT_START("IN0-3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service") PORT_CODE(KEYCODE_F2)
-//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("IN3-2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note In")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
@@ -8097,7 +8097,7 @@ ROM_END
   Witch Strike (Export, 6T/12T ver 1.01A)
   Witch Strike (Export, 6T/12T ver 1.01B)
 
-  1992, Video Klein.   Prototypes?? 
+  1992, Video Klein.   Prototypes??
 
 *********************************************/
 
@@ -8288,7 +8288,7 @@ ROM_END
 
 
 /*********************************************
- 
+
    Witch Jack
    1992-1996 Video Klein
 
@@ -8668,7 +8668,7 @@ ROM_END
 
 ROM_START( wtchjackd )	/* Witch Jack 0.62 / 1995-08-02 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wj5x563.bin",	0x8000, 0x8000, CRC(55e74382) SHA1(af0a890c55db36e8a2f847ea103858cc7b7115be) )	// 
+	ROM_LOAD( "wj5x563.bin",	0x8000, 0x8000, CRC(55e74382) SHA1(af0a890c55db36e8a2f847ea103858cc7b7115be) )	//
 
 	ROM_REGION( 0x18000, "temp", 0 )
 	ROM_LOAD( "wj5x5_1zs.bin",	0x00000, 0x8000, BAD_DUMP CRC(a780ba7f) SHA1(dde75187df298392333cfe1a19beed5b9d172aad) )
@@ -9692,9 +9692,9 @@ static DRIVER_INIT( icp1db )
 
   and then...
 
-  F2D4: 48            pha  
-  F2D5: 8A            txa  
-  F2D6: 48            pha  
+  F2D4: 48            pha
+  F2D5: 8A            txa
+  F2D6: 48            pha
   F2D7: A2 00         ldx  #$00
   F2D9: BD EE F2      lda  $F2EE,x    ; read a char.
   F2DC: F0 08         beq  $F2E6      ; if 0 (end of string), branch to end.
@@ -9703,9 +9703,9 @@ static DRIVER_INIT( icp1db )
   F2E3: E8            inx             ; increment X-register.
   F2E4: D0 F3         bne  $F2D9      ; loop to read the next char....
   F2E6: 68            pla             ; end.
-  F2E7: AA            tax  
-  F2E8: 68            pla  
-  F2E9: 60            rts  
+  F2E7: AA            tax
+  F2E8: 68            pla
+  F2E9: 60            rts
 
   F2EA: 02            kil  $02        ; kill.
   F2EB: 4C EA F2      jmp  $F2EA      ; just in case the 1st time fails, go to kill again.

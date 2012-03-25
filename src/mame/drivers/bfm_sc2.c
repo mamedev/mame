@@ -3889,7 +3889,7 @@ static DRIVER_INIT (luvjub)
 #define sc2_gslam_sound \
 	ROM_REGION( 0x80000, "upd", 0 )\
 	ROM_LOAD( "grandslamsnd.bin", 0x0000, 0x080000, CRC(e4af3787) SHA1(9aa40f7c4c4db3618b553505b02663c1d5f297c3) )\
-	
+
 #define sc2_gslam_sound_alt \
 	ROM_REGION( 0x80000, "upd", 0 )\
 	ROM_LOAD( "gslamsndb.bin", 0x0000, 0x080000, CRC(c9dfb6f5) SHA1(6e529c210b26e7ce164cebbff8ec314c6fa8f7bf) )
@@ -4343,7 +4343,7 @@ ROM_START( sc2focus )
 	ROM_REGION( 0x20000, "upd", 0 )
 	ROM_LOAD("focsound.bin", 0x00000, 0x20000, CRC(fce86700) SHA1(546680dd85234608c1b7e850bad3165400fd981c))
 ROM_END
-	
+
 ROM_START( sc2gslam )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-grand-slam_std_ac_ass.bin", 0x0000, 0x010000, CRC(b28dcd9c) SHA1(f20ef0f0a1b5cc287cf93a175fede98dde3fecf4) )
@@ -4382,7 +4382,7 @@ ROM_END
 ROM_START( sc2cshcl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club_cashino_std_ac_f65_rot_ass.bin", 0x0000, 0x010000, CRC(23aa2c72) SHA1(155df9b501cf5ae9eb3afca48c4100617793ac09) )
-	
+
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD( "cashsnd", 0x0000, 0x080000, CRC(807d37a6) SHA1(bd5f7c39a64a562e96a850a2cc82bfe3f74f1e54) )
 ROM_END
@@ -4415,7 +4415,7 @@ ROM_START( sc2cshcl1p )
 ROM_END
 
 	//There are two distinct builds here, one clearly marked up as mark 2. For sanity's sake, though they share sound, I'm assigning them as separate entities
-	
+
 ROM_START( sc2catms )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cat and mouse p1.bin", 0x0000, 0x010000, CRC(b33b2a75) SHA1(ac57b4d33ac1218e39b8bbd669c40bdbb3839ccf) )
@@ -5069,7 +5069,7 @@ ROM_START( sc2ptytm1p )
 	ROM_LOAD( "partysnd1.bin", 0x0000, 0x020000, CRC(b5a5cc9e) SHA1(c9b132ad0d1ce9ff6b56ebde89d5006a5cf7dff6) )
 ROM_END
 
-	
+
 ROM_START( sc2ofool )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "onlyfoolsnhorses_std.bin", 0x0000, 0x010000, CRC(03cc611a) SHA1(e37d6b87017a52f8de339bbd69b2ccbff9872fae) )
@@ -5471,7 +5471,7 @@ ROM_START( sc2copsc2 )
 	sc2_cops_sound
 ROM_END
 
-	
+
 //Some of these are labelled as for different cabinets, which probably means different reel motors or configurations
 ROM_START( sc2copcl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5502,7 +5502,7 @@ ROM_START( sc2copcl2 )
 	ROM_LOAD( "club-cops-and-robbers_std_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(229c65c1) SHA1(8052c4b8702275235545807e7b075571fc97d4f3) )
 	sc2_copcl_sound
 ROM_END
-	
+
 ROM_START( sc2copcl3 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-cops-and-robbers_std_fe_ac_p67_ass.bin", 0x0000, 0x010000, CRC(4906d170) SHA1(c304a2986560d675b2e776965fdf444e4d56f104) )
@@ -5588,7 +5588,7 @@ ROM_START( sc2copcl11p )
 ROM_END
 
 
-	
+
 ROM_START( sc2copdc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-deluxe-cops-and-robbers_std_ac_250pnd-25p_p67_ass.bin", 0x0000, 0x010000, CRC(fd19db9a) SHA1(441d80b8463ffd5f8783b3cb80d8321f64e8fcc5) )
@@ -5821,7 +5821,7 @@ ROM_START( sc2delsd )
 ROM_END
 
 // sets below are mazooma
-//Protocol status is guessed from part number for now until we're certain everything works with Mazooma games. 
+//Protocol status is guessed from part number for now until we're certain everything works with Mazooma games.
 ROM_START( sc2delsm )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "98400005", 0x0000, 0x010000, CRC(bd9153cf) SHA1(695a897077b2136ba4d0699cad616df5ceadf824) )
@@ -6186,7 +6186,7 @@ ROM_START( sc2hifly4 )
 	ROM_LOAD( "hiflyergame.bin", 0x0000, 0x010000, CRC(b3627b55) SHA1(105ff7da69eb2ca722ee251a4a6af49c46ab1bc8) )
 	sc2_hifly_sound
 ROM_END
-	
+
 ROM_START( sc2inst )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "instant-jackpot_std_ac_var_10pnd_ass.bin", 0x0000, 0x010000, CRC(81a235e9) SHA1(3ed26da7511b2b2324d74f8395215157c41850ce) )
@@ -6502,7 +6502,7 @@ ROM_END
 
 
 
-	
+
 
 ROM_START( sc2wwcl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -7107,7 +7107,7 @@ ROM_END
 ROM_START( sc2gcclb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club-golden-casino_std_ac_250pnd-20p_ass.bin", 0x0000, 0x010000, CRC(5f7fc343) SHA1(264c5bba36c820440c2ed97c04d4dd3592e111da) )
-	
+
 	ROM_REGION( 0x80000, "altrevs", 0 )//Wrong hardware?
 	ROM_LOAD( "95004065.p1", 0x0000, 0x080000, CRC(2670726b) SHA1(0f8045c68131191fceea5728e14c901d159bfb57) )
 
@@ -7206,7 +7206,7 @@ ROM_START( sc2hypr1 )
 	ROM_LOAD( "hyperactive_std_wi_ac_10pnd-20p_ass.bin", 0x0000, 0x010000, CRC(2d01bc08) SHA1(c2186fb639735d4e1d46ceaeae6eee63c7a740b7) )
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
-	
+
 ROM_START( sc2hypr1p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "hyperactive_dat_wi_ac_10pnd-20p_ass.bin", 0x0000, 0x010000, CRC(6d11a9eb) SHA1(d68564a96984c5dde536add4507bc8bae75e19ea) )
@@ -7286,7 +7286,7 @@ ROM_END
 ROM_START( sc2relgm1p )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "reel-gems_dat_ga_20p_ass.bin", 0x0000, 0x010000, CRC(86e81781) SHA1(7b59efa627f70b2c3598c5abd276a7c2737b0751) )
-	
+
 	ROM_REGION( 0x200000, "upd", ROMREGION_ERASE00 )
 ROM_END
 
@@ -7683,7 +7683,7 @@ GAME( 199?, sc2sstar2p	, sc2sstar	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 
 GAME( 199?, sc2sstar3	, sc2sstar	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 4, UK, 2nd Triennial) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2sstar3p	, sc2sstar	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 4, UK, 2nd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2sstar4	, sc2sstar	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Superstar (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS)
-	
+
 
 GAME( 199?, sc2wwcl		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Wild West Club (Bellfruit) (set 1, UK, 250GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2wwclp	, sc2wwcl	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",      "Wild West Club (Bellfruit) (set 1, UK, 250GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
@@ -7746,23 +7746,23 @@ GAME( 199?, sc2scshxgman, sc2scshx	,  scorpion2		, drwho		, drwho		, 0,		 "Conce
 GAME( 199?, sc2scshxstar, sc2scshx	,  scorpion2		, drwho		, drwho		, 0,		 "Concept",   "Super Cash X (Concept) (Starpoint Hardware)", GAME_FLAGS)
 GAME( 199?, sc2scshxcas,  sc2scshx	,  scorpion2		, drwho		, drwho		, 0,		 "Concept",   "Super Casino Cash X (Concept)", GAME_FLAGS)
 
-GAME( 199?, sc2cgc		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Carrot Gold Club (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cnile	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Cash On The Nile Club (Bellfruit) (set 1 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cnile1	, sc2cnile	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cnile2	, sc2cnile	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 200GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cnile2p	, sc2cnile	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 150GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2cnile3p	, sc2cnile	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Cash On The Nile Club (Bellfruit) (set 3 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cgc		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Carrot Gold Club (Bellfruit) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cnile	, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 1 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cnile1	, sc2cnile	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cnile2	, sc2cnile	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 200GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cnile2p	, sc2cnile	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 2 UK, 150GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2cnile3p	, sc2cnile	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Cash On The Nile Club (Bellfruit) (set 3 UK, 150GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
 
-GAME( 199?, sc2casr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Casino Royale (Bellfruit) (set 1, UK, 10GBP Jackpot, 3rd Triennial) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2casrp	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Casino Royale (Bellfruit) (set 1, UK, 10GBP Jackpot, 3rd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2casr1	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Casino Royale (Bellfruit) (set 2, UK, 3rd Triennial) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2casr1p	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Casino Royale (Bellfruit) (set 2, UK, 3rd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2casr2	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Casino Royale (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2casr2p	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Casino Royale (Bellfruit) (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2casr3	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Casino Royale (Bellfruit) (set 4, UK, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2casr3p	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Casino Royale (Bellfruit) (set 4, UK, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2casr4	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Casino Royale (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS)
-GAME( 199?, sc2casr4p	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",  	 "Casino Royale (Bellfruit) (set 5, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2casr		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 1, UK, 10GBP Jackpot, 3rd Triennial) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2casrp	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 1, UK, 10GBP Jackpot, 3rd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2casr1	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 2, UK, 3rd Triennial) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2casr1p	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 2, UK, 3rd Triennial, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2casr2	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 3, UK) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2casr2p	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 3, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2casr3	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 4, UK, 8GBP Jackpot) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2casr3p	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 4, UK, 8GBP Jackpot, Protocol) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2casr4	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 5, UK) (Scorpion 2/3)", GAME_FLAGS)
+GAME( 199?, sc2casr4p	, sc2casr	,  scorpion2		, drwho		, drwho		, 0,		 "BFM", 	 "Casino Royale (Bellfruit) (set 5, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)
 
 GAME( 199?, sc2cmbt		, 0			,  scorpion2		, drwho		, drwho		, 0,		 "BFM",		 "Cat & Mouse & Bonzo Too (Bellfruit) (set 1, UK) (Scorpion 2/3)", GAME_FLAGS)
 GAME( 199?, sc2cmbtp	, sc2cmbt	,  scorpion2		, drwho		, drwho		, 0,		 "BFM",		 "Cat & Mouse & Bonzo Too (Bellfruit) (set 1, UK, Protocol) (Scorpion 2/3)", GAME_FLAGS)

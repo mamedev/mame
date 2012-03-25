@@ -1744,8 +1744,8 @@ static const UINT8 fade_table(int v)
 {
     int low  = v & 0x001f;
     int high = v & 0x03e0;
-    
-    return (low * (high | (high >> 5)) + 0x210) >> 10; 
+
+    return (low * (high | (high >> 5)) + 0x210) >> 10;
 }
 
 static UINT16 u1,u2;

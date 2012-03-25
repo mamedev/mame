@@ -2643,20 +2643,20 @@ ROM_START( invadpt2br )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pv01",        0x0000, 0x0800, CRC(7288a511) SHA1(ff617872784c28ed03591aefa9f0519e5651701f) )
 	/* pv01 had weird encryption applied to it, very likely to have been done post-dump. */
-//	for (offs = 0x4fc; offs < 0x5fc; offs++)
-//		rom[offs] ^= 0x6c;
+//  for (offs = 0x4fc; offs < 0x5fc; offs++)
+//      rom[offs] ^= 0x6c;
 
 	// 0x4fc + 1 * 0x56
-//	for (offs = 0x54e; offs < 0x552; offs++)
-//		rom[offs] ^= 0x03;
+//  for (offs = 0x54e; offs < 0x552; offs++)
+//      rom[offs] ^= 0x03;
 
 	// 0x4fc + 2 * 0x56
-//	for (offs = 0x5a4; offs < 0x5a8; offs++)
-//		rom[offs] ^= 0x01;
+//  for (offs = 0x5a4; offs < 0x5a8; offs++)
+//      rom[offs] ^= 0x01;
 
 	// 0x4fc + 3 * 0x56
-//	for (offs = 0x5fa; offs < 0x5fc; offs++)
-//		rom[offs] ^= 0x02;
+//  for (offs = 0x5fa; offs < 0x5fc; offs++)
+//      rom[offs] ^= 0x02;
 
 	ROM_LOAD( "br_pv02",     0x0800, 0x0800, CRC(420c7c35) SHA1(b51265f4d9e5a8cf9d53099a97cadd25ea0b34ce) )
 	ROM_LOAD( "br_pv03",     0x1000, 0x0800, CRC(dffd04b9) SHA1(d51a0f27e90b0a49cf2d57ec82a863dcae9f3ea4) )

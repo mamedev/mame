@@ -1955,36 +1955,36 @@ ROM_END
 /* similar-looking h/w to spikes91, includes roms from spikes91 and svolley.  possibly an svolley boot on spikes91 h/w? */
 ROM_START( spikes91a )
 	ROM_REGION( 0x40000, "maincpu", 0 )	/* 68000 code */
-    ROM_LOAD16_BYTE( "4-prg.bin", 0x00001, 0x10000, CRC(eefaa208) SHA1(2a0417e170de3212f45be64719bb1eb0c6d33c59) ) 
-    ROM_LOAD16_BYTE( "6-prg.bin", 0x00000, 0x10000, CRC(da7d2e81) SHA1(ca78a661876ddbcb0e7599edcc819558afb76930) ) 
+    ROM_LOAD16_BYTE( "4-prg.bin", 0x00001, 0x10000, CRC(eefaa208) SHA1(2a0417e170de3212f45be64719bb1eb0c6d33c59) )
+    ROM_LOAD16_BYTE( "6-prg.bin", 0x00000, 0x10000, CRC(da7d2e81) SHA1(ca78a661876ddbcb0e7599edcc819558afb76930) )
 	ROM_LOAD16_BYTE( "5-prg.bin", 0x20000, 0x08000, CRC(e7630122) SHA1(d200afe5134030be615f112af0ab54ac3b349eca) ) // these 2 match program ROMs from svolley
 	ROM_LOAD16_BYTE( "3-prg.bin", 0x20001, 0x08000, CRC(b6b24910) SHA1(2e4cf80a8eb1fcd9448405ff881bb99ae4ce8909) )
 
 	ROM_REGION( 0x080000, "gfx1", 0 )
-    ROM_LOAD( "19.bin",       0x000000, 0x010000, CRC(12a67e3f) SHA1(c77b264eae0f55af36728b6e5e5e1fec3d366eb1) ) 
-    ROM_LOAD( "20.bin",       0x010000, 0x010000, CRC(31828996) SHA1(b324902b9fff0bab1daa3af5136b96d50d12956f) ) 
-    ROM_LOAD( "21.bin",       0x020000, 0x010000, CRC(51cbe0d6) SHA1(d60b2a297d7e994c60db28e8ba60b0664e01f61d) ) 
-    ROM_LOAD( "22.bin",       0x030000, 0x010000, CRC(c289bfc0) SHA1(4a8929c5f304a1d203cad04c72fc6e96764dc858) ) 
+    ROM_LOAD( "19.bin",       0x000000, 0x010000, CRC(12a67e3f) SHA1(c77b264eae0f55af36728b6e5e5e1fec3d366eb1) )
+    ROM_LOAD( "20.bin",       0x010000, 0x010000, CRC(31828996) SHA1(b324902b9fff0bab1daa3af5136b96d50d12956f) )
+    ROM_LOAD( "21.bin",       0x020000, 0x010000, CRC(51cbe0d6) SHA1(d60b2a297d7e994c60db28e8ba60b0664e01f61d) )
+    ROM_LOAD( "22.bin",       0x030000, 0x010000, CRC(c289bfc0) SHA1(4a8929c5f304a1d203cad04c72fc6e96764dc858) )
 
 	ROM_REGION( 0x100000, "gfx2", ROMREGION_INVERT )
-    ROM_LOAD( "7.bin",        0x000000, 0x010000, CRC(9596a4c0) SHA1(1f233bb2fa662fb8cd9c0db478e392ca26d9484b) ) 
-    ROM_LOAD( "8.bin",        0x010000, 0x010000, CRC(451ebd75) SHA1(67d5a9fadf3c8a39d59e7b21cb8633dd19886f76) ) 
-    ROM_LOAD( "10.bin",       0x020000, 0x010000, CRC(a05249e6) SHA1(8671e0c980ba87ea14895176fb5c8a48bb4c932e) ) 
-    ROM_LOAD( "11.bin",       0x030000, 0x010000, CRC(0983987a) SHA1(c334276774ffdee0023ea6287e98e0e6e372fb80) ) 
-    ROM_LOAD( "13.bin",       0x040000, 0x010000, CRC(429159f3) SHA1(4395413c4ab4a1fd322a1af6f2b93bb62b044223) ) 
-    ROM_LOAD( "14.bin",       0x050000, 0x010000, CRC(4babf749) SHA1(1d5055e825b9efc17a200f4e04e6fa326397f7cc) ) 
-    ROM_LOAD( "16.bin",       0x060000, 0x010000, CRC(f5436c8d) SHA1(d29508cc5ee43d7b072112c6d95c36ee0328e5fb) ) 
-    ROM_LOAD( "17.bin",       0x070000, 0x010000, CRC(f82f9664) SHA1(678fd8f3abc39ccb4ef32e9d6ef481d7d751aecb) ) 
-    ROM_LOAD( "9.bin",        0x080000, 0x008000, CRC(3291e3e0) SHA1(dcc358bf66e4c65992d4376c203b811928068cf3) ) 
-    ROM_LOAD( "12.bin",       0x088000, 0x008000, CRC(40aedad9) SHA1(cbf50eae4ccbc06213a5c227409e1dade7180572) ) 
-    ROM_LOAD( "15.bin",       0x090000, 0x008000, CRC(911104d7) SHA1(66b48c34da2cc17faeffa1d36f5b6b7e15c2033b) ) 
-    ROM_LOAD( "18.bin",       0x098000, 0x008000, CRC(07265de1) SHA1(bad7f1b168640a7d90b0d4d9c255ba98fa4c6fa8) ) 
+    ROM_LOAD( "7.bin",        0x000000, 0x010000, CRC(9596a4c0) SHA1(1f233bb2fa662fb8cd9c0db478e392ca26d9484b) )
+    ROM_LOAD( "8.bin",        0x010000, 0x010000, CRC(451ebd75) SHA1(67d5a9fadf3c8a39d59e7b21cb8633dd19886f76) )
+    ROM_LOAD( "10.bin",       0x020000, 0x010000, CRC(a05249e6) SHA1(8671e0c980ba87ea14895176fb5c8a48bb4c932e) )
+    ROM_LOAD( "11.bin",       0x030000, 0x010000, CRC(0983987a) SHA1(c334276774ffdee0023ea6287e98e0e6e372fb80) )
+    ROM_LOAD( "13.bin",       0x040000, 0x010000, CRC(429159f3) SHA1(4395413c4ab4a1fd322a1af6f2b93bb62b044223) )
+    ROM_LOAD( "14.bin",       0x050000, 0x010000, CRC(4babf749) SHA1(1d5055e825b9efc17a200f4e04e6fa326397f7cc) )
+    ROM_LOAD( "16.bin",       0x060000, 0x010000, CRC(f5436c8d) SHA1(d29508cc5ee43d7b072112c6d95c36ee0328e5fb) )
+    ROM_LOAD( "17.bin",       0x070000, 0x010000, CRC(f82f9664) SHA1(678fd8f3abc39ccb4ef32e9d6ef481d7d751aecb) )
+    ROM_LOAD( "9.bin",        0x080000, 0x008000, CRC(3291e3e0) SHA1(dcc358bf66e4c65992d4376c203b811928068cf3) )
+    ROM_LOAD( "12.bin",       0x088000, 0x008000, CRC(40aedad9) SHA1(cbf50eae4ccbc06213a5c227409e1dade7180572) )
+    ROM_LOAD( "15.bin",       0x090000, 0x008000, CRC(911104d7) SHA1(66b48c34da2cc17faeffa1d36f5b6b7e15c2033b) )
+    ROM_LOAD( "18.bin",       0x098000, 0x008000, CRC(07265de1) SHA1(bad7f1b168640a7d90b0d4d9c255ba98fa4c6fa8) )
 
 	ROM_REGION( 0x020000, "user1", ROMREGION_ERASEFF ) /* lookup tables for the sprites  */
 
 	ROM_REGION( 0x20000, "cpu1", 0 ) /* Z80 Sound CPU */
 	ROM_LOAD( "2-snd.bin", 0x00000, 0x10000, CRC(e3065b1d) SHA1(c4a3a95ba7f43cdf1b0c574f41de06d007ad2bd8) ) // matches 1.ic140 from pspikes91
-    ROM_LOAD( "1-snd.bin", 0x10000, 0x08000, CRC(009d7157) SHA1(2cdda7094c7476289d75a78ee25b34fa3b3225c0) ) 
+    ROM_LOAD( "1-snd.bin", 0x10000, 0x08000, CRC(009d7157) SHA1(2cdda7094c7476289d75a78ee25b34fa3b3225c0) )
 ROM_END
 
 /* this is a bootleg / chinese hack of power spikes */

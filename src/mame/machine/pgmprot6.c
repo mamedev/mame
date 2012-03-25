@@ -14,7 +14,7 @@
  IGS025 is some kind of state machine, bitswaps etc.
 
  Simulation is incomplete
- 
+
  ***********************************************************************/
 
 #include "emu.h"

@@ -110,7 +110,7 @@ static UINT32 gm(int i)
   unsigned int x;
   int idx = i & 0xff;
   int i1, i2;
-  
+
   if(i & 0x008000)
     idx ^= 1;
   if(i & 0x100000)
@@ -153,7 +153,7 @@ static UINT32 gm(int i)
     x ^= 0x00020080;
   if(bt(xmap_high_15, i2))
     x ^= 0x20000002;
-  
+
   if(i & 0x010000)
     x ^= 0xaa00000f;
   if(i & 0x020000)
@@ -169,10 +169,10 @@ static UINT32 gm(int i)
 static UINT32 trans(UINT32 v, UINT32 x)
 {
   unsigned y,r2,v2;
-  
+
   v2 = (BIT(v,30)<<8)|(BIT(v,22)<<12)|(BIT(v,18)<<18)|(BIT(v,19)<<19)|(BIT(v,22)<<22)|(BIT(v,24)<<24)|(BIT(v,3)<<25)|(BIT(v,26)<<26)|(BIT(v,28)<<28);
   v2 ^= 0x01000000;
-  
+
   r2 = 0;
   y = 0;
 
@@ -208,8 +208,8 @@ static UINT32 trans(UINT32 v, UINT32 x)
   y |= ((                              0 ^ BIT(x,29) ^ BIT(v,29))<<29);
   y |= ((                              0 ^ BIT(x,30) ^ BIT(v,30))<<30);
   y |= ((                              0 ^ BIT(x,31) ^ BIT(v,31))<<31);
-  
-  
+
+
   r2 |= (                     0<< 0);
   r2 |= (                     0<< 1);
   r2 |= (                     0<< 2);
@@ -242,7 +242,7 @@ static UINT32 trans(UINT32 v, UINT32 x)
   r2 |= ((BIT(v2,28)&BIT(y,28))<<29);
   r2 |= (                     0<<30);
   r2 |= (                     0<<31);
-  
+
   r2 ^= y;
   r2 ^= 0x0c500000;
 

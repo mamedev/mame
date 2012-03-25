@@ -3140,7 +3140,7 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 
             UML_LABEL(block, compiler->labelnum++);             // 2:
 			UML_DIVS(block, R32(G_RD(op)), R32(G_RD(op)), R32(G_RA(op)), R32(G_RB(op)));	// divs    rd,rd,ra,rb
-            generate_compute_flags(ppc, block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags> 
+            generate_compute_flags(ppc, block, desc, op & M_RC, ((op & M_OE) ? XER_OV : 0), FALSE);// <update flags>
 
             UML_LABEL(block, compiler->labelnum++);             // 3:
             return TRUE;

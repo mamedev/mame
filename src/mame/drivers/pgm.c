@@ -63,31 +63,31 @@ Most of these are not emulated correctly. In most cases the protection device su
 game region code..
 
 ASIC 3:
-	state based device?
-	see
-	machine/pgmprot.c
+    state based device?
+    see
+    machine/pgmprot.c
 
 ASIC 25 + ASIC 12
-	state based device + rom overlays
-	see
-	machine/pgmprot5.c
+    state based device + rom overlays
+    see
+    machine/pgmprot5.c
 
 ASIC 25 + ASIC 22
-	state based device + encrypted DMA device
-	see
-	machine/pgmprot4.c
+    state based device + encrypted DMA device
+    see
+    machine/pgmprot4.c
 
 ASIC 25 + ASIC 28
-	state based device + encrypted DMA device?
-	see
-	machine/pgmprot6.c
+    state based device + encrypted DMA device?
+    see
+    machine/pgmprot6.c
 
 ASIC 027A(55857F/55857G):
-	ARM based CPUs with internal ROM
-	see
-	machine/pgmprot1.c
-	machine/pgmprot2.c
-	machine/pgmprot3.c
+    ARM based CPUs with internal ROM
+    see
+    machine/pgmprot1.c
+    machine/pgmprot2.c
+    machine/pgmprot3.c
 
 
 there are probably more...
@@ -2946,7 +2946,7 @@ ROM_START( dmnfrnt )
 	/* one of these is probably a bad dump, it should be obvious once progress is made because the external rom is checksummed by the internal one */
 	ROM_LOAD( "v105_32m.u26",     0x000000, 0x400000,  CRC(d200ee63) SHA1(3128c27c5f5a4361d31e7b4bb006de631b3a228c) )
 	ROM_LOAD( "chinese-v105.u62", 0x000000, 0x400000,  CRC(c798c2ef) SHA1(91e364c33b935293fa765ca521cdb67ac45ec70f) )
-	
+
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t04501.u29",    0x180000, 0x800000, CRC(900eaaac) SHA1(4033cb7b28fcadb92d5af3ea7fdd1c22747618fd) )
@@ -3091,7 +3091,7 @@ ROM_START( thegladpcb )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
 	ROM_LOAD( "igs.62", 0x000000, 0x200000, CRC(0f3f511e) SHA1(28dd8d27495cec86e968a3ea549c5b30513dbb6e) )
-	
+
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t04601.u33",   0x180000, 0x800000, CRC(e5dab371) SHA1(2e3c93958eb0326b6b84b95c2168626f26bbac76) )

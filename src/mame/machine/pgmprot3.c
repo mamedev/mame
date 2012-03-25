@@ -36,7 +36,7 @@
 
 static WRITE32_HANDLER( svg_arm7_ram_sel_w )
 {
-//	printf("svg_arm7_ram_sel_w %08x\n", data);
+//  printf("svg_arm7_ram_sel_w %08x\n", data);
 	space->machine().scheduler().synchronize(); // force resync
 
 	pgm_state *state = space->machine().driver_data<pgm_state>();
@@ -250,7 +250,7 @@ static READ32_HANDLER( dmnfrnt_speedup_r )
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 	int pc = cpu_get_pc(&space->device());
 	if (pc == 0x8000fea) device_eat_cycles(&space->device(), 500);
-//	else printf("dmn_speedup_r %08x\n", pc);
+//  else printf("dmn_speedup_r %08x\n", pc);
 	return state->m_arm_ram[0x000444/4];
 }
 

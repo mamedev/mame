@@ -113,26 +113,26 @@ static SCREEN_UPDATE_IND16( galaxia )
 			{
 				// background vs. bullet collision detection
 				if (background) state->m_collision |= 0x80;
-				
+
 				// bullet size/color/priority is guessed
 				bitmap.pix16(y, x) = 7;
 				if (x) bitmap.pix16(y, x-1) = 7;
 			}
-			
+
 			// copy the S2636 images into the main bitmap and check collision
 			int pixel0 = s2636_0_bitmap.pix16(y, x);
 			int pixel1 = s2636_1_bitmap.pix16(y, x);
 			int pixel2 = s2636_2_bitmap.pix16(y, x);
-			
+
 			int pixel = pixel0 | pixel1 | pixel2;
-			
+
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
 				// S2636 vs. S2636 collision detection
 				if (S2636_IS_PIXEL_DRAWN(pixel0) && S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision |= 0x01;
 				if (S2636_IS_PIXEL_DRAWN(pixel1) && S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision |= 0x02;
 				if (S2636_IS_PIXEL_DRAWN(pixel2) && S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x04;
-				
+
 				// S2636 vs. bullet collision detection
 				if (bullet) state->m_collision |= 0x08;
 
@@ -140,7 +140,7 @@ static SCREEN_UPDATE_IND16( galaxia )
 				if (background)
 				{
 					/* bit4 causes problems on 2nd level
-					if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x10; */
+                    if (S2636_IS_PIXEL_DRAWN(pixel0)) state->m_collision |= 0x10; */
 					if (S2636_IS_PIXEL_DRAWN(pixel1)) state->m_collision |= 0x20;
 					if (S2636_IS_PIXEL_DRAWN(pixel2)) state->m_collision |= 0x40;
 				}
@@ -191,7 +191,7 @@ static SCREEN_UPDATE_IND16( astrowar )
 				break;
 
 			int pixel = s2636_0_bitmap.pix16(y, x + s_offset);
-			
+
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
 				// S2636 vs. background collision detection
@@ -217,7 +217,7 @@ static SCREEN_UPDATE_IND16( astrowar )
 static WRITE8_HANDLER(galaxia_video_w)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
-//	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+//  space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	if (*state->m_fo_state)
 		state->m_video[offset] = data;
 	else

@@ -326,7 +326,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "tms32051",   _16le, -1, CPU_DISASSEMBLE_NAME(tms32051) },
 	{ "tms34010",   _8bit,  3, CPU_DISASSEMBLE_NAME(tms34010) },
 	{ "tms34020",   _8bit,  3, CPU_DISASSEMBLE_NAME(tms34020) },
-	//	{ "tms57002",   _32le, -2, CPU_DISASSEMBLE_NAME(tms57002) },
+	//  { "tms57002",   _32le, -2, CPU_DISASSEMBLE_NAME(tms57002) },
 	{ "tms7000",    _8bit,  0, CPU_DISASSEMBLE_NAME(tms7000) },
 	{ "upd7810",    _8bit,  0, CPU_DISASSEMBLE_NAME(upd7810) },
 	{ "upd7807",    _8bit,  0, CPU_DISASSEMBLE_NAME(upd7807) },

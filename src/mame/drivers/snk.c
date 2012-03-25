@@ -6119,7 +6119,7 @@ ROM_END
 
 ROM_START( fsoccerba )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "fs3.c6", 0x00000, 0x10000, CRC(e644d207) SHA1(efd5a6cf99461a0dc6cec6c8e2c16d82c6630132) ) 
+    ROM_LOAD( "fs3.c6", 0x00000, 0x10000, CRC(e644d207) SHA1(efd5a6cf99461a0dc6cec6c8e2c16d82c6630132) )
 
 	ROM_REGION( 0x10000, "sub", 0 )
 	ROM_LOAD( "fs1_ver4.bin",  0x00000, 0x10000, CRC(97830108) SHA1(dab241baf8d889c768e1fbe25f1e5059b3cbbab6) )

@@ -60,7 +60,7 @@
   Other specs...
 
   Name of game:       Janken Man.
-  Manufacturer:	      Sanwaizu Co., Ltd. (Bankruptcy on March 6, 1998)
+  Manufacturer:       Sanwaizu Co., Ltd. (Bankruptcy on March 6, 1998)
   Year:               May 1985 (1985)
   Body dimensions:    Depth: 355mm,  Width: 340mm, Height: 855mm (body only)
   Weight:             30kg.
@@ -105,7 +105,7 @@
     1 = Right
 
   lamps:
-  
+
     0 = Multiplier 1 "attarii" (pays x1)
     1 = Multiplier 2 "ooatari" (pays x2)
 
