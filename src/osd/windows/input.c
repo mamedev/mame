@@ -1507,14 +1507,14 @@ static void dinput_mouse_poll(device_info *devinfo)
 
 static BOOL CALLBACK dinput_joystick_enum(LPCDIDEVICEINSTANCE instance, LPVOID ref)
 {
-	DWORD cooperative_level = DISCL_FOREGROUND | DISCL_EXCLUSIVE;
+	DWORD cooperative_level = DISCL_FOREGROUND | DISCL_NONEXCLUSIVE;
 	int axisnum, axiscount, povnum, butnum;
 	running_machine &machine = *(running_machine *)ref;
 	device_info *devinfo;
 	HRESULT result;
 
 	if (win_window_list != NULL && win_has_menu(win_window_list)) {
-		cooperative_level = DISCL_BACKGROUND | DISCL_EXCLUSIVE;
+		cooperative_level = DISCL_BACKGROUND | DISCL_NONEXCLUSIVE;
 	}
 	// allocate and link in a new device
 	devinfo = dinput_device_create(machine, &joystick_list, instance, &c_dfDIJoystick, NULL, cooperative_level);
