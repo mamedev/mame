@@ -490,6 +490,36 @@ ROM_START( rastan )
 	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) ) /* samples are 4bit ADPCM */
 ROM_END
 
+/* this is an official Taito PCB and mostly matches rastanu, but the copyright message is TAITO JAPAN so I assume it's a World version */
+ROM_START( rastan2 )
+	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
+    ROM_LOAD16_BYTE( "b04-38.19",    0x00000, 0x10000, CRC(1c91dbb1) SHA1(17fc55e8546cc0b847aebd67fb4570a1e9f128f3) ) 
+    ROM_LOAD16_BYTE( "b04-37.7",     0x00001, 0x10000, CRC(ecf20bdd) SHA1(92e46b1edef40a19be17091c09daba598d77bca8) ) 
+    ROM_LOAD16_BYTE( "b04-40.20",    0x20000, 0x10000, CRC(0930d4b3) SHA1(c269b3856040ed9409de99cca48f22a2f355fc4c) ) 
+    ROM_LOAD16_BYTE( "b04-39.8",     0x20001, 0x10000, CRC(d95ade5e) SHA1(f47557dcfa9d3137e2a3838e45858fc21471cc91) ) 
+    ROM_LOAD16_BYTE( "b04-42.21",    0x40000, 0x10000, CRC(1857a7cb) SHA1(7d967d04ade648c6ddb19aad9e184b6e272856da) ) 
+    ROM_LOAD16_BYTE( "b04-43-1.9",   0x40001, 0x10000, CRC(ca4702ff) SHA1(0f8c2d7d332c4e35884c48d87ba9fd26924d1692) ) 
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )
+	ROM_LOAD( "b04-19.49", 0x00000, 0x4000, CRC(ee81fdd8) SHA1(fa59dac2583a7d2979550dffc6f9c6c2bd67bfd5) )
+	ROM_CONTINUE(            0x10000, 0xc000 )
+
+	ROM_REGION( 0x080000, "gfx1", 0 )
+	ROM_LOAD( "b04-01.40",  0x00000, 0x20000, CRC(cd30de19) SHA1(f8d158d38cd07a24cb5ddefd4ce90beec706924d) )
+	ROM_LOAD( "b04-03.39",  0x20000, 0x20000, CRC(ab67e064) SHA1(5c49f0ff9221cba9f2bb8da86eb4448c73012410) )
+	ROM_LOAD( "b04-02.67",  0x40000, 0x20000, CRC(54040fec) SHA1(a2bea2ce1cebd25b33be41723299ca0512d95f9e) )
+	ROM_LOAD( "b04-04.66",  0x60000, 0x20000, CRC(94737e93) SHA1(3df7f085fe6468bda11fab2e86252df6f74f7a99) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "b04-05.15",  0x00000, 0x20000, CRC(c22d94ac) SHA1(04f69f9af7ac4242e95dba32988afa3616d75a92) )
+	ROM_LOAD( "b04-07.14",  0x20000, 0x20000, CRC(b5632a51) SHA1(da6ebe6afe245443a76b33714213549356c0c5c3) )
+	ROM_LOAD( "b04-06.28",  0x40000, 0x20000, CRC(002ccf39) SHA1(fdc29f39198f9b488e298ee89b0eeb3417527733) )
+	ROM_LOAD( "b04-08.27",  0x60000, 0x20000, CRC(feafca05) SHA1(9de9ff1fcf037e5ab25c181b678245041238d6ae) )
+
+	ROM_REGION( 0x10000, "adpcm", 0 )	/* MSM5205 samples */
+	ROM_LOAD( "b04-20.76", 0x0000, 0x10000, CRC(fd1a34cc) SHA1(b1682959521fa295769207b75cf7d839e9ec95fd) )
+ROM_END
+
 ROM_START( rastanu )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
 	ROM_LOAD16_BYTE( "b04-35.19", 0x00000, 0x10000, CRC(1c91dbb1) SHA1(17fc55e8546cc0b847aebd67fb4570a1e9f128f3) )
@@ -607,7 +637,8 @@ ROM_START( rastsaga1 )
 ROM_END
 
 
-GAME( 1987, rastan,    0,      rastan, rastan,   0, ROT0, "Taito Corporation Japan",   "Rastan (World)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastan,    0,      rastan, rastan,   0, ROT0, "Taito Corporation Japan",   "Rastan (World, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, rastan2,   rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation Japan",   "Rastan (World, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, rastanu,   rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, rastanu2,  rastan, rastan, rastsaga, 0, ROT0, "Taito America Corporation", "Rastan (US, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, rastsaga,  rastan, rastan, rastsaga, 0, ROT0, "Taito Corporation",         "Rastan Saga (Japan)", GAME_SUPPORTS_SAVE )
