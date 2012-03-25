@@ -292,6 +292,25 @@ static ADDRESS_MAP_START( sderby_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( luckboom_map, AS_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_BASE_MEMBER(sderby_state,m_videoram)		/* bg */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_BASE_MEMBER(sderby_state,m_md_videoram)	/* mid */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_BASE_MEMBER(sderby_state,m_fg_videoram)	/* fg */
+	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)
+	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP	/* ??? - check code at 0x000456 (executed once at startup) */
+	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP	/* ??? - check code at 0x000524 (executed once at startup) */
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_MEMBER(sderby_state,m_spriteram) AM_SIZE_MEMBER(sderby_state,m_spriteram_size)
+	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
+	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w)	/* output port */
+	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
+	AM_RANGE(0xe00000, 0xe007ff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( spacewin_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_BASE_MEMBER(sderby_state,m_videoram)		/* bg */
@@ -355,6 +374,26 @@ static INPUT_PORTS_START( sderby )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_SERVICE_NO_TOGGLE(0x1000, IP_ACTIVE_LOW)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )		// check code at 0x00765e
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( luckboom )
+	PORT_START("IN0")	/* 0x308000.w */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_SERVICE_NO_TOGGLE(0x1000, IP_ACTIVE_LOW)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -459,6 +498,30 @@ static MACHINE_CONFIG_START( sderby, sderby_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(sderby_map)
 	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
+	MCFG_SCREEN_UPDATE_STATIC(sderby)
+
+	MCFG_GFXDECODE(sderby)
+	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_VIDEO_START(sderby)
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( luckboom, sderby_state )
+
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(luckboom_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -718,6 +781,53 @@ ROM_START( croupiera )
 	ROM_LOAD( "8.bin", 0x200000, 0x80000, CRC(d4c2b7da) SHA1(515be861443acc5b911241dbaafa42e02f79985a))
 ROM_END
 
+/*
+Lucky Boom (c)1996 Playmark
+
+QTY		Type 					clock 			position 	function
+1x		MC68000P12 								u24			16/32-bit Microprocessor - main
+1x 		M6295 									u146 		4-Channel Mixing ADCPM Voice Synthesis LSI - sound
+1x 		KA358 									u155 		Dual Operational Amplifier - sound
+1x 		TDA2003 								TD1 		Audio Amplifier - sound
+1x 		oscillator 				24.000000MHz	XL1 	
+1x 		oscillator 				28.000000MHz	XL2 	
+1x 		blu resonator 	1000J					Y1 	
+
+ROMs
+QTY 	Type		position 	status
+1x 		TMS27C020 	1 			dumped
+2x 		AM27C010 	2,3 		dumped
+5x 		TMS27C010 	4-8 		dumped
+
+RAMs
+QTY 	Type 			position
+8x 		HM3-65728BK-5 	u42,u73,u74,u75,u80,u81,u124,u125
+2x 		HY62256ALP-10 	u2,u6
+2x 		KM6264BL-7L 	u36,u37
+PLDs
+QTY 	Type 				position 			status
+2x		A1020B-PL84C 		u110,u137 			read protected
+4x 		TIBPAL22V10ACNT 	u1,u77,u111,u112 	read protected 
+*/
+
+
+
+ROM_START( luckboom )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "2.u16", 0x00000, 0x20000, CRC(0a20eaca) SHA1(edd325b60b3a3ce84e89f8be91b9e19f82d15317) )
+	ROM_LOAD16_BYTE( "3.u15", 0x00001, 0x20000, CRC(0d3bb24c) SHA1(31826ec29650aa8b70e1b713678401113e008832) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "1.u147", 0x00000, 0x40000, CRC(0d42c0a3) SHA1(1b1d4c7dcbb063e8bf133063770b753947d1a017) )
+
+	ROM_REGION( 0xa0000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "4.u141", 0x000000, 0x20000, CRC(3aeccad7) SHA1(4104dd3ae928c1a876ac9b460fe18b58ce1206f7) )
+	ROM_LOAD( "5.u142", 0x020000, 0x20000, CRC(4e4f9ac6) SHA1(e9b0c48195d8b21cdab16d66423ff43e6292ef2c) )
+	ROM_LOAD( "6.u143", 0x040000, 0x20000, CRC(d1b4910e) SHA1(cfcb14bcd992bceaa634b20eb2d446caa62b6d82) )
+	ROM_LOAD( "7.u144", 0x060000, 0x20000, CRC(00334bad) SHA1(2d8af2a4b517ceb1ae5504b15086c8faaf934b53) )
+	ROM_LOAD( "8.u145", 0x080000, 0x20000, CRC(dc12df50) SHA1(0796d6428dc3a032ea55e06e8e07245a256ed036) )
+ROM_END
+
 
 /******************************
 *        Game Drivers         *
@@ -728,3 +838,4 @@ GAMEL( 1996, sderby,    0,        sderby,   sderby,   0,     ROT0, "Playmark", "
 GAMEL( 1996, spacewin,  0,        spacewin, spacewin, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",             0,                                             layout_spacewin )
 GAMEL( 1997, croupier,  0,        pmroulet, pmroulet, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.20.05)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING, layout_pmroulet )
 GAMEL( 1997, croupiera, croupier, pmroulet, pmroulet, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette v.09.04)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING, layout_pmroulet )
+GAME ( 1996, luckboom,  0,        luckboom, luckboom, 0,     ROT0, "Playmark", "Lucky Boom", 0 )

@@ -757,6 +757,12 @@ $(MAMEOBJ)/igs.a: \
 	$(DRIVERS)/spoker.o \
 	$(MACHINE)/pgmcrypt.o \
 	$(MACHINE)/pgmprot.o \
+	$(MACHINE)/pgmprot1.o \
+	$(MACHINE)/pgmprot2.o \
+	$(MACHINE)/pgmprot3.o \
+	$(MACHINE)/pgmprot4.o \
+	$(MACHINE)/pgmprot5.o \
+	$(MACHINE)/pgmprot6.o \
 
 $(MAMEOBJ)/irem.a: \
 	$(DRIVERS)/m10.o $(VIDEO)/m10.o \

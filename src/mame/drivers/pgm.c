@@ -63,59 +63,32 @@ Most of these are not emulated correctly. In most cases the protection device su
 game region code..
 
 ASIC 3:
-    used by:
-    different per region, supplies region code
-    used by:
-    Oriental Legend
-    function:
+	state based device?
+	see
+	machine/pgmprot.c
 
 ASIC 25 + ASIC 12
-    ASIC25 is a logic device (not MCU) which performs bitswap operations
-    ASIC12 is ... ? (rom overlays?)
-
-    used by:
-    Dragon World 2
+	state based device + rom overlays
+	see
+	machine/pgmprot5.c
 
 ASIC 25 + ASIC 22
-    ASIC25 is a logic device (not MCU) which performs bitswap operations, and connects to the ASIC22.  It differs per region.
-    ASIC22 is an MCU and acts as an encrypted DMA device
-
-    (ASIC22 can be swapped between games with no side-effects, ASIC25 can't)
-
-    used by:
-    Dragon World 3
-    The Killing Blade
+	state based device + encrypted DMA device
+	see
+	machine/pgmprot4.c
 
 ASIC 25 + ASIC 28
-    ASIC25 (see above)
-    ASIC28 acts as an encrypted DMA device (updated version of ASIC22 with different encryption etc.)
+	state based device + encrypted DMA device?
+	see
+	machine/pgmprot6.c
 
-    used by:
-    Oriental Legend Super
+ASIC 027A(55857F/55857G):
+	ARM based CPUs with internal ROM
+	see
+	machine/pgmprot1.c
+	machine/pgmprot2.c
+	machine/pgmprot3.c
 
-ASIC 27 (55857E):
-    performs a variety of calculations, quite complex, different per region, supplies region code
-
-    used by:
-    Knights of Valour 1 / (Plus?)
-    Photo Y2k / Real and Fake
-
-ASIC 27A(55857F/55857G):
-    arm7 cpu with 16kb internal rom (different per game / region) + optional external data rom
-    probably used to give extra power to the system, lots of calculations are offloaded to it
-    used by:
-    Knights of Valour Super Heroes / Plus
-    Puzzli II
-    Oriental Legend Special Plus
-    Knights of Valor 2 / 2 Plus
-    DoDonPachi II
-    Martial Masters
-    The Gladiator
-    Demon Front
-    The Killing Blade Plus
-    Spectral VS Generation
-
-    The 55857G variant appears to be protected against reading even from native code.
 
 there are probably more...
 
@@ -213,20 +186,13 @@ Notes:
 */
 
 #define PGMLOGERROR 0
-#define PGMARM7LOGERROR 0
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/arm7/arm7.h"
-#include "sound/ics2115.h"
-#include "cpu/arm7/arm7core.h"
-#include "machine/nvram.h"
 #include "includes/pgm.h"
-#include "machine/v3021.h"
+
 
 UINT16 *pgm_mainram;
-static void IGS022_reset(running_machine& machine);
+
 
 static READ16_HANDLER( pgm_videoram_r )
 {
@@ -257,85 +223,6 @@ static READ16_HANDLER ( z80_ram_r )
 {
 	pgm_state *state = space->machine().driver_data<pgm_state>();
 	return (state->m_z80_mainram[offset * 2] << 8) | state->m_z80_mainram[offset * 2 + 1];
-}
-
-static READ32_HANDLER( arm7_latch_arm_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	device_set_input_line(state->m_prot, ARM7_FIRQ_LINE, CLEAR_LINE ); // guess
-
-	if (PGMARM7LOGERROR)
-		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->m_kov2_latchdata_68k_w, mem_mask, cpu_get_pc(&space->device()));
-	return state->m_kov2_latchdata_68k_w;
-}
-
-static WRITE32_HANDLER( arm7_latch_arm_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	if (PGMARM7LOGERROR)
-		logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, cpu_get_pc(&space->device()));
-
-	COMBINE_DATA(&state->m_kov2_latchdata_arm_w);
-}
-
-static READ32_HANDLER( arm7_shareram_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	if (PGMARM7LOGERROR)
-		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, state->m_arm7_shareram[offset], mem_mask, cpu_get_pc(&space->device()));
-	return state->m_arm7_shareram[offset];
-}
-
-static WRITE32_HANDLER( arm7_shareram_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	if (PGMARM7LOGERROR)
-		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, cpu_get_pc(&space->device()));
-	COMBINE_DATA(&state->m_arm7_shareram[offset]);
-}
-
-static READ16_HANDLER( arm7_latch_68k_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", state->m_kov2_latchdata_arm_w & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
-	return state->m_kov2_latchdata_arm_w;
-}
-
-static WRITE16_HANDLER( arm7_latch_68k_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
-	COMBINE_DATA(&state->m_kov2_latchdata_68k_w);
-
-	device_set_input_line(state->m_prot, ARM7_FIRQ_LINE, ASSERT_LINE ); // guess
-}
-
-static READ16_HANDLER( arm7_ram_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
-
-	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(&space->device()));
-	return share16[BYTE_XOR_LE(offset)];
-}
-
-static WRITE16_HANDLER( arm7_ram_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
-
-	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(&space->device()));
-	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
 
 static WRITE16_HANDLER ( z80_ram_w )
@@ -407,7 +294,7 @@ static WRITE8_HANDLER( z80_l3_w )
 	soundlatch3_w(space, 0, data);
 }
 
-static void sound_irq( device_t *device, int level )
+void pgm_sound_irq( device_t *device, int level )
 {
 	pgm_state *state = device->machine().driver_data<pgm_state>();
 	device_set_input_line(state->m_soundcpu, 0, level);
@@ -418,170 +305,16 @@ static void sound_irq( device_t *device, int level )
     sound_irq
 };*/
 
-/*** Misc Protection Handlers *************************************************************/
-
-/* Kov Superheroes */
-
-static READ32_HANDLER( kovsh_arm7_protlatch_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	space->machine().scheduler().synchronize(); // force resync
-
-	return (state->m_kovsh_highlatch_68k_w << 16) | (state->m_kovsh_lowlatch_68k_w);
-}
-
-static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	space->machine().scheduler().synchronize(); // force resync
-
-	if (ACCESSING_BITS_16_31)
-	{
-		state->m_kovsh_highlatch_arm_w = data >> 16;
-		state->m_kovsh_highlatch_68k_w = 0;
-	}
-	if (ACCESSING_BITS_0_15)
-	{
-		state->m_kovsh_lowlatch_arm_w = data;
-		state->m_kovsh_lowlatch_68k_w = 0;
-	}
-}
-
-static READ16_HANDLER( kovsh_68k_protlatch_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	space->machine().scheduler().synchronize(); // force resync
-
-	switch (offset)
-	{
-		case 1: return state->m_kovsh_highlatch_arm_w;
-		case 0: return state->m_kovsh_lowlatch_arm_w;
-	}
-	return -1;
-}
-
-static WRITE16_HANDLER( kovsh_68k_protlatch_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	space->machine().scheduler().synchronize(); // force resync
-
-	switch (offset)
-	{
-		case 1:
-			state->m_kovsh_highlatch_68k_w = data;
-			break;
-
-		case 0:
-			state->m_kovsh_lowlatch_68k_w = data;
-			break;
-	}
-}
-
-static READ16_HANDLER( kovsh_arm7_ram_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
-
-	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(&space->device()));
-	return share16[BYTE_XOR_LE(offset << 1)];
-}
-
-static WRITE16_HANDLER( kovsh_arm7_ram_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
-
-	if (PGMARM7LOGERROR)
-		logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(&space->device()));
-	COMBINE_DATA(&share16[BYTE_XOR_LE(offset << 1)]);
-}
-
-
-
-
-static READ32_HANDLER( kovsh_arm7_unk_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	return state->m_kovsh_counter++;
-}
-
-static READ32_HANDLER( kovsh_exrom_r )
-{
-	return 0x00000000;
-}
-
-
-//55857G
-
-static WRITE32_HANDLER( svg_arm7_ram_sel_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	state->m_svg_ram_sel = data & 1;
-}
-
-static READ32_HANDLER( svg_arm7_shareram_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	return state->m_svg_shareram[state->m_svg_ram_sel & 1][offset];
-}
-
-static WRITE32_HANDLER( svg_arm7_shareram_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	COMBINE_DATA(&state->m_svg_shareram[state->m_svg_ram_sel & 1][offset]);
-}
-
-static READ16_HANDLER( svg_m68k_ram_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	int ram_sel = (state->m_svg_ram_sel & 1) ^ 1;
-	UINT16 *share16 = (UINT16 *)(state->m_svg_shareram[ram_sel & 1]);
-
-	return share16[BYTE_XOR_LE(offset)];
-}
-
-static WRITE16_HANDLER( svg_m68k_ram_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	int ram_sel = (state->m_svg_ram_sel & 1) ^ 1;
-	UINT16 *share16 = (UINT16 *)(state->m_svg_shareram[ram_sel & 1]);
-
-	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
-}
-
-static READ16_HANDLER( svg_68k_nmi_r )
-{
-	return 0;
-}
-
-static WRITE16_HANDLER( svg_68k_nmi_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	generic_pulse_irq_line(state->m_prot, ARM7_FIRQ_LINE, 1);
-}
-
-static WRITE16_HANDLER( svg_latch_68k_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
-	COMBINE_DATA(&state->m_kov2_latchdata_68k_w);
-}
 
 /*** Memory Maps *************************************************************/
 
 /*** Z80 (sound CPU)**********************************************************/
 
-static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( pgm_z80_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(pgm_state, m_z80_mainram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8 )
+ADDRESS_MAP_START( pgm_z80_io, AS_IO, 8 )
 	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("ics", ics2115_device::read, ics2115_device::write)
 	AM_RANGE(0x8100, 0x81ff) AM_READWRITE(soundlatch3_r, z80_l3_w)
 	AM_RANGE(0x8200, 0x82ff) AM_READWRITE(soundlatch_r, soundlatch_w)
@@ -590,7 +323,7 @@ ADDRESS_MAP_END
 
 /*** 68000 (main CPU) + variants for protection devices **********************/
 
-static ADDRESS_MAP_START( pgm_base_mem, AS_PROGRAM, 16)
+ADDRESS_MAP_START( pgm_base_mem, AS_PROGRAM, 16)
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
@@ -614,108 +347,24 @@ static ADDRESS_MAP_START( pgm_base_mem, AS_PROGRAM, 16)
 	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pgm_mem, AS_PROGRAM, 16)
+ADDRESS_MAP_START( pgm_mem, AS_PROGRAM, 16)
 	AM_IMPORT_FROM(pgm_base_mem)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM   /* BIOS ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pgm_basic_mem, AS_PROGRAM, 16)
+ADDRESS_MAP_START( pgm_basic_mem, AS_PROGRAM, 16)
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( killbld_mem, AS_PROGRAM, 16)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x2fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_MEMBER(pgm_state, m_sharedprotram) // Shared with protection device
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( olds_mem, AS_PROGRAM, 16)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE_MEMBER(pgm_state, m_sharedprotram) // Shared with protection device
-ADDRESS_MAP_END
-
-/* 55857E? */
-/* Knights of Valor, Photo Y2k */
-/*  no execute only space? */
-static ADDRESS_MAP_START( kov_map, AS_PROGRAM, 16)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x4f0000, 0x4f003f) AM_READWRITE(kovsh_arm7_ram_r, kovsh_arm7_ram_w) /* ARM7 Shared RAM */
-	AM_RANGE(0x500000, 0x500005) AM_READWRITE(kovsh_68k_protlatch_r, kovsh_68k_protlatch_w) /* ARM7 Latch */
-ADDRESS_MAP_END
-
-/* 55857F? */
-/* Knights of Valor 2, Martial Masters, DoDonpachi 2 */
-/*  no execute only space? */
-static ADDRESS_MAP_START( kov2_mem, AS_PROGRAM, 16)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x5fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0xd00000, 0xd0ffff) AM_READWRITE(arm7_ram_r, arm7_ram_w) /* ARM7 Shared RAM */
-	AM_RANGE(0xd10000, 0xd10001) AM_READWRITE(arm7_latch_68k_r, arm7_latch_68k_w) /* ARM7 Latch */
-ADDRESS_MAP_END
-
-/* 55857G? */
-/* Demon Front, The Gladiator, Happy 6-in-1, Spectral Vs. Generation, Killing Blade EX */
-/*  the ones with an EXECUTE ONLY region of ARM space? */
-static ADDRESS_MAP_START( svg_68k_mem, AS_PROGRAM, 16)
-	AM_IMPORT_FROM(pgm_mem)
-	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")  /* Game ROM */
-
-	AM_RANGE(0x500000, 0x51ffff) AM_READWRITE(svg_m68k_ram_r, svg_m68k_ram_w)    /* ARM7 Shared RAM */
-	AM_RANGE(0x5c0000, 0x5c0001) AM_READWRITE(svg_68k_nmi_r, svg_68k_nmi_w)      /* ARM7 FIQ */
-	AM_RANGE(0x5c0300, 0x5c0301) AM_READWRITE(arm7_latch_68k_r, svg_latch_68k_w) /* ARM7 Latch */
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( cavepgm_mem, AS_PROGRAM, 16)
-	AM_IMPORT_FROM(pgm_base_mem)
-	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	/* protection devices installed (simulated) later */
-ADDRESS_MAP_END
-
-/*** ARM7 (protection CPUs) **************************************************/
-
-static ADDRESS_MAP_START( 55857E_arm7_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-	AM_RANGE(0x08100000, 0x083fffff) AM_READ(kovsh_exrom_r) // unpopulated, returns 0 to keep checksum happy
-	AM_RANGE(0x10000000, 0x100003ff) AM_RAM // internal ram for asic
-	AM_RANGE(0x40000000, 0x40000003) AM_READWRITE(kovsh_arm7_protlatch_r, kovsh_arm7_protlatch_w)
-	AM_RANGE(0x40000008, 0x4000000b) AM_WRITENOP // ?
-	AM_RANGE(0x4000000c, 0x4000000f) AM_READ(kovsh_arm7_unk_r)
-	AM_RANGE(0x50800000, 0x5080003f) AM_READWRITE(arm7_shareram_r, arm7_shareram_w) AM_BASE_MEMBER(pgm_state, m_arm7_shareram)
-	AM_RANGE(0x50000000, 0x500003ff) AM_RAM // uploads xor table to decrypt 68k rom here
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( 55857F_arm7_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-	AM_RANGE(0x08000000, 0x083fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
-	AM_RANGE(0x18000000, 0x1800ffff) AM_RAM AM_BASE_MEMBER(pgm_state, m_arm_ram)
-	AM_RANGE(0x38000000, 0x38000003) AM_READWRITE(arm7_latch_arm_r, arm7_latch_arm_w) /* 68k Latch */
-	AM_RANGE(0x48000000, 0x4800ffff) AM_READWRITE(arm7_shareram_r, arm7_shareram_w) AM_BASE_MEMBER(pgm_state, m_arm7_shareram)
-	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
-	AM_RANGE(0x18000000, 0x1803ffff) AM_RAM AM_BASE_MEMBER(pgm_state, m_arm_ram)
-	AM_RANGE(0x38000000, 0x3801ffff) AM_READWRITE(svg_arm7_shareram_r, svg_arm7_shareram_w)
-	AM_RANGE(0x48000000, 0x48000003) AM_READWRITE(arm7_latch_arm_r, arm7_latch_arm_w) /* 68k Latch */
-	AM_RANGE(0x40000018, 0x4000001b) AM_WRITE(svg_arm7_ram_sel_w) /* RAM SEL */
-	AM_RANGE(0x50000000, 0x500003ff) AM_RAM
-ADDRESS_MAP_END
 
 
 /*** Input Ports *************************************************************/
 
 /* enough for 4 players, the basic dips mapped are listed in the test mode */
 
-static INPUT_PORTS_START( pgm )
+INPUT_PORTS_START( pgm )
 	PORT_START("P1P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
@@ -800,143 +449,9 @@ static INPUT_PORTS_START( pgm )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( orlegend )
-	PORT_INCLUDE ( pgm )
-
-	PORT_MODIFY("Region")
-	PORT_DIPNAME( 0x0003, 0x0000, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, DEF_STR( World ) )
-    PORT_CONFSETTING(      0x0001, "World (duplicate)" ) // again?
-	PORT_CONFSETTING(      0x0002, DEF_STR( Korea ) )
-	PORT_CONFSETTING(      0x0003, DEF_STR( China ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( orld105k )
-	PORT_INCLUDE ( pgm )
-
-	PORT_MODIFY("Region")
-	PORT_DIPNAME( 0x0003, 0x0002, DEF_STR( Unused ) )	// region switch
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )		// if enabled, game gives
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )		// "incorrect version" error
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( sango )
-	PORT_INCLUDE ( pgm )
-
-	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_CONFNAME( 0x000f, 0x0005, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
-	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
-	PORT_CONFSETTING(      0x0002, "Japan (Alta license)" )
-	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
-	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
-	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( sango_ch )
-	PORT_INCLUDE ( pgm )
-
-	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_CONFNAME( 0x000f, 0x0000, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
-	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
-	PORT_CONFSETTING(      0x0002, "Japan (Alta license)" )
-	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
-	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
-	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( dw3 )
-	PORT_INCLUDE ( pgm )
-
-	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_CONFNAME( 0x000f, 0x0006, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, "0" )
-	PORT_CONFSETTING(      0x0001, "1" )
-	PORT_CONFSETTING(      0x0002, "2" )
-	PORT_CONFSETTING(      0x0003, "3" )
-	PORT_CONFSETTING(      0x0004, "4" )
-	PORT_CONFSETTING(      0x0005, "5" )
-	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
-	PORT_CONFSETTING(      0x0007, "7" )
-
-INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( olds )
-	PORT_INCLUDE ( pgm )
 
-	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_CONFNAME( 0x000f, 0x0006, DEF_STR( Region ) )
-	/* includes the following regions:
-    1 = taiwan, 2 = china, 3 = japan (title = orlegend special),
-    4 = korea, 5 = hong kong, 6 = world */
-	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
-	PORT_CONFSETTING(      0x0002, DEF_STR( China ) )
-	PORT_CONFSETTING(      0x0003, DEF_STR( Japan ) )
-	PORT_CONFSETTING(      0x0004, DEF_STR( Korea ) )
-	PORT_CONFSETTING(      0x0005, DEF_STR( Hong_Kong ) )
-	PORT_CONFSETTING(      0x0006, DEF_STR( World ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( killbld )
-	PORT_INCLUDE ( pgm )
-
-	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_DIPNAME( 0x00ff, 0x0021, "Region (not currently working)" ) // different regions supply different protection code sequences, we only have the China one ATM
-	PORT_DIPSETTING(      0x0016, DEF_STR( Taiwan ) )
-	PORT_DIPSETTING(      0x0017, DEF_STR( China ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(      0x0019, DEF_STR( Japan ) )
-//  PORT_DIPSETTING(      0x001a, "1a" ) // invalid
-//  PORT_DIPSETTING(      0x001b, "1b" ) // invalid
-//  PORT_DIPSETTING(      0x001c, "1c" ) // invalid
-//  PORT_DIPSETTING(      0x001d, "1d" ) // invalid
-//  PORT_DIPSETTING(      0x001e, "1e" ) // invalid
-//  PORT_DIPSETTING(      0x001f, "1f" ) // invalid
-	PORT_DIPSETTING(      0x0020, DEF_STR( Korea ) )
-	PORT_DIPSETTING(      0x0021, DEF_STR( World ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( photoy2k )
-	PORT_INCLUDE ( pgm )
-
-	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_CONFNAME( 0x000f, 0x0003, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, DEF_STR( Taiwan ) )
-	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )
-	PORT_CONFSETTING(      0x0002, "Japan (Alta license)" )
-	PORT_CONFSETTING(      0x0003, DEF_STR( World ) )
-	PORT_CONFSETTING(      0x0004, DEF_STR( Korea ) )
-	PORT_CONFSETTING(      0x0005, DEF_STR( Hong_Kong ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( ddp2 )
-	PORT_INCLUDE ( pgm )
-
-	PORT_START("RegionHack")	/* Region - actually supplied by protection device */
-	PORT_CONFNAME( 0x00ff, 0x00ff, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0000, DEF_STR( China ) )
-	PORT_CONFSETTING(      0x0001, DEF_STR( Taiwan ) )
-	PORT_CONFSETTING(      0x0002, "Japan (Cave license)" )
-	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
-	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
-	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
-	PORT_CONFSETTING(      0x00ff, "Untouched" ) // don't hack the region
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( oldsplus )
-	PORT_INCLUDE ( pgm )
-
-	PORT_MODIFY("Region")	/* Region - supplied by protection device */
-	PORT_CONFNAME( 0x000f, 0x0001, DEF_STR( Region ) )
-	PORT_CONFSETTING(      0x0001, DEF_STR( China ) )
-	PORT_CONFSETTING(      0x0002, DEF_STR( Japan ) )
-	PORT_CONFSETTING(      0x0003, DEF_STR( Korea ) )
-	PORT_CONFSETTING(      0x0004, DEF_STR( Hong_Kong ) )
-	PORT_CONFSETTING(      0x0005, DEF_STR( World ) )
-	PORT_CONFSETTING(      0x0006, DEF_STR( Taiwan ) )
-INPUT_PORTS_END
 
 
 /*** GFX Decodes *************************************************************/
@@ -972,7 +487,7 @@ static const gfx_layout pgm32_charlayout =
 	 32*256
 };
 
-static GFXDECODE_START( pgm )
+GFXDECODE_START( pgm )
 	GFXDECODE_ENTRY( "tiles", 0, pgm8_charlayout,    0x800, 32  ) /* 8x8x4 Tiles */
 	// we have to unpack the data before we can decode it as 32x32, hence we don't know how many tiles etc. in advance, see INIT
 	//GFXDECODE_ENTRY( "gfx2", 0, pgm32_charlayout,   0x400, 32  ) /* 32x32x5 Tiles */
@@ -980,9 +495,9 @@ GFXDECODE_END
 
 /*** Machine Driver **********************************************************/
 
-/* only dragon world 2 NEEDs irq4, Puzzli 2 explicitly doesn't want it, what
-   is the source? maybe the protection device? */
-static TIMER_DEVICE_CALLBACK( drgw_interrupt )
+/* most games require IRQ4 for inputs to work, Puzzli 2 is explicit about not wanting it tho
+   what is the source? */
+TIMER_DEVICE_CALLBACK( pgm_interrupt )
 {
 	pgm_state *state = timer.machine().driver_data<pgm_state>();
 	int scanline = param;
@@ -994,7 +509,7 @@ static TIMER_DEVICE_CALLBACK( drgw_interrupt )
 		if (!state->m_irq4_disabled) device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
-static MACHINE_START( pgm )
+MACHINE_START( pgm )
 {
 	pgm_state *state = machine.driver_data<pgm_state>();
 
@@ -1004,40 +519,24 @@ static MACHINE_START( pgm )
 	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
 	state->m_prot = machine.device<cpu_device>("prot");
 	state->m_ics = machine.device("ics");
-
-//  state->save_item(NAME(state->m_cal_val));
-//  state->save_item(NAME(state->m_cal_mask));
-//  state->save_item(NAME(state->m_cal_com));
-//  state->save_item(NAME(state->m_cal_cnt));
 }
 
-static MACHINE_RESET( pgm )
+MACHINE_RESET( pgm )
 {
-//  pgm_state *state = machine.driver_data<pgm_state>();
-
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
-
-//  state->m_cal_val = 0;
-//  state->m_cal_mask = 0;
-//  state->m_cal_com = 0;
-//  state->m_cal_cnt = 0;
 }
 
-static MACHINE_RESET( killbld );
-static MACHINE_RESET( dw3 );
-static MACHINE_RESET( olds );
-extern MACHINE_RESET( kov );
 
 MACHINE_CONFIG_FRAGMENT( pgmbase )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
 	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", drgw_interrupt, "screen", 0, 1)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", pgm_interrupt, "screen", 0, 1)
 
 	MCFG_CPU_ADD("soundcpu", Z80, 33868800/4)
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_CPU_PROGRAM_MAP(pgm_z80_mem)
+	MCFG_CPU_IO_MAP(pgm_z80_io)
 
 	MCFG_MACHINE_START( pgm )
 	MCFG_MACHINE_RESET( pgm )
@@ -1061,192 +560,22 @@ MACHINE_CONFIG_FRAGMENT( pgmbase )
 
 	/*sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-    MCFG_ICS2115_ADD("ics", 0, sound_irq)
+    MCFG_ICS2115_ADD("ics", 0, pgm_sound_irq)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pgm, pgm_state )
+MACHINE_CONFIG_START( pgm, pgm_state )
 	MCFG_FRAGMENT_ADD(pgmbase)
 MACHINE_CONFIG_END
 
 
 
 
-static MACHINE_CONFIG_DERIVED( killbld, pgm )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(killbld_mem)
-
-	MCFG_MACHINE_RESET(killbld)
-MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( dw3, pgm )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(killbld_mem)
-
-	MCFG_MACHINE_RESET(dw3)
-MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( olds, pgm )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(olds_mem)
 
-	MCFG_MACHINE_RESET(olds)
-MACHINE_CONFIG_END
-
-/******* ARM 55857E *******/
-
-static MACHINE_CONFIG_DERIVED( kov, pgm )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kov_map)
-
-	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857E?
-	MCFG_CPU_PROGRAM_MAP(55857E_arm7_map)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( kov_disabled_arm, pgm ) // for simulated cases
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
-
-	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857E?
-	MCFG_CPU_PROGRAM_MAP(55857E_arm7_map)
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( kov_simulated_arm, kov_disabled_arm ) // for simulated cases
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kov_map)
-
-	MCFG_MACHINE_RESET(kov)
-MACHINE_CONFIG_END
-
-/******* ARM 55857F *******/
-
-static MACHINE_CONFIG_DERIVED( kov2, pgm )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kov2_mem)
-
-	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857F
-	MCFG_CPU_PROGRAM_MAP(55857F_arm7_map)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( kov2_disabled_arm, pgm ) // for simulated cases
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
-
-	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857F
-	MCFG_CPU_PROGRAM_MAP(55857F_arm7_map)
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
-
-/******* ARM 55857G *******/
-
-static MACHINE_CONFIG_DERIVED( svg, pgm )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(svg_68k_mem)
-
-	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 33333333)	// 55857G
-	MCFG_CPU_PROGRAM_MAP(55857G_arm7_map)
-
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( svg_disabled_arm, pgm ) // for simulated cases
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
-
-	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 33333333)	// 55857G
-	MCFG_CPU_PROGRAM_MAP(55857G_arm7_map)
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
-
-class cavepgm_state : public pgm_state
-{
-public:
-	cavepgm_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pgm_state(mconfig, type, tag) {
-
-		m_ddp3internal_slot = 0;
-	}
-
-	UINT16 m_value0;
-	UINT16 m_value1;
-	UINT16 m_valuekey;
-	UINT16 m_ddp3lastcommand;
-	UINT32 m_valueresponse;
-	int m_ddp3internal_slot;
-	UINT32 m_ddp3slots[0x100];
-	INT16 m_ddp3thrust;
-};
-
-static MACHINE_START( cavepgm )
-{
-	MACHINE_START_CALL(pgm);
-
-	cavepgm_state *state = machine.driver_data<cavepgm_state>();
-
-	state->save_item(NAME(state->m_value0));
-	state->save_item(NAME(state->m_value1));
-	state->save_item(NAME(state->m_valuekey));
-	state->save_item(NAME(state->m_valueresponse));
-	state->save_item(NAME(state->m_ddp3internal_slot));
-	state->save_item(NAME(state->m_ddp3slots));
-}
-
-static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20000000)
-	MCFG_CPU_PROGRAM_MAP(cavepgm_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", drgw_interrupt, "screen", 0, 1)
-
-	MCFG_CPU_ADD("soundcpu", Z80, 33868800/4)
-	MCFG_CPU_PROGRAM_MAP(z80_mem)
-	MCFG_CPU_IO_MAP(z80_io)
-
-	MCFG_MACHINE_START( cavepgm )
-	MCFG_MACHINE_RESET( pgm )
-	MCFG_NVRAM_ADD_0FILL("sram")
-
-	MCFG_V3021_ADD("rtc")
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(pgm)
-	MCFG_SCREEN_VBLANK_STATIC(pgm)
-
-	MCFG_GFXDECODE(pgm)
-	MCFG_PALETTE_LENGTH(0x1200/2)
-
-	MCFG_VIDEO_START(pgm)
-
-	/*sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-    MCFG_ICS2115_ADD("ics", 0, sound_irq)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-MACHINE_CONFIG_END
-
-// for now we're using a protection sim close ot the CavePgm one, so use that state.
-static MACHINE_CONFIG_DERIVED( puzzli2_disabled_arm, cavepgm )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(pgm_basic_mem)
-
-	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857F?
-	MCFG_CPU_PROGRAM_MAP(55857F_arm7_map)
-	MCFG_DEVICE_DISABLE()
-MACHINE_CONFIG_END
 
 
 /*** Rom Loading *************************************************************/
@@ -3197,7 +2526,7 @@ ROM_START( ddp2 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp2_igs027a_japan.bin", 0x000000, 0x04000, CRC(742d34d2) SHA1(4491c08f3cefef2933ad5a741f4bb05cc2f3e1a0) )
 
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3224,7 +2553,7 @@ ROM_START( ddp2101 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp2_igs027a_japan.bin", 0x000000, 0x04000, CRC(742d34d2) SHA1(4491c08f3cefef2933ad5a741f4bb05cc2f3e1a0) )
 
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3251,7 +2580,7 @@ ROM_START( ddp2100 )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp2_igs027a_japan.bin", 0x000000, 0x04000, CRC(742d34d2) SHA1(4491c08f3cefef2933ad5a741f4bb05cc2f3e1a0) )
 
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data) */
 	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
@@ -3380,9 +2709,6 @@ ROM_START( puzzli2 )
 
 	ROM_REGION( 0x4000, "prot", ROMREGION_ERASEFF ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "puzzli2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
-
-	ROM_REGION32_LE( 0x4000000, "user1", ROMREGION_ERASEFF )
-	/* not on this PCB */
 
 	ROM_REGION( 0x600000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -3620,7 +2946,7 @@ ROM_START( dmnfrnt )
 	/* one of these is probably a bad dump, it should be obvious once progress is made because the external rom is checksummed by the internal one */
 	ROM_LOAD( "v105_32m.u26",     0x000000, 0x400000,  CRC(d200ee63) SHA1(3128c27c5f5a4361d31e7b4bb006de631b3a228c) )
 	ROM_LOAD( "chinese-v105.u62", 0x000000, 0x400000,  CRC(c798c2ef) SHA1(91e364c33b935293fa765ca521cdb67ac45ec70f) )
-
+	
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
 	ROM_LOAD( "t04501.u29",    0x180000, 0x800000, CRC(900eaaac) SHA1(4033cb7b28fcadb92d5af3ea7fdd1c22747618fd) )
@@ -3670,7 +2996,7 @@ ROM_END
 
 ROM_START( dmnfrntpcb )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_WORD_SWAP( "demonfrontpcb_bios.42",    0x000000, 0x020000, NO_DUMP ) // missing
+	ROM_LOAD16_WORD_SWAP( "pgm_p02s.u42",    0x00000, 0x020000, CRC(78c15fa2) SHA1(885a6558e022602cc6f482ac9667ba9f61e75092) ) /* IGS PGM P02S 1A3708A1A0 S002838  (uses standard PGM v2 bios) */
 	ROM_LOAD16_WORD_SWAP( "demonfront_v107-u43.bin",    0x100000, 0x200000,  CRC(671d8a31) SHA1(a0c2af67d7c56b4b355883892a47640fc72408a1) )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
@@ -3976,9 +3302,6 @@ ROM_START( ket )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
-	/* no external protection rom */
-
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
@@ -4005,9 +3328,6 @@ ROM_START( keta )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
-
-	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
-	/* no external protection rom */
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
@@ -4036,9 +3356,6 @@ ROM_START( ketb )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
-	/* no external protection rom */
-
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "t04701w064.u19",   0x180000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) ) //text-1
@@ -4066,9 +3383,6 @@ ROM_START( espgal )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "espgal_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
-	/* no external protection rom */
-
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "t01s.u18", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "t04801w064.u19",   0x180000, 0x800000, CRC(6021c79e) SHA1(fbc340dafb18aa3094de29b881318a5a9794e4bc) ) //text-1
@@ -4092,9 +3406,6 @@ ROM_START( ddpdoj )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
-
-	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
-	/* no external protection rom */
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
@@ -4124,9 +3435,6 @@ ROM_START( ddpdoja )
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
-	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
-	/* no external protection rom */
-
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "t04401w064.u19",0x180000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) ) //text-1
@@ -4153,9 +3461,6 @@ ROM_START( ddpdojb )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
-
-	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
-	/* no external protection rom */
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
@@ -4184,9 +3489,6 @@ ROM_START( ddpdojblk )
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
-
-	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
-	/* no external protection rom */
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
@@ -4286,7 +3588,7 @@ static void expand_colourdata( running_machine &machine )
 
 
 
-static void pgm_basic_init( running_machine &machine, bool set_bank = true )
+void pgm_basic_init( running_machine &machine, bool set_bank)
 {
 	pgm_state *state = machine.driver_data<pgm_state>();
 
@@ -4306,1553 +3608,11 @@ static DRIVER_INIT( pgm )
 	pgm_basic_init(machine);
 }
 
-/* Oriental Legend INIT */
 
-static DRIVER_INIT( orlegend )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-	pgm_basic_init(machine);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xC0400e, 0xC0400f, FUNC(pgm_asic3_r), FUNC(pgm_asic3_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xC04000, 0xC04001, FUNC(pgm_asic3_reg_w));
 
-	state->m_asic3_reg = 0;
-	state->m_asic3_latch[0] = 0;
-	state->m_asic3_latch[1] = 0;
-	state->m_asic3_latch[2] = 0;
-	state->m_asic3_x = 0;
-	state->m_asic3_y = 0;
-	state->m_asic3_z = 0;
-	state->m_asic3_h1 = 0;
-	state->m_asic3_h2 = 0;
-	state->m_asic3_hold = 0;
 
-	state->save_item(NAME(state->m_asic3_reg));
-	state->save_item(NAME(state->m_asic3_latch));
-	state->save_item(NAME(state->m_asic3_x));
-	state->save_item(NAME(state->m_asic3_y));
-	state->save_item(NAME(state->m_asic3_z));
-	state->save_item(NAME(state->m_asic3_h1));
-	state->save_item(NAME(state->m_asic3_h2));
-	state->save_item(NAME(state->m_asic3_hold));
-}
 
-static void drgwld2_common_init(running_machine &machine)
-{
-	pgm_basic_init(machine);
-	pgm_dw2_decrypt(machine);
-	/*
-    Info from Elsemi
-    Here is how to "bypass" the dw2 hang protection, it fixes the mode
-    select and after failing in the 2nd stage (probably there are other checks
-    out there).
-    */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd80000, 0xd80003, FUNC(dw2_d80000_r));
-}
-
-static DRIVER_INIT( drgw2 )
-{	/* incomplete? */
-	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
-	drgwld2_common_init(machine);
-	/* These ROM patches are not hacks, the protection device
-       overlays the normal ROM code, this has been confirmed on a real PCB
-       although some addresses may be missing */
-	mem16[0x131098 / 2] = 0x4e93;
-	mem16[0x13113e / 2] = 0x4e93;
-	mem16[0x1311ce / 2] = 0x4e93;
-}
-
-static DRIVER_INIT( dw2v100x )
-{
-	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
-	drgwld2_common_init(machine);
-
-	mem16[0x131084 / 2] = 0x4e93;
-	mem16[(0x131084+0xa6) / 2] = 0x4e93;
-	mem16[(0x131084+0x136) / 2] = 0x4e93;
-}
-
-static DRIVER_INIT( drgw2c )
-{
-	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
-	drgwld2_common_init(machine);
-	/* These ROM patches are not hacks, the protection device
-       overlays the normal ROM code, this has been confirmed on a real PCB
-       although some addresses may be missing */
-	mem16[0x1303bc / 2] = 0x4e93;
-	mem16[0x130462 / 2] = 0x4e93;
-	mem16[0x1304f2 / 2] = 0x4e93;
-}
-
-static DRIVER_INIT( drgw2j )
-{
-	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
-	drgwld2_common_init(machine);
-	/* These ROM patches are not hacks, the protection device
-       overlays the normal ROM code, this has been confirmed on a real PCB
-       although some addresses may be missing */
-	mem16[0x1302c0 / 2] = 0x4e93;
-	mem16[0x130366 / 2] = 0x4e93;
-	mem16[0x1303f6 / 2] = 0x4e93;
-}
-
-static void kovsh_latch_init( running_machine &machine )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-
-	state->m_kovsh_highlatch_arm_w = 0;
-	state->m_kovsh_lowlatch_arm_w = 0;
-	state->m_kovsh_highlatch_68k_w = 0;
-	state->m_kovsh_lowlatch_68k_w = 0;
-	state->m_kovsh_counter = 1;
-
-	state->save_item(NAME(state->m_kovsh_highlatch_arm_w));
-	state->save_item(NAME(state->m_kovsh_lowlatch_arm_w));
-	state->save_item(NAME(state->m_kovsh_highlatch_68k_w));
-	state->save_item(NAME(state->m_kovsh_lowlatch_68k_w));
-	state->save_item(NAME(state->m_kovsh_counter));
-}
-
-static DRIVER_INIT( kov )
-{
-	pgm_basic_init(machine);
-	pgm_kov_decrypt(machine);
-	kovsh_latch_init(machine);
-	install_protection_asic_sim_kov(machine);
-}
-
-static DRIVER_INIT( kovboot )
-{
-	pgm_basic_init(machine);
-//  pgm_kov_decrypt(machine);
-	kovsh_latch_init(machine);
-	install_protection_asic_sim_kov(machine);
-}
-
-static DRIVER_INIT( pstar )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-
-	pgm_basic_init(machine);
-	pgm_pstar_decrypt(machine);
-	kovsh_latch_init(machine);
-
-	state->m_pstars_key = 0;
-	state->m_pstars_int[0] = 0;
-	state->m_pstars_int[1] = 0;
-	state->m_pstars_val = 0;
-	state->m_pstar_e7 = 0;
-	state->m_pstar_b1 = 0;
-	state->m_pstar_ce = 0;
-	state->m_pstar_ram[0] = 0;
-	state->m_pstar_ram[1] = 0;
-	state->m_pstar_ram[2] = 0;
-	memset(state->m_pstars_regs, 0, 16);
-
-	state->save_item(NAME(state->m_pstars_key));
-	state->save_item(NAME(state->m_pstars_int));
-	state->save_item(NAME(state->m_pstars_regs));
-	state->save_item(NAME(state->m_pstars_val));
-	state->save_item(NAME(state->m_pstar_e7));
-	state->save_item(NAME(state->m_pstar_b1));
-	state->save_item(NAME(state->m_pstar_ce));
-	state->save_item(NAME(state->m_pstar_ram));
-
-}
-
-static DRIVER_INIT( photoy2k )
-{
-	pgm_basic_init(machine);
-	pgm_photoy2k_decrypt(machine);
-	kovsh_latch_init(machine);
-}
-
-static DRIVER_INIT( py2k2 )
-{
-	pgm_basic_init(machine);
-	pgm_py2k2_decrypt(machine);
-	kovsh_latch_init(machine);
-}
-
-
-static DRIVER_INIT( kovsh )
-{
-	pgm_basic_init(machine);
-	pgm_kovsh_decrypt(machine);
-	kovsh_latch_init(machine);
-}
-
-static DRIVER_INIT( kovshp )
-{
-	pgm_basic_init(machine);
-	pgm_kovshp_decrypt(machine);
-	kovsh_latch_init(machine);
-}
-
-
-static void kov2_latch_init( running_machine &machine )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-
-	state->m_kov2_latchdata_68k_w = 0;
-	state->m_kov2_latchdata_arm_w = 0;
-
-	state->save_item(NAME(state->m_kov2_latchdata_68k_w));
-	state->save_item(NAME(state->m_kov2_latchdata_arm_w));
-}
-
-static DRIVER_INIT( kov2 )
-{
-	pgm_basic_init(machine);
-	pgm_kov2_decrypt(machine);
-	kov2_latch_init(machine);
-}
-
-
-static DRIVER_INIT( martmast )
-{
-	pgm_basic_init(machine);
-	pgm_mm_decrypt(machine);
-	kov2_latch_init(machine);
-}
-
-
-static WRITE32_HANDLER( ddp2_arm_region_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	int pc = cpu_get_pc(&space->device());
-	int regionhack = input_port_read(space->machine(), "RegionHack");
-	if (pc==0x0174 && regionhack != 0xff) data = (data & 0x0000ffff) | (regionhack << 16);
-	COMBINE_DATA(&state->m_arm7_shareram[0x0]);
-}
-
-static READ32_HANDLER( ddp2_speedup_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	int pc = cpu_get_pc(&space->device());
-	UINT32 data = state->m_arm_ram[0x300c/4];
-
-	if (pc==0x080109b4)
-	{
-		/* if we've hit the loop where this is read and both values are 0 then the only way out is an interrupt */
-		int r4 = (cpu_get_reg(&space->device(), ARM7_R4));
-		r4 += 0xe;
-		
-		if (r4==0x18002f9e)
-		{
-			UINT32 data2 =  state->m_arm_ram[0x2F9C/4]&0xffff0000;
-			if ((data==0x00000000) && (data2==0x00000000)) device_spin_until_interrupt(&space->device());
-		}
-	}
-
-	return data;
-}
-
-
-
-static DRIVER_INIT( ddp2 )
-{
-	pgm_basic_init(machine);
-	pgm_ddp2_decrypt(machine);
-	kov2_latch_init(machine);
-
-	// we only have a Japan internal ROM dumped for now, allow us to override that for debugging purposes.
-	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x48000000, 0x48000003, FUNC(ddp2_arm_region_w));
-
-	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x1800300c, 0x1800300f, FUNC(ddp2_speedup_r));
-
-
-}
-
-static void svg_basic_init(running_machine &machine)
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-
-	pgm_basic_init(machine);
-	state->m_svg_shareram[0] = auto_alloc_array(machine, UINT32, 0x10000 / 4);
-	state->m_svg_shareram[1] = auto_alloc_array(machine, UINT32, 0x10000 / 4);
-	state->m_svg_ram_sel = 0;
-
-	state->save_pointer(NAME(state->m_svg_shareram[0]), 0x10000 / 4);
-	state->save_pointer(NAME(state->m_svg_shareram[1]), 0x10000 / 4);
-	state->save_item(NAME(state->m_svg_ram_sel));
-}
-
-static DRIVER_INIT( theglad )
-{
-	svg_basic_init(machine);
-	pgm_theglad_decrypt(machine);
-	kov2_latch_init(machine);
-}
-
-static DRIVER_INIT( svg )
-{
-	svg_basic_init(machine);
-	pgm_svg_decrypt(machine);
-	kov2_latch_init(machine);
-}
-
-static DRIVER_INIT( svgpcb )
-{
-	svg_basic_init(machine);
-	pgm_svgpcb_decrypt(machine);
-	kov2_latch_init(machine);
-}
-
-static DRIVER_INIT( killbldp )
-{
-	svg_basic_init(machine);
-	pgm_killbldp_decrypt(machine);
-	kov2_latch_init(machine);
-}
-
-static READ32_HANDLER( dmnfrnt_speedup_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	int pc = cpu_get_pc(&space->device());
-	if (pc == 0x8000fea) device_eat_cycles(&space->device(), 500);
-//	else printf("dmn_speedup_r %08x\n", pc);
-	return state->m_arm_ram[0x000444/4];
-}
-
-
-static DRIVER_INIT( dmnfrnt )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-
-	svg_basic_init(machine);
-	pgm_dfront_decrypt(machine);
-	kov2_latch_init(machine);
-
-	/* put some fake code for the ARM here ... */
-	UINT16 *temp16 = (UINT16 *)machine.region("prot")->base();
-	temp16[(0x0000)/2] = 0xd088;
-	temp16[(0x0002)/2] = 0xe59f;
-	temp16[(0x0004)/2] = 0x0680;
-	temp16[(0x0006)/2] = 0xe3a0;
-	temp16[(0x0008)/2] = 0xff10;
-	temp16[(0x000a)/2] = 0xe12f;
-	temp16[(0x0090)/2] = 0x0400;
-	temp16[(0x0092)/2] = 0x1000;
-
-	machine.device("prot")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x18000444, 0x18000447, FUNC(dmnfrnt_speedup_r));
-
-	// the internal rom probably also supplies the region here
-	UINT16 *share16 = (UINT16 *)(state->m_svg_shareram[0]);
-	share16[0x158/2] = 0x0005;
-
-
-}
-
-
-/* The IGS022 is an MCU which performs encrypted DMA used by
- - The Killing Blade
- - Dragon World 3
-
- There is also an automatic transfer which happens on startup using params stored in the data ROM.
- This has been verified on real hardware running without any 68k game program.
-
-*/
-
-
-static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT16 size, UINT16 mode)
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-	UINT16 param;
-	/*
-    P_SRC =0x300290 (offset from prot rom base)
-    P_DST =0x300292 (words from 0x300000)
-    P_SIZE=0x300294 (words)
-    P_MODE=0x300296
-
-    Mode 5 direct
-    Mode 6 swap nibbles and bytes
-
-    1,2,3 table based ops
-    */
-
-	//mame_printf_debug("src %04x dst %04x size %04x mode %04x\n", src, dst, size, mode);
-
-	//if (src&1) mame_printf_debug("odd offset\n");
-
-	param = mode >> 8;
-	mode &=0xf;  // what are the other bits?
-
-
-	if ((mode == 0) || (mode == 1) || (mode == 2) || (mode == 3))
-	{
-		/* mode3 applies a xor from a 0x100 byte table to the data being
-           transferred
-
-           the table is stored at the start of the protection rom.
-
-           the param used with the mode gives a start offset into the table
-
-           odd offsets seem to change the table slightly (see rawDataOdd)
-
-       */
-
-		/*
-        unsigned char rawDataOdd[256] = {
-            0xB6, 0xA8, 0xB1, 0x5D, 0x2C, 0x5D, 0x4F, 0xC1,
-            0xCF, 0x39, 0x3A, 0xB7, 0x65, 0x85, 0xD9, 0xEE,
-            0xDB, 0x7B, 0x5F, 0x81, 0x03, 0x6D, 0xEB, 0x07,
-            0x0F, 0xB5, 0x61, 0x59, 0xCD, 0x60, 0x06, 0x21,
-            0xA0, 0x99, 0xDD, 0x27, 0x42, 0xD7, 0xC5, 0x5B,
-            0x3B, 0xC6, 0x4F, 0xA2, 0x20, 0xF6, 0x61, 0x61,
-            0x8C, 0x46, 0x8C, 0xCA, 0xE0, 0x0E, 0x2C, 0xE9,
-            0xBA, 0x0F, 0x45, 0x6D, 0x36, 0x1C, 0x18, 0x37,
-            0xE7, 0x85, 0x89, 0xA4, 0x94, 0x46, 0x30, 0x9B,
-            0xB2, 0xF4, 0x41, 0x55, 0xA5, 0x63, 0x1C, 0xEF,
-            0xB7, 0x18, 0xB3, 0xB1, 0xD4, 0x72, 0xA0, 0x1C,
-            0x0B, 0x97, 0x02, 0xB6, 0xC5, 0x1F, 0x1B, 0x94,
-            0xC3, 0x83, 0xAA, 0xAC, 0xD9, 0x44, 0x09, 0xD7,
-            0x6C, 0xDB, 0x07, 0xA9, 0xAD, 0x64, 0x83, 0xF1,
-            0x92, 0x09, 0xCD, 0x0E, 0x99, 0x2F, 0xBC, 0xF8,
-            0x3C, 0x63, 0x8F, 0x0A, 0x33, 0x03, 0x84, 0x91,
-            0x6C, 0xAC, 0x3A, 0x15, 0xCB, 0x67, 0xC7, 0x69,
-            0xA1, 0x92, 0x99, 0x74, 0xEE, 0x90, 0x0D, 0xBE,
-            0x57, 0x30, 0xD1, 0xBA, 0xE5, 0xDE, 0xFA, 0xD6,
-            0x83, 0x8C, 0xE4, 0x43, 0x36, 0x5E, 0xCD, 0x84,
-            0x1A, 0x18, 0x31, 0xB9, 0x20, 0x48, 0xE3, 0xA8,
-            0x89, 0x32, 0xF0, 0x90, 0x21, 0x80, 0x33, 0xAE,
-            0x3C, 0xA6, 0xB8, 0x8C, 0x72, 0x17, 0xD1, 0x0C,
-            0x1A, 0x29, 0xFA, 0x38, 0x87, 0xC9, 0x6E, 0xC7,
-            0x05, 0xDE, 0x85, 0x6E, 0x92, 0x7E, 0xD4, 0xED,
-            0x5C, 0xD3, 0x03, 0xD4, 0xFE, 0xCB, 0x6C, 0x19,
-            0x7A, 0x83, 0x79, 0x5B, 0xF6, 0x71, 0xBA, 0xF4,
-            0x37, 0x53, 0xC9, 0xC1, 0xDE, 0xDB, 0xDE, 0xB1,
-            0x64, 0x17, 0x31, 0x0E, 0xD7, 0xA2, 0x13, 0x8E,
-            0x52, 0x8D, 0xCB, 0x19, 0x3D, 0x0B, 0x31, 0x58,
-            0x4A, 0xDE, 0x0C, 0x01, 0x2B, 0x85, 0x2D, 0xE5,
-            0x13, 0x22, 0x48, 0xB6, 0xF3, 0x2D, 0x00, 0x9A
-        };
-        */
-		int x;
-		UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
-
-		for (x = 0; x < size; x++)
-		{
-			//UINT16 *RAMDUMP = (UINT16*)space->machine().region("user2")->base();
-			//UINT16 dat = RAMDUMP[dst + x];
-
-			UINT16 dat2 = PROTROM[src + x];
-
-			UINT8 extraoffset = param&0xfe; // the lowest bit changed the table addressing in tests, see 'rawDataOdd' table instead.. it's still related to the main one, not identical
-			UINT8* dectable = (UINT8*)machine.region("igs022data")->base();//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
-			UINT16 extraxor = ((dectable[((x*2)+0+extraoffset)&0xff]) << 8) | (dectable[((x*2)+1+extraoffset)&0xff] << 0);
-
-			dat2 = ((dat2 & 0x00ff)<<8) | ((dat2 & 0xff00)>>8);
-
-			//  mode==0 plain
-			if (mode==3) dat2 ^= extraxor;
-			if (mode==2) dat2 += extraxor;
-			if (mode==1) dat2 -= extraxor;
-
-			//if (dat!=dat2)
-			//  printf("Mode %04x Param %04x Mismatch %04x %04x\n", mode, param, dat, dat2);
-
-			state->m_sharedprotram[dst + x] = dat2;
-		}
-
-		/* Killing Blade: hack, patches out some additional security checks... we need to emulate them instead! */
-		// different region IGS025 devices supply different sequences - we currently only have the china sequence for Killing Blade
-		//if ((mode==3) && (param==0x54) && (src*2==0x2120) && (dst*2==0x2600)) state->m_sharedprotram[0x2600 / 2] = 0x4e75;
-
-	}
-	if (mode == 4)
-	{
-		mame_printf_debug("unhandled copy mode %04x!\n", mode);
-		// not used by killing blade
-		/* looks almost like a fixed value xor, but isn't */
-	}
-	else if (mode == 5)
-	{
-		/* mode 5 seems to be a straight copy */
-		int x;
-		UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
-		for (x = 0; x < size; x++)
-		{
-			UINT16 dat = PROTROM[src + x];
-
-
-			state->m_sharedprotram[dst + x] = dat;
-		}
-	}
-	else if (mode == 6)
-	{
-		/* mode 6 seems to swap bytes and nibbles */
-		int x;
-		UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
-		for (x = 0; x < size; x++)
-		{
-			UINT16 dat = PROTROM[src + x];
-
-			dat = ((dat & 0xf000) >> 12)|
-				  ((dat & 0x0f00) >> 4)|
-				  ((dat & 0x00f0) << 4)|
-				  ((dat & 0x000f) << 12);
-
-			state->m_sharedprotram[dst + x] = dat;
-		}
-	}
-	else if (mode == 7)
-	{
-		mame_printf_debug("unhandled copy mode %04x!\n", mode);
-		// not used by killing blade
-		/* weird mode, the params get left in memory? - maybe it's a NOP? */
-	}
-	else
-	{
-		mame_printf_debug("unhandled copy mode %04x!\n", mode);
-		// not used by killing blade
-		/* invalid? */
-
-	}
-}
-
-// the internal MCU boot code automatically does this DMA
-// and puts the version # of the data rom in ram
-static void IGS022_reset(running_machine& machine)
-{
-	int i;
-	UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
-	pgm_state *state = machine.driver_data<pgm_state>();
-	UINT16 tmp;
-
-	// fill ram with A5 patern
-	for (i = 0; i < 0x4000/2; i++)
-		state->m_sharedprotram[i] = 0xa55a;
-
-	// the auto-dma
-	UINT16 src = PROTROM[0x100 / 2];
-	UINT32 dst = PROTROM[0x102 / 2];
-	UINT16 size = PROTROM[0x104/ 2];
-	UINT16 mode = PROTROM[0x106 / 2];
-
-	src = ((src & 0xff00) >> 8) | ((src & 0x00ff) << 8);
-	dst = ((dst & 0xff00) >> 8) | ((dst & 0x00ff) << 8);
-	size = ((size & 0xff00) >> 8) | ((size & 0x00ff) << 8);
-	mode &= 0xff;
-
-	src >>= 1;
-
-	printf("Auto-DMA %04x %04x %04x %04x\n",src,dst,size,mode);
-
-	IGS022_do_dma(machine,src,dst,size,mode);
-
-	// there is also a version ID? (or is it some kind of checksum) that is stored in the data rom, and gets copied..
-	// Dragon World 3 checks it
-	tmp = PROTROM[0x114/2];
-	tmp = ((tmp & 0xff00) >> 8) | ((tmp & 0x00ff) << 8);
-	state->m_sharedprotram[0x2a2/2] = tmp;
-}
-
-static void IGS022_handle_command(running_machine& machine)
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-	UINT16 cmd = state->m_sharedprotram[0x200/2];
-	//mame_printf_debug("command %04x\n", cmd);
-	if (cmd == 0x6d)	//Store values to asic ram
-	{
-		UINT32 p1 = (state->m_sharedprotram[0x298/2] << 16) | state->m_sharedprotram[0x29a/2];
-		UINT32 p2 = (state->m_sharedprotram[0x29c/2] << 16) | state->m_sharedprotram[0x29e/2];
-
-		if ((p2 & 0xffff) == 0x9)	//Set value
-		{
-			int reg = (p2 >> 16) & 0xffff;
-			if (reg & 0x200)
-				state->m_kb_regs[reg & 0xff] = p1;
-		}
-		if ((p2 & 0xffff) == 0x6)	//Add value
-		{
-			int src1 = (p1 >> 16) & 0xff;
-			int src2 = (p1 >> 0) & 0xff;
-			int dst = (p2 >> 16) & 0xff;
-			state->m_kb_regs[dst] = state->m_kb_regs[src2] - state->m_kb_regs[src1];
-		}
-		if ((p2 & 0xffff) == 0x1)	//Add Imm?
-		{
-			int reg = (p2 >> 16) & 0xff;
-			int imm = (p1 >> 0) & 0xffff;
-			state->m_kb_regs[reg] += imm;
-		}
-		if ((p2 & 0xffff) == 0xa)	//Get value
-		{
-			int reg = (p1 >> 16) & 0xFF;
-			state->m_sharedprotram[0x29c/2] = (state->m_kb_regs[reg] >> 16) & 0xffff;
-			state->m_sharedprotram[0x29e/2] = state->m_kb_regs[reg] & 0xffff;
-		}
-	}
-	if(cmd == 0x4f)	//memcpy with encryption / scrambling
-	{
-		UINT16 src = state->m_sharedprotram[0x290 / 2] >> 1; // ?
-		UINT32 dst = state->m_sharedprotram[0x292 / 2];
-		UINT16 size = state->m_sharedprotram[0x294 / 2];
-		UINT16 mode = state->m_sharedprotram[0x296 / 2];
-
-		IGS022_do_dma(machine, src,dst,size,mode);
-	}
-
-}
-
-
-static WRITE16_HANDLER( killbld_igs025_prot_w )
-{
-//  mame_printf_debug("killbrd prot r\n");
-//  return 0;
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	offset &= 0xf;
-
-	if (offset == 0)
-		state->m_kb_cmd = data;
-	else //offset==2
-	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n", cpu_get_pc(&space->device()), state->m_kb_cmd, data);
-		if (state->m_kb_cmd == 0)
-			state->m_kb_reg = data;
-		else if (state->m_kb_cmd == 2)
-		{
-			if (data == 1)	//Execute cmd
-			{
-				IGS022_handle_command(space->machine());
-				state->m_kb_reg++;
-			}
-		}
-		else if (state->m_kb_cmd == 4)
-			state->m_kb_ptr = data;
-		else if (state->m_kb_cmd == 0x20)
-			state->m_kb_ptr++;
-	}
-}
-
-static READ16_HANDLER( killbld_igs025_prot_r )
-{
-//  mame_printf_debug("killbld prot w\n");
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	UINT16 res ;
-
-	offset &= 0xf;
-	res = 0;
-
-	if (offset == 1)
-	{
-		if (state->m_kb_cmd == 1)
-		{
-			res = state->m_kb_reg & 0x7f;
-		}
-		else if (state->m_kb_cmd == 5)
-		{
-
-			UINT8 kb_region_sequence[11] = {0x17, 0x14, 0x91, 0x89, 0x21, 0xD5, 0x7C, 0x65, 0x8F, 0x8E, 0xE1};
-			UINT8 ret;
-
-			// this isn't properly understood.. should be some kind of bitswap / xor / shift..based on values written to 0x22/0x23 etc.?
-			// return hardcoded china sequence results for now, avoids rom patch
-			if (state->m_kb_region_sequence_position < 11)
-			{
-				ret = kb_region_sequence[state->m_kb_region_sequence_position];
-				state->m_kb_region_sequence_position++;
-			}
-			else
-			{
-				UINT32 protvalue = 0x89911400 | input_port_read(space->machine(), "Region");
-				ret = (protvalue >> (8 * (state->m_kb_ptr - 1))) & 0xff;
-			}
-
-			res = 0x3f00 | ret;  // always 0x3fxx in logged behavior...
-
-		}
-	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", cpu_get_pc(&space->device()), state->m_kb_cmd, res);
-	return res;
-}
-
-
-
-
-static MACHINE_RESET( killbld )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-
-	MACHINE_RESET_CALL(pgm);
-	/* fill the protection ram with a5 + auto dma */
-	IGS022_reset(machine);
-
-	// Reset IGS025 stuff
-	state->m_kb_cmd = 0;
-	state->m_kb_reg = 0;
-	state->m_kb_ptr = 0;
-	state->m_kb_region_sequence_position = 0;
-	memset(state->m_kb_regs, 0, 0x10);
-
-}
-
-
-
-
-/* ASIC025/ASIC022 don't provide rom patches like the DW2 protection does, the previous dump was bad :-) */
-static DRIVER_INIT( killbld )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-
-	pgm_basic_init(machine);
-	pgm_killbld_decrypt(machine);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xd40000, 0xd40003, FUNC(killbld_igs025_prot_r), FUNC(killbld_igs025_prot_w));
-
-	state->m_kb_cmd = 0;
-	state->m_kb_reg = 0;
-	state->m_kb_ptr = 0;
-	state->m_kb_region_sequence_position = 0;
-	memset(state->m_kb_regs, 0, 0x10);
-
-	state->save_item(NAME(state->m_kb_region_sequence_position));
-	state->save_item(NAME(state->m_kb_cmd));
-	state->save_item(NAME(state->m_kb_reg));
-	state->save_item(NAME(state->m_kb_ptr));
-	state->save_item(NAME(state->m_kb_regs));
-}
-
-static MACHINE_RESET( dw3 )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-
-
-	MACHINE_RESET_CALL(pgm);
-	/* fill the protection ram with a5 + auto dma */
-	IGS022_reset(machine);
-
-	/* game won't boot unless various values are in protection RAM
-     - these should almost certainly end up there as the result of executing the protection
-       commands are startup, but which, and how? */
-
-//  state->m_sharedprotram[0x200/2] = 0x006d;
-	state->m_sharedprotram[0x202/2] = 0x007c; // it cares about this, operation status flag?
-
-//  state->m_sharedprotram[0x20c/2] = 0x0000;
-//  state->m_sharedprotram[0x20e/2] = 0x0007;
-//  state->m_sharedprotram[0x210/2] = 0x0000;
-//  state->m_sharedprotram[0x212/2] = 0x0004;
-//  state->m_sharedprotram[0x214/2] = 0x0000;
-//  state->m_sharedprotram[0x216/2] = 0x0007;
-//  state->m_sharedprotram[0x218/2] = 0x0000;
-//  state->m_sharedprotram[0x21a/2] = 0x0004;
-
-//  state->m_sharedprotram[0x288/2] = 0x0000;
-//  state->m_sharedprotram[0x28a/2] = 0x00c2;
-//  state->m_sharedprotram[0x28c/2] = 0x0000;
-//  state->m_sharedprotram[0x28e/2] = 0x00c2;
-//  state->m_sharedprotram[0x290/2] = 0x0500;
-//  state->m_sharedprotram[0x292/2] = 0x1000;
-//  state->m_sharedprotram[0x294/2] = 0x00c3;
-//  state->m_sharedprotram[0x296/2] = 0x7104;
-//  state->m_sharedprotram[0x298/2] = 0x0000;
-//  state->m_sharedprotram[0x29a/2] = 0x0003;
-//  state->m_sharedprotram[0x29c/2] = 0x0108;
-//  state->m_sharedprotram[0x29e/2] = 0x0009;
-
-//  state->m_sharedprotram[0x2a2/2] = 0x84f6; // it cares about this, it's the version number of the data rom, copied automatically!
-
-//  state->m_sharedprotram[0x2ac/2] = 0x006d;
-//  state->m_sharedprotram[0x2ae/2] = 0x0000;
-
-//  state->m_sharedprotram[0x2b0/2] = 0xaf56;
-
-
-	// Reset IGS025 stuff
-	state->m_kb_cmd = 0;
-	state->m_kb_reg = 0;
-	state->m_kb_ptr = 0;
-	state->m_kb_region_sequence_position = 0;
-	memset(state->m_kb_regs, 0, 0x10);
-
-}
-
-
-
-static int reg;
-static int ptr=0;
-
-#define DW3BITSWAP(s,d,bs,bd)  d=((d&(~(1<<bd)))|(((s>>bs)&1)<<bd))
-static UINT8 dw3_swap;
-static WRITE16_HANDLER( drgw3_igs025_prot_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	offset&=0xf;
-
-	if(offset==0)
-		state->m_kb_cmd=data;
-	else //offset==2
-	{
-		printf("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(&space->device()),state->m_kb_cmd,data);
-		if(state->m_kb_cmd==0)
-			reg=data;
-		else if(state->m_kb_cmd==3)	//??????????
-		{
-			dw3_swap = data;
-
-			printf("SWAP %02x\n",dw3_swap);
-		}
-		//else if(kb_cmd==4)
-		//  ptr=data;
-		else if(state->m_kb_cmd==0x20)
-			ptr++;
-	}
-}
-
-static READ16_HANDLER( drgw3_igs025_prot_r )
-{
-//  mame_printf_debug("killbld prot w\n");
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-
-	UINT16 res ;
-
-	offset&=0xf;
-	res=0;
-
-	if(offset==1)
-	{
-		if(state->m_kb_cmd==0)	//swap
-		{
-				UINT8 v1=(dw3_swap+1)&0x7F;
-				UINT8 v2=0;
-				DW3BITSWAP(v1,v2,7,0);
-				DW3BITSWAP(v1,v2,6,1);
-				DW3BITSWAP(v1,v2,5,2);
-				DW3BITSWAP(v1,v2,4,3);
-				DW3BITSWAP(v1,v2,3,4);
-				DW3BITSWAP(v1,v2,2,5);
-				DW3BITSWAP(v1,v2,1,6);
-				DW3BITSWAP(v1,v2,0,7);
-
-				res=v2;
-
-		}
-		else if(state->m_kb_cmd==1)
-		{
-			res=reg&0x7f;
-		}
-		else if(state->m_kb_cmd==5)
-		{
-			UINT32 protvalue;
-			protvalue = 0x60000|input_port_read(space->machine(), "Region");
-			res=(protvalue>>(8*(ptr-1)))&0xff;
-
-
-		}
-	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",cpu_get_pc(&space->device()),state->m_kb_cmd,res);
-	return res;
-}
-
-
-static DRIVER_INIT( drgw3 )
-{
-	pgm_basic_init(machine);
-
-/*
-    pgm_state *state = machine.driver_data<pgm_state>();
-
-    {
-        int x;
-        UINT16 *RAMDUMP = (UINT16*)machine.region("user2")->base();
-        for (x=0;x<(0x4000/2);x++)
-        {
-            state->m_sharedprotram[x] = RAMDUMP[x];
-            if((x>=0x100)&&(x<0x110)) printf("data 0x%4x, offset:%x\n",state->m_sharedprotram[x],x);
-        }
-    }
-*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xDA5610, 0xDA5613, FUNC(drgw3_igs025_prot_r), FUNC(drgw3_igs025_prot_w));
-
-	pgm_dw3_decrypt(machine);
-}
-
-static INT32 puzzli_54_trigger = 0;
-
-// Preliminary
-static WRITE16_HANDLER( puzzli2_asic_w )
-{
-	cavepgm_state *state = space->machine().driver_data<cavepgm_state>();
-
-	switch (offset & 0x03)
-	{
-		case 0: state->m_value0 = data; return;
-
-		case 1:
-		{
-			if ((data >> 8) == 0xff) state->m_valuekey = 0xffff;
-
-			state->m_value0 ^= state->m_valuekey;
-
-			switch ((data ^ state->m_valuekey) & 0xff)
-			{
-				case 0x13: // ASIC status?
-					state->m_valueresponse = 0x74<<16; // 2d or 74! (based on?)
-				break;
-
-				case 0x31:
-				{
-					// how is this selected? command 54?
-
-					// just a wild guess
-					if (puzzli_54_trigger) {
-						// pc == 1387de
-						state->m_valueresponse = 0x63<<16; // ?
-					} else {
-						// pc == 14cf58
-						state->m_valueresponse = 0xd2<<16;
-					}
-
-					puzzli_54_trigger = 0;
-				}
-				break;
-
-				case 0x38: // Reset
-					state->m_valueresponse = 0x78<<16;
-					state->m_valuekey = 0;
-					puzzli_54_trigger = 0;
-				break;
-
-				case 0x41: // ASIC status?
-					state->m_valueresponse = 0x74<<16;
-				break;
-
-				case 0x47: // ASIC status?
-					state->m_valueresponse = 0x74<<16;
-				break;
-
-				case 0x52: // ASIC status?
-				{
-					// how is this selected?
-
-					//if (state->m_value0 == 6) {
-						state->m_valueresponse = (0x74<<16)|1; // |1?
-					//} else {
-					//  state->m_valueresponse = 0x74<<16;
-					//}
-				}
-				break;
-
-				case 0x54: // ??
-					puzzli_54_trigger = 1;
-					state->m_valueresponse = 0x36<<16;
-				break;
-
-				case 0x61: // ??
-					state->m_valueresponse = 0x36<<16;
-				break;
-
-				case 0x63: // probably read from a data table?
-					state->m_valueresponse = 0; // wrong...
-				break;
-
-				case 0x67: // probably read from a data table?
-					state->m_valueresponse = 0; // wrong...
-				break;
-
-				default:
-					state->m_valueresponse = 0x74<<16;
-				break;
-			}
-
-			state->m_valuekey = (state->m_valuekey + 0x0100) & 0xff00;
-			if (state->m_valuekey == 0xff00) state->m_valuekey = 0x0100;
-			state->m_valuekey |= state->m_valuekey >> 8;
-		}
-		return;
-
-		case 2: return;
-	}
-}
-
-
-static DRIVER_INIT( dw2001 )
-{
-	//pgm_state *state = machine.driver_data<pgm_state>();
-	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
-
-	pgm_basic_init(machine);
-	kovsh_latch_init(machine);
-	pgm_mm_decrypt(machine); // encryption is the same as martial masters
-
-	mem16[0x11e90c / 2] = 0x4e71;
-	mem16[0x11e90e / 2] = 0x4e71;
-
-	mem16[0x11e91a / 2] = 0x4e71;
-
-	mem16[0x11eaf6 / 2] = 0x4e71;
-	mem16[0x11eaf8 / 2] = 0x4e71;
-
-	mem16[0x11eb04 / 2] = 0x4e71;
-
-}
-
-static UINT32 olds_prot_addr( UINT16 addr )
-{
-	UINT32 mode = addr & 0xff;
-	UINT32 offset = addr >> 8;
-	UINT32 realaddr;
-
-	switch(mode)
-	{
-		case 0x0:
-		case 0x5:
-		case 0xa:
-			realaddr = 0x402a00 + (offset << 2);
-			break;
-
-		case 0x2:
-		case 0x8:
-			realaddr = 0x402e00 + (offset << 2);
-			break;
-
-		case 0x1:
-			realaddr = 0x40307e;
-			break;
-
-		case 0x3:
-			realaddr = 0x403090;
-			break;
-
-		case 0x4:
-			realaddr = 0x40309a;
-			break;
-
-		case 0x6:
-			realaddr = 0x4030a4;
-			break;
-
-		case 0x7:
-			realaddr = 0x403000;
-			break;
-
-		case 0x9:
-			realaddr = 0x40306e;
-			break;
-
-		default:
-			realaddr = 0;
-	}
-	return realaddr;
-}
-
-static UINT32 olds_read_reg( running_machine &machine, UINT16 addr )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-	UINT32 protaddr = (olds_prot_addr(addr) - 0x400000) / 2;
-	return state->m_sharedprotram[protaddr] << 16 | state->m_sharedprotram[protaddr + 1];
-}
-
-static void olds_write_reg( running_machine &machine, UINT16 addr, UINT32 val )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-	state->m_sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2]     = val >> 16;
-	state->m_sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2 + 1] = val & 0xffff;
-}
-
-static MACHINE_RESET( olds )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-	UINT16 *mem16 = (UINT16 *)machine.region("user2")->base();
-	int i;
-
-	MACHINE_RESET_CALL(pgm);
-
-	/* populate shared protection ram with data read from pcb .. */
-	for (i = 0; i < 0x4000 / 2; i++)
-	{
-		state->m_sharedprotram[i] = mem16[i];
-	}
-
-	//ROM:004008B4                 .word 0xFBA5
-	for(i = 0; i < 0x4000 / 2; i++)
-	{
-		if (state->m_sharedprotram[i] == (0xffff - i))
-			state->m_sharedprotram[i] = 0x4e75;
-	}
-}
-
-static READ16_HANDLER( olds_r )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	UINT16 res = 0;
-
-	if (offset == 1)
-	{
-		if (state->m_kb_cmd == 1)
-			res = state->m_kb_reg & 0x7f;
-		if (state->m_kb_cmd == 2)
-			res = state->m_olds_bs | 0x80;
-		if (state->m_kb_cmd == 3)
-			res = state->m_olds_cmd3;
-		else if (state->m_kb_cmd == 5)
-		{
-			UINT32 protvalue = 0x900000 | input_port_read(space->machine(), "Region"); // region from protection device.
-			res = (protvalue >> (8 * (state->m_kb_ptr - 1))) & 0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
-
-		}
-	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n", cpu_get_pc(&space->device()), state->m_kb_cmd, res);
-	return res;
-}
-
-static WRITE16_HANDLER( olds_w )
-{
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	if (offset == 0)
-		state->m_kb_cmd = data;
-	else //offset==2
-	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(&space->device()), state->m_kb_cmd, data);
-		if (state->m_kb_cmd == 0)
-			state->m_kb_reg = data;
-		else if(state->m_kb_cmd == 2)	//a bitswap=
-		{
-			int reg = 0;
-			if (data & 0x01)
-				reg |= 0x40;
-			if (data & 0x02)
-				reg |= 0x80;
-			if (data & 0x04)
-				reg |= 0x20;
-			if (data & 0x08)
-				reg |= 0x10;
-			state->m_olds_bs = reg;
-		}
-		else if (state->m_kb_cmd == 3)
-		{
-			UINT16 cmd = state->m_sharedprotram[0x3026 / 2];
-			switch (cmd)
-			{
-				case 0x11:
-				case 0x12:
-						break;
-				case 0x64:
-					{
-						UINT16 cmd0 = state->m_sharedprotram[0x3082 / 2];
-						UINT16 val0 = state->m_sharedprotram[0x3050 / 2];	//CMD_FORMAT
-						{
-							if ((cmd0 & 0xff) == 0x2)
-								olds_write_reg(space->machine(), val0, olds_read_reg(space->machine(), val0) + 0x10000);
-						}
-						break;
-					}
-
-				default:
-						break;
-			}
-			state->m_olds_cmd3 = ((data >> 4) + 1) & 0x3;
-		}
-		else if (state->m_kb_cmd == 4)
-			state->m_kb_ptr = data;
-		else if(state->m_kb_cmd == 0x20)
-		  state->m_kb_ptr++;
-	}
-}
-
-static READ16_HANDLER( olds_prot_swap_r )
-{
-	if (cpu_get_pc(&space->device()) < 0x100000)		//bios
-		return pgm_mainram[0x178f4 / 2];
-	else						//game
-		return pgm_mainram[0x178d8 / 2];
-
-}
-
-static DRIVER_INIT( olds )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-	pgm_basic_init(machine);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xdcb400, 0xdcb403, FUNC(olds_r), FUNC(olds_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8178f4, 0x8178f5, FUNC(olds_prot_swap_r));
-
-	state->m_kb_cmd = 0;
-	state->m_kb_reg = 0;
-	state->m_kb_ptr = 0;
-	state->m_olds_bs = 0;
-	state->m_olds_cmd3 = 0;
-
-	state->save_item(NAME(state->m_kb_cmd));
-	state->save_item(NAME(state->m_kb_reg));
-	state->save_item(NAME(state->m_kb_ptr));
-	state->save_item(NAME(state->m_olds_bs));
-	state->save_item(NAME(state->m_olds_cmd3));
-}
-
-
-
-static void pgm_decode_kovlsqh2_tiles( running_machine &machine )
-{
-	int i, j;
-	UINT16 *src = (UINT16 *)(machine.region("tiles")->base() + 0x180000);
-	UINT16 *dst = auto_alloc_array(machine, UINT16, 0x800000);
-
-	for (i = 0; i < 0x800000 / 2; i++)
-	{
-		j = BITSWAP24(i, 23, 22, 9, 8, 21, 18, 0, 1, 2, 3, 16, 15, 14, 13, 12, 11, 10, 19, 20, 17, 7, 6, 5, 4);
-
-		dst[j] = BITSWAP16(src[i], 1, 14, 8, 7, 0, 15, 6, 9, 13, 2, 5, 10, 12, 3, 4, 11);
-	}
-
-	memcpy( src, dst, 0x800000 );
-
-	auto_free( machine, dst );
-}
-
-static void pgm_decode_kovlsqh2_sprites( running_machine &machine, UINT8 *src )
-{
-	int i, j;
-	UINT8 *dst = auto_alloc_array(machine, UINT8, 0x800000);
-
-	for (i = 0; i < 0x800000; i++)
-	{
-		j = BITSWAP24(i, 23, 10, 9, 22, 19, 18, 20, 21, 17, 16, 15, 14, 13, 12, 11, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-
-		dst[j] = src[i];
-	}
-
-	memcpy( src, dst, 0x800000 );
-
-	auto_free( machine, dst );
-}
-
-static void pgm_decode_kovlsqh2_samples( running_machine &machine )
-{
-	int i;
-	UINT8 *src = (UINT8 *)(machine.region("ics")->base() + 0x400000);
-
-	for (i = 0; i < 0x400000; i+=2) {
-		src[i + 0x000001] = src[i + 0x400001];
-	}
-
-	memcpy( src + 0x400000, src, 0x400000 );
-}
-
-static void pgm_decode_kovqhsgs_program( running_machine &machine )
-{
-	int i;
-	UINT16 *src = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
-	UINT16 *dst = auto_alloc_array(machine, UINT16, 0x400000);
-
-	for (i = 0; i < 0x400000 / 2; i++)
-	{
-		int j = BITSWAP24(i, 23, 22, 21, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 6, 7, 5, 4, 3, 2, 1, 0);
-
-		dst[j] = BITSWAP16(src[i], 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 4, 5, 3, 2, 1, 0);
-	}
-
-	memcpy( src, dst, 0x400000 );
-
-	auto_free( machine, dst );
-}
-
-static void pgm_decode_kovqhsgs2_program( running_machine &machine )
-{
-	int i;
-	UINT16 *src = (UINT16 *)(machine.region("maincpu")->base() + 0x100000);
-	UINT16 *dst = auto_alloc_array(machine, UINT16, 0x400000);
-
-	for (i = 0; i < 0x400000 / 2; i++)
-	{
-		int j = BITSWAP24(i, 23, 22, 21, 20, 19, 16, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 18, 17, 7);
-
-		dst[j] = src[i];
-	}
-
-	memcpy( src, dst, 0x400000 );
-
-	auto_free( machine, dst );
-}
-
-
-static DRIVER_INIT( kovlsqh2 )
-{
-	pgm_decode_kovqhsgs2_program(machine);
-	pgm_decode_kovlsqh2_tiles(machine);
-
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprmask")->base() + 0x0800000);
-
-	pgm_decode_kovlsqh2_samples(machine);
-	pgm_basic_init(machine);
-	kovsh_latch_init(machine);
-}
-
-static DRIVER_INIT( kovqhsgs )
-{
-	pgm_decode_kovqhsgs_program(machine);
-	pgm_decode_kovlsqh2_tiles(machine);
-
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x0800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x1000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x1800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x2000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprcol")->base() + 0x2800000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprmask")->base() + 0x0000000);
-	pgm_decode_kovlsqh2_sprites(machine, machine.region("sprmask")->base() + 0x0800000);
-
-	pgm_decode_kovlsqh2_samples(machine);
-
-	pgm_basic_init(machine);
-	kovsh_latch_init(machine);
-}
-
-/*
- in Ketsui (ket) @ 000A719C (move.w)
-
- if you change D0 to 0x12
- the game will runs to "Asic27 Test" mode
-
- bp A71A0,1,{d0=0x12;g}
-*/
-
-static WRITE16_HANDLER( ddp3_asic_w )
-{
-	cavepgm_state *state = space->machine().driver_data<cavepgm_state>();
-
-	if (offset == 0)
-	{
-		state->m_value0 = data;
-		return;
-	}
-	else if (offset == 1)
-	{
-		UINT16 realkey;
-		if ((data >> 8) == 0xff)
-			state->m_valuekey = 0xff00;
-		realkey = state->m_valuekey >> 8;
-		realkey |= state->m_valuekey;
-		{
-			state->m_valuekey += 0x0100;
-			state->m_valuekey &= 0xff00;
-			if (state->m_valuekey == 0xff00)
-				state->m_valuekey =  0x0100;
-		}
-		data ^= realkey;
-		state->m_value1 = data;
-		state->m_value0 ^= realkey;
-
-		state->m_ddp3lastcommand = state->m_value1 & 0xff;
-
-		/* typical frame (ddp3) (all 3 games use only these commands? for the most part of levels espgal just issues 8e)
-            vbl
-            145f28 command 67
-            145f70 command e5
-            145f28 command 67
-            145f70 command e5
-            1460c6 command 40
-            145ec0 command 8e
-            */
-
-		switch (state->m_ddp3lastcommand)
-		{
-			default:
-				printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->m_ddp3lastcommand, state->m_value0);
-				state->m_valueresponse = 0x880000;
-				break;
-
-			case 0x40:
-				state->m_valueresponse = 0x880000;
-			    state->m_ddp3slots[(state->m_value0>>10)&0x1F]=
-					(state->m_ddp3slots[(state->m_value0>>5)&0x1F]+
-					 state->m_ddp3slots[(state->m_value0>>0)&0x1F])&0xffffff;
-				break;
-
-			case 0x67: // set high bits
-		//      printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->m_ddp3lastcommand, state->m_value0);
-				state->m_valueresponse = 0x880000;
-				state->m_ddp3internal_slot = (state->m_value0 & 0xff00)>>8;
-				state->m_ddp3slots[state->m_ddp3internal_slot] = (state->m_value0 & 0x00ff) << 16;
-				break;
-
-			case 0xe5: // set low bits for operation?
-			//  printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->m_ddp3lastcommand, state->m_value0);
-				state->m_valueresponse = 0x880000;
-				state->m_ddp3slots[state->m_ddp3internal_slot] |= (state->m_value0 & 0xffff);
-				break;
-
-
-			case 0x8e: // read back result of operations
-		//      printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->m_ddp3lastcommand, state->m_value0);
-				state->m_valueresponse = state->m_ddp3slots[state->m_value0&0xff];
-				break;
-
-
-			case 0x99: // reset?
-				state->m_valuekey = 0x100;
-				state->m_valueresponse = 0x00880000;
-				break;
-
-		}
-	}
-	else if (offset==2)
-	{
-
-	}
-
-}
-
-static READ16_HANDLER( ddp3_asic_r )
-{
-	cavepgm_state *state = space->machine().driver_data<cavepgm_state>();
-
-	if (offset == 0)
-	{
-		UINT16 d = state->m_valueresponse & 0xffff;
-		UINT16 realkey = state->m_valuekey >> 8;
-		realkey |= state->m_valuekey;
-		d ^= realkey;
-
-		return d;
-
-	}
-	else if (offset == 1)
-	{
-		UINT16 d = state->m_valueresponse >> 16;
-		UINT16 realkey = state->m_valuekey >> 8;
-		realkey |= state->m_valuekey;
-		d ^= realkey;
-		return d;
-
-	}
-	return 0xffff;
-}
-
-
-void install_asic27a_ddp3(running_machine& machine)
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
-}
-
-void install_asic27a_ket(running_machine& machine)
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
-}
-
-void install_asic27a_espgal(running_machine& machine)
-{
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
-}
-
-static DRIVER_INIT( ddp3 )
-{
-	pgm_basic_init(machine, false);
-	pgm_py2k2_decrypt(machine); // yes, it's the same as photo y2k2
-	install_asic27a_ddp3(machine);
-}
-
-static DRIVER_INIT( ket )
-{
-	pgm_basic_init(machine, false);
-	pgm_ket_decrypt(machine);
-	install_asic27a_ket(machine);
-}
-
-static DRIVER_INIT( espgal )
-{
-	pgm_basic_init(machine, false);
-	pgm_espgal_decrypt(machine);
-	install_asic27a_espgal(machine);
-}
-
-static DRIVER_INIT( puzzli2 )
-{
-	cavepgm_state *state = machine.driver_data<cavepgm_state>();
-
-	pgm_basic_init(machine);
-
-	pgm_puzzli2_decrypt(machine);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(puzzli2_asic_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4fffff, FUNC(sango_protram_r));
-
-	// doesn't like this irq??
-	state->m_irq4_disabled = 1;
-}
-
-static void oldsplus_latch_init( running_machine &machine )
-{
-	pgm_state *state = machine.driver_data<pgm_state>();
-
-	state->m_oldsplus_key = 0;
-	state->m_oldsplus_int[0] = 0;
-	state->m_oldsplus_int[1] = 0;
-	state->m_oldsplus_val = 0;
-	memset(state->m_oldsplus_ram, 0, 0x100);
-	memset(state->m_oldsplus_regs, 0, 0x100);
-
-	state_save_register_global(machine, state->m_oldsplus_key);
-	state_save_register_global(machine, state->m_oldsplus_val);
-	state_save_register_global_array(machine, state->m_oldsplus_int);
-	state_save_register_global_array(machine, state->m_oldsplus_ram);
-	state_save_register_global_array(machine, state->m_oldsplus_regs);
-}
-
-#if 0
-static DRIVER_INIT( oldsplus )
-{
-	pgm_basic_init(machine);
-	pgm_oldsplus_decrypt(machine);
-	kovsh_latch_init(machine);
-}
-#endif
-
-static DRIVER_INIT( oldsplus )
-{
-	pgm_basic_init(machine);
-	pgm_oldsplus_decrypt(machine);
-	oldsplus_latch_init(machine);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500003, FUNC(oldsplus_r), FUNC(oldsplus_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4fffff, FUNC(oldsplus_protram_r));
-}
-
-static DRIVER_INIT( kov2p )
-{
-	// this hacks the identification of the kov2 rom to return the string required for kov2p
-	// this isn't guaranteed to work properly (and definitely wouldn't on real hardware due to the internal
-	// ROM uploading the encryption table)  The internal ROM should be dumped properly.
-	UINT8 *mem8 = (UINT8 *)machine.region("user1")->base();
-	pgm_basic_init(machine);
-	pgm_kov2p_decrypt(machine);
-	kov2_latch_init(machine);
-	mem8[0xDE] = 0xC0;
-	mem8[0xDF] = 0x46;
-	mem8[0x4ED8] = 0xA8;// B0
-	mem8[0x4EDC] = 0x9C;// A4
-	mem8[0x4EE0] = 0x5C;// 64
-	mem8[0x4EE4] = 0x94;// 9C
-	mem8[0x4EE8] = 0xE8;// F0
-	mem8[0x4EEC] = 0x6C;// 74
-	mem8[0x4EF0] = 0xD4;// DC
-	mem8[0x4EF4] = 0x50;// 58
-	mem8[0x4EF8] = 0x80;// 88
-	mem8[0x4EFC] = 0x9C;// A4
-	mem8[0x4F00] = 0x28;// 30
-	mem8[0x4F04] = 0x30;// 38
-	mem8[0x4F08] = 0x34;// 3C
-	mem8[0x4F0C] = 0x1C;// 24
-	mem8[0x1FFFFC] = 0x33;
-	mem8[0x1FFFFD] = 0x99;
-}
-
-static DRIVER_INIT( happy6 )
-{
-	svg_basic_init(machine);
-	pgm_happy6_decrypt(machine);
-	kov2_latch_init(machine);
-}
 
 
 /*** GAME ********************************************************************/
@@ -5882,27 +3642,27 @@ GAME( 1999, photoy2k104,  photoy2k,  kov,     photoy2k, photoy2k,   ROT0,   "IGS
 GAME( 1999, photoy2k102,  photoy2k,  kov,     photoy2k, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 102, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
 
 // region provided by internal ARM rom
-GAME( 1999, kovsh,        pgm,       kov,     sango,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 104, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, China internal ROM
-GAME( 1999, kovsh103,     kovsh,     kov,     sango,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 103, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V103, China internal ROM
+GAME( 1999, kovsh,        pgm,       kov,     kovsh,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 104, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, China internal ROM
+GAME( 1999, kovsh103,     kovsh,     kov,     kovsh,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 103, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V103, China internal ROM
 // nasty modern asian bootleg of Knights of Valour Super Heroes with characters ripped from SNK's The King of Fighters series!
-GAME( 1999, kovqhsgs,     kovsh,     kov,     sango,	kovqhsgs,   ROT0,   "bootleg", "Knights of Valour: Quan Huang San Guo Special / Sangoku Senki: Quan Huang San Guo Special (ver. 303CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1999, kovqhsgs,     kovsh,     kov,     kovsh,	kovqhsgs,   ROT0,   "bootleg", "Knights of Valour: Quan Huang San Guo Special / Sangoku Senki: Quan Huang San Guo Special (ver. 303CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 // region provided by internal ARM rom
-GAME( 2000, kov2,         pgm,       kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 107, 102, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 05/10/01 14:24:08 V107 (Ext. Arm V102, Int. Arm V100HK)
-GAME( 2000, kov2106,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 106, 102, 100KH)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 02/27/01 13:26:46 V106 (Ext. Arm V102, Int. Arm V100HK)
-GAME( 2000, kov2103,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 103, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 12/28/00 15:09:31 V103 (Ext. Arm V101, Int. Arm V100HK)
-GAME( 2000, kov2102,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 102, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 12/14/00 10:33:36 V102 (Ext. Arm V101, Int. Arm V100HK)
-GAME( 2000, kov2101,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 101, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
-GAME( 2000, kov2100,      kov2,      kov2,    sango,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 100, 100, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
+GAME( 2000, kov2,         pgm,       kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 107, 102, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 05/10/01 14:24:08 V107 (Ext. Arm V102, Int. Arm V100HK)
+GAME( 2000, kov2106,      kov2,      kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 106, 102, 100KH)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 02/27/01 13:26:46 V106 (Ext. Arm V102, Int. Arm V100HK)
+GAME( 2000, kov2103,      kov2,      kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 103, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 12/28/00 15:09:31 V103 (Ext. Arm V101, Int. Arm V100HK)
+GAME( 2000, kov2102,      kov2,      kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 102, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 12/14/00 10:33:36 V102 (Ext. Arm V101, Int. Arm V100HK)
+GAME( 2000, kov2101,      kov2,      kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 101, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
+GAME( 2000, kov2100,      kov2,      kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 100, 100, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
 
 // region provided by internal ARM rom
-GAME( 2001, kov2p,        pgm,       kov2,    sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2001, kov2p205,     kov2p,     kov2,    sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, kov2p,        pgm,       kov2,    kov2,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, kov2p205,     kov2p,     kov2,    kov2,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 // region provided by internal ARM rom
-GAME( 2001, martmast,     pgm,       kov2,    sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 102US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 102US
-GAME( 2001, martmastc,    martmast,  kov2,    sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 101CN
-GAME( 2001, martmastc102, martmast,  kov2,    sango,    martmast,   ROT0,   "IGS", "Martial Masters (ver. 102, 101, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V102, Ext Arm 101, Int Arm 101CN
+GAME( 2001, martmast,     pgm,       kov2,    martmast,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 102US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 102US
+GAME( 2001, martmastc,    martmast,  kov2,    martmast,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 101CN
+GAME( 2001, martmastc102, martmast,  kov2,    martmast,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 102, 101, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V102, Ext Arm 101, Int Arm 101CN
 
 // region provided by internal ARM rom
 GAME( 2001, ddp2,         pgm,       kov2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 102)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
@@ -5911,9 +3671,9 @@ GAME( 2001, ddp2100,      ddp2,      kov2,    ddp2,     ddp2,       ROT270, "IGS
 
 // we bypass the internal ARM rom on these, ideally it should still be dumped tho!
 // ARM version strings don't match 100% with labels... for 68k ROMs I'm using the build time / date stamp from near the start of the rom, there are some slightly different time stamps later
-GAME( 2002, dmnfrnt,      pgm,       svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V105, ROM M105XX 08/05/02) (ARM label V105, ROM 08/05/02 S105XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 10:24:11 ARM time: 10:33:23
-GAME( 2002, dmnfrnta,     dmnfrnt,   svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V102, ROM M102XX 06/19/02) (ARM label V102, ROM 05/24/02 S101XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 13:44:08 ARM time: 13:04:31
-GAME( 2002, dmnfrntpcb,   dmnfrnt,   svg,     sango,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V107KR, ROM M107KR 11/03/03) (ARM label V107KR, ROM 10/16/03 S106KR) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // works but reports version mismatch (wants internal rom version and region to match external?)
+GAME( 2002, dmnfrnt,      pgm,       svg,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V105, ROM M105XX 08/05/02) (ARM label V105, ROM 08/05/02 S105XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 10:24:11 ARM time: 10:33:23
+GAME( 2002, dmnfrnta,     dmnfrnt,   svg,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V102, ROM M102XX 06/19/02) (ARM label V102, ROM 05/24/02 S101XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 13:44:08 ARM time: 13:04:31
+GAME( 2002, dmnfrntpcb,   dmnfrnt,   svg,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V107KR, ROM M107KR 11/03/03) (ARM label V107KR, ROM 10/16/03 S106KR) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // works but reports version mismatch (wants internal rom version and region to match external?)
 
 
 
@@ -5972,13 +3732,13 @@ GAME( 1998, drgw3100,     drgw3,     dw3,     dw3,      drgw3,      ROT0,   "IGS
 
 GAME( 1998, dwex,         pgm,       dw3,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
-GAME( 1999, puzlstar,     pgm,       kov_disabled_arm,     sango,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, dw2001,       pgm,       kov2,     dw2001,   dw2001,    ROT0,   "IGS", "Dragon World 2001", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // V0000 02/21/01 16:05:16
 
-GAME( 2001, py2k2,        pgm,       kov_disabled_arm,     photoy2k, py2k2,      ROT0,   "IGS", "Photo Y2K 2", GAME_NOT_WORKING )  /* need internal rom of IGS027A */
+GAME( 1999, puzlstar,     pgm,       kov_simulated_arm,    pstar,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2001, dw2001,       pgm,       kov2_disabled_arm,     sango,    dw2001,    ROT0,   "IGS", "Dragon World 2001", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // V0000 02/21/01 16:05:16
+GAME( 2001, py2k2,        pgm,       kov_simulated_arm,    py2k2,    py2k2,      ROT0,   "IGS", "Photo Y2K 2", GAME_NOT_WORKING )  /* need internal rom of IGS027A */
 
-GAME( 2001, puzzli2,      pgm,       puzzli2_disabled_arm,  sango,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 2001, puzzli2,      pgm,       kov_simulated_arm,  puzzli2,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 
 
@@ -5986,27 +3746,27 @@ GAME( 2001, puzzli2,      pgm,       puzzli2_disabled_arm,  sango,    puzzli2,  
 
 
 // all 3 68k roms still have V100 strings, but are clearly different builds, there don't appear to be build string dates in them.  Two of the external ARM roms are marked V100 but are different builds, it's possible the single PCB version 100 is based on a later main revision
-GAME( 2003, theglad,      pgm,       svg,     sango,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 01/16/03 SHEN JIAN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 10:39:25
-GAME( 2003, theglada,     theglad,   svg,     sango,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V101) (ARM label V107, ROM 06/06/03 SHEN JIAN V107)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 16:17:27
-GAME( 2003, thegladpcb,   theglad,   svg,     sango,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 02/25/03 SHEN JIAN) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 16:32:21
+GAME( 2003, theglad,      pgm,       svg,     pgm,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 01/16/03 SHEN JIAN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 10:39:25
+GAME( 2003, theglada,     theglad,   svg,     pgm,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V101) (ARM label V107, ROM 06/06/03 SHEN JIAN V107)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 16:17:27
+GAME( 2003, thegladpcb,   theglad,   svg,     pgm,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 02/25/03 SHEN JIAN) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 16:32:21
 
 
 
-GAME( 2004, oldsplus,     pgm,       svg_disabled_arm,     oldsplus,     oldsplus,   ROT0,   "IGS", "Oriental Legend Special Plus / Xi You Shi E Zhuan Super Plus", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, oldsplus,     pgm,       kov_simulated_arm, oldsplus,     oldsplus,   ROT0,   "IGS", "Oriental Legend Special Plus / Xi You Shi E Zhuan Super Plus", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2004, kovshp,       pgm,       kov,     sango,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovshp,       pgm,       kov,     kovsh,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 // these bootlegs are clones of this instead
-GAME( 2004, kovlsqh,      kovshp,     kov,     sango,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang / Sangoku Senki: Luan Shi Quan Huang (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsqh2,     kovshp,     kov,     sango,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang 2 / Sangoku Senki: Luan Shi Quan Huang 2 (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsjb,      kovshp,     kov,     sango,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsjba,     kovshp,     kov,     sango,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsqh,      kovshp,     kov,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang / Sangoku Senki: Luan Shi Quan Huang (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsqh2,     kovshp,     kov,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang 2 / Sangoku Senki: Luan Shi Quan Huang 2 (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsjb,      kovshp,     kov,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsjba,     kovshp,     kov,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2005, killbldp,     pgm,       svg,     sango,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (ver. 300)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2005, killbldp,     pgm,       svg,     pgm,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (ver. 300)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2004, happy6,       pgm,       svg,     sango,    happy6,     ROT0,   "IGS", "Happy 6-in-1 (ver. 101CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, happy6,       pgm,       svg,     pgm,    happy6,     ROT0,   "IGS", "Happy 6-in-1 (ver. 101CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2005, svg,          pgm,       svg,     sango,    svg,        ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // label was 200, but it's code rev 201? // ARM time: 10:07:20
-GAME( 2005, svgpcb,       svg,       svg,     sango,    svgpcb,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V100JP) (ARM label V100JP ROM 05/12/05  S.V.G V100) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 15:31:35
+GAME( 2005, svg,          pgm,       svg,     pgm,    svg,        ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // label was 200, but it's code rev 201? // ARM time: 10:07:20
+GAME( 2005, svgpcb,       svg,       svg,     pgm,    svgpcb,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V100JP) (ARM label V100JP ROM 05/12/05  S.V.G V100) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 15:31:35
 
 
 

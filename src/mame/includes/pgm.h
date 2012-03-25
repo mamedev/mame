@@ -1,4 +1,14 @@
 
+#include "machine/v3021.h"
+#include "cpu/z80/z80.h"
+#include "cpu/m68000/m68000.h"
+#include "cpu/arm7/arm7.h"
+#include "sound/ics2115.h"
+#include "cpu/arm7/arm7core.h"
+#include "machine/nvram.h"
+
+#define PGMARM7LOGERROR 0
+
 class pgm_state : public driver_device
 {
 public:
@@ -72,15 +82,6 @@ public:
 	UINT32        m_kb_regs[0x10];
 	UINT16        m_olds_bs;
 	UINT16        m_olds_cmd3;
-	// pstars
-	UINT16        m_pstars_key;
-	UINT16        m_pstars_int[2];
-	UINT32        m_pstars_regs[16];
-	UINT32        m_pstars_val;
-	UINT16        m_pstar_e7;
-	UINT16        m_pstar_b1;
-	UINT16        m_pstar_ce;
-	UINT16        m_pstar_ram[3];
 	// ASIC 3 (oriental legends protection)
 	UINT8         m_asic3_reg;
 	UINT8         m_asic3_latch[3];
@@ -90,28 +91,67 @@ public:
 	UINT8         m_asic3_h1;
 	UINT8         m_asic3_h2;
 	UINT16        m_asic3_hold;
-	// ASIC28
-	UINT16        m_asic28_key;
-	UINT16        m_asic28_regs[10];
-	UINT16        m_asic_params[256];
-	UINT16        m_asic28_rcnt;
-	UINT32        m_eoregs[16];
-	// Oldsplus simulation
-	UINT16        m_oldsplus_key;
-	UINT16        m_oldsplus_int[2];
-	UINT32        m_oldsplus_val;
-	UINT16        m_oldsplus_ram[0x100];
-	UINT32        m_oldsplus_regs[0x100];
 
 	UINT32*       m_arm_ram;
 
 };
 
+/* for machine/pgmprot1.c type games */
+class pgm_kovarmsim_state : public pgm_state
+{
+public:
+	pgm_kovarmsim_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pgm_state(mconfig, type, tag) {
 
+		m_ddp3internal_slot = 0;
+	}
+
+	UINT16 m_value0;
+	UINT16 m_value1;
+	UINT16 m_valuekey;
+	UINT16 m_ddp3lastcommand;
+	UINT32 m_valueresponse;
+	int m_ddp3internal_slot;
+	UINT32 m_ddp3slots[0x100];
+
+	// pstars / oldsplus
+	UINT16        m_pstar_e7;
+	UINT16        m_pstar_b1;
+	UINT16        m_pstar_ce;
+	UINT16        m_extra_ram[0x100];
+
+	typedef void (*pgm_arm_sim_command_handler)(pgm_kovarmsim_state *state, int pc);
+
+	pgm_arm_sim_command_handler arm_sim_handler;
+};
 
 
 
 extern UINT16 *pgm_mainram;	// used by nvram handler, we cannot move it to driver data struct
+
+/*----------- defined in drivers/pgm.c -----------*/
+
+void pgm_basic_init( running_machine &machine, bool set_bank  = true );
+
+INPUT_PORTS_EXTERN( pgm );
+
+/* we only need half of these because CavePGM has it's own MACHINE DRIVER in pgmprot1.c - refactor */
+TIMER_DEVICE_CALLBACK( pgm_interrupt );
+
+GFXDECODE_EXTERN( pgm );
+
+MACHINE_CONFIG_EXTERN( pgm );
+
+ADDRESS_MAP_EXTERN( pgm_z80_mem, 8 );
+ADDRESS_MAP_EXTERN( pgm_z80_io, 8 );
+void pgm_sound_irq( device_t *device, int level );
+
+ADDRESS_MAP_EXTERN( pgm_mem, 16 );
+ADDRESS_MAP_EXTERN( pgm_basic_mem, 16 );
+ADDRESS_MAP_EXTERN( pgm_base_mem, 16 );
+
+MACHINE_START( pgm );
+MACHINE_RESET( pgm );
 
 /*----------- defined in machine/pgmcrypt.c -----------*/
 
@@ -141,27 +181,101 @@ void pgm_happy6_decrypt(running_machine &machine);
 
 /*----------- defined in machine/pgmprot.c -----------*/
 
-READ16_HANDLER( pstars_protram_r );
-READ16_HANDLER( pstars_r );
-WRITE16_HANDLER( pstars_w );
+DRIVER_INIT( orlegend );
 
-READ16_HANDLER( pgm_asic3_r );
-WRITE16_HANDLER( pgm_asic3_w );
-WRITE16_HANDLER( pgm_asic3_reg_w );
+INPUT_PORTS_EXTERN( orlegend );
+INPUT_PORTS_EXTERN( orld105k );
 
-READ16_HANDLER( sango_protram_r );
-READ16_HANDLER( asic28_r );
-WRITE16_HANDLER( asic28_w );
+/*----------- defined in machine/pgmprot1.c -----------*/
 
-READ16_HANDLER( dw2_d80000_r );
+/* emulations */
+DRIVER_INIT( photoy2k );
+DRIVER_INIT( kovsh );
+DRIVER_INIT( kovshp );
+DRIVER_INIT( kovlsqh2 );
+DRIVER_INIT( kovqhsgs );
 
+MACHINE_CONFIG_EXTERN( kov );
 
-READ16_HANDLER( oldsplus_protram_r );
-READ16_HANDLER( oldsplus_r );
-WRITE16_HANDLER( oldsplus_w );
+/* simulations */
+DRIVER_INIT( ddp3 );
+DRIVER_INIT( ket );
+DRIVER_INIT( espgal );
+DRIVER_INIT( puzzli2 );
+DRIVER_INIT( py2k2 );
+DRIVER_INIT( pstar );
+DRIVER_INIT( kov );
+DRIVER_INIT( kovboot );
+DRIVER_INIT( oldsplus );
 
-MACHINE_RESET( kov );
-void install_protection_asic_sim_kov(running_machine &machine);
+MACHINE_CONFIG_EXTERN( kov_simulated_arm );
+MACHINE_CONFIG_EXTERN( cavepgm );
+
+INPUT_PORTS_EXTERN( sango );
+INPUT_PORTS_EXTERN( sango_ch );
+INPUT_PORTS_EXTERN( photoy2k );
+INPUT_PORTS_EXTERN( oldsplus );
+INPUT_PORTS_EXTERN( pstar );
+INPUT_PORTS_EXTERN( py2k2 );
+INPUT_PORTS_EXTERN( puzzli2 );
+INPUT_PORTS_EXTERN( kovsh );
+
+/*----------- defined in machine/pgmprot2.c -----------*/
+
+/* emulations */
+MACHINE_CONFIG_EXTERN( kov2 );
+
+DRIVER_INIT( kov2 );
+DRIVER_INIT( kov2p );
+DRIVER_INIT( martmast );
+DRIVER_INIT( ddp2 );
+
+/* simulations (or missing) */
+
+DRIVER_INIT( dw2001 );
+
+INPUT_PORTS_EXTERN( ddp2 );
+INPUT_PORTS_EXTERN( kov2 );
+INPUT_PORTS_EXTERN( martmast );
+INPUT_PORTS_EXTERN( dw2001 );
+
+/*----------- defined in machine/pgmprot3.c -----------*/
+
+MACHINE_CONFIG_EXTERN( svg );
+
+DRIVER_INIT( theglad );
+DRIVER_INIT( svg );
+DRIVER_INIT( svgpcb );
+DRIVER_INIT( killbldp );
+DRIVER_INIT( dmnfrnt );
+DRIVER_INIT( happy6 );
+
+/*----------- defined in machine/pgmprot4.c -----------*/
+
+MACHINE_CONFIG_EXTERN( killbld );
+MACHINE_CONFIG_EXTERN( dw3 );
+
+DRIVER_INIT( killbld );
+DRIVER_INIT( drgw3 );
+
+INPUT_PORTS_EXTERN( killbld );
+INPUT_PORTS_EXTERN( dw3 );
+
+/*----------- defined in machine/pgmprot5.c -----------*/
+
+DRIVER_INIT( drgw2 );
+DRIVER_INIT( dw2v100x );
+DRIVER_INIT( drgw2c );
+DRIVER_INIT( drgw2j );
+
+/*----------- defined in machine/pgmprot6.c -----------*/
+
+MACHINE_CONFIG_EXTERN( olds );
+
+DRIVER_INIT( olds );
+
+INPUT_PORTS_EXTERN( olds );
+
 
 /*----------- defined in video/pgm.c -----------*/
 
