@@ -5148,7 +5148,7 @@ GAME( 1996, bgareggatw, bgaregga, bgaregga, bgareggatw, bgaregga, ROT270, "Raizi
 GAME( 1996, bgaregganv, bgaregga, bgaregga, bgareggahk, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays New Version only when set to HK
 GAME( 1996, bgareggat2, bgaregga, bgaregga, bgaregga,   bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
 GAME( 1996, bgareggacn, bgaregga, bgaregga, bgareggacn, bgaregga, ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
-GAME( 1996, bgareggabl, bgaregga, bgaregga, bgareggacn, bgaregga, ROT270, "hack", "1945 2 - Battle Garegga Chinese hack", GAME_SUPPORTS_SAVE )
+GAME( 1996, bgareggabl, bgaregga, bgaregga, bgareggacn, bgaregga, ROT270, "hack", "1945 2 - Battle Garegga Chinese hack", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 // these are all based on Version B, even if only the Japan version states 'version B'
 GAME( 1998, batrider,   0,        batrider, batrider,  batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Europe) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
