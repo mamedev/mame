@@ -1,6 +1,6 @@
 .\"  -*- nroff -*-
 .\"
-.\" mame.1
+.\" mame.6
 .\"
 .\" Man page created from usage and source information:
 .\" * commands: see src/emu/clifront.c clifront.h
@@ -13,7 +13,7 @@
 .\" and updated by Andrew Burton <burtona@gol.com>, July 2003
 .\"
 .\"
-.TH MAME 1 2010-07-07 0.138u4 "MAME - The Multiple Arcade Machine Emulator"
+.TH MAME 1 2012-03-25 0.145u5 "MAME \- The Multiple Arcade Machine Emulator"
 .\"
 .\"
 .\" NAME chapter
@@ -146,11 +146,17 @@ is returned as one of the following:
 .B \-listdevices, \-ld
 Output the list of devices referenced by a given game or set of games.
 .TP
+.B \-listslots, \-lslot
+Output the list of available slots and slot devices for the system.
+.TP
 .B \-listmedia, \-lm
 Output the list of available media for the system.
 .TP
-.B \-listsoftware
+.B \-listsoftware, \-lsoft
 Output the list of known software for the system.
+.TP
+.B \-getsoftlist, \-glist
+Retrieve software list by name.
 .\"
 .\" *******************************************************
 .SS Configuration options
@@ -191,6 +197,9 @@ So, for example, if you wanted to disable overlay effects in the
 vector games, you can create a vector.ini with the "effect none" line
 in it, and it will override whatever effect value you have in your
 mame.ini. The default is ON (\-readconfig).
+.TP
+.B \-writeconfig, \-wc
+Write configuration to \fI[driver]\fR.ini on exit.
 .\"
 .\" *******************************************************
 .SS Search path options
@@ -467,6 +476,10 @@ Set number of processors; this overrides the number the system reports.
 .TP
 .B \-sdlvideofps
 Show SDL video performance.
+.TP
+.B \-bench
+Benchmark for the given number of emulated seconds;
+implies \-video none \-nosound \-nothrottle.
 .\"
 .\" *******************************************************
 .SS Rotation options
@@ -648,6 +661,9 @@ Center vertically within the view area. Default is ON (\-centerv).
 .B \-waitvsync
 Enable waiting for the start of VBLANK before flipping screens;
 reduces tearing effects.
+.TP
+.B \-syncrefresh
+Enable using the start of VBLANK for throttling instead of the game time.
 .\"
 .\" *******************************************************
 .SS Software video rendering subsystem options
@@ -728,24 +744,33 @@ Preferred custom OpenGL GLSL shader screen bitmap (from 0 to 9).
 Enable OpenGL GLSL handling of brightness and contrast. Better RGB game
 performance for free. Default is ON.
 .TP
-.B \-resolution, \-r
-Select the resolution to use in full\-screen mode.
-\fB\-switchres\fR must be enabled for this to work.
-.TP
 .B \-screen
+Explicit name for all screens; 'auto' here will try to make a best guess.
 .TP
 .B \-aspect, \-screen_aspect
+Aspect ratio for all screens; 'auto' here will try to make a best guess.
+.TP
+.B \-resolution, \-r
+Preferred resolution for all screens;
+format is \fIwidth\fRx\fIheight\fR[@\fIrefreshrate\fR] or 'auto'.
 .TP
 .B \-view
+Preferred view for all screens
 .TP
 .B \-screen[0\-3]
+Explicit name of the first|second|third|fourth screen; 'auto' here will try
+to make a best guess.
 .TP
 .B \-aspect[0\-3]
+Aspect ratio of the first|second|third|fourth screen; 'auto' here will try
+to make a best guess.
 .TP
 .B \-resolution[0\-3], \-r[0\-3]
+Preferred resolution for the first|second|third|fourth screen;
+format is \fIwidth\fRx\fIheight\fR[@\fIrefreshrate\fR] or 'auto'.
 .TP
 .B \-view[0\-3]
-All these options are reserved for future use.
+Preferred view for the first|second|third|fourth screen.
 .\"
 .\" *******************************************************
 .SS Full screen options
@@ -886,11 +911,18 @@ The default is 0.85.
 .B \-natural, \-nat
 Specifies whether to use a natural keyboard or not.
 .TP
-.B \-uimodekey, \-umk
-Specifies the key used to toggle between full and partial UI mode.
+.B \-joystick_contradictory
+Enable contradictory direction digital joystick input at the same time.
+.TP
+.B \-coin_impulse \fItime
+Set coin impulse time. A negative value for \fItime\fR disables the impulse;
+set \fItime\fR to 0 to obey driver or give a positive value to set impulse time.
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
 .\" SDL specific
 .\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-uimodekey, \-umk
+Specifies the key used to toggle between full and partial UI mode.
 .TP
 .B \-keymap
 Enable keymap for non\-QWERTY keyboards. Used in conjuction with
@@ -900,26 +932,12 @@ Enable keymap for non\-QWERTY keyboards. Used in conjuction with
 Specifies the full path to the keymap file to be used. Shipped keymap files lie
 in \fB/usr/share/games/mame/keymaps\fR.
 .TP
-.B \-joy_idx1 \fIjoystick
-.TP
-.B \-joy_idx2 \fIjoystick
-.TP
-.B \-joy_idx3 \fIjoystick
-.TP
-.B \-joy_idx4 \fIjoystick
-.TP
-.B \-joy_idx5 \fIjoystick
-.TP
-.B \-joy_idx6 \fIjoystick
-.TP
-.B \-joy_idx7 \fIjoystick
-.TP
-.B \-joy_idx8 \fIjoystick
+.B \-joy_idx[0\-8] \fIjoystick
 With these options you can assign a joystick to a 
 specific index in MAME. Even if the kernel will list the joysticks
 in a different order on the next boot, MAME will still see the joystick
 as e.g. "Joystick 2". Use mame \-v to see which joysticks are recognized.
-Default is AUTO.
+Default is 'auto'.
 .TP
 .B \-sixaxis
 Use special handling for PS3 Sixaxis controllers.
@@ -957,8 +975,7 @@ depending on the presence of a particular class of analog
 control for a particular game. For example, if you specify the option
 \-paddle mouse, then any game that has a paddle control will automatically
 enable mouse controls just as if you had explicitly specified \-mouse.
-Note that these controls override the values of \-[no]mouse,
-\-[no]joystick, etc.
+Note that these controls override the values of \-[no]mouse, \-[no]joystick, etc.
 .\"
 .\" *******************************************************
 .SS Debugging options
@@ -1015,6 +1032,26 @@ menu in the user interface. The	default is OFF (\-nocheat).
 .B \-[no]skip_gameinfo
 Forces MAME to skip displaying the game info screen. The default is OFF
 (\-noskip_gameinfo).
+.TP
+.B \-uifont \fIfontname
+Specifies the name of a BDF font file to use for the UI font. If this
+font cannot be found or cannot be loaded, the system will fall back
+to its built\-in UI font. On some platforms \fIfontname\fP can be a system
+font name instead of a BDF font file. The default is 'default' (use 
+the OSD\-determined default font).
+.TP
+.B \-ramsize, \-ram
+Size of RAM (if supported by driver).
+.TP
+.B \-confirm_quit
+Display confirm quit screen on exit.
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.\" SDL specific
+.\" +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+.TP
+.B \-watchdog
+Specifies a number of seconds after which MAME should automatically exit
+if it detects that the emulation has locked up.
 .\"
 .\"
 .\" LEGAL NOTICE chapter
