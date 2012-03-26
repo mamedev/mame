@@ -15,17 +15,47 @@ Other than that, the video hardware looks like it's similar to Galaxian
 (2 x 2114, 2 x 2101, 2 x EPROM) but there is no attack RAM and the graphics
 EPROMS are 2708. The graphics EPROMS do contain Galaxian-like graphics...
 
+Quick PCB sketch:
+  ------------------------------------------------------------------------------
+  |                                                                            |
+  |                   13l    13i    13h                                        |
+  |                                                                            |
+  |    PROM           11l    11i    11h      S2636                     XTAL    |
+|6-|                                                                   ?MHz    |
+  |                          10i    10h      S2636                             |
+|5-|                                                                           |
+|--|                          8i     8h      S2636                   S2650A    |
+|--|                                                                           |
+|--|                                                                           |
+  |                                                                            |
+|4-|                                                                           |
+|--|                                                                           |
+|--|                                                                           |
+|--|                                                                           |
+  |                                                                            |
+|3-|                                                                           |
+|--|                                                                           |
+|--|                                                                           |
+|--|       DSW                                                                 |
+  |                                                     3d                     |
+|2-|       DSW                                                                |-1|
+  |                                                     1d                    |--|
+  |                                                                           |--|
+  ------------------------------------------------------------------------------
+
 Astro Wars (port of Astro Fighter) is on a stripped down board of Galaxia,
-using only one 2636 chip.
+using only one 2636 chip, less RAM, and no PROM.
 
 ---
 
 HW has many similarities with quasar.c / cvs.c / zac2650.c
 
 TODO:
-- fix colors (and use MAME tilemaps)
-- accurate astrowar sprite/bg sync
+- fix colors
 - starfield hardware?
+- improve bullets
+- accurate astrowar sprite/bg sync
+- XTAL
 
 */
 
@@ -52,6 +82,8 @@ static WRITE8_HANDLER(galaxia_video_w)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
 //  space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+	state->m_bg_tilemap->mark_tile_dirty(offset);
+
 	if (*state->m_fo_state)
 		state->m_video[offset] = data;
 	else
@@ -61,6 +93,7 @@ static WRITE8_HANDLER(galaxia_video_w)
 static READ8_HANDLER(galaxia_video_r)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
+
 	if (*state->m_fo_state)
 		return state->m_video[offset];
 	else
@@ -71,7 +104,10 @@ static WRITE8_HANDLER(galaxia_scroll_w)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->m_scroll = data;
+
+	// fixed scrolling area
+	for (int i = 1; i < 6; i++)
+		state->m_bg_tilemap->set_scrolly(i, data);
 }
 
 static WRITE8_HANDLER(galaxia_ctrlport_w)
@@ -114,10 +150,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( astrowar_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet) // but no bullet hw?
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE_MEMBER(galaxia_state, m_video)
-	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
+	AM_RANGE(0x1c00, 0x1cff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet)
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -290,6 +326,7 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_GFXDECODE(galaxia)
 	MCFG_PALETTE_LENGTH(0x100)
 
+	MCFG_PALETTE_INIT(galaxia)
 	MCFG_VIDEO_START(galaxia)
 
 	MCFG_S2636_ADD("s2636_0", galaxia_s2636_config[0])
@@ -329,6 +366,7 @@ static MACHINE_CONFIG_START( astrowar, galaxia_state )
 	MCFG_GFXDECODE(astrowar)
 	MCFG_PALETTE_LENGTH(0x100)
 
+	MCFG_PALETTE_INIT(galaxia)
 	MCFG_VIDEO_START(galaxia)
 
 	MCFG_S2636_ADD("s2636_0", astrowar_s2636_config)

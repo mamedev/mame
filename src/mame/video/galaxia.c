@@ -11,6 +11,39 @@
 #include "includes/galaxia.h"
 
 
+PALETTE_INIT( galaxia )
+{
+	for (int i = 0; i < 0x100 ; i++)
+	{
+		// 1bpp is correct, but there should be more permutations
+		palette_set_color_rgb(machine, i, pal1bit(i >> 0), pal1bit(i >> 1), pal1bit(i >> 2));
+	}
+}
+
+static TILE_GET_INFO( get_bg_tile_info )
+{
+	galaxia_state *state = machine.driver_data<galaxia_state>();
+	UINT8 code = state->m_video[tile_index];
+	UINT8 attr = state->m_color[tile_index];
+	UINT8 color = attr;
+
+	SET_TILE_INFO(0, code, color, 0);
+}
+
+VIDEO_START( galaxia )
+{
+	galaxia_state *state = machine.driver_data<galaxia_state>();
+	state->m_color = auto_alloc_array(machine, UINT8, 0x400);
+	
+	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_bg_tilemap->set_transparent_pen(0);
+	state->m_bg_tilemap->set_scroll_cols(8);
+
+	machine.primary_screen->register_screen_bitmap(state->m_temp_bitmap);
+}
+
+
+/********************************************************************************/
 
 SCREEN_UPDATE_IND16( galaxia )
 {
@@ -22,30 +55,16 @@ SCREEN_UPDATE_IND16( galaxia )
 	bitmap_ind16 &s2636_2_bitmap = s2636_update(screen.machine().device("s2636_2"), cliprect);
 
 	bitmap.fill(0, cliprect);
-
-	// draw background
-	for (x = 0; x < 32; x++)
-	{
-		// fixed scrolling area
-		int y_offs = 0;
-		if (x >= 4 && x < 24)
-			y_offs = state->m_scroll ^ 0xff;
-
-		for (y = 0; y < 32; y++)
-		{
-			int tile = state->m_video[y << 5 | x];
-			int color = state->m_color[y << 5 | x];
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0], tile, color, 0, 0, x*8, (y_offs + y*8) & 0xff, 0);
-		}
-	}
-
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			// draw bullets (guesswork)
 			bool bullet = state->m_bullet[y] && x == (state->m_bullet[y] ^ 0xff);
-			bool background = bitmap.pix16(y, x) != 0;
+			bool background = (bitmap.pix16(y, x) & 7) != 0;
+
+			// draw bullets (guesswork)
 			if (bullet)
 			{
 				// background vs. bullet collision detection
@@ -100,23 +119,25 @@ SCREEN_UPDATE_IND16( astrowar )
 	bitmap_ind16 &s2636_0_bitmap = s2636_update(screen.machine().device("s2636_0"), cliprect);
 
 	bitmap.fill(0, cliprect);
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
+	copybitmap(state->m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
-	// draw background (no scroll?)
-	for (x = 0; x < 32; x++)
-	{
-		for (y = 0; y < 32; y++)
-		{
-			int tile = state->m_video[y << 5 | x];
-			int color = state->m_color[y << 5 | x];
-			drawgfx_transpen(bitmap,cliprect,screen.machine().gfx[0], tile, color, 0, 0, x*8, y*8, 0);
-		}
-	}
-
-	copybitmap(state->m_collision_bitmap, bitmap, 0, 0, 0, 0, cliprect);
-
-	// copy the S2636 bitmap into the main bitmap and check collision
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
+		// draw bullets (guesswork)
+		if (state->m_bullet[y])
+		{
+			UINT8 pos = (state->m_bullet[y] ^ 0xff) - 8;
+
+			// background vs. bullet collision detection
+			if (state->m_temp_bitmap.pix16(y, pos) & 7)
+				state->m_collision |= 0x02;
+
+			// bullet size/color/priority is guessed
+			bitmap.pix16(y, pos) = 7;
+			if (pos) bitmap.pix16(y, pos-1) = 7;
+		}
+
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			// NOTE: similar to zac2650.c, the sprite chip runs at a different frequency than the background generator
@@ -128,12 +149,13 @@ SCREEN_UPDATE_IND16( astrowar )
 			if ((int)(sx + 0.5) > cliprect.max_x)
 				break;
 
+			// copy the S2636 bitmap into the main bitmap and check collision
 			int pixel = s2636_0_bitmap.pix16(y, x + s_offset);
 
 			if (S2636_IS_PIXEL_DRAWN(pixel))
 			{
 				// S2636 vs. background collision detection
-				if (state->m_collision_bitmap.pix16(y, (int)(sx)) || state->m_collision_bitmap.pix16(y, (int)(sx + 0.5)))
+				if ((state->m_temp_bitmap.pix16(y, (int)(sx)) | state->m_temp_bitmap.pix16(y, (int)(sx + 0.5))) & 7)
 					state->m_collision |= 0x01;
 
 				bitmap.pix16(y, (int)(sx)) = S2636_PIXEL_COLOR(pixel);
@@ -143,16 +165,4 @@ SCREEN_UPDATE_IND16( astrowar )
 	}
 
 	return 0;
-}
-
-
-
-/********************************************************************************/
-
-VIDEO_START( galaxia )
-{
-	galaxia_state *state = machine.driver_data<galaxia_state>();
-	state->m_color = auto_alloc_array(machine, UINT8, 0x400);
-
-	machine.primary_screen->register_screen_bitmap(state->m_collision_bitmap);
 }

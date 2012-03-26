@@ -16,15 +16,16 @@ public:
 
 	UINT8 *m_fo_state;
 
-	bitmap_ind16 m_collision_bitmap;
+	tilemap_t *m_bg_tilemap;
+	bitmap_ind16 m_temp_bitmap;
 
 	UINT8 m_collision;
-	UINT8 m_scroll;
 };
 
 
 /*----------- defined in video/galaxia.c -----------*/
 
+PALETTE_INIT( galaxia );
+VIDEO_START( galaxia );
 SCREEN_UPDATE_IND16( galaxia );
 SCREEN_UPDATE_IND16( astrowar );
-VIDEO_START( galaxia );
