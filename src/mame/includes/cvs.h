@@ -92,7 +92,9 @@ WRITE8_HANDLER( cvs_video_fx_w );
 READ8_HANDLER( cvs_collision_r );
 READ8_HANDLER( cvs_collision_clear );
 
-void cvs_scroll_stars(running_machine &machine);
+void cvs_init_stars( running_machine &machine );
+void cvs_scroll_stars( running_machine &machine );
+void cvs_update_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always);
 
 PALETTE_INIT( cvs );
 SCREEN_UPDATE_IND16( cvs );

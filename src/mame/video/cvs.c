@@ -15,8 +15,6 @@
 #define SPRITE_PEN_BASE		(0x820)
 #define BULLET_STAR_PEN		(0x828)
 
-#define STARS_COLOR_BASE	16
-
 
 /******************************************************
  * Convert Colour prom to format for Mame Colour Map  *
@@ -129,44 +127,8 @@ WRITE8_HANDLER( cvs_scroll_w )
 VIDEO_START( cvs )
 {
 	cvs_state *state = machine.driver_data<cvs_state>();
-	int generator = 0;
-	int y;
 
-	/* precalculate the star background */
-
-	state->m_total_stars = 0;
-
-	for (y = 255; y >= 0; y--)
-	{
-		int x;
-
-		for (x = 511; x >= 0; x--)
-		{
-			int bit1, bit2;
-
-			generator <<= 1;
-			bit1 = (~generator >> 17) & 1;
-			bit2 = (generator >> 5) & 1;
-
-			if (bit1 ^ bit2)
-				generator |= 1;
-
-			if (((~generator >> 16) & 1) && (generator & 0xfe) == 0xfe)
-			{
-				if(((~(generator >> 12)) & 0x01) && ((~(generator >> 13)) & 0x01))
-				{
-					if (state->m_total_stars < CVS_MAX_STARS)
-					{
-						state->m_stars[state->m_total_stars].x = x;
-						state->m_stars[state->m_total_stars].y = y;
-						state->m_stars[state->m_total_stars].code = 1;
-
-						state->m_total_stars++;
-					}
-				}
-			}
-		}
-	}
+	cvs_init_stars(machine);
 
 	/* create helper bitmaps */
 	machine.primary_screen->register_screen_bitmap(state->m_background_bitmap);
@@ -177,13 +139,6 @@ VIDEO_START( cvs )
 	state->save_item(NAME(state->m_background_bitmap));
 	state->save_item(NAME(state->m_collision_background));
 	state->save_item(NAME(state->m_scrolled_collision_background));
-}
-
-
-void cvs_scroll_stars( running_machine &machine )
-{
-	cvs_state *state = machine.driver_data<cvs_state>();
-	state->m_stars_scroll++;
 }
 
 
@@ -314,26 +269,81 @@ SCREEN_UPDATE_IND16( cvs )
 
 	/* stars circuit */
 	if (state->m_stars_on)
+		cvs_update_stars(screen.machine(), bitmap, cliprect, BULLET_STAR_PEN, 0);
+
+	return 0;
+}
+
+
+
+/* cvs stars hardware */
+
+void cvs_scroll_stars( running_machine &machine )
+{
+	cvs_state *state = machine.driver_data<cvs_state>();
+	state->m_stars_scroll++;
+}
+
+void cvs_init_stars( running_machine &machine )
+{
+	cvs_state *state = machine.driver_data<cvs_state>();
+	int generator = 0;
+	int x, y;
+
+	/* precalculate the star background */
+
+	state->m_total_stars = 0;
+
+	for (y = 255; y >= 0; y--)
 	{
-		for (offs = 0; offs < state->m_total_stars; offs++)
+		for (x = 511; x >= 0; x--)
 		{
-			UINT8 x = (state->m_stars[offs].x + state->m_stars_scroll) >> 1;
-			UINT8 y = state->m_stars[offs].y + ((state->m_stars_scroll + state->m_stars[offs].x) >> 9);
+			int bit1, bit2;
 
-			if ((y & 1) ^ ((x >> 4) & 1))
+			generator <<= 1;
+			bit1 = (~generator >> 17) & 1;
+			bit2 = (generator >> 5) & 1;
+
+			if (bit1 ^ bit2)
+				generator |= 1;
+
+			if (((~generator >> 16) & 1) && (generator & 0xfe) == 0xfe)
 			{
-				if (flip_screen_x_get(screen.machine()))
-					x = ~x;
+				if(((~(generator >> 12)) & 0x01) && ((~(generator >> 13)) & 0x01))
+				{
+					if (state->m_total_stars < CVS_MAX_STARS)
+					{
+						state->m_stars[state->m_total_stars].x = x;
+						state->m_stars[state->m_total_stars].y = y;
+						state->m_stars[state->m_total_stars].code = 1;
 
-				if (flip_screen_y_get(screen.machine()))
-					y = ~y;
-
-				if ((y >= cliprect.min_y) && (y <= cliprect.max_y) &&
-					(colortable_entry_get_value(screen.machine().colortable, bitmap.pix16(y, x)) == 0))
-					bitmap.pix16(y, x) = BULLET_STAR_PEN;
+						state->m_total_stars++;
+					}
+				}
 			}
 		}
 	}
+}
 
-	return 0;
+void cvs_update_stars(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const pen_t star_pen, bool update_always)
+{
+	cvs_state *state = machine.driver_data<cvs_state>();
+	for (int offs = 0; offs < state->m_total_stars; offs++)
+	{
+		UINT8 x = (state->m_stars[offs].x + state->m_stars_scroll) >> 1;
+		UINT8 y = state->m_stars[offs].y + ((state->m_stars_scroll + state->m_stars[offs].x) >> 9);
+
+		if ((y & 1) ^ ((x >> 4) & 1))
+		{
+			if (flip_screen_x_get(machine))
+				x = ~x;
+
+			if (flip_screen_y_get(machine))
+				y = ~y;
+
+			if ((y >= cliprect.min_y) && (y <= cliprect.max_y) &&
+				(update_always || (colortable_entry_get_value(machine.colortable, bitmap.pix16(y, x)) == 0)))
+				bitmap.pix16(y, x) = star_pen;
+		}
+	}
 }
