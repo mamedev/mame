@@ -157,6 +157,17 @@ VIDEO_START( bgaregga )
 	state->m_tx_tilemap->set_scrolldx(0x1d4, 0x2a);
 }
 
+VIDEO_START( bgareggabl )
+{
+	toaplan2_state *state = machine.driver_data<toaplan2_state>();
+
+	VIDEO_START_CALL( toaplan2 );
+
+	/* Create the Text tilemap for this game */
+	truxton2_create_tx_tilemap(machine);
+	state->m_tx_tilemap->set_scrolldx(0x04, 0x2a);
+}
+
 VIDEO_START( batrider )
 {
 	toaplan2_state *state = machine.driver_data<toaplan2_state>();

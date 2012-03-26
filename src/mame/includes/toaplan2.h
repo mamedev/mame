@@ -62,6 +62,7 @@ VIDEO_START( truxton2 );
 VIDEO_START( fixeightbl );
 VIDEO_START( bgaregga );
 VIDEO_START( batrider );
+VIDEO_START( bgareggabl );
 
 SCREEN_UPDATE_IND16( toaplan2 );
 SCREEN_UPDATE_IND16( truxton2 );
