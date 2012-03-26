@@ -3,9 +3,10 @@
 
 #include "cpu/sh4/sh4.h"
 
-#define MCFG_MAPLE_DC_ADD(_tag, _maincpu_tag) \
+#define MCFG_MAPLE_DC_ADD(_tag, _maincpu_tag, _irq_cb)	\
 	MCFG_DEVICE_ADD(_tag, MAPLE_DC, 0) \
-	maple_dc_device::static_set_maincpu_tag(*device, _maincpu_tag);
+	maple_dc_device::static_set_maincpu_tag(*device, _maincpu_tag); \
+	maple_dc_device::static_set_irq_cb(*device, _irq_cb);
 
 class maple_device;
 
@@ -14,6 +15,7 @@ class maple_dc_device : public device_t
 public:
 	maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag);
+	static void static_set_irq_cb(device_t &device, void (*irq_cb)(running_machine &));
 
 	DECLARE_READ32_MEMBER(sb_mdstar_r);  // 5f6c04
 	DECLARE_WRITE32_MEMBER(sb_mdstar_w);
@@ -57,6 +59,7 @@ private:
 
 	UINT32 dma_state, dma_adr, dma_port, dma_dest;
 	bool dma_endflag;
+	void (*irq_cb)(running_machine &);
 
 	void dma_step();
 

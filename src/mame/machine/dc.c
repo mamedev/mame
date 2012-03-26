@@ -102,6 +102,14 @@ void naomi_g1_irq(running_machine &machine)
 	dc_update_interrupt_status(machine);
 }
 
+void dc_maple_irq(running_machine &machine)
+{
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
+	dc_update_interrupt_status(machine);
+}
+
 static TIMER_CALLBACK( ch2_dma_irq )
 {
 	dc_state *state = machine.driver_data<dc_state>();

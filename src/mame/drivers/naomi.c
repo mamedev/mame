@@ -2512,7 +2512,7 @@ static MACHINE_CONFIG_START( naomi_aw_base, dc_state )
 	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
 
-	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu" )
+	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 
 	MCFG_MACHINE_START( dc )
 	MCFG_MACHINE_RESET( naomi )

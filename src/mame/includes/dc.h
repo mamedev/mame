@@ -383,4 +383,6 @@ SCREEN_UPDATE_RGB32(dc);
 #define IST_EXT_AICA	0x00000002
 #define IST_EXT_GDROM	0x00000001
 
+void dc_maple_irq(running_machine &machine);
+
 #endif
