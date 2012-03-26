@@ -573,6 +573,7 @@ $(MAMEOBJ)/comad.a: \
 
 $(MAMEOBJ)/cvs.a: \
 	$(DRIVERS)/cvs.o $(VIDEO)/cvs.o \
+	$(DRIVERS)/galaxia.o $(VIDEO)/galaxia.o \
 	$(DRIVERS)/quasar.o $(VIDEO)/quasar.o \
 
 $(MAMEOBJ)/dataeast.a: \
@@ -1570,7 +1571,6 @@ $(MAMEOBJ)/yunsung.a: \
 	$(DRIVERS)/yunsun16.o $(VIDEO)/yunsun16.o \
 
 $(MAMEOBJ)/zaccaria.a: \
-	$(DRIVERS)/galaxia.o $(VIDEO)/galaxia.o \
 	$(DRIVERS)/laserbat.o $(AUDIO)/laserbat.o \
 	$(DRIVERS)/zac2650.o $(VIDEO)/zac2650.o \
 	$(DRIVERS)/zaccaria.o $(VIDEO)/zaccaria.o \

@@ -20,7 +20,7 @@ Quick PCB sketch:
   |                                                                            |
   |                   13l    13i    13h                                        |
   |                                                                            |
-  |    PROM           11l    11i    11h      S2636                     XTAL    |
+  |    PROM           11l    11i    11h      S2636            S2621    XTAL    |
 |6-|                                                                   ?MHz    |
   |                          10i    10h      S2636                             |
 |5-|                                                                           |
@@ -43,6 +43,8 @@ Quick PCB sketch:
   |                                                                           |--|
   ------------------------------------------------------------------------------
 
+XTAL label is not readable on any PCB?
+
 Astro Wars (port of Astro Fighter) is on a stripped down board of Galaxia,
 using only one 2636 chip, less RAM, and no PROM.
 
@@ -51,8 +53,7 @@ using only one 2636 chip, less RAM, and no PROM.
 HW has many similarities with quasar.c / cvs.c / zac2650.c
 
 TODO:
-- fix colors
-- starfield hardware?
+- fix colors, there's no color prom?!
 - improve bullets
 - accurate astrowar sprite/bg sync
 - XTAL
@@ -69,6 +70,7 @@ TODO:
 static INTERRUPT_GEN( galaxia_interrupt )
 {
 	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
+	cvs_scroll_stars(device->machine());
 }
 
 
@@ -83,21 +85,7 @@ static WRITE8_HANDLER(galaxia_video_w)
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
 //  space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	state->m_bg_tilemap->mark_tile_dirty(offset);
-
-	if (*state->m_fo_state)
-		state->m_video[offset] = data;
-	else
-		state->m_color[offset] = data;
-}
-
-static READ8_HANDLER(galaxia_video_r)
-{
-	galaxia_state *state = space->machine().driver_data<galaxia_state>();
-
-	if (*state->m_fo_state)
-		return state->m_video[offset];
-	else
-		return state->m_color[offset];
+	cvs_video_or_color_ram_w(space, offset, data);
 }
 
 static WRITE8_HANDLER(galaxia_scroll_w)
@@ -125,24 +113,24 @@ static READ8_HANDLER(galaxia_collision_r)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	return state->m_collision;
+	return state->m_collision_register;
 }
 
 static READ8_HANDLER(galaxia_collision_clear)
 {
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
 	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->m_collision = 0;
+	state->m_collision_register = 0;
 	return 0xff;
 }
 
 static ADDRESS_MAP_START( galaxia_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet_ram)
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w) AM_BASE_MEMBER(galaxia_state, m_video)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, galaxia_video_w) AM_BASE_MEMBER(galaxia_state, m_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x7214, 0x7214) AM_READ_PORT("IN0")
@@ -152,8 +140,8 @@ static ADDRESS_MAP_START( astrowar_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE_MEMBER(galaxia_state, m_video)
-	AM_RANGE(0x1c00, 0x1cff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, galaxia_video_w)  AM_BASE_MEMBER(galaxia_state, m_video_ram)
+	AM_RANGE(0x1c00, 0x1cff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxia_state, m_bullet_ram)
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -283,19 +271,19 @@ static const gfx_layout tiles8x8x2_layout =
 };
 
 static GFXDECODE_START( galaxia )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x2_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x2_layout, 0, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( astrowar )
-	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x1_layout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8x1_layout, 0, 8 )
 GFXDECODE_END
 
 
 static const s2636_interface galaxia_s2636_config[3] =
 {
-	{ "screen", 0x100, 3, -27, "s2636snd_0" },
-	{ "screen", 0x100, 3, -27, "s2636snd_1" },
-	{ "screen", 0x100, 3, -27, "s2636snd_2" }
+	{ "screen", 0x100, 3, -26, "s2636snd_0" },
+	{ "screen", 0x100, 3, -26, "s2636snd_1" },
+	{ "screen", 0x100, 3, -26, "s2636snd_2" }
 };
 
 static const s2636_interface astrowar_s2636_config =
@@ -324,7 +312,7 @@ static MACHINE_CONFIG_START( galaxia, galaxia_state )
 	MCFG_SCREEN_UPDATE_STATIC(galaxia)
 
 	MCFG_GFXDECODE(galaxia)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x18+2)
 
 	MCFG_PALETTE_INIT(galaxia)
 	MCFG_VIDEO_START(galaxia)
@@ -360,14 +348,14 @@ static MACHINE_CONFIG_START( astrowar, galaxia_state )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(256, 256)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 30*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(astrowar)
 
 	MCFG_GFXDECODE(astrowar)
-	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_LENGTH(0x18+2)
 
-	MCFG_PALETTE_INIT(galaxia)
-	MCFG_VIDEO_START(galaxia)
+	MCFG_PALETTE_INIT(astrowar)
+	MCFG_VIDEO_START(astrowar)
 
 	MCFG_S2636_ADD("s2636_0", astrowar_s2636_config)
 
@@ -425,5 +413,5 @@ ROM_START( astrowar )
 ROM_END
 
 
-GAME( 1979, galaxia,  0, galaxia,  galaxia, 0, ROT90, "Zaccaria / Zelco", "Galaxia",    GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1980, astrowar, 0, astrowar, galaxia, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1979, galaxia,  0, galaxia,  galaxia, 0, ROT90, "Zaccaria / Zelco", "Galaxia",    GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1980, astrowar, 0, astrowar, galaxia, 0, ROT90, "Zaccaria / Zelco", "Astro Wars", GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS )
