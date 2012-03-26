@@ -73,11 +73,12 @@ VIDEO_START( galaxia )
 {
 	galaxia_state *state = machine.driver_data<galaxia_state>();
 	
+	assert((STAR_PEN & 7) == 0);
+	
 	state->m_bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_transparent_pen(0);
 	state->m_bg_tilemap->set_scroll_cols(8);
 	
-	machine.primary_screen->register_screen_bitmap(state->m_stars_bitmap);
 	cvs_init_stars(machine);
 }
 
@@ -104,6 +105,7 @@ SCREEN_UPDATE_IND16( galaxia )
 	bitmap_ind16 &s2636_2_bitmap = s2636_update(screen.machine().device("s2636_2"), cliprect);
 
 	bitmap.fill(0, cliprect);
+	cvs_update_stars(screen.machine(), bitmap, cliprect, STAR_PEN, 1);
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -155,11 +157,6 @@ SCREEN_UPDATE_IND16( galaxia )
 		}
 	}
 
-	// cvs stars circuit
-	state->m_stars_bitmap.fill(0, cliprect);
-	cvs_update_stars(screen.machine(), state->m_stars_bitmap, cliprect, STAR_PEN, 1);
-	copybitmap_trans(bitmap, state->m_stars_bitmap, 0, 0, 0, 0, cliprect, 0);
-
 	return 0;
 }
 
@@ -173,6 +170,7 @@ SCREEN_UPDATE_IND16( astrowar )
 	bitmap_ind16 &s2636_0_bitmap = s2636_update(screen.machine().device("s2636_0"), cliprect);
 
 	bitmap.fill(0, cliprect);
+	cvs_update_stars(screen.machine(), bitmap, cliprect, STAR_PEN, 1);
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	copybitmap(state->m_temp_bitmap, bitmap, 0, 0, 0, 0, cliprect);
 
@@ -216,11 +214,6 @@ SCREEN_UPDATE_IND16( astrowar )
 			}
 		}
 	}
-
-	// cvs stars circuit
-	state->m_stars_bitmap.fill(0, cliprect);
-	cvs_update_stars(screen.machine(), state->m_stars_bitmap, cliprect, STAR_PEN, 1);
-	copybitmap_trans(bitmap, state->m_stars_bitmap, 0, 0, 0, 0, cliprect, 0);
 
 	return 0;
 }

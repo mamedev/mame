@@ -13,7 +13,6 @@ public:
 		: cvs_state(mconfig, type, tag) { }
 
 	tilemap_t *m_bg_tilemap;
-	bitmap_ind16 m_stars_bitmap;
 	bitmap_ind16 m_temp_bitmap;
 };
 
