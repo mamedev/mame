@@ -26,9 +26,6 @@ public:
 	UINT16 *      m_rowscrollram;
 	UINT16 *      m_videoram;
 	UINT8  *      m_z80_mainram;
-	UINT32 *      m_arm7_shareram;
-	UINT32 *      m_svg_shareram[2];	//for 5585G MACHINE
-	UINT16 *      m_sharedprotram;		// killbld & olds
 	UINT8  *      m_sprite_a_region;
 	size_t        m_sprite_a_region_size;
 	UINT16 *      m_spritebufferram; // buffered spriteram
@@ -43,7 +40,6 @@ public:
 	/* devices */
 	cpu_device *m_maincpu;
 	cpu_device *m_soundcpu;
-	cpu_device *m_prot;
 	device_t *m_ics;
 
 	/* used by rendering */
@@ -62,26 +58,19 @@ public:
 	UINT8        m_cal_cnt;
 	system_time  m_systime;
 
-	/* protection handling */
-	// kov2
-	UINT32        m_kov2_latchdata_68k_w;
-	UINT32        m_kov2_latchdata_arm_w;
-	// kovsh
-	UINT16        m_kovsh_highlatch_arm_w;
-	UINT16        m_kovsh_lowlatch_arm_w;
-	UINT16        m_kovsh_highlatch_68k_w;
-	UINT16        m_kovsh_lowlatch_68k_w;
-	UINT32        m_kovsh_counter;
-	// svg
-	int           m_svg_ram_sel;
-	// killbld & olds
-	int           m_kb_cmd;
-	int           m_kb_reg;
-	int           m_kb_ptr;
-	int			  m_kb_region_sequence_position;
-	UINT32        m_kb_regs[0x10];
-	UINT16        m_olds_bs;
-	UINT16        m_olds_cmd3;
+
+};
+
+
+/* for machine/pgmprot.c type games */
+class pgm_asic3_state : public pgm_state
+{
+public:
+	pgm_asic3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pgm_state(mconfig, type, tag) {
+
+	}
+
 	// ASIC 3 (oriental legends protection)
 	UINT8         m_asic3_reg;
 	UINT8         m_asic3_latch[3];
@@ -91,39 +80,130 @@ public:
 	UINT8         m_asic3_h1;
 	UINT8         m_asic3_h2;
 	UINT16        m_asic3_hold;
-
-	UINT32*       m_arm_ram;
-
 };
 
+
 /* for machine/pgmprot1.c type games */
-class pgm_kovarmsim_state : public pgm_state
+class pgm_arm_type1_state : public pgm_state
 {
 public:
-	pgm_kovarmsim_state(const machine_config &mconfig, device_type type, const char *tag)
+	pgm_arm_type1_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag) {
 
-		m_ddp3internal_slot = 0;
+		m_curslots = 0;
+		m_puzzli_54_trigger = 0;
 	}
 
+	/////////////// simulations
 	UINT16 m_value0;
 	UINT16 m_value1;
 	UINT16 m_valuekey;
 	UINT16 m_ddp3lastcommand;
 	UINT32 m_valueresponse;
-	int m_ddp3internal_slot;
-	UINT32 m_ddp3slots[0x100];
+	int m_curslots;
+	UINT32 m_slots[0x100];
 
-	// pstars / oldsplus
-	UINT16        m_pstar_e7;
-	UINT16        m_pstar_b1;
-	UINT16        m_pstar_ce;
-	UINT16        m_extra_ram[0x100];
+	// pstars / oldsplus / kov
+	UINT16 m_pstar_e7_value;
+	UINT16 m_pstar_b1_value;
+	UINT16 m_pstar_ce_value;
+	UINT16 m_kov_c0_value;
+	UINT16 m_kov_cb_value;
+	UINT16 m_kov_fe_value;
+	UINT16 m_extra_ram[0x100];
+	// puzzli2
+	INT32 m_puzzli_54_trigger;
 
-	typedef void (*pgm_arm_sim_command_handler)(pgm_kovarmsim_state *state, int pc);
+	typedef void (*pgm_arm_sim_command_handler)(pgm_arm_type1_state *state, int pc);
 
 	pgm_arm_sim_command_handler arm_sim_handler;
+
+	/////////////// emulation
+	UINT16        m_pgm_arm_type1_highlatch_arm_w;
+	UINT16        m_pgm_arm_type1_lowlatch_arm_w;
+	UINT16        m_pgm_arm_type1_highlatch_68k_w;
+	UINT16        m_pgm_arm_type1_lowlatch_68k_w;
+	UINT32        m_pgm_arm_type1_counter;
+	UINT32 *      m_arm7_shareram;
+
+	cpu_device *m_prot;
 };
+
+/* for machine/pgmprot2.c type games */
+class pgm_arm_type2_state : public pgm_state
+{
+public:
+	pgm_arm_type2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pgm_state(mconfig, type, tag) {
+
+	}
+	// kov2
+	UINT32        m_kov2_latchdata_68k_w;
+	UINT32        m_kov2_latchdata_arm_w;
+
+	UINT32*       m_arm_ram;
+	UINT32 *      m_arm7_shareram;
+
+	cpu_device *m_prot;
+};
+
+
+
+/* for machine/pgmprot3.c type games */
+class pgm_arm_type3_state : public pgm_state
+{
+public:
+	pgm_arm_type3_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pgm_state(mconfig, type, tag) {
+
+	}
+	// svg
+	int           m_svg_ram_sel;
+	UINT32 *      m_svg_shareram[2];	//for 5585G MACHINE
+
+	UINT32        m_svg_latchdata_68k_w;
+	UINT32        m_svg_latchdata_arm_w;
+	UINT32*       m_arm_ram;
+
+	cpu_device *m_prot;
+};
+
+
+/* for machine/pgmprot4.c type games */
+class pgm_022_025_state : public pgm_state
+{
+public:
+	pgm_022_025_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pgm_state(mconfig, type, tag) {
+
+	}
+	int           m_kb_cmd;
+	int           m_kb_reg;
+	int           m_kb_ptr;
+	int			  m_kb_region_sequence_position;
+	UINT32        m_kb_regs[0x10];
+	UINT16 *      m_sharedprotram;
+
+};
+
+/* for machine/pgmprot6.c type games */
+class pgm_028_025_state : public pgm_state
+{
+public:
+	pgm_028_025_state(const machine_config &mconfig, device_type type, const char *tag)
+		: pgm_state(mconfig, type, tag) {
+
+	}
+	// olds
+	int           m_kb_cmd;
+	int           m_kb_reg;
+	int           m_kb_ptr;
+	UINT16        m_olds_bs;
+	UINT16        m_olds_cmd3;
+	UINT16 *      m_sharedprotram;
+
+};
+
 
 
 
@@ -135,12 +215,12 @@ void pgm_basic_init( running_machine &machine, bool set_bank  = true );
 
 INPUT_PORTS_EXTERN( pgm );
 
-/* we only need half of these because CavePGM has it's own MACHINE DRIVER in pgmprot1.c - refactor */
 TIMER_DEVICE_CALLBACK( pgm_interrupt );
 
 GFXDECODE_EXTERN( pgm );
 
 MACHINE_CONFIG_EXTERN( pgm );
+MACHINE_CONFIG_EXTERN( pgmbase );
 
 ADDRESS_MAP_EXTERN( pgm_z80_mem, 8 );
 ADDRESS_MAP_EXTERN( pgm_z80_io, 8 );
@@ -186,6 +266,8 @@ DRIVER_INIT( orlegend );
 INPUT_PORTS_EXTERN( orlegend );
 INPUT_PORTS_EXTERN( orld105k );
 
+MACHINE_CONFIG_EXTERN( pgm_asic3 );
+
 /*----------- defined in machine/pgmprot1.c -----------*/
 
 /* emulations */
@@ -195,7 +277,6 @@ DRIVER_INIT( kovshp );
 DRIVER_INIT( kovlsqh2 );
 DRIVER_INIT( kovqhsgs );
 
-MACHINE_CONFIG_EXTERN( kov );
 
 /* simulations */
 DRIVER_INIT( ddp3 );
@@ -208,8 +289,9 @@ DRIVER_INIT( kov );
 DRIVER_INIT( kovboot );
 DRIVER_INIT( oldsplus );
 
-MACHINE_CONFIG_EXTERN( kov_simulated_arm );
-MACHINE_CONFIG_EXTERN( cavepgm );
+MACHINE_CONFIG_EXTERN( pgm_arm_type1 );
+MACHINE_CONFIG_EXTERN( pgm_arm_type1_sim );
+MACHINE_CONFIG_EXTERN( pgm_arm_type1_cave );
 
 INPUT_PORTS_EXTERN( sango );
 INPUT_PORTS_EXTERN( sango_ch );
@@ -223,7 +305,7 @@ INPUT_PORTS_EXTERN( kovsh );
 /*----------- defined in machine/pgmprot2.c -----------*/
 
 /* emulations */
-MACHINE_CONFIG_EXTERN( kov2 );
+MACHINE_CONFIG_EXTERN( pgm_arm_type2 );
 
 DRIVER_INIT( kov2 );
 DRIVER_INIT( kov2p );
@@ -241,7 +323,7 @@ INPUT_PORTS_EXTERN( dw2001 );
 
 /*----------- defined in machine/pgmprot3.c -----------*/
 
-MACHINE_CONFIG_EXTERN( svg );
+MACHINE_CONFIG_EXTERN( pgm_arm_type3 );
 
 DRIVER_INIT( theglad );
 DRIVER_INIT( svg );
@@ -252,8 +334,8 @@ DRIVER_INIT( happy6 );
 
 /*----------- defined in machine/pgmprot4.c -----------*/
 
-MACHINE_CONFIG_EXTERN( killbld );
-MACHINE_CONFIG_EXTERN( dw3 );
+MACHINE_CONFIG_EXTERN( pgm_022_025_kb );
+MACHINE_CONFIG_EXTERN( pgm_022_025_dw );
 
 DRIVER_INIT( killbld );
 DRIVER_INIT( drgw3 );
@@ -270,7 +352,7 @@ DRIVER_INIT( drgw2j );
 
 /*----------- defined in machine/pgmprot6.c -----------*/
 
-MACHINE_CONFIG_EXTERN( olds );
+MACHINE_CONFIG_EXTERN( pgm_028_025_ol );
 
 DRIVER_INIT( olds );
 

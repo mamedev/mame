@@ -35,7 +35,7 @@
 
 static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT16 size, UINT16 mode)
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 	UINT16 param;
 	/*
     P_SRC =0x300290 (offset from prot rom base)
@@ -195,7 +195,7 @@ static void IGS022_reset(running_machine& machine)
 {
 	int i;
 	UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 	UINT16 tmp;
 
 	// fill ram with A5 patern
@@ -228,7 +228,7 @@ static void IGS022_reset(running_machine& machine)
 
 static void IGS022_handle_command(running_machine& machine)
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 	UINT16 cmd = state->m_sharedprotram[0x200/2];
 	//mame_printf_debug("command %04x\n", cmd);
 	if (cmd == 0x6d)	//Store values to asic ram
@@ -279,7 +279,7 @@ static WRITE16_HANDLER( killbld_igs025_prot_w )
 {
 //  mame_printf_debug("killbrd prot r\n");
 //  return 0;
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
 	offset &= 0xf;
 
 	if (offset == 0)
@@ -307,7 +307,7 @@ static WRITE16_HANDLER( killbld_igs025_prot_w )
 static READ16_HANDLER( killbld_igs025_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
 	UINT16 res ;
 
 	offset &= 0xf;
@@ -351,7 +351,7 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 
 static MACHINE_RESET( killbld )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 
 	MACHINE_RESET_CALL(pgm);
 	/* fill the protection ram with a5 + auto dma */
@@ -371,7 +371,7 @@ static MACHINE_RESET( killbld )
 
 DRIVER_INIT( killbld )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 
 	pgm_basic_init(machine);
 	pgm_killbld_decrypt(machine);
@@ -393,7 +393,7 @@ DRIVER_INIT( killbld )
 
 static MACHINE_RESET( dw3 )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 
 
 	MACHINE_RESET_CALL(pgm);
@@ -455,7 +455,7 @@ static int ptr=0;
 static UINT8 dw3_swap;
 static WRITE16_HANDLER( drgw3_igs025_prot_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
 
 	offset&=0xf;
 
@@ -482,7 +482,7 @@ static WRITE16_HANDLER( drgw3_igs025_prot_w )
 static READ16_HANDLER( drgw3_igs025_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
 
 	UINT16 res ;
 
@@ -530,7 +530,7 @@ DRIVER_INIT( drgw3 )
 	pgm_basic_init(machine);
 
 /*
-    pgm_state *state = machine.driver_data<pgm_state>();
+    pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 
     {
         int x;
@@ -551,12 +551,14 @@ DRIVER_INIT( drgw3 )
 static ADDRESS_MAP_START( killbld_mem, AS_PROGRAM, 16)
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x2fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_MEMBER(pgm_state, m_sharedprotram) // Shared with protection device
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_MEMBER(pgm_022_025_state, m_sharedprotram) // Shared with protection device
 ADDRESS_MAP_END
 
 
 
-MACHINE_CONFIG_DERIVED( killbld, pgm )
+MACHINE_CONFIG_START( pgm_022_025_kb, pgm_022_025_state )
+	MCFG_FRAGMENT_ADD(pgmbase)
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(killbld_mem)
 
@@ -564,7 +566,9 @@ MACHINE_CONFIG_DERIVED( killbld, pgm )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED( dw3, pgm )
+MACHINE_CONFIG_START( pgm_022_025_dw, pgm_022_025_state )
+	MCFG_FRAGMENT_ADD(pgmbase)
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(killbld_mem)
 

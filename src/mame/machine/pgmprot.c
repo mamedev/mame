@@ -1,8 +1,10 @@
 /***********************************************************************
  PGM ASIC3 PGM protection emulation
 
- these are simulations of the IGS 012 and 025 protection combination
- used on the following PGM games
+ this seems similar to the IGS025? Is the physical chip ASIC3, or is
+ that just what the game calls it?
+
+ Used by:
 
  Oriental Legend
 
@@ -15,7 +17,7 @@
 
 static void asic3_compute_hold(running_machine &machine)
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_asic3_state *state = machine.driver_data<pgm_asic3_state>();
 
 	// The mode is dependent on the region
 	static const int modes[4] = { 1, 1, 3, 2 };
@@ -52,7 +54,7 @@ static void asic3_compute_hold(running_machine &machine)
 
 READ16_HANDLER( pgm_asic3_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_asic3_state *state = space->machine().driver_data<pgm_asic3_state>();
 	UINT8 res = 0;
 	/* region is supplied by the protection device */
 
@@ -96,7 +98,7 @@ READ16_HANDLER( pgm_asic3_r )
 
 WRITE16_HANDLER( pgm_asic3_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_asic3_state *state = space->machine().driver_data<pgm_asic3_state>();
 
 	if(ACCESSING_BITS_0_7)
 	{
@@ -132,7 +134,7 @@ WRITE16_HANDLER( pgm_asic3_w )
 
 WRITE16_HANDLER( pgm_asic3_reg_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_asic3_state *state = space->machine().driver_data<pgm_asic3_state>();
 
 	if(ACCESSING_BITS_0_7)
 		state->m_asic3_reg = data & 0xff;
@@ -146,7 +148,7 @@ WRITE16_HANDLER( pgm_asic3_reg_w )
 
 DRIVER_INIT( orlegend )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_asic3_state *state = machine.driver_data<pgm_asic3_state>();
 	pgm_basic_init(machine);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xC0400e, 0xC0400f, FUNC(pgm_asic3_r), FUNC(pgm_asic3_w));
@@ -194,3 +196,6 @@ INPUT_PORTS_START( orld105k )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )		// "incorrect version" error
 INPUT_PORTS_END
 
+MACHINE_CONFIG_START( pgm_asic3, pgm_asic3_state )
+	MCFG_FRAGMENT_ADD(pgmbase)
+MACHINE_CONFIG_END

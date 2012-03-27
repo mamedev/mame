@@ -517,7 +517,6 @@ MACHINE_START( pgm )
 
 	state->m_maincpu = machine.device<cpu_device>("maincpu");
 	state->m_soundcpu = machine.device<cpu_device>("soundcpu");
-	state->m_prot = machine.device<cpu_device>("prot");
 	state->m_ics = machine.device("ics");
 }
 
@@ -3624,12 +3623,12 @@ GAME( 1997, pgm,          0,         pgm,     pgm,      pgm,        ROT0,   "IGS
    -----------------------------------------------------------------------------------------------------------------------*/
 
 // the version numbering on these is a mess... date srings from ROM (and in some cases even those are missing..)
-GAME( 1997, orlegend,     pgm,       pgm,     orlegend, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 126)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )                // V0001 01/14/98 18:16:38 - runs as World
-GAME( 1997, orlegende,    orlegend,  pgm,     orlegend, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )                // V0001 07/14/97 11:19:45 - runs as World
-GAME( 1997, orlegendc,    orlegend,  pgm,     orlegend, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // V0001 05/05/97 10:08:21 - runs as World, Korea, China
-GAME( 1997, orlegendca,   orlegend,  pgm,     orlegend, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. ???, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // V0001 04/02/97 13:35:43 - runs as HongKong, China, China
-GAME( 1997, orlegend111c, orlegend,  pgm,     orlegend, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 111, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // V0001 no date!          - runs as HongKong, China, China
-GAME( 1997, orlegend105k, orlegend,  pgm,     orld105k, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 105, Korean Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )  // V0000 no date!          - runs as Korea
+GAME( 1997, orlegend,     pgm,       pgm_asic3,     orlegend, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 126)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )                // V0001 01/14/98 18:16:38 - runs as World
+GAME( 1997, orlegende,    orlegend,  pgm_asic3,     orlegend, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )                // V0001 07/14/97 11:19:45 - runs as World
+GAME( 1997, orlegendc,    orlegend,  pgm_asic3,     orlegend, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 112, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // V0001 05/05/97 10:08:21 - runs as World, Korea, China
+GAME( 1997, orlegendca,   orlegend,  pgm_asic3,     orlegend, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. ???, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // V0001 04/02/97 13:35:43 - runs as HongKong, China, China
+GAME( 1997, orlegend111c, orlegend,  pgm_asic3,     orlegend, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 111, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // V0001 no date!          - runs as HongKong, China, China
+GAME( 1997, orlegend105k, orlegend,  pgm_asic3,     orld105k, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 105, Korean Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )  // V0000 no date!          - runs as Korea
 
 GAME( 1997, drgw2,        pgm,       pgm,     pgm,      drgw2,      ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // This set still has protection issues!
 GAME( 1997, dw2v100x,     drgw2,     pgm,     pgm,      dw2v100x,   ROT0,   "IGS", "Dragon World II (ver. 100X, Export)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // This set still has protection issues!
@@ -3637,59 +3636,59 @@ GAME( 1997, drgw2j,       drgw2,     pgm,     pgm,      drgw2j,     ROT0,   "IGS
 GAME( 1997, drgw2c,       drgw2,     pgm,     pgm,      drgw2c,     ROT0,   "IGS", "Zhong Guo Long II (ver. 100C, China)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 // region provided by internal ARM rom
-GAME( 1999, photoy2k,     pgm,       kov,     photoy2k, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 105)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 1999, photoy2k104,  photoy2k,  kov,     photoy2k, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
-GAME( 1999, photoy2k102,  photoy2k,  kov,     photoy2k, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 102, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1999, photoy2k,     pgm,       pgm_arm_type1,     photoy2k, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 105)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1999, photoy2k104,  photoy2k,  pgm_arm_type1,     photoy2k, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
+GAME( 1999, photoy2k102,  photoy2k,  pgm_arm_type1,     photoy2k, photoy2k,   ROT0,   "IGS", "Photo Y2K (ver. 102, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* region provided by protection device */
 
 // region provided by internal ARM rom
-GAME( 1999, kovsh,        pgm,       kov,     kovsh,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 104, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, China internal ROM
-GAME( 1999, kovsh103,     kovsh,     kov,     kovsh,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 103, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V103, China internal ROM
+GAME( 1999, kovsh,        pgm,       pgm_arm_type1,     kovsh,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 104, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, China internal ROM
+GAME( 1999, kovsh103,     kovsh,     pgm_arm_type1,     kovsh,    kovsh,      ROT0,   "IGS", "Knights of Valour Super Heroes / Sangoku Senki Super Heroes (ver. 103, CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V103, China internal ROM
 // nasty modern asian bootleg of Knights of Valour Super Heroes with characters ripped from SNK's The King of Fighters series!
-GAME( 1999, kovqhsgs,     kovsh,     kov,     kovsh,	kovqhsgs,   ROT0,   "bootleg", "Knights of Valour: Quan Huang San Guo Special / Sangoku Senki: Quan Huang San Guo Special (ver. 303CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1999, kovqhsgs,     kovsh,     pgm_arm_type1,     kovsh,	kovqhsgs,   ROT0,   "bootleg", "Knights of Valour: Quan Huang San Guo Special / Sangoku Senki: Quan Huang San Guo Special (ver. 303CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 // region provided by internal ARM rom
-GAME( 2000, kov2,         pgm,       kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 107, 102, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 05/10/01 14:24:08 V107 (Ext. Arm V102, Int. Arm V100HK)
-GAME( 2000, kov2106,      kov2,      kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 106, 102, 100KH)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 02/27/01 13:26:46 V106 (Ext. Arm V102, Int. Arm V100HK)
-GAME( 2000, kov2103,      kov2,      kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 103, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 12/28/00 15:09:31 V103 (Ext. Arm V101, Int. Arm V100HK)
-GAME( 2000, kov2102,      kov2,      kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 102, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 12/14/00 10:33:36 V102 (Ext. Arm V101, Int. Arm V100HK)
-GAME( 2000, kov2101,      kov2,      kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 101, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
-GAME( 2000, kov2100,      kov2,      kov2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 100, 100, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
+GAME( 2000, kov2,         pgm,       pgm_arm_type2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 107, 102, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 05/10/01 14:24:08 V107 (Ext. Arm V102, Int. Arm V100HK)
+GAME( 2000, kov2106,      kov2,      pgm_arm_type2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 106, 102, 100KH)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 02/27/01 13:26:46 V106 (Ext. Arm V102, Int. Arm V100HK)
+GAME( 2000, kov2103,      kov2,      pgm_arm_type2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 103, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 12/28/00 15:09:31 V103 (Ext. Arm V101, Int. Arm V100HK)
+GAME( 2000, kov2102,      kov2,      pgm_arm_type2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 102, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 12/14/00 10:33:36 V102 (Ext. Arm V101, Int. Arm V100HK)
+GAME( 2000, kov2101,      kov2,      pgm_arm_type2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 101, 101, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
+GAME( 2000, kov2100,      kov2,      pgm_arm_type2,    kov2,    kov2,       ROT0,   "IGS", "Knights of Valour 2 / Sangoku Senki 2 (ver. 100, 100, 100HK)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 11/29/00 11:03:08 V100 (Ext. Arm V100, Int. Arm V100HK)
 
 // region provided by internal ARM rom
-GAME( 2001, kov2p,        pgm,       kov2,    kov2,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2001, kov2p205,     kov2p,     kov2,    kov2,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, kov2p,        pgm,       pgm_arm_type2,    kov2,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, kov2p205,     kov2p,     pgm_arm_type2,    kov2,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 // region provided by internal ARM rom
-GAME( 2001, martmast,     pgm,       kov2,    martmast,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 102US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 102US
-GAME( 2001, martmastc,    martmast,  kov2,    martmast,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 101CN
-GAME( 2001, martmastc102, martmast,  kov2,    martmast,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 102, 101, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V102, Ext Arm 101, Int Arm 101CN
+GAME( 2001, martmast,     pgm,       pgm_arm_type2,    martmast,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 102US)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 102US
+GAME( 2001, martmastc,    martmast,  pgm_arm_type2,    martmast,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 104, 102, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V104, Ext Arm 102, Int Arm 101CN
+GAME( 2001, martmastc102, martmast,  pgm_arm_type2,    martmast,  martmast,   ROT0,   "IGS", "Martial Masters (ver. 102, 101, 101CN)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k V102, Ext Arm 101, Int Arm 101CN
 
 // region provided by internal ARM rom
-GAME( 2001, ddp2,         pgm,       kov2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 102)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2001, ddp2101,      ddp2,      kov2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 101)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2001, ddp2100,      ddp2,      kov2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 100)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, ddp2,         pgm,       pgm_arm_type2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 102)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, ddp2101,      ddp2,      pgm_arm_type2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 101)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2001, ddp2100,      ddp2,      pgm_arm_type2,    ddp2,     ddp2,       ROT270, "IGS", "DoDonPachi II - Bee Storm (Japan, ver. 100)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 // we bypass the internal ARM rom on these, ideally it should still be dumped tho!
 // ARM version strings don't match 100% with labels... for 68k ROMs I'm using the build time / date stamp from near the start of the rom, there are some slightly different time stamps later
-GAME( 2002, dmnfrnt,      pgm,       svg,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V105, ROM M105XX 08/05/02) (ARM label V105, ROM 08/05/02 S105XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 10:24:11 ARM time: 10:33:23
-GAME( 2002, dmnfrnta,     dmnfrnt,   svg,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V102, ROM M102XX 06/19/02) (ARM label V102, ROM 05/24/02 S101XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 13:44:08 ARM time: 13:04:31
-GAME( 2002, dmnfrntpcb,   dmnfrnt,   svg,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V107KR, ROM M107KR 11/03/03) (ARM label V107KR, ROM 10/16/03 S106KR) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // works but reports version mismatch (wants internal rom version and region to match external?)
+GAME( 2002, dmnfrnt,      pgm,       pgm_arm_type3,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V105, ROM M105XX 08/05/02) (ARM label V105, ROM 08/05/02 S105XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 10:24:11 ARM time: 10:33:23
+GAME( 2002, dmnfrnta,     dmnfrnt,   pgm_arm_type3,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V102, ROM M102XX 06/19/02) (ARM label V102, ROM 05/24/02 S101XX)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // 68k time: 13:44:08 ARM time: 13:04:31
+GAME( 2002, dmnfrntpcb,   dmnfrnt,   pgm_arm_type3,     pgm,    dmnfrnt,    ROT0,   "IGS", "Demon Front (68k label V107KR, ROM M107KR 11/03/03) (ARM label V107KR, ROM 10/16/03 S106KR) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // works but reports version mismatch (wants internal rom version and region to match external?)
 
 
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
 
-GAME( 2002, ddpdoj,       0,         cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou V101 (2002.04.05.Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
-GAME( 2002, ddpdoja,    ddpdoj,      cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou V100 (2002.04.05.Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2002, ddpdojb,    ddpdoj,      cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (2002.04.05 Master Ver)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2002, ddpdojblk,  ddpdoj,      cavepgm,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)",                GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+GAME( 2002, ddpdoj,       0,         pgm_arm_type1_cave,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou V101 (2002.04.05.Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // is there a v101 without the . after 05?
+GAME( 2002, ddpdoja,    ddpdoj,      pgm_arm_type1_cave,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou V100 (2002.04.05.Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, ddpdojb,    ddpdoj,      pgm_arm_type1_cave,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (2002.04.05 Master Ver)",      GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, ddpdojblk,  ddpdoj,      pgm_arm_type1_cave,    pgm,     ddp3,      ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)",                GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
-GAME( 2002, ket,          0,         cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2002, keta,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 2002, ketb,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, ket,          0,         pgm_arm_type1_cave,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01. Master Ver.)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, keta,         ket,       pgm_arm_type1_cave,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver.)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2002, ketb,         ket,       pgm_arm_type1_cave,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (2003/01/01 Master Ver)",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 2003, espgal,       0,         cavepgm,    pgm,     espgal,    ROT270, "Cave", "Espgaluda (2003/10/15 Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 2003, espgal,       0,         pgm_arm_type1_cave,    pgm,     espgal,    ROT270, "Cave", "Espgaluda (2003/10/15 Master Ver)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 
 
@@ -3699,24 +3698,24 @@ GAME( 2003, espgal,       0,         cavepgm,    pgm,     espgal,    ROT270, "Ca
    -----------------------------------------------------------------------------------------------------------------------*/
 
  // it's playable, but the region check is still patched (different IGS025 chips return different sequences so that the game can determine the region)
-GAME( 1998, killbld,      pgm,       killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1998, killbld104,   killbld,   killbld, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1998, killbld,      pgm,       pgm_022_025_kb, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 109, Chinese Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1998, killbld104,   killbld,   pgm_022_025_kb, killbld,  killbld,    ROT0,   "IGS", "The Killing Blade (ver. 104)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1998, olds,         pgm,       olds,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 101, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, olds100,      olds,      olds,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, olds100a,     olds,      olds,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // crashes on some bosses, high score table etc.
+GAME( 1998, olds,         pgm,       pgm_028_025_ol,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 101, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, olds100,      olds,      pgm_028_025_ol,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, olds100a,     olds,      pgm_028_025_ol,    olds,     olds,       ROT0,   "IGS", "Oriental Legend Special / Xi You Shi E Zhuan Super (ver. 100, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // crashes on some bosses, high score table etc.
 
-GAME( 1999, kov,          pgm,       kov_simulated_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
-GAME( 1999, kov115,       kov,       kov_simulated_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0006 02/22/99 11:53:18
-GAME( 1999, kov100,       kov,       kov_simulated_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 100, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // V0002 01/31/99 01:54:16
+GAME( 1999, kov,          pgm,       pgm_arm_type1_sim,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 117)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0008 04/27/99 10:33:33
+GAME( 1999, kov115,       kov,       pgm_arm_type1_sim,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 115)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */                 // V0006 02/22/99 11:53:18
+GAME( 1999, kov100,       kov,       pgm_arm_type1_sim,     sango,    kov,        ROT0,   "IGS", "Knights of Valour / Sangoku Senki (ver. 100, Japanese Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // V0002 01/31/99 01:54:16
 
-GAME( 1999, kovplus,      pgm,       kov_simulated_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 1999, kovplusa,     kovplus,   kov_simulated_arm,     sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovplus,      pgm,       pgm_arm_type1_sim,     sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovplusa,     kovplus,   pgm_arm_type1_sim,     sango,    kov,        ROT0,   "IGS", "Knights of Valour Plus / Sangoku Senki Plus (ver. 119, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 // modified title screen is only visible for china region, so use that by default.  Character select portraits don't seem quite right (different protection?)
-GAME( 1999, kovsgqyz,     kovplus,   kov_simulated_arm,     sango_ch,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 1999, kovsgqyza,    kovplus,   kov_simulated_arm,     sango_ch,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 1999, kovsgqyzb,    kovplus,   kov_simulated_arm,     sango_ch,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 3)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovsgqyz,     kovplus,   pgm_arm_type1_sim,     sango_ch,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovsgqyza,    kovplus,   pgm_arm_type1_sim,     sango_ch,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, kovsgqyzb,    kovplus,   pgm_arm_type1_sim,     sango_ch,    kovboot,    ROT0,   "bootleg", "Knights of Valour: SanGuo QunYingZhuan / Sangoku Senki: SanGuo QunYingZhuan (bootleg, set 3)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 
 
@@ -3726,19 +3725,19 @@ GAME( 1999, kovsgqyzb,    kovplus,   kov_simulated_arm,     sango_ch,    kovboot
    -----------------------------------------------------------------------------------------------------------------------*/
 
 // should have DMA protection, like killbld, as well as the math / bitswap / memory manipulation stuff, but it never attempts to trigger the DMA? - we currently have a RAM dump to allow it to boot, but I think this stuff should be DMA copied into RAM, like killbld
-GAME( 1998, drgw3,        pgm,       dw3,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 106, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, drgw3105,     drgw3,     dw3,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1998, drgw3100,     drgw3,     dw3,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Japan Only?
+GAME( 1998, drgw3,        pgm,       pgm_022_025_dw,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 106, Korean Board)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, drgw3105,     drgw3,     pgm_022_025_dw,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 105)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, drgw3100,     drgw3,     pgm_022_025_dw,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Japan Only?
 
-GAME( 1998, dwex,         pgm,       dw3,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1998, dwex,         pgm,       pgm_022_025_dw,     dw3,      drgw3,      ROT0,   "IGS", "Dragon World 3 EX (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
-GAME( 2001, dw2001,       pgm,       kov2,     dw2001,   dw2001,    ROT0,   "IGS", "Dragon World 2001", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // V0000 02/21/01 16:05:16
+GAME( 2001, dw2001,       pgm,       pgm_arm_type2,     dw2001,   dw2001,    ROT0,   "IGS", "Dragon World 2001", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // V0000 02/21/01 16:05:16
 
-GAME( 1999, puzlstar,     pgm,       kov_simulated_arm,    pstar,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 1999, puzlstar,     pgm,       pgm_arm_type1_sim,    pstar,    pstar,      ROT0,   "IGS", "Puzzle Star (ver. 100MG)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2001, py2k2,        pgm,       kov_simulated_arm,    py2k2,    py2k2,      ROT0,   "IGS", "Photo Y2K 2", GAME_NOT_WORKING )  /* need internal rom of IGS027A */
+GAME( 2001, py2k2,        pgm,       pgm_arm_type1_sim,    py2k2,    py2k2,      ROT0,   "IGS", "Photo Y2K 2", GAME_NOT_WORKING )  /* need internal rom of IGS027A */
 
-GAME( 2001, puzzli2,      pgm,       kov_simulated_arm,  puzzli2,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 2001, puzzli2,      pgm,       pgm_arm_type1_sim,  puzzli2,    puzzli2,    ROT0,   "IGS", "Puzzli 2 Super (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 
 
@@ -3746,27 +3745,27 @@ GAME( 2001, puzzli2,      pgm,       kov_simulated_arm,  puzzli2,    puzzli2,   
 
 
 // all 3 68k roms still have V100 strings, but are clearly different builds, there don't appear to be build string dates in them.  Two of the external ARM roms are marked V100 but are different builds, it's possible the single PCB version 100 is based on a later main revision
-GAME( 2003, theglad,      pgm,       svg,     pgm,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 01/16/03 SHEN JIAN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 10:39:25
-GAME( 2003, theglada,     theglad,   svg,     pgm,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V101) (ARM label V107, ROM 06/06/03 SHEN JIAN V107)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 16:17:27
-GAME( 2003, thegladpcb,   theglad,   svg,     pgm,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 02/25/03 SHEN JIAN) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 16:32:21
+GAME( 2003, theglad,      pgm,       pgm_arm_type3,     pgm,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 01/16/03 SHEN JIAN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 10:39:25
+GAME( 2003, theglada,     theglad,   pgm_arm_type3,     pgm,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V101) (ARM label V107, ROM 06/06/03 SHEN JIAN V107)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 16:17:27
+GAME( 2003, thegladpcb,   theglad,   pgm_arm_type3,     pgm,    theglad,    ROT0,   "IGS", "The Gladiator - Road of the Sword / Shen Jian (M68k label V100) (ARM label V100, ROM 02/25/03 SHEN JIAN) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 16:32:21
 
 
 
-GAME( 2004, oldsplus,     pgm,       kov_simulated_arm, oldsplus,     oldsplus,   ROT0,   "IGS", "Oriental Legend Special Plus / Xi You Shi E Zhuan Super Plus", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, oldsplus,     pgm,       pgm_arm_type1_sim, oldsplus,     oldsplus,   ROT0,   "IGS", "Oriental Legend Special Plus / Xi You Shi E Zhuan Super Plus", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2004, kovshp,       pgm,       kov,     kovsh,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovshp,       pgm,       pgm_arm_type1,     kovsh,    kovshp,     ROT0,   "IGS", "Knights of Valour Super Heroes Plus / Sangoku Senki Super Heroes Plus (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 // these bootlegs are clones of this instead
-GAME( 2004, kovlsqh,      kovshp,     kov,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang / Sangoku Senki: Luan Shi Quan Huang (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsqh2,     kovshp,     kov,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang 2 / Sangoku Senki: Luan Shi Quan Huang 2 (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsjb,      kovshp,     kov,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2004, kovlsjba,     kovshp,     kov,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsqh,      kovshp,    pgm_arm_type1,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang / Sangoku Senki: Luan Shi Quan Huang (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsqh2,     kovshp,    pgm_arm_type1,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Quan Huang 2 / Sangoku Senki: Luan Shi Quan Huang 2 (ver. 200CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsjb,      kovshp,    pgm_arm_type1,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 1)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, kovlsjba,     kovshp,    pgm_arm_type1,     kovsh,	kovlsqh2,   ROT0,   "bootleg", "Knights of Valour: Luan Shi Jie Ba / Sangoku Senki: Luan Shi Jie Ba (ver. 200CN, set 2)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2005, killbldp,     pgm,       svg,     pgm,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (ver. 300)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2005, killbldp,     pgm,       pgm_arm_type3,     pgm,    killbldp,   ROT0,   "IGS", "The Killing Blade Plus (ver. 300)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2004, happy6,       pgm,       svg,     pgm,    happy6,     ROT0,   "IGS", "Happy 6-in-1 (ver. 101CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2004, happy6,       pgm,       pgm_arm_type3,     pgm,    happy6,     ROT0,   "IGS", "Happy 6-in-1 (ver. 101CN)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2005, svg,          pgm,       svg,     pgm,    svg,        ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // label was 200, but it's code rev 201? // ARM time: 10:07:20
-GAME( 2005, svgpcb,       svg,       svg,     pgm,    svgpcb,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V100JP) (ARM label V100JP ROM 05/12/05  S.V.G V100) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 15:31:35
+GAME( 2005, svg,          pgm,       pgm_arm_type3,     pgm,    svg,        ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V200) (ARM label V200, ROM 10/11/05 S.V.G V201)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // label was 200, but it's code rev 201? // ARM time: 10:07:20
+GAME( 2005, svgpcb,       svg,       pgm_arm_type3,     pgm,    svgpcb,     ROT0,   "IGS / Idea Factory", "S.V.G. - Spectral vs Generation (M68k label V100JP) (ARM label V100JP ROM 05/12/05  S.V.G V100) (JAMMA PCB)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */ // ARM time: 15:31:35
 
 
 

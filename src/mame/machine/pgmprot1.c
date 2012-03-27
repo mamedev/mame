@@ -1,5 +1,6 @@
 /***********************************************************************
- PGM IGA027A (55857E type) ARM protection simulations & emulation
+ PGM IGA027A (55857E* type) ARM protection simulations & emulation
+   *guess, the part number might not be directly tied to behavior, see note below
 
  these are simulations of the 'kov' type ARM device
  used by
@@ -10,8 +11,9 @@
  Photo Y2k2 (py2k2)
  Puzzle Star (puzlstar)
 
- the following appear to use this scheme but are post 2001 so
- might use a newer revision of the chip with EO area
+ the following appear to have the same basic behavior as the
+ early '55857E' type chips, but are actually using the '55857G'
+ chips, which execute only area (confirmed on ddpdoj at least)
 
  DoDonPachi Dai-ou-jou (ddpdoj)
  Espgaluda (espgal)
@@ -54,68 +56,68 @@
 /**************************** EMULATION *******************************/
 /* used by photoy2k, kovsh */
 
-static READ32_HANDLER( kovsh_arm7_protlatch_r )
+static READ32_HANDLER( pgm_arm7_type1_protlatch_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 
 	space->machine().scheduler().synchronize(); // force resync
 
-	return (state->m_kovsh_highlatch_68k_w << 16) | (state->m_kovsh_lowlatch_68k_w);
+	return (state->m_pgm_arm_type1_highlatch_68k_w << 16) | (state->m_pgm_arm_type1_lowlatch_68k_w);
 }
 
-static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
+static WRITE32_HANDLER( pgm_arm7_type1_protlatch_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 
 	space->machine().scheduler().synchronize(); // force resync
 
 	if (ACCESSING_BITS_16_31)
 	{
-		state->m_kovsh_highlatch_arm_w = data >> 16;
-		state->m_kovsh_highlatch_68k_w = 0;
+		state->m_pgm_arm_type1_highlatch_arm_w = data >> 16;
+		state->m_pgm_arm_type1_highlatch_68k_w = 0;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		state->m_kovsh_lowlatch_arm_w = data;
-		state->m_kovsh_lowlatch_68k_w = 0;
+		state->m_pgm_arm_type1_lowlatch_arm_w = data;
+		state->m_pgm_arm_type1_lowlatch_68k_w = 0;
 	}
 }
 
-static READ16_HANDLER( kovsh_68k_protlatch_r )
+static READ16_HANDLER( pgm_arm7_type1_68k_protlatch_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 
 	space->machine().scheduler().synchronize(); // force resync
 
 	switch (offset)
 	{
-		case 1: return state->m_kovsh_highlatch_arm_w;
-		case 0: return state->m_kovsh_lowlatch_arm_w;
+		case 1: return state->m_pgm_arm_type1_highlatch_arm_w;
+		case 0: return state->m_pgm_arm_type1_lowlatch_arm_w;
 	}
 	return -1;
 }
 
-static WRITE16_HANDLER( kovsh_68k_protlatch_w )
+static WRITE16_HANDLER( pgm_arm7_type1_68k_protlatch_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 
 	space->machine().scheduler().synchronize(); // force resync
 
 	switch (offset)
 	{
 		case 1:
-			state->m_kovsh_highlatch_68k_w = data;
+			state->m_pgm_arm_type1_highlatch_68k_w = data;
 			break;
 
 		case 0:
-			state->m_kovsh_lowlatch_68k_w = data;
+			state->m_pgm_arm_type1_lowlatch_68k_w = data;
 			break;
 	}
 }
 
-static READ16_HANDLER( kovsh_arm7_ram_r )
+static READ16_HANDLER( pgm_arm7_type1_ram_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
 
 	if (PGMARM7LOGERROR)
@@ -123,9 +125,9 @@ static READ16_HANDLER( kovsh_arm7_ram_r )
 	return share16[BYTE_XOR_LE(offset << 1)];
 }
 
-static WRITE16_HANDLER( kovsh_arm7_ram_w )
+static WRITE16_HANDLER( pgm_arm7_type1_ram_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 	UINT16 *share16 = (UINT16 *)state->m_arm7_shareram;
 
 	if (PGMARM7LOGERROR)
@@ -136,29 +138,29 @@ static WRITE16_HANDLER( kovsh_arm7_ram_w )
 
 
 
-static READ32_HANDLER( kovsh_arm7_unk_r )
+static READ32_HANDLER( pgm_arm7_type1_unk_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	return state->m_kovsh_counter++;
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
+	return state->m_pgm_arm_type1_counter++;
 }
 
-static READ32_HANDLER( kovsh_exrom_r )
+static READ32_HANDLER( pgm_arm7_type1_exrom_r )
 {
 	return 0x00000000;
 }
 
-static READ32_HANDLER( arm7_shareram_r )
+static READ32_HANDLER( pgm_arm7_type1_shareram_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, state->m_arm7_shareram[offset], mem_mask, cpu_get_pc(&space->device()));
 	return state->m_arm7_shareram[offset];
 }
 
-static WRITE32_HANDLER( arm7_shareram_w )
+static WRITE32_HANDLER( pgm_arm7_type1_shareram_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, cpu_get_pc(&space->device()));
@@ -171,30 +173,23 @@ static WRITE32_HANDLER( arm7_shareram_w )
 static ADDRESS_MAP_START( kov_map, AS_PROGRAM, 16)
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x4f0000, 0x4f003f) AM_READWRITE(kovsh_arm7_ram_r, kovsh_arm7_ram_w) /* ARM7 Shared RAM */
-	AM_RANGE(0x500000, 0x500005) AM_READWRITE(kovsh_68k_protlatch_r, kovsh_68k_protlatch_w) /* ARM7 Latch */
+	AM_RANGE(0x4f0000, 0x4f003f) AM_READWRITE(pgm_arm7_type1_ram_r, pgm_arm7_type1_ram_w) /* ARM7 Shared RAM */
+	AM_RANGE(0x500000, 0x500005) AM_READWRITE(pgm_arm7_type1_68k_protlatch_r, pgm_arm7_type1_68k_protlatch_w) /* ARM7 Latch */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 55857E_arm7_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
-	AM_RANGE(0x08100000, 0x083fffff) AM_READ(kovsh_exrom_r) // unpopulated, returns 0 to keep checksum happy
+	AM_RANGE(0x08100000, 0x083fffff) AM_READ(pgm_arm7_type1_exrom_r) // unpopulated, returns 0 to keep checksum happy
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM // internal ram for asic
-	AM_RANGE(0x40000000, 0x40000003) AM_READWRITE(kovsh_arm7_protlatch_r, kovsh_arm7_protlatch_w)
+	AM_RANGE(0x40000000, 0x40000003) AM_READWRITE(pgm_arm7_type1_protlatch_r, pgm_arm7_type1_protlatch_w)
 	AM_RANGE(0x40000008, 0x4000000b) AM_WRITENOP // ?
-	AM_RANGE(0x4000000c, 0x4000000f) AM_READ(kovsh_arm7_unk_r)
-	AM_RANGE(0x50800000, 0x5080003f) AM_READWRITE(arm7_shareram_r, arm7_shareram_w) AM_BASE_MEMBER(pgm_state, m_arm7_shareram)
+	AM_RANGE(0x4000000c, 0x4000000f) AM_READ(pgm_arm7_type1_unk_r)
+	AM_RANGE(0x50800000, 0x5080003f) AM_READWRITE(pgm_arm7_type1_shareram_r, pgm_arm7_type1_shareram_w) AM_BASE_MEMBER(pgm_arm_type1_state, m_arm7_shareram)
 	AM_RANGE(0x50000000, 0x500003ff) AM_RAM // uploads xor table to decrypt 68k rom here
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED( kov, pgm )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(kov_map)
 
-	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857E?
-	MCFG_CPU_PROGRAM_MAP(55857E_arm7_map)
-MACHINE_CONFIG_END
 
 /**************************** SIMULATIONS *****************************/
 
@@ -210,87 +205,74 @@ static ADDRESS_MAP_START( cavepgm_mem, AS_PROGRAM, 16)
 ADDRESS_MAP_END
 
 
-static MACHINE_START( cavepgm )
+static MACHINE_START( pgm_arm_type1 )
 {
 	MACHINE_START_CALL(pgm);
 
-	pgm_kovarmsim_state *state = machine.driver_data<pgm_kovarmsim_state>();
+
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
+
+	state->m_prot = machine.device<cpu_device>("prot");
 
 	state->save_item(NAME(state->m_value0));
 	state->save_item(NAME(state->m_value1));
 	state->save_item(NAME(state->m_valuekey));
 	state->save_item(NAME(state->m_valueresponse));
-	state->save_item(NAME(state->m_ddp3internal_slot));
-	state->save_item(NAME(state->m_ddp3slots));
+	state->save_item(NAME(state->m_curslots));
+	state->save_item(NAME(state->m_slots));
 }
 
-MACHINE_CONFIG_START( cavepgm, pgm_kovarmsim_state )
+MACHINE_CONFIG_START( pgm_arm_type1_cave, pgm_arm_type1_state )
+	MCFG_FRAGMENT_ADD(pgmbase)
 
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 20000000)
+	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cavepgm_mem)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", pgm_interrupt, "screen", 0, 1)
 
-	MCFG_CPU_ADD("soundcpu", Z80, 33868800/4)
-	MCFG_CPU_PROGRAM_MAP(pgm_z80_mem)
-	MCFG_CPU_IO_MAP(pgm_z80_io)
-
-	MCFG_MACHINE_START( cavepgm )
-	MCFG_MACHINE_RESET( pgm )
-	MCFG_NVRAM_ADD_0FILL("sram")
-
-	MCFG_V3021_ADD("rtc")
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_MACHINE_START( pgm_arm_type1 )
+	
+	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 64*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(pgm)
-	MCFG_SCREEN_VBLANK_STATIC(pgm)
-
-	MCFG_GFXDECODE(pgm)
-	MCFG_PALETTE_LENGTH(0x1200/2)
-
-	MCFG_VIDEO_START(pgm)
-
-	/*sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-    MCFG_ICS2115_ADD("ics", 0, pgm_sound_irq)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( kov_simulated_arm, cavepgm )
+MACHINE_CONFIG_DERIVED( pgm_arm_type1_sim, pgm_arm_type1_cave )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(kov_sim_map)
 
 	/* protection CPU */
-	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857E?
+	MCFG_CPU_ADD("prot", ARM7, 20000000 )	// 55857E?
 	MCFG_CPU_PROGRAM_MAP(55857E_arm7_map)
 	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
-void kovsh_latch_init( running_machine &machine )
+MACHINE_CONFIG_DERIVED( pgm_arm_type1, pgm_arm_type1_cave )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(kov_map)
+
+	/* protection CPU */
+	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857E?
+	MCFG_CPU_PROGRAM_MAP(55857E_arm7_map)
+MACHINE_CONFIG_END
+
+void pgm_arm7_type1_latch_init( running_machine &machine )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 
-	state->m_kovsh_highlatch_arm_w = 0;
-	state->m_kovsh_lowlatch_arm_w = 0;
-	state->m_kovsh_highlatch_68k_w = 0;
-	state->m_kovsh_lowlatch_68k_w = 0;
-	state->m_kovsh_counter = 1;
+	state->m_pgm_arm_type1_highlatch_arm_w = 0;
+	state->m_pgm_arm_type1_lowlatch_arm_w = 0;
+	state->m_pgm_arm_type1_highlatch_68k_w = 0;
+	state->m_pgm_arm_type1_lowlatch_68k_w = 0;
+	state->m_pgm_arm_type1_counter = 1;
 
-	state->save_item(NAME(state->m_kovsh_highlatch_arm_w));
-	state->save_item(NAME(state->m_kovsh_lowlatch_arm_w));
-	state->save_item(NAME(state->m_kovsh_highlatch_68k_w));
-	state->save_item(NAME(state->m_kovsh_lowlatch_68k_w));
-	state->save_item(NAME(state->m_kovsh_counter));
+	state->save_item(NAME(state->m_pgm_arm_type1_highlatch_arm_w));
+	state->save_item(NAME(state->m_pgm_arm_type1_lowlatch_arm_w));
+	state->save_item(NAME(state->m_pgm_arm_type1_highlatch_68k_w));
+	state->save_item(NAME(state->m_pgm_arm_type1_lowlatch_68k_w));
+	state->save_item(NAME(state->m_pgm_arm_type1_counter));
 }
 
 static READ16_HANDLER( kovsh_fake_region_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 	int regionhack = input_port_read(space->machine(), "RegionHack");
 	if (regionhack != 0xff) return regionhack;
 
@@ -303,7 +285,7 @@ DRIVER_INIT( photoy2k )
 {
 	pgm_basic_init(machine);
 	pgm_photoy2k_decrypt(machine);
-	kovsh_latch_init(machine);
+	pgm_arm7_type1_latch_init(machine);
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
 }
@@ -312,7 +294,7 @@ DRIVER_INIT( kovsh )
 {
 	pgm_basic_init(machine);
 	pgm_kovsh_decrypt(machine);
-	kovsh_latch_init(machine);
+	pgm_arm7_type1_latch_init(machine);
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
 }
@@ -321,7 +303,7 @@ DRIVER_INIT( kovshp )
 {
 	pgm_basic_init(machine);
 	pgm_kovshp_decrypt(machine);
-	kovsh_latch_init(machine);
+	pgm_arm7_type1_latch_init(machine);
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
 }
@@ -428,7 +410,7 @@ DRIVER_INIT( kovlsqh2 )
 
 	pgm_decode_kovlsqh2_samples(machine);
 	pgm_basic_init(machine);
-	kovsh_latch_init(machine);
+	pgm_arm7_type1_latch_init(machine);
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
 }
@@ -449,7 +431,7 @@ DRIVER_INIT( kovqhsgs )
 
 	pgm_decode_kovlsqh2_samples(machine);
 	pgm_basic_init(machine);
-	kovsh_latch_init(machine);
+	pgm_arm7_type1_latch_init(machine);
 	/* we only have a china internal ROM dumped for now.. allow region to be changed for debugging (to ensure all alt titles / regions can be seen) */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0008, 0x4f0009, FUNC(kovsh_fake_region_r));
 }
@@ -463,9 +445,9 @@ DRIVER_INIT( kovqhsgs )
  bp A71A0,1,{d0=0x12;g}
 */
 
-static READ16_HANDLER( ddp3_asic_r )
+static READ16_HANDLER( pgm_arm7_type1_sim_r )
 {
-	pgm_kovarmsim_state *state = space->machine().driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 
 	if (offset == 0)
 	{
@@ -490,7 +472,7 @@ static READ16_HANDLER( ddp3_asic_r )
 }
 
 /* working */
-void command_handler_ddp3(pgm_kovarmsim_state *state, int pc)
+void command_handler_ddp3(pgm_arm_type1_state *state, int pc)
 {
 	switch (state->m_ddp3lastcommand)
 	{
@@ -501,28 +483,28 @@ void command_handler_ddp3(pgm_kovarmsim_state *state, int pc)
 
 		case 0x40:
 			state->m_valueresponse = 0x880000;
-		    state->m_ddp3slots[(state->m_value0>>10)&0x1F]=
-				(state->m_ddp3slots[(state->m_value0>>5)&0x1F]+
-				 state->m_ddp3slots[(state->m_value0>>0)&0x1F])&0xffffff;
+		    state->m_slots[(state->m_value0>>10)&0x1F]=
+				(state->m_slots[(state->m_value0>>5)&0x1F]+
+				 state->m_slots[(state->m_value0>>0)&0x1F])&0xffffff;
 			break;
 
 		case 0x67: // set high bits
 	//      printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->m_ddp3lastcommand, state->m_value0);
 			state->m_valueresponse = 0x880000;
-			state->m_ddp3internal_slot = (state->m_value0 & 0xff00)>>8;
-			state->m_ddp3slots[state->m_ddp3internal_slot] = (state->m_value0 & 0x00ff) << 16;
+			state->m_curslots = (state->m_value0 & 0xff00)>>8;
+			state->m_slots[state->m_curslots] = (state->m_value0 & 0x00ff) << 16;
 			break;
 
 		case 0xe5: // set low bits for operation?
 		//  printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->m_ddp3lastcommand, state->m_value0);
 			state->m_valueresponse = 0x880000;
-			state->m_ddp3slots[state->m_ddp3internal_slot] |= (state->m_value0 & 0xffff);
+			state->m_slots[state->m_curslots] |= (state->m_value0 & 0xffff);
 			break;
 
 
 		case 0x8e: // read back result of operations
 	//      printf("%06x command %02x | %04x\n", cpu_get_pc(&space->device()), state->m_ddp3lastcommand, state->m_value0);
-			state->m_valueresponse = state->m_ddp3slots[state->m_value0&0xff];
+			state->m_valueresponse = state->m_slots[state->m_value0&0xff];
 			break;
 
 
@@ -535,8 +517,8 @@ void command_handler_ddp3(pgm_kovarmsim_state *state, int pc)
 }
 
 /* preliminary */
-static INT32 puzzli_54_trigger = 0;
-void command_handler_puzzli2(pgm_kovarmsim_state *state, int pc)
+
+void command_handler_puzzli2(pgm_arm_type1_state *state, int pc)
 {
 	printf("%08x: %02x %04x\n",pc, state->m_ddp3lastcommand, state->m_value0);
 
@@ -551,7 +533,7 @@ void command_handler_puzzli2(pgm_kovarmsim_state *state, int pc)
 			// how is this selected? command 54?
 
 			// just a wild guess
-			if (puzzli_54_trigger) {
+			if (state->m_puzzli_54_trigger) {
 				// pc == 1387de
 				state->m_valueresponse = 0x63<<16; // ?
 			} else {
@@ -559,14 +541,14 @@ void command_handler_puzzli2(pgm_kovarmsim_state *state, int pc)
 				state->m_valueresponse = 0xd2<<16;
 			}
 
-			puzzli_54_trigger = 0;
+			state->m_puzzli_54_trigger = 0;
 		}
 		break;
 
 		case 0x38: // Reset
 			state->m_valueresponse = 0x78<<16;
 			state->m_valuekey = 0x100;
-			puzzli_54_trigger = 0;
+			state->m_puzzli_54_trigger = 0;
 		break;
 
 		case 0x41: // ASIC status?
@@ -590,7 +572,7 @@ void command_handler_puzzli2(pgm_kovarmsim_state *state, int pc)
 		break;
 
 		case 0x54: // ??
-			puzzli_54_trigger = 1;
+			state->m_puzzli_54_trigger = 1;
 			state->m_valueresponse = 0x36<<16;
 		break;
 
@@ -613,7 +595,7 @@ void command_handler_puzzli2(pgm_kovarmsim_state *state, int pc)
 }
 
 /* preliminary */
-void command_handler_py2k2(pgm_kovarmsim_state *state, int pc)
+void command_handler_py2k2(pgm_arm_type1_state *state, int pc)
 {
 	switch (state->m_ddp3lastcommand)
 	{
@@ -732,7 +714,7 @@ static const int pstar_80[0x1a3]={
 	0x00,0x00,0x00
 };
 
-void command_handler_pstars(pgm_kovarmsim_state *state, int pc)
+void command_handler_pstars(pgm_arm_type1_state *state, int pc)
 {
 	switch (state->m_ddp3lastcommand)
 	{
@@ -754,12 +736,12 @@ void command_handler_pstars(pgm_kovarmsim_state *state, int pc)
 			break;
 
 		case 0xb1:
-			state->m_pstar_b1 = state->m_value0;
+			state->m_pstar_b1_value = state->m_value0;
 			state->m_valueresponse = 0x890000;
 			break;
 
 		case 0xbf:
-			state->m_valueresponse = state->m_pstar_b1 * state->m_value0;
+			state->m_valueresponse = state->m_pstar_b1_value * state->m_value0;
 			break;
 
 		case 0xc1: //TODO:TIMER  0,1,2,FIX TO 0 should be OK?
@@ -767,30 +749,30 @@ void command_handler_pstars(pgm_kovarmsim_state *state, int pc)
 			break;
 
 		case 0xce: //TODO:TIMER  0,1,2
-			state->m_pstar_ce = state->m_value0;
+			state->m_pstar_ce_value = state->m_value0;
 			state->m_valueresponse=0x890000;
 			break;
 
 		case 0xcf: //TODO:TIMER  0,1,2
-			state->m_extra_ram[state->m_pstar_ce] = state->m_value0;
+			state->m_extra_ram[state->m_pstar_ce_value] = state->m_value0;
 			state->m_valueresponse = 0x890000;
 			break;
 
 		case 0xe7:
-			state->m_pstar_e7 = (state->m_value0 >> 12) & 0xf;
-			state->m_ddp3slots[state->m_pstar_e7] &= 0xffff;
-			state->m_ddp3slots[state->m_pstar_e7] |= (state->m_value0 & 0xff) << 16;
+			state->m_pstar_e7_value = (state->m_value0 >> 12) & 0xf;
+			state->m_slots[state->m_pstar_e7_value] &= 0xffff;
+			state->m_slots[state->m_pstar_e7_value] |= (state->m_value0 & 0xff) << 16;
 			state->m_valueresponse = 0x890000;
 			break;
 
 		case 0xe5:
-			state->m_ddp3slots[state->m_pstar_e7] &= 0xff0000;
-			state->m_ddp3slots[state->m_pstar_e7] |= state->m_value0;
+			state->m_slots[state->m_pstar_e7_value] &= 0xff0000;
+			state->m_slots[state->m_pstar_e7_value] |= state->m_value0;
 			state->m_valueresponse = 0x890000;
 			break;
 
 		case 0xf8: //@73C
-			state->m_valueresponse = state->m_ddp3slots[state->m_value0 & 0xf] & 0xffffff;
+			state->m_valueresponse = state->m_slots[state->m_value0 & 0xf] & 0xffffff;
 			break;
 
 		case 0xba:
@@ -841,13 +823,8 @@ static const UINT8 kov_BATABLE[0x40] = {
 
 static const UINT8 kov_B0TABLE[16] = { 2, 0, 1, 4, 3 }; // Maps char portraits to tables
 
-static UINT32 kov_slots[16];
-static UINT16 kov_internal_slot;
-static UINT16 kov_c0_value;
-static UINT16 kov_cb_value;
-static UINT16 kov_fe_value;
 
-void command_handler_kov(pgm_kovarmsim_state *state, int pc)
+void command_handler_kov(pgm_arm_type1_state *state, int pc)
 {
 	switch (state->m_ddp3lastcommand)
 	{
@@ -880,7 +857,7 @@ void command_handler_kov(pgm_kovarmsim_state *state, int pc)
 
 			if (state->m_value0 == 0x0102) state->m_value0 = 0x0100; // why?
 
-			kov_slots[(state->m_value0 >> 8) & 0x0f] = kov_slots[(state->m_value0 >> 0) & 0x0f];
+			state->m_slots[(state->m_value0 >> 8) & 0x0f] = state->m_slots[(state->m_value0 >> 0) & 0x0f];
 		}
 		break;
 
@@ -890,21 +867,21 @@ void command_handler_kov(pgm_kovarmsim_state *state, int pc)
 
 		case 0xc0: // Text layer 'x' select
 			state->m_valueresponse = 0x880000;
-			kov_c0_value = state->m_value0;
+			state->m_kov_c0_value = state->m_value0;
 		break;
 
 		case 0xc3: // Text layer offset
-			state->m_valueresponse = 0x904000 + ((kov_c0_value + (state->m_value0 * 0x40)) * 4);
+			state->m_valueresponse = 0x904000 + ((state->m_kov_c0_value + (state->m_value0 * 0x40)) * 4);
 		break;
 
 		case 0xcb: // Background layer 'x' select
 			state->m_valueresponse = 0x880000;
-			kov_cb_value = state->m_value0;
+			state->m_kov_cb_value = state->m_value0;
 		break;
 
 		case 0xcc: // Background layer offset
 			if (state->m_value0 & 0x400) state->m_value0 = -(0x400 - (state->m_value0 & 0x3ff));
-			state->m_valueresponse = 0x900000 + ((kov_cb_value + (state->m_value0 * 0x40)) * 4);
+			state->m_valueresponse = 0x900000 + ((state->m_kov_cb_value + (state->m_value0 * 0x40)) * 4);
 		break;
 
 		case 0xd0: // Text palette offset
@@ -914,7 +891,7 @@ void command_handler_kov(pgm_kovarmsim_state *state, int pc)
 
 		case 0xd6: // Copy slot to slot 0
 			state->m_valueresponse = 0x880000;
-			kov_slots[0] = kov_slots[state->m_value0 & 0x0f];
+			state->m_slots[0] = state->m_slots[state->m_value0 & 0x0f];
 		break;
 
 		case 0xdc: // Background palette offset
@@ -931,18 +908,18 @@ void command_handler_kov(pgm_kovarmsim_state *state, int pc)
 		{
 			state->m_valueresponse = 0x880000;
 
-			INT32 sel = (kov_internal_slot >> 12) & 0x0f;
-			kov_slots[sel] = (kov_slots[sel] & 0x00ff0000) | ((state->m_value0 & 0xffff) <<  0);
+			INT32 sel = (state->m_curslots >> 12) & 0x0f;
+			state->m_slots[sel] = (state->m_slots[sel] & 0x00ff0000) | ((state->m_value0 & 0xffff) <<  0);
 		}
 		break;
 
 		case 0xe7: // Write slot (and slot select) (high)
 		{
 			state->m_valueresponse = 0x880000;
-			kov_internal_slot = state->m_value0;
+			state->m_curslots = state->m_value0;
 
-			INT32 sel = (kov_internal_slot >> 12) & 0x0f;
-			kov_slots[sel] = (kov_slots[sel] & 0x0000ffff) | ((state->m_value0 & 0x00ff) << 16);
+			INT32 sel = (state->m_curslots >> 12) & 0x0f;
+			state->m_slots[sel] = (state->m_slots[sel] & 0x0000ffff) | ((state->m_value0 & 0x00ff) << 16);
 		}
 		break;
 
@@ -952,16 +929,16 @@ void command_handler_kov(pgm_kovarmsim_state *state, int pc)
 
 		case 0xf8: // Read slot
 		case 0xab: // kovsgqyz (f8)
-			state->m_valueresponse = kov_slots[state->m_value0 & 0x0f] & 0x00ffffff;
+			state->m_valueresponse = state->m_slots[state->m_value0 & 0x0f] & 0x00ffffff;
 		break;
 
 		case 0xfc: // Adjust damage level to char experience level
-			state->m_valueresponse = (state->m_value0 * kov_fe_value) >> 6;
+			state->m_valueresponse = (state->m_value0 * state->m_kov_fe_value) >> 6;
 		break;
 
 		case 0xfe: // Damage level adjust
 			state->m_valueresponse = 0x880000;
-			kov_fe_value = state->m_value0;
+			state->m_kov_fe_value = state->m_value0;
 		break;
 
 		default:
@@ -1127,7 +1104,7 @@ static const int oldsplus_8c[0x20]={
 };
 
 
-void command_handler_oldsplus(pgm_kovarmsim_state *state, int pc)
+void command_handler_oldsplus(pgm_arm_type1_state *state, int pc)
 {
 	switch (state->m_ddp3lastcommand)
 	{
@@ -1189,27 +1166,27 @@ void command_handler_oldsplus(pgm_kovarmsim_state *state, int pc)
 			switch (state->m_extra_ram[0xe7])
 			{
 				case 0xb000:
-					state->m_ddp3slots[0xb] = state->m_value0;
-					state->m_ddp3slots[0xc] = 0;
+					state->m_slots[0xb] = state->m_value0;
+					state->m_slots[0xc] = 0;
 					break;
 
 				case 0xc000:
-					state->m_ddp3slots[0xc] = state->m_value0;
+					state->m_slots[0xc] = state->m_value0;
 					break;
 
 				case 0xd000:
-					state->m_ddp3slots[0xd] = state->m_value0;
+					state->m_slots[0xd] = state->m_value0;
 					break;
 
 				case 0xf000:
-					state->m_ddp3slots[0xf] = state->m_value0;
+					state->m_slots[0xf] = state->m_value0;
 					break;
 			}
 			state->m_valueresponse = 0x990000;
 			break;
 
 		case 0xf8:
-			state->m_valueresponse = state->m_ddp3slots[state->m_value0];
+			state->m_valueresponse = state->m_slots[state->m_value0];
 			break;
 
 		case 0xfc:
@@ -1217,17 +1194,17 @@ void command_handler_oldsplus(pgm_kovarmsim_state *state, int pc)
 			break;
 
 		case 0xc5:
-			state->m_ddp3slots[0xd] --;
+			state->m_slots[0xd] --;
 			state->m_valueresponse = 0x990000;
 			break;
 
 		case 0xd6:
-			state->m_ddp3slots[0xb] ++;
+			state->m_slots[0xb] ++;
 			state->m_valueresponse = 0x990000;
 			break;
 
 		case 0x3a:
-			state->m_ddp3slots[0xf] = 0;
+			state->m_slots[0xf] = 0;
 			state->m_valueresponse = 0x990000;
 			break;
 
@@ -1298,9 +1275,9 @@ void command_handler_oldsplus(pgm_kovarmsim_state *state, int pc)
 	}
 }
 
-static WRITE16_HANDLER( ddp3_asic_w )
+static WRITE16_HANDLER( pgm_arm7_type1_sim_w )
 {
-	pgm_kovarmsim_state *state = space->machine().driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 	int pc = cpu_get_pc(&space->device());
 
 	if (offset == 0)
@@ -1335,31 +1312,17 @@ static WRITE16_HANDLER( ddp3_asic_w )
 	}
 }
 
-
-static READ16_HANDLER( sango_protram_r )
+static READ16_HANDLER( pgm_arm7_type1_sim_protram_r )
 {
-	// at offset == 4 is region (supplied by device)
-	// 0 = china
-	// 1 = taiwan
-	// 2 = japan
-	// 3 = korea
-	// 4 = hong kong
-	// 5 = world
-
 	if (offset == 4)
 		return input_port_read(space->machine(), "Region");
 
-	// otherwise it doesn't seem to use the ram for anything important, we return 0 to avoid test mode corruption
-	// kovplus reads from offset 000e a lot ... why?
-#ifdef MAME_DEBUG
-	popmessage ("protection ram r %04x",offset);
-#endif
 	return 0x0000;
 }
 
-static READ16_HANDLER( pstars_protram_r )
+static READ16_HANDLER( pstars_arm7_type1_sim_protram_r )
 {
-	pgm_kovarmsim_state *state = space->machine().driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = space->machine().driver_data<pgm_arm_type1_state>();
 
 	if (offset == 4)		//region
 		return input_port_read(space->machine(), "Region");
@@ -1372,142 +1335,124 @@ static READ16_HANDLER( pstars_protram_r )
 }
 
 
-static READ16_HANDLER( puzzli2_protram_r )
-{
-	if (offset == 4)
-		return input_port_read(space->machine(), "Region");
-
-	printf("%06x puzzli2_protram_r %02x\n", cpu_get_pc(&space->device()), offset);
-
-	return 0x0000;
-}
-
-static READ16_HANDLER( oldsplus_protram_r )
-{
-	if (offset == 4)
-		return input_port_read(space->machine(), "Region");
-
-	return 0x0000;
-}
-
 DRIVER_INIT( ddp3 )
 {
-	pgm_kovarmsim_state *state = machine.driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 	pgm_basic_init(machine, false);
 	pgm_py2k2_decrypt(machine); // yes, it's the same as photo y2k2
 	state->arm_sim_handler = command_handler_ddp3;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
 }
 
 DRIVER_INIT( ket )
 {
-	pgm_kovarmsim_state *state = machine.driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 	pgm_basic_init(machine, false);
 	pgm_ket_decrypt(machine);
 	state->arm_sim_handler = command_handler_ddp3;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
 }
 
 DRIVER_INIT( espgal )
 {
 	pgm_basic_init(machine, false);
 	pgm_espgal_decrypt(machine);
-	pgm_kovarmsim_state *state = machine.driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 	state->arm_sim_handler = command_handler_ddp3;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x400000, 0x400005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
 }
 
 DRIVER_INIT( puzzli2 )
 {
-	pgm_kovarmsim_state *state = machine.driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 	pgm_basic_init(machine);
 	pgm_puzzli2_decrypt(machine);
 	state->arm_sim_handler = command_handler_puzzli2;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(puzzli2_protram_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
 	state->m_irq4_disabled = 1; // // doesn't like this irq??
 }
 
 DRIVER_INIT( py2k2 )
 {
-	pgm_kovarmsim_state *state = machine.driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 	pgm_basic_init(machine);
 	pgm_py2k2_decrypt(machine);
 	state->arm_sim_handler = command_handler_py2k2;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(puzzli2_protram_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
 }
 
 DRIVER_INIT( pstar )
 {
-	pgm_kovarmsim_state *state = machine.driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 
 	pgm_basic_init(machine);
 	pgm_pstar_decrypt(machine);
-	kovsh_latch_init(machine);
+	pgm_arm7_type1_latch_init(machine);
 
-	state->m_pstar_e7 = 0;
-	state->m_pstar_b1 = 0;
-	state->m_pstar_ce = 0;
+	state->m_pstar_e7_value = 0;
+	state->m_pstar_b1_value = 0;
+	state->m_pstar_ce_value = 0;
 	state->m_extra_ram[0] = 0;
 	state->m_extra_ram[1] = 0;
 	state->m_extra_ram[2] = 0;
-	memset(state->m_ddp3slots, 0, 16);
+	memset(state->m_slots, 0, 16);
 
 	state->arm_sim_handler = command_handler_pstars;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pstars_protram_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pstars_arm7_type1_sim_protram_r));
 
-	state->save_item(NAME(state->m_pstar_e7));
-	state->save_item(NAME(state->m_pstar_b1));
-	state->save_item(NAME(state->m_pstar_ce));
+	state->save_item(NAME(state->m_pstar_e7_value));
+	state->save_item(NAME(state->m_pstar_b1_value));
+	state->save_item(NAME(state->m_pstar_ce_value));
 	state->save_item(NAME(state->m_extra_ram));
 }
 
 DRIVER_INIT( kov )
 {
-	pgm_kovarmsim_state *state = machine.driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 	pgm_basic_init(machine);
 	pgm_kov_decrypt(machine);
-	kovsh_latch_init(machine);
-	kov_internal_slot = 0;
-	kov_c0_value = 0;
-	kov_cb_value = 0;
-	kov_fe_value = 0;
+	pgm_arm7_type1_latch_init(machine);
+	state->m_curslots = 0;
+	state->m_kov_c0_value = 0;
+	state->m_kov_cb_value = 0;
+	state->m_kov_fe_value = 0;
 	state->arm_sim_handler = command_handler_kov;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(sango_protram_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
 }
 
 DRIVER_INIT( kovboot )
 {
-	pgm_kovarmsim_state *state = machine.driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 	pgm_basic_init(machine);
 //  pgm_kov_decrypt(machine);
-	kovsh_latch_init(machine);
-	kov_internal_slot = 0;
-	kov_c0_value = 0;
-	kov_cb_value = 0;
-	kov_fe_value = 0;
+	pgm_arm7_type1_latch_init(machine);
+	state->m_curslots = 0;
+	state->m_kov_c0_value = 0;
+	state->m_kov_cb_value = 0;
+	state->m_kov_fe_value = 0;
 	state->arm_sim_handler = command_handler_kov;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(sango_protram_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
 
 }
 
 DRIVER_INIT( oldsplus )
 {
-	pgm_kovarmsim_state *state = machine.driver_data<pgm_kovarmsim_state>();
+	pgm_arm_type1_state *state = machine.driver_data<pgm_arm_type1_state>();
 	pgm_basic_init(machine);
 	pgm_oldsplus_decrypt(machine);
-	kovsh_latch_init(machine);
+	pgm_arm7_type1_latch_init(machine);
 	memset(state->m_extra_ram, 0, 0x100);
-	memset(state->m_ddp3slots, 0, 0x100);
+	memset(state->m_slots, 0, 0x100);
 	state->arm_sim_handler = command_handler_oldsplus;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(ddp3_asic_r), FUNC(ddp3_asic_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(oldsplus_protram_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x500000, 0x500005, FUNC(pgm_arm7_type1_sim_r), FUNC(pgm_arm7_type1_sim_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4f0000, 0x4f003f, FUNC(pgm_arm7_type1_sim_protram_r));
 	state_save_register_global_array(machine, state->m_extra_ram);
-	state_save_register_global_array(machine, state->m_ddp3slots);
+	state_save_register_global_array(machine, state->m_slots);
 }
 
 INPUT_PORTS_START( photoy2k )

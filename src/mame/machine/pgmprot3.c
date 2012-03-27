@@ -1,5 +1,6 @@
 /***********************************************************************
- PGM IGA027A (55857G type) ARM protection emulation
+ PGM IGA027A (55857G* type) ARM protection emulation
+  *guess, the part number might not be directly tied to behavior, see note below
 
  these are emulation of the 'dmnfrnt' type ARM device
  used by
@@ -28,6 +29,11 @@
 
  IGS027A type 55857G has also been seen on various IGS gambling boards
  as the main CPU (eg. Haunted House, see igs_m027a)
+ 
+ 55857G is also used on the Cave single board PGM systems, but in those
+ cases it behaves like the 55857E (pgmprot1.c)
+
+
 
  ***********************************************************************/
 
@@ -39,25 +45,25 @@ static WRITE32_HANDLER( svg_arm7_ram_sel_w )
 //  printf("svg_arm7_ram_sel_w %08x\n", data);
 	space->machine().scheduler().synchronize(); // force resync
 
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 	state->m_svg_ram_sel = data & 1;
 }
 
 static READ32_HANDLER( svg_arm7_shareram_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 	return state->m_svg_shareram[state->m_svg_ram_sel & 1][offset];
 }
 
 static WRITE32_HANDLER( svg_arm7_shareram_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 	COMBINE_DATA(&state->m_svg_shareram[state->m_svg_ram_sel & 1][offset]);
 }
 
 static READ16_HANDLER( svg_m68k_ram_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 	int ram_sel = (state->m_svg_ram_sel & 1) ^ 1;
 	UINT16 *share16 = (UINT16 *)(state->m_svg_shareram[ram_sel & 1]);
 
@@ -66,7 +72,7 @@ static READ16_HANDLER( svg_m68k_ram_r )
 
 static WRITE16_HANDLER( svg_m68k_ram_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 	int ram_sel = (state->m_svg_ram_sel & 1) ^ 1;
 	UINT16 *share16 = (UINT16 *)(state->m_svg_shareram[ram_sel & 1]);
 
@@ -80,47 +86,47 @@ static READ16_HANDLER( svg_68k_nmi_r )
 
 static WRITE16_HANDLER( svg_68k_nmi_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 	generic_pulse_irq_line(state->m_prot, ARM7_FIRQ_LINE, 1);
 }
 
 static WRITE16_HANDLER( svg_latch_68k_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 	if (PGMARM7LOGERROR)
 		logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
-	COMBINE_DATA(&state->m_kov2_latchdata_68k_w);
+	COMBINE_DATA(&state->m_svg_latchdata_68k_w);
 }
 
 
 static READ16_HANDLER( svg_latch_68k_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", state->m_kov2_latchdata_arm_w & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
-	return state->m_kov2_latchdata_arm_w;
+		logerror("M68K: Latch read: %04x (%04x) (%06x)\n", state->m_svg_latchdata_arm_w & 0x0000ffff, mem_mask, cpu_get_pc(&space->device()));
+	return state->m_svg_latchdata_arm_w;
 }
 
 
 
 static READ32_HANDLER( svg_latch_arm_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 
 	if (PGMARM7LOGERROR)
-		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->m_kov2_latchdata_68k_w, mem_mask, cpu_get_pc(&space->device()));
-	return state->m_kov2_latchdata_68k_w;
+		logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", state->m_svg_latchdata_68k_w, mem_mask, cpu_get_pc(&space->device()));
+	return state->m_svg_latchdata_68k_w;
 }
 
 static WRITE32_HANDLER( svg_latch_arm_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 
 	if (PGMARM7LOGERROR)
 		logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, cpu_get_pc(&space->device()));
 
-	COMBINE_DATA(&state->m_kov2_latchdata_arm_w);
+	COMBINE_DATA(&state->m_svg_latchdata_arm_w);
 }
 
 /* 55857G? */
@@ -140,7 +146,7 @@ static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
-	AM_RANGE(0x18000000, 0x1803ffff) AM_RAM AM_BASE_MEMBER(pgm_state, m_arm_ram)
+	AM_RANGE(0x18000000, 0x1803ffff) AM_RAM AM_BASE_MEMBER(pgm_arm_type3_state, m_arm_ram)
 	AM_RANGE(0x38000000, 0x3801ffff) AM_READWRITE(svg_arm7_shareram_r, svg_arm7_shareram_w)
 	AM_RANGE(0x48000000, 0x48000003) AM_READWRITE(svg_latch_arm_r, svg_latch_arm_w) /* 68k Latch */
 	AM_RANGE(0x40000018, 0x4000001b) AM_WRITE(svg_arm7_ram_sel_w) /* RAM SEL */
@@ -148,9 +154,24 @@ static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
+MACHINE_START( pgm_arm_type3 )
+{
+	MACHINE_START_CALL(pgm);
+	pgm_arm_type3_state *state = machine.driver_data<pgm_arm_type3_state>();
+
+	state->m_prot = machine.device<cpu_device>("prot");
+
+	/* register type specific Save State stuff here */
+}
+
+
 /******* ARM 55857G *******/
 
-MACHINE_CONFIG_DERIVED( svg, pgm )
+MACHINE_CONFIG_START( pgm_arm_type3, pgm_arm_type3_state )
+	MCFG_FRAGMENT_ADD(pgmbase)
+
+	MCFG_MACHINE_START( pgm_arm_type3 )
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(svg_68k_mem)
 
@@ -164,7 +185,7 @@ MACHINE_CONFIG_END
 
 static void svg_basic_init(running_machine &machine)
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_arm_type3_state *state = machine.driver_data<pgm_arm_type3_state>();
 
 	pgm_basic_init(machine);
 	state->m_svg_shareram[0] = auto_alloc_array(machine, UINT32, 0x10000 / 4);
@@ -202,15 +223,15 @@ static void pgm_create_dummy_internal_arm_region(running_machine &machine)
 
 
 
-static void kov2_latch_init( running_machine &machine )
+static void svg_latch_init( running_machine &machine )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_arm_type3_state *state = machine.driver_data<pgm_arm_type3_state>();
 
-	state->m_kov2_latchdata_68k_w = 0;
-	state->m_kov2_latchdata_arm_w = 0;
+	state->m_svg_latchdata_68k_w = 0;
+	state->m_svg_latchdata_arm_w = 0;
 
-	state->save_item(NAME(state->m_kov2_latchdata_68k_w));
-	state->save_item(NAME(state->m_kov2_latchdata_arm_w));
+	state->save_item(NAME(state->m_svg_latchdata_68k_w));
+	state->save_item(NAME(state->m_svg_latchdata_arm_w));
 }
 
 
@@ -218,7 +239,7 @@ DRIVER_INIT( theglad )
 {
 	svg_basic_init(machine);
 	pgm_theglad_decrypt(machine);
-	kov2_latch_init(machine);
+	svg_latch_init(machine);
 	pgm_create_dummy_internal_arm_region(machine);
 }
 
@@ -226,7 +247,7 @@ DRIVER_INIT( svg )
 {
 	svg_basic_init(machine);
 	pgm_svg_decrypt(machine);
-	kov2_latch_init(machine);
+	svg_latch_init(machine);
 	pgm_create_dummy_internal_arm_region(machine);
 }
 
@@ -234,7 +255,7 @@ DRIVER_INIT( svgpcb )
 {
 	svg_basic_init(machine);
 	pgm_svgpcb_decrypt(machine);
-	kov2_latch_init(machine);
+	svg_latch_init(machine);
 	pgm_create_dummy_internal_arm_region(machine);
 }
 
@@ -242,12 +263,12 @@ DRIVER_INIT( killbldp )
 {
 	svg_basic_init(machine);
 	pgm_killbldp_decrypt(machine);
-	kov2_latch_init(machine);
+	svg_latch_init(machine);
 }
 
 static READ32_HANDLER( dmnfrnt_speedup_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_arm_type3_state *state = space->machine().driver_data<pgm_arm_type3_state>();
 	int pc = cpu_get_pc(&space->device());
 	if (pc == 0x8000fea) device_eat_cycles(&space->device(), 500);
 //  else printf("dmn_speedup_r %08x\n", pc);
@@ -265,11 +286,11 @@ static READ16_HANDLER( dmnfrnt_main_speedup_r )
 
 DRIVER_INIT( dmnfrnt )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_arm_type3_state *state = machine.driver_data<pgm_arm_type3_state>();
 
 	svg_basic_init(machine);
 	pgm_dfront_decrypt(machine);
-	kov2_latch_init(machine);
+	svg_latch_init(machine);
 
 	/* put some fake code for the ARM here ... */
 	pgm_create_dummy_internal_arm_region(machine);
@@ -293,6 +314,8 @@ DRIVER_INIT( happy6 )
 {
 	svg_basic_init(machine);
 	pgm_happy6_decrypt(machine);
-	kov2_latch_init(machine);
+	svg_latch_init(machine);
 	pgm_create_dummy_internal_arm_region(machine);
 }
+
+
