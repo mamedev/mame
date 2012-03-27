@@ -19,6 +19,9 @@ write addresses?
 most graphics are stored as packed 4bpp in RAM, expanded before
 writing to the vdp device.  actual gfx are 8bpp.
 
+Sound pitch is directly correlated with irqs, scanline timings and pixel clock,
+so it's surely not 100% correct. Sound sample playbacks looks fine at current time tho.
+
 
 Dip sw.1
 --------
@@ -65,13 +68,16 @@ Dip sw.2
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "video/ramdac.h"
+#include "sound/dac.h"
 
 class littlerb_state : public driver_device
 {
 public:
 	littlerb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
+		  m_maincpu(*this, "maincpu"),
+		  m_dacl(*this, "dacl"),
+   	      m_dacr(*this, "dacr")
 		{ }
 
 	UINT16 m_vdp_address_low;
@@ -89,8 +95,11 @@ public:
 	int m_type2_writes;
 	UINT32 m_lasttype2pc;
 	UINT8 m_sound_index_l,m_sound_index_r;
+	UINT16 m_sound_pointer_l,m_sound_pointer_r;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<dac_device> m_dacl;
+	required_device<dac_device> m_dacr;
 };
 
 
@@ -303,14 +312,16 @@ static WRITE16_HANDLER( littlerb_l_sound_w )
 {
 	littlerb_state *state = space->machine().driver_data<littlerb_state>();
 	state->m_sound_index_l = (data >> sound_data_shift(space->machine())) & 0xff;
-	popmessage("%04x %04x",state->m_sound_index_l,state->m_sound_index_r);
+	state->m_sound_pointer_l = 0;
+	//popmessage("%04x %04x",state->m_sound_index_l,state->m_sound_index_r);
 }
 
 static WRITE16_HANDLER( littlerb_r_sound_w )
 {
 	littlerb_state *state = space->machine().driver_data<littlerb_state>();
 	state->m_sound_index_r = (data >> sound_data_shift(space->machine())) & 0xff;
-	popmessage("%04x %04x",state->m_sound_index_l,state->m_sound_index_r);
+	state->m_sound_pointer_r = 0;
+	//popmessage("%04x %04x",state->m_sound_index_l,state->m_sound_index_r);
 }
 
 static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16 )
@@ -481,9 +492,26 @@ static TIMER_DEVICE_CALLBACK( littlerb_scanline )
 	littlerb_state *state = timer.machine().driver_data<littlerb_state>();
 	int scanline = param;
 
+	if((scanline % 2) == 0)
+	{
+		UINT8 res;
+		UINT8 *sample_rom = timer.machine().region("samples")->base();
+
+		res = sample_rom[state->m_sound_pointer_l|(state->m_sound_index_l<<10)|0x40000];
+		dac_signed_w(state->m_dacl, 0, res);
+		res = sample_rom[state->m_sound_pointer_r|(state->m_sound_index_r<<10)|0x00000];
+		dac_signed_w(state->m_dacr, 0, res);
+		state->m_sound_pointer_l++;
+		state->m_sound_pointer_l&=0x3ff;
+		state->m_sound_pointer_r++;
+		state->m_sound_pointer_r&=0x3ff;
+	}
+
 //	logerror("IRQ\n");
 	if(scanline == 256)
+	{
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
+	}
 }
 
 static MACHINE_CONFIG_START( littlerb, littlerb_state )
@@ -504,6 +532,13 @@ static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
 
 //  MCFG_PALETTE_INIT(littlerb)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
+
+	MCFG_SOUND_ADD("dacl", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+
+	MCFG_SOUND_ADD("dacr", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( littlerb )
@@ -512,9 +547,9 @@ ROM_START( littlerb )
 	ROM_LOAD16_BYTE( "romb.u29", 0x00000, 0x80000, CRC(b2fb1d61) SHA1(9a9d7176c241928d07af651e5f7f21d4f019701d) )
 
 	ROM_REGION( 0x80000, "samples", 0 ) /* sound samples */
-	ROM_LOAD16_BYTE( "romc.u26", 0x00001, 0x40000, CRC(f193c5b6) SHA1(95548a40e2b5064c558b36cabbf507d23678b1b2) )
-	ROM_LOAD16_BYTE( "romd.u32", 0x00000, 0x40000, CRC(d6b81583) SHA1(b7a63d18a41ccac4d3db9211de0b0cdbc914317a) )
+	ROM_LOAD( "romc.u26", 0x40000, 0x40000, CRC(f193c5b6) SHA1(95548a40e2b5064c558b36cabbf507d23678b1b2) )
+	ROM_LOAD( "romd.u32", 0x00000, 0x40000, CRC(d6b81583) SHA1(b7a63d18a41ccac4d3db9211de0b0cdbc914317a) )
 ROM_END
 
 
-GAME( 1993, littlerb, 0, littlerb, littlerb, 0, ROT0, "TCH", "Little Robin", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1993, littlerb, 0, littlerb, littlerb, 0, ROT0, "TCH", "Little Robin", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
