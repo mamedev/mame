@@ -7,6 +7,8 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
+#include "video/tms9928a.h"
+#include "machine/6821pia.h"
 
 class by133_state : public driver_device
 {
@@ -14,18 +16,29 @@ public:
 	by133_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_videocpu(*this, "videocpu")
+		  m_videocpu(*this, "videocpu"),
+		  m_pia(*this, "pia")
 	{ }
 
-protected:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_videocpu;
+	required_device<cpu_device> m_pia;
+
+//	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+protected:
 
 	// driver_device overrides
 	virtual void machine_reset();
 };
+
+#if 0
+UINT32 by133_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+{
+	return 0;
+}
+#endif
 
 static ADDRESS_MAP_START( by133_map, AS_PROGRAM, 8, by133_state )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
@@ -33,12 +46,29 @@ static ADDRESS_MAP_START( by133_map, AS_PROGRAM, 8, by133_state )
 	AM_RANGE(0x1000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
+
+
 static ADDRESS_MAP_START( by133_video_map, AS_PROGRAM, 8, by133_state )
-	AM_RANGE(0x0000, 0xffff) AM_NOP
+//	AM_RANGE(0x0000, 0x1fff) communication with main CPU
+	AM_RANGE(0x2000, 0x2003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE( "tms9928a", tms9928a_device, vram_read, vram_write )
+	AM_RANGE(0x4001, 0x4001) AM_DEVREADWRITE( "tms9928a", tms9928a_device, register_read, register_write )
+	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static INPUT_CHANGED( test_switch_press )
+{
+	by133_state *state = field.machine().driver_data<by133_state>();
+
+	if(newval)
+		device_set_input_line(state->m_videocpu, INPUT_LINE_NMI, PULSE_LINE);
+}
+
 static INPUT_PORTS_START( by133 )
+	/* service switch is directly hard-wired with the NMI signal */
+	PORT_START("TEST")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_IMPULSE(1) PORT_CHANGED(test_switch_press, 0)
 INPUT_PORTS_END
 
 void by133_state::machine_reset()
@@ -49,13 +79,66 @@ static DRIVER_INIT( by133 )
 {
 }
 
+static WRITE_LINE_DEVICE_HANDLER(vdp_interrupt)
+{
+	cputag_set_input_line(device->machine(), "videocpu", M6809_IRQ_LINE, (state ? ASSERT_LINE : CLEAR_LINE));
+}
+
+static TMS9928A_INTERFACE(byvid_tms9928a_interface)
+{
+	"screen",
+	0x4000,
+	DEVCB_LINE(vdp_interrupt)
+};
+
+static WRITE_LINE_DEVICE_HANDLER( by133_firq )
+{
+	cputag_set_input_line(device->machine(), "videocpu", M6809_FIRQ_LINE, (state ? ASSERT_LINE : CLEAR_LINE));
+}
+
+static READ8_DEVICE_HANDLER(by133_portb_r)
+{
+	return 0;
+}
+
+static const pia6821_interface pia_intf =
+{
+	DEVCB_NULL,		/* port A in */
+	DEVCB_HANDLER(by133_portb_r),		/* port B in */
+	DEVCB_NULL,		/* line CA1 in */
+	DEVCB_NULL,		/* line CB1 in */
+	DEVCB_NULL,		/* line CA2 in */
+	DEVCB_NULL,		/* line CB2 in */
+	DEVCB_NULL,		/* port A out */
+	DEVCB_NULL,		/* port B out */
+	DEVCB_NULL,		/* line CA2 out */
+	DEVCB_NULL,		/* port CB2 out */
+	DEVCB_LINE(by133_firq),		/* IRQA */
+	DEVCB_LINE(by133_firq)		/* IRQB */
+};
+
+
 static MACHINE_CONFIG_START( by133, by133_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6800, 3580000/4)
+	MCFG_DEVICE_DISABLE()
 	MCFG_CPU_PROGRAM_MAP(by133_map)
 
 	MCFG_CPU_ADD("videocpu", M6809, 3580000/4)
 	MCFG_CPU_PROGRAM_MAP(by133_video_map)
+
+	MCFG_PIA6821_ADD("pia", pia_intf)
+
+	/* video hardware */
+	MCFG_TMS9928A_ADD( "tms9928a", TMS9928A, byvid_tms9928a_interface )
+	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
+	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
+
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+//  MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/4)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /*-----------------------------------------------------
@@ -99,5 +182,5 @@ ROM_START(granny)
 ROM_END
 
 
-GAME(1982,  babypac,  0,  by133,  by133,  by133,  ROT0,  "Bally",    "Baby Pacman (Video/Pinball Combo)",              GAME_IS_SKELETON_MECHANICAL)
+GAME(1982,  babypac,  0,  by133,  by133,  by133,  ROT90,  "Bally",    "Baby Pacman (Video/Pinball Combo)",              GAME_IS_SKELETON_MECHANICAL)
 GAME(1984,  granny,   0,  by133,  by133,  by133,  ROT0,  "Bally",    "Granny and the Gators (Video/Pinball Combo)",    GAME_IS_SKELETON_MECHANICAL)
