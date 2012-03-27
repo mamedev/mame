@@ -139,7 +139,7 @@ FORMATSOBJS = \
 	$(LIBOBJ)/formats/p6001_cas.o	\
 	$(LIBOBJ)/formats/pasti_dsk.o	\
 	$(LIBOBJ)/formats/pc_dsk.o		\
-	$(LIBOBJ)/formats/pmd_pmd.o		\
+	$(LIBOBJ)/formats/pmd_cas.o		\
 	$(LIBOBJ)/formats/primoptp.o	\
 	$(LIBOBJ)/formats/rk_cas.o		\
 	$(LIBOBJ)/formats/smx_dsk.o		\

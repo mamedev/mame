@@ -1,16 +1,16 @@
 /*********************************************************************
 
-    pmd_pmd.h
+    pmd_cas.h
 
     Format code for PMD-85 casette files
 
 *********************************************************************/
 
-#ifndef PMD_PMD_H
-#define PMD_PMD_H
+#ifndef PMD_CAS_H
+#define PMD_CAS_H
 
 #include "cassimg.h"
 
-CASSETTE_FORMATLIST_EXTERN(pmd85_pmd_format);
+CASSETTE_FORMATLIST_EXTERN(pmd85_cassette_formats);
 
-#endif /* PMD_PMD_H */
+#endif /* PMD_CAS_H */
