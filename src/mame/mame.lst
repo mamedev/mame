@@ -18806,9 +18806,45 @@ m5clr		// MPU 5 Ram & Meter Clear (Barcrest)
 m5tst		// MPU 5 Test Rom (Barcrest)
 
 m5addams	// Addams Family (Barcrest)
+m5addamsa	//
+m5addamsb	//
+m5addamsc	//
+m5addamsd	//
+m5addamse	//
+m5addamsf	//
+m5addamsg	//
+m5addamsh	//
+m5addamsi	//
+m5addamsj	//
+m5addamsk	//
+m5addamsl	//
+m5addamsm	//
+m5addamsn	//
+m5addamso	//
+m5addamsp	//
+m5addamsq	//
+m5addamsr	//
+m5addamss	//
 m5addlad	// Adders & Ladders (Barcrest)
 m5addlada	//
 m5addladb	//
+m5addladc	//
+m5addladd	//
+m5addlade	//
+m5addladf	//
+m5addladg	//
+m5addladh	//
+m5addladi	//
+m5addladj	//
+m5addladk	//
+m5addladl	//
+m5addladm	//
+m5addladn	//
+m5addlado	//
+m5addladp	//
+m5addladq	//
+m5addladr	//
+m5addlads	//
 m5fire		// All Fired Up (Barcrest)
 m5arab		// Arabian Nights (Barcrest)
 m5austin	// Austin Powers (Barcrest)
@@ -18946,6 +18982,7 @@ m5hotrk		// Hot Rocks (Barcrest)
 /* Barcrest / Red Gaming */
 
 m5ashock	// Aftershock (Barcrest - Red Gaming)
+m5ashocka	//
 m5bigsht	// Big Shot (Barcrest - Red Gaming)
 m5bnkrs		// Bonkers (Barcrest - Red Gaming)
 m5bbank		// Break The Bank (Barcrest - Red Gaming)
@@ -18986,9 +19023,35 @@ m5slide		// Slider (Barcrest - Red Gaming)
 
 m5sixsht	// 6 Shooter (Vivid)
 m5sixshta	//
+m5sixshtb	//
+m5sixshtc	//
+m5sixshtd	//
+m5sixshte	//
+m5sixshtf	//
+m5sixshtg	//
+m5sixshth	//
+m5sixshti	//
+m5sixshtj	//
+m5sixshtk	//
+m5sixshtl	//
+m5sixshtm	//
+m5sixshtn	//
 m5all41		// All 4 One (Vivid)
-m5all41v	//
+m5all41a	//
+m5all41b	//
+m5all41c	//
+m5all41d	//
+m5all41e	//
+m5all41f	//
+m5all41g	//
+m5all41h	//
+m5all41i	//
+m5all41j	//
+m5all41k	//
+m5all41l	//
+m5all41m	//
 m5atlan		// Atlantic (Vivid)
+m5atlana	//
 m5bttf		// Back To The Features (Vivid)
 m5btlbnk	// Bottle Bank (Vivid)
 m5caesc		// Caesar's Cash (Vivid)
@@ -19042,6 +19105,9 @@ m5rawin		// Reel A Win (Vivid)
 /* Empire */
 
 m5fewmor	// A Few Dollars More (Empire)
+m5fewmora	//
+m5fewmorb	//
+m5fewmorc	//
 m5wonga		// A Fish Called Wonga (Empire)
 m5aceclb	// Ace Of Clubs (Empire)
 m5aceclba	//
@@ -19144,7 +19210,7 @@ m5xena		// Xena Warrior Princess (Bwb)
 
 
 /* Lowen */
-m5all41l	// All 4 One (Lowen)
+m5all41low	// All 4 One (Lowen)
 m5dblfun	// Double Fun (Lowen)
 m5jakjok	// Jackpot Jokers (Lowen)
 m5roundl	// Round & Round (Lowen)
