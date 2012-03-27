@@ -70,7 +70,9 @@ class littlerb_state : public driver_device
 {
 public:
 	littlerb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu")
+		{ }
 
 	UINT16 m_vdp_address_low;
 	UINT16 m_vdp_address_high;
@@ -86,6 +88,9 @@ public:
 	int m_paldac_offset;
 	int m_type2_writes;
 	UINT32 m_lasttype2pc;
+	UINT8 m_sound_index_l,m_sound_index_r;
+
+	required_device<cpu_device> m_maincpu;
 };
 
 
@@ -98,15 +103,16 @@ WRITE16_HANDLER( region4_w )
 /* this map is wrong because our VDP access is wrong! */
 static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16 )
 	// it ends up writing some gfx here (the bubbles when you shoot an enemy)
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM 
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
+	AM_RANGE(0x00080000, 0x003fffff) AM_RAM // temp so it doesn't fill the log
 
 	/* these are definitely written by a non-incrementing access to the VDP */
 	AM_RANGE(0x00800000, 0x00800001) AM_DEVWRITE8_MODERN("^ramdac", ramdac_device, index_w, 0x00ff)
 	AM_RANGE(0x00800002 ,0x00800003) AM_DEVWRITE8_MODERN("^ramdac", ramdac_device, pal_w,   0x00ff)
 	AM_RANGE(0x00800004 ,0x00800005) AM_DEVWRITE8_MODERN("^ramdac", ramdac_device, mask_w,  0x00ff)
-               
+
 	// most gfx end up here including the sprite list
-	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM_WRITE(region4_w)  AM_BASE_MEMBER(littlerb_state, m_region4) 
+	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM_WRITE(region4_w)  AM_BASE_MEMBER(littlerb_state, m_region4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
@@ -286,6 +292,27 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 
 }
 
+/* could be slightly different (timing wise, directly related to the irqs), but certainly they smoked some bad pot for this messy way ... */
+static UINT8 sound_data_shift(running_machine &machine)
+{
+	return ((machine.primary_screen->frame_number() % 16) == 0) ? 8 : 0;
+}
+
+/* l is SFX, r is BGM (they doesn't seem to share the same data ROM) */
+static WRITE16_HANDLER( littlerb_l_sound_w )
+{
+	littlerb_state *state = space->machine().driver_data<littlerb_state>();
+	state->m_sound_index_l = (data >> sound_data_shift(space->machine())) & 0xff;
+	popmessage("%04x %04x",state->m_sound_index_l,state->m_sound_index_r);
+}
+
+static WRITE16_HANDLER( littlerb_r_sound_w )
+{
+	littlerb_state *state = space->machine().driver_data<littlerb_state>();
+	state->m_sound_index_r = (data >> sound_data_shift(space->machine())) & 0xff;
+	popmessage("%04x %04x",state->m_sound_index_l,state->m_sound_index_r);
+}
+
 static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16 )
 	AM_RANGE(0x000008, 0x000017) AM_WRITENOP
 	AM_RANGE(0x000020, 0x00002f) AM_WRITENOP
@@ -293,13 +320,22 @@ static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16 )
 	AM_RANGE(0x060004, 0x060007) AM_WRITENOP
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // main ram?
+	AM_RANGE(0x700000, 0x700007) AM_READ(littlerb_vdp_r) AM_WRITE(littlerb_vdp_w)
+	AM_RANGE(0x740000, 0x740001) AM_WRITE(littlerb_l_sound_w)
+	AM_RANGE(0x760000, 0x760001) AM_WRITE(littlerb_r_sound_w)
+	AM_RANGE(0x780000, 0x780001) AM_WRITENOP // generic outputs
 	AM_RANGE(0x7c0000, 0x7c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READ_PORT("P1")
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
-	AM_RANGE(0x700000, 0x700007) AM_READ(littlerb_vdp_r) AM_WRITE(littlerb_vdp_w)
-	AM_RANGE(0x780000, 0x780001) AM_WRITENOP
 ADDRESS_MAP_END
 
+/* guess according to DASM code and checking the gameplay speed, could be different */
+static CUSTOM_INPUT( littlerb_frame_step_r )
+{
+	UINT32 ret = field.machine().primary_screen->frame_number();
+
+	return (ret) & 7;
+}
 
 static INPUT_PORTS_START( littlerb )
 	PORT_START("DSW")	/* 16bit */
@@ -367,9 +403,7 @@ static INPUT_PORTS_START( littlerb )
 	PORT_DIPNAME( 0x1000, 0x1000, "???"  )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xe000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(littlerb_frame_step_r, NULL)
 
 	PORT_START("P2")	/* 16bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -442,22 +476,25 @@ static SCREEN_UPDATE_IND16(littlerb)
 	return 0;
 }
 
-static INTERRUPT_GEN( littlerb )
+static TIMER_DEVICE_CALLBACK( littlerb_scanline )
 {
-	logerror("IRQ\n");
-	device_set_input_line(device, 4, HOLD_LINE);
+	littlerb_state *state = timer.machine().driver_data<littlerb_state>();
+	int scanline = param;
+
+//	logerror("IRQ\n");
+	if(scanline == 256)
+		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( littlerb, littlerb_state )
 	MCFG_CPU_ADD("maincpu", M68000, 12000000)
 	MCFG_CPU_PROGRAM_MAP(littlerb_main)
-	MCFG_CPU_VBLANK_INT("screen", littlerb)
-
+	MCFG_TIMER_ADD_SCANLINE("scantimer", littlerb_scanline, "screen", 0, 1)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_SIZE(512, 262)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 320-1, 0*8, 256-1)
 	MCFG_SCREEN_UPDATE_STATIC(littlerb)
 
