@@ -2387,32 +2387,32 @@ ROM_START( funcube2 )
 	ROM_LOAD( "fc21_iopr-0.u49", 0x00000, 0x20000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
 
 	ROM_REGION( 0x300, "pic", 0 )		// PIC12C508? Code
-	ROM_LOAD( "fc21a", 0x000, 0x300, NO_DUMP )
+	ROM_LOAD( "fc21a.u57", 0x000, 0x300, NO_DUMP )
 
 	ROM_REGION( 0x800000, "sprites", 0 )
 	ROM_LOAD32_WORD( "fc21_obj-0.u43", 0x000000, 0x400000, CRC(08cfe6d9) SHA1(d10f362dcde01f7a9855d8f76af3084b5dd1573a) )
 	ROM_LOAD32_WORD( "fc21_obj-1.u42", 0x000002, 0x400000, CRC(4c1fbc20) SHA1(ff83691c19ce3600b31c494eaec26d2ac79e0028) )
 
-	ROM_REGION( 0x1000000, "oki", 0 )
-	ROM_LOAD( "fc21_voi0.u47", 0x000000, 0x400000, CRC(25b5fc3f) SHA1(18b16a14e9ee62f3fea382e9d3fdcd43bdb165f5) )
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "fc21_voi0.u47", 0x000000, 0x200000, CRC(4a49370a) SHA1(ac10e2c25626965b49475767ef5a0ec3ba9a2d01) )
 ROM_END
 
 ROM_START( funcube3 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // XCF5206 Code
-	ROM_LOAD( "fc31prg-0a.u4", 0x00000, 0x80000, CRC(ed7d70dd) SHA1(4ebfca9e60ab5e8de22821f0475abf515c83ce53) )
+	ROM_LOAD( "fc31_prg-0a.u4", 0x00000, 0x80000, CRC(ed7d70dd) SHA1(4ebfca9e60ab5e8de22821f0475abf515c83ce53) )
 
 	ROM_REGION( 0x20000, "sub", 0 )		// H8/3007 Code
-	ROM_LOAD( "fc21iopr-0.u49", 0x00000, 0x20000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
+	ROM_LOAD( "fc21_iopr-0.u49", 0x00000, 0x20000, CRC(314555ef) SHA1(b17e3926c8ef7f599856c198c330d2051aae13ad) )
 
 	ROM_REGION( 0x400, "pic", 0 )		// PIC12C508? Code
 	ROM_LOAD( "fc31a.u57", 0x000, 0x400, NO_DUMP )
 
 	ROM_REGION( 0x800000, "sprites", 0 )
-	ROM_LOAD32_WORD( "fc31obj-0.u43", 0x000000, 0x400000, CRC(08c5eb6f) SHA1(016d8f3067db487ccd47188142743897c9722b1f) )
-	ROM_LOAD32_WORD( "fc31obj-1.u42", 0x000002, 0x400000, CRC(4dadc76e) SHA1(cf82296b38dc22a618fd178816316af05f2459b3) )
+	ROM_LOAD32_WORD( "fc31_obj-0.u43", 0x000000, 0x400000, CRC(08c5eb6f) SHA1(016d8f3067db487ccd47188142743897c9722b1f) )
+	ROM_LOAD32_WORD( "fc31_obj-1.u42", 0x000002, 0x400000, CRC(4dadc76e) SHA1(cf82296b38dc22a618fd178816316af05f2459b3) )
 
-	ROM_REGION( 0x1000000, "oki", 0 )
-	ROM_LOAD( "fc31snd-0.u47", 0x000000, 0x400000, CRC(319e8c32) SHA1(65fe58d762efb7c092a226ecbfed04c174af35a5) )
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "fc31_snd-0.u47", 0x000000, 0x200000, CRC(36b03769) SHA1(20e583359421e0933c781a487fe5f7220052a6d4) )
 ROM_END
 
 ROM_START( funcube4 )
@@ -2429,8 +2429,8 @@ ROM_START( funcube4 )
 	ROM_LOAD32_WORD( "fc41_obj-0.u43", 0x000000, 0x400000, CRC(9ff029d5) SHA1(e057f4929aa745ecaf9d4ff7e39974c82e440146) )
 	ROM_LOAD32_WORD( "fc41_obj-1.u42", 0x000002, 0x400000, CRC(5ab7b087) SHA1(c600158b2358cdf947357170044dda2deacd4f37) )
 
-	ROM_REGION( 0x1000000, "oki", 0 )
-	ROM_LOAD( "fc41_snd0.u47", 0x000000, 0x400000, CRC(48337257) SHA1(d1755024b824100070b489f48f6ae921765329e8) )
+	ROM_REGION( 0x1000000, "oki", ROMREGION_ERASE00 )
+	ROM_LOAD( "fc41_snd0.u47", 0x000000, 0x200000, CRC(e6f7d2bc) SHA1(638c73d439eaaff8097cb0aa2684f9f7111bcade) )
 ROM_END
 
 static DRIVER_INIT( funcube2 )
@@ -2444,14 +2444,6 @@ static DRIVER_INIT( funcube2 )
 
 	// Sub CPU
 	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts
-
-    // Audio
-    // The first half of the rom appears to be a dupe of the second half with 0xffs destructively interleaved
-	UINT8* oki = (UINT8*) machine.region("oki")->base();
-    for (int i = 0; i < 0x200000; i++)
-    {
-        oki[i] = oki[i+0x200000];
-    }
 }
 
 static DRIVER_INIT( funcube3 )
@@ -2465,14 +2457,6 @@ static DRIVER_INIT( funcube3 )
 
 	// Sub CPU
 	sub_cpu[0x4d4/2] = 0x5470;	// rte -> rts
-
-    // Audio
-    // The first half of the rom appears to be a dupe of the second half with 0xffs destructively interleaved
-	UINT8* oki = (UINT8*) machine.region("oki")->base();
-    for (int i = 0; i < 0x200000; i++)
-    {
-        oki[i] = oki[i+0x200000];
-    }
 }
 
 /***************************************************************************
