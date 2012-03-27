@@ -1512,7 +1512,7 @@ GAME( 19??, ec_supmb,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Con
 GAME( 19??, ec_stkex,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Stake X (Concept Games Ltd) (?)"		, GAME_FLAGS)
 GAME( 19??, ec_fltr,    0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Flutter (Concept Games Ltd) (?)"		, GAME_FLAGS)
 GAME( 19??, ec_rdht7,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Red Hot 7 (MAB PCB?) (Concept Games Ltd) (?)"		, GAME_FLAGS)
-GAME( 19??, ec_unkt,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Unknown 'T' (MAB PCB?) (Concept Games Ltd) (?)"		, GAME_FLAGS)
+GAME( 19??, ec_unkt,	0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "unknown 'T' (MAB PCB?) (Concept Games Ltd) (?)"		, GAME_FLAGS)
 
 //These look more like some variant of Astra Gaming hardware than the MAB PCB, but I can't be sure. Certainly they dont seem to be on the base hardware
 GAME( 19??, ec_gold7,   0		 , ecoinfr,   ecoinfr_barx,   ecoinfrmab,	ROT0,  "Concept Games Ltd", "Golden 7 (Concept Games Ltd) (?)"		, GAME_FLAGS)
