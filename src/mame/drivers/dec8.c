@@ -1119,7 +1119,7 @@ static INPUT_PORTS_START( shackled )
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x40, "Leave Off" )	                /* game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page */
+	PORT_DIPNAME( 0x10, 0x10, "Leave Off" )	                /* game doesn't boot when this is On - code at 0x401a - related to MCU - "dias" in Dip Switches page */
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
