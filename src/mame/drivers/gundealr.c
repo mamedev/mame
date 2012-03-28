@@ -588,7 +588,7 @@ ROM_END
 
 
 GAME( 1990, gundealr,  0,        gundealr, gundealr, 0, ROT270, "Dooyong", "Gun Dealer",                GAME_SUPPORTS_SAVE )
-GAME( 19??, gundealra, gundealr, gundealr, gundealr, 0, ROT270, "Dooyong", "Gun Dealer (alt card set)", GAME_SUPPORTS_SAVE )
-GAME( 1990, gundealrt, gundealr, gundealr, gundealt, 0, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1990, gundealra, gundealr, gundealr, gundealr, 0, ROT270, "Dooyong", "Gun Dealer (alt card set)", GAME_SUPPORTS_SAVE )
+GAME( 1990, gundealrt, gundealr, gundealr, gundealt, 0, ROT270, "Dooyong (Tecmo license)", "Gun Dealer (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, yamyam,    0,        yamyam,   yamyam,   0, ROT0,   "Dooyong", "Yam! Yam!?",                GAME_SUPPORTS_SAVE )
 GAME( 1990, wiseguy,   yamyam,   yamyam,   yamyam,   0, ROT0,   "Dooyong", "Wise Guy",                  GAME_SUPPORTS_SAVE )
