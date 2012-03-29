@@ -1300,7 +1300,7 @@ void software_list_find_approx_matches(software_list_device *swlistdev, software
 		software_info *candidate = swinfo;
 
 		software_part *part = software_find_part(swinfo, NULL, NULL);
-		if ((interface==NULL || !strcmp(interface, part->interface_)) && (is_software_compatible(part, swlistdev)))
+		if ((interface==NULL || softlist_contain_interface(interface, part->interface_)) && (is_software_compatible(part, swlistdev)))
 		{
 
 			/* pick the best match between driver name and description */
@@ -1436,7 +1436,7 @@ const software_part *software_find_part(const software_info *sw, const char *par
 				{
 					if ( interface )
 					{
-						if ( !strcmp(interface, part->interface_) )
+						if ( softlist_contain_interface(interface, part->interface_) )
 						{
 							break;
 						}
@@ -1452,7 +1452,7 @@ const software_part *software_find_part(const software_info *sw, const char *par
 				/* No specific partname supplied, find the first match based on interface */
 				if ( interface )
 				{
-					if ( !strcmp(interface, part->interface_) )
+					if ( softlist_contain_interface(interface, part->interface_) )
 					{
 						break;
 					}
@@ -1787,7 +1787,7 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 						const char *interface = req_image->image_interface();
 						if (interface != NULL)
 						{
-							if (!strcmp(interface, req_software_part_ptr->interface_))
+							if (softlist_contain_interface(interface, req_software_part_ptr->interface_))
 							{
 								const char *option = options.value(req_image->brief_instance_name());
 								// mount only if not already mounted
@@ -1899,7 +1899,7 @@ bool swinfo_has_multiple_parts(const software_info *swinfo, const char *interfac
 
 	for (const software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
 	{
-		if (strcmp(interface, swpart->interface_) == 0)
+		if (softlist_contain_interface(interface, swpart->interface_))
 			count++;
 	}
 	return (count > 1) ? true : false;
@@ -2047,4 +2047,22 @@ void software_list_device::device_validity_check(validity_checker &valid) const
 		}
 		software_list_close(list);
 	}
+}
+
+bool softlist_contain_interface(const char *interface, const char *part_interface)
+{
+    bool result = FALSE;
+
+	astring interfaces(interface);
+	char *intf = strtok((char*)interfaces.cstr(),",");
+	while (intf != NULL)
+	{
+		if (!strcmp(intf, part_interface))
+        {
+            result = TRUE;
+            break;
+        }
+		intf = strtok (NULL, ",");
+	}
+    return result;
 }

@@ -189,7 +189,7 @@ int cli_frontend::execute(int argc, char **argv)
 										const char *interface = image->image_interface();
 										if (interface != NULL)
 										{
-											if (!strcmp(interface, swpart->interface_))
+											if (softlist_contain_interface(interface, swpart->interface_))
 											{
 												const char *option = m_options.value(image->brief_instance_name());
 												// mount only if not already mounted

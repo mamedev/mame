@@ -201,4 +201,5 @@ const char *software_get_default_slot(const machine_config &config, emu_options 
 bool is_software_compatible(const software_part *swpart, const software_list_device *swlist);
 bool swinfo_has_multiple_parts(const software_info *swinfo, const char *interface);
 
+bool softlist_contain_interface(const char *interface, const char *part_interface);
 #endif

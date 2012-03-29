@@ -39,7 +39,7 @@ void ui_menu_software_parts::populate()
 {
 	for (const software_part *swpart = software_find_part(info, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
 	{
-		if (strcmp(interface, swpart->interface_) == 0)
+		if (softlist_contain_interface(interface, swpart->interface_))
 		{
 			software_part_menu_entry *entry = (software_part_menu_entry *) m_pool_alloc(sizeof(*entry));
 			// check if the available parts have specific part_id to be displayed (e.g. "Map Disc", "Bonus Disc", etc.)
@@ -126,7 +126,7 @@ ui_menu_software_list::entry_info *ui_menu_software_list::append_software_entry(
 	// check if at least one of the parts has the correct interface and add a menu entry only in this case
 	for (const software_part *swpart = software_find_part(swinfo, NULL, NULL); swpart != NULL; swpart = software_part_next(swpart))
 	{
-		if ((strcmp(interface, swpart->interface_) == 0) && is_software_compatible(swpart, swlist))
+		if ((softlist_contain_interface(interface, swpart->interface_)) && is_software_compatible(swpart, swlist))
 		{
 			entry_updated = TRUE;
 			// allocate a new entry
@@ -335,7 +335,7 @@ void ui_menu_software::populate()
 				for (const software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 				{
 					const software_part *part = software_find_part(swinfo, NULL, NULL);
-					if (strcmp(interface,part->interface_)==0) {
+					if (softlist_contain_interface(interface,part->interface_)) {
 						found = true;
 					}
 				}
@@ -361,7 +361,7 @@ void ui_menu_software::populate()
 				for (const software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 				{
 					const software_part *part = software_find_part(swinfo, NULL, NULL);
-					if (strcmp(interface,part->interface_)==0) {
+					if (softlist_contain_interface(interface,part->interface_)) {
 						found = true;
 					}
 				}
