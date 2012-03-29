@@ -6,7 +6,7 @@
 .\" Ashley T. Howes <debiandev@ashleyhowes.com>, February 2005
 .\" updated by Cesare Falco <cesare.falco@gmail.com>, February 2007
 .\"
-.TH CHDMAN 1 2012-03-25 0.145u5 "chdman"
+.TH CHDMAN 1 2012-03-25 0.145u5 "MAME Compressed Hunks of Data (CHD) manager"
 .\"
 .\" NAME chapter
 .SH NAME
@@ -60,44 +60,64 @@ Extract a laserdisc image from a CHD\-LD image.
 .B copy \fIinput\fR.chd \fIoutput\fR.chd
 Copy all hunks of data from one CHD file to another. The hunk sizes do not need to match.
 If the source is shorter than the destination, the source data will be padded with 0s.
+.\"
 .\" SWITCHES chapter
 .SH SWITCHES
 .TP
-.B --chs, -chs \fI <cylinders,heads,sectors>: specifies CHS geometry values for CHD harddisks
+.B \-\-chs, \-chs \fIcylinders,heads,sectors
+Specifies CHS geometry values for CHD harddisks.
 .TP
-.B --compression, -c \fI <none|type1[,type2[,...]]>: which compression codecs to use (up to 4)
+.B \-\-compression, \-c \fInone\fR|\fItype1\fR[,\fItype2\fR[,...]]
+Which compression codecs to use (up to 4).
 .TP
-.B --force, -f \fI : force overwriting an existing file
+.B \-\-force, \-f
+Force overwriting an existing file.
 .TP
-.B --help, -h \fI : shows the available switches for an option
+.B \-\-help, \-h
+Shows the available switches for an option.
 .TP
-.B --hunksize, -hs \fI <bytes>: size of each unit, in hunks
+.B \-\-hunksize, \-hs \fIbytes
+Size of each unit, in hunks.
 .TP
-.B --ident, -id \fI <filename>: name of ident file to provide CHS information
+.B \-\-ident, \-id \fIfilename
+Name of ident file to provide CHS information.
 .TP
-.B --input, -i \fI <filename>: input file name
+.B \-\-input, \-i \fIfilename
+Input file name.
 .TP
-.B --inputstartbyte, -isb \fI <offset>: starting byte offset within the input
+.B \-\-inputstartbyte, \-isb \fIoffset
+Starting byte offset within the input.
 .TP
-.B --inputstarthunk, -ish \fI <offset>:  starting hunk offset within the input
+.B \-\-inputstarthunk, \-ish \fIoffset
+Starting hunk offset within the input.
 .TP
-.B --inputbytes, -ib \fI <length>: effective length of the input in bytes
+.B \-\-inputbytes, \-ib \fIlength
+Effective length of the input in bytes.
 .TP                              
-.B --inputhunks, -ih \fI <length>: effective length of the input in hunks
+.B \-\-inputhunks, \-ih \fIlength
+Effective length of the input in hunks.
 .TP
-.B --inputparent, -ip \fI <filename>: parent CHD's input file name
+.B \-\-inputparent, \-ip \fIfilename
+Parent CHD's input file name.
 .TP
-.B --numprocessors, -np \fI <count>: limits the number of processors to use during compression
+.B \-\-numprocessors, \-np \fIcount
+Limits the number of processors to use during compression.
 .TP
-.B --sectorsize, -ss \fI <bytes>: size of each hard disk sector
+.B \-\-sectorsize, \-ss \fIbytes
+size of each hard disk sector.
 .TP
-.B --verbose, -v \fI : output additional information about the operation
+.B \-\-verbose, \-v
+Output additional information about the operation.
 .TP
-.B --output, -o \fI <filename>: output file name
+.B \-\-output, \-o \fIfilename
+Output file name.
 .TP
-.B --outputbin, -ob \fI <filename>: output binary file name for extractcd
+.B \-\-outputbin, \-ob \fIfilename
+Output binary file name for extractcd.
 .TP
-.B --outputparent, -op \fI <filename>: parent CHD's output file name
+.B \-\-outputparent, \-op \fIfilename
+Parent CHD's output file name.
 .TP
-.B --unitsize, -us \fI <bytes>: size of each unit, in bytes
+.B \-\-unitsize, \-us \fIbytes
+Size of each unit, in bytes.
 
