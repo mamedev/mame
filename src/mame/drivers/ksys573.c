@@ -92,6 +92,7 @@ N *drummania 10thMIX                            2004.04
 P Fisherman's Bait                              1998.06    GE765 UA          765 UA B02
 P Fisherman's Bait 2                            1998       GC865 UA          865 UA B02
 P Fisherman's Bait Marlin Challenge             1999       GX889             889 AA/EA/JA/UA(needs redump)
+P Gachagachamp                                  1999.01    GQ877 JA          GE877-JA(PCMCIA card)
 A GUITARFREAKS                                  1999.02    GQ886 EA/JA/UA    886 ** C02
 A GUITARFREAKS 2ndMIX                           1999.07    GQ883 JA          929 JB B02(needs redump)
 A *GUITARFREAKS 2ndMIX Link ver.                1999.09
@@ -107,7 +108,6 @@ N GUITARFREAKS 10thMIX                          2003.10    GCD10 JA          D10
 N *GUITARFREAKS 11thMIX                         2004.04
 G *Gun Mania                                    2000.07    G?906 JA          (no CD)
 ? *Gun Mania Zone Plus                          2000.10
-P *Gachaga Champ                                1999.01
 P Hyper Bishi Bashi Champ                       1998.07    GC908 JA          908    A02
 P Jikkyou Powerful Pro Yakyuu EX                1998.04    GX802 JA          802 JA B02
 P *Jikkyou Powerful Pro Yakyuu EX 98            1998.08
@@ -170,7 +170,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   |   058232         |056879 |    |3644|                            SM5877   |
   |                  |       |    |----|         ADC0834                LM358|
   |                  |-------|            ADM485           CN4               |
-  |                                                         CN3      CN17    |
+  |                              CN5                        CN3      CN17    |
   |                                TEST_SW  DIP4 USB   CN8     RCA-L/R   CN9 |
   |--|          JAMMA            |-------------------------------------------|
      |---------------------------|
@@ -208,7 +208,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   LA4705    - Sanyo LA4705 15W 2-channel power amplifier (SIP18)
   LM358     - National Semiconductor LM358 low power dual operational amplifier (SOIC8, @ 33C)
   CXD2925Q  - Sony CXD2925Q SPU (QFP100, @ 15Q)
-  CXD8561Q  - Sony CXD8561Q GPU (QFP208, @ 10M)
+  CXD8561Q  - Sony CXD8561Q GPU (QFP208, @ 10M) Also found CXD8561BQ in some units
   CXD8530CQ - Sony CXD8530CQ R3000-based CPU (QFP208, @ 17M)
   9536      - Xilinx XC9536 in-system-programmable CPLD (PLCC44, @ 22J)
   3644      - Hitachi H8/3644 HD6473644H microcontroller with 32k ROM & 1k RAM (QFP64, @ 18E,
@@ -226,12 +226,13 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
               is updated with the new game data
   29F016      Fujitsu 29F016A-90PFTN 2M x8 FlashROM (TSOP48, @ 27H/J/L/M & 31H/J/L/M)
               Also found Sharp LH28F016S (2M x8 TSOP40) in some units
-  KM416V256 - Samsung Electronics KM416V256BT-7 256k x 16 DRAM (TSOP44/40, @ 11Q)
-  KM48V514  - Samsung Electronics KM48V514BJ-6 512k x 8 EDO DRAM (SOJ28, @ 16G/H, 14G/H, 12G/H, 9G/H)
+  KM416V256 - Samsung Electronics KM416V256BT-7 256k x 16 DRAM (TSOP44/40, @ 11Q labelled 'SPUDR4M')
+  KM48V514  - Samsung Electronics KM48V514BJ-6 512k x 8 EDO DRAM (SOJ28, @ 16G/H, 14G/H, 12G/H, 9G/H labelled 'HDR4M8SJ')
+              Also found NEC 424805AL-A60 in some units
   32M       - NEC D481850GF-A12 128k x 32Bit x 2 Banks SGRAM (QFP100, @ 4P & 4L)
-
+              Also found Samsung KM4132G271Q-12 in some units
   Software  -
-              - 700A01.22G 4M MaskROM (DIP32, @ 22G)
+              - 700A01.22G 4M MaskROM (DIP32, @ 22G). AMD 27C040 is also used
               - SONY ATAPI CDROM drive, with CDROM disc containing program + graphics + sound
                 Some System 573 units contain a CR-583 drive dated October 1997, some contain a
                 CR-587 drive dated March 1998. Note that the CR-587 will not read CDR discs ;-)
@@ -269,6 +270,24 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
         C2242      - 2SC2242 Transistor
         PC817      - Sharp PC817 Photo-coupler IC (DIP4)
         PAL        - AMD PALCE16V8Q, stamped 'E765Bx' (DIP20)
+
+
+ GE877-PWB(C) (C)1998 KONAMI
+  |----------------------|
+|--       JAMMA OUT      --|
+|                          |
+|      CN6                 |
+|     CN5  CN4  CN3  CN2   |
+|                          |
+|                          |
+|         JAMMA IN         |
+|--------------------------|
+ Notes: This PCB is used for Gachagachamp. No ICs.
+
+        CN5 - To control lever unit (1P). uses 9 pins out of 15 pins of B15P-SHF-1AA
+        CN6 - To control lever unit (2P). uses 9 pins out of 14 pins of B14P-SHF-1AA
+        (CN4, CN3, CN2 is printed pattern only, no actual connector)
+
 
 
   Digital I/O PCB
