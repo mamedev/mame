@@ -2864,6 +2864,7 @@ src/mame/drivers/quizdna.c svneol=native#text/plain
 src/mame/drivers/quizo.c svneol=native#text/plain
 src/mame/drivers/quizpani.c svneol=native#text/plain
 src/mame/drivers/quizpun2.c svneol=native#text/plain
+src/mame/drivers/quizshow.c svneol=native#text/plain
 src/mame/drivers/r2dtank.c svneol=native#text/plain
 src/mame/drivers/r2dx_v33.c svneol=native#text/plain
 src/mame/drivers/rabbit.c svneol=native#text/plain

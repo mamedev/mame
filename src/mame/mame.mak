@@ -456,6 +456,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/orbit.o $(AUDIO)/orbit.o $(VIDEO)/orbit.o \
 	$(DRIVERS)/poolshrk.o $(AUDIO)/poolshrk.o $(VIDEO)/poolshrk.o \
 	$(DRIVERS)/quantum.o \
+	$(DRIVERS)/quizshow.o \
 	$(DRIVERS)/rampart.o $(VIDEO)/rampart.o \
 	$(DRIVERS)/relief.o $(VIDEO)/relief.o \
 	$(DRIVERS)/runaway.o $(VIDEO)/runaway.o \
