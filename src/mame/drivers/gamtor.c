@@ -26,19 +26,13 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "video/ramdac.h"
+#include "video/pc_vga.h"
 
 class gaminator_state : public driver_device
 {
 public:
 	gaminator_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
-
-	UINT32* m_vram;
-	UINT32* m_tmapram1;
-	UINT32* m_tmapram2;
-
-	struct { int r,g,b,offs,offs_internal; } m_pal;
 };
 
 static WRITE32_HANDLER( gamtor_unk_w )
@@ -46,132 +40,20 @@ static WRITE32_HANDLER( gamtor_unk_w )
 
 }
 
-static READ32_HANDLER( gamtor_unk2_r )
-{
-	return space->machine().rand();
-}
-
-
-
-static WRITE32_HANDLER( gamtor_unk2_w )
-{
-
-}
-
-static WRITE32_HANDLER( gamtor_unk3_w )
-{
-
-}
-
-static READ32_HANDLER( gamtor_unk4_r )
-{
-	return space->machine().rand();
-}
-
-static WRITE32_HANDLER( gamtor_unk4_w )
-{
-
-}
-
-static WRITE32_HANDLER( gamtor_unk6_w )
-{
-
-}
-
-static READ32_HANDLER( gamtor_unk7_r )
-{
-	return space->machine().rand();
-}
-
-#define GAMTOR_NUM_TILES 0x4000000 / 8
-
-static const gfx_layout gamtor_layout =
-{
-	8,8,
-	GAMTOR_NUM_TILES,
-	1,
-	{ 0 },
-	{ 0,1,2,3,4,5,6,7 },
-	{  3*8, 2*8, 1*8, 0*8,  7*8, 6*8, 5*8, 4*8 },
-	8*8
-};
-
-static WRITE32_HANDLER( gaminator_vram_w )
-{
-	gaminator_state *state = space->machine().driver_data<gaminator_state>();
-
-	COMBINE_DATA(state->m_vram + offset);
-	gfx_element_mark_dirty(space->machine().gfx[0], offset/8);
-
-}
-
-VIDEO_START( gamtor )
-{
-	gaminator_state *state = machine.driver_data<gaminator_state>();
-
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[0] = gfx_element_alloc(machine, &gamtor_layout, (UINT8 *)state->m_vram, 1, 0);
-
-}
-
-SCREEN_UPDATE_IND16(gamtor)
-{
-	gaminator_state *state = screen.machine().driver_data<gaminator_state>();
-
-	int tile_base = 0x00000;
-
-	// where does the base address come from?
-	if (!strcmp(screen.machine().system().name,"g4u5"))	tile_base = 0x31BE4 - 2;
-	if (!strcmp(screen.machine().system().name,"llcharm"))	tile_base = 0x2f58d - 2;
-
-
-
-	const gfx_element *gfx = screen.machine().gfx[0];
-	int count = 0;
-	for (int y=0;y<32;y++)
-	{
-		for (int x=0;x<80;x++)
-		{
-			UINT32 chr = state->m_tmapram1[count];
-
-
-			int tile = ((chr>>24)&0xff)*2;
-			tile += tile_base;
-
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,y*16);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile+1,0,0,0,x*8,(y*16)+8);
-
-			count++;
-		}
-
-	}
-
-	return 0;
-}
-
-
-
 
 
 static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_ROM
-	AM_RANGE(0x08000000, 0x0bffffff) AM_RAM_WRITE(gaminator_vram_w) AM_BASE_MEMBER(gaminator_state, m_vram) // 0x083ea460 = some data
+	AM_RANGE(0x08000000, 0x0bffffff) AM_RAM
 	AM_RANGE(0x1e040008, 0x1e04000b) AM_WRITE( gamtor_unk_w )
 
 	AM_RANGE(0x20000000, 0x2003ffff) AM_RAM
 
-	/* These are definitely VGA/SVGA ports, for example 0x3d4-0x3d5 = CRTC */
-	AM_RANGE(0x400003c0, 0x400003c3) AM_WRITE( gamtor_unk3_w )
-	AM_RANGE(0x400003c4, 0x400003c7) AM_READWRITE( gamtor_unk4_r, gamtor_unk4_w )
-	AM_RANGE(0x400003c8, 0x400003cb) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, index_w, 0x000000ff)
-	AM_RANGE(0x400003c8, 0x400003cb) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, pal_w,   0x0000ff00)
-//  AM_RANGE(0x400003c8, 0x400003cb) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, mask_w,  0x00ff0000)
-	AM_RANGE(0x400003cc, 0x400003cf) AM_WRITE( gamtor_unk6_w )
-	AM_RANGE(0x400003d4, 0x400003d7) AM_READWRITE( gamtor_unk2_r, gamtor_unk2_w )
-	AM_RANGE(0x400003d8, 0x400003fb) AM_READ( gamtor_unk7_r )
-
-	AM_RANGE(0x44000000, 0x44007fff) AM_RAM AM_BASE_MEMBER(gaminator_state, m_tmapram1) // puts strings here, looks almost like a tilemap, but where are the tiles?
-	AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_BASE_MEMBER(gaminator_state, m_tmapram2) // beetlem (like above, mirror?)
+	/* standard VGA */
+//  AM_RANGE(0x40000000, 0x40000fff) AM_RAM // regs
+	AM_RANGE(0x44000000, 0x4401ffff) AM_RAM // VRAM
+//	AM_RANGE(0x44000000, 0x44007fff) AM_RAM AM_BASE_MEMBER(gaminator_state, m_tmapram1) // puts strings here, looks almost like a tilemap, but where are the tiles?
+//	AM_RANGE(0x440a0000, 0x440a1fff) AM_RAM AM_BASE_MEMBER(gaminator_state, m_tmapram2) // beetlem (like above, mirror?)
 
 	AM_RANGE(0xe0000000, 0xe00001ff) AM_RAM // nvram?
 
@@ -183,34 +65,12 @@ INPUT_PORTS_END
 
 
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
-ADDRESS_MAP_END
-
-static RAMDAC_INTERFACE( ramdac_intf )
-{
-	0
-};
-
 static MACHINE_CONFIG_START( gaminator, gaminator_state )
 	MCFG_CPU_ADD("maincpu", MCF5206E, 40000000) /* definitely Coldfire, model / clock uncertain */
 	MCFG_CPU_PROGRAM_MAP(gaminator_map)
 	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold) // irq6 seems to be needed to get past the ROM checking
 
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(gamtor)
-
-	MCFG_PALETTE_LENGTH(0x100)
-
-	MCFG_RAMDAC_ADD("ramdac", ramdac_intf, ramdac_map)
-
-
-	MCFG_VIDEO_START(gamtor)
+	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
@@ -1386,11 +1246,13 @@ ROM_START( llcharma )
 	ROM_LOAD( "llc_92_5.6-0", 0x0000, 0x2000000, CRC(c8c2a5d3) SHA1(ec23eff63871cc515ec58a894446d4d639d864e4) )
 ROM_END
 
+static READ8_HANDLER( vga_setting ) { return 0xff; } // hard-code to color
 
 
 DRIVER_INIT( gaminator )
 {
-
+	pc_vga_init(machine, vga_setting, NULL);
+	pc_vga_gamtor_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0x44000000, machine.device("maincpu")->memory().space(AS_PROGRAM), 0x40000000);
 }
 
 

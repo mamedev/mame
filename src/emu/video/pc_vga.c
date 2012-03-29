@@ -2746,3 +2746,128 @@ WRITE8_HANDLER( s3_mem_w )
 
 	vga_mem_w(space,offset,data);
 }
+
+/******************************************
+
+gamtor.c implementation (TODO: identify the video card)
+
+******************************************/
+
+READ8_HANDLER(vga_gamtor_mem_r)
+{
+	return vga.memory[offset];
+}
+
+WRITE8_HANDLER(vga_gamtor_mem_w)
+{
+	vga.memory[offset] = data;
+}
+
+
+READ8_HANDLER(vga_port_gamtor_03b0_r)
+{
+	UINT8 res;
+
+	switch(offset)
+	{
+		default:
+			res = vga_port_03b0_r(space,offset ^ 3);
+			break;
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(vga_port_gamtor_03b0_w)
+{
+	switch(offset)
+	{
+		default:
+			vga_port_03b0_w(space,offset ^ 3,data);
+			break;
+	}
+}
+
+READ8_HANDLER(vga_port_gamtor_03c0_r)
+{
+	UINT8 res;
+
+	switch(offset)
+	{
+		default:
+			res = vga_port_03c0_r(space,offset ^ 3);
+			break;
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(vga_port_gamtor_03c0_w)
+{
+	switch(offset)
+	{
+		default:
+			vga_port_03c0_w(space,offset ^ 3,data);
+			break;
+	}
+}
+
+READ8_HANDLER(vga_port_gamtor_03d0_r)
+{
+	UINT8 res;
+
+	switch(offset)
+	{
+		default:
+			res = vga_port_03d0_r(space,offset ^ 3);
+			break;
+	}
+
+	return res;
+}
+
+WRITE8_HANDLER(vga_port_gamtor_03d0_w)
+{
+	switch(offset)
+	{
+		default:
+			vga_port_03d0_w(space,offset ^ 3,data);
+			break;
+	}
+}
+
+void pc_vga_gamtor_io_init(running_machine &machine, address_space *mem_space, offs_t mem_offset, address_space *io_space, offs_t port_offset)
+{
+	int buswidth;
+	UINT64 mask = 0;
+
+	buswidth = machine.firstcpu->memory().space_config(AS_PROGRAM)->m_databus_width;
+	switch(buswidth)
+	{
+		case 8:
+			mask = 0;
+			break;
+
+		case 16:
+			mask = 0xffff;
+			break;
+
+		case 32:
+			mask = 0xffffffff;
+			break;
+
+		case 64:
+			mask = -1;
+			break;
+
+		default:
+			fatalerror("VGA: Bus width %d not supported", buswidth);
+			break;
+	}
+	io_space->install_legacy_readwrite_handler(port_offset + 0x3b0, port_offset + 0x3bf, FUNC(vga_port_gamtor_03b0_r), FUNC(vga_port_gamtor_03b0_w), mask);
+	io_space->install_legacy_readwrite_handler(port_offset + 0x3c0, port_offset + 0x3cf, FUNC(vga_port_gamtor_03c0_r), FUNC(vga_port_gamtor_03c0_w), mask);
+	io_space->install_legacy_readwrite_handler(port_offset + 0x3d0, port_offset + 0x3df, FUNC(vga_port_gamtor_03d0_r), FUNC(vga_port_gamtor_03d0_w), mask);
+
+	mem_space->install_legacy_readwrite_handler(mem_offset + 0x00000, mem_offset + 0x1ffff, FUNC(vga_gamtor_mem_r), FUNC(vga_gamtor_mem_w), mask);
+}
+
