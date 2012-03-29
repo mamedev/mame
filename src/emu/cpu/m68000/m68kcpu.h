@@ -27,7 +27,6 @@
 
 typedef class _m68ki_cpu_core m68ki_cpu_core;
 
-
 #include "m68000.h"
 #include "../../../lib/softfloat/milieu.h"
 #include "../../../lib/softfloat/softfloat.h"
@@ -552,7 +551,7 @@ class m68k_memory_interface
 public:
 	void init8(address_space &space);
 	void init16(address_space &space);
-	void init16_68307(address_space &space);
+	void init16_m68307(address_space &space);
 	void init32(address_space &space);
 	void init32mmu(address_space &space);
 	void init32hmmu(address_space &space);
@@ -571,13 +570,13 @@ private:
 	UINT16 read_immediate_16(offs_t address);
 	UINT16 simple_read_immediate_16(offs_t address);
 
-	UINT16 simple_read_immediate_16_68307(offs_t address);
-	UINT8 read_byte_68307(offs_t address);
-	UINT16 read_word_68307(offs_t address);
-	UINT32 read_dword_68307(offs_t address);
-	void write_byte_68307(offs_t address, UINT8 data);
-	void write_word_68307(offs_t address, UINT16 data);
-	void write_dword_68307(offs_t address, UINT32 data);
+	UINT16 simple_read_immediate_16_m68307(offs_t address);
+	UINT8 read_byte_m68307(offs_t address);
+	UINT16 read_word_m68307(offs_t address);
+	UINT32 read_dword_m68307(offs_t address);
+	void write_byte_m68307(offs_t address, UINT8 data);
+	void write_word_m68307(offs_t address, UINT16 data);
+	void write_dword_m68307(offs_t address, UINT32 data);
 
 	UINT8 read_byte_32_mmu(offs_t address);
 	void write_byte_32_mmu(offs_t address, UINT8 data);
@@ -722,6 +721,31 @@ public:
 	UINT32 ic_address[M68K_IC_SIZE];   /* instruction cache address data */
 	UINT16 ic_data[M68K_IC_SIZE];      /* instruction cache content data */
 
+	/* 68307 peripheral modules */
+	m68307_sim*    m68307SIM;
+	m68307_mbus*   m68307MBUS;
+	m68307_serial* m68307SERIAL;
+	m68307_timer*  m68307TIMER;
+
+	UINT16 m68307_base;
+	UINT16 m68307_scrhigh;
+	UINT16 m68307_scrlow;
+
+	int m68307_currentcs;
+
+	/* 68340 peripheral modules */
+	m68340_sim*	   m68340SIM;
+	m68340_dma*	   m68340DMA;
+	m68340_serial* m68340SERIAL;
+	m68340_timer*  m68340TIMER;
+
+	UINT32 m68340_base;
+
+
+	/* 68308 / 68340 internal address map */
+	address_space *internal;
+
+
 	/* external instruction hook (does not depend on debug mode) */
 	typedef int (*instruction_hook_t)(device_t *device, offs_t curpc);
 	instruction_hook_t instruction_hook;
@@ -731,6 +755,29 @@ public:
 	#undef OPCODE_PROTOTYPES
 };
 
+
+INLINE m68ki_cpu_core *m68k_get_safe_token(device_t *device)
+{
+	assert(device != NULL);
+	assert(device->type() == M68000 ||
+		   device->type() == M68301 ||
+		   device->type() == M68307 ||
+		   device->type() == M68008 ||
+		   device->type() == M68008PLCC ||
+		   device->type() == M68010 ||
+		   device->type() == M68EC020 ||
+		   device->type() == M68020 ||
+		   device->type() == M68020HMMU ||
+		   device->type() == M68020PMMU ||
+		   device->type() == M68EC030 ||
+		   device->type() == M68030 ||
+		   device->type() == M68EC040 ||
+		   device->type() == M68040 ||
+		   device->type() == SCC68070 ||
+		   device->type() == MCF5206E ||
+		   device->type() == M68340);
+	return (m68ki_cpu_core *)downcast<legacy_cpu_device *>(device)->token();
+}
 
 extern const UINT8    m68ki_shift_8_table[];
 extern const UINT16   m68ki_shift_16_table[];

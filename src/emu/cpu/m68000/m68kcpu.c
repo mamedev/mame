@@ -639,28 +639,6 @@ const UINT8 m68ki_ea_idx_cycle_table[64] =
 #define MASK_040_OR_LATER			(CPU_TYPE_040 | CPU_TYPE_EC040)
 
 
-INLINE m68ki_cpu_core *get_safe_token(device_t *device)
-{
-	assert(device != NULL);
-	assert(device->type() == M68000 ||
-		   device->type() == M68301 ||
-		   device->type() == M68307 ||
-		   device->type() == M68008 ||
-		   device->type() == M68008PLCC ||
-		   device->type() == M68010 ||
-		   device->type() == M68EC020 ||
-		   device->type() == M68020 ||
-		   device->type() == M68020HMMU ||
-		   device->type() == M68020PMMU ||
-		   device->type() == M68EC030 ||
-		   device->type() == M68030 ||
-		   device->type() == M68EC040 ||
-		   device->type() == M68040 ||
-		   device->type() == SCC68070 ||
-		   device->type() == MCF5206E ||
-		   device->type() == M68340);
-	return (m68ki_cpu_core *)downcast<legacy_cpu_device *>(device)->token();
-}
 
 /* ======================================================================== */
 /* ================================= API ================================== */
@@ -733,7 +711,7 @@ static void m68k_cause_bus_error(m68ki_cpu_core *m68k)
 /* translate logical to physical addresses */
 static CPU_TRANSLATE( m68k )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	if (m68k)
@@ -769,7 +747,7 @@ static CPU_TRANSLATE( m68k )
 /* translate logical to physical addresses for Apple HMMU */
 static CPU_TRANSLATE( m68khmmu )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	/* only applies to the program address space and only does something if the MMU's enabled */
 	if (m68k)
@@ -785,7 +763,7 @@ static CPU_TRANSLATE( m68khmmu )
 /* Execute some instructions until we use up cycles clock cycles */
 static CPU_EXECUTE( m68k )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	m68k->initial_cycles = m68k->remaining_cycles;
 
@@ -917,7 +895,7 @@ static CPU_EXECUTE( m68k )
 static CPU_INIT( m68k )
 {
 	static UINT32 emulation_initialized = 0;
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	m68k->device = device;
 	m68k->program = device->space(AS_PROGRAM);
@@ -961,7 +939,7 @@ static CPU_INIT( m68k )
 /* Pulse the RESET line on the CPU */
 static CPU_RESET( m68k )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	/* Disable the PMMU/HMMU on reset, if any */
 	m68k->pmmu_enabled = 0;
@@ -1019,7 +997,7 @@ static CPU_RESET( m68k )
 
 static CPU_DISASSEMBLE( m68k )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, m68k->dasm_type);
 }
 
@@ -1031,7 +1009,7 @@ static CPU_DISASSEMBLE( m68k )
 
 static CPU_IMPORT_STATE( m68k )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	switch (entry.index())
 	{
@@ -1070,7 +1048,7 @@ static CPU_IMPORT_STATE( m68k )
 
 static CPU_EXPORT_STATE( m68k )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	switch (entry.index())
 	{
@@ -1109,7 +1087,7 @@ static CPU_EXPORT_STATE( m68k )
 
 static CPU_SET_INFO( m68k )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1136,7 +1114,7 @@ static CPU_SET_INFO( m68k )
 
 static CPU_EXPORT_STRING( m68k )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 	UINT16 sr;
 
 	switch (entry.index())
@@ -1198,7 +1176,7 @@ static CPU_EXPORT_STRING( m68k )
 
 static CPU_GET_INFO( m68k )
 {
-	m68ki_cpu_core *m68k = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
+	m68ki_cpu_core *m68k = (device != NULL && device->token() != NULL) ? m68k_get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1255,21 +1233,21 @@ static CPU_GET_INFO( m68k )
 
 void m68k_set_encrypted_opcode_range(device_t *device, offs_t start, offs_t end)
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 	m68k->encrypted_start = start;
 	m68k->encrypted_end = end;
 }
 
 void m68k_set_hmmu_enable(device_t *device, int enable)
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	m68k->hmmu_enabled = enable;
 }
 
 void m68k_set_instruction_hook(device_t *device, instruction_hook_t ihook)
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
     m68k->instruction_hook = ihook;
 }
@@ -1287,7 +1265,7 @@ void m68k_memory_interface::init8(address_space &space)
 {
 	m_space = &space;
 	m_direct = &space.direct();
-	m_cpustate = get_safe_token(&space.device());
+	m_cpustate = m68k_get_safe_token(&space.device());
 	opcode_xor = 0;
 
 	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::m68008_read_immediate_16), this);
@@ -1317,7 +1295,7 @@ void m68k_memory_interface::init16(address_space &space)
 {
 	m_space = &space;
 	m_direct = &space.direct();
-	m_cpustate = get_safe_token(&space.device());
+	m_cpustate = m68k_get_safe_token(&space.device());
 	opcode_xor = 0;
 
 	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::simple_read_immediate_16), this);
@@ -1329,81 +1307,82 @@ void m68k_memory_interface::init16(address_space &space)
 	write32 = m68k_write32_delegate(FUNC(address_space::write_dword), &space);
 }
 
-
-
-
-UINT16 m68k_memory_interface::simple_read_immediate_16_68307(offs_t address)
+int m68307_calc_cs(m68ki_cpu_core *m68k, offs_t address)
 {
-    if ( address >= 0xf0 && address < 0x100 )
-	{
-		return 0;
-	}
+	m68307_sim* sim = m68k->m68307SIM;
 
+	for (int i=0;i<4;i++)
+	{
+		int br,amask,bra;
+		br = sim->m_br[i] & 1;
+		amask = ((sim->m_or[i]&0x1ffc)<<11);
+		bra = ((sim->m_br[i] & 0x1ffc)<<11);
+		if ((br) && ((address & amask) == bra)) return i+1;
+	}
+	return 0;
+}
+
+
+
+UINT16 m68k_memory_interface::simple_read_immediate_16_m68307(offs_t address)
+{
+//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	return m_direct->read_decrypted_word(address);
 }
 
-UINT8 m68k_memory_interface::read_byte_68307(offs_t address)
+UINT8 m68k_memory_interface::read_byte_m68307(offs_t address)
 {
-    if ( address >= 0xf0 && address < 0x100 )
-	{
-		return 0;
-	}
-
+//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	return m_space->read_byte(address);
 }
 
-UINT16 m68k_memory_interface::read_word_68307(offs_t address)
+UINT16 m68k_memory_interface::read_word_m68307(offs_t address)
 {
-    if ( address >= 0xf0 && address < 0x100 )
-	{
-		return 0;
-	}
-
+//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	return m_space->read_word(address);
 }
 
-UINT32 m68k_memory_interface::read_dword_68307(offs_t address)
+UINT32 m68k_memory_interface::read_dword_m68307(offs_t address)
 {
-    if ( address >= 0xf0 && address < 0x100 )
-	{
-		return 0;
-	}
-
+//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	return m_space->read_dword(address);
 }
 
-void m68k_memory_interface::write_byte_68307(offs_t address, UINT8 data)
+void m68k_memory_interface::write_byte_m68307(offs_t address, UINT8 data)
 {
+//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	m_space->write_byte(address, data);
 }
 
-void m68k_memory_interface::write_word_68307(offs_t address, UINT16 data)
+void m68k_memory_interface::write_word_m68307(offs_t address, UINT16 data)
 {
+//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	m_space->write_word(address, data);
 }
 
-void m68k_memory_interface::write_dword_68307(offs_t address, UINT32 data)
+void m68k_memory_interface::write_dword_m68307(offs_t address, UINT32 data)
 {
+//	m_cpustate->m68307_currentcs = m68307_calc_cs(m_cpustate, address);
 	m_space->write_dword(address, data);
 }
 
 
 
 
-void m68k_memory_interface::init16_68307(address_space &space)
+void m68k_memory_interface::init16_m68307(address_space &space)
 {
 	m_space = &space;
 	m_direct = &space.direct();
-	m_cpustate = get_safe_token(&space.device());
+	m_cpustate = m68k_get_safe_token(&space.device());
 	opcode_xor = 0;
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::simple_read_immediate_16_68307), this);
-	read8 = m68k_read8_delegate(FUNC(m68k_memory_interface::read_byte_68307), this);
-	read16 = m68k_read16_delegate(FUNC(m68k_memory_interface::read_word_68307), this);
-	read32 = m68k_read32_delegate(FUNC(m68k_memory_interface::read_dword_68307), this);
-	write8 = m68k_write8_delegate(FUNC(m68k_memory_interface::write_byte_68307), this);
-	write16 = m68k_write16_delegate(FUNC(m68k_memory_interface::write_word_68307), this);
-	write32 = m68k_write32_delegate(FUNC(m68k_memory_interface::write_dword_68307), this);
+	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::simple_read_immediate_16_m68307), this);
+	read8 = m68k_read8_delegate(FUNC(m68k_memory_interface::read_byte_m68307), this);
+	read16 = m68k_read16_delegate(FUNC(m68k_memory_interface::read_word_m68307), this);
+	read32 = m68k_read32_delegate(FUNC(m68k_memory_interface::read_dword_m68307), this);
+	write8 = m68k_write8_delegate(FUNC(m68k_memory_interface::write_byte_m68307), this);
+	write16 = m68k_write16_delegate(FUNC(m68k_memory_interface::write_word_m68307), this);
+	write32 = m68k_write32_delegate(FUNC(m68k_memory_interface::write_dword_m68307), this);
 }
 
 /****************************************************************************
@@ -1415,7 +1394,7 @@ void m68k_memory_interface::init32(address_space &space)
 {
 	m_space = &space;
 	m_direct = &space.direct();
-	m_cpustate = get_safe_token(&space.device());
+	m_cpustate = m68k_get_safe_token(&space.device());
 	opcode_xor = WORD_XOR_BE(0);
 
 	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::read_immediate_16), this);
@@ -1633,7 +1612,7 @@ void m68k_memory_interface::init32mmu(address_space &space)
 {
 	m_space = &space;
 	m_direct = &space.direct();
-	m_cpustate = get_safe_token(&space.device());
+	m_cpustate = m68k_get_safe_token(&space.device());
 	opcode_xor = WORD_XOR_BE(0);
 
 	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::read_immediate_16_mmu), this);
@@ -1760,7 +1739,7 @@ void m68k_memory_interface::init32hmmu(address_space &space)
 {
 	m_space = &space;
 	m_direct = &space.direct();
-	m_cpustate = get_safe_token(&space.device());
+	m_cpustate = m68k_get_safe_token(&space.device());
 	opcode_xor = WORD_XOR_BE(0);
 
 	readimm16 = m68k_readimm16_delegate(FUNC(m68k_memory_interface::read_immediate_16_hmmu), this);
@@ -1774,34 +1753,42 @@ void m68k_memory_interface::init32hmmu(address_space &space)
 
 void m68k_set_reset_callback(device_t *device, m68k_reset_func callback)
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 	m68k->reset_instr_callback = callback;
 }
 
 void m68k_set_cmpild_callback(device_t *device, m68k_cmpild_func callback)
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 	m68k->cmpild_instr_callback = callback;
 }
 
 void m68k_set_rte_callback(device_t *device, m68k_rte_func callback)
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 	m68k->rte_instr_callback = callback;
 }
 
 void m68k_set_tas_callback(device_t *device, m68k_tas_func callback)
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 	m68k->tas_instr_callback = callback;
 }
 
 UINT16 m68k_get_fc(device_t *device)
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 	return m68k->mmu_tmp_fc;
 }
 
+UINT16 m68307_get_cs(device_t *device, offs_t address)
+{
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
+
+	m68k->m68307_currentcs = m68307_calc_cs(m68k, address);
+
+	return m68k->m68307_currentcs;
+}
 
 /****************************************************************************
  * State definition
@@ -1809,7 +1796,7 @@ UINT16 m68k_get_fc(device_t *device)
 
 static void define_state(device_t *device)
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 	UINT32 addrmask = (m68k->cpu_type & MASK_24BIT_SPACE) ? 0xffffff : 0xffffffff;
 
 	device_state_interface *state;
@@ -1864,7 +1851,7 @@ static void define_state(device_t *device)
 
 static CPU_INIT( m68000 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -1911,7 +1898,7 @@ CPU_GET_INFO( m68000 )
 
 static CPU_INIT( m68301 )
 {
-//  m68ki_cpu_core *m68k = get_safe_token(device);
+//  m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68000);
 
@@ -1936,7 +1923,7 @@ CPU_GET_INFO( m68301 )
 
 static CPU_INIT( m68307 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68000);
 
@@ -1944,19 +1931,110 @@ static CPU_INIT( m68307 )
        set via remappable register
     */
 	new(&m68k->memory) m68k_memory_interface;
-	m68k->memory.init16_68307(*m68k->program);
+	m68k->memory.init16_m68307(*m68k->program);
 
+	m68k->m68307SIM    = new m68307_sim();
+	m68k->m68307MBUS   = new m68307_mbus();
+	m68k->m68307SERIAL = new m68307_serial();
+	m68k->m68307TIMER  = new m68307_timer();
+
+	m68k->m68307SIM->reset();
+	m68k->m68307MBUS->reset();
+	m68k->m68307SERIAL->reset();
+	m68k->m68307TIMER->reset();
+
+	m68k->internal = device->space(AS_PROGRAM);
+	m68k->m68307_base = 0xbfff;
+	m68k->m68307_scrhigh = 0x0007;
+	m68k->m68307_scrlow = 0xf010;
 }
+
+static READ16_HANDLER( m68307_internal_base_r )
+{
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+
+	int pc = cpu_get_pc(&space->device());
+	logerror("%08x m68307_internal_base_r %08x, (%04x)\n", pc, offset*2,mem_mask);
+
+	switch (offset<<1)
+	{
+		case 0x2: return m68k->m68307_base;
+		case 0x4: return m68k->m68307_scrhigh;
+		case 0x6: return m68k->m68307_scrlow;
+	}
+
+	logerror("(read was illegal?)\n");
+
+	return 0x0000;
+}
+
+static WRITE16_HANDLER( m68307_internal_base_w )
+{
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+
+	int pc = cpu_get_pc(&space->device());
+	logerror("%08x m68307_internal_base_w %08x, %04x (%04x)\n", pc, offset*2,data,mem_mask);
+	int base = 0;
+	//int mask = 0;
+
+	switch (offset<<1)
+	{
+		case 0x2:
+			/* remove old internal handler */
+			base = (m68k->m68307_base & 0x0fff) << 12;
+			//mask = (m68k->m68307_base & 0xe000) >> 13;
+			//if ( m68k->m68307_base & 0x1000 ) mask |= 7;
+         	m68k->internal->unmap_readwrite(base+0x000, base+0x04f);
+         	m68k->internal->unmap_readwrite(base+0x100, base+0x11f);
+         	m68k->internal->unmap_readwrite(base+0x120, base+0x13f);
+         	m68k->internal->unmap_readwrite(base+0x140, base+0x149);
+
+			/* store new base address */
+			COMBINE_DATA(&m68k->m68307_base);
+
+			/* install new internal handler */
+			base = (m68k->m68307_base & 0x0fff) << 12;
+			//mask = (m68k->m68307_base & 0xe000) >> 13;
+			//if ( m68k->m68307_base & 0x1000 ) mask |= 7;     
+			m68k->internal->install_legacy_readwrite_handler(base + 0x000, base + 0x04f, FUNC(m68307_internal_sim_r),    FUNC(m68307_internal_sim_w));
+			m68k->internal->install_legacy_readwrite_handler(base + 0x100, base + 0x11f, FUNC(m68307_internal_serial_r), FUNC(m68307_internal_serial_w));
+			m68k->internal->install_legacy_readwrite_handler(base + 0x120, base + 0x13f, FUNC(m68307_internal_timer_r),  FUNC(m68307_internal_timer_w));
+			m68k->internal->install_legacy_readwrite_handler(base + 0x140, base + 0x149, FUNC(m68307_internal_mbus_r),   FUNC(m68307_internal_mbus_w));
+
+			break;
+
+		case 0x4:
+			COMBINE_DATA(&m68k->m68307_scrhigh);
+			break;
+
+		case 0x6:
+			COMBINE_DATA(&m68k->m68307_scrlow);
+			break;
+
+		default:
+			logerror("(write was illegal?)\n");
+			break;
+	}
+}
+
+static ADDRESS_MAP_START( m68307_internal_map, AS_PROGRAM, 16 )
+	AM_RANGE(0x000000f0, 0x000000ff) AM_READWRITE(m68307_internal_base_r, m68307_internal_base_w)
+ADDRESS_MAP_END
 
 CPU_GET_INFO( m68307 )
 {
 	switch (state)
 	{
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 32;							break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68307);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "68307");						break;
+
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(m68307_internal_map); break;
+
 
 		default:									CPU_GET_INFO_CALL(m68k);						break;
 	}
@@ -1969,7 +2047,7 @@ CPU_GET_INFO( m68307 )
 
 static CPU_INIT( m68008 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -2042,7 +2120,7 @@ CPU_GET_INFO( m68008plcc )
 
 static CPU_INIT( m68010 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -2093,7 +2171,7 @@ CPU_GET_INFO( m68010 )
 
 static CPU_INIT( m68020 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -2146,7 +2224,7 @@ CPU_GET_INFO( m68020 )
 // 68020 with 68851 PMMU
 static CPU_INIT( m68020pmmu )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68020);
 
@@ -2177,7 +2255,7 @@ CPU_GET_INFO( m68020pmmu )
 // 68020 with Apple HMMU & 68881 FPU
 static CPU_INIT( m68020hmmu )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68020);
 
@@ -2211,7 +2289,7 @@ CPU_GET_INFO( m68020hmmu )
 
 static CPU_INIT( m68ec020 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -2264,7 +2342,7 @@ CPU_GET_INFO( m68ec020 )
 
 static CPU_INIT( m68030 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -2323,7 +2401,7 @@ CPU_GET_INFO( m68030 )
 
 static CPU_INIT( m68ec030 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -2373,7 +2451,7 @@ CPU_GET_INFO( m68ec030 )
 
 static CPU_INIT( m68040 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -2431,7 +2509,7 @@ CPU_GET_INFO( m68040 )
 
 static CPU_INIT( m68ec040 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -2481,7 +2559,7 @@ CPU_GET_INFO( m68ec040 )
 
 static CPU_INIT( m68lc040 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -2531,7 +2609,7 @@ CPU_GET_INFO( m68lc040 )
 
 static CPU_INIT( scc68070 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68010);
 
@@ -2559,10 +2637,70 @@ CPU_GET_INFO( scc68070 )
  * Freescale M68340 section
  ****************************************************************************/
 
+static READ32_HANDLER( m68340_internal_base_r )
+{
+
+
+	int pc = cpu_get_pc(&space->device());
+	logerror("%08x m68340_internal_base_r %08x, (%04x)\n", pc, offset*4,mem_mask);
+	return 0x55555555;
+}
+
+static WRITE32_HANDLER( m68340_internal_base_w )
+{
+	m68ki_cpu_core *m68k = m68k_get_safe_token(&space->device());
+
+	int pc = cpu_get_pc(&space->device());
+	logerror("%08x m68340_internal_base_w %08x, %04x (%04x)\n", pc, offset*4,data,mem_mask);
+
+	// other conditions?
+	if (m68k->dfc==0x7)
+	{
+		// unmap old modules
+		if (m68k->m68340_base&1)
+		{
+			int base = m68k->m68340_base & 0xfffff000;
+
+			m68k->internal->unmap_readwrite(base + 0x000, base + 0x05f);
+			m68k->internal->unmap_readwrite(base + 0x600, base + 0x67f);
+			m68k->internal->unmap_readwrite(base + 0x700, base + 0x723);
+			m68k->internal->unmap_readwrite(base + 0x780, base + 0x7bf);
+
+		}
+
+		COMBINE_DATA(&m68k->m68340_base);
+		logerror("%08x m68340_internal_base_w %08x, %04x (%04x) (m68340_base write)\n", pc, offset*4,data,mem_mask);
+
+		// map new modules
+		if (m68k->m68340_base&1)
+		{
+			int base = m68k->m68340_base & 0xfffff000;
+
+			m68k->internal->install_legacy_readwrite_handler(base + 0x000, base + 0x05f, FUNC(m68340_internal_sim_r),    FUNC(m68340_internal_sim_w));
+			m68k->internal->install_legacy_readwrite_handler(base + 0x600, base + 0x67f, FUNC(m68340_internal_timer_r),  FUNC(m68340_internal_timer_w));
+			m68k->internal->install_legacy_readwrite_handler(base + 0x700, base + 0x723, FUNC(m68340_internal_serial_r), FUNC(m68340_internal_serial_w));
+			m68k->internal->install_legacy_readwrite_handler(base + 0x780, base + 0x7bf, FUNC(m68340_internal_dma_r),    FUNC(m68340_internal_dma_w));
+
+		}
+
+	}
+	else
+	{
+		logerror("%08x m68340_internal_base_w %08x, %04x (%04x) (should fall through?)\n", pc, offset*4,data,mem_mask);
+	}
+
+
+
+}
+
+
+static ADDRESS_MAP_START( m68340_internal_map, AS_PROGRAM, 32 )
+	AM_RANGE(0x0003ff00, 0x0003ff03) AM_READWRITE( m68340_internal_base_r, m68340_internal_base_w)
+ADDRESS_MAP_END
 
 static CPU_INIT( m68340 )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 
@@ -2587,6 +2725,20 @@ static CPU_INIT( m68340 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 
+	m68k->m68340SIM    = new m68340_sim();
+	m68k->m68340DMA    = new m68340_dma();
+	m68k->m68340SERIAL = new m68340_serial();
+	m68k->m68340TIMER  = new m68340_timer();
+
+	m68k->m68340SIM->reset();
+	m68k->m68340DMA->reset();
+	m68k->m68340SERIAL->reset();
+	m68k->m68340TIMER->reset();
+
+	m68k->m68340_base = 0x00000000;
+
+	m68k->internal = device->space(AS_PROGRAM);
+
 	define_state(device);
 }
 
@@ -2601,6 +2753,8 @@ CPU_GET_INFO( m68340 )
 
 		case DEVINFO_INT_DATABUS_WIDTH + AS_PROGRAM:			info->i = 32;							break;
 		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:		info->i = 32;							break;
+
+		case DEVINFO_PTR_INTERNAL_MEMORY_MAP + AS_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(m68340_internal_map); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68340);						break;
@@ -2619,7 +2773,7 @@ CPU_GET_INFO( m68340 )
 
 static CPU_INIT( coldfire )
 {
-	m68ki_cpu_core *m68k = get_safe_token(device);
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
 
 	CPU_INIT_CALL(m68k);
 

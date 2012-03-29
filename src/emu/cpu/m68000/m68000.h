@@ -4,6 +4,16 @@
 #define __M68000_H__
 
 
+#include "68307sim.h"
+#include "68307bus.h"
+#include "68307ser.h"
+#include "68307tmu.h"
+
+#include "68340sim.h"
+#include "68340dma.h"
+#include "68340ser.h"
+#include "68340tmu.h"
+
 /* There are 7 levels of interrupt to the 68K.
  * A transition from < 7 to 7 will cause a non-maskable interrupt (NMI).
  */
@@ -123,7 +133,7 @@ void m68k_set_cmpild_callback(device_t *device, m68k_cmpild_func callback);
 void m68k_set_rte_callback(device_t *device, m68k_rte_func callback);
 void m68k_set_tas_callback(device_t *device, m68k_tas_func callback);
 UINT16 m68k_get_fc(device_t *device);
-
+UINT16 m68307_get_cs(device_t *device, offs_t address);
 
 typedef int (*instruction_hook_t)(device_t *device, offs_t curpc);
 void m68k_set_instruction_hook(device_t *device, instruction_hook_t ihook);
