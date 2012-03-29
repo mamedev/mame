@@ -211,6 +211,12 @@ BUILD_EXPAT = 1
 # uncomment next line to build zlib as part of MAME build
 BUILD_ZLIB = 1
 
+# uncomment next line to build libflac as part of MAME build
+BUILD_FLAC = 1
+
+# uncomment next line to build jpeglib as part of MAME build
+BUILD_JPEGLIB = 1
+
 # uncomment next line to include the symbols
 # SYMBOLS = 1
 
@@ -411,7 +417,14 @@ DEFS += -DUSE_NETWORK
 endif
 
 # need to ensure FLAC functions are statically linked
+ifeq ($(BUILD_FLAC),1)
 DEFS += -DFLAC__NO_DLL
+endif
+
+# define USE_SYSTEM_JPEGLIB if library shipped with MAME is not used
+ifneq ($(BUILD_JPEGLIB),1)
+DEFS += -DUSE_SYSTEM_JPEGLIB
+endif
 
 
 
@@ -620,13 +633,30 @@ LIBS += -lz
 ZLIB =
 endif
 
+# add flac library
+ifeq ($(BUILD_FLAC),1)
+INCPATH += -I$(SRC)/lib/util
+FLAC_LIB = $(OBJ)/libflac.a
+# $(OBJ)/libflac++.a
+else
+LIBS += -lFLAC
+FLAC_LIB =
+endif
+
+# add jpeglib image library
+ifeq ($(BUILD_JPEGLIB),1)
+INCPATH += -I$(SRC)/lib/libjpeg
+JPEG_LIB = $(OBJ)/libjpeg.a
+else
+LIBS += -ljpeg
+JPEG_LIB =
+endif
+
 # add SoftFloat floating point emulation library
 SOFTFLOAT = $(OBJ)/libsoftfloat.a
 
 # add formats emulation library
 FORMATS_LIB = $(OBJ)/libformats.a
-
-JPEG_LIB = $(OBJ)/libjpeg.a
 
 #-------------------------------------------------
 # 'default' target needs to go here, before the 
@@ -636,9 +666,6 @@ JPEG_LIB = $(OBJ)/libjpeg.a
 default: maketree buildtools emulator
 
 all: default tools
-
-FLAC_LIB = $(OBJ)/libflac.a 
-# $(OBJ)/libflac++.a
 
 
 7Z_LIB = $(OBJ)/lib7z.a 
