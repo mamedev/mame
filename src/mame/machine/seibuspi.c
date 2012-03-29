@@ -53,7 +53,7 @@ static UINT32 partial_carry_sum(UINT32 add1,UINT32 add2,UINT32 carry_mask,int bi
 	return res;
 }
 
-static UINT32 partial_carry_sum32(UINT32 add1,UINT32 add2,UINT32 carry_mask)
+UINT32 partial_carry_sum32(UINT32 add1,UINT32 add2,UINT32 carry_mask)
 {
 	return partial_carry_sum(add1,add2,carry_mask,32);
 }

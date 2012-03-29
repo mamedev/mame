@@ -2,6 +2,7 @@
 
 #include "emu.h"
 #include "includes/raiden2.h"
+#include "seibuspi.h"
 
 /* INIT */
 
@@ -119,7 +120,7 @@ static UINT32 gm(int i)
   i1 = idx & 0xff;
   i2 = (i >> 8) & 0xff;
 
-  x = 0x4c435012;
+  x = 0;
 
   if(bt(xmap_low_01, i1))
     x ^= 0x00401000;
@@ -130,9 +131,9 @@ static UINT32 gm(int i)
   if(bt(xmap_low_23, i1))
     x ^= 0x00102000;
   if(bt(xmap_low_31, i1))
-    x ^= 0x00008000;
+    x ^= 0x00018000;
   if(bt(xmap_high_00, i2))
-    x ^= 0x0c000400;
+    x ^= 0x04000400;
   if(bt(xmap_high_02, i2))
     x ^= 0x00200020;
   if(bt(xmap_high_03, i2))
@@ -159,94 +160,11 @@ static UINT32 gm(int i)
   if(i & 0x020000)
     x ^= 0x00aa00f0;
   if(i & 0x040000)
-    x ^= 0x5d000f00;
+    x ^= 0x55000f00;
   if(i & 0x080000)
-    x ^= 0x0054f000;
+    x ^= 0x0055f000;
 
   return x;
-}
-
-static UINT32 trans(UINT32 v, UINT32 x)
-{
-  unsigned y,r2,v2;
-
-  v2 = (BIT(v,30)<<8)|(BIT(v,22)<<12)|(BIT(v,18)<<18)|(BIT(v,19)<<19)|(BIT(v,22)<<22)|(BIT(v,24)<<24)|(BIT(v,3)<<25)|(BIT(v,26)<<26)|(BIT(v,28)<<28);
-  v2 ^= 0x01000000;
-
-  r2 = 0;
-  y = 0;
-
-  y |= ((                              0 ^ BIT(x, 0) ^ BIT(v, 0))<< 0);
-  y |= ((                              0 ^ BIT(x, 1) ^ BIT(v, 1))<< 1);
-  y |= ((                              0 ^ BIT(x, 2) ^ BIT(v, 2))<< 2);
-  y |= ((                              0 ^ BIT(x, 3) ^ BIT(v, 3))<< 3);
-  y |= ((                              0 ^ BIT(x, 4) ^ BIT(v, 4))<< 4);
-  y |= ((                              0 ^ BIT(x, 5) ^ BIT(v, 5))<< 5);
-  y |= ((                              0 ^ BIT(x, 6) ^ BIT(v, 6))<< 6);
-  y |= ((                              0 ^ BIT(x, 7) ^ BIT(v, 7))<< 7);
-  y |= ((                              0 ^ BIT(x, 8) ^ BIT(v, 8))<< 8);
-  y |= ((                              0 ^ BIT(x, 9) ^ BIT(v, 9))<< 9);
-  y |= ((                              0 ^ BIT(x,10) ^ BIT(v,10))<<10);
-  y |= ((                              0 ^ BIT(x,11) ^ BIT(v,11))<<11);
-  y |= ((                              0 ^ BIT(x,12) ^ BIT(v,12))<<12);
-  y |= ((                              0 ^ BIT(x,13) ^ BIT(v,13))<<13);
-  y |= ((                              0 ^ BIT(x,14) ^ BIT(v,14))<<14);
-  y |= ((                              0 ^ BIT(x,15) ^ BIT(v,15))<<15);
-  y |= ((                              0 ^ BIT(x,16) ^ BIT(v,16))<<16);
-  y |= ((                              0 ^ BIT(x,17) ^ BIT(v,17))<<17);
-  y |= ((                              0 ^ BIT(x,18) ^ BIT(v,18))<<18);
-  y |= ((                              1 ^ BIT(x,19) ^ BIT(v,19))<<19);
-  y |= ((                      BIT(x,19) ^ BIT(x,20) ^ BIT(v,20))<<20);
-  y |= ((                              0 ^ BIT(x,21) ^ BIT(v,21))<<21);
-  y |= ((                              0 ^ BIT(x,22) ^ BIT(v,22))<<22);
-  y |= ((                              0 ^ BIT(x,23) ^ BIT(v,23))<<23);
-  y |= ((                              1 ^ BIT(x,24) ^ BIT(v,24))<<24);
-  y |= ((                      BIT(x,24) ^ BIT(x,25) ^ BIT(v,25))<<25);
-  y |= ((          (BIT(x,24)&BIT(x,25)) ^ BIT(x,26) ^ BIT(v,26))<<26);
-  y |= (((BIT(x,24)&BIT(x,25)&BIT(x,26)) ^ BIT(x,27) ^ BIT(v,27))<<27);
-  y |= ((                              0 ^ BIT(x,28) ^ BIT(v,28))<<28);
-  y |= ((                              0 ^ BIT(x,29) ^ BIT(v,29))<<29);
-  y |= ((                              0 ^ BIT(x,30) ^ BIT(v,30))<<30);
-  y |= ((                              0 ^ BIT(x,31) ^ BIT(v,31))<<31);
-
-
-  r2 |= (                     0<< 0);
-  r2 |= (                     0<< 1);
-  r2 |= (                     0<< 2);
-  r2 |= (                     0<< 3);
-  r2 |= (                     0<< 4);
-  r2 |= (                     0<< 5);
-  r2 |= (                     0<< 6);
-  r2 |= (                     0<< 7);
-  r2 |= (                     0<< 8);
-  r2 |= ((BIT(v2, 8)&BIT(y, 8))<< 9);
-  r2 |= (                     0<<10);
-  r2 |= (                     0<<11);
-  r2 |= (                     0<<12);
-  r2 |= ((BIT(v2,12)&BIT(y,12))<<13);
-  r2 |= (                     0<<14);
-  r2 |= (                     0<<15);
-  r2 |= (                     0<<16);
-  r2 |= (                     0<<17);
-  r2 |= (                     0<<18);
-  r2 |= ((BIT(v2,18)&BIT(y,18))<<19);
-  r2 |= ((BIT(v2,19)&BIT(y,19))<<20);
-  r2 |= (                     0<<21);
-  r2 |= (                     0<<22);
-  r2 |= ((BIT(v2,22)&BIT(y,22))<<23);
-  r2 |= (                     0<<24);
-  r2 |= ((BIT(v2,24)&BIT(y,24))<<25);
-  r2 |= ((BIT(v2,25)&BIT(y,25))<<26);
-  r2 |= ((BIT(v2,26)&BIT(y,26))<<27);
-  r2 |= (                     0<<28);
-  r2 |= ((BIT(v2,28)&BIT(y,28))<<29);
-  r2 |= (                     0<<30);
-  r2 |= (                     0<<31);
-
-  r2 ^= y;
-  r2 ^= 0x0c500000;
-
-  return r2;
 }
 
 void raiden2_decrypt_sprites(running_machine &machine)
@@ -254,27 +172,13 @@ void raiden2_decrypt_sprites(running_machine &machine)
   int i;
   UINT32 *data = (UINT32 *)machine.region("gfx3")->base();
   for(i=0; i<0x800000/4; i++) {
-    UINT32 x1, v1, y1;
-
-    int idx = i & 0xff;
-    //int i2;
-    //int idx2;
-
-    //idx2 = ((i>>7) & 0x3ff) | ((i>>8) & 0x400);
-    if(i & 0x008000)
-      idx ^= 1;
-    if(i & 0x100000)
-      idx ^= 256;
-
-    //i2 = i >> 8;
+    UINT32 x1, v1;
 
     v1 = sw(yrot(data[i], gr(i)));
 
     x1 = gm(i);
 
-    y1 = ~trans(v1, x1);
-
-    data[i] = y1;
+    data[i] = partial_carry_sum32(v1, x1 ^ 0xbfbc2fed, 0x176c91a8) ^ 0x0f488000;
   }
 }
 
