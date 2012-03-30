@@ -4883,6 +4883,64 @@ ROM_START( fb5v )
 	ROM_LOAD_OPTIONAL( "fb515sh.id", 0x00, 0x20, CRC(d20771d2) SHA1(6a61d89d1c583c587106003849091a6c4f8b0faf) )
 ROM_END
 
+/* Fun River */
+ROM_START( funriver )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "frd14r.bin", 0x00000, 0x80000, CRC(03ffabcc) SHA1(0e65be88dc4158f77082e5b50836197dd0e397da) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, CRC(9ce6b729) SHA1(9a81bac5233268816bff406748e181436e2e61ea) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "frrom3.bin", 0x00000, 0x80000, CRC(6e8aba12) SHA1(3d0fe4af974bbcdf332fdcb12d3b43a04c92ddfb) )
+	ROM_LOAD16_BYTE( "frrom4.bin", 0x00001, 0x80000, CRC(a9e1310e) SHA1(246781415911c9d3b77669f58e492ec599adf384) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, CRC(0bf20cd9) SHA1(b2482c37af89c4b08e0f7e6e3c9c0be396a43516) )
+	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, CRC(86a57fb9) SHA1(ca6a3a50ff47a0344ab4fd206e275319e1d571b3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fr14r.id", 0x00, 0x20, CRC(1542e2bc) SHA1(56e615866d451abd2d6c2d689a85bdca447c2538) )
+ROM_END
+
+ROM_START( funriverd1 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "frd13r.bin", 0x00000, 0x80000, CRC(9d2a1f7a) SHA1(28c5b6c2bdb400a9cca337608c78ce954917b156) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, CRC(9ce6b729) SHA1(9a81bac5233268816bff406748e181436e2e61ea) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "frrom3.bin", 0x00000, 0x80000, CRC(6e8aba12) SHA1(3d0fe4af974bbcdf332fdcb12d3b43a04c92ddfb) )
+	ROM_LOAD16_BYTE( "frrom4.bin", 0x00001, 0x80000, CRC(a9e1310e) SHA1(246781415911c9d3b77669f58e492ec599adf384) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, CRC(0bf20cd9) SHA1(b2482c37af89c4b08e0f7e6e3c9c0be396a43516) )
+	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, CRC(86a57fb9) SHA1(ca6a3a50ff47a0344ab4fd206e275319e1d571b3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fr13r.id", 0x00, 0x20, CRC(71238f75) SHA1(d6907da137d2a019f0a0aea95da83d505f11866e) )
+ROM_END
+
+ROM_START( funriverv )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "frv14r.bin", 0x00000, 0x80000, CRC(5629d38e) SHA1(6404f70d94b1ec39d1df4e00c620eb5498d3ff83) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, CRC(9ce6b729) SHA1(9a81bac5233268816bff406748e181436e2e61ea) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "frrom3.bin", 0x00000, 0x80000, CRC(6e8aba12) SHA1(3d0fe4af974bbcdf332fdcb12d3b43a04c92ddfb) )
+	ROM_LOAD16_BYTE( "frrom4.bin", 0x00001, 0x80000, CRC(a9e1310e) SHA1(246781415911c9d3b77669f58e492ec599adf384) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, CRC(0bf20cd9) SHA1(b2482c37af89c4b08e0f7e6e3c9c0be396a43516) )
+	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, CRC(86a57fb9) SHA1(ca6a3a50ff47a0344ab4fd206e275319e1d571b3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fr14r.id", 0x00, 0x20, CRC(1542e2bc) SHA1(56e615866d451abd2d6c2d689a85bdca447c2538) )
+ROM_END
+
 /* Fruit Bonus '06 - 10th anniversary */
 ROM_START( fb6 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
@@ -5584,44 +5642,6 @@ ROM_START( version4o )
 	ROM_LOAD_OPTIONAL( "fcs40r1.id", 0x00, 0x20, CRC(b3638cdb) SHA1(283824c57f3f62f6e2b505f6e13b100a7d7f33af) )
 ROM_END
 
-ROM_START( funriver )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "frd14r.bin", 0x00000, 0x80000, CRC(03ffabcc) SHA1(0e65be88dc4158f77082e5b50836197dd0e397da) )
-
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "frrom3.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "frrom4.bin", 0x00001, 0x80000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, NO_DUMP )
-
-	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
-	ROM_LOAD_OPTIONAL( "fr14r.id", 0x00, 0x20, CRC(1542e2bc) SHA1(56e615866d451abd2d6c2d689a85bdca447c2538) )
-ROM_END
-
-ROM_START( funriverv )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "frv14r.bin", 0x00000, 0x80000, CRC(5629d38e) SHA1(6404f70d94b1ec39d1df4e00c620eb5498d3ff83) )
-
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "frrom3.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "frrom4.bin", 0x00001, 0x80000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, NO_DUMP )
-
-	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
-	ROM_LOAD_OPTIONAL( "fr14r.id", 0x00, 0x20, CRC(1542e2bc) SHA1(56e615866d451abd2d6c2d689a85bdca447c2538) )
-ROM_END
-
 ROM_START( spooky )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "snd204r.bin", 0x00000, 0x80000, CRC(0e737c07) SHA1(50b55390f6ae6ae661d020dabd685651a7f160b2) )
@@ -6115,6 +6135,10 @@ GAME( 2005, fb5c,        fb5,      sfbonus,    amcoe1_reels3,    fb5,           
 GAME( 2005, fb5d,        fb5,      sfbonus,    amcoe1_reels3,    fb5d,            ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 3)", 0)
 GAME( 2005, fb5v,        fb5,      sfbonus,    amcoe1_reels3,    fb5v,            ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH Dual)", 0)
 
+GAME( 2005, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (Version 1.4R CGA)", 0)
+GAME( 2005, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (Version 1.4R Dual)", 0)
+GAME( 2005, funriverd1,  funriver, sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (Version 1.3R CGA)", 0)
+
 GAME( 2006, fb6,         0,        sfbonus,    amcoe1_reels3,    fb6,             ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E CGA)", 0)
 GAME( 2006, fb6v,        fb6,      sfbonus,    amcoe1_reels3,    fb6v3,           ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E Dual)", 0)
 GAME( 2006, fb6d1,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA)", 0)
@@ -6152,9 +6176,6 @@ GAME( 200?, fbdeluxeo,   fbdeluxe, sfbonus,    amcoe1_reels3,    fbdeluxe,      
 GAME( 200?, fb3g,        0,        sfbonus,    amcoe1_reels3,    fb3g,            ROT0,  "Amcoe", "Fruit Bonus 3G (Version 1.0.3)", 0) /* After Around The World */
 
 // no graphic / sound roms dumped for these sets, but functional program roms & descramble are in place
-GAME( 2005, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (Version 1.4R CGA)", GAME_NOT_WORKING)
-GAME( 2005, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (Version 1.4R Dual)", GAME_NOT_WORKING)
-
 GAME( 2006, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3R CGA)",  GAME_NOT_WORKING)
 GAME( 2006, version4v,   version4, sfbonus,    amcoe1_reels3,    version4v,       ROT0,  "Amcoe", "Version 4 (Version 4.3R Dual)", GAME_NOT_WORKING)
 GAME( 2006, version4d2,  version4, sfbonus,    amcoe1_reels3,    version4d2,      ROT0,  "Amcoe", "Version 4 (Version 4.3E CGA)",  GAME_NOT_WORKING)
