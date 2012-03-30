@@ -4074,6 +4074,7 @@ src/mame/layout/polepos.lay svneol=native#text/plain
 src/mame/layout/pulltabs.lay svneol=native#text/plain
 src/mame/layout/pyramid.lay svneol=native#text/plain
 src/mame/layout/quintoon.lay svneol=native#text/plain
+src/mame/layout/quizshow.lay svneol=native#text/plain
 src/mame/layout/radr.lay svneol=native#text/plain
 src/mame/layout/re800.lay svneol=native#text/plain
 src/mame/layout/re900.lay svneol=native#text/plain

@@ -11,12 +11,15 @@ TODO:
 - discrete sound (should be simple to those that know how)
 - is timing accurate?
 - correct gfx roms
-- color overlay
+- fix color inverted tiles (8*12 instead of 8*8!)
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
+
+#include "quizshow.lh"
+
 
 #define MASTER_CLOCK	XTAL_12_096MHz
 #define PIXEL_CLOCK		(MASTER_CLOCK/2)
@@ -408,4 +411,4 @@ ROM_START( quizshow )
 ROM_END
 
 
-GAME( 1976, quizshow, 0, quizshow, quizshow, 0, ROT0, "Atari", "Quiz Show", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAMEL( 1976, quizshow, 0, quizshow, quizshow, 0, ROT0, "Atari", "Quiz Show", GAME_NO_SOUND | GAME_NOT_WORKING, layout_quizshow )
