@@ -138,7 +138,7 @@ static WRITE8_HANDLER(quizshow_tape_control_w)
 
 	// d2: enable user category select (changes tape head position)
 	output_set_lamp_value(10, data >> 2 & 1);
-	state->m_category_enable = data & 4;
+	state->m_category_enable = (data & 0xc) == 0xc;
 
 	// d3: tape motor
 	// TODO
@@ -403,7 +403,7 @@ ROM_START( quizshow )
 
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x0200, "user1", 0 )
+	ROM_REGION( 0x0200, "user1", 0 ) // gfx1
 	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, BAD_DUMP CRC(4f42fdd6) SHA1(f8ea4b582e26cad37b746174cdc9f1c7ae0819c3) ) // not dumped yet, placeholder taken from dominos.zip
 	ROM_LOAD_NIB_LOW ( "005466-02.n2", 0x0000, 0x0200, BAD_DUMP CRC(957dd8df) SHA1(280457392f40cd66eae34d2fcdbd4d2142793402) ) // "
 
