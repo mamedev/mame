@@ -6,27 +6,27 @@
 			<color red="1" green="1" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="28" right="256" bottom="60" />
-			<color red="1" green="0.2" blue="0.125" />
+			<bounds left="0" top="32" right="256" bottom="64" />
+			<color red="1" green="0.3" blue="0.125" />
 		</rect>
 		<rect>
-			<bounds left="0" top="60" right="256" bottom="108" />
-			<color red="0.125" green="1" blue="0.33" />
+			<bounds left="0" top="64" right="256" bottom="112" />
+			<color red="0.125" green="1" blue="0.44" />
 		</rect>
 		<rect>
-			<bounds left="0" top="108" right="256" bottom="140" />
+			<bounds left="0" top="112" right="256" bottom="144" />
 			<color red="1" green="0.66" blue="0.125" />
 		</rect>
 		<rect>
-			<bounds left="0" top="140" right="256" bottom="172" />
+			<bounds left="0" top="144" right="256" bottom="176" />
 			<color red="0.125" green="0.66" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="172" right="256" bottom="204" />
-			<color red="0.66" green="0.125" blue="1" />
+			<bounds left="0" top="176" right="256" bottom="208" />
+			<color red="0.66" green="0.25" blue="1" />
 		</rect>
 		<rect>
-			<bounds left="0" top="204" right="256" bottom="240" />
+			<bounds left="0" top="208" right="256" bottom="240" />
 			<color red="1" green="1" blue="0.33" />
 		</rect>
 	</element>

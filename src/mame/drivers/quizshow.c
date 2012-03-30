@@ -10,8 +10,7 @@ TODO:
 - preserve tape and hook it up, the game is not playable without it
 - discrete sound (should be simple to those that know how)
 - is timing accurate?
-- correct gfx roms
-- fix color inverted tiles (8*12 instead of 8*8!)
+- correct dump for gfx roms
 
 ***************************************************************************/
 
@@ -63,27 +62,24 @@ PALETTE_INIT( quizshow )
 	colortable_palette_set_color(machine.colortable, 1, RGB_WHITE);
 
 	// normal, blink/off, invert, blink+invert
-	colortable_entry_set_value(machine.colortable, 0, 0);
-	colortable_entry_set_value(machine.colortable, 1, 1);
-	colortable_entry_set_value(machine.colortable, 2, 0);
-	colortable_entry_set_value(machine.colortable, 3, 0);
-	colortable_entry_set_value(machine.colortable, 4, 1);
-	colortable_entry_set_value(machine.colortable, 5, 0);
-	colortable_entry_set_value(machine.colortable, 6, 1);
-	colortable_entry_set_value(machine.colortable, 7, 1);
+	const int lut_pal[16] = {
+		0, 0, 1, 0,
+		0, 0, 0, 0,
+		1, 0, 0, 0,
+		1, 0, 1, 0
+	};
+	
+	for (int i = 0; i < 16 ; i++)
+		colortable_entry_set_value(machine.colortable, i, lut_pal[i]);
 }
 
 static TILE_GET_INFO( get_tile_info )
 {
 	quizshow_state *state = machine.driver_data<quizshow_state>();
-	UINT8 code = state->m_main_ram[(tile_index >> 1 & 0x1e0) | (tile_index & 0x1f)];
+	UINT8 code = state->m_main_ram[tile_index];
 
 	// d6: blink, d7: invert
 	UINT8 color = (code & (state->m_blink_state | 0x80)) >> 6;
-
-	// video is idle on uneven rows
-	if (tile_index & 0x20)
-		color = 1;
 
 	SET_TILE_INFO(0, code & 0x3f, color, 0);
 }
@@ -91,7 +87,7 @@ static TILE_GET_INFO( get_tile_info )
 VIDEO_START( quizshow )
 {
 	quizshow_state *state = machine.driver_data<quizshow_state>();
-	state->m_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+	state->m_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 16, 32, 16);
 }
 
 SCREEN_UPDATE_IND16( quizshow )
@@ -179,8 +175,8 @@ static READ8_HANDLER(quizshow_timing_r)
 	// d5-d6: 4F-8F
 	ret |= state->m_clocks >> 2 & 0x60;
 
-	// d7: display busy
-	if (space->machine().primary_screen->vpos() >= VBSTART || space->machine().primary_screen->vpos() & 8)
+	// d7: display busy/idle, during in-between tilerows(?) and blanking
+	if (space->machine().primary_screen->vpos() >= VBSTART || (space->machine().primary_screen->vpos() + 4) & 8)
 		ret &= 0x7f;
 
 	return ret;
@@ -196,7 +192,7 @@ static WRITE8_HANDLER(quizshow_main_ram_w)
 {
 	quizshow_state *state = space->machine().driver_data<quizshow_state>();
 	state->m_main_ram[offset]=data;
-	state->m_tilemap->mark_tile_dirty((offset << 1 & 0x3c0) | (offset & 0x1f));
+	state->m_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -328,13 +324,16 @@ INPUT_PORTS_END
 
 static const gfx_layout tile_layout =
 {
-	8,8,
-	64,
-	1,
-	{ 0 },
+	8, 16,
+	RGN_FRAC(1,2),
+	2,
+	{ RGN_FRAC(0,2), RGN_FRAC(1,2) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
+	{
+		0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+		8*8, 9*8,10*8,11*8,12*8,13*8,14*8,15*8,
+	},
+	8*16
 };
 
 static GFXDECODE_START( quizshow )
@@ -376,7 +375,7 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 	MCFG_SCREEN_UPDATE_STATIC(quizshow)
 
 	MCFG_GFXDECODE(quizshow)
-	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_LENGTH(8*2)
 
 	MCFG_PALETTE_INIT(quizshow)
 	MCFG_VIDEO_START(quizshow)
@@ -402,7 +401,9 @@ ROM_START( quizshow )
 	ROM_LOAD( "005464-05.h1", 0x00800, 0x0200, CRC(b8d61b96) SHA1(eb437a5deaf2fc2a9acebbc506321f3151b4eafa) )
 	ROM_LOAD( "005464-06.k1", 0x00a00, 0x0200, CRC(200023b2) SHA1(271d0b2b2f985a6c7b7146869ed00990a52dd653) )
 
-	ROM_REGION( 0x0200, "gfx1", 0 )
+	ROM_REGION( 0x0800, "gfx1", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x0200, "user1", 0 )
 	ROM_LOAD_NIB_HIGH( "005466-01.m2", 0x0000, 0x0200, BAD_DUMP CRC(4f42fdd6) SHA1(f8ea4b582e26cad37b746174cdc9f1c7ae0819c3) ) // not dumped yet, placeholder taken from dominos.zip
 	ROM_LOAD_NIB_LOW ( "005466-02.n2", 0x0000, 0x0200, BAD_DUMP CRC(957dd8df) SHA1(280457392f40cd66eae34d2fcdbd4d2142793402) ) // "
 
@@ -411,4 +412,29 @@ ROM_START( quizshow )
 ROM_END
 
 
-GAMEL( 1976, quizshow, 0, quizshow, quizshow, 0, ROT0, "Atari", "Quiz Show", GAME_NO_SOUND | GAME_NOT_WORKING, layout_quizshow )
+static DRIVER_INIT( quizshow )
+{
+	UINT8 *gfxdata = machine.region("user1")->base();
+	UINT8 *dest = machine.region("gfx1")->base();
+
+	int tile, line;
+
+	// convert gfx data to 8*16(actually 8*12), and 2bpp for masking inverted colors
+	for (tile = 0; tile < 0x40; tile++)
+	{
+		for (line = 2; line < 14; line ++)
+		{
+			dest[tile << 4 | line] = 0;
+			dest[tile << 4 | line | 0x400] = 0;
+
+			if (line >= 4 && line < 12)
+				dest[tile << 4 | line] = gfxdata[tile << 3 | (line - 4)];
+		}
+	}
+	
+	// HACK out a gfxrom glitch, remove it when a good dump is out
+	dest[0x208] = dest[0x209] = 0;
+}
+
+
+GAMEL( 1976, quizshow, 0, quizshow, quizshow, quizshow, ROT0, "Atari", "Quiz Show", GAME_NO_SOUND | GAME_NOT_WORKING, layout_quizshow )
