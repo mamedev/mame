@@ -306,6 +306,8 @@ void ui_menu_software_list::handle()
 			// reset the char buffer also in this case
 			if (filename_buffer[0] != '\0')
 				memset(filename_buffer, '\0', ARRAY_LENGTH(filename_buffer));
+			result = filename_buffer;
+			ui_menu::stack_pop(machine());
 		}
 	}
 }
