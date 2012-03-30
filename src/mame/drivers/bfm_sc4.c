@@ -44,11 +44,12 @@
     -------------------------------
 */
 
-#define ADDRESS_MAP_MODERN
+
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/bfm_sc45.h"
+#include "sound/ymz280b.h"
 
 
 class sc4_state : public driver_device
@@ -57,10 +58,11 @@ public:
 	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu")
-	{ }
+	{
+	}
 
-protected:
-
+	UINT16* m_cpuregion;
+	UINT16* m_mainram;
 	// devices
 	required_device<cpu_device> m_maincpu;
 };
@@ -73,19 +75,110 @@ public:
 		  m_adder4cpu(*this, "adder4")
 	{ }
 
-protected:
-
 	// devices
 	required_device<cpu_device> m_adder4cpu;
 };
 
+static READ16_HANDLER( sc4_mem_r )
+{
+	sc4_state *state = space->machine().driver_data<sc4_state>();
+	int pc = cpu_get_pc(&space->device());
+	int cs = m68307_get_cs(state->m_maincpu, offset * 2);
+	int base = 0, end = 0;
+//	if (!(space->debugger_access())) printf("cs is %d\n", cs);
 
-static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16, sc4_state )
-	AM_RANGE(0x0000000, 0x2fffff) AM_ROM
-	AM_RANGE(0x0000000, 0x80ffff) AM_RAM
+	switch ( cs )
+	{
+		case 1:
+			if (offset<0x100000/2)
+				return state->m_cpuregion[offset];
+			else
+				logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, cs);
+			break;
+
+		case 2:
+			base = 0x800000/2;
+			end = base + 0x100000 / 2;
+
+			if ((offset>=base) && (offset<end))
+			{
+				offset-=base;
+				return(state->m_mainram[offset]);
+			}
+			else
+			{
+				logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, cs);
+			}
+			break;
+
+		case 3:
+			logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, cs);
+			return 0x0000;
+			break;
+
+		case 4:
+			logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, cs);
+			return 0x0000;
+			break;
+
+		default:
+			logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d (invalid?)\n", pc, offset*2, mem_mask, cs);
+
+	}
+
+	return 0x0000;
+}
+
+static WRITE16_HANDLER( sc4_mem_w )
+{
+	sc4_state *state = space->machine().driver_data<sc4_state>();
+	int pc = cpu_get_pc(&space->device());
+	int cs = m68307_get_cs(state->m_maincpu, offset * 2);
+	int base = 0, end = 0;
+
+	switch ( cs )
+	{
+		case 1:
+			if (offset<0x100000/2)
+				logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d (ROM WRITE?!)\n", pc, offset*2, data, mem_mask, cs);
+			else
+				logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d\n", pc, offset*2, data, mem_mask, cs);
+			
+			break;
+
+		case 2:
+			base = 0x800000/2;
+			end = base + 0x100000 / 2;
+
+			if ((offset>=base) && (offset<end))
+			{
+				offset-=base;
+				COMBINE_DATA(&state->m_mainram[offset]);
+			}
+			else
+			{
+				logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d\n", pc, offset*2, data, mem_mask, cs);
+			}
+			break;
+
+		case 3:
+			logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d\n", pc, offset*2, data, mem_mask, cs);
+			break;
+
+		case 4:
+			logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d\n", pc, offset*2, data, mem_mask, cs);
+			break;
+
+		default:
+			logerror("%08x maincpu write access offset %08x data %04x mem_mask %04x cs %d (invalid?)\n", pc, offset*2, data, mem_mask, cs);
+	}
+}
+
+static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16 )
+	AM_RANGE(0x000000000, 0xffffffff) AM_READWRITE(sc4_mem_r, sc4_mem_w) 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sc4_adder4_map, AS_PROGRAM, 32, sc4_adder4_state )
+static ADDRESS_MAP_START( sc4_adder4_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -94,12 +187,36 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(  sc4 )
 INPUT_PORTS_END
 
+static MACHINE_START( sc4 )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	state->m_cpuregion = (UINT16*)machine.region( "maincpu" )->base();
+	state->m_mainram = (UINT16*)auto_alloc_array_clear(machine, UINT16, 0x100000);
+}
+
+
+static void bfm_sc4_irqhandler(device_t *device, int state)
+{
+	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
+}
+
+static const ymz280b_interface ymz280b_config =
+{
+	bfm_sc4_irqhandler
+};
+
+
 static MACHINE_CONFIG_START( sc4, sc4_state )
 	MCFG_CPU_ADD("maincpu", M68307, 16000000)	 // 68307! (EC000 core)
 	MCFG_CPU_PROGRAM_MAP(sc4_map)
+	MCFG_MACHINE_START( sc4 )
 
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	/* unknown sound */
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_CONFIG(ymz280b_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
