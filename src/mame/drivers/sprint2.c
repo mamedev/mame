@@ -505,7 +505,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( sprint2, sprint2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(sprint2_map)
 	MCFG_CPU_VBLANK_INT("screen", sprint2)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
@@ -659,7 +659,7 @@ ROM_START( dominos )
 ROM_END
 
 
-GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint1, ROT0, "Atari", "Sprint 1", 0 )
-GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2, ROT0, "Atari", "Sprint 2 (set 1)", 0 )
-GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2, ROT0, "Atari", "Sprint 2 (set 2)", 0 )
+GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint1, ROT0, "Atari (Kee Games)", "Sprint 1", 0 )
+GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 1)", 0 )
+GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)", 0 )
 GAME( 1977, dominos,  0,       dominos, dominos, dominos, ROT0, "Atari", "Dominos", 0 )

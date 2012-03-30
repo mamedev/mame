@@ -484,8 +484,8 @@ static DRIVER_INIT( decode )
 }
 
 
-GAME( 1976, tank8,    0,        tank8,    tank8,    0,	      ROT0, "Atari", "Tank 8 (set 1)", 0)
-GAME( 1976, tank8a,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari", "Tank 8 (set 2)",  GAME_NOT_WORKING )
-GAME( 1976, tank8b,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari", "Tank 8 (set 3)",  GAME_NOT_WORKING )
-GAME( 1976, tank8c,   tank8,    tank8,    tank8,    0,        ROT0, "Atari", "Tank 8 (set 4)",  GAME_NOT_WORKING )
-GAME( 1976, tank8d,   tank8,    tank8,    tank8,    0,        ROT0, "Atari", "Tank 8 (set 5)",  GAME_NOT_WORKING )
+GAME( 1976, tank8,    0,        tank8,    tank8,    0,	      ROT0, "Atari (Kee Games)", "Tank 8 (set 1)", 0)
+GAME( 1976, tank8a,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  GAME_NOT_WORKING )
+GAME( 1976, tank8b,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  GAME_NOT_WORKING )
+GAME( 1976, tank8c,   tank8,    tank8,    tank8,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  GAME_NOT_WORKING )
+GAME( 1976, tank8d,   tank8,    tank8,    tank8,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  GAME_NOT_WORKING )

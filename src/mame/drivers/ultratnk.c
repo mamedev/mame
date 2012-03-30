@@ -9,7 +9,7 @@ Atari Ultra Tank driver
 #include "includes/ultratnk.h"
 #include "audio/sprint4.h"
 
-#define MASTER_CLOCK    12096000
+#define MASTER_CLOCK    XTAL_12_096MHz
 
 #define HTOTAL 384
 #define VTOTAL 262
@@ -348,4 +348,4 @@ ROM_START( ultratnk )
 ROM_END
 
 
-GAME( 1978, ultratnk, 0, ultratnk, ultratnk, 0, 0, "Atari", "Ultra Tank", 0 )
+GAME( 1978, ultratnk, 0, ultratnk, ultratnk, 0, 0, "Atari (Kee Games)", "Ultra Tank", 0 )
