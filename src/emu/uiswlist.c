@@ -329,7 +329,7 @@ void ui_menu_software::populate()
 		{
 			const software_list *list = software_list_open(machine().options(), swlist->list_name(), false, NULL);
 
-			if (list)
+			if (list && interface)
 			{
 				bool found = false;
 				for (const software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
@@ -355,7 +355,7 @@ void ui_menu_software::populate()
 		{
 			const software_list *list = software_list_open(machine().options(), swlist->list_name(), false, NULL);
 
-			if (list)
+			if (list && interface)
 			{
 				bool found = false;
 				for (const software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
