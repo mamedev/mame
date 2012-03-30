@@ -1791,7 +1791,7 @@ bool load_software_part(emu_options &options, device_image_interface *image, con
 							{
 								const char *option = options.value(req_image->brief_instance_name());
 								// mount only if not already mounted
-								if (strlen(option)==0) {
+								if (strlen(option)==0 && !req_image->filename()) {
 									req_image->set_init_phase();
 									req_image->load(requirement);
 								}
