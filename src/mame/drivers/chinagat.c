@@ -727,10 +727,10 @@ ROM_START( chinagat )
 	ROM_LOAD( "23ja-0.100",  0x60000, 0x20000, CRC(f678594f) SHA1(4bdcf9407543925f4630a8c7f1f48b85f76343a9) )	/* 0,1 */
 
 	ROM_REGION(0x40000, "gfx3", 0 )	/* Background */
-	ROM_LOAD( "chinagat_a-13", 0x00000, 0x10000, NO_DUMP )		/* Where are    */
-	ROM_LOAD( "chinagat_a-12", 0x10000, 0x10000, NO_DUMP )		/* these on the */
-	ROM_LOAD( "chinagat_a-15", 0x20000, 0x10000, NO_DUMP )		/* real board ? */
-	ROM_LOAD( "chinagat_a-14", 0x30000, 0x10000, NO_DUMP )
+	ROM_LOAD( "chinagat_a-13", 0x00000, 0x10000, BAD_DUMP CRC(b745cac4) SHA1(759767ca7c5123b03b9e1a42bb105d194cb76400) ) // not dumped yet, these were taken from the bootleg set instead
+	ROM_LOAD( "chinagat_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // Where are these on the real board?
+	ROM_LOAD( "chinagat_a-15", 0x20000, 0x10000, BAD_DUMP CRC(2f268f37) SHA1(f82cfe3b2001d5ed2a709ca9c51febcf624bb627) )
+	ROM_LOAD( "chinagat_a-14", 0x30000, 0x10000, BAD_DUMP CRC(aef814c8) SHA1(f6b9229ca7beb9a0e47d1f6a1083c6102fdd20c8) )
 
 	ROM_REGION(0x40000, "oki", 0 )	/* ADPCM */
 	ROM_LOAD( "23j1-0.53", 0x00000, 0x20000, CRC(f91f1001) SHA1(378402a3c966cabd61e9662ae5decd66672a228b) )
@@ -764,10 +764,10 @@ ROM_START( saiyugou )
 	ROM_LOAD( "23ja-0.100", 0x60000, 0x20000, CRC(f678594f) SHA1(4bdcf9407543925f4630a8c7f1f48b85f76343a9) )	/* 0,1 */
 
 	ROM_REGION(0x40000, "gfx3", 0 )	/* Background */
-	ROM_LOAD( "saiyugou_a-13", 0x00000, 0x10000, NO_DUMP )
-	ROM_LOAD( "saiyugou_a-12", 0x10000, 0x10000, NO_DUMP )
-	ROM_LOAD( "saiyugou_a-15", 0x20000, 0x10000, NO_DUMP )
-	ROM_LOAD( "saiyugou_a-14", 0x30000, 0x10000, NO_DUMP )
+	ROM_LOAD( "saiyugou_a-13", 0x00000, 0x10000, BAD_DUMP CRC(b745cac4) SHA1(759767ca7c5123b03b9e1a42bb105d194cb76400) ) // not dumped yet, these were taken from the bootleg set instead
+	ROM_LOAD( "saiyugou_a-12", 0x10000, 0x10000, BAD_DUMP CRC(3c864299) SHA1(cb12616e4d6c53a82beb4cd51510a632894b359c) ) // Where are these on the real board?
+	ROM_LOAD( "saiyugou_a-15", 0x20000, 0x10000, BAD_DUMP CRC(2f268f37) SHA1(f82cfe3b2001d5ed2a709ca9c51febcf624bb627) )
+	ROM_LOAD( "saiyugou_a-14", 0x30000, 0x10000, BAD_DUMP CRC(aef814c8) SHA1(f6b9229ca7beb9a0e47d1f6a1083c6102fdd20c8) )
 
 	ROM_REGION(0x40000, "oki", 0 )	/* ADPCM */
 	ROM_LOAD( "23j1-0.53", 0x00000, 0x20000, CRC(f91f1001) SHA1(378402a3c966cabd61e9662ae5decd66672a228b) )
@@ -925,7 +925,7 @@ static DRIVER_INIT( chinagat )
 
 
 /*   ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT    MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat, ROT0, "Technos Japan (Taito / Romstar license)", "China Gate (US)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat, ROT0, "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1988, chinagat,   0,        chinagat,   chinagat, chinagat, ROT0, "Technos Japan (Taito / Romstar license)", "China Gate (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, saiyugou,   chinagat, chinagat,   chinagat, chinagat, ROT0, "Technos Japan", "Sai Yu Gou Ma Roku (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, saiyugoub1, chinagat, saiyugoub1, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1988, saiyugoub2, chinagat, saiyugoub2, chinagat, chinagat, ROT0, "bootleg", "Sai Yu Gou Ma Roku (Japan bootleg 2)", GAME_SUPPORTS_SAVE )
