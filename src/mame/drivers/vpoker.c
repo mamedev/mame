@@ -179,7 +179,7 @@ static WRITE8_HANDLER( blitter_w )
 	}
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vpoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM		/* vpoker has 0x100, 5acespkr has 0x200 */
 	AM_RANGE(0x0400, 0x0407) AM_DEVREADWRITE_MODERN("6840ptm", ptm6840_device, read, write)

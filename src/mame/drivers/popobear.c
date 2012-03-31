@@ -284,7 +284,7 @@ static WRITE8_HANDLER( popobear_irq_ack_w )
 	}
 }
 
-static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM

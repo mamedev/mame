@@ -609,7 +609,7 @@ static READ32_HANDLER(shared_psx_r)
 	return result;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, twinkle_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE(shared_psx_r, shared_psx_w)
 	AM_RANGE(0x1f200000, 0x1f20001f) AM_READWRITE(am53cf96_r, am53cf96_w)
@@ -731,7 +731,7 @@ static WRITE16_HANDLER( shared_68k_w )
 	state->m_spu_shared[offset] = data & 0xff;
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	// 220000 = LEDs?

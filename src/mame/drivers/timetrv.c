@@ -73,13 +73,13 @@ static READ8_HANDLER( ld_r )
 	return space->machine().rand();
 }
 
-static ADDRESS_MAP_START( timetrv_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( timetrv_map, AS_PROGRAM, 8, timetrv_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM //irq vectors + work ram
 	AM_RANGE(0x10000, 0x107ff) AM_RAM
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( timetrv_io, AS_IO, 8 )
+static ADDRESS_MAP_START( timetrv_io, AS_IO, 8, timetrv_state )
 	AM_RANGE(0x0122, 0x0123) AM_WRITENOP //eeprom write bits
 	AM_RANGE(0x1000, 0x1000) AM_READ(test1_r) //inputs
 	AM_RANGE(0x1001, 0x1001) AM_READ(test2_r) //eeprom read bit + inputs

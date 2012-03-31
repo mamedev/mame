@@ -30,7 +30,7 @@ static WRITE8_HANDLER( gekiretu_rombank_w )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( quizdna_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( quizdna_map, AS_PROGRAM, 8, quizdna_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(quizdna_fg_ram_w)
@@ -41,7 +41,7 @@ static ADDRESS_MAP_START( quizdna_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekiretu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gekiretu_map, AS_PROGRAM, 8, quizdna_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(quizdna_fg_ram_w)
@@ -52,7 +52,7 @@ static ADDRESS_MAP_START( gekiretu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizdna_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( quizdna_io_map, AS_IO, 8, quizdna_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( quizdna_io_map, AS_IO, 8 )
 	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gakupara_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( gakupara_io_map, AS_IO, 8, quizdna_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(quizdna_bg_yscroll_w)
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( gakupara_io_map, AS_IO, 8 )
 	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekiretu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( gekiretu_io_map, AS_IO, 8, quizdna_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)

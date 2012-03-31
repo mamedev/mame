@@ -282,7 +282,7 @@ static WRITE16_HANDLER( astrocorp_palette_w )
 	);
 }
 
-static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x050000, 0x050fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, m_spriteram, m_spriteram_size)
 	AM_RANGE( 0x052000, 0x052001 ) AM_WRITE(astrocorp_draw_sprites_w)
@@ -297,7 +297,7 @@ static ADDRESS_MAP_START( showhand_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( showhanc_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( showhanc_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, m_paletteram)
 	AM_RANGE( 0x070000, 0x070001 ) AM_DEVWRITE("oki", astrocorp_sound_bank_w)
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( showhanc_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0xff00)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( skilldrp_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( skilldrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, m_spriteram, m_spriteram_size)
 	AM_RANGE( 0x202000, 0x202001 ) AM_WRITE(astrocorp_draw_sprites_w)
@@ -327,7 +327,7 @@ static ADDRESS_MAP_START( skilldrp_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( speeddrp_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( speeddrp_map, AS_PROGRAM, 16, astrocorp_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x280000, 0x283fff ) AM_RAM AM_SHARE("nvram")	// battery
 	AM_RANGE( 0x380000, 0x380fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, m_spriteram, m_spriteram_size)

@@ -124,7 +124,7 @@ static WRITE8_HANDLER( lamp_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, victory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_READ(victory_video_control_r)
 	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(victory_video_control_w)
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, victory_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("SW2")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("SW1")

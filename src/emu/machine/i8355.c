@@ -43,7 +43,7 @@ enum
 const device_type I8355 = &device_creator<i8355_device>;
 
 // default address map
-static ADDRESS_MAP_START( i8355, AS_0, 8 )
+static ADDRESS_MAP_START( i8355, AS_0, 8, i8355_device )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 

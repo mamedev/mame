@@ -1097,11 +1097,11 @@ static CPU_GET_INFO( pic16c5x )
  *  Internal Memory Map
  ****************************************************************************/
 
-static ADDRESS_MAP_START( pic16c54_rom, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pic16c54_rom, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c54_ram, AS_DATA, 8 )
+static ADDRESS_MAP_START( pic16c54_ram, AS_DATA, 8, legacy_cpu_device )
 	AM_RANGE(0x00, 0x07) AM_RAM
 	AM_RANGE(0x08, 0x0f) AM_RAM
 	AM_RANGE(0x10, 0x1f) AM_RAM
@@ -1155,11 +1155,11 @@ CPU_GET_INFO( pic16c54 )
  *  Internal Memory Map
  ****************************************************************************/
 
-static ADDRESS_MAP_START( pic16c55_rom, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pic16c55_rom, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c55_ram, AS_DATA, 8 )
+static ADDRESS_MAP_START( pic16c55_ram, AS_DATA, 8, legacy_cpu_device )
 	AM_RANGE(0x00, 0x07) AM_RAM
 	AM_RANGE(0x08, 0x0f) AM_RAM
 	AM_RANGE(0x10, 0x1f) AM_RAM
@@ -1213,11 +1213,11 @@ CPU_GET_INFO( pic16c55 )
  *  Internal Memory Map
  ****************************************************************************/
 
-static ADDRESS_MAP_START( pic16c56_rom, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pic16c56_rom, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c56_ram, AS_DATA, 8 )
+static ADDRESS_MAP_START( pic16c56_ram, AS_DATA, 8, legacy_cpu_device )
 	AM_RANGE(0x00, 0x07) AM_RAM
 	AM_RANGE(0x08, 0x0f) AM_RAM
 	AM_RANGE(0x10, 0x1f) AM_RAM
@@ -1271,11 +1271,11 @@ CPU_GET_INFO( pic16c56 )
  *  Internal Memory Map
  ****************************************************************************/
 
-static ADDRESS_MAP_START( pic16c57_rom, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pic16c57_rom, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c57_ram, AS_DATA, 8 )
+static ADDRESS_MAP_START( pic16c57_ram, AS_DATA, 8, legacy_cpu_device )
 	AM_RANGE(0x00, 0x07) AM_RAM AM_MIRROR(0x60)
 	AM_RANGE(0x08, 0x0f) AM_RAM AM_MIRROR(0x60)
 	AM_RANGE(0x10, 0x1f) AM_RAM
@@ -1331,11 +1331,11 @@ CPU_GET_INFO( pic16c57 )
  *  Internal Memory Map
  ****************************************************************************/
 
-static ADDRESS_MAP_START( pic16c58_rom, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pic16c58_rom, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pic16c58_ram, AS_DATA, 8 )
+static ADDRESS_MAP_START( pic16c58_ram, AS_DATA, 8, legacy_cpu_device )
 	AM_RANGE(0x00, 0x07) AM_RAM AM_MIRROR(0x60)
 	AM_RANGE(0x08, 0x0f) AM_RAM AM_MIRROR(0x60)
 	AM_RANGE(0x10, 0x1f) AM_RAM

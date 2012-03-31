@@ -151,7 +151,7 @@ static WRITE16_HANDLER( thunderj_atarivc_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, thunderj_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
@@ -184,7 +184,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, thunderj_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x07ffff) AM_ROM
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")

@@ -192,7 +192,7 @@ static void arcadia_reset_coins(running_machine &machine)
  *
  *************************************/
 
-static ADDRESS_MAP_START( amiga_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( amiga_map, AS_PROGRAM, 16, arcadia_amiga_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(arcadia_amiga_state, m_chip_ram, m_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)

@@ -98,7 +98,7 @@ static WRITE8_HANDLER( coinlockout_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x7b00, 0x7bff) AM_ROM	/* space for diagnostic ROM? The code looks */
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_READ(cpu0_mf800_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(retofinv_fg_videoram_w) AM_SHARE("share2")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("share1")
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(irq1_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM 		/* space for diagnostic ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, retofinv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(retofinv_68705_portA_r, retofinv_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(retofinv_68705_portB_r, retofinv_68705_portB_w)

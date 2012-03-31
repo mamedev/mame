@@ -98,7 +98,7 @@ There's a separate sound board also, but it wasn't available so is not documente
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midxunit_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_READWRITE(midtunit_vram_data_r, midtunit_vram_data_w)
 	AM_RANGE(0x00800000, 0x00bfffff) AM_READWRITE(midtunit_vram_color_r, midtunit_vram_color_w)
 	AM_RANGE(0x20000000, 0x20ffffff) AM_RAM

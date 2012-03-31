@@ -150,7 +150,7 @@ static WRITE8_HANDLER( gberet_sound_w )
 	sn76496_w(space->machine().device("snsnd"), 0, *state->m_soundlatch);
 }
 
-static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, m_colorram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, m_videoram)
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, m_colorram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, m_videoram)
@@ -208,7 +208,7 @@ static WRITE8_HANDLER( gberetb_nmi_ack_w )
 	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, m_colorram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, m_videoram)

@@ -64,7 +64,7 @@ static WRITE8_HANDLER( protection_w )
 
 
 
-static ADDRESS_MAP_START( skyskipr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( skyskipr_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE_MEMBER(popeye_state, m_background_pos)
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( skyskipr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popeye_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( popeye_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( popeye_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popeyebl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( popeyebl_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE_MEMBER(popeye_state, m_background_pos)
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( popeyebl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe01f) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popeye_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( popeye_io_map, AS_IO, 8, popeye_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")

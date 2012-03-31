@@ -198,7 +198,7 @@ static WRITE8_HANDLER( sprite_lookup_w )
 	state->m_sprite_color_lookup[offset] = data;
 }
 
-static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 	AM_RANGE(0x04000, 0x07fff) AM_ROM
 	AM_RANGE(0x08000, 0x09fff) AM_ROM
@@ -225,7 +225,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8, _20pacgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP	/* Z180 internal registers */
 	AM_RANGE(0x40, 0x7f) AM_NOP	/* Z180 internal registers */

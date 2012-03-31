@@ -64,7 +64,7 @@ static WRITE8_HANDLER( shootout_coin_counter_w )
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE(shootout_bankswitch_w)
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE(shootout_flipscreen_w)
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1")
@@ -96,7 +96,7 @@ ADDRESS_MAP_END
 /*******************************************************************************/
 
 /* same as Tryout */
-static ADDRESS_MAP_START( shootout_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shootout_sound_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)

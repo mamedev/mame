@@ -1700,7 +1700,7 @@ static void remap_dynamic_addresses(running_machine &machine)
  *
  *************************************/
 
-static ADDRESS_MAP_START( vegas_map_8mb, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( vegas_map_8mb, AS_PROGRAM, 32, vegas_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE_MEMBER(vegas_state, m_rambase) AM_SIZE_MEMBER(vegas_state, m_ramsize)
 	AM_RANGE(0x1fa00000, 0x1fa00fff) AM_READWRITE(nile_r, nile_w) AM_BASE_MEMBER(vegas_state, m_nile_regs)
@@ -1708,7 +1708,7 @@ static ADDRESS_MAP_START( vegas_map_8mb, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( vegas_map_32mb, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( vegas_map_32mb, AS_PROGRAM, 32, vegas_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE_MEMBER(vegas_state, m_rambase) AM_SIZE_MEMBER(vegas_state, m_ramsize)
 	AM_RANGE(0x1fa00000, 0x1fa00fff) AM_READWRITE(nile_r, nile_w) AM_BASE_MEMBER(vegas_state, m_nile_regs)

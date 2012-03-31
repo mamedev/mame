@@ -275,7 +275,7 @@ static READ32_HANDLER( aleck_dips_r )
     4MB @ 0xd0800000 - 0xd0bfffff doncdoon, hipai, kurufev, twrshaft, srmvs : unused
  */
 
-static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	/*AM_MIRROR(0xc0000000)*/ AM_BASE(&rdram)				// RDRAM
 
 	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("dmem")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("imem")
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_BASE(&rsp_dmem) AM_SHARE("dmem")

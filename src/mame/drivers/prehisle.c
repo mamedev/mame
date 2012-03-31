@@ -25,7 +25,7 @@ static WRITE16_HANDLER( prehisle_sound16_w )
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( prehisle_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( prehisle_map, AS_PROGRAM, 16, prehisle_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x070000, 0x073fff) AM_RAM
 	AM_RANGE(0x090000, 0x0907ff) AM_RAM_WRITE(prehisle_fg_videoram16_w) AM_BASE_MEMBER(prehisle_state, m_videoram)
@@ -51,14 +51,14 @@ static WRITE8_DEVICE_HANDLER( D7759_upd_reset_w )
 	upd7759_reset_w(device, data & 0x80);
 }
 
-static ADDRESS_MAP_START( prehisle_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( prehisle_sound_map, AS_PROGRAM, 8, prehisle_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP	// ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prehisle_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( prehisle_sound_io_map, AS_IO, 8, prehisle_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_write_port_w)

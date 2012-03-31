@@ -127,7 +127,7 @@ static INTERRUPT_GEN( yiear_nmi_interrupt )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yiear_state )
 	AM_RANGE(0x0000, 0x0000) AM_DEVREAD("vlm", yiear_speech_r)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(yiear_control_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(konami_SN76496_latch_w)

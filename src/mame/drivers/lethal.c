@@ -459,7 +459,7 @@ static READ8_HANDLER( gunsaux_r )
 	return res;
 }
 
-static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM				// work RAM
 	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_w)
@@ -479,7 +479,7 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE_MODERN("k054539", k054539_device, read, write)

@@ -322,7 +322,7 @@ static TIMER_DEVICE_CALLBACK( xexex_interrupt )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE_MEMBER(xexex_state, m_workram)			// work RAM
 
@@ -369,7 +369,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xexex_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

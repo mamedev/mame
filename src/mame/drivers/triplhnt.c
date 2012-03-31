@@ -135,7 +135,7 @@ static READ8_HANDLER( triplhnt_da_latch_r )
 }
 
 
-static ADDRESS_MAP_START( triplhnt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( triplhnt_map, AS_PROGRAM, 8, triplhnt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x300)
 	AM_RANGE(0x0400, 0x04ff) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, m_playfield_ram)

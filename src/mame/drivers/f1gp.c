@@ -92,7 +92,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 }
 
 
-static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
 	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_BASE_MEMBER(f1gp_state, m_sprcgram)									// SPR-1 CG RAM + SPR-2 CG RAM
@@ -141,19 +141,19 @@ static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(f1gp_fgscroll_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( f1gp_cpu2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gp_cpu2_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, f1gp_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, f1gp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w)	// f1gp
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w)	// f1gp2
@@ -186,7 +186,7 @@ static WRITE16_HANDLER( f1gpb_misc_w )
     */
 }
 
-static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x2fffff) AM_READ(extrarom_r)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READ(extrarom2_r)
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff800, 0xfff809) AM_RAM AM_BASE_MEMBER(f1gp_state, m_rozregs)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( f1gpb_cpu2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( f1gpb_cpu2_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w)

@@ -30,7 +30,7 @@
 static READ16_DEVICE_HANDLER( vertigo_pit8254_lsb_r ) { return pit8253_r( device, offset ); }
 static WRITE16_DEVICE_HANDLER( vertigo_pit8254_lsb_w ) { if (ACCESSING_BITS_0_7) pit8253_w(device, offset, data); }
 
-static ADDRESS_MAP_START( vertigo_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( vertigo_map, AS_PROGRAM, 16, vertigo_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM
 	AM_RANGE(0x000008, 0x001fff) AM_RAM AM_MIRROR(0x010000)
 	AM_RANGE(0x002000, 0x003fff) AM_RAM AM_BASE_MEMBER(vertigo_state, m_vectorram)
@@ -56,7 +56,7 @@ ADDRESS_MAP_END
  *************************************/
 
 #if 0
-static ADDRESS_MAP_START( vertigo_motor, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( vertigo_motor, AS_PROGRAM, 8, vertigo_state )
 	AM_RANGE(0x010, 0x07f) AM_RAM
 	AM_RANGE(0x080, 0x7ff) AM_ROM
 ADDRESS_MAP_END

@@ -73,7 +73,7 @@ static WRITE8_HANDLER ( aeroboto_1a2_w )
 		state->m_disable_irq = 1;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aeroboto_state )
 	AM_RANGE(0x01a2, 0x01a2) AM_WRITE(aeroboto_1a2_w)			// affects IRQ line (more protection?)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aeroboto_state, m_mainram)	// main  RAM
 	AM_RANGE(0x0800, 0x08ff) AM_RAM								// tile color buffer; copied to 0x2000
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM								// main ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, aeroboto_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x9002, 0x9002) AM_DEVREAD("ay1", ay8910_r)

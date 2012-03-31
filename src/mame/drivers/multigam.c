@@ -326,7 +326,7 @@ static WRITE8_HANDLER(multigam_mapper2_w)
 
 *******************************************************/
 
-static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( multigam_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigam_mapper2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( multigmt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( multigmt_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(multigam_switch_prg_rom)
@@ -615,7 +615,7 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 
 *******************************************************/
 
-static ADDRESS_MAP_START( multigm3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( multigm3_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
@@ -931,7 +931,7 @@ static WRITE8_HANDLER(supergm3_chr_bank_w)
 
 *******************************************************/
 
-static ADDRESS_MAP_START( supergm3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( supergm3_map, AS_PROGRAM, 8, multigam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* additional RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)

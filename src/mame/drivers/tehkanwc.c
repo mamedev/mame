@@ -217,7 +217,7 @@ static void tehkanwc_adpcm_int(device_t *device)
 
 
 
-static ADDRESS_MAP_START( main_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( main_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE(tehkanwc_flipscreen_y_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
@@ -258,7 +258,7 @@ static ADDRESS_MAP_START( sub_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8001, 0x8001) AM_DEVWRITE("msm", msm_reset_w)/* MSM51xx reset */
@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(soundlatch_r, sound_answer_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_port, AS_IO, 8, tehkanwc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)

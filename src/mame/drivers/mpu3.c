@@ -871,7 +871,7 @@ static READ8_HANDLER( mpu3ptm_r )
 	return ptm2->read(offset >>2);
 }
 
-static ADDRESS_MAP_START( mpu3_basemap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpu3_basemap, AS_PROGRAM, 8, mpu3_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x881f) AM_READWRITE(mpu3ptm_r, mpu3ptm_w)/* PTM6840 IC2 */
 	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */

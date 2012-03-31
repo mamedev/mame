@@ -37,7 +37,7 @@ INLINE namco_62xx_state *get_safe_token(device_t *device)
     DEVICE INTERFACE
 ***************************************************************************/
 
-static ADDRESS_MAP_START( namco_62xx_map_io, AS_IO, 8 )
+static ADDRESS_MAP_START( namco_62xx_map_io, AS_IO, 8, namco_62xx_device )
 //  AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(namco_62xx_K_r)
 //  AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(namco_62xx_O_w)
 //  AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READ(namco_62xx_R0_r)

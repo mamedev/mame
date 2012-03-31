@@ -237,7 +237,7 @@ static WRITE32_HANDLER( fuuki32_vregs_w )
 	}
 }
 
-static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32, fuuki32_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM																		// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																		// Work RAM
 	AM_RANGE(0x410000, 0x41ffff) AM_RAM																		// Work RAM (used by asurabus)
@@ -296,14 +296,14 @@ static WRITE8_HANDLER( snd_ymf278b_w )
 		ymf262_w(space->machine().device("ymf2"), offset, data);
 }
 
-static ADDRESS_MAP_START( fuuki32_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fuuki32_sound_map, AS_PROGRAM, 8, fuuki32_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
 	AM_RANGE(0x7ff0, 0x7fff) AM_READWRITE(snd_z80_r, snd_z80_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")				// ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( fuuki32_sound_io_map, AS_IO, 8, fuuki32_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITENOP // leftover/unused nmi handler related

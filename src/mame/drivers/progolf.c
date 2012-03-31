@@ -240,7 +240,7 @@ static WRITE8_HANDLER( progolf_videoram_w )
 	videoram[offset] = data;
 }
 
-static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, progolf_state )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(progolf_charram_w) AM_BASE_MEMBER(progolf_state, m_fbram)
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(progolf_videoram_r,progolf_videoram_w)
@@ -256,7 +256,7 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, progolf_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x4000, 0x4fff) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)

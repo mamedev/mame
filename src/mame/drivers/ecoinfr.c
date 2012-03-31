@@ -324,7 +324,7 @@ WRITE8_HANDLER( ec_port18_out_w )
 }
 
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, ecoinfr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
@@ -335,7 +335,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( portmap, AS_IO, 8, ecoinfr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ec_port00_out_w) AM_READ_PORT("IN0") // Reel 1 Write
 	AM_RANGE(0x01, 0x01) AM_WRITE(ec_port01_out_w) AM_READ_PORT("IN1") // Reel 2 Write + Reels Opto Read

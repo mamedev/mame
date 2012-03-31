@@ -623,7 +623,7 @@ static WRITE16_HANDLER( dsp1_bank_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy4_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE_MEMBER(atarisy4_state, m_m68k_ram)
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x580000, 0x580001) AM_READ_PORT("JOYSTICK")
@@ -644,13 +644,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsp0_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dsp0_map, AS_PROGRAM, 16, atarisy4_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("dsp0_bank0")
 	AM_RANGE(0x0800, 0x0fff) AM_RAMBANK("dsp0_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp0_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( dsp0_io_map, AS_IO, 16, atarisy4_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp0_bank_w)
 	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(dsp0_bio_r)
 ADDRESS_MAP_END
@@ -662,13 +662,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsp1_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dsp1_map, AS_PROGRAM, 16, atarisy4_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("dsp1_bank0")
 	AM_RANGE(0x0800, 0x0fff) AM_RAMBANK("dsp1_bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp1_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( dsp1_io_map, AS_IO, 16, atarisy4_state )
 	AM_RANGE(0x00, 0x01) AM_WRITE(dsp1_bank_w)
 	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(dsp1_bio_r)
 ADDRESS_MAP_END

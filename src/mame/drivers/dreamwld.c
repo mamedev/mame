@@ -448,7 +448,7 @@ static WRITE32_HANDLER( dreamwld_palette_w )
 
 
 
-static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_spriteram)
@@ -468,7 +468,7 @@ static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_workram) // work ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dreamwld_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dreamwld_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_IMPORT_FROM( baryon_map )
 
 	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE(dreamwld_6295_1_bank_w) // sfx

@@ -245,7 +245,7 @@ static WRITE8_HANDLER( flyball_misc_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( flyball_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flyball_map, AS_PROGRAM, 8, flyball_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_NOP

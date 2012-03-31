@@ -252,7 +252,7 @@ static READ8_HANDLER(pal_r)
 	return space->machine().generic.paletteram.u8[offset];
 }
 
-static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITEONLY
 	AM_RANGE(0xb000, 0xb0ff) AM_READONLY			// sound related ?
@@ -282,7 +282,7 @@ static WRITE8_HANDLER( seibu_sound_comms_w )
 	seibu_main_word_w(space,offset,data,0x00ff);
 }
 
-static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP // rld result write-back
 //  AM_RANGE(0xb000, 0xb0ff) AM_RAM
@@ -308,7 +308,7 @@ ADDRESS_MAP_END
 
 /* Sound CPU */
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_WRITENOP // AM_DEVWRITE("ym1", ym2203_w) ?
 	AM_RANGE(0xc800, 0xc801) AM_WRITENOP // AM_DEVWRITE("ym2", ym2203_w) ?

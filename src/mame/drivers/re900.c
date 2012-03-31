@@ -221,11 +221,11 @@ static WRITE8_HANDLER(re900_watchdog_reset_w)
 *    Memory Map Information    *
 *******************************/
 
-static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, re900_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE_MEMBER(re900_state, m_rom)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem_io, AS_IO, 8 )
+static ADDRESS_MAP_START( mem_io, AS_IO, 8, re900_state )
 	AM_RANGE(0x0000, 0xbfff) AM_READ (rom_r)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_MODERN("tms9128", tms9928a_device, vram_write)

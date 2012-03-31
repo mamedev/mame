@@ -149,7 +149,7 @@ static WRITE8_HANDLER( vvillage_lamps_w )
 	set_led_status(space->machine(), 4, data & 0x10);
 }
 
-static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8, caswin_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ(vvillage_rng_r) //accessed by caswin only
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_BASE_MEMBER(caswin_state, m_sc0_attr)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vvillage_io, AS_IO, 8 )
+static ADDRESS_MAP_START( vvillage_io, AS_IO, 8, caswin_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)

@@ -199,7 +199,7 @@ public:
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( 4roses_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( 4roses_map, AS_PROGRAM, 8, _4roses_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	// AM_SHARE("nvram")
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_MEMBER(funworld_state, m_videoram)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_MEMBER(funworld_state, m_colorram)

@@ -172,7 +172,7 @@ static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32, galastrm_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(galastrm_state, m_ram)								/* main CPUA ram */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE_MEMBER(galastrm_state, m_spriteram, m_spriteram_size)

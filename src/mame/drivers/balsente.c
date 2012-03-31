@@ -242,7 +242,7 @@ DIP locations verified for:
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, balsente_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(balsente_state, m_spriteram)
 	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(balsente_videoram_w) AM_BASE_MEMBER(balsente_state, m_videoram)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(balsente_paletteram_w) AM_BASE_GENERIC(paletteram)
@@ -272,7 +272,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, balsente_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(balsente_m6850_sound_w)
@@ -280,7 +280,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, balsente_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_READWRITE(balsente_counter_8253_r, balsente_counter_8253_w)
 	AM_RANGE(0x08, 0x0f) AM_READ(balsente_counter_state_r)
@@ -299,7 +299,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* CPU 1 read addresses */
-static ADDRESS_MAP_START( shrike68k_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shrike68k_map, AS_PROGRAM, 16, balsente_state )
 	AM_RANGE(0x000000, 0x003fff) AM_ROM
 	AM_RANGE(0x010000, 0x01001f) AM_RAM AM_BASE_MEMBER(balsente_state, m_shrike_io)
 	AM_RANGE(0x018000, 0x018fff) AM_RAM AM_BASE_MEMBER(balsente_state, m_shrike_shared)

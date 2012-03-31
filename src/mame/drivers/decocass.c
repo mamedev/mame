@@ -117,7 +117,7 @@ static READ8_HANDLER( mirrorcolorram_r )
 }
 
 
-static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8, decocass_state )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE(ram_w) AM_BASE_MEMBER(decocass_state, m_rambase)
 	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(charram_w) AM_BASE_MEMBER(decocass_state, m_charram) /* still RMS3 RAM */
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(fgvideoram_w) AM_BASE_SIZE_MEMBER(decocass_state, m_fgvideoram, m_fgvideoram_size)  /* DSP3 RAM */
@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocass_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( decocass_sound_map, AS_PROGRAM, 8, decocass_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(decocass_sound_nmi_enable_r, decocass_sound_nmi_enable_w)
 	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(decocass_sound_data_ack_reset_r, decocass_sound_data_ack_reset_w)
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( decocass_sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( decocass_mcu_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( decocass_mcu_portmap, AS_IO, 8, decocass_state )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(i8041_p1_r, i8041_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(i8041_p2_r, i8041_p2_w)
 ADDRESS_MAP_END

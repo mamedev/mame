@@ -863,7 +863,7 @@ static WRITE16_HANDLER( galpani3_framebuffer3_bgcol_w )
 
 
 
-static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM

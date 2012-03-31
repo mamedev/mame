@@ -200,7 +200,7 @@ static WRITE8_HANDLER( audio_result_w )
 	state->m_audio_result = data;
 }
 
-static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 /*  AM_RANGE(0x100000, 0x17ffff) multi-cart or banking, some writes points here if anything lies there too */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
@@ -270,7 +270,7 @@ static READ16_HANDLER( rom_window_r )
 	return rom[offset | 0x80000/2 | state->m_bank_val*0x40000/2];
 }
 
-static ADDRESS_MAP_START( nprsp_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nprsp_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_READ(rom_window_r)
 	AM_RANGE(0x200000, 0x200001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
@@ -297,7 +297,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( neoprint_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( neoprint_audio_map, AS_PROGRAM, 8, neoprint_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM//AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)
 //  AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 3)
 //  AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 2)
@@ -314,7 +314,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( neoprint_audio_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( neoprint_audio_io_map, AS_IO, 8, neoprint_state )
   /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_WRITENOP
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)

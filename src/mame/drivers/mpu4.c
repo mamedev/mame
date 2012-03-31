@@ -2908,7 +2908,7 @@ TIMER_DEVICE_CALLBACK( gen_50hz )
 	update_meters(state);//run at 100Hz to sync with PIAs
 }
 
-static ADDRESS_MAP_START( mpu4_memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpu4_memmap, AS_PROGRAM, 8, mpu4_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
 	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)	/* write bank (rom page select) */

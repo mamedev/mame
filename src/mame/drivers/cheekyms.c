@@ -22,13 +22,13 @@ static INPUT_CHANGED( coin_inserted )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cheekyms_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_MEMBER(cheekyms_state, m_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, cheekyms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")

@@ -101,7 +101,7 @@ static WRITE8_HANDLER( sprcros2_s_port3_w )
 	state->m_s_port3 = data;
 }
 
-static ADDRESS_MAP_START( sprcros2_master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sprcros2_master_map, AS_PROGRAM, 8, sprcros2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_BASE_MEMBER(sprcros2_state, m_fgvideoram)
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( sprcros2_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")			//shared with slave cpu
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprcros2_master_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sprcros2_master_io_map, AS_IO, 8, sprcros2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76496_w)
@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( sprcros2_master_io_map, AS_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_WRITE(sprcros2_m_port7_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprcros2_slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sprcros2_slave_map, AS_PROGRAM, 8, sprcros2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_BASE_MEMBER(sprcros2_state, m_bgvideoram)
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( sprcros2_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprcros2_slave_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sprcros2_slave_io_map, AS_IO, 8, sprcros2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sprcros2_bgscrollx_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(sprcros2_bgscrolly_w)

@@ -162,7 +162,7 @@ static READ8_HANDLER( unk_r )
 /* 3x3106 - SRAM 256x1 */
 /* 1x3622 - ROM 512x4  - doesn't seem to be used ????????????*/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aceal_state )
 
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
 

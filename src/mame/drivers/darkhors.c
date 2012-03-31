@@ -310,7 +310,7 @@ static WRITE32_HANDLER( darkhors_unk1_w )
 //  if (ACCESSING_BITS_16_31)    popmessage("%04X",data >> 16);
 }
 
-static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
@@ -346,7 +346,7 @@ static WRITE32_HANDLER( jclub2_tileram_w )
 
 }
 
-static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
@@ -725,7 +725,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_VIDEO_START(jclub2)
 MACHINE_CONFIG_END
 
-static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, darkhors_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_snd_r, st0016_snd_w)
@@ -733,7 +733,7 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( st0016_io, AS_IO, 8 )
+static ADDRESS_MAP_START( st0016_io, AS_IO, 8, darkhors_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	//AM_RANGE(0xc0, 0xc0) AM_READ(cmd1_r)

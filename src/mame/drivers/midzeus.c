@@ -564,7 +564,7 @@ static READ32_HANDLER( invasn_gun_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32, midzeus_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
@@ -579,7 +579,7 @@ static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
@@ -1118,7 +1118,7 @@ static READ8_HANDLER( PIC16C5X_T0_clk_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( pic_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pic_io_map, AS_IO, 8, midzeus_state )
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 

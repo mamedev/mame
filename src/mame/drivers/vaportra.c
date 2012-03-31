@@ -48,7 +48,7 @@ static READ16_HANDLER( vaportra_control_r )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vaportra_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100003) AM_WRITE(vaportra_priority_w)
 	AM_RANGE(0x100006, 0x100007) AM_WRITE(vaportra_sound_w)
@@ -77,7 +77,7 @@ static READ8_HANDLER( vaportra_soundlatch_r )
 	return soundlatch_r(space, offset);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vaportra_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r, ym2151_w)

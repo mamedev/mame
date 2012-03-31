@@ -63,7 +63,7 @@ static SCREEN_UPDATE_IND16( tcl )
 	return 0;
 }
 
-static ADDRESS_MAP_START( tcl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tcl_map, AS_PROGRAM, 8, tcl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM  /* bfff ? */
 ADDRESS_MAP_END
 

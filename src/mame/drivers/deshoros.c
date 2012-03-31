@@ -106,7 +106,7 @@ static WRITE8_HANDLER( io_w )
 //  printf("%02x -> [%02x]\n",data,offset);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, deshoros_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x900f) AM_READWRITE(io_r,io_w) AM_BASE_MEMBER(deshoros_state, m_io_ram) //i/o area

@@ -377,7 +377,7 @@ static WRITE16_DEVICE_HANDLER( sound_bank_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( tickee_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tickee_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("nvram")
@@ -395,7 +395,7 @@ ADDRESS_MAP_END
 
 
 /* addreses in the 04x range shifted slightly...*/
-static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04100000, 0x04103fff) AM_RAM AM_SHARE("nvram")
@@ -411,7 +411,7 @@ static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mouseatk_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mouseatk_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("nvram")
@@ -428,7 +428,7 @@ ADDRESS_MAP_END
 
 
 /* newer hardware */
-static ADDRESS_MAP_START( rapidfir_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rapidfir_map, AS_PROGRAM, 16, tickee_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
 	AM_RANGE(0x02000000, 0x027fffff) AM_READWRITE(rapidfir_transparent_r, rapidfir_transparent_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)

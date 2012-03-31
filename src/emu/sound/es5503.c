@@ -47,7 +47,7 @@ static const UINT32 accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0
 static const int    resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
 
 // default address map
-static ADDRESS_MAP_START( es5503, AS_0, 8 )
+static ADDRESS_MAP_START( es5503, AS_0, 8, es5503_device )
 	AM_RANGE(0x000000, 0x1ffff) AM_ROM
 ADDRESS_MAP_END
 

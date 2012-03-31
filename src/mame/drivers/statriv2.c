@@ -288,14 +288,14 @@ static const ppi8255_interface ppi8255_intf =
  *
  *************************************/
 
-static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8, statriv2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE_MEMBER(statriv2_state, m_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8, statriv2_state )
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_BASE_MEMBER(statriv2_state, m_question_offset)
 	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 #ifdef UNUSED_CODE
-static ADDRESS_MAP_START( statusbj_io, AS_IO, 8 )
+static ADDRESS_MAP_START( statusbj_io, AS_IO, 8, statriv2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_address_data_w)

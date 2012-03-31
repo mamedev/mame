@@ -352,7 +352,7 @@ static READ16_HANDLER( test_r )
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0) //maybe not
 
@@ -373,7 +373,7 @@ static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16 )
 	//0x800008 "arrow" w?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( coinmvga_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( coinmvga_io_map, AS_IO, 8, coinmvga_state )
 /*  Digital I/O ports (ports 4-B are valid on 16-bit H8/3xx) */
 //  AM_RANGE(H8_PORT_4, H8_PORT_4)
 //  AM_RANGE(H8_PORT_5, H8_PORT_5)

@@ -204,7 +204,7 @@ static WRITE16_HANDLER( magmax_vreg_w )
 
 
 
-static ADDRESS_MAP_START( magmax_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( magmax_map, AS_PROGRAM, 16, magmax_state )
 	AM_RANGE(0x000000, 0x013fff) AM_ROM
 	AM_RANGE(0x018000, 0x018fff) AM_RAM
 	AM_RANGE(0x020000, 0x0207ff) AM_RAM AM_BASE_MEMBER(magmax_state, m_videoram)
@@ -220,13 +220,13 @@ static ADDRESS_MAP_START( magmax_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x03001e, 0x03001f) AM_WRITENOP	/* IRQ ack */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magmax_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( magmax_sound_map, AS_PROGRAM, 8, magmax_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_READ(magmax_sound_irq_ack)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magmax_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( magmax_sound_io_map, AS_IO, 8, magmax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)

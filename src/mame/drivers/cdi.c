@@ -55,7 +55,7 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 *      Memory maps       *
 *************************/
 
-static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
     AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(cdi_state,m_planea)
     AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE_MEMBER(cdi_state,m_planeb)
 #if ENABLE_UART_PRINTING

@@ -409,7 +409,7 @@ static WRITE8_HANDLER( bombsa_flipscreen_w )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(psychic5_paged_ram_r, psychic5_paged_ram_w)
@@ -425,20 +425,20 @@ static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psychic5_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( psychic5_sound_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psychic5_soundport_map, AS_IO, 8 )
+static ADDRESS_MAP_START( psychic5_soundport_map, AS_IO, 8, psychic5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ym2203_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -457,14 +457,14 @@ static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(psychic5_paged_ram_r, bombsa_paged_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombsa_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bombsa_sound_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY								// Is this a confirm of some sort?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombsa_soundport_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bombsa_soundport_map, AS_IO, 8, psychic5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)

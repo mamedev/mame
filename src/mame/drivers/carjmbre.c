@@ -58,7 +58,7 @@ static WRITE8_HANDLER( nmi_mask_w )
 }
 
 
-static ADDRESS_MAP_START( carjmbre_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( carjmbre_map, AS_PROGRAM, 8, carjmbre_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 //  AM_RANGE(0x8800, 0x8800) AM_READNOP         // watchdog?
@@ -75,13 +75,13 @@ static ADDRESS_MAP_START( carjmbre_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW") AM_WRITE(soundlatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( carjmbre_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( carjmbre_sound_map, AS_PROGRAM, 8, carjmbre_state )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x1000) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( carjmbre_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( carjmbre_sound_io_map, AS_IO, 8, carjmbre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x10, 0x10) AM_WRITENOP			//?? written on init/0xff sound command reset

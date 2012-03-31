@@ -253,7 +253,7 @@ READ8_DEVICE_HANDLER( namco_50xx_read )
     DEVICE INTERFACE
 ***************************************************************************/
 
-static ADDRESS_MAP_START( namco_50xx_map_io, AS_IO, 8 )
+static ADDRESS_MAP_START( namco_50xx_map_io, AS_IO, 8, namco_50xx_device )
 	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(namco_50xx_K_r)
 	AM_RANGE(MB88_PORTO,  MB88_PORTO)  AM_WRITE(namco_50xx_O_w)
 	AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READ(namco_50xx_R0_r)

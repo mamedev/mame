@@ -25,7 +25,7 @@ static WRITE8_HANDLER( suprloco_soundport_w )
 	device_spin_until_time(&space->device(), attotime::from_usec(50));
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_BASE_SIZE_MEMBER(suprloco_state, m_spriteram, m_spriteram_size)
@@ -42,7 +42,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVWRITE("sn1", sn76496_w)

@@ -360,7 +360,7 @@ static WRITE32_HANDLER( hotgmck_pcm_bank_w )
 		set_hotgmck_pcm_bank(space->machine(), 1);
 }
 
-static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM		// program ROM (1 meg)
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
 	AM_RANGE(0x03000000, 0x030037ff) AM_RAM AM_BASE_SIZE_MEMBER(psikyo4_state, m_spriteram, m_spriteram_size)

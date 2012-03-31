@@ -95,7 +95,7 @@ static WRITE8_HANDLER( multiply_w )
 }
 
 
-static ADDRESS_MAP_START( flkatck_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flkatck_map, AS_PROGRAM, 8, flkatck_state )
 	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE(flkatck_k007121_regs_w)									/* 007121 registers */
 	AM_RANGE(0x0008, 0x03ff) AM_RAM																	/* RAM */
 	AM_RANGE(0x0400, 0x041f) AM_READWRITE(flkatck_ls138_r, flkatck_ls138_w)							/* inputs, DIPS, bankswitch, counters, sound command */
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( flkatck_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flkatck_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flkatck_sound_map, AS_PROGRAM, 8, flkatck_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(multiply_r, multiply_w)				/* ??? */

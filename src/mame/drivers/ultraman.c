@@ -32,7 +32,7 @@ static WRITE16_HANDLER( sound_irq_trigger_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette */
@@ -55,7 +55,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x304800, 0x304fff) AM_DEVREADWRITE8("k051960", k051960_r, k051960_w, 0x00ff)		/* Sprite RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ultraman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)	/* Sound latch read */
@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	/* YM2151 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, ultraman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITENOP                     /* ??? */
 ADDRESS_MAP_END

@@ -151,7 +151,7 @@ static const ppi8255_interface ppi8255_intf[5] =
 };
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM	/* ??? */
 	AM_RANGE(0x9000, 0x9fff) AM_RAM	/* ??? */
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -187,13 +187,13 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_READNOP	/* irq ack? */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu3_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu3_port_map, AS_IO, 8, taxidriv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_r)

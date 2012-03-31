@@ -465,7 +465,7 @@ public:
 // start/end tags for the address map
 #define ADDRESS_MAP_NAME(_name) construct_address_map_##_name
 
-#define ADDRESS_MAP_START(_name, _space, _bits) \
+#define ADDRESS_MAP_START(_name, _space, _bits, _class) \
 ATTR_COLD void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device) \
 { \
 	typedef read##_bits##_delegate read_delegate; \
@@ -473,6 +473,7 @@ ATTR_COLD void ADDRESS_MAP_NAME(_name)(address_map &map, const device_t &device)
 	address_map_entry##_bits *curentry = NULL; \
 	(void)curentry; \
 	map.configure(_space, _bits); \
+	typedef _class drivdata_class; \
 
 #define ADDRESS_MAP_END \
 }

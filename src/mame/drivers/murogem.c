@@ -133,7 +133,7 @@ static WRITE8_HANDLER( outport_w )
 }
 
 
-static ADDRESS_MAP_START( murogem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( murogem_map, AS_PROGRAM, 8, murogem_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)

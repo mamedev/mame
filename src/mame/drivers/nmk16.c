@@ -311,7 +311,7 @@ static WRITE16_HANDLER( afega_soundlatch_w )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( vandyke_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( vandyke_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( vandyke_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, m_mainram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vandykeb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( vandykeb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( vandykeb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, m_mainram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( manybloc_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( manybloc_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( manybloc_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, m_mainram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tharrier_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tharrier_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ(tharrier_mcu_r) // AM_READ_PORT("IN1")
@@ -385,7 +385,7 @@ static ADDRESS_MAP_START( tharrier_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE_MEMBER(nmk16_state, m_mainram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tharrier_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tharrier_sound_map, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(soundlatch_r,soundlatch2_w)
@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( tharrier_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf700, 0xf700) AM_WRITE(tharrier_oki6295_bankswitch_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tharrier_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tharrier_sound_io_map, AS_IO, 8, nmk16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
@@ -403,7 +403,7 @@ ADDRESS_MAP_END
 //Read input port 1 030c8/  BAD
 //3478  GOOD
 
-static ADDRESS_MAP_START( mustang_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mustang_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( mustang_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE_MEMBER(nmk16_state, m_mainram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mustangb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mustangb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -438,7 +438,7 @@ static ADDRESS_MAP_START( mustangb_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( twinactn_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( twinactn_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -456,7 +456,7 @@ static ADDRESS_MAP_START( twinactn_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( acrobatm_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( acrobatm_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8ffff) AM_RAM AM_BASE_MEMBER(nmk16_state, m_mainram)
 	AM_RANGE(0xc0000, 0xc0001) AM_READ_PORT("IN0")
@@ -474,7 +474,7 @@ static ADDRESS_MAP_START( acrobatm_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xd4000, 0xd47ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, m_nmk_txvideoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bioship_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bioship_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -653,7 +653,7 @@ static WRITE16_HANDLER( hachamf_mainram_w )
 	}
 }
 
-static ADDRESS_MAP_START( hachamf_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hachamf_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	/* I/O Region */
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
@@ -881,7 +881,7 @@ static TIMER_DEVICE_CALLBACK( hachamf_mcu_sim )
 	mcu_run(timer.machine(),0);
 }
 
-static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x044022, 0x044023) AM_READNOP  /* No Idea */
 //  AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM    /* Work RAM */
@@ -904,7 +904,7 @@ static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, m_nmk_txvideoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tdragonb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tdragonb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x044022, 0x044023) AM_READNOP  /* No Idea */
 	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE_MEMBER(nmk16_state, m_mainram)
@@ -921,7 +921,7 @@ static ADDRESS_MAP_START( tdragonb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, m_nmk_txvideoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ssmissin_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ssmissin_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE_MEMBER(nmk16_state, m_mainram)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
@@ -937,7 +937,7 @@ static ADDRESS_MAP_START( ssmissin_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_MIRROR(0x1800) AM_RAM_WRITE(nmk_txvideoram_w) AM_BASE_MEMBER(nmk16_state, m_nmk_txvideoram) //mirror for airattck
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ssmissin_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssmissin_sound_map, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ssmissin_soundbank_w)
@@ -945,7 +945,7 @@ static ADDRESS_MAP_START( ssmissin_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( strahl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( strahl_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x80000, 0x80001) AM_READ_PORT("IN0")
 	AM_RANGE(0x80002, 0x80003) AM_READ_PORT("IN1")
@@ -964,7 +964,7 @@ static ADDRESS_MAP_START( strahl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xf0000, 0xfffff) AM_RAM AM_BASE_MEMBER(nmk16_state, m_mainram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( macross_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( macross_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -982,7 +982,7 @@ static ADDRESS_MAP_START( macross_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE(nmk16_mainram_strange_w) AM_BASE_MEMBER(nmk16_state, m_mainram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gunnail_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gunnail_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -1002,7 +1002,7 @@ static ADDRESS_MAP_START( gunnail_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, m_mainram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( macross2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( macross2_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("IN1")
@@ -1028,7 +1028,7 @@ static ADDRESS_MAP_START( macross2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE_MEMBER(nmk16_state, m_mainram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raphero_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( raphero_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN0")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("IN1")
@@ -1075,7 +1075,7 @@ static WRITE8_HANDLER( raphero_sound_rombank_w )
 	memory_set_bankptr(space->machine(), "bank1",space->machine().region("audiocpu")->base() + 0x10000 + (data & 0x07) * 0x4000);
 }
 
-static ADDRESS_MAP_START( raphero_sound_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( raphero_sound_mem_map, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
@@ -1088,7 +1088,7 @@ static ADDRESS_MAP_START( raphero_sound_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( macross2_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( macross2_sound_map, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* banked ROM */
 	AM_RANGE(0xa000, 0xa000) AM_READNOP	/* IRQ ack? watchdog? */
@@ -1097,7 +1097,7 @@ static ADDRESS_MAP_START( macross2_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(soundlatch_r,soundlatch2_w)	/* from 68000 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( macross2_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( macross2_sound_io_map, AS_IO, 8, nmk16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
@@ -1105,7 +1105,7 @@ static ADDRESS_MAP_START( macross2_sound_io_map, AS_IO, 8 )
 	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_okibank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bjtwin_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bjtwin_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
@@ -4618,7 +4618,7 @@ static WRITE16_HANDLER( afega_scroll1_w )
 */
 
 
-static ADDRESS_MAP_START( afega, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( afega, AS_PROGRAM, 16, nmk16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")			// Buttons
@@ -4687,7 +4687,7 @@ static WRITE8_DEVICE_HANDLER( spec2k_oki1_banking_w )
 		downcast<okim6295_device *>(device)->set_bank_base(0x40000);
 }
 
-static ADDRESS_MAP_START( afega_sound_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( afega_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0003, 0x0003) AM_WRITENOP // bug in sound prg?
 	AM_RANGE(0x0004, 0x0004) AM_WRITENOP // bug in sound prg?
 	AM_RANGE(0x0000, 0xefff) AM_ROM
@@ -4697,7 +4697,7 @@ static ADDRESS_MAP_START( afega_sound_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)		// M6295
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( firehawk_sound_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( firehawk_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xfff0, 0xfff0) AM_READ(soundlatch_r)
@@ -4718,7 +4718,7 @@ static WRITE8_DEVICE_HANDLER( twinactn_oki_bank_w )
 //  logerror("%04x: oki bank %02x\n", cpu_get_pc(&space->device()), data);
 }
 
-static ADDRESS_MAP_START( twinactn_sound_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( twinactn_sound_cpu, AS_PROGRAM, 8, nmk16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki1", twinactn_oki_bank_w)

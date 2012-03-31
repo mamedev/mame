@@ -478,7 +478,7 @@ static WRITE16_HANDLER( sound_write_w )
 }
 #endif
 
-static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blitter", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
@@ -505,7 +505,7 @@ static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16 )
 //  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( steaser_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( steaser_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blitter", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
@@ -575,7 +575,7 @@ static WRITE8_HANDLER( bankrob_mcu2_w )
 	logerror("%s: mcu2 written with %02x\n", space->machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
@@ -660,7 +660,7 @@ static WRITE8_HANDLER( bankroba_mcu2_w )
 	logerror("%s: mcu2 written with %02x\n", space->machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( bankroba_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bankroba_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -805,7 +805,7 @@ static WRITE16_HANDLER( cjffruit_mcu_w )
 	logerror("%s: mcu written with %02x\n", space->machine().describe_context(),data >> 8);
 }
 
-static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x480000, 0x4807ff) AM_RAM
@@ -907,7 +907,7 @@ static WRITE16_HANDLER( deucesw2_leds3_w )
 	}
 }
 
-static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
@@ -981,7 +981,7 @@ static WRITE8_HANDLER( dualgame_mcu2_w )
 	logerror("%s: mcu2 written with %02x\n", space->machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
@@ -1085,7 +1085,7 @@ static READ16_HANDLER( hermit_track_r )
 		((0xf - ((input_port_read(space->machine(), "TRACK_X") + 0x7) & 0xf)) << 8)  ;
 }
 
-static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
@@ -1159,7 +1159,7 @@ static WRITE8_HANDLER( maxidbl_mcu2_w )
 	logerror("%s: mcu2 written with %02x\n", space->machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -1596,7 +1596,7 @@ const mc6845_interface mc6845_intf_irq5 =
 	crtc_addr				/* update address callback */
 };
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, blitz68k_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

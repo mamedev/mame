@@ -401,7 +401,7 @@ static WRITE8_HANDLER( signature2_w )
 	}
 }
 
-static ADDRESS_MAP_START( getrivia_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( getrivia_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
@@ -423,7 +423,7 @@ static ADDRESS_MAP_START( getrivia_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gselect_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gselect_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
@@ -438,7 +438,7 @@ static ADDRESS_MAP_START( gselect_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 // TODO: where are mapped the lower 0x2000 bytes of the banks?
-static ADDRESS_MAP_START( amuse_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( amuse_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( amuse_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gepoker_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gepoker_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
@@ -471,7 +471,7 @@ static ADDRESS_MAP_START( gepoker_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amuse1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( amuse1_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram")
@@ -488,7 +488,7 @@ static ADDRESS_MAP_START( amuse1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( findout_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( findout_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r,ppi8255_w)
@@ -509,7 +509,7 @@ static ADDRESS_MAP_START( findout_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizvid_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( quizvid_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r,ppi8255_w)
@@ -527,7 +527,7 @@ static ADDRESS_MAP_START( quizvid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( suprpokr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( suprpokr_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
@@ -539,7 +539,7 @@ static ADDRESS_MAP_START( suprpokr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( geimulti_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( geimulti_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
@@ -552,7 +552,7 @@ static ADDRESS_MAP_START( geimulti_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprtauth_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sprtauth_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)

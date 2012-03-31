@@ -195,7 +195,7 @@ static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8, toypop_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,m_videoram)	/* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,m_spriteram)										/* general RAM, area 1 */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m_m68000_sharedram)		/* shared RAM with the 68000 CPU */
@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM											/* ROM code */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( toypop_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( toypop_map, AS_PROGRAM, 8, toypop_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,m_videoram)	/* video RAM */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,m_spriteram)										/* general RAM, area 1 */
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m_m68000_sharedram)		/* shared RAM with the 68000 CPU */
@@ -237,7 +237,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, toypop_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(toypop_sound_interrupt_disable_w)	/* ??? toypop doesn't write here */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(toypop_sound_interrupt_enable_acknowledge_w)
@@ -253,7 +253,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, toypop_state )
 	AM_RANGE(0x000000, 0x007fff) AM_ROM										/* ROM code */
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM										/* RAM */
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(toypop_m68000_sharedram_r, toypop_m68000_sharedram_w)	/* shared RAM with the main CPU */

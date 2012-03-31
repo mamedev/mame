@@ -402,7 +402,7 @@ static WRITE16_HANDLER( write_sndram )
 	cubeqcpu_sndram_w(space->machine().device("sound_cpu"), offset, data, mem_mask);
 }
 
-static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, cubeqst_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x03ffff)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(read_rotram, write_rotram)
@@ -419,11 +419,11 @@ ADDRESS_MAP_END
 
 
 /* For the bit-sliced CPUs */
-static ADDRESS_MAP_START( rotate_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( rotate_map, AS_PROGRAM, 64, cubeqst_state )
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( line_sound_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( line_sound_map, AS_PROGRAM, 64, cubeqst_state )
 	AM_RANGE(0x000, 0x0ff) AM_ROM
 ADDRESS_MAP_END
 

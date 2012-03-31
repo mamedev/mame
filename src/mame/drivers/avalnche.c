@@ -110,7 +110,7 @@ static WRITE8_HANDLER( avalance_start_lamp_w )
 	set_led_status(space->machine(), 2, data & 1);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_MEMBER(avalnche_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( catch_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( catch_map, AS_PROGRAM, 8, avalnche_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_MEMBER(avalnche_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")

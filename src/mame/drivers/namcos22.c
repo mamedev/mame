@@ -1797,18 +1797,18 @@ static WRITE16_HANDLER( master_render_device_w )
 	}
 }
 
-static ADDRESS_MAP_START( master_dsp_program, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( master_dsp_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM /* internal ROM (4k words) */
 	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_BASE_MEMBER(namcos22_state, m_mpMasterExternalRAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_dsp_data, AS_DATA, 16 )
+static ADDRESS_MAP_START( master_dsp_data, AS_DATA, 16, namcos22_state )
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_READ(master_external_ram_r) AM_WRITE(master_external_ram_w)
 	AM_RANGE(0x8000, 0xffff) AM_READ(namcos22_dspram16_r) AM_WRITE(namcos22_dspram16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16 )
+static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16, namcos22_state )
 	AM_RANGE(0x0,0x0) AM_WRITE(point_ram_loword_iw) AM_READ(point_ram_loword_r)
 	AM_RANGE(0x1,0x1) AM_WRITE(point_ram_hiword_w) AM_READ(point_ram_hiword_ir)
 	AM_RANGE(0x2,0x2) AM_WRITE(dsp_unk2_w) AM_READ(pdp_begin_r)
@@ -1891,16 +1891,16 @@ static WRITE16_HANDLER( dsp_slave_portb_w )
 	/* The slave dsp uses this to transmit a command sequence to an external device. */
 }
 
-static ADDRESS_MAP_START( slave_dsp_program, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( slave_dsp_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM /* internal ROM */
 	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE_MEMBER(namcos22_state, m_mpSlaveExternalRAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_dsp_data, AS_DATA, 16 )
+static ADDRESS_MAP_START( slave_dsp_data, AS_DATA, 16, namcos22_state )
 	AM_RANGE(0x8000, 0x9fff) AM_READ(slave_external_ram_r) AM_WRITE(slave_external_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_dsp_io, AS_IO, 16 )
+static ADDRESS_MAP_START( slave_dsp_io, AS_IO, 16, namcos22_state )
 	/* unknown signal */
 	AM_RANGE(0x3,0x3) AM_READ(dsp_slave_port3_r)
 
@@ -2546,7 +2546,7 @@ static WRITE32_HANDLER( namcos22s_chipselect_w )
 }
 
 /* Namco Super System 22 */
-static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32, namcos22_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namcos22_keycus_r, namcos22_keycus_w)
 	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
@@ -2617,7 +2617,7 @@ static WRITE16_HANDLER( s22mcu_shared_w )
 */
 
 // Super System 22 M37710
-static ADDRESS_MAP_START( mcu_program, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mcu_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
 	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE( s22mcu_shared_r, s22mcu_shared_w )
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("user4", 0xc000)
@@ -2629,7 +2629,7 @@ static ADDRESS_MAP_START( mcu_program, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 // System 22 37702
-static ADDRESS_MAP_START( mcu_s22_program, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mcu_s22_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
 	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE( s22mcu_shared_r, s22mcu_shared_w )
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0)
@@ -2945,7 +2945,7 @@ static READ8_HANDLER( airco22_mcu_adc_r )
 	}
 }
 
-static ADDRESS_MAP_START( mcu_io, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io, AS_IO, 8, namcos22_state )
 	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ( mcu_port4_r ) AM_WRITE( mcu_port4_w )
 	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READ( mcu_port5_r ) AM_WRITE( mcu_port5_w )
 	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READ( mcu_port6_r ) AM_WRITE( mcu_port6_w )
@@ -2958,7 +2958,7 @@ static READ8_HANDLER( mcu_port4_s22_r )
 	return state->m_p4 | 0x10;	// for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
 }
 
-static ADDRESS_MAP_START( mcu_s22_io, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_s22_io, AS_IO, 8, namcos22_state )
 	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ( mcu_port4_s22_r )
 ADDRESS_MAP_END
 
@@ -3031,7 +3031,7 @@ MACHINE_CONFIG_END
 
 /* Namco System 22 */
 
-static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
 	/**
      * Program ROM (2M bytes)
      * Mounted position: LLB: CPU 4D, LMB: CPU 2D, UMB: CPU 8D, UUB: CPU 6D

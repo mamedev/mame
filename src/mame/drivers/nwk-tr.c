@@ -488,7 +488,7 @@ static MACHINE_START( nwktr )
 	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x003fffff, FALSE, state->m_work_ram);
 }
 
-static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32, nwktr_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(nwktr_state, m_work_ram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_DEVREADWRITE("k001604", k001604_reg_r, k001604_reg_w)
 	AM_RANGE(0x74010000, 0x74017fff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
@@ -511,7 +511,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, nwktr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* Work RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
@@ -534,7 +534,7 @@ static WRITE32_HANDLER( dsp_dataram_w )
 	state->m_sharc_dataram[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc_map, AS_DATA, 32 )
+static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, nwktr_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram_r, dsp_dataram_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM

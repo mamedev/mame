@@ -374,7 +374,7 @@ static MACHINE_RESET( ppking )
 	state->m_flag1 = state->m_flag2 = 1;
 }
 
-static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_MEMBER(gladiatr_state, m_spriteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(ppking_video_registers_w)
@@ -386,12 +386,12 @@ static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ppking_cpu3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ppking_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, gladiatr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
 	AM_RANGE(0xc004, 0xc004) AM_NOP	// WRITE(ppking_irq_patch_w)
@@ -399,7 +399,7 @@ static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8 )
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8 )
+static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x20, 0x21) AM_READ(qx1_r) AM_WRITE(qx1_w)
@@ -411,7 +411,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_MEMBER(gladiatr_state, m_spriteram)
@@ -423,19 +423,19 @@ static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("msm", glad_adpcm_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(glad_cpu_sound_command_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(gladiatr_spritebank_w)
@@ -446,7 +446,7 @@ static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8 )
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP	// watchdog_reset_w doesn't work
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8 )
+static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x20, 0x21) AM_READWRITE(TAITO8741_1_r, TAITO8741_1_w)

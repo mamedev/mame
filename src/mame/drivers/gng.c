@@ -40,7 +40,7 @@ static WRITE8_HANDLER( gng_coin_counter_w )
 	coin_counter_w(space->machine(), offset, data);
 }
 
-static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x0000, 0x1dff) AM_RAM
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(gng_fgvideoram_w) AM_BASE_MEMBER(gng_state, m_fgvideoram)
@@ -66,7 +66,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)

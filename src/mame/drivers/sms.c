@@ -494,7 +494,7 @@ static PALETTE_INIT( sms )
  *
  *************************************/
 
-static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x01000, 0x01007) AM_WRITE(video_w)
@@ -505,7 +505,7 @@ static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sureshot_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sureshot_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x02000, 0x02007) AM_WRITE(video_w)
 	AM_RANGE(0x03000, 0x03003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
@@ -514,7 +514,7 @@ static ADDRESS_MAP_START( sureshot_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x3100, 0x3103) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)

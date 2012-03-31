@@ -58,7 +58,7 @@ static WRITE8_HANDLER( yamyam_bankswitch_w )
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, gundealr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW0")
@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(gundealr_state, m_rambase)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, gundealr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END

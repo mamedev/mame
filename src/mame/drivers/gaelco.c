@@ -121,7 +121,7 @@ static WRITE16_HANDLER(thoop_encrypted_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM															/* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_BASE_MEMBER(gaelco_state, m_videoram)				/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM															/* Screen RAM */
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM															/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigkarnk_snd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bigkarnk_snd_map, AS_PROGRAM, 8, gaelco_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM											/* RAM */
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)	/* OKI6295 */
 //  AM_RANGE(0x0900, 0x0900) AM_WRITENOP                                    /* enable sound output? */
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( bigkarnk_snd_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0c00, 0xffff) AM_ROM											/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_BASE_MEMBER(gaelco_state, m_videoram)				/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM															/* Screen RAM */
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM															/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_encrypted_w) AM_BASE_MEMBER(gaelco_state, m_videoram)			/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(gaelco_encrypted_w) AM_BASE_MEMBER(gaelco_state, m_screen)				/* Screen RAM */
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM															/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop_vram_encrypted_w) AM_BASE_MEMBER(gaelco_state, m_videoram)			/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(thoop_encrypted_w) AM_BASE_MEMBER(gaelco_state, m_screen)				/* Screen RAM */

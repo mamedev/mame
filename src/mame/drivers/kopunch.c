@@ -42,7 +42,7 @@ static WRITE8_HANDLER( kopunch_coin_w )
 
 
 
-static ADDRESS_MAP_START( kopunch_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kopunch_map, AS_PROGRAM, 8, kopunch_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(kopunch_videoram_w) AM_BASE_MEMBER(kopunch_state, m_videoram)
@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( kopunch_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7100, 0x7aff) AM_RAM	// ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kopunch_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kopunch_io_map, AS_IO, 8, kopunch_state )
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("P1")
 	AM_RANGE(0x31, 0x32) AM_READ(kopunch_in_r)
 	AM_RANGE(0x33, 0x33) AM_WRITENOP

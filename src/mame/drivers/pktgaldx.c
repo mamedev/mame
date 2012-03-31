@@ -71,7 +71,7 @@ static WRITE16_DEVICE_HANDLER(pktgaldx_oki_bank_w)
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
@@ -120,7 +120,7 @@ cpu #0 (PC=0000923C): unmapped program memory word read from 00167DB2 & 00FF
 /* do the 300000 addresses somehow interact with the protection addresses on this bootleg? */
 /* or maybe protection writes go to sound ... */
 
-static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, m_pktgaldb_fgram) // fgram on original?
 	AM_RANGE(0x102000, 0x102fff) AM_RAM // bgram on original?

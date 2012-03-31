@@ -64,7 +64,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m57_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(m57_videoram_w) AM_BASE_MEMBER(m57_state, m_videoram)
 	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_MEMBER(m57_state, m_scrollram)

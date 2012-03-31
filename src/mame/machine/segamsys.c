@@ -30,14 +30,14 @@ static struct sms_vdp *md_sms_vdp;
 #define SMS_VDP_VRAM(address) chip->vram[(address)&0x3fff]
 
 #ifdef UNUSED_FUNCTION
-static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8, driver_device )
 //  AM_RANGE(0x0000 , 0xbfff) AM_ROM
 //  AM_RANGE(0xc000 , 0xdfff) AM_RAM AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 #endif
 
 
-ADDRESS_MAP_START( sms_io_map, AS_IO, 8 )
+ADDRESS_MAP_START( sms_io_map, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

@@ -354,7 +354,7 @@ static WRITE32_HANDLER( pip_w )
 }
 
 
-static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
 	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8 (ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)	// nvram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
@@ -422,7 +422,7 @@ static WRITE32_HANDLER( ms32_irq5_guess_w )
 	irq_raise(space->machine(), 5);
 }
 
-static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
 	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3)
 
 	AM_RANGE(0xfce00004, 0xfce00023) AM_RAM // regs?
@@ -1384,7 +1384,7 @@ static WRITE8_HANDLER( to_main_w )
 	irq_raise(space->machine(), 1);
 }
 
-static ADDRESS_MAP_START( ms32_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ms32_sound_map, AS_PROGRAM, 8, ms32_state )
 	AM_RANGE(0x0000, 0x3eff) AM_ROM
 	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE("ymf", ymf271_r,ymf271_w)
 	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)

@@ -162,7 +162,7 @@ static CUSTOM_INPUT( prot_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( pirates_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pirates_map, AS_PROGRAM, 16, pirates_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // main ram
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("INPUTS")

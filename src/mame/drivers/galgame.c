@@ -275,7 +275,7 @@ static WRITE16_HANDLER(clk_w)
 	state->m_clk = data;
 }
 
-static ADDRESS_MAP_START( galaxygame_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( galaxygame_map, AS_PROGRAM, 16, galaxygame_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xfec0, 0xfecf) AM_READWRITE(ke_r, ke_w)
 	AM_RANGE(0xff52, 0xff53) AM_READWRITE(y_r, y_w) // 177522 Y

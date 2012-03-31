@@ -306,7 +306,7 @@ static WRITE8_HANDLER( gridlee_coin_counter_w )
  *************************************/
 
 /* CPU 1 read addresses */
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gridlee_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(gridlee_state, m_spriteram)
 	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(gridlee_videoram_w) AM_BASE_MEMBER(gridlee_state, m_videoram)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(led_0_w)

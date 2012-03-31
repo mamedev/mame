@@ -224,7 +224,7 @@ static WRITE8_HANDLER( irq_mask_w )
 	state->m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)		/* AFE */
 	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)	/* FLIP */
 	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_WRITE(konami_sh_irqtrigger_w)	/* 26 */ /* cause interrupt on audio CPU */
@@ -260,7 +260,7 @@ static WRITE8_HANDLER( yieartf_nmi_mask_w )
 }
 
 
-static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x0000) AM_DEVREAD("vlm", yiear_speech_r) AM_WRITE(konami_SN76496_latch_w)
 	AM_RANGE(0x0001, 0x0001) AM_DEVWRITE("snsnd", konami_SN76496_w)
 	AM_RANGE(0x0002, 0x0002) AM_DEVWRITE("vlm", yiear_VLM5030_control_w)
@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( yieartf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	/* all usual addresses +0x8000 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(watchdog_reset_w)
@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( reaktor_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Reaktor reads / writes some I/O ports, no idea what they're connected to, if anything */
-static ADDRESS_MAP_START( reaktor_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( reaktor_io_map, AS_IO, 8, trackfld_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP
 	AM_RANGE(0x01, 0x01) AM_NOP
@@ -327,7 +327,7 @@ static ADDRESS_MAP_START( reaktor_io_map, AS_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x10b0, 0x10b0) AM_WRITE(trackfld_flipscreen_w)
 	AM_RANGE(0x10b1, 0x10b1) AM_READNOP AM_WRITE(konami_sh_irqtrigger_w)
@@ -353,7 +353,7 @@ static ADDRESS_MAP_START( mastkin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wizzquiz_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
 	AM_RANGE(0x1080, 0x1080) AM_WRITE(trackfld_flipscreen_w)
@@ -388,7 +388,7 @@ READ8_DEVICE_HANDLER( trackfld_SN76496_r )
 	return 0xff; // ?
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE("vlm", vlm5030_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hyprolyb_sound_map, AS_PROGRAM, 8, trackfld_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x1c00) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)

@@ -340,12 +340,12 @@ static READ8_HANDLER( expram_r )
 }
 
 
-static ADDRESS_MAP_START( jackie_prg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jackie_prg_map, AS_PROGRAM, 8, jackie_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jackie_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( jackie_io_map, AS_IO, 8, jackie_state )
 	AM_RANGE(0x0520, 0x0524) AM_WRITE(jackie_unk_reg1_lo_w)
 	AM_RANGE(0x0d20, 0x0d24) AM_WRITE(jackie_unk_reg1_hi_w)
 	AM_RANGE(0x0560, 0x0564) AM_WRITE(jackie_unk_reg2_lo_w)

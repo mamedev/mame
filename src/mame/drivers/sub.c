@@ -213,7 +213,7 @@ static SCREEN_UPDATE_IND16(sub)
 	return 0;
 }
 
-static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0x0000, 0xafff) AM_ROM
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_MEMBER(sub_state,m_attr)
@@ -248,18 +248,18 @@ static WRITE8_HANDLER( nmi_mask_w )
 	state->m_nmi_en = data & 1;
 }
 
-static ADDRESS_MAP_START( subm_io, AS_IO, 8 )
+static ADDRESS_MAP_START( subm_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch2_r, subm_to_sound_w) // to/from sound CPU
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subm_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( subm_sound_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(nmi_mask_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( subm_sound_io, AS_IO, 8 )
+static ADDRESS_MAP_START( subm_sound_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch2_w) // to/from main CPU
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_address_data_w)

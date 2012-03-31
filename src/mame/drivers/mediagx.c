@@ -907,7 +907,7 @@ static I8237_INTERFACE( dma8237_2_config )
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32, mediagx_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM AM_BASE_MEMBER(mediagx_state, m_main_ram)
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
 	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE_MEMBER(mediagx_state, m_cga_ram)
@@ -920,7 +920,7 @@ static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mediagx_io, AS_IO, 32)
+static ADDRESS_MAP_START(mediagx_io, AS_IO, 32, mediagx_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_master", io20_r, io20_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
@@ -1116,7 +1116,7 @@ static const struct pit8253_config mediagx_pit8254_config =
 	}
 };
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, mediagx_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

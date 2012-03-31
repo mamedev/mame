@@ -101,7 +101,7 @@ static READ16_HANDLER( blmbycar_opt_wheel_r )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( blmbycar_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY												// ???
@@ -136,7 +136,7 @@ static READ16_HANDLER( waterball_unk_r )
 	return state->m_retvalue;
 }
 
-static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( watrball_map, AS_PROGRAM, 16, blmbycar_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM
 	AM_RANGE(0x100000, 0x103fff) AM_WRITEONLY												// ???

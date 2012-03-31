@@ -272,7 +272,7 @@ static INPUT_PORTS_START( tourvision )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) // games slot status in bits 3 to 7
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE( 0x000000, 0x0FFFFF) AM_ROM
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE( &pce_user_ram )
 	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_0_r, vdc_0_w )
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE( h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io , AS_IO, 8)
+static ADDRESS_MAP_START( pce_io , AS_IO, 8, tourvision_state )
 	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_0_r, vdc_0_w )
 ADDRESS_MAP_END
 
@@ -292,7 +292,7 @@ static WRITE8_HANDLER( tourvision_8085_d000_w )
 	//logerror( "D000 (8085) write %02x\n", data );
 }
 
-static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x80ff) AM_DEVREADWRITE_MODERN("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE(0x8100, 0x8107) AM_DEVREADWRITE_MODERN("i8155", i8155_device, io_r, io_w)

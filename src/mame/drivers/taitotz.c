@@ -325,7 +325,7 @@ static WRITE64_HANDLER(ppc_common_w)
 // 0x40000000...0x400fffff: BIOS Work RAM
 // 0x40100000...0x40ffffff: User Work RAM
 
-static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64)
+static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64, taitotz_state )
 	//AM_RANGE(0x00000000, 0x00000007) AM_RAM   // Register/RAM access port? - Written 128k+256k times on boot
 	//AM_RANGE(0x00000008, 0x0000000f) AM_RAM   // Register/RAM address port?
 	AM_RANGE(0x00000000, 0x0000000f) AM_WRITE(video_chip_w)
@@ -354,7 +354,7 @@ ADDRESS_MAP_END
 // 0xfc0d55:    INTRX1
 // 0xfc0ce1:    INTTX1
 
-static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8, taitotz_state )
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM		// Work RAM
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END

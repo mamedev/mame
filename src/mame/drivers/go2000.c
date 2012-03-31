@@ -57,7 +57,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 	device_set_input_line(state->m_soundcpu, 0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16, go2000_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_MEMBER(go2000_state, m_videoram)
@@ -76,12 +76,12 @@ static WRITE8_HANDLER( go2000_pcm_1_bankswitch_w )
 	memory_set_bank(space->machine(), "bank1", data & 0x07);
 }
 
-static ADDRESS_MAP_START( go2000_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( go2000_sound_map, AS_PROGRAM, 8, go2000_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( go2000_sound_io, AS_IO, 8 )
+static ADDRESS_MAP_START( go2000_sound_io, AS_IO, 8, go2000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_w)

@@ -468,7 +468,7 @@ static WRITE8_HANDLER( led_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_ROM	/* slapstic maps here */
 	AM_RANGE(0x2e0000, 0x2e0001) AM_READ(atarisy1_int3state_r)
@@ -502,7 +502,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy1_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

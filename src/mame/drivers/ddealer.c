@@ -452,7 +452,7 @@ static WRITE16_HANDLER( ddealer_mcu_shared_w )
 	}
 }
 
-static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")

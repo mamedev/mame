@@ -183,7 +183,7 @@ READ8_DEVICE_HANDLER( buggychl_mcu_status_r )
 	return res;
 }
 
-ADDRESS_MAP_START( buggychl_mcu_map, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( buggychl_mcu_map, AS_PROGRAM, 8, buggychl_mcu_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("bmcu", buggychl_68705_port_a_r, buggychl_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_DEVREADWRITE("bmcu", buggychl_68705_port_b_r, buggychl_68705_port_b_w)

@@ -355,7 +355,7 @@ static WRITE8_HANDLER( disco_w )
 }
 
 
-static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(btime_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
@@ -372,7 +372,7 @@ static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
 	AM_RANGE(0x0500, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
@@ -392,7 +392,7 @@ static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfff9, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(tisland_w)	/* override the following entries to */
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
@@ -410,7 +410,7 @@ static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(zoar_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
@@ -430,7 +430,7 @@ static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(lnc_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
@@ -447,7 +447,7 @@ static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(mmonkey_w)	/* override the following entries to */
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
@@ -464,7 +464,7 @@ static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
@@ -482,7 +482,7 @@ static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( disco_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( disco_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(disco_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x04ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
@@ -501,7 +501,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_BASE_MEMBER(btime_state, m_audio_rambase)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)
@@ -512,7 +512,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)

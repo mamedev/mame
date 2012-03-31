@@ -58,7 +58,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m52_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_BASE_MEMBER(m52_state, m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_BASE_MEMBER(m52_state, m_colorram)
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( alpha1v_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( alpha1v_map, AS_PROGRAM, 8, m52_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(m52_videoram_w) AM_BASE_MEMBER(m52_state, m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(m52_colorram_w) AM_BASE_MEMBER(m52_state, m_colorram)
@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( alpha1v_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, m52_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x1f) AM_WRITE(m52_scroll_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x1f) AM_WRITE(m52_bg1xpos_w)

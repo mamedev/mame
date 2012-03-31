@@ -99,7 +99,7 @@ static WRITE8_HANDLER( mystston_ay8910_select_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mystston_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
 	AM_RANGE(0x0780, 0x07df) AM_RAM AM_BASE_MEMBER(mystston_state, m_spriteram)
 	AM_RANGE(0x07e0, 0x0fff) AM_RAM

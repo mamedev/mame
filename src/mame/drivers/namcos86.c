@@ -333,7 +333,7 @@ static MACHINE_RESET( namco86 )
 
 
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, namcos86_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w) AM_BASE_MEMBER(namcos86_state, m_rthunder_videoram1)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w) AM_BASE_MEMBER(namcos86_state, m_rthunder_videoram2)
 
@@ -364,7 +364,7 @@ ADDRESS_MAP_END
 
 
 #define CPU2_MEMORY(NAME,ADDR_SPRITE,ADDR_VIDEO1,ADDR_VIDEO2,ADDR_ROM,ADDR_BANK,ADDR_WDOG,ADDR_INT)	\
-static ADDRESS_MAP_START( NAME##_cpu2_map, AS_PROGRAM, 8 )							\
+static ADDRESS_MAP_START( NAME##_cpu2_map, AS_PROGRAM, 8, namcos86_state ) 							\
 	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w) AM_BASE_MEMBER(namcos86_state, m_rthunder_spriteram)	\
 	AM_RANGE(ADDR_VIDEO1+0x0000, ADDR_VIDEO1+0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w)	\
 	AM_RANGE(ADDR_VIDEO2+0x0000, ADDR_VIDEO2+0x1fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w)	\
@@ -389,7 +389,7 @@ CPU2_MEMORY( wndrmomo, 0x2000, 0x4000, 0x6000, UNUSED, UNUSED, 0xc000, 0xc800 )
 
 
 #define MCU_MEMORY(NAME,ADDR_LOWROM,ADDR_INPUT,ADDR_UNK1,ADDR_UNK2)			\
-static ADDRESS_MAP_START( NAME##_mcu_map, AS_PROGRAM, 8 )					\
+static ADDRESS_MAP_START( NAME##_mcu_map, AS_PROGRAM, 8, namcos86_state )	\
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r,m6801_io_w)	\
 	AM_RANGE(0x0080, 0x00ff) AM_RAM														\
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */	\
@@ -422,7 +422,7 @@ static READ8_HANDLER( readFF )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos86_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("IN2")
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)	/* leds won't work otherwise */
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(namcos86_coin_w)

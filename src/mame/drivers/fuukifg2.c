@@ -87,7 +87,7 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 	}
 }
 
-static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																		// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																		// RAM
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki16_vram_0_w) AM_BASE_MEMBER(fuuki16_state, m_vram[0])					// Layers
@@ -133,13 +133,13 @@ static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )
 	oki->set_bank_base(((data & 6) >> 1) * 0x40000);
 }
 
-static ADDRESS_MAP_START( fuuki16_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fuuki16_sound_map, AS_PROGRAM, 8, fuuki16_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM			// ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM			// RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")	// Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fuuki16_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( fuuki16_sound_io_map, AS_IO, 8, fuuki16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki16_sound_rombank_w)	// ROM Bank
 	AM_RANGE(0x11, 0x11) AM_READ(soundlatch_r) AM_WRITENOP	// From Main CPU / ? To Main CPU ?

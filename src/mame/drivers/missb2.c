@@ -156,7 +156,7 @@ static WRITE8_HANDLER( missb2_bg_bank_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(missb2_state, m_videoram, m_videoram_size)
@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff98, 0xff98) AM_WRITENOP	// ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")	// ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")	// ROM data for the background palette ram
@@ -194,7 +194,7 @@ ADDRESS_MAP_END
 
 // Looks like the original bublbobl code modified to support the OKI M6295.
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)

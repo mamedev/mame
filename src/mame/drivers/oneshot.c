@@ -105,7 +105,7 @@ static WRITE16_DEVICE_HANDLER( soundbank_w )
 
 
 
-static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x19c034, 0x19c035) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oneshot_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( oneshot_sound_map, AS_PROGRAM, 8, oneshot_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(soundlatch_r,soundlatch_w)
 	AM_RANGE(0x8001, 0x87ff) AM_RAM

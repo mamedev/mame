@@ -25,12 +25,12 @@ public:
 
 
 
-static ADDRESS_MAP_START( extrema_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( extrema_map, AS_PROGRAM, 8, extrema_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( extrema_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( extrema_portmap, AS_IO, 8, extrema_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

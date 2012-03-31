@@ -59,7 +59,7 @@ static WRITE8_HANDLER( cpu_sound_command_w )
 
 
 
-static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8, contra_state )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(contra_K007121_ctrl_0_w)
 	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("P1")
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, contra_state )
 	AM_RANGE(0x0000, 0x0000) AM_READ(soundlatch_r)
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP /* read triggers irq reset and latch read (in the hardware only). */

@@ -1276,7 +1276,7 @@ static CPU_INIT( m6803 )
 	}
 }
 
-static ADDRESS_MAP_START(m6803_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(m6803_mem, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0020, 0x007f) AM_NOP        /* unused */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM        /* 6803 internal RAM */

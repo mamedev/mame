@@ -480,7 +480,7 @@ static WRITE16_HANDLER( kickgoal_eeprom_w )
 
 /* Memory Maps *****************************************************************/
 
-static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16, kickgoal_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 /// AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE("oki", kickgoal_snd_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
@@ -504,11 +504,11 @@ ADDRESS_MAP_END
 	/* $000 - 7FF  PIC16C57 Internal Program ROM. Note: code is 12bits wide */
 	/* $000 - 07F  PIC16C57 Internal Data RAM */
 
-static ADDRESS_MAP_START( kickgoal_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kickgoal_sound_io_map, AS_IO, 8, kickgoal_state )
 	/* Unknown without the PIC dump */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( actionhw_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( actionhw_io_map, AS_IO, 8, kickgoal_state )
 	/* Unknown without the PIC dump */
 ADDRESS_MAP_END
 

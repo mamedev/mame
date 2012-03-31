@@ -710,7 +710,7 @@ static WRITE16_HANDLER( smgp_excs_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -749,7 +749,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -771,14 +771,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -793,13 +793,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( smgp_comm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( smgp_comm_map, AS_PROGRAM, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( smgp_comm_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( smgp_comm_portmap, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

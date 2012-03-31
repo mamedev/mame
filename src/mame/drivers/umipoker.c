@@ -292,7 +292,7 @@ static WRITE16_HANDLER( saiyu_counters_w )
 }
 
 
-static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16, umipoker_state )
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("nvram")
@@ -318,12 +318,12 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xe0002e, 0xe0002f) AM_WRITE(umipoker_scrolly_3_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( umipoker_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( umipoker_audio_map, AS_PROGRAM, 8, umipoker_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(z80_shared_ram_r,z80_shared_ram_w) AM_BASE_MEMBER(umipoker_state, m_z80_wram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( umipoker_audio_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( umipoker_audio_io_map, AS_IO, 8, umipoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)

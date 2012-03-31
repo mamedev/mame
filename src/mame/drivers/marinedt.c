@@ -300,7 +300,7 @@ static WRITE8_HANDLER( marinedt_pf_w )
 
 }
 
-static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8, marinedt_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4400, 0x47ff) AM_RAM				//unused, vram mirror?
@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4c00, 0x4c00) AM_WRITENOP	//?? maybe off by one error
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( marinedt_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( marinedt_io_map, AS_IO, 8, marinedt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW0")		//dips coinage
 	AM_RANGE(0x01, 0x01) AM_READ(marinedt_port1_r)	//trackball xy muxed

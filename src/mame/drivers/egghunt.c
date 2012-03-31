@@ -217,7 +217,7 @@ static WRITE8_DEVICE_HANDLER( egghunt_okibanking_w )
 	oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
 }
 
-static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_BASE_MEMBER(egghunt_state, m_atram)
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, egghunt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(egghunt_vidram_bank_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(egghunt_gfx_banking_w)
@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("oki", egghunt_okibanking_r, egghunt_okibanking_w)

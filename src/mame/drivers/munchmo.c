@@ -86,7 +86,7 @@ static READ8_DEVICE_HANDLER( munchmo_ayreset_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, m_sprite_xpos)
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* memory map provided thru schematics */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_READ(soundlatch_r)
 	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_data_w)

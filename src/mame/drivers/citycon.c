@@ -27,7 +27,7 @@ static READ8_HANDLER( citycon_irq_ack_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(citycon_videoram_w) AM_BASE_MEMBER(citycon_state, m_videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(citycon_linecolor_w) AM_BASE_MEMBER(citycon_state, m_linecolor)
@@ -42,7 +42,7 @@ static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 //  AM_RANGE(0x4002, 0x4002) AM_DEVREAD("aysnd", ay8910_r)  /* ?? */

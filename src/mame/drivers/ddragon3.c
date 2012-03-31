@@ -207,7 +207,7 @@ static WRITE16_HANDLER( ddragon3_io_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_BASE_MEMBER(ddragon3_state, m_fg_videoram) /* Foreground (32x32 Tiles - 4 by per tile) */
 	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_BASE_MEMBER(ddragon3_state, m_bg_videoram) /* Background (32x32 Tiles - 2 by per tile) */
@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_BASE_MEMBER(ddragon3_state, m_fg_videoram) /* Foreground (32x32 Tiles - 4 by per tile) */
 	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_BASE_MEMBER(ddragon3_state, m_spriteram)
@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_BASE_MEMBER(ddragon3_state, m_fg_videoram) /* Foreground (32x32 Tiles - 4 by per tile) */
 	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_BASE_MEMBER(ddragon3_state, m_spriteram)
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ddragon3_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2151", ym2151_r, ym2151_w)
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("oki", oki_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ctribe_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ctribe_sound_map, AS_PROGRAM, 8, ddragon3_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ym2151", ym2151_status_port_r, ym2151_w)

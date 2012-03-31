@@ -126,7 +126,7 @@ static WRITE8_HANDLER( tp84_sh_irqtrigger_w )
 
 
 
-static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("SYSTEM") AM_WRITEONLY AM_BASE_MEMBER(tp84_state, m_palette_bank)
 	AM_RANGE(0x2820, 0x2820) AM_READ_PORT("P1")
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(tp84_state, m_bg_videoram)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM AM_BASE_MEMBER(tp84_state, m_fg_videoram)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_BASE_MEMBER(tp84_state, m_bg_colorram)
@@ -177,7 +177,7 @@ static WRITE8_HANDLER( sub_irq_mask_w )
 }
 
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, tp84_state )
 //  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
 	AM_RANGE(0x2000, 0x2000) AM_READ(tp84_scanline_r) /* beam position */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irq_mask_w)
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)

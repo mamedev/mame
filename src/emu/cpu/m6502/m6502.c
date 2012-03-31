@@ -399,7 +399,7 @@ static WRITE8_HANDLER( m6510_write_0000 )
 	cpustate->out_port_func(cpustate->ddr, cpustate->port & cpustate->ddr);
 }
 
-static ADDRESS_MAP_START(m6510_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(m6510_mem, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(m6510_read_0000, m6510_write_0000)
 ADDRESS_MAP_END
 

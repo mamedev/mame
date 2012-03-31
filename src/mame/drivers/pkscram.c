@@ -94,7 +94,7 @@ static WRITE16_HANDLER( pkscramble_output_w )
 	coin_counter_w(space->machine(), 0, data & 0x80);
 }
 
-static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16, pkscram_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x0400ff) AM_RAM AM_SHARE("nvram")

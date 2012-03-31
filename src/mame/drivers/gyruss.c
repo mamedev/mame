@@ -158,7 +158,7 @@ static WRITE8_HANDLER( slave_irq_mask_w )
 	state->m_slave_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_MEMBER(gyruss_state, m_colorram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE_MEMBER(gyruss_state, m_videoram)
@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc185, 0xc185) AM_WRITEONLY AM_BASE_MEMBER(gyruss_state, m_flipscreen)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x0000) AM_READ(gyruss_scanline_r)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(slave_irq_mask_w)
 	AM_RANGE(0x4000, 0x403f) AM_RAM
@@ -184,13 +184,13 @@ static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_r)
@@ -211,11 +211,11 @@ static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8 )
 	AM_RANGE(0x18, 0x18) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_cpu2_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_cpu2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( audio_cpu2_io_map, AS_IO, 8, gyruss_state )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("discrete", gyruss_dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(gyruss_irq_clear_w)

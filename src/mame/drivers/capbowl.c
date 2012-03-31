@@ -229,7 +229,7 @@ void capbowl_state::init_nvram(nvram_device &nvram, void *base, size_t size)
  *
  *************************************/
 
-static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE_MEMBER(capbowl_state, m_rowaddress)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(capbowl_rom_select_w)
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( capbowl_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bowlrama_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bowlrama_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(bowlrama_blitter_r, bowlrama_blitter_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY AM_BASE_MEMBER(capbowl_state, m_rowaddress)
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("nvram")
@@ -263,7 +263,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, capbowl_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP				/* Not hooked up according to the schematics */

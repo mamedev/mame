@@ -102,7 +102,7 @@ static WRITE16_HANDLER( mahjong_panel_w )
 	state->m_mux_data = data;
 }
 
-static ADDRESS_MAP_START( goodejan_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( goodejan_map, AS_PROGRAM, 16, goodejan_state )
 	AM_RANGE(0x00000, 0x0afff) AM_RAM
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(seibucrtc_sc3vram_w) AM_BASE(&seibucrtc_sc3vram)
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( goodejan_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /*totmejan CRT is at 8000-804f,goodejan is at 8040-807f(808f but not tested)*/
-static ADDRESS_MAP_START( common_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( common_io_map, AS_IO, 16, goodejan_state )
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(goodejan_gfxbank_w)
 	AM_RANGE(0xb000, 0xb003) AM_WRITENOP
 	AM_RANGE(0xb004, 0xb005) AM_WRITE(mahjong_panel_w)
@@ -126,12 +126,12 @@ static ADDRESS_MAP_START( common_io_map, AS_IO, 16 )
 	AM_RANGE(0xd000, 0xd00f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( totmejan_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( totmejan_io_map, AS_IO, 16, goodejan_state )
 	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)
 	AM_IMPORT_FROM(common_io_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( goodejan_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( goodejan_io_map, AS_IO, 16, goodejan_state )
 	AM_RANGE(0x8040, 0x807f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)
 	AM_IMPORT_FROM(common_io_map)
 ADDRESS_MAP_END

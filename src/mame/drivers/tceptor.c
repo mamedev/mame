@@ -163,7 +163,7 @@ static READ8_HANDLER( readFF )
 
 /*******************************************************************/
 
-static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tceptor_tile_ram_w) AM_BASE_MEMBER(tceptor_state, m_tile_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_BASE_MEMBER(tceptor_state, m_tile_attr)
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m6502_a_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m6502_a_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAM
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( m6502_a_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("dac", voice_w)			// voice data
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, tceptor_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM			// M68K ERROR 1
 	AM_RANGE(0x100000, 0x10ffff) AM_ROM			// not sure
 	AM_RANGE(0x200000, 0x203fff) AM_RAM			// M68K ERROR 0
@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w)
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, tceptor_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(readFF) AM_WRITENOP
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF) AM_WRITENOP
 ADDRESS_MAP_END

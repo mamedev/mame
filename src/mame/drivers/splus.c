@@ -581,11 +581,11 @@ static DRIVER_INIT( splus )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( splus_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( splus_map, AS_PROGRAM, 8, splus_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE_MEMBER(splus_state, m_program_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( splus_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
 	// Serial I/O
     AM_RANGE(0x0000, 0x0000) AM_READ(splus_serial_r) AM_WRITE(splus_serial_w)
 

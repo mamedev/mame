@@ -114,7 +114,7 @@ static READ16_HANDLER(irq_ack_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( tapatune_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tapatune_map, AS_PROGRAM, 16, tapatune_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM // program rom and graphics roms
 	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_BASE_MEMBER(tapatune_state, m_videoram) // hardware video buffer
 	AM_RANGE(0x320000, 0x327fff) AM_RAM // workram
@@ -209,13 +209,13 @@ static WRITE8_HANDLER(bsmt_reg_w)
 	bsmt->write_data(state->m_bsmt_data);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tapatune_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START ( sound_io_map, AS_IO, 8)
+static ADDRESS_MAP_START ( sound_io_map, AS_IO, 8, tapatune_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(bsmt_data_lo_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(bsmt_data_hi_w)

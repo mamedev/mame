@@ -60,7 +60,7 @@ static READ16_HANDLER(io_r)
 	return retval;
 }
 
-static ADDRESS_MAP_START( parentj_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( parentj_map, AS_PROGRAM, 16, taitoo_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM
 	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(io_r, io_w) /* TC0220IOC ? */

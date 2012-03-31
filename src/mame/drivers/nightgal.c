@@ -464,7 +464,7 @@ static READ8_DEVICE_HANDLER( input_2p_r )
 * Night Gal
 ********************************/
 #ifdef UNUSED_CODE
-static ADDRESS_MAP_START( nightgal_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nightgal_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc100, 0xc100) AM_READ(nsc_latch_r)
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(nsc_latch_w)
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( nightgal_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nightgal_io, AS_IO, 8 )
+static ADDRESS_MAP_START( nightgal_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -485,7 +485,7 @@ static ADDRESS_MAP_START( nightgal_io, AS_IO, 8 )
 	AM_RANGE(0x12,0x14) AM_WRITE(blitter_w) //data for the nsc to be processed
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
 	AM_RANGE(0x0081, 0x0083) AM_READ(nsc_blit_r)
@@ -505,14 +505,14 @@ ADDRESS_MAP_END
 * Sexy Gal
 ********************************/
 
-static ADDRESS_MAP_START( sexygal_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sexygal_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM //???
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_BASE_MEMBER(nightgal_state,m_comms_ram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sexygal_io, AS_IO, 8 )
+static ADDRESS_MAP_START( sexygal_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 //  AM_RANGE(0x10,0x10) AM_WRITE(output_w)
@@ -523,7 +523,7 @@ static ADDRESS_MAP_START( sexygal_io, AS_IO, 8 )
 	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE(royalqn_blitter_2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
@@ -540,14 +540,14 @@ ADDRESS_MAP_END
 * Royal Queen
 ********************************/
 
-static ADDRESS_MAP_START( royalqn_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( royalqn_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_BASE_MEMBER(nightgal_state,m_comms_ram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( royalqn_io, AS_IO, 8 )
+static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_MIRROR(0xec) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02,0x03) AM_MIRROR(0xec) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -561,7 +561,7 @@ static ADDRESS_MAP_START( royalqn_io, AS_IO, 8 )
 	AM_RANGE(0x17,0x17) AM_MIRROR(0xe8) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
 	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)

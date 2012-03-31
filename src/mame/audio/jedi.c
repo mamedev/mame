@@ -173,7 +173,7 @@ static WRITE8_HANDLER( speech_reset_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x0810, 0x081f) AM_MIRROR(0x07c0) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)

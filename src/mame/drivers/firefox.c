@@ -488,7 +488,7 @@ static MACHINE_START( firefox )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, firefox_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(tileram_w) AM_BASE_MEMBER(firefox_state, m_tileram)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_MEMBER(firefox_state, m_spriteram)
@@ -534,7 +534,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, firefox_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0700) AM_RAM /* RIOT ram */
 	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x07e0) AM_DEVREADWRITE("riot",riot6532_r, riot6532_w)

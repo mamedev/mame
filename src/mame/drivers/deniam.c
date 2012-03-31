@@ -78,7 +78,7 @@ static WRITE16_HANDLER( deniam_irq_ack_w )
 	cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, m_videoram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, m_textram)
@@ -95,12 +95,12 @@ static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deniam_state )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, deniam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ymsnd", ym3812_w)
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 /* identical to 16b, but handles sound directly */
-static ADDRESS_MAP_START( deniam16c_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( deniam16c_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, m_videoram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, m_textram)

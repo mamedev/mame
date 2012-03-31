@@ -166,7 +166,7 @@ static WRITE16_HANDLER( cninja_pf34_control_w )
 }
 
 
-static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(cninja_pf12_control_w)
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( cninja_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x308000, 0x308fff) AM_WRITENOP /* Bootleg only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cninjabl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cninjabl_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
 	AM_RANGE(0x138000, 0x1387ff) AM_RAM AM_SHARE("spriteram") /* bootleg sprite-ram (sprites rewritten here in new format) */
@@ -223,7 +223,7 @@ static ADDRESS_MAP_START( cninjabl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1b4000, 0x1b4001) AM_DEVWRITE_MODERN("spriteram", buffered_spriteram16_device, write) /* DMA flag */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( edrandy_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( edrandy_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(cninja_pf12_control_w)
@@ -251,7 +251,7 @@ static ADDRESS_MAP_START( edrandy_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( robocop2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( robocop2_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(cninja_pf12_control_w)
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( robocop2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1f8000, 0x1f8001) AM_READ_PORT("DSW3") /* Dipswitch #3 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mutantf_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mutantf_map, AS_PROGRAM, 16, cninja_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
@@ -307,7 +307,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r, ym2151_w)
@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map_mutantf, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map_mutantf, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READNOP AM_WRITENOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( sound_map_mutantf, AS_PROGRAM, 8 )
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stoneage_s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( stoneage_s_map, AS_PROGRAM, 8, cninja_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

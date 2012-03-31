@@ -25,7 +25,7 @@ UINT32 st0016_rom_bank;
  *
  *************************************/
 
-static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, st0016_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
@@ -76,7 +76,7 @@ WRITE8_HANDLER(st0016_rom_bank_w)
 	st0016_rom_bank=data;
 }
 
-static ADDRESS_MAP_START( st0016_io, AS_IO, 8 )
+static ADDRESS_MAP_START( st0016_io, AS_IO, 8, st0016_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P1") AM_WRITE(mux_select_w)
@@ -132,7 +132,7 @@ static WRITE8_HANDLER(latch8_w)
 	space->machine().scheduler().synchronize();
 }
 
-static ADDRESS_MAP_START( v810_mem,AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( v810_mem,AS_PROGRAM, 32, st0016_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM
 	AM_RANGE(0xc0000000, 0xc001ffff) AM_RAM
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( v810_mem,AS_PROGRAM, 32 )
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( st0016_m2_io, AS_IO, 8 )
+static ADDRESS_MAP_START( st0016_m2_io, AS_IO, 8, st0016_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	AM_RANGE(0xc0, 0xc3) AM_READ(latch8_r) AM_WRITE(latch8_w)

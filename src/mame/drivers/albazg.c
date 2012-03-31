@@ -227,7 +227,7 @@ static I8255A_INTERFACE( ppi8255_intf )
 
 /***************************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
@@ -240,7 +240,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map, AS_IO, 8, albazg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)

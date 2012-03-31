@@ -114,7 +114,7 @@ static READ16_HANDLER( sengokmj_system_r )
 	return (input_port_read(space->machine(), "SYSTEM") & 0xffbf) | state->m_hopper_io;
 }
 
-static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sengokmj_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( sengokmj_io_map, AS_IO, 16, sengokmj_state )
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	/*Areas from 8000-804f are for the custom Seibu CRTC.*/
 	AM_RANGE(0x8000, 0x804f) AM_RAM_WRITE(seibucrtc_vregs_w) AM_BASE(&seibucrtc_vregs)

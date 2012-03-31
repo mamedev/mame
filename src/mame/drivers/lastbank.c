@@ -30,7 +30,7 @@ static SCREEN_UPDATE_IND16( lastbank )
 	return 0;
 }
 
-static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* TODO: ROM banks! */
 
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastbank_io, AS_IO, 8 )
+static ADDRESS_MAP_START( lastbank_io, AS_IO, 8, lastbank_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 ADDRESS_MAP_END

@@ -340,11 +340,11 @@ static MACHINE_RESET( ssv )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dsp_prg_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dsp_prg_map, AS_PROGRAM, 32, ssv_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("dspprg", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_data_map, AS_DATA, 16 )
+static ADDRESS_MAP_START( dsp_data_map, AS_DATA, 16, ssv_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspdata", 0)
 ADDRESS_MAP_END
 
@@ -441,7 +441,7 @@ static READ16_HANDLER( drifto94_rand_r )
 	return space->machine().rand() & 0xffff;
 }
 
-static ADDRESS_MAP_START( drifto94_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drifto94_map, AS_PROGRAM, 16, ssv_state )
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY										// ?
 	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
@@ -587,7 +587,7 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 	}
 }
 
-static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(gdfs_tmapram_w) AM_BASE_MEMBER(ssv_state, m_gdfs_tmapram)
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM
 	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_BASE_MEMBER(ssv_state, m_gdfs_tmapscroll)
@@ -626,7 +626,7 @@ static READ16_HANDLER( hypreact_input_r )
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( hypreact_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hypreact_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)			// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                      // ? 5 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)			// Inverted lockout lines
@@ -642,7 +642,7 @@ ADDRESS_MAP_END
                                 Hyper Reaction 2
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hypreac2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hypreac2_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)				// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 5 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)				// Inverted lockout lines
@@ -661,7 +661,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( srmp4_input_r );
 
-static ADDRESS_MAP_START( janjans1_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( janjans1_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_WRITENOP							// koikois2 but not janjans1
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
 	AM_RANGE(0x210006, 0x210007) AM_READNOP
@@ -675,7 +675,7 @@ ADDRESS_MAP_END
                                 Keith & Lucy
 ***************************************************************************/
 
-static ADDRESS_MAP_START( keithlcy_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( keithlcy_map, AS_PROGRAM, 16, ssv_state )
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP  // ? 1 at the start
 	AM_RANGE(0x210010, 0x210011) AM_WRITENOP	//
 	AM_RANGE(0x21000e, 0x21000f) AM_READNOP	//
@@ -688,7 +688,7 @@ ADDRESS_MAP_END
                                 Meosis Magic
 ***************************************************************************/
 
-static ADDRESS_MAP_START( meosism_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( meosism_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r	)							// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 5 at the start
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                                       // ? read once, value not used
@@ -717,7 +717,7 @@ static WRITE16_HANDLER( ssv_mainram_w )
 	COMBINE_DATA(&state->m_mainram[offset]);
 }
 
-static ADDRESS_MAP_START( mslider_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mslider_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x01ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w)	// RAM Mirror
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY							// ?
@@ -730,7 +730,7 @@ ADDRESS_MAP_END
                     Gourmet Battle Quiz Ryohrioh CooKing
 ***************************************************************************/
 
-static ADDRESS_MAP_START( ryorioh_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ryorioh_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(watchdog_reset16_w)	// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 1 at the start
 	SSV_MAP( 0xc00000 )
@@ -754,7 +754,7 @@ static READ16_HANDLER( srmp4_input_r )
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( srmp4_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( srmp4_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)				// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1,5 at the start
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ(srmp4_input_r)						// Inputs
@@ -803,7 +803,7 @@ static READ16_HANDLER( srmp7_input_r )
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( srmp7_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( srmp7_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x050faf) AM_RAM										// More RAM
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)				// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 0,4 at the start
@@ -821,7 +821,7 @@ ADDRESS_MAP_END
                                 Survival Arts
 ***************************************************************************/
 
-static ADDRESS_MAP_START( survarts_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( survarts_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)	// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 0,4 at the start
 //  AM_RANGE(0x290000, 0x290001) AM_READNOP               // ?
@@ -873,7 +873,7 @@ static WRITE16_HANDLER( sxyreact_motor_w )
 //  popmessage("%04X",data);   // 8 = motor on; 0 = motor off
 }
 
-static ADDRESS_MAP_START( sxyreact_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sxyreact_map, AS_PROGRAM, 16, ssv_state )
 //  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w)             // sxyreac2 reads / writes here, why?
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)							// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
@@ -892,7 +892,7 @@ ADDRESS_MAP_END
 
 /* comes as either a standalone board or a standard SSV rom board (verified) */
 
-static ADDRESS_MAP_START( twineag2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( twineag2_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x03ffff) AM_RAM							// More RAM
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)	// Watchdog (also value is cmp.b with mem 8)
 	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
@@ -907,7 +907,7 @@ ADDRESS_MAP_END
 
 /* standalone board based on SSV hardware */
 
-static ADDRESS_MAP_START( ultrax_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ultrax_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x03ffff) AM_RAM							// More RAM
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)	// Watchdog (also value is cmp.b with memory address 8)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 2,6 at the start
@@ -958,7 +958,7 @@ static WRITE16_HANDLER(latch16_w)
 	space->machine().scheduler().synchronize();
 }
 
-static ADDRESS_MAP_START( jsk_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jsk_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x050000, 0x05ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w)	// RAM Mirror?
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(watchdog_reset16_w)				// Watchdog
 	AM_RANGE(0x400000, 0x47ffff) AM_RAM										// RAM?
@@ -967,7 +967,7 @@ static ADDRESS_MAP_START( jsk_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jsk_v810_mem, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( jsk_v810_mem, AS_PROGRAM, 32, ssv_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM
 	AM_RANGE(0xc0000000, 0xc001ffff) AM_RAM
@@ -1047,7 +1047,7 @@ static WRITE16_HANDLER( eaglshot_gfxram_w )
 }
 
 
-static ADDRESS_MAP_START( eaglshot_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( eaglshot_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(eaglshot_gfxram_r, eaglshot_gfxram_w)
 	AM_RANGE(0x210000, 0x210001) AM_READNOP /*AM_READ(watchdog_reset16_r)*/					// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start

@@ -152,7 +152,7 @@ static WRITE8_HANDLER( bwp2_ctrl_w )
 // CPU Memory Maps
 
 // Main CPU
-static ADDRESS_MAP_START( bwp1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bwp1_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x1b00, 0x1b07) AM_READ(bwp1_io_r)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE_MEMBER(bwing_state, m_bwp1_sharedram1)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
@@ -168,7 +168,7 @@ ADDRESS_MAP_END
 
 
 // Sub CPU
-static ADDRESS_MAP_START( bwp2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bwp2_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE_MEMBER(bwing_state, m_bwp2_sharedram1)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1803) AM_WRITE(bwp2_ctrl_w)
@@ -177,7 +177,7 @@ ADDRESS_MAP_END
 
 
 // Sound CPU
-static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x0200) AM_DEVWRITE("dac", dac_signed_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(bwp3_nmiack_w)
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bwp3_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bwp3_io_map, AS_IO, 8, bwing_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("VBLANK") AM_WRITE(bwp3_u8F_w)
 ADDRESS_MAP_END
 

@@ -289,7 +289,7 @@ static WRITE8_HANDLER( boxer_led_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8, boxer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_BASE_MEMBER(boxer_state, m_tile_ram)

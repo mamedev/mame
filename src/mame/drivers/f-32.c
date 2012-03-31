@@ -52,7 +52,7 @@ static SCREEN_UPDATE_IND16( mosaicf2 )
 
 
 
-static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32, mosaicf2_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE_MEMBER(mosaicf2_state, m_videoram)
 	AM_RANGE(0x80000000, 0x80ffffff) AM_ROM AM_REGION("user2",0)
@@ -71,7 +71,7 @@ static READ32_HANDLER( f32_input_port_1_r )
 }
 
 
-static ADDRESS_MAP_START( mosaicf2_io, AS_IO, 32 )
+static ADDRESS_MAP_START( mosaicf2_io, AS_IO, 32, mosaicf2_state )
 	AM_RANGE(0x4000, 0x4003) AM_DEVREAD8_MODERN("oki", okim6295_device, read, 0x000000ff)
 	AM_RANGE(0x4810, 0x4813) AM_DEVREAD8("ymsnd", ym2151_status_port_r, 0x000000ff)
 	AM_RANGE(0x5000, 0x5003) AM_READ_PORT("P1")

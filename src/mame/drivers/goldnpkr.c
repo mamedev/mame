@@ -1338,7 +1338,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 *           Memory Map Information           *
 *********************************************/
 
-static ADDRESS_MAP_START( goldnpkr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( goldnpkr_map, AS_PROGRAM, 8, goldnpkr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
@@ -1350,7 +1350,7 @@ static ADDRESS_MAP_START( goldnpkr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x7fff) AM_ROM /* superdbl uses 0x2000..0x3fff address space */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pottnpkr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pottnpkr_map, AS_PROGRAM, 8, goldnpkr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
@@ -1362,7 +1362,7 @@ static ADDRESS_MAP_START( pottnpkr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( witchcrd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( witchcrd_map, AS_PROGRAM, 8, goldnpkr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
@@ -1389,7 +1389,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( witchcrd_falcon_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( witchcrd_falcon_map, AS_PROGRAM, 8, goldnpkr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
@@ -1402,7 +1402,7 @@ static ADDRESS_MAP_START( witchcrd_falcon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wildcard_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wildcard_map, AS_PROGRAM, 8, goldnpkr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
@@ -1424,7 +1424,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( wcrdxtnd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wcrdxtnd_map, AS_PROGRAM, 8, goldnpkr_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram") /* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
@@ -1444,7 +1444,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( wildcrdb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wildcrdb_map, AS_PROGRAM, 8, goldnpkr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
@@ -1458,13 +1458,13 @@ static ADDRESS_MAP_START( wildcrdb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wildcrdb_mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wildcrdb_mcu_map, AS_PROGRAM, 8, goldnpkr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x2fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wildcrdb_mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( wildcrdb_mcu_io_map, AS_IO, 8, goldnpkr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -1477,7 +1477,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( genie_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( genie_map, AS_PROGRAM, 8, goldnpkr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)

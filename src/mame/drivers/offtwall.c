@@ -276,7 +276,7 @@ static READ16_HANDLER( unknown_verify_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, offtwall_state )
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
 	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("maincpu", 0x38000) AM_BASE_MEMBER(offtwall_state, m_bankrom_base)
 	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")

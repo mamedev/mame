@@ -797,7 +797,7 @@ static const tms36xx_interface monsterb_tms3617_interface =
  *
  *************************************/
 
-static ADDRESS_MAP_START( monsterb_7751_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( monsterb_7751_portmap, AS_IO, 8, driver_device )
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)

@@ -145,7 +145,7 @@ static READ32_HANDLER( nexus3d_unk_r )
 //
 //}
 
-static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32, nexus3d_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(nexus3d_state, m_mainram)
 
 	AM_RANGE(0x00400000, 0x01ffffff) AM_RAM // ?? uploads various data, + pointers to data in the 0x01ffxxxx range, might be video system related

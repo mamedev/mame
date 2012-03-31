@@ -45,7 +45,7 @@ static PALETTE_INIT( subs )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, subs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("discrete", subs_noise_reset_w)
 	AM_RANGE(0x0000, 0x0007) AM_READ(subs_control_r)

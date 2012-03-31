@@ -544,7 +544,7 @@ static READ32_HANDLER(randomized_r)
 	return space->machine().rand();
 }
 
-static ADDRESS_MAP_START( ssfindo_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( ssfindo_map, AS_PROGRAM, 32, ssfindo_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
 	AM_RANGE(0x03012e60, 0x03012e67) AM_NOP
@@ -562,7 +562,7 @@ static ADDRESS_MAP_START( ssfindo_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x10000000, 0x11ffffff) AM_RAM AM_BASE_MEMBER(ssfindo_state, m_vram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppcar_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( ppcar_map, AS_PROGRAM, 32, ssfindo_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
 	AM_RANGE(0x03012b00, 0x03012bff) AM_READ(randomized_r) AM_WRITENOP
@@ -588,7 +588,7 @@ static WRITE32_HANDLER(tetfight_unk_w)
 	//sound latch ?
 }
 
-static ADDRESS_MAP_START( tetfight_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( tetfight_map, AS_PROGRAM, 32, ssfindo_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x03200000, 0x032001ff) AM_READWRITE(PS7500_IO_r,PS7500_IO_w)
 	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(FIFO_w)

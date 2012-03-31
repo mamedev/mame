@@ -243,7 +243,7 @@ static READ8_HANDLER( vblank_r )
 	return input_port_read(space->machine(), "IN0");
 }
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE_MEMBER(exprraid_state, m_main_ram)
 	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_SIZE_MEMBER(exprraid_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_BASE_MEMBER(exprraid_state, m_videoram)
@@ -266,11 +266,11 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( master_io_map, AS_IO, 8, exprraid_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_r, ym3526_w)

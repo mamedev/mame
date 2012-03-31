@@ -179,14 +179,14 @@ static CUSTOM_INPUT( wolfman_replay_hs_r )
 }
 
 
-static ADDRESS_MAP_START( peyper_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( peyper_map, AS_PROGRAM, 8, peyper_state )
 //  AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5FFF) AM_ROM
 	AM_RANGE(0x6000, 0x67FF) AM_RAM //AM_BASE_GENERIC(nvram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( peyper_io, AS_IO, 8 )
+static ADDRESS_MAP_START( peyper_io, AS_IO, 8, peyper_state )
 //  AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)

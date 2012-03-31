@@ -172,7 +172,7 @@ static READ16_HANDLER ( mugsmash_input_ports_r )
 }
 #endif
 
-static ADDRESS_MAP_START( mugsmash_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mugsmash_map, AS_PROGRAM, 16, mugsmash_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_BASE_MEMBER(mugsmash_state, m_videoram1)
 	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_BASE_MEMBER(mugsmash_state, m_videoram2)
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( mugsmash_map, AS_PROGRAM, 16 )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mugsmash_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mugsmash_sound_map, AS_PROGRAM, 8, mugsmash_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)

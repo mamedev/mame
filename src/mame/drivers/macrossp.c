@@ -402,7 +402,7 @@ static WRITE32_HANDLER( macrossp_palette_fade_w )
 
 /*** MEMORY MAPS *************************************************************/
 
-static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_BASE_SIZE_MEMBER(macrossp_state, m_spriteram, m_spriteram_size)
 	/* SCR A Layer */
@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32 )
 //  AM_RANGE(0xfe0000, 0xfe0003) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( macrossp_sound_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( macrossp_sound_map, AS_PROGRAM, 16, macrossp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM
 	AM_RANGE(0x400000, 0x40007f) AM_DEVREADWRITE8("ensoniq", es5506_r, es5506_w, 0x00ff)

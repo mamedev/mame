@@ -160,7 +160,7 @@ static READ8_HANDLER( debug_r )
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( nsmpoker_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nsmpoker_map, AS_PROGRAM, 8, nsmpoker_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0xafff) AM_RAM	// OK... cleared at beginning.
 	AM_RANGE(0xb000, 0xcfff) AM_ROM	// WRONG... just to map the last rom somewhere.
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( nsmpoker_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(nsmpoker_colorram_w) AM_BASE_MEMBER(nsmpoker_state, m_colorram) // WRONG... just a placeholder.
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nsmpoker_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( nsmpoker_portmap, AS_IO, 8, nsmpoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_READ(debug_r)	// kind of trap at beginning
 ADDRESS_MAP_END

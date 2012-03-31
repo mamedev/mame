@@ -72,7 +72,7 @@ static WRITE8_HANDLER( skyraid_scroll_w )
 }
 
 
-static ADDRESS_MAP_START( skyraid_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( skyraid_map, AS_PROGRAM, 8, skyraid_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x300)
 	AM_RANGE(0x0400, 0x040f) AM_WRITEONLY AM_BASE_MEMBER(skyraid_state, m_pos_ram)
 	AM_RANGE(0x0800, 0x087f) AM_RAM AM_MIRROR(0x480) AM_BASE_MEMBER(skyraid_state, m_alpha_num_ram)

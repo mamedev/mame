@@ -494,7 +494,7 @@ void adder2_decode_char_roms(running_machine &machine)
 // adder2 board memorymap /////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-ADDRESS_MAP_START( adder2_memmap, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( adder2_memmap, AS_PROGRAM, 8, driver_device )
 
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(adder2_screen_page_w)		// screen access/display select
 	AM_RANGE(0x0000, 0x7FFF) AM_ROMBANK("bank2")				// 8k  paged ROM (4 pages)

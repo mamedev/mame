@@ -2118,7 +2118,7 @@ static DRIVER_INIT( nkishusp )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( drgnwrld, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drgnwrld, AS_PROGRAM, 16, igs011_state )
 //  drgnwrld: IGS011 protection dynamically mapped at 1dd7x
 //  AM_RANGE( 0x01dd70, 0x01dd77 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x01dd78, 0x01dd79 ) AM_READ ( igs011_prot1_r )
@@ -2152,7 +2152,7 @@ static ADDRESS_MAP_START( drgnwrld, AS_PROGRAM, 16 )
 	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ( igs_3_dips_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnwrld_igs012, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drgnwrld_igs012, AS_PROGRAM, 16, igs011_state )
 	// IGS012
 	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE( igs012_prot_swap_w		)	AM_MIRROR(0x01c000)	// swap (a5 / 55)
 	AM_RANGE( 0x001610, 0x00161f ) AM_READ ( igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 0)
@@ -2197,7 +2197,7 @@ static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
 //  popmessage("oki %04x",data);
 }
 
-static ADDRESS_MAP_START( lhb, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( lhb, AS_PROGRAM, 16, igs011_state )
 //  lhb: IGS011 protection dynamically mapped at 834x
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
@@ -2237,7 +2237,7 @@ static ADDRESS_MAP_START( lhb, AS_PROGRAM, 16 )
 	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_5_dips_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16, igs011_state )
 //  xymg: IGS011 protection dynamically mapped at 834x
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
@@ -2276,7 +2276,7 @@ static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16 )
 	AM_RANGE( 0x888000, 0x888001 ) AM_READ( igs_3_dips_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wlcc, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wlcc, AS_PROGRAM, 16, igs011_state )
 //  wlcc: IGS011 protection dynamically mapped at 834x
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
@@ -2315,7 +2315,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( lhb2, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( lhb2, AS_PROGRAM, 16, igs011_state )
 //  lhb2: IGS011 protection dynamically mapped at 1ff8x
 //  AM_RANGE( 0x01ff80, 0x01ff87 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
@@ -2416,7 +2416,7 @@ static WRITE16_HANDLER( vbowl_link_1_w )	{ }
 static WRITE16_HANDLER( vbowl_link_2_w )	{ }
 static WRITE16_HANDLER( vbowl_link_3_w )	{ }
 
-static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16, igs011_state )
 //  vbowl: IGS011 protection dynamically mapped at 834x
 //  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE( igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )

@@ -391,7 +391,7 @@ static WRITE16_HANDLER( irq_lv2_ack_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x0603ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x060400, 0x063fff) AM_RAM
@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv1_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
 //  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(kozure_io_w)
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16 )
 	AM_IMPORT_FROM( terraf_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
@@ -444,7 +444,7 @@ static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
@@ -477,7 +477,7 @@ static WRITE8_HANDLER( legiono_fg_scroll_w )
 	state->m_fg_scrolly = (state->m_legion_cmd[0x00] & 0xff) | ((state->m_legion_cmd[0x01] & 0x3) << 8);
 }
 
-static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x040000, 0x04003f) AM_WRITE8(legiono_fg_scroll_w,0x00ff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
@@ -500,7 +500,7 @@ static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x065fff) AM_RAM
@@ -677,7 +677,7 @@ static READ16_HANDLER(sharedram_r)
 	return state->m_sharedram[offset];
 }
 
-static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x080600, 0x083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(bigfghtr_state, m_sharedram)
@@ -703,12 +703,12 @@ static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_READ(latch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, armedf_state )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cclimbr2_soundmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cclimbr2_soundmap, AS_PROGRAM, 8, armedf_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -751,20 +751,20 @@ static WRITE8_HANDLER( fg_scroll_msb_w )
 }
 
 
-static ADDRESS_MAP_START( terrafb_extraz80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( terrafb_extraz80_map, AS_PROGRAM, 8, armedf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(blitter_txram_r,blitter_txram_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( terrafb_extraz80_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( terrafb_extraz80_portmap, AS_IO, 8, armedf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x00) AM_WRITE(fg_scrollx_w)
 	AM_RANGE(0x01,0x01) AM_WRITE(fg_scrolly_w)
 	AM_RANGE(0x02,0x02) AM_WRITE(fg_scroll_msb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0, 0x1) AM_DEVWRITE("ymsnd", ym3812_w)
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE("dac1", dac_signed_w)

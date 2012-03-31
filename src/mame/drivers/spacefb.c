@@ -197,7 +197,7 @@ static MACHINE_RESET( spacefb )
  *
  *************************************/
 
-static ADDRESS_MAP_START( spacefb_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spacefb_main_map, AS_PROGRAM, 8, spacefb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM AM_BASE_MEMBER(spacefb_state, m_videoram) AM_SIZE_MEMBER(spacefb_state, m_videoram_size)
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( spacefb_main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spacefb_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spacefb_audio_map, AS_PROGRAM, 8, spacefb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
@@ -219,7 +219,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( spacefb_main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( spacefb_main_io_map, AS_IO, 8, spacefb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -234,7 +234,7 @@ static ADDRESS_MAP_START( spacefb_main_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spacefb_audio_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( spacefb_audio_io_map, AS_IO, 8, spacefb_state )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(spacefb_audio_p2_r)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(spacefb_audio_t0_r)

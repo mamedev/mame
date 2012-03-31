@@ -450,7 +450,7 @@ static WRITE16_HANDLER(ac_unk2_w)
 		popmessage("UNK-2 enabled %04x",data);
 }
 
-static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x082000, 0x082005) AM_WRITE(ac_bgscroll_w)
 	AM_RANGE(0x082100, 0x082105) AM_WRITE(ac_txscroll_w)

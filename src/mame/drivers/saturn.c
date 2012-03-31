@@ -749,7 +749,7 @@ static READ8_HANDLER( saturn_cart_type_r )
 	return cart_ram_header[state->m_cart_type];
 }
 
-static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(saturn_SMPC_r, saturn_SMPC_w,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r, saturn_backupram_w,0xffffffff) AM_SHARE("share1")
@@ -779,7 +779,7 @@ static ADDRESS_MAP_START( saturn_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM, Dragon Ball Z sprites needs this
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32, saturn_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_SHARE("share6")  // bios
 	AM_RANGE(0x00100000, 0x0010007f) AM_READWRITE8(stv_SMPC_r, stv_SMPC_w,0xffffffff)
 	AM_RANGE(0x00180000, 0x0018ffff) AM_READWRITE8(saturn_backupram_r,saturn_backupram_w,0xffffffff) AM_SHARE("share1")
@@ -806,7 +806,7 @@ static ADDRESS_MAP_START( stv_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0xc0000000, 0xc00007ff) AM_RAM // cache RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 16, saturn_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE_MEMBER(saturn_state,m_sound_ram)
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp", scsp_r, scsp_w)
 ADDRESS_MAP_END

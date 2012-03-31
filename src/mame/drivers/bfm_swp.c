@@ -138,7 +138,7 @@ public:
 
 
 
-static ADDRESS_MAP_START( bfm_swp_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( bfm_swp_map, AS_PROGRAM, 32, bfm_swp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xb00000, 0xb03fff) AM_RAM
 ADDRESS_MAP_END

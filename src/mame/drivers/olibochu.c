@@ -244,7 +244,7 @@ static WRITE8_HANDLER( sound_command_w )
 }
 
 
-static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(olibochu_videoram_w) AM_BASE_MEMBER(olibochu_state, m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(olibochu_colorram_w) AM_BASE_MEMBER(olibochu_state, m_colorram)
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( olibochu_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( olibochu_sound_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_r)	/* likely ay8910 input port, not direct */

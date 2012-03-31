@@ -684,7 +684,7 @@ static WRITE32_HANDLER( skns_v3t_w )
 	btiles[offset*4+3] = (data & 0x000000ff) >> 0;
 }
 
-static ADDRESS_MAP_START( skns_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( skns_map, AS_PROGRAM, 32, skns_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM /* BIOS ROM */
 	AM_RANGE(0x00400000, 0x0040000f) AM_WRITE(skns_io_w) /* I/O Write */
 	AM_RANGE(0x00400000, 0x00400003) AM_READ_PORT("400000")

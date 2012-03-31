@@ -668,7 +668,7 @@ DRIVER_INIT( lhauntent )
 	ent_decode(machine, 0x22, 0x44, 0x44, 0xbb, 0x24240);
 }
 
-static ADDRESS_MAP_START( multfish_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( multfish_map, AS_PROGRAM, 8, multfish_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITE(multfish_vid_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("m48t35", multfish_timekeeper_r, multfish_timekeeper_w)
@@ -902,7 +902,7 @@ static WRITE8_HANDLER( multfish_dispenable_w )
 	state->m_disp_enable = data;
 }
 
-static ADDRESS_MAP_START( multfish_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( multfish_portmap, AS_IO, 8, multfish_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
@@ -958,7 +958,7 @@ static ADDRESS_MAP_START( multfish_portmap, AS_IO, 8 )
 	AM_RANGE(0xf8, 0xfd)  AM_WRITE(multfish_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rollfr_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rollfr_portmap, AS_IO, 8, multfish_state )
 	AM_RANGE(0x33, 0x33) AM_WRITE(rollfr_hopper_w)
 	AM_IMPORT_FROM(multfish_portmap)
 ADDRESS_MAP_END

@@ -159,7 +159,7 @@ static WRITE16_HANDLER ( wwfsstar_scrollwrite );
  Pretty Straightforward
 *******************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfsstar_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfsstar_fg0_videoram_w) AM_BASE_MEMBER(wwfsstar_state,m_fg0_videoram)	/* FG0 Ram */
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(wwfsstar_bg0_videoram_w) AM_BASE_MEMBER(wwfsstar_state,m_bg0_videoram)	/* BG0 Ram */
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM								/* Work Ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wwfsstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

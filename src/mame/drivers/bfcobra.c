@@ -1325,14 +1325,14 @@ static MACHINE_RESET( bfcobra )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( z80_prog_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_prog_map, AS_PROGRAM, 8, bfcobra_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank4")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank2")
 	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( z80_io_map, AS_IO, 8, bfcobra_state )
 ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x23) AM_READWRITE(chipset_r, chipset_w)
 	AM_RANGE(0x24, 0x24) AM_DEVWRITE_MODERN("acia6850_0", acia6850_device, control_write)
@@ -1459,7 +1459,7 @@ static WRITE8_DEVICE_HANDLER( upd_w )
 	upd7759_start_w(device, data & 0x40 ? 0 : 1);
 }
 
-static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8, bfcobra_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM	AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_RAM		// W 'B', 6F
 	AM_RANGE(0x2200, 0x2200) AM_RAM		// W 'F'

@@ -1551,7 +1551,7 @@ static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
  * Naomi 1 address map
  */
 
-static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, dc_state )
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
 
@@ -1603,7 +1603,7 @@ ADDRESS_MAP_END
  * Naomi 2 address map
  */
 
-static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, dc_state )
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
 
@@ -1662,7 +1662,7 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( naomi_port, AS_IO, 64 )
+static ADDRESS_MAP_START( naomi_port, AS_IO, 64, dc_state )
 	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("main_eeprom", eeprom_93c46a_r, eeprom_93c46a_w)
 ADDRESS_MAP_END
 
@@ -1755,7 +1755,7 @@ static WRITE64_HANDLER( aw_modem_w )
 	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
-static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, dc_state )
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE( aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
 	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE( aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
@@ -1827,7 +1827,7 @@ static const aica_interface aica_config =
 };
 
 
-static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE_MEMBER( dc_state, dc_sound_ram )                /* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE("aica", dc_arm_aica_r, dc_arm_aica_w)

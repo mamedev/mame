@@ -472,7 +472,7 @@ static MACHINE_RESET( exidy440 )
  *
  *************************************/
 
-static ADDRESS_MAP_START( exidy440_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( exidy440_map, AS_PROGRAM, 8, exidy440_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(exidy440_state, m_imageram)
 	AM_RANGE(0x2000, 0x209f) AM_RAM_WRITE(exidy440_spriteram_w) AM_BASE_MEMBER(exidy440_state, m_spriteram)
 	AM_RANGE(0x20a0, 0x29ff) AM_RAM

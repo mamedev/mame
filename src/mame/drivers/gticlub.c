@@ -400,7 +400,7 @@ static MACHINE_START( gticlub )
 	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->m_work_ram);
 }
 
-static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE_MEMBER(gticlub_state, m_work_ram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
 	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
@@ -423,7 +423,7 @@ ADDRESS_MAP_END
 
 /**********************************************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, gticlub_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("k056800", k056800_sound_r, k056800_sound_w)
@@ -458,14 +458,14 @@ static WRITE32_HANDLER( dsp_dataram1_w )
 	state->m_sharc_dataram_1[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc_map, AS_DATA, 32 )
+static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, gticlub_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(K001005_r, K001005_w)
 	AM_RANGE(0x700000, 0x7000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hangplt_sharc0_map, AS_DATA, 32 )
+static ADDRESS_MAP_START( hangplt_sharc0_map, AS_DATA, 32, gticlub_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
@@ -476,7 +476,7 @@ static ADDRESS_MAP_START( hangplt_sharc0_map, AS_DATA, 32 )
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hangplt_sharc1_map, AS_DATA, 32 )
+static ADDRESS_MAP_START( hangplt_sharc1_map, AS_DATA, 32, gticlub_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM

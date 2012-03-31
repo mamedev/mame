@@ -269,7 +269,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/slapfght.h"
 
 
-static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
@@ -294,7 +294,7 @@ static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixcolorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixcolorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixcolorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slapfight_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
@@ -341,7 +341,7 @@ static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8 )
 	AM_RANGE(0x0c, 0x0d) AM_WRITE(slapfight_palette_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(slapfight_68705_portA_r, slapfight_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(slapfight_68705_portB_r, slapfight_68705_portB_w)
@@ -358,7 +358,7 @@ static READ8_HANDLER(tigerh_status_r)
 	return (slapfight_port_00_r(space, 0) & 0xf9)| ((tigerh_mcu_status_r(space, 0)));
 }
 
-static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(tigerh_status_r, slapfight_port_00_w)	/* status register */
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w)	/* status register */
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
@@ -376,7 +376,7 @@ static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(tigerh_68705_portA_r,tigerh_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(tigerh_68705_portB_r,tigerh_68705_portB_w)
@@ -388,7 +388,7 @@ static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with main CPU */
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8 )
 //  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_r)

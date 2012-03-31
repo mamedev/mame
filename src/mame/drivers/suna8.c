@@ -510,7 +510,7 @@ static WRITE8_HANDLER( hardhead_flipscreen_w )
 	coin_lockout_w ( space->machine(), 1,	data & 0x10);
 }
 
-static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xc000, 0xd7ff) AM_RAM								// RAM
@@ -527,7 +527,7 @@ static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hardhead_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hardhead_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READNOP	// ? IRQ Ack
 ADDRESS_MAP_END
@@ -578,7 +578,7 @@ static WRITE8_HANDLER( sranger_prot_w )
 	space->write_byte(0xcd99,0xff);
 }
 
-static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(watchdog_reset_r, soundlatch_w)	// To Sound CPU
@@ -596,7 +596,7 @@ static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rranger_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( rranger_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READNOP	// ? IRQ Ack
 ADDRESS_MAP_END
@@ -662,7 +662,7 @@ static WRITE8_HANDLER( brickzn_rombank_w )
 	state->m_rombank = data;
 }
 
-static ADDRESS_MAP_START( brickzn_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( brickzn_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM										// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")								// Banked ROM
 	AM_RANGE(0xc040, 0xc040) AM_WRITE(brickzn_rombank_w				)	// ROM Bank
@@ -766,7 +766,7 @@ static WRITE8_HANDLER( hardhea2_rambank_1_w )
 }
 
 
-static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")							// Banked ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")						// P1 (Inputs)
@@ -826,7 +826,7 @@ static WRITE8_HANDLER( starfigh_spritebank_w )
 	state->m_spritebank = state->m_spritebank_latch;
 }
 
-static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM										// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")								// Banked ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")						// P1 (Inputs)
@@ -961,7 +961,7 @@ static WRITE8_HANDLER( sparkman_en_trash_w )
 }
 #endif
 
-static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")							// Banked ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")						// P1 (Inputs)
@@ -995,7 +995,7 @@ ADDRESS_MAP_END
                                 Hard Head
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hardhead_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hardhead_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	// ROM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("aysnd", ay8910_address_data_w		)
@@ -1006,7 +1006,7 @@ static ADDRESS_MAP_START( hardhead_sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hardhead_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hardhead_sound_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READNOP	// ? IRQ Ack
 ADDRESS_MAP_END
@@ -1016,7 +1016,7 @@ ADDRESS_MAP_END
                                 Rough Ranger
 ***************************************************************************/
 
-static ADDRESS_MAP_START( rranger_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rranger_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	// ROM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym1", ym2203_w			)	// Samples + Music
 	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ym2", ym2203_w			)	// Music + FX
@@ -1030,7 +1030,7 @@ ADDRESS_MAP_END
                                 Brick Zone
 ***************************************************************************/
 
-static ADDRESS_MAP_START( brickzn_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( brickzn_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM	// ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_w	)
 	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("aysnd", ay8910_address_data_w		)
@@ -1042,7 +1042,7 @@ ADDRESS_MAP_END
 
 /* PCM Z80 , 4 DACs (4 bits per sample), NO RAM !! */
 
-static ADDRESS_MAP_START( brickzn_pcm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( brickzn_pcm_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM	// ROM
 ADDRESS_MAP_END
 
@@ -1054,7 +1054,7 @@ static WRITE8_HANDLER( brickzn_pcm_w )
 }
 
 
-static ADDRESS_MAP_START( brickzn_pcm_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( brickzn_pcm_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r		)	// From Sound CPU
 	AM_RANGE(0x00, 0x03) AM_WRITE(brickzn_pcm_w		)	// 4 x DAC

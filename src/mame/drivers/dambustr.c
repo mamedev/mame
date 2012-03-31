@@ -76,7 +76,7 @@ static WRITE8_DEVICE_HANDLER( dambustr_noise_enable_w )
 }
 
 
-static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(dambustr_bg_color_w)

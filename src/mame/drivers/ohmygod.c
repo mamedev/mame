@@ -39,7 +39,7 @@ static WRITE16_HANDLER( ohmygod_ctrl_w )
 	}
 }
 
-static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM
 	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE(ohmygod_videoram_w) AM_BASE_MEMBER(ohmygod_state, m_videoram)

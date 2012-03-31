@@ -50,7 +50,7 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8, commando_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, commando_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)

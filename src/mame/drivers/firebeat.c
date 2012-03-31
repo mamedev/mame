@@ -1749,7 +1749,7 @@ static MACHINE_START( firebeat )
 	state->m_flash[2] = machine.device<fujitsu_29f016a_device>("flash2");
 }
 
-static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE_MEMBER(firebeat_state, m_work_ram)
 	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE(midi_uart_r, midi_uart_w)
 	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
@@ -1772,7 +1772,7 @@ static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION("user1", 0)		/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16, firebeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	AM_RANGE(0x340000, 0x34000f) AM_READ(spu_unk_r)

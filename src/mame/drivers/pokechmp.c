@@ -105,7 +105,7 @@ static WRITE8_HANDLER( pokechmp_paletteram_w )
 }
 
 
-static ADDRESS_MAP_START( pokechmp_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pokechmp_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pokechmp_videoram_w) AM_BASE_MEMBER(pokechmp_state, m_videoram)
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE_MEMBER(pokechmp_state, m_spriteram, m_spriteram_size)
@@ -129,7 +129,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( pokechmp_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pokechmp_sound_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)

@@ -123,7 +123,7 @@ static WRITE16_HANDLER(fitfight_700000_w)
 		state->m_fof_700000_data = data;
 }
 
-static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_100000)
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_100000)
@@ -209,7 +209,7 @@ ADDRESS_MAP_END
 
 /* 7810 (?) sound cpu */
 
-static ADDRESS_MAP_START( snd_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( snd_mem, AS_PROGRAM, 8, fitfight_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")	/* ??? External ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -249,7 +249,7 @@ static WRITE8_HANDLER(snd_portc_w)
 	//mame_printf_debug("PC W %x @%x\n",data,cpu_get_pc(&space->device()));
 }
 
-static ADDRESS_MAP_START( snd_io, AS_IO, 8 )
+static ADDRESS_MAP_START( snd_io, AS_IO, 8, fitfight_state )
 		AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READ(snd_porta_r) AM_WRITE(snd_porta_w)
 		AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_READ(snd_portb_r) AM_WRITE(snd_portb_w)
 		AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READ(snd_portc_r) AM_WRITE(snd_portc_w)

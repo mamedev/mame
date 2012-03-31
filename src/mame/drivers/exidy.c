@@ -201,7 +201,7 @@ static WRITE8_HANDLER( fax_bank_select_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( exidy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( exidy_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(exidy_state, m_videoram)
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x003f) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite1_xpos)
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( exidy_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sidetrac_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sidetrac_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_BASE_MEMBER(exidy_state, m_characterram)
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( sidetrac_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( targ_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( targ_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE_MEMBER(exidy_state, m_characterram)
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
@@ -238,7 +238,7 @@ static ADDRESS_MAP_START( targ_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spectar_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spectar_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE_MEMBER(exidy_state, m_characterram)
 	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
@@ -248,7 +248,7 @@ static ADDRESS_MAP_START( spectar_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rallys_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rallys_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(exidy_state, m_videoram)
@@ -270,7 +270,7 @@ static ADDRESS_MAP_START( rallys_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( venture_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( venture_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE_MEMBER(exidy_state, m_characterram)
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( venture_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pepper2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pepper2_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x4800, 0x4fff) AM_NOP
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE_MEMBER(exidy_state, m_characterram)
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( pepper2_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")

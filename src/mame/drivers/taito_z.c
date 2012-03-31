@@ -1523,7 +1523,7 @@ static WRITE16_HANDLER( spacegun_pancontrol )
 ***********************************************************/
 
 
-static ADDRESS_MAP_START( contcirc_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( contcirc_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x084000, 0x087fff) AM_RAM AM_SHARE("share1")
@@ -1535,7 +1535,7 @@ static ADDRESS_MAP_START( contcirc_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x4006ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( contcirc_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( contcirc_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x084000, 0x087fff) AM_RAM AM_SHARE("share1")
@@ -1545,7 +1545,7 @@ static ADDRESS_MAP_START( contcirc_cpub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( chasehq_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( chasehq_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_SHARE("share1")
@@ -1561,7 +1561,7 @@ static ADDRESS_MAP_START( chasehq_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xe003ff) AM_READWRITE(chasehq_motor_r, chasehq_motor_w)	/* motor cpu */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chq_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( chq_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_SHARE("share1")
@@ -1569,7 +1569,7 @@ static ADDRESS_MAP_START( chq_cpub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( enforce_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( enforce_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
@@ -1581,7 +1581,7 @@ static ADDRESS_MAP_START( enforce_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x620000, 0x62000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( enforce_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( enforce_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
@@ -1591,7 +1591,7 @@ static ADDRESS_MAP_START( enforce_cpub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bshark_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bshark_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
@@ -1604,7 +1604,7 @@ static ADDRESS_MAP_START( bshark_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bsharkjjs_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bsharkjjs_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
@@ -1617,7 +1617,7 @@ static ADDRESS_MAP_START( bsharkjjs_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bshark_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bshark_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
@@ -1630,7 +1630,7 @@ static ADDRESS_MAP_START( bshark_cpub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sci_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sci_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x10bfff) AM_RAM AM_SHARE("share1")
@@ -1646,7 +1646,7 @@ static ADDRESS_MAP_START( sci_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc08000, 0xc08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sci_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sci_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM AM_SHARE("share1")
@@ -1654,7 +1654,7 @@ static ADDRESS_MAP_START( sci_cpub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nightstr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nightstr_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x113fff) AM_RAM AM_SHARE("share1")
@@ -1669,7 +1669,7 @@ static ADDRESS_MAP_START( nightstr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xe40000, 0xe40007) AM_READWRITE(nightstr_stick_r, bshark_stick_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nightstr_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nightstr_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
@@ -1677,7 +1677,7 @@ static ADDRESS_MAP_START( nightstr_cpub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( aquajack_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( aquajack_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
@@ -1689,7 +1689,7 @@ static ADDRESS_MAP_START( aquajack_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc40000, 0xc403ff) AM_RAM AM_BASE_SIZE_MEMBER(taitoz_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aquajack_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( aquajack_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_SHARE("share1")
@@ -1701,7 +1701,7 @@ static ADDRESS_MAP_START( aquajack_cpub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spacegun_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( spacegun_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x30c000, 0x30ffff) AM_RAM
 	AM_RANGE(0x310000, 0x31ffff) AM_RAM AM_SHARE("share1")
@@ -1711,7 +1711,7 @@ static ADDRESS_MAP_START( spacegun_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xb00000, 0xb00007) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_rbswap_word_w)	/* palette */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spacegun_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( spacegun_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x20c000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("share1")
@@ -1725,7 +1725,7 @@ static ADDRESS_MAP_START( spacegun_cpub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dblaxle_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dblaxle_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_SHARE("share1")
@@ -1741,7 +1741,7 @@ static ADDRESS_MAP_START( dblaxle_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc08000, 0xc08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)	/* set in int6, seems to stay zero */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dblaxle_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dblaxle_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_SHARE("share1")
@@ -1750,7 +1750,7 @@ static ADDRESS_MAP_START( dblaxle_cpub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( racingb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( racingb_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_SHARE("share1")
@@ -1765,7 +1765,7 @@ static ADDRESS_MAP_START( racingb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xb08000, 0xb08001) AM_READWRITE(sci_spriteframe_r, sci_spriteframe_w)	/* alternates 0/0x100 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( racingb_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( racingb_cpub_map, AS_PROGRAM, 16, taitoz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x403fff) AM_RAM
 	AM_RANGE(0x410000, 0x41ffff) AM_RAM AM_SHARE("share1")
@@ -1776,7 +1776,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, taitoz_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

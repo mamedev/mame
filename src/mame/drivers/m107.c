@@ -127,7 +127,7 @@ static WRITE16_HANDLER( m107_sound_reset_w )
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m107_vram_w) AM_BASE_MEMBER(m107_state, m_vram_data)
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -164,14 +164,14 @@ static WRITE16_HANDLER( wpksoc_output_w )
 		popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( wpksoc_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wpksoc_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0xf0000, 0xf0001) AM_READ_PORT("WPK_DSW0")
 	AM_RANGE(0xf0002, 0xf0003) AM_READ_PORT("WPK_DSW1")
 	AM_RANGE(0xf0004, 0xf0005) AM_READ_PORT("WPK_DSW2")
 	AM_IMPORT_FROM(main_map)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wpksoc_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( wpksoc_io_map, AS_IO, 16, m107_state )
 	AM_RANGE(0x22, 0x23) AM_WRITE(wpksoc_output_w)
 	AM_RANGE(0xc0, 0xc1) AM_READ_PORT("WPK_IN0")
 	AM_RANGE(0xc2, 0xc3) AM_READ_PORT("WPK_IN1")
@@ -180,7 +180,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", irem_ga20_r, irem_ga20_w, 0x00ff)

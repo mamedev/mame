@@ -159,7 +159,7 @@ static WRITE8_HANDLER( tankbatt_coin_lockout_w )
 	coin_lockout_w(space->machine(), 1,data & 1);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
 	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE_MEMBER(tankbatt_state, m_bulletsram) AM_SIZE_MEMBER(tankbatt_state, m_bulletsram_size)
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM

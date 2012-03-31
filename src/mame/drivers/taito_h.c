@@ -249,7 +249,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE_MEMBER(taitoh_state, m_m68000_mainram)
 	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE_MEMBER(taitoh_state, m_m68000_mainram)
 	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
@@ -271,7 +271,7 @@ static ADDRESS_MAP_START( recordbr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE_MEMBER(taitoh_state, m_m68000_mainram)
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( dleague_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitoh_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

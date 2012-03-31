@@ -86,14 +86,14 @@ public:
  *
  *************************************/
 
-static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, su2000_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("mem_bank")
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcat_io, AS_IO, 32 )
+static ADDRESS_MAP_START( pcat_io, AS_IO, 32, su2000_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 ADDRESS_MAP_END
 

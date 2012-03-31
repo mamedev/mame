@@ -139,7 +139,7 @@ PALETTE_INIT( sega315_5378 )
 
 
 // default address map
-static ADDRESS_MAP_START( sega315_5124, AS_0, 8 )
+static ADDRESS_MAP_START( sega315_5124, AS_0, 8, sega315_5124_device )
 	AM_RANGE(0x0000, VRAM_SIZE-1) AM_RAM
 ADDRESS_MAP_END
 

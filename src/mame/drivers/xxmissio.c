@@ -88,7 +88,7 @@ static MACHINE_START( xxmissio )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( map1, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( map1, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( map2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( map2, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 

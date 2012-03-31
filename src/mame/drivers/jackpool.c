@@ -166,7 +166,7 @@ static WRITE16_HANDLER( jackpool_io_w )
 	#endif
 }
 
-static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16, jackpool_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1200ff) AM_RAM

@@ -57,7 +57,7 @@ static READ16_HANDLER( unknown_read_0xffff00 )
 	return space->machine().rand();
 }
 
-static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")			// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
@@ -89,7 +89,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 

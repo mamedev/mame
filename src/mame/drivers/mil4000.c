@@ -270,7 +270,7 @@ static WRITE16_HANDLER( output_w )
 //  popmessage("%04x\n",data);
 }
 
-static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE_MEMBER(mil4000_state, m_sc0_vram)	// CY62256L-70, U77
 	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE_MEMBER(mil4000_state, m_sc1_vram)	// CY62256L-70, U77

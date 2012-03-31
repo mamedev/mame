@@ -124,7 +124,7 @@ static WRITE8_HANDLER( cball_wram_w )
 
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, cball_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 
 	AM_RANGE(0x0000, 0x03ff) AM_READ(cball_wram_r) AM_MASK(0x7f)

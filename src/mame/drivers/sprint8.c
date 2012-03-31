@@ -102,7 +102,7 @@ static WRITE8_HANDLER( sprint8_int_reset_w )
 }
 
 
-static ADDRESS_MAP_START( sprint8_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sprint8_map, AS_PROGRAM, 8, sprint8_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sprint8_video_ram_w) AM_BASE_MEMBER(sprint8_state, m_video_ram)
 	AM_RANGE(0x1c00, 0x1c00) AM_READ(sprint8_collision_r)

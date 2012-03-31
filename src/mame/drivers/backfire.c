@@ -260,7 +260,7 @@ static WRITE32_HANDLER( backfire_spriteram2_w )
 
 
 
-static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)

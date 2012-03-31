@@ -496,7 +496,7 @@ static WRITE8_HANDLER( output_port_1_w )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8, snookr10_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")		/* IN0 */
@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tenballs_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tenballs_map, AS_PROGRAM, 8, snookr10_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")		/* IN0 */

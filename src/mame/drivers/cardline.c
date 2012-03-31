@@ -111,11 +111,11 @@ static WRITE8_HANDLER(lamps_w)
 	output_set_lamp_value(7,(data >> 7) & 1);
 }
 
-static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, cardline_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem_io, AS_IO, 8 )
+static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("IN0")
 	AM_RANGE(0x2005, 0x2005) AM_READ_PORT("IN1")

@@ -48,7 +48,7 @@ static WRITE8_HANDLER( sound_command_w )
 }
 
 
-static ADDRESS_MAP_START( kingobox_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingobox_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM /* work ram */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share2") /* shared with sprite cpu */
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( kingobox_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc05, 0xfc05) AM_READ_PORT("EXTRA")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingobox_video_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingobox_video_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1") /* shared with main */
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( kingobox_video_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(kingofb_colorram2_w) AM_BASE_MEMBER(kingofb_state, m_colorram2) /* foreground colorram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingobox_sprite_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingobox_sprite_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share2") /* shared with main */
@@ -86,13 +86,13 @@ static ADDRESS_MAP_START( kingobox_sprite_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc400, 0xc43f) AM_RAM  /* something related to scroll? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingobox_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingobox_sound_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM /* work ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingobox_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kingobox_sound_io_map, AS_IO, 8, kingofb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( kingobox_sound_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 /* Ring King */
-static ADDRESS_MAP_START( ringking_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ringking_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM /* work ram */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share2") /* shared with sprite cpu */
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( ringking_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM /* ???? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ringking_video_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ringking_video_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1") /* shared with main */
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( ringking_video_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(kingofb_colorram2_w) AM_BASE_MEMBER(kingofb_state, m_colorram2) /* foreground colorram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ringking_sprite_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ringking_sprite_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share2") /* shared with main */
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( ringking_sprite_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa400, 0xa43f) AM_RAM /* something related to scroll? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ringking_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ringking_sound_io_map, AS_IO, 8, kingofb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_r)

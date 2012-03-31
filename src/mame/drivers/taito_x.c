@@ -421,7 +421,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 /**************************************************************************/
 
-static ADDRESS_MAP_START( superman_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( superman_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP	/* written each frame at $3a9c, mostly 0x10 */
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP	/* written each frame at $3aa2, mostly 0x10 */
@@ -439,7 +439,7 @@ static ADDRESS_MAP_START( superman_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf03fff) AM_RAM			/* Main RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( daisenpu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( daisenpu_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 //  AM_RANGE(0x400000, 0x400001) AM_WRITENOP    /* written each frame at $2ac, values change */
 	AM_RANGE(0x500000, 0x50000f) AM_READ(superman_dsw_input_r)
@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( daisenpu_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf03fff) AM_RAM			/* Main RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gigandes_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gigandes_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP	/* 0x1 written each frame at $d42, watchdog? */
 	AM_RANGE(0x500000, 0x500007) AM_READ(superman_dsw_input_r)
@@ -469,7 +469,7 @@ static ADDRESS_MAP_START( gigandes_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf03fff) AM_RAM			/* Main RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ballbros_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ballbros_map, AS_PROGRAM, 16, taitox_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_WRITENOP	/* 0x1 written each frame at $c56, watchdog? */
 	AM_RANGE(0x500000, 0x50000f) AM_READ(superman_dsw_input_r)
@@ -487,7 +487,7 @@ ADDRESS_MAP_END
 
 /**************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitox_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -501,7 +501,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w) /* bankswitch ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( daisenpu_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( daisenpu_sound_map, AS_PROGRAM, 8, taitox_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

@@ -119,7 +119,7 @@ static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
 	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE_MEMBER(cabal_state, m_spriteram, m_spriteram_size)
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xe8000, 0xe800d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
 	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE_MEMBER(cabal_state, m_spriteram, m_spriteram_size)
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( cabalbl_coin_w )
 	//data & 0x40? video enable?
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(seibu_irq_clear_w)
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cabalbl_sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch3_w)
@@ -227,21 +227,21 @@ static WRITE8_DEVICE_HANDLER( cabalbl_adpcm_w )
 	msm5205_vclk_w(device,0);
 }
 
-static ADDRESS_MAP_START( cabalbl_talk1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cabalbl_talk1_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_talk1_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( cabalbl_talk1_portmap, AS_IO, 8, cabal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("msm1", cabalbl_adpcm_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_talk2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cabalbl_talk2_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_talk2_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( cabalbl_talk2_portmap, AS_IO, 8, cabal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch4_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("msm2", cabalbl_adpcm_w)

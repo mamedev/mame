@@ -412,7 +412,7 @@ static WRITE8_HANDLER( dunhuang_layers_w )
                                 Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dunhuang_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dunhuang_map, AS_PROGRAM, 8, dunhuang_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )
@@ -480,7 +480,7 @@ static WRITE8_HANDLER( dunhuang_82_w )
 }
 #endif
 
-static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
 	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE( dunhuang_pos_x_w )
 	AM_RANGE( 0x0001, 0x0001 ) AM_WRITE( dunhuang_pos_y_w )
 	AM_RANGE( 0x0002, 0x0004 ) AM_WRITE( dunhuang_tile_w )

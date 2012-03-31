@@ -133,7 +133,7 @@ static READ8_HANDLER( tecmo_dswb_h_r )
 }
 
 
-static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_BASE_MEMBER(tecmo_state, m_txvideoram)
@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tecmo_txvideoram_w) AM_BASE_MEMBER(tecmo_state, m_txvideoram)
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(tecmo_bgvideoram_w) AM_BASE_MEMBER(tecmo_state, m_bgvideoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(tecmo_fgvideoram_w) AM_BASE_MEMBER(tecmo_state, m_fgvideoram)
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITENOP	/* ? if mapped to watchdog like in the others, causes reset */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ymsnd", ym3812_w)
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* NMI acknowledge */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x2000, 0x207f) AM_RAM				/* Silkworm set #2 has a custom CPU which */
 												/* writes code to this area */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM

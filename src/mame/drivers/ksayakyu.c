@@ -104,7 +104,7 @@ static WRITE8_HANDLER(tomaincpu_w)
 	soundlatch_w(space, 0, data);
 }
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_SIZE_MEMBER(ksayakyu_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundcpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( soundcpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_r)

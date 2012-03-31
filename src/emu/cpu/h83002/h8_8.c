@@ -732,7 +732,7 @@ static TIMER_CALLBACK( h8_timer_3_cb )
 	timer_8bit_expire(h8, 1, 1);
 }
 
-static ADDRESS_MAP_START( h8_3334_internal_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( h8_3334_internal_map, AS_PROGRAM, 8, legacy_cpu_device )
 	// 512B RAM
 	AM_RANGE(0xfb80, 0xff7f) AM_RAM
 	AM_RANGE(0xff88, 0xffff) AM_READWRITE( h8330_itu_r, h8330_itu_w )

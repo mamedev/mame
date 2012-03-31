@@ -317,7 +317,7 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset * 2 + 1, data, mem_mask);
 }
 
-static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE_MEMBER(psikyo_state, m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
@@ -359,12 +359,12 @@ static WRITE32_HANDLER( s1945bl_oki_w )
 		printf("ACCESSING_BITS_0_7 ?? %08x %08x\n", data & 0x000000ff, mem_mask);
 }
 
-static ADDRESS_MAP_START( s1945bl_oki_map, AS_0, 8 )
+static ADDRESS_MAP_START( s1945bl_oki_map, AS_0, 8, psikyo_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psikyo_bootleg_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( psikyo_bootleg_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_MEMBER(psikyo_state, m_bootleg_spritebuffer)				// RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
 
@@ -420,13 +420,13 @@ static WRITE8_HANDLER( sngkace_sound_bankswitch_w )
 	memory_set_bank(space->machine(), "bank1", data & 0x03);
 }
 
-static ADDRESS_MAP_START( sngkace_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sngkace_sound_map, AS_PROGRAM, 8, psikyo_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM							// ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM							// RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")					// Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sngkace_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sngkace_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sngkace_sound_bankswitch_w)
@@ -444,13 +444,13 @@ static WRITE8_HANDLER( gunbird_sound_bankswitch_w )
 	memory_set_bank(space->machine(), "bank1", (data >> 4) & 0x03);
 }
 
-static ADDRESS_MAP_START( gunbird_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gunbird_sound_map, AS_PROGRAM, 8, psikyo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM							// ROM
 	AM_RANGE(0x8000, 0x81ff) AM_RAM							// RAM
 	AM_RANGE(0x8200, 0xffff) AM_ROMBANK("bank1")					// Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gunbird_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( gunbird_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
@@ -462,7 +462,7 @@ ADDRESS_MAP_END
                         Strikers 1945 / Tengai
 ***************************************************************************/
 
-static ADDRESS_MAP_START( s1945_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( s1945_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITENOP

@@ -83,7 +83,7 @@ Custom ICs - 053260        - sound chip (QFP80)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1f80, 0x1f80) AM_READ_PORT("COIN")
 	AM_RANGE(0x1f81, 0x1f81) AM_READ_PORT("TEST")
@@ -133,7 +133,7 @@ static WRITE8_HANDLER( z80_arm_nmi_w )
 	space->machine().scheduler().timer_set(attotime::from_usec(25), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
-static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM

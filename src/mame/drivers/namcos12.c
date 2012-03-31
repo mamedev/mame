@@ -1229,7 +1229,7 @@ static WRITE32_HANDLER( s12_dma_bias_w )
 	state->m_n_dmabias = data;
 }
 
-static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE(bankoffset_w)			/* banking */
 	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(namcos12_state, m_sharedram) /* shared ram?? */
@@ -1418,7 +1418,7 @@ static MACHINE_RESET( namcos12 )
 }
 
 /* H8/3002 MCU stuff */
-static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16, namcos12_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
@@ -1599,7 +1599,7 @@ static READ8_HANDLER( s12_mcu_gun_v_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( s12h8iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( s12h8iomap, AS_IO, 8, namcos12_state )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT("DSW")
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s12_mcu_p8_r ) AM_WRITENOP
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s12_mcu_pa_r, s12_mcu_pa_w )

@@ -98,7 +98,7 @@ static READ8_HANDLER( s2636_portA_r )
 	}
 }
 
-static ADDRESS_MAP_START( malzak_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( malzak_map, AS_PROGRAM, 8, malzak_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_ROMBANK("bank1")
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( malzak_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( malzak2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( malzak2_map, AS_PROGRAM, 8, malzak_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_ROMBANK("bank1")
@@ -183,7 +183,7 @@ static READ8_HANDLER( collision_r )
 	return 0xd0 + state->m_collision_counter;
 }
 
-static ADDRESS_MAP_START( malzak_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( malzak_io_map, AS_IO, 8, malzak_state )
 	AM_RANGE(0x00, 0x00) AM_READ(collision_r) // returns where a collision can occur.
 	AM_RANGE(0x40, 0x40) AM_WRITE(port40_w)  // possibly sound codes for dual SN76477s
 	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)  // possibly playfield scroll X offset

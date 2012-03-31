@@ -182,7 +182,7 @@ static WRITE8_HANDLER( mcu_port_p_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, arabian_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ_PORT("IN0")
@@ -199,7 +199,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, arabian_state )
 	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
@@ -212,7 +212,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, arabian_state )
 	AM_RANGE(MB88_PORTK,  MB88_PORTK ) AM_READ(mcu_portk_r)
 	AM_RANGE(MB88_PORTO,  MB88_PORTO ) AM_WRITE(mcu_port_o_w)
 	AM_RANGE(MB88_PORTP,  MB88_PORTP ) AM_WRITE(mcu_port_p_w)

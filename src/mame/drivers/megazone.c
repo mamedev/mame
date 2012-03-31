@@ -84,7 +84,7 @@ static WRITE8_HANDLER( irq_mask_w )
 }
 
 
-static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(megazone_coin_counter_w) /* coin counter 2, coin counter 1 */
 	AM_RANGE(0x0005, 0x0005) AM_WRITE(megazone_flipscreen_w)
 	AM_RANGE(0x0007, 0x0007) AM_WRITE(irq_mask_w)
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM		/* 4000->5FFF is a debug rom */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w)	/* START line. Interrupts 8039 */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch_w)			/* CODE  line. Command Interrupts 8039 */
@@ -115,18 +115,18 @@ static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megazone_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( megazone_sound_io_map, AS_IO, 8, megazone_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0x00, 0x02) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megazone_i8039_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( megazone_i8039_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megazone_i8039_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( megazone_i8039_io_map, AS_IO, 8, megazone_state )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)

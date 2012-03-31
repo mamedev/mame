@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 	sp0256_ALD_w(device, 0, data);
 }
 
-static ADDRESS_MAP_START( sauro_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sauro_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE_MEMBER(sauro_state, m_spriteram, m_spriteram_size)
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( sauro_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(tecfri_colorram2_w) AM_BASE_MEMBER(sauro_state, m_colorram2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW2")
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8 )
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_w)
@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_BASE_SIZE_MEMBER(sauro_state, m_spriteram, m_spriteram_size)

@@ -392,7 +392,7 @@ static WRITE8_HANDLER( omegaf_io_protection_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( ninjakd2_main_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ninjakd2_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("KEYCOIN")
@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( ninjakd2_main_cpu, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mnight_main_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mnight_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xd9ff) AM_RAM
@@ -434,7 +434,7 @@ static ADDRESS_MAP_START( mnight_main_cpu, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( robokid_main_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( robokid_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
@@ -462,7 +462,7 @@ static ADDRESS_MAP_START( robokid_main_cpu, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( omegaf_main_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( omegaf_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("KEYCOIN")
@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( omegaf_main_cpu, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ninjakd2_sound_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ninjakd2_sound_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -497,7 +497,7 @@ static ADDRESS_MAP_START( ninjakd2_sound_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(ninjakd2_pcm_play_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ninjakd2_sound_io, AS_IO, 8 )
+static ADDRESS_MAP_START( ninjakd2_sound_io, AS_IO, 8, ninjakd2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("2203.1", ym2203_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("2203.2", ym2203_w)

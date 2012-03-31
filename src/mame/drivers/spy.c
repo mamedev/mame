@@ -384,7 +384,7 @@ static WRITE8_HANDLER( k052109_051960_w )
 		k051960_w(state->m_k051960, offset - 0x3c00, data);
 }
 
-static ADDRESS_MAP_START( spy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spy_map, AS_PROGRAM, 8, spy_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(spy_bankedram1_r, spy_bankedram1_w) AM_BASE_MEMBER(spy_state, m_ram)
 	AM_RANGE(0x0800, 0x1aff) AM_RAM
 	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(bankswitch_w)
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( spy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spy_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spy_sound_map, AS_PROGRAM, 8, spy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)

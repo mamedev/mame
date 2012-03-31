@@ -49,7 +49,7 @@ static READ8_HANDLER( tourtabl_get_databus_contents )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tourtabl_state )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0100) AM_READWRITE(tia_r, tia_w)
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x0100) AM_RAM
 	AM_RANGE(0x0280, 0x029f) AM_DEVREADWRITE("riot1", riot6532_r, riot6532_w)

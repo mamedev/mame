@@ -917,7 +917,7 @@ static MACHINE_RESET( coh3002t )
 	cputag_set_input_line(machine, "mn10200",INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 }
 
-static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x00400000, 0x007fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_READWRITE(flash_s1_r, flash_s1_w)

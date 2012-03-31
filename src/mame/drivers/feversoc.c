@@ -160,7 +160,7 @@ static WRITE32_HANDLER( output_w )
 	}
 }
 
-static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 	AM_RANGE(0x02000000, 0x0203dfff) AM_RAM //work ram
 	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_BASE_MEMBER(feversoc_state, m_spriteram)

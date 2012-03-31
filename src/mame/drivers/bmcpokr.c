@@ -56,7 +56,7 @@ public:
 
 
 
-static ADDRESS_MAP_START( bmcpokr_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bmcpokr_mem, AS_PROGRAM, 16, bmcpokr_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -294,7 +294,7 @@ static WRITE16_HANDLER( tetrisp2_coincounter_w )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( tetrisp2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tetrisp2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															// ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")			// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
@@ -351,7 +351,7 @@ static WRITE16_HANDLER( nndmseal_b20000_w )
 //  popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")	// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	// Spare Object RAM
@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															// ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")			// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															// ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")			// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
@@ -465,7 +465,7 @@ static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															// ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram")			// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
@@ -500,7 +500,7 @@ static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rocknms_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rocknms_sub_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															// ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("spriteram2")		// Object RAM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM

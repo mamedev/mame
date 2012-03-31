@@ -539,7 +539,7 @@ static READ16_HANDLER( srmp6_irq_ack_r )
 	return 0; // value read doesn't matter
 }
 
-static ADDRESS_MAP_START( srmp6_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( srmp6_map, AS_PROGRAM, 16, srmp6_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM					// work RAM
 	AM_RANGE(0x600000, 0x7fffff) AM_ROMBANK("bank1")		// banked ROM (used by ROM check)

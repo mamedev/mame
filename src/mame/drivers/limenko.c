@@ -146,7 +146,7 @@ static WRITE32_HANDLER( spriteram_buffer_w )
   MEMORY MAPS
 *****************************************************************************************************/
 
-static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32, limenko_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE_MEMBER(limenko_state, m_mainram)
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(limenko_state, m_fg_videoram)
@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( limenko_io_map, AS_IO, 32 )
+static ADDRESS_MAP_START( limenko_io_map, AS_IO, 32, limenko_state )
 	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
 	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
@@ -173,7 +173,7 @@ ADDRESS_MAP_END
 
 /* Spotty memory map */
 
-static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32, limenko_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE_MEMBER(limenko_state, m_mainram)
 	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(limenko_state, m_fg_videoram)
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spotty_io_map, AS_IO, 32 )
+static ADDRESS_MAP_START( spotty_io_map, AS_IO, 32, limenko_state )
 	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
 	AM_RANGE(0x0800, 0x0803) AM_WRITENOP // hopper related
@@ -219,7 +219,7 @@ static READ8_HANDLER( spotty_sound_r )
 		return space->machine().device<okim6295_device>("oki")->read(*space,0);
 }
 
-static ADDRESS_MAP_START( spotty_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( spotty_sound_io_map, AS_IO, 8, limenko_state )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(spotty_sound_r) AM_DEVWRITE_MODERN("oki", okim6295_device, write) //? sound latch and ?
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
 ADDRESS_MAP_END

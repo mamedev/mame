@@ -368,7 +368,7 @@ static WRITE16_HANDLER(galsnew_vram_1_bank_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM // main program
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user2",0) // other data
 	AM_RANGE(0x100000, 0x3fffff) AM_ROM AM_REGION("user1",0) // main data
@@ -411,7 +411,7 @@ ADDRESS_MAP_END
 
 // bigger rom space, OKI commands moved
 //  no CALC mcu
-static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x000000, 0x4fffff) AM_ROM
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE_MEMBER(expro02_state, m_galsnew_bg_pixram)
 	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE_MEMBER(expro02_state, m_galsnew_fg_pixram)

@@ -501,7 +501,7 @@ static READ8_HANDLER( dd_adpcm_status_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( ddragon_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ddragon_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(ddragon_state, m_rambase)
 	AM_RANGE(0x1000, 0x11ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1200, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
@@ -523,7 +523,7 @@ static ADDRESS_MAP_START( ddragon_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dd2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dd2_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(ddragon_fgvideoram_w) AM_BASE_MEMBER(ddragon_state, m_fgvideoram)
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w) AM_BASE_MEMBER(ddragon_state, m_spriteram)
@@ -551,7 +551,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(ddragon_hd63701_internal_registers_r, ddragon_hd63701_internal_registers_w)
 	AM_RANGE(0x001f, 0x0fff) AM_RAM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w)
@@ -559,14 +559,14 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ddragonba_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ddragonba_sub_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dd2_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dd2_sub_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(ddragon_spriteram_r, ddragon_spriteram_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(ddragon2_sub_irq_ack_w)
@@ -581,7 +581,7 @@ static WRITE8_HANDLER( ddragonba_port_w )
 	device_set_input_line(state->m_sub_cpu, state->m_sprite_irq, CLEAR_LINE );
 }
 
-static ADDRESS_MAP_START( ddragonba_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( ddragonba_sub_portmap, AS_IO, 8, ddragon_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(ddragonba_port_w)
 ADDRESS_MAP_END
 
@@ -593,7 +593,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
 	AM_RANGE(0x1800, 0x1800) AM_READ(dd_adpcm_status_r)
@@ -603,7 +603,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dd2_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dd2_sound_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("fmsnd", ym2151_r, ym2151_w)
@@ -619,7 +619,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, ddragon_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE(darktowr_mcu_w) AM_BASE_MEMBER(ddragon_state, m_darktowr_mcu_ports)
 	AM_RANGE(0x0008, 0x007f) AM_RAM

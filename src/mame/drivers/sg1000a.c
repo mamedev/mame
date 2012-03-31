@@ -134,13 +134,13 @@ public:
  *
  *************************************/
 
-static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, sg1000a_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // separate region needed for decrypting
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_MIRROR(0x400)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, sg1000a_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("snsnd", sn76496_w)
 	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)

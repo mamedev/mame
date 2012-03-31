@@ -319,13 +319,13 @@ static void jan_adpcm_int( device_t *device )
  *
  *************************************/
 
-static ADDRESS_MAP_START( jantotsu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jantotsu_map, AS_PROGRAM, 8, jantotsu_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(jantotsu_bitmap_r, jantotsu_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jantotsu_io, AS_IO, 8 )
+static ADDRESS_MAP_START( jantotsu_io, AS_IO, 8, jantotsu_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE("sn2", sn76496_w)

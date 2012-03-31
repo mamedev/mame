@@ -57,7 +57,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 };
 
-static ADDRESS_MAP_START( shtzone_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shtzone_map, AS_PROGRAM, 8, shtzone_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 ADDRESS_MAP_END

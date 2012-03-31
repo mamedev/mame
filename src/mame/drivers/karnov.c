@@ -427,7 +427,7 @@ static READ16_HANDLER( karnov_control_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16, karnov_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM AM_BASE_MEMBER(karnov_state, m_ram)
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
@@ -440,7 +440,7 @@ static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8, karnov_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_w)

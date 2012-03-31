@@ -90,7 +90,7 @@
 #include "video/decocomn.h"
 #include "video/decospr.h"
 
-static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, boogwing_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

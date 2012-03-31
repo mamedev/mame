@@ -149,7 +149,7 @@ static WRITE8_HANDLER( pushman_68000_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( pushman_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pushman_map, AS_PROGRAM, 16, pushman_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060007) AM_READWRITE(pushman_68705_r, pushman_68705_w)
 	AM_RANGE(0xfe0800, 0xfe17ff) AM_RAM AM_BASE_MEMBER(pushman_state, m_spriteram)
@@ -163,25 +163,25 @@ static ADDRESS_MAP_START( pushman_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pushman_state )
 	AM_RANGE(0x0000, 0x0007) AM_READWRITE(pushman_68000_r, pushman_68000_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, pushman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, pushman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, pushman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x60000, 0x60007) AM_READWRITE(bballs_68705_r, bballs_68705_w)

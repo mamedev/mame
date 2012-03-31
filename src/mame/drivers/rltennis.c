@@ -88,7 +88,7 @@ static WRITE16_HANDLER(rlt_snd2_w)
 	COMBINE_DATA(&state->m_data740000);
 }
 
-static ADDRESS_MAP_START( rltennis_main, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rltennis_main, AS_PROGRAM, 16, rltennis_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
@@ -177,7 +177,7 @@ static MACHINE_RESET( rltennis )
 	state->m_timer->adjust(attotime::from_hz(RLT_TIMER_FREQ));
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, rltennis_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 

@@ -96,13 +96,13 @@ static SCREEN_UPDATE_RGB32( dotrikun )
  *
  *************************************/
 
-static ADDRESS_MAP_START( dotrikun_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dotrikun_map, AS_PROGRAM, 8, dotrikun_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_BASE_MEMBER(dotrikun_state, m_dotrikun_bitmap)
 	AM_RANGE(0x8600, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, dotrikun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("INPUTS") AM_WRITE(dotrikun_color_w)
 ADDRESS_MAP_END

@@ -129,7 +129,7 @@ static WRITE16_HANDLER( latch_w )
 /* full map verified from schematics and GALs */
 /* addresses in the 1xxxxx region map to /WAIT */
 /* addresses in the 2xxxxx region map to /WAIT2 */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, batman_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM

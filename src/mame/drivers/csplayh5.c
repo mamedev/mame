@@ -87,7 +87,7 @@ static WRITE16_HANDLER( csplayh5_sound_w )
 }
 
 
-static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_WRITE(csplayh5_sound_w)
@@ -109,7 +109,7 @@ static READ16_HANDLER( test_r )
 	return space->machine().rand();
 }
 
-static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x04002a, 0x04002b) AM_READ(test_r)
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( csplayh5_sub_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( csplayh5_sub_io_map, AS_IO, 16, csplayh5_state )
 
 ADDRESS_MAP_END
 #endif
@@ -342,13 +342,13 @@ static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )
 }
 
 
-static ADDRESS_MAP_START( csplayh5_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( csplayh5_sound_map, AS_PROGRAM, 8, csplayh5_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( csplayh5_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( csplayh5_sound_io_map, AS_IO, 8, csplayh5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)

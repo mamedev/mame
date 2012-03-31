@@ -183,7 +183,7 @@ static WRITE8_DEVICE_HANDLER(protection_w)
 	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
-static ADDRESS_MAP_START( cpu0_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu0_mem, AS_PROGRAM, 8, pipeline_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM_WRITE(vram1_w) AM_BASE_MEMBER(pipeline_state, m_vram1)
@@ -194,13 +194,13 @@ static ADDRESS_MAP_START( cpu0_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xb840, 0xb840) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_mem, AS_PROGRAM, 8, pipeline_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_port, AS_IO, 8, pipeline_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x06, 0x07) AM_NOP
@@ -224,7 +224,7 @@ static WRITE8_HANDLER(mcu_ddrA_w)
 	state->m_ddrA=data;
 }
 
-static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8, pipeline_state )
 	AM_RANGE(0x0000, 0x0000) AM_READ(mcu_portA_r) AM_WRITE(mcu_portA_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(mcu_ddrA_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM

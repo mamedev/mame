@@ -443,7 +443,7 @@ static const ay8910_interface ssio_ay8910_interface_2 =
 /********* memory interfaces ***********/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( ssio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssio_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM
@@ -568,7 +568,7 @@ void csdeluxe_reset_w(running_machine &machine, int state)
 /********* memory interfaces ***********/
 
 /* address map determined by PAL; not verified */
-static ADDRESS_MAP_START( csdeluxe_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( csdeluxe_map, AS_PROGRAM, 16, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
 	AM_RANGE(0x000000, 0x007fff) AM_ROM
@@ -688,7 +688,7 @@ void soundsgood_reset_w(running_machine &machine, int state)
 /********* memory interfaces ***********/
 
 /* address map determined by PAL; not verified */
-static ADDRESS_MAP_START( soundsgood_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( soundsgood_map, AS_PROGRAM, 16, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -792,7 +792,7 @@ void turbocs_reset_w(running_machine &machine, int state)
 /********* memory interfaces ***********/
 
 /* address map verified from schematics */
-static ADDRESS_MAP_START( turbocs_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( turbocs_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE_MODERN("tcspia", pia6821_device, read_alt, write_alt)
@@ -923,7 +923,7 @@ void squawkntalk_reset_w(running_machine &machine, int state)
 /* address map verified from schematics */
 /* note that jumpers control the ROM sizes; if these are changed, use the alternate */
 /* address map below */
-static ADDRESS_MAP_START( squawkntalk_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( squawkntalk_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x4f6c) AM_DEVREADWRITE_MODERN("sntpia0", pia6821_device, read, write)
@@ -935,7 +935,7 @@ ADDRESS_MAP_END
 /* alternate address map if the ROM jumpers are changed to support a smaller */
 /* ROM size of 2k */
 #ifdef UNUSED_FUNCTION
-ADDRESS_MAP_START( squawkntalk_alt_map, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( squawkntalk_alt_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0083) AM_MIRROR(0x676c) AM_DEVREADWRITE_MODERN("sntpia0", pia6821_device, read, write)

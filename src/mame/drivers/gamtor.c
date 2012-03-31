@@ -42,7 +42,7 @@ static WRITE32_HANDLER( gamtor_unk_w )
 
 
 
-static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gaminator_map, AS_PROGRAM, 32, gaminator_state )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_ROM
 	AM_RANGE(0x08000000, 0x0bffffff) AM_RAM
 	AM_RANGE(0x1e040008, 0x1e04000b) AM_WRITE( gamtor_unk_w )

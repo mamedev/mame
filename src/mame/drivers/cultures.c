@@ -180,7 +180,7 @@ static WRITE8_HANDLER( bg_bank_w )
 	coin_counter_w(space->machine(), 0, data & 0x10);
 }
 
-static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8, cultures_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(bg0_videoram_w) AM_BASE_MEMBER(cultures_state, m_bg0_videoram)
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( cultures_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cultures_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cultures_io_map, AS_IO, 8, cultures_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_RAM
 	AM_RANGE(0x10, 0x13) AM_RAM

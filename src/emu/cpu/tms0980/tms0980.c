@@ -460,32 +460,32 @@ INLINE tms0980_state *get_safe_token(device_t *device)
 }
 
 
-static ADDRESS_MAP_START(tms0980_internal_rom, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(tms0980_internal_rom, AS_PROGRAM, 16, legacy_cpu_device)
 	AM_RANGE( 0x0000, 0x0FFF ) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tms0980_internal_ram, AS_DATA, 8)
+static ADDRESS_MAP_START(tms0980_internal_ram, AS_DATA, 8, legacy_cpu_device)
 	AM_RANGE( 0x0000, 0x0FFF ) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(program_10bit_8, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(program_10bit_8, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE( 0x000, 0x3ff ) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(program_11bit_8, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(program_11bit_8, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE( 0x000, 0x7ff ) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(data_6bit, AS_DATA, 8)
+static ADDRESS_MAP_START(data_6bit, AS_DATA, 8, legacy_cpu_device)
 	AM_RANGE( 0x00, 0x3f ) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(data_7bit, AS_DATA, 8)
+static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, legacy_cpu_device)
 	AM_RANGE( 0x00, 0x7f ) AM_RAM
 ADDRESS_MAP_END
 

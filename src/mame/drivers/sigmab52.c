@@ -303,7 +303,7 @@ static READ8_HANDLER(unk_f721_r)
 *      Memory Maps       *
 *************************/
 
-static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")
 
@@ -348,7 +348,7 @@ ADDRESS_MAP_END
 */
 
 #ifdef UNUSED_CODE
-static ADDRESS_MAP_START( sound_prog_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_prog_map, AS_PROGRAM, 8, sigmab52_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 #endif

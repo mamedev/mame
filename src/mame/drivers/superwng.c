@@ -284,7 +284,7 @@ static WRITE8_HANDLER(superwng_cointcnt2_w)
 	coin_counter_w(space->machine(), 1, data);
 }
 
-static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8, superwng_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(superwng_bg_vram_w) AM_BASE_MEMBER(superwng_state, m_videoram_bg)
@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa187, 0xa187) AM_WRITENOP //unknown , always(?) 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superwng_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( superwng_sound_map, AS_PROGRAM, 8, superwng_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(superwng_sound_nmi_clear_w)

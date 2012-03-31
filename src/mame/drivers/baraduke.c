@@ -162,7 +162,7 @@ static WRITE8_HANDLER( baraduke_irq_ack_w )
 
 
 
-static ADDRESS_MAP_START( baraduke_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( baraduke_map, AS_PROGRAM, 8, baraduke_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(baraduke_spriteram_r,baraduke_spriteram_w) AM_BASE_MEMBER(baraduke_state, m_spriteram)	/* Sprite RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(baraduke_videoram_r,baraduke_videoram_w) AM_BASE_MEMBER(baraduke_state, m_videoram)	/* Video RAM */
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namcos1_cus30_r,namcos1_cus30_w)		/* PSG device, shared RAM */
@@ -181,7 +181,7 @@ static READ8_HANDLER( soundkludge_r )
 	return ((state->m_counter++) >> 4) & 0xff;
 }
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, baraduke_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r,m6801_io_w)/* internal registers */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM								/* built in RAM */
 	AM_RANGE(0x1105, 0x1105) AM_READ(soundkludge_r)				/* cures speech */
@@ -199,7 +199,7 @@ static READ8_HANDLER( readFF )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, baraduke_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(inputport_r)			/* input ports read */
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(inputport_select_w)	/* input port select */
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)	/* leds won't work otherwise */

@@ -31,7 +31,7 @@ static WRITE8_HANDLER( irqack_w )
 	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP

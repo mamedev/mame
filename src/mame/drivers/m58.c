@@ -24,7 +24,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( yard_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( yard_map, AS_PROGRAM, 8, m58_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(yard_videoram_w) AM_BASE_MEMBER(m58_state, m_videoram)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(yard_scroll_panel_w)

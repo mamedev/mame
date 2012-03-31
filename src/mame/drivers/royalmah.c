@@ -463,7 +463,7 @@ static WRITE8_HANDLER ( mjclub_bank_w )
 }
 
 
-static ADDRESS_MAP_START( royalmah_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( royalmah_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITE( royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )	// banked ROMs not present in royalmah
@@ -471,7 +471,7 @@ static ADDRESS_MAP_START( royalmah_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mjapinky_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjapinky_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITE( royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
@@ -483,7 +483,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( royalmah_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( royalmah_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
@@ -491,7 +491,7 @@ static ADDRESS_MAP_START( royalmah_iomap, AS_IO, 8 )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ippatsu_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( ippatsu_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
@@ -501,7 +501,7 @@ static ADDRESS_MAP_START( ippatsu_iomap, AS_IO, 8 )
 	AM_RANGE( 0x13, 0x13 ) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( suzume_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( suzume_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( suzume_iomap, AS_IO, 8 )
 	AM_RANGE( 0x81, 0x81 ) AM_WRITE( suzume_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dondenmj_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( dondenmj_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w)
@@ -522,7 +522,7 @@ static ADDRESS_MAP_START( dondenmj_iomap, AS_IO, 8 )
 	AM_RANGE( 0x87, 0x87 ) AM_WRITE( dynax_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( makaijan_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( makaijan_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w)
@@ -533,7 +533,7 @@ static ADDRESS_MAP_START( makaijan_iomap, AS_IO, 8 )
 	AM_RANGE( 0x86, 0x86 ) AM_WRITE( dynax_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( daisyari_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( daisyari_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w)
@@ -542,7 +542,7 @@ static ADDRESS_MAP_START( daisyari_iomap, AS_IO, 8 )
 	AM_RANGE( 0xc0, 0xc0 ) AM_READWRITE( daisyari_dsw_r, daisyari_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjclub_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( mjclub_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( mjclub_dsw_r, mjclub_bank_w )
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
@@ -551,7 +551,7 @@ static ADDRESS_MAP_START( mjclub_iomap, AS_IO, 8 )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjdiplob_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( mjdiplob_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
@@ -562,7 +562,7 @@ static ADDRESS_MAP_START( mjdiplob_iomap, AS_IO, 8 )
 	AM_RANGE( 0x63, 0x63 ) AM_READ_PORT("DSW3")	// DSW3
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tontonb_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( tontonb_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
@@ -573,7 +573,7 @@ static ADDRESS_MAP_START( tontonb_iomap, AS_IO, 8 )
 	AM_RANGE( 0x47, 0x47 ) AM_READ_PORT("DSW3")	// DSW3
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majs101b_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( majs101b_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
@@ -582,7 +582,7 @@ static ADDRESS_MAP_START( majs101b_iomap, AS_IO, 8 )
 	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( majs101b_dsw_r, dynax_bank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjderngr_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( mjderngr_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x02, 0x03 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
@@ -595,7 +595,7 @@ static ADDRESS_MAP_START( mjderngr_iomap, AS_IO, 8 )
 	AM_RANGE( 0x60, 0x60 ) AM_WRITE( mjderngr_palbank_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjapinky_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( mjapinky_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE( mjapinky_bank_w )
 	AM_RANGE( 0x01, 0x01 ) AM_DEVREAD( "aysnd", ay8910_r )
@@ -606,7 +606,7 @@ static ADDRESS_MAP_START( mjapinky_iomap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( janoh_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( janoh_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITE( royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, m_videoram)
@@ -616,7 +616,7 @@ ADDRESS_MAP_END
 /* this CPU makes little sense - what is it for? why so many addresses accessed?
   -- it puts a value in shared ram to allow the main CPU to boot, then.. ?
 */
-static ADDRESS_MAP_START( janoh_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( janoh_sub_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4100, 0x413f ) AM_RAM
 	AM_RANGE( 0x6000, 0x607f ) AM_RAM
@@ -625,7 +625,7 @@ static ADDRESS_MAP_START( janoh_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0xf000, 0xffff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( janoh_sub_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( janoh_sub_iomap, AS_IO, 8, royalmah_state )
 ADDRESS_MAP_END
 
 /****************************************************************************
@@ -721,7 +721,7 @@ static WRITE8_HANDLER( jansou_sound_w )
 
 
 
-static ADDRESS_MAP_START( jansou_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jansou_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 
 	AM_RANGE( 0x6000, 0x600f ) AM_WRITE(jansou_colortable_w)
@@ -739,12 +739,12 @@ static ADDRESS_MAP_START( jansou_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, m_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jansou_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jansou_sub_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jansou_sub_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( jansou_sub_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r) AM_DEVWRITE( "dac", dac_w )
 ADDRESS_MAP_END
@@ -754,7 +754,7 @@ ADDRESS_MAP_END
                                 Janputer '96
 ****************************************************************************/
 
-static ADDRESS_MAP_START( janptr96_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( janptr96_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAMBANK("bank3") AM_SHARE("nvram")	// nvram
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAMBANK("bank2")	// banked nvram
@@ -812,7 +812,7 @@ static WRITE8_HANDLER( janptr96_coin_counter_w )
 	coin_counter_w(space->machine(), 1,data & 1);	// out
 }
 
-static ADDRESS_MAP_START( janptr96_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( janptr96_iomap, AS_IO, 8, royalmah_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE( janptr96_rombank_w )	// BANK ROM Select
 	AM_RANGE( 0x1e, 0x1e ) AM_READWRITE( janptr96_dswsel_r, janptr96_dswsel_w )
@@ -895,7 +895,7 @@ static WRITE8_HANDLER( mjifb_videoram_w )
 	videoram[offset + 0x4000] = data;
 }
 
-static ADDRESS_MAP_START( mjifb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjifb_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjifb_rom_io_r, mjifb_rom_io_w) AM_BASE_MEMBER(royalmah_state, m_videoram)
@@ -940,7 +940,7 @@ static WRITE8_HANDLER( mjifb_p8_w )
 	state->m_mjifb_rom_enable = (data & 0x08);
 }
 
-static ADDRESS_MAP_START( mjifb_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( mjifb_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE( mjifb_p3_r, mjifb_p3_w )
 	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE( mjifb_p4_w )
 	AM_RANGE( T90_P5, T90_P5 ) AM_READ ( mjifb_p5_r )
@@ -1000,7 +1000,7 @@ static WRITE8_HANDLER( mjdejavu_rom_io_w )
 	logerror("%04X: unmapped input write at %04X = %02X\n", cpu_get_pc(&space->device()), offset,data);
 }
 
-static ADDRESS_MAP_START( mjdejavu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjdejavu_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjdejavu_rom_io_r, mjdejavu_rom_io_w) AM_BASE_MEMBER(royalmah_state, m_videoram)
@@ -1035,7 +1035,7 @@ static WRITE8_HANDLER( mjtensin_6ff3_w )
 	mjtensin_update_rombank(space->machine());
 }
 
-static ADDRESS_MAP_START( mjtensin_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjtensin_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fbf ) AM_RAM
 	AM_RANGE( 0x6fc1, 0x6fc1 ) AM_DEVREAD( "aysnd", ay8910_r )
@@ -1051,7 +1051,7 @@ static ADDRESS_MAP_START( mjtensin_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, m_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjtensin_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( mjtensin_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( T90_P3, T90_P3 ) AM_READ ( mjtensin_p3_r )
 	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE( mjtensin_p4_w )
 ADDRESS_MAP_END
@@ -1108,7 +1108,7 @@ static WRITE8_HANDLER( cafetime_7fe3_w )
 //  popmessage("%02x",data);
 }
 
-static ADDRESS_MAP_START( cafetime_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cafetime_map, AS_PROGRAM, 8, royalmah_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x7eff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x7fc1, 0x7fc1 ) AM_DEVREAD( "aysnd", ay8910_r )
@@ -1127,7 +1127,7 @@ static ADDRESS_MAP_START( cafetime_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cafetime_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( cafetime_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( T90_P3, T90_P3 ) AM_WRITE( cafetime_p3_w )
 	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE( cafetime_p4_w )
 ADDRESS_MAP_END
@@ -1214,7 +1214,7 @@ static READ8_HANDLER( mjvegasa_12500_r )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( mjvegasa_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjvegasa_map, AS_PROGRAM, 8, royalmah_state )
 
 	AM_RANGE( 0x00000, 0x05fff ) AM_ROM
 	AM_RANGE( 0x06000, 0x07fff ) AM_RAM AM_SHARE("nvram")
@@ -1235,7 +1235,7 @@ static ADDRESS_MAP_START( mjvegasa_map, AS_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjvegasa_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( mjvegasa_iomap, AS_IO, 8, royalmah_state )
 	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE( mjtensin_p3_r, mjvegasa_p3_w )
 	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE( mjvegasa_p4_w )
 ADDRESS_MAP_END

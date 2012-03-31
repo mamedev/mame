@@ -2017,7 +2017,7 @@ static WRITE16_HANDLER( m68307_internal_base_w )
 	}
 }
 
-static ADDRESS_MAP_START( m68307_internal_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( m68307_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE(0x000000f0, 0x000000ff) AM_READWRITE(m68307_internal_base_r, m68307_internal_base_w)
 ADDRESS_MAP_END
 
@@ -2694,7 +2694,7 @@ static WRITE32_HANDLER( m68340_internal_base_w )
 }
 
 
-static ADDRESS_MAP_START( m68340_internal_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( m68340_internal_map, AS_PROGRAM, 32, legacy_cpu_device )
 	AM_RANGE(0x0003ff00, 0x0003ff03) AM_READWRITE( m68340_internal_base_r, m68340_internal_base_w)
 ADDRESS_MAP_END
 

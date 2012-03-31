@@ -81,7 +81,7 @@ static READ8_HANDLER( pip_r )
 	return 0x7f;
 }
 
-static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0010, 0x0010) AM_WRITE(rollerg_0010_w)
 	AM_RANGE(0x0020, 0x0020) AM_READWRITE(watchdog_reset_r,watchdog_reset_w)
 	AM_RANGE(0x0030, 0x0031) AM_DEVREADWRITE("k053260", rollerg_sound_r, k053260_w)	/* K053260 */
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rollerg_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rollerg_sound_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa02f) AM_DEVREADWRITE("k053260", k053260_r,k053260_w)

@@ -249,7 +249,7 @@ static WRITE8_HANDLER( cyclemb_flip_w )
 	// a bunch of other things are setted here
 }
 
-static ADDRESS_MAP_START( cyclemb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cyclemb_map, AS_PROGRAM, 8, cyclemb_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_vram)
@@ -260,20 +260,20 @@ static ADDRESS_MAP_START( cyclemb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xbfff) AM_RAM //WRAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cyclemb_io, AS_IO, 8 )
+static ADDRESS_MAP_START( cyclemb_io, AS_IO, 8, cyclemb_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(cyclemb_8741_0_r, cyclemb_8741_0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cyclemb_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cyclemb_sound_map, AS_PROGRAM, 8, cyclemb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8 )
+static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_address_data_w)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r) AM_WRITE(soundlatch2_w)

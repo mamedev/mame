@@ -151,7 +151,7 @@ static WRITE8_DEVICE_HANDLER( ultratnk_explosion_w )
 }
 
 
-static ADDRESS_MAP_START( ultratnk_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ultratnk_cpu_map, AS_PROGRAM, 8, ultratnk_state )
 
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 

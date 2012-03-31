@@ -535,12 +535,12 @@ static WRITE16_HANDLER( cpuregs_w )
  * Internal memory map
  **************************************************************************/
 
-static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE(0x2000, 0x23ff) AM_RAM	AM_SHARE("saram")		// SARAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("daram_b0")	// DARAM B0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( internal_data, AS_DATA, 16 )
+static ADDRESS_MAP_START( internal_data, AS_DATA, 16, legacy_cpu_device )
 	AM_RANGE(0x0000, 0x005f) AM_READWRITE(cpuregs_r, cpuregs_w)
 	AM_RANGE(0x0060, 0x007f) AM_RAM							// DARAM B2
 	AM_RANGE(0x0100, 0x02ff) AM_RAM AM_SHARE("daram_b0")	// DARAM B0

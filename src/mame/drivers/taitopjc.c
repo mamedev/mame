@@ -65,6 +65,13 @@ static UINT32 jc_screen_ram[0x10000];
 
 static UINT8 common_ram[0x2000];
 
+class taitopjc_state : public driver_device
+{
+public:
+	taitopjc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+	{ }
+};
 
 static VIDEO_START( taitopjc )
 {
@@ -302,7 +309,7 @@ static WRITE64_HANDLER(dsp_w)
 // DBAT2 U: 0xc0000003   L: 0xc0000022      (0xc0000000...0xc001ffff)
 // DBAT3 U: 0xfe0003ff   L: 0xfe000022      (0xfe000000...0xffffffff)
 
-static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64)
+static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64, taitopjc_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM // Work RAM
 	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE(video_r, video_w)
 	AM_RANGE(0x80000000, 0x80003fff) AM_READWRITE(dsp_r, dsp_w)
@@ -358,7 +365,7 @@ static WRITE8_HANDLER(tlcs_sound_w)
 // 0xfc0fb5: INTRX1
 // 0xfc0f41: INTTX1
 
-static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8, taitopjc_state )
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE(tlcs_sound_r, tlcs_sound_w)
 	AM_RANGE(0x060000, 0x061fff) AM_READWRITE(tlcs_common_r, tlcs_common_w)
@@ -391,7 +398,7 @@ static const tlcs900_interface taitopjc_tlcs900_interface =
 	DEVCB_HANDLER( taitopjc_tlcs900_to3 )
 };
 
-static MACHINE_CONFIG_START( taitopjc, driver_device )
+static MACHINE_CONFIG_START( taitopjc, taitopjc_state )
 	MCFG_CPU_ADD("maincpu", PPC603E, 100000000)
 	MCFG_CPU_CONFIG(ppc603e_config)
 	MCFG_CPU_PROGRAM_MAP(ppc603e_mem)

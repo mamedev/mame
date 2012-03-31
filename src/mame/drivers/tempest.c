@@ -394,7 +394,7 @@ static WRITE8_HANDLER( tempest_coin_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_BASE(&avgdvg_colorram)
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")

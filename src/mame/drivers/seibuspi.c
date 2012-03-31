@@ -1032,7 +1032,7 @@ static READ32_HANDLER( soundrom_r )
 
 /********************************************************************/
 
-static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x00000417) AM_RAM
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_READNOP
@@ -1061,7 +1061,7 @@ static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")		/* ROM location in real-mode */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spisound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spisound_map, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank5")
 	AM_RANGE(0x4002, 0x4002) AM_WRITENOP			/* ack RST 10 */
 	AM_RANGE(0x4003, 0x4003) AM_WRITENOP			/* Unknown */
@@ -1130,7 +1130,7 @@ static const ymf271_interface ymf271_config =
 
 /********************************************************************/
 
-static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x00000417) AM_RAM
 	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_READNOP
@@ -1159,7 +1159,7 @@ static WRITE32_HANDLER(input_select_w)
 	state->m_ejsakura_input_port = data;
 }
 
-static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x0000000f) AM_RAM
 	AM_RANGE(0x00000010, 0x00000013) AM_READ(spi_int_r)				/* Unknown */
 	AM_RANGE(0x00000090, 0x00000097) AM_RAM /* Unknown */

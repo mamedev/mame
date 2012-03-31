@@ -109,7 +109,7 @@ static WRITE8_HANDLER( irq_mask_w )
 	state->m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, m_videoram)
@@ -138,7 +138,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, m_videoram)
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, bagman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("aysnd", ay8910_r)

@@ -69,7 +69,7 @@ static READ8_HANDLER( turtship_ports_r )
 }
 
 
-static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(sidearms_colorram_w) AM_BASE_MEMBER(sidearms_state,m_colorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sidearms_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sidearms_sound_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
@@ -139,7 +139,7 @@ static WRITE8_HANDLER( whizz_bankswitch_w )
 	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
 }
 
-static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
@@ -163,12 +163,12 @@ static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( whizz_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( whizz_sound_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( whizz_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( whizz_io_map, AS_IO, 8, sidearms_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP

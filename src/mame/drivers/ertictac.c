@@ -51,7 +51,7 @@ static READ32_HANDLER( ertictac_podule_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( ertictac_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( ertictac_map, AS_PROGRAM, 32, ertictac_state )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 

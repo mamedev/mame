@@ -866,7 +866,7 @@ DEVICE_GET_INFO( venture_sound )
 DEFINE_LEGACY_SOUND_DEVICE(EXIDY_VENTURE, venture_sound);
 
 
-static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
 	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
@@ -935,13 +935,13 @@ static READ8_DEVICE_HANDLER( mtrap_voiceio_r )
 }
 
 
-static ADDRESS_MAP_START( cvsd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cvsd_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE("custom", mtrap_voiceio_r, mtrap_voiceio_w)
 ADDRESS_MAP_END
@@ -1105,7 +1105,7 @@ DEVICE_GET_INFO( victory_sound )
 DEFINE_LEGACY_SOUND_DEVICE(EXIDY_VICTORY, victory_sound);
 
 
-static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
 	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)

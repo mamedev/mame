@@ -576,7 +576,7 @@ static MACHINE_START( pbillian )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(superqix_state, m_spriteram, m_spriteram_size)
@@ -585,7 +585,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -598,7 +598,7 @@ static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8 )
 	AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotsmash_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hotsmash_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -611,7 +611,7 @@ static ADDRESS_MAP_START( hotsmash_port_map, AS_IO, 8 )
 	AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay1", ay8910_data_address_w)
@@ -624,7 +624,7 @@ static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8 )
 	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE(superqix_bitmapram2_w) AM_BASE_MEMBER(superqix_state, m_bitmapram2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bootleg_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bootleg_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD("ay1", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE("ay1", ay8910_data_address_w)
@@ -638,7 +638,7 @@ static ADDRESS_MAP_START( bootleg_port_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8, superqix_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READ(hotsmash_68705_portA_r)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(hotsmash_68705_portB_w)
@@ -650,12 +650,12 @@ ADDRESS_MAP_END
 
 /* I8751 memory handlers */
 
-static ADDRESS_MAP_START( bootleg_mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bootleg_mcu_io_map, AS_IO, 8, superqix_state )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(bootleg_mcu_p1_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(bootleg_mcu_p3_r, mcu_p3_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sqixu_mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sqixu_mcu_io_map, AS_IO, 8, superqix_state )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READ(sqixu_mcu_p0_r)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("DSW1")
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(sqixu_mcu_p2_w)

@@ -84,7 +84,7 @@ static READ16_HANDLER( DS5002FP_R )
     return 0x55aa;
 }
 
-static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM													/* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop2_vram_w) AM_BASE_MEMBER(thoop2_state, m_videoram)	/* Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE_MEMBER(thoop2_state, m_vregs)					/* Video Registers */

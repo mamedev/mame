@@ -207,7 +207,7 @@ static WRITE8_HANDLER( main_irq_ack_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dacholer_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE(background_w) AM_BASE_MEMBER(dacholer_state, m_bgvideoram)
@@ -215,13 +215,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(dacholer_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( itaten_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( itaten_main_map, AS_PROGRAM, 8, dacholer_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xb7ff) AM_RAM
 	AM_IMPORT_FROM( main_map )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -238,13 +238,13 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( snd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( snd_map, AS_PROGRAM, 8, dacholer_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xd000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( itaten_snd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( itaten_snd_map, AS_PROGRAM, 8, dacholer_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
@@ -281,7 +281,7 @@ static WRITE8_HANDLER( music_irq_w )
 	state->m_music_interrupt_enable = data;
 }
 
-static ADDRESS_MAP_START( snd_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch_clear_w )
 	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
@@ -293,7 +293,7 @@ static ADDRESS_MAP_START( snd_io_map, AS_IO, 8 )
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay3", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( itaten_snd_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( itaten_snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch_clear_w )
 	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay1", ay8910_data_address_w)

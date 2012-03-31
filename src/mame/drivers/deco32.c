@@ -734,7 +734,7 @@ static WRITE32_HANDLER( deco32_pf3_rowscroll_w ) { deco32_state *state = space->
 static WRITE32_HANDLER( deco32_pf4_rowscroll_w ) { deco32_state *state = space->machine().driver_data<deco32_state>(); COMBINE_DATA(&state->m_pf4_rowscroll32[offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->m_pf4_rowscroll[offset]); }
 
 
-static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100007) AM_READ(deco32_71_r)
@@ -767,7 +767,7 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32, deco32_state )
 //  AM_RANGE(0x000000, 0x001fff) AM_ROM AM_WRITE(deco32_pf1_data_w) // wtf??
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE_MEMBER(deco32_state, m_ram)
@@ -802,7 +802,7 @@ static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x208800, 0x208803) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fghthsta_memmap, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( fghthsta_memmap, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE_MEMBER(deco32_state, m_ram)
 	AM_RANGE(0x140000, 0x140003) AM_WRITENOP /* VBL irq ack */
@@ -833,7 +833,7 @@ ADDRESS_MAP_END
 
 // the video drawing (especially sprite) code on this is too slow to cope with proper partial updates
 // raster effects appear to need some work on it anyway?
-static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE_MEMBER(deco32_state, m_ram)
 	AM_RANGE(0x120000, 0x120fff) AM_READ(dragngun_prot_r)
@@ -880,7 +880,7 @@ static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x500000, 0x500003) AM_WRITE(dragngun_sprite_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE_MEMBER(deco32_state, m_ram)
 	AM_RANGE(0x120000, 0x120fff) AM_READ(dragngun_prot_r)
@@ -926,7 +926,7 @@ static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x500000, 0x500003) AM_WRITE(dragngun_sprite_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, deco32_state )
 
 	AM_RANGE(0x000000, 0x0f7fff) AM_ROM
 	AM_RANGE(0x0f8000, 0x0fffff) AM_ROM AM_WRITENOP
@@ -971,7 +971,7 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(tattass_prot_r, tattass_prot_w) AM_BASE(&deco32_prot_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE_MEMBER(deco32_state, m_ram)
 	AM_RANGE(0x120000, 0x1200ff) AM_NOP							/* ACIA (unused) */
@@ -1014,7 +1014,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deco32_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
@@ -1034,7 +1034,7 @@ static READ8_HANDLER(latch_r)
 	return soundlatch_r(space,0);
 }
 
-static ADDRESS_MAP_START( nslasher_sound, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nslasher_sound, AS_PROGRAM, 8, deco32_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -1043,7 +1043,7 @@ static ADDRESS_MAP_START( nslasher_sound, AS_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd000) AM_READ(latch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nslasher_io_sound, AS_IO, 8 )
+static ADDRESS_MAP_START( nslasher_io_sound, AS_IO, 8, deco32_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
 

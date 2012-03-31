@@ -146,7 +146,7 @@ static WRITE8_HANDLER( poo_vregs_w )
 	state->m_vram_colbank = data & 0x18;
 }
 
-static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8, poo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM
@@ -169,19 +169,19 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unclepoo_main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( unclepoo_main_portmap, AS_IO, 8, poo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( unclepoo_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( unclepoo_sub_map, AS_PROGRAM, 8, poo_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_WRITENOP  /* R/C filter ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unclepoo_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( unclepoo_sub_portmap, AS_IO, 8, poo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay", ay8910_address_w)

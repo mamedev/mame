@@ -68,7 +68,7 @@ static WRITE8_HANDLER( scregg_irqack_w )
 }
 
 
-static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)

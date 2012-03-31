@@ -715,7 +715,7 @@ static WRITE16_HANDLER( mcu_halt_clear_w )
 
 
 
-static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM area is written several times (dev system?)
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")	// nvram is for gekisou only
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
@@ -738,7 +738,7 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x780000, 0x780001) AM_WRITE(watchdog_reset16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE_MEMBER(equites_state, m_workram) // work RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") // joyport [2211]
@@ -761,7 +761,7 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_BASE_MEMBER(equites_state, m_spriteram_2)	// sprite RAM 2 (8-bit)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE("msm", msm5232_w)
@@ -774,12 +774,12 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, equites_state )
 	AM_RANGE(0x00e0, 0x00e5) AM_WRITE(equites_8155_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(equites_state, m_mcu_ram) /* main CPU shared RAM */
 ADDRESS_MAP_END
 

@@ -48,7 +48,7 @@ public:
 
 //ce9b8
 /* TODO: understand the proper ROM loading.*/
-static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_dyn_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0)
@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcat_io, AS_IO, 32 )
+static ADDRESS_MAP_START( pcat_io, AS_IO, 32, pcat_dyn_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write, 0xffffffff)
 ADDRESS_MAP_END

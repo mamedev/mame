@@ -334,7 +334,7 @@ static WRITE8_HANDLER( omegrace_soundlatch_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, omegrace_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4bff) AM_RAM
 	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_SHARE("nvram") /* NVRAM */
@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
 	AM_RANGE(0x09, 0x09) AM_READ(watchdog_reset_r)
@@ -366,13 +366,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, omegrace_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_port, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_port, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)	/* likely ay8910 input port, not direct */
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)

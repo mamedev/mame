@@ -79,7 +79,7 @@ Preliminary COP MCU memory map
 /*****************************************************************************/
 
 
-static ADDRESS_MAP_START( legionna_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( legionna_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(legionna_mcu_r, legionna_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( legionna_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( heatbrl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( heatbrl_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(heatbrl_mcu_r, heatbrl_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( heatbrl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(godzilla_mcu_r, godzilla_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
@@ -132,7 +132,7 @@ static WRITE16_HANDLER( denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w )
 	paletteram16_xBBBBBGGGGGRRRRR_word_w(space,offset,data,mem_mask);
 }
 
-static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(denjinmk_mcu_r, denjinmk_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x11f000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( grainbow_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( grainbow_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(grainbow_mcu_r, grainbow_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( grainbow_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cupsoc_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cupsoc_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(cupsoc_mcu_r,cupsoc_mcu_w) AM_BASE(&cop_mcu_ram)
@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( cupsoc_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cupsocs_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cupsocs_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(cupsocs_mcu_r,cupsocs_mcu_w) AM_BASE(&cop_mcu_ram)
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( cupsocs_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
 	AM_RANGE(0x100000, 0x1007ff) AM_READWRITE(copdxbl_0_r,copdxbl_0_w) AM_BASE(&cop_mcu_ram)
@@ -229,7 +229,7 @@ static WRITE8_DEVICE_HANDLER( okim_rombank_w )
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x7));
 }
 
-static ADDRESS_MAP_START( cupsocbl_sound_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cupsocbl_sound_mem, AS_PROGRAM, 8, legionna_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", okim_rombank_w)

@@ -76,7 +76,7 @@ Notes:
 
 /*************************************************************/
 
-static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_BASE_MEMBER(namcond1_state, m_shared_ram)
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(ygv608_r,ygv608_w)
@@ -251,7 +251,7 @@ static WRITE8_HANDLER( mcu_pa_write )
 }
 
 /* H8/3002 MCU stuff */
-static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16 )
 	AM_RANGE(0xc00040, 0xc00041) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 8, namcond1_state )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ( mcu_p7_read )
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( mcu_pa_read, mcu_pa_write )
 	AM_RANGE(H8_ADC_0_L, H8_ADC_3_H) AM_NOP // MCU reads these, but the games have no analog controls

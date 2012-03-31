@@ -152,7 +152,7 @@ static WRITE8_HANDLER(nmi_line_w)
 
 
 /* PROGRAM MAPS */
-static ADDRESS_MAP_START( z80_0_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_0_mem, AS_PROGRAM, 8, esh_state )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_BASE_MEMBER(esh_state, m_tile_ram)
@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 
 
 /* IO MAPS */
-static ADDRESS_MAP_START( z80_0_io, AS_IO, 8 )
+static ADDRESS_MAP_START( z80_0_io, AS_IO, 8, esh_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0,0xf0) AM_READ_PORT("IN0")
 	AM_RANGE(0xf1,0xf1) AM_READ_PORT("IN1")

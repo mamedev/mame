@@ -738,7 +738,7 @@ static WRITE8_DEVICE_HANDLER( buckrog_ppi8255_0_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( turbo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( turbo_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x0700) AM_MASK(0x0f7) AM_RAM AM_BASE_MEMBER(turbo_state, m_spriteram)
 	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_WRITE(turbo_coin_and_lamp_w)
@@ -764,7 +764,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( subroc3d_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( subroc3d_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE_MEMBER(turbo_state, m_sprite_position)	// CONT RAM
 	AM_RANGE(0xa400, 0xa7ff) AM_RAM AM_BASE_MEMBER(turbo_state, m_spriteram)			// CONT RAM
@@ -788,7 +788,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, m_videoram)		// FIX PAGE
@@ -806,14 +806,14 @@ static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( buckrog_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( buckrog_cpu2_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x0000, 0xdfff) AM_WRITE(buckrog_bitmap_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( buckrog_cpu2_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( buckrog_cpu2_portmap, AS_IO, 8, turbo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READ(buckrog_cpu2_command_r)
 ADDRESS_MAP_END

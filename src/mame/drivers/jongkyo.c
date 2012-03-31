@@ -217,7 +217,7 @@ static WRITE8_HANDLER( unknown_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8, jongkyo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE(videoram2_w) // wrong, this doesn't seem to be video ram on write..
 	AM_RANGE(0x4000, 0x6bff) AM_ROM // fixed rom
 	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")	// banked (8 banks)
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jongkyo_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( jongkyo_portmap, AS_IO, 8, jongkyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// R 01 keyboard
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)

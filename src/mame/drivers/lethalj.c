@@ -208,7 +208,7 @@ static WRITE16_HANDLER( cclownz_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( lethalj_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( lethalj_map, AS_PROGRAM, 16, lethalj_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x04000000, 0x0400000f) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)

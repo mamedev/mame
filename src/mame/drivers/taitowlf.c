@@ -457,7 +457,7 @@ static WRITE32_HANDLER(at_page32_w)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32, taitowlf_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	#if ENABLE_VGA
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32)
+static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32, taitowlf_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)

@@ -26,7 +26,7 @@ public:
 
 };
 
-static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( pgm2_map, AS_PROGRAM, 32, pgm2_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 ADDRESS_MAP_END
 

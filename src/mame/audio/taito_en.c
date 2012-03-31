@@ -287,7 +287,7 @@ static WRITE16_HANDLER(es5510_dsp_w)
 	}
 }
 
-static ADDRESS_MAP_START( f3_sound_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( f3_sound_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("share1")
 	AM_RANGE(0x140000, 0x140fff) AM_READWRITE(f3_68000_share_r, f3_68000_share_w)
 	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_r, es5505_w)

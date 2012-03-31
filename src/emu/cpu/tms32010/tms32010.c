@@ -913,7 +913,7 @@ static CPU_EXECUTE( tms32010 )
  *  TMS32010 Internal Memory Map
  ****************************************************************************/
 
-static ADDRESS_MAP_START( tms32010_ram, AS_DATA, 16 )
+static ADDRESS_MAP_START( tms32010_ram, AS_DATA, 16, legacy_cpu_device )
 	AM_RANGE(0x00, 0x7f) AM_RAM		/* Page 0 */
 	AM_RANGE(0x80, 0x8f) AM_RAM		/* Page 1 */
 ADDRESS_MAP_END
@@ -1074,7 +1074,7 @@ CPU_GET_INFO( tms32010 )
  *  TMS32015 Internal Memory Map
  ****************************************************************************/
 
-static ADDRESS_MAP_START( tms32015_ram, AS_DATA, 16 )
+static ADDRESS_MAP_START( tms32015_ram, AS_DATA, 16, tms32015_device )
 	AM_RANGE(0x00, 0x7f) AM_RAM		/* Page 0 */
 	AM_RANGE(0x80, 0xff) AM_RAM		/* Page 1 */
 ADDRESS_MAP_END

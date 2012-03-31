@@ -441,7 +441,7 @@ static void ide_interrupt(device_t *device, int state)
  *
  *************************************/
 
-static ADDRESS_MAP_START( memory_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( memory_map, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM							// PRG ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM							// WORK RAM
 	AM_RANGE(0x480000, 0x48443f) AM_RAM_WRITE(paletteram32_w)		// COLOR RAM

@@ -130,7 +130,7 @@ static WRITE8_DEVICE_HANDLER( jailbrek_speech_w )
 	vlm5030_rst(device, (data >> 2) & 1);
 }
 
-static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(jailbrek_colorram_w) AM_BASE_MEMBER(jailbrek_state, m_colorram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(jailbrek_videoram_w) AM_BASE_MEMBER(jailbrek_state, m_videoram)
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(jailbrek_state, m_spriteram, m_spriteram_size)

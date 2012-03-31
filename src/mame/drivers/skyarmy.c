@@ -162,7 +162,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 }
 
 
-static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8, skyarmy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skyarmy_videoram_w) AM_BASE_MEMBER(skyarmy_state,m_videoram) /* Video RAM */
@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( skyarmy_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( skyarmy_io_map, AS_IO, 8, skyarmy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_r)

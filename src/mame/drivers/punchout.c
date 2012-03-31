@@ -313,7 +313,7 @@ static WRITE8_HANDLER( spunchout_exp_w )
 
 
 
-static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
@@ -327,7 +327,7 @@ static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
@@ -348,7 +348,7 @@ static WRITE8_HANDLER( nmi_mask_w )
 	state->m_nmi_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)
 	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)

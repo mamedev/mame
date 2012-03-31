@@ -408,7 +408,15 @@ Notes:
 #include "cpu/powerpc/ppc.h"
 #include "machine/naomigd.h"
 
-static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 32 )
+class triforce_state : public driver_device
+{
+public:
+	triforce_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+	{ }
+};
+
+static ADDRESS_MAP_START( gc_map, AS_PROGRAM, 32, triforce_state )
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0) AM_SHARE("share2")	/* Program ROM */
 ADDRESS_MAP_END
 
@@ -426,7 +434,7 @@ static SCREEN_UPDATE_RGB32(triforce)
 static INPUT_PORTS_START( triforce )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( triforce_base, driver_device )
+static MACHINE_CONFIG_START( triforce_base, triforce_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", PPC403GA, 64000000) /* Correct CPU is a PowerPC 750 (what Apple called "G3") with paired-single vector instructions added */

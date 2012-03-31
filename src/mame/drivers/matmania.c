@@ -65,7 +65,7 @@ static WRITE8_HANDLER( maniach_sh_command_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( matmania_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( matmania_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
 	AM_RANGE(0x0780, 0x07df) AM_WRITEONLY AM_BASE_SIZE_MEMBER(matmania_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, m_videoram2, m_videoram2_size)
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( matmania_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
 	AM_RANGE(0x0780, 0x07df) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, m_videoram2, m_videoram2_size)
@@ -102,7 +102,7 @@ static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( matmania_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( matmania_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_data_address_w)
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( matmania_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniach_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( maniach_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", ym3526_w)
 	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE("dac", dac_signed_w)
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( maniach_sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( maniach_mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( maniach_mcu_map, AS_PROGRAM, 8, matmania_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(maniach_68705_port_a_r,maniach_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(maniach_68705_port_b_r,maniach_68705_port_b_w)

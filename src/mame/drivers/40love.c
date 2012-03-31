@@ -631,7 +631,7 @@ static WRITE8_HANDLER( to_main_w )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( 40love_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( 40love_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	/* M5517P on main board */
 	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE("bmcu", buggychl_mcu_r, buggychl_mcu_w)
@@ -656,7 +656,7 @@ static ADDRESS_MAP_START( 40love_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w) /* banked pixel layer */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( undoukai_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( undoukai_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(fortyl_state, m_mcu_ram) /* M5517P on main board */
@@ -754,7 +754,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
 //  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", state->m_snd_ctrl0, state->m_snd_ctrl1, state->m_snd_ctrl2, state->m_snd_ctrl3);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fortyl_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_address_data_w)

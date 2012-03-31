@@ -231,7 +231,7 @@ static WRITE16_HANDLER( cuebrickj_nvram_bank_w )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", twin16_upd_reset_w)
@@ -243,7 +243,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("upd", twin16_upd_busy_r)	// miaj writes 0 to it
 	ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x780000, 0x79ffff) AM_RAM AM_BASE_MEMBER(twin16_state, m_sprite_gfx_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 	AM_RANGE(0x060000, 0x063fff) AM_RAM

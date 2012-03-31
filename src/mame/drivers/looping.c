@@ -484,7 +484,7 @@ static READ8_HANDLER( protection_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(looping_videoram_w) AM_BASE_MEMBER(looping_state, m_videoram)
@@ -504,7 +504,7 @@ static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf803, 0xf803) AM_MIRROR(0x03fc) AM_READWRITE(adc_r, adc_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( looping_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( looping_io_map, AS_IO, 8, looping_state )
 	/* 400 = A16 */
 	/* 401 = A17 */
 	/* 402 = COLOR 9 */
@@ -519,7 +519,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8, looping_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
@@ -531,7 +531,7 @@ static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3e03, 0x3e03) AM_MIRROR(0x00f6) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( looping_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( looping_sound_io_map, AS_IO, 8, looping_state )
 	AM_RANGE(0x000, 0x000) AM_WRITE(looping_souint_clr)
 	AM_RANGE(0x001, 0x007) AM_DEVWRITE("dac", looping_sound_sw)
 	AM_RANGE(0x008, 0x008) AM_DEVWRITE("aysnd", ay_enable_w)
@@ -542,15 +542,15 @@ ADDRESS_MAP_END
 
 
 /* standard COP420 map */
-static ADDRESS_MAP_START( looping_cop_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( looping_cop_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( looping_cop_data_map, AS_DATA, 8 )
+static ADDRESS_MAP_START( looping_cop_data_map, AS_DATA, 8, looping_state )
 	AM_RANGE(0x0000, 0x003f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( looping_cop_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( looping_cop_io_map, AS_IO, 8, looping_state )
 	AM_RANGE(0x0100, 0x0107) AM_READWRITE(cop_io_r, cop_io_w)
 ADDRESS_MAP_END
 

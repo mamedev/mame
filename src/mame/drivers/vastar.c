@@ -105,7 +105,7 @@ static WRITE8_HANDLER( nmi_mask_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(vastar_bg2videoram_r, vastar_bg2videoram_w) AM_BASE_MEMBER(vastar_state,m_bg2videoram)
 	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(vastar_bg1videoram_r, vastar_bg1videoram_w) AM_BASE_MEMBER(vastar_state,m_bg1videoram)
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xcc00, 0xcc3f) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,m_spriteram3)	/* actually cc10-cc1f and cc30-cc3f */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_port_map, AS_IO, 8, vastar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(flip_screen_w)
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( main_port_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu2_port_map, AS_IO, 8, vastar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_r)

@@ -176,7 +176,7 @@ static WRITE8_HANDLER( key_matrix_status_w )
 		state->m_coin_settings = state->m_km_status & 0xf;
 }
 
-static ADDRESS_MAP_START( speedatk_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( speedatk_mem, AS_PROGRAM, 8, speedatk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(key_matrix_r,key_matrix_w)
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(key_matrix_status_r,key_matrix_status_w)
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( speedatk_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( speedatk_io, AS_IO, 8 )
+static ADDRESS_MAP_START( speedatk_io, AS_IO, 8, speedatk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(speedatk_6845_w) //h46505 address / data routing
 	AM_RANGE(0x24, 0x24) AM_WRITE(watchdog_reset_w)

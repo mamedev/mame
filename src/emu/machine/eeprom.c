@@ -73,12 +73,12 @@ const eeprom_interface eeprom_interface_93C66B =
 };
 
 
-static ADDRESS_MAP_START( eeprom_map8, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( eeprom_map8, AS_PROGRAM, 8, eeprom_device )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( eeprom_map16, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( eeprom_map16, AS_PROGRAM, 16, eeprom_device )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 ADDRESS_MAP_END
 

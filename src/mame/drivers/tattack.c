@@ -67,7 +67,7 @@ static VIDEO_START( tattack )
 		state->m_tmap = tilemap_create( machine, get_tile_info,tilemap_scan_rows,8,8,32,32 );
 }
 
-static ADDRESS_MAP_START( mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 //  AM_RANGE(0x4000, 0x4000) AM_READNOP $315
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(tattack_state, m_videoram)

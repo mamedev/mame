@@ -231,7 +231,7 @@ static WRITE8_HANDLER( dual_pokey_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( alpha_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( alpha_map, AS_PROGRAM, 8, mhavoc_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(mhavoc_state, m_zram0)
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
@@ -262,7 +262,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gamma_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gamma_map, AS_PROGRAM, 8, mhavoc_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM								/* Program RAM (2K) */
     AM_RANGE(0x0800, 0x0fff) AM_RAM AM_MIRROR (0x1800)
 	AM_RANGE(0x2000, 0x203f) AM_READWRITE(quad_pokey_r, quad_pokey_w)	/* Quad Pokey read  */
@@ -285,7 +285,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( alphaone_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( alphaone_map, AS_PROGRAM, 8, mhavoc_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(mhavoc_state, m_zram0)
 	AM_RANGE(0x0800, 0x09ff) AM_RAM

@@ -104,7 +104,7 @@ static WRITE8_DEVICE_HANDLER( bingoc_play_w )
 //  printf("%02x\n",data);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bingoc_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10007f) AM_READ(bingoc_rand_r) //comms? lamps?
 	AM_RANGE(0x180000, 0x18007f) AM_READ(bingoc_rand_r) //comms? lamps?
@@ -114,12 +114,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bingoc_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io, AS_IO, 8, bingoc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("upd", bingoc_play_w)

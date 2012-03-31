@@ -234,7 +234,7 @@ DONE? (check on real board)
 #include "sound/msm5205.h"
 #include "includes/stfight.h"
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")                  /* sf02.bin */
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_GENERIC(paletteram)
@@ -256,7 +256,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(stfight_state, m_sprite_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)

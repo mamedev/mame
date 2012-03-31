@@ -291,7 +291,7 @@ static WRITE8_DEVICE_HANDLER( galpani2_oki2_bank_w )
 }
 
 
-static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM												// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(galpani2_state, m_ram)		// Work RAM
 	AM_RANGE(0x110000, 0x11000f) AM_RAM												// ? corrupted? stack dumper on POST failure, pc+sr on gp2se
@@ -362,7 +362,7 @@ static READ16_HANDLER( galpani2_bankedrom_r )
 	else				return 0xffff; //floating bus for absent ROMs
 }
 
-static ADDRESS_MAP_START( galpani2_mem2, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( galpani2_mem2, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM																// ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_BASE_MEMBER(galpani2_state, m_ram2)										// Work RAM
 	AM_RANGE(0x400000, 0x4fffff) AM_RAM_WRITE(galpani2_bg15_w) AM_BASE_MEMBER(galpani2_state, m_bg15)	// bg15

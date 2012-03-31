@@ -594,7 +594,7 @@ static WRITE8_HANDLER( flip_screen_w ) { flip_screen_set(space->machine(), data)
 /******************************************************************************/
 
 
-static ADDRESS_MAP_START( lastmisn_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastmisn_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram2)
@@ -620,7 +620,7 @@ static ADDRESS_MAP_START( lastmisn_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastmisn_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastmisn_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
@@ -640,7 +640,7 @@ static ADDRESS_MAP_START( lastmisn_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shackled_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shackled_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram2)
@@ -664,7 +664,7 @@ static ADDRESS_MAP_START( shackled_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shackled_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shackled_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
@@ -689,7 +689,7 @@ static ADDRESS_MAP_START( shackled_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gondo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gondo_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, m_bg_data)
@@ -712,7 +712,7 @@ static ADDRESS_MAP_START( gondo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( garyoret_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( garyoret_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(dec8_bg_data_r, dec8_bg_data_w) AM_BASE_MEMBER(dec8_state, m_bg_data)
@@ -734,7 +734,7 @@ static ADDRESS_MAP_START( garyoret_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meikyuh_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( meikyuh_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(dec8_videoram_w) AM_BASE_SIZE_MEMBER(dec8_state, m_videoram, m_videoram_size)
@@ -758,7 +758,7 @@ static ADDRESS_MAP_START( meikyuh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( csilver_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( csilver_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram2)
@@ -783,7 +783,7 @@ static ADDRESS_MAP_START( csilver_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( csilver_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( csilver_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
@@ -799,7 +799,7 @@ static ADDRESS_MAP_START( csilver_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0eff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0f00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("share2")
@@ -823,7 +823,7 @@ static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oscar_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( oscar_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0eff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0f00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("share2")
@@ -831,7 +831,7 @@ static ADDRESS_MAP_START( oscar_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(srdarwin_videoram_w) AM_BASE_MEMBER(dec8_state, m_videoram)
@@ -854,7 +854,7 @@ static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
 	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
@@ -882,7 +882,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 /* Used for Cobra Command, Maze Hunter, Super Real Darwin etc */
-static ADDRESS_MAP_START( dec8_s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dec8_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3812_w)
@@ -891,7 +891,7 @@ static ADDRESS_MAP_START( dec8_s_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden */
-static ADDRESS_MAP_START( oscar_s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( oscar_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3526_w)
@@ -900,7 +900,7 @@ static ADDRESS_MAP_START( oscar_s_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Used by Last Mission, Shackled & Breywood */
-static ADDRESS_MAP_START( ym3526_s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ym3526_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_w)
@@ -909,7 +909,7 @@ static ADDRESS_MAP_START( ym3526_s_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Captain Silver - same sound system as Pocket Gal */
-static ADDRESS_MAP_START( csilver_s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( csilver_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_w)
@@ -977,7 +977,7 @@ static WRITE8_HANDLER( dec8_mcu_to_main_w )
 		device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( dec8_mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( dec8_mcu_io_map, AS_IO, 8, dec8_state )
 	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P3) AM_READWRITE(dec8_mcu_from_main_r, dec8_mcu_to_main_w)
 ADDRESS_MAP_END
 

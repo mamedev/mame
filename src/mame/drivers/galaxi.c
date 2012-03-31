@@ -272,7 +272,7 @@ static CUSTOM_INPUT( hopper_r )
 }
 
 
-static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE(galaxi_bg1_w) AM_BASE_MEMBER(galaxi_state, m_bg1_ram)

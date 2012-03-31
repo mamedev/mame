@@ -500,7 +500,7 @@ static WRITE16_HANDLER( blitter_w )
 
 static WRITE16_HANDLER( wecleman_soundlatch_w );
 
-static ADDRESS_MAP_START( wecleman_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wecleman_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM	// ROM (03c000-03ffff used as RAM sometimes!)
 	AM_RANGE(0x040494, 0x040495) AM_WRITE(wecleman_videostatus_w) AM_BASE_MEMBER(wecleman_state, m_videostatus)	// cloud blending control (HACK)
 	AM_RANGE(0x040000, 0x043fff) AM_RAM	// RAM
@@ -532,7 +532,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( hotchase_soundlatch_w );
 
-static ADDRESS_MAP_START( hotchase_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hotchase_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x041fff) AM_RAM									// RAM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM									// RAM
@@ -562,7 +562,7 @@ ADDRESS_MAP_END
                     WEC Le Mans 24 Sub CPU Handlers
 ***************************************************************************/
 
-static ADDRESS_MAP_START( wecleman_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wecleman_sub_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_MEMBER(wecleman_state, m_roadram) AM_SIZE_MEMBER(wecleman_state, m_roadram_size)	// Road
 	AM_RANGE(0x070000, 0x073fff) AM_RAM AM_SHARE("share1")	// RAM (Shared with main CPU)
@@ -573,7 +573,7 @@ ADDRESS_MAP_END
                         Hot Chase Sub CPU Handlers
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hotchase_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hotchase_sub_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// ROM
 	AM_RANGE(0x020000, 0x020fff) AM_RAM AM_BASE_MEMBER(wecleman_state, m_roadram) AM_SIZE_MEMBER(wecleman_state, m_roadram_size)	// Road
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("share1") // Shared with main CPU
@@ -630,7 +630,7 @@ static WRITE8_DEVICE_HANDLER( wecleman_K00723216_bank_w )
 	k007232_set_bank(device, 0, ~data&1 );	//* (wecleman062gre)
 }
 
-static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x8500, 0x8500) AM_WRITENOP	// incresed with speed (global volume)?
@@ -723,7 +723,7 @@ static WRITE8_DEVICE_HANDLER( hotchase_k007232_w )
 	k007232_w(device, offset ^ 1, data);
 }
 
-static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x100d) AM_DEVREADWRITE("konami1", hotchase_k007232_r, hotchase_k007232_w)	// 3 x K007232
 	AM_RANGE(0x2000, 0x200d) AM_DEVREADWRITE("konami2", hotchase_k007232_r, hotchase_k007232_w)

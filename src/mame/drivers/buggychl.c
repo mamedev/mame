@@ -131,7 +131,7 @@ static WRITE8_HANDLER( sound_enable_w )
 
 
 
-static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM /* A22-04 (23) */
 	AM_RANGE(0x4000, 0x7fff) AM_ROM /* A22-05 (22) */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* 6116 SRAM (36) */
@@ -163,7 +163,7 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xdc06, 0xdc06) AM_WRITE(buggychl_bg_scrollx_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay1", ay8910_address_data_w)

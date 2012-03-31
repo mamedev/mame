@@ -314,7 +314,7 @@ static WRITE8_HANDLER(page3_w)
 
 
 
-static ADDRESS_MAP_START( sfkick_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( sfkick_map, AS_PROGRAM, 8, sfkick_state )
 	AM_RANGE( 0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE( 0x2000, 0x3fff) AM_ROMBANK("bank2")
 	AM_RANGE( 0x4000, 0x5fff) AM_ROMBANK("bank3")
@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( sfkick_map, AS_PROGRAM, 8)
 	AM_RANGE( 0xc000, 0xffff) AM_WRITE( page3_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sfkick_io_map, AS_IO, 8)
+static ADDRESS_MAP_START( sfkick_io_map, AS_IO, 8, sfkick_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0xa0, 0xa7) AM_WRITE( soundlatch_w )
@@ -338,12 +338,12 @@ static ADDRESS_MAP_START( sfkick_io_map, AS_IO, 8)
 	AM_RANGE( 0xb4, 0xb5) AM_RAM /* loopback ? req by sfkicka (MSX Bios leftover)*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sfkick_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sfkick_sound_map, AS_PROGRAM, 8, sfkick_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sfkick_sound_io_map, AS_IO, 8)
+static ADDRESS_MAP_START( sfkick_sound_io_map, AS_IO, 8, sfkick_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)

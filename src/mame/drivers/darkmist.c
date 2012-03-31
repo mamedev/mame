@@ -36,7 +36,7 @@ static WRITE8_HANDLER(darkmist_hw_w)
 	memory_set_bankptr(space->machine(), "bank1",&space->machine().region("maincpu")->base()[0x010000+((data&0x80)?0x4000:0)]);
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1")

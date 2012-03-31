@@ -286,7 +286,7 @@ static READ16_HANDLER( irq4_ack_r )
 }
 
 
-static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ(irq1_ack_r)
 	AM_RANGE(0x100000, 0x100001) AM_READ(irq2_ack_r)

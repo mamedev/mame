@@ -160,7 +160,7 @@ static INTERRUPT_GEN( jubileep_interrupt )
 * Memory Map Information *
 *************************/
 //59a
-static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x30ff) AM_WRITE(jubileep_videoram_w) AM_BASE_MEMBER(jubilee_state, m_videoram)	/* wrong... just placed somewhere */
@@ -182,7 +182,7 @@ static READ8_HANDLER(unk_r)
 	return (space->machine().rand() & 0xff);
 }
 
-static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8 )
+static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8, jubilee_state )
 //  AM_RANGE(0x0000, 0xffff) AM_READ(unk_r)
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc",  mc6845_status_r, mc6845_address_w)
 //  AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)

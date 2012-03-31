@@ -23,19 +23,19 @@ public:
 };
 
 
-static ADDRESS_MAP_START( astrafr_master_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( astrafr_master_map, AS_PROGRAM, 32, astrafr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // as_partyd set
 ADDRESS_MAP_END
 
 // probably identical, afaik they're linekd units..
-static ADDRESS_MAP_START( astrafr_slave_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( astrafr_slave_map, AS_PROGRAM, 32, astrafr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // as_partyd set
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( astra_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( astra_map, AS_PROGRAM, 32, astrafr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // as_partyd set
 ADDRESS_MAP_END

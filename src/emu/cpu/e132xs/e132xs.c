@@ -375,27 +375,27 @@ static void check_interrupts(hyperstone_state *cpustate);
 
 // 4Kb IRAM (On-Chip Memory)
 
-static ADDRESS_MAP_START( e116_4k_iram_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( e116_4k_iram_map, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_MIRROR(0x1ffff000)
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( e132_4k_iram_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( e132_4k_iram_map, AS_PROGRAM, 32, legacy_cpu_device )
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM AM_MIRROR(0x1ffff000)
 ADDRESS_MAP_END
 
 
 // 8Kb IRAM (On-Chip Memory)
 
+static ADDRESS_MAP_START( e116_8k_iram_map, AS_PROGRAM, 16, legacy_cpu_device )
 
-static ADDRESS_MAP_START( e116_8k_iram_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0000000, 0xc0001fff) AM_RAM AM_MIRROR(0x1fffe000)
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( e132_8k_iram_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( e132_8k_iram_map, AS_PROGRAM, 32, legacy_cpu_device )
 	AM_RANGE(0xc0000000, 0xc0001fff) AM_RAM AM_MIRROR(0x1fffe000)
 ADDRESS_MAP_END
 
@@ -403,13 +403,13 @@ ADDRESS_MAP_END
 // 16Kb IRAM (On-Chip Memory)
 
 
-static ADDRESS_MAP_START( e116_16k_iram_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( e116_16k_iram_map, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE(0xc0000000, 0xc0003fff) AM_RAM AM_MIRROR(0x1fffc000)
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( e132_16k_iram_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( e132_16k_iram_map, AS_PROGRAM, 32, legacy_cpu_device )
 	AM_RANGE(0xc0000000, 0xc0003fff) AM_RAM AM_MIRROR(0x1fffc000)
 ADDRESS_MAP_END
 

@@ -122,7 +122,7 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_portb_w )
 	logerror("%s:CIA0_portb_w(%02x)\n", device->machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( cd32_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( cd32_map, AS_PROGRAM, 32, cd32_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(cd32_state, m_chip_ram, m_chip_ram_size)
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("DIPSW1")

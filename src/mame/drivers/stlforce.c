@@ -90,7 +90,7 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data>>8) & 3));
 }
 
-static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(stlforce_bg_videoram_w) AM_BASE_MEMBER(stlforce_state,m_bg_videoram)
 	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(stlforce_mlow_videoram_w) AM_BASE_MEMBER(stlforce_state,m_mlow_videoram)

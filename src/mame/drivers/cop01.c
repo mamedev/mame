@@ -124,7 +124,7 @@ static READ8_HANDLER( cop01_sound_irq_ack_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cop01_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cop01_map, AS_PROGRAM, 8, cop01_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM /* c000-c7ff in cop01 */
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE_MEMBER(cop01_state, m_bgvideoram)
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( cop01_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE_MEMBER(cop01_state, m_fgvideoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -156,13 +156,13 @@ static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8 )
 	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cop01_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_READ(cop01_sound_irq_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
@@ -178,7 +178,7 @@ static READ8_HANDLER( kludge )
 	return state->m_timer++;
 }
 
-static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP	/* 1412M2? */

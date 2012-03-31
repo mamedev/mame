@@ -776,7 +776,7 @@ static WRITE32_HANDLER( unknown_13a_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gaelco3d_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_w) AM_BASE_GENERIC(paletteram)
@@ -807,7 +807,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(gaelco3d_paletteram_020_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x51000c, 0x51000f) AM_READ_PORT("IN0")
@@ -837,19 +837,19 @@ static ADDRESS_MAP_START( main020_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_BASE_MEMBER(gaelco3d_state, m_m68k_ram_base)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x000000, 0x007fff) AM_READWRITE(tms_m68k_ram_r, tms_m68k_ram_w)
 	AM_RANGE(0x400000, 0x5fffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xc00000, 0xc00007) AM_WRITE(gaelco3d_render_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, gaelco3d_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(gaelco3d_state, m_adsp_ram_base)		/* 1k words internal RAM */
 	AM_RANGE(0x37ff, 0x37ff) AM_READNOP							/* speedup hammers this for no apparent reason */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16 )
+static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, gaelco3d_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(adsp_rombank_w)
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(sound_data_r, sound_status_w)

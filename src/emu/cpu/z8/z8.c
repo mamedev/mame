@@ -734,11 +734,11 @@ static CPU_RESET( z8 )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, legacy_cpu_device )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_4kb, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( program_4kb, AS_PROGRAM, 8, legacy_cpu_device )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 

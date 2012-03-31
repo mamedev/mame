@@ -505,7 +505,7 @@ static READ16_HANDLER( tmaster_coins_r )
 	return input_port_read(space->machine(), "COIN")|(space->machine().rand()&0x0800);
 }
 
-static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x27ffff ) AM_RAM
 	AM_RANGE( 0x280000, 0x28ffef ) AM_RAM AM_SHARE("nvram")
@@ -729,7 +729,7 @@ static READ16_HANDLER( dummy_read_01 )
 	return 0x3;	// Pass the check at PC = 0xfae & a later one
 }
 
-static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
 
 	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_BASE_MEMBER(tmaster_state, m_galgames_ram )
 	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( "maincpu", 0x40000 )

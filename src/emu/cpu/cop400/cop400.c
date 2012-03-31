@@ -1236,32 +1236,32 @@ static CPU_EXECUTE( cop400 )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( program_512b, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( program_512b, AS_PROGRAM, 8, legacy_cpu_device )
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_1kb, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( program_1kb, AS_PROGRAM, 8, legacy_cpu_device )
 	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, legacy_cpu_device )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( data_32b, AS_DATA, 8 )
+static ADDRESS_MAP_START( data_32b, AS_DATA, 8, legacy_cpu_device )
 	AM_RANGE(0x00, 0x1f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( data_64b, AS_DATA, 8 )
+static ADDRESS_MAP_START( data_64b, AS_DATA, 8, legacy_cpu_device )
 	AM_RANGE(0x00, 0x3f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( data_128b, AS_DATA, 8 )
+static ADDRESS_MAP_START( data_128b, AS_DATA, 8, legacy_cpu_device )
 	AM_RANGE(0x00, 0x7f) AM_RAM
 ADDRESS_MAP_END
 
 #ifdef UNUSED_CODE
-static ADDRESS_MAP_START( data_160b, AS_DATA, 8 )
+static ADDRESS_MAP_START( data_160b, AS_DATA, 8, legacy_cpu_device )
 	AM_RANGE(0x00, 0x9f) AM_RAM
 ADDRESS_MAP_END
 #endif

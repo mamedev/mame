@@ -132,7 +132,7 @@ static WRITE32_HANDLER( svg_latch_arm_w )
 /* 55857G? */
 /* Demon Front, The Gladiator, Happy 6-in-1, Spectral Vs. Generation, Killing Blade EX */
 /*  the ones with an EXECUTE ONLY region of ARM space? */
-static ADDRESS_MAP_START( svg_68k_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START( svg_68k_mem, AS_PROGRAM, 16, pgm_arm_type3_state )
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")  /* Game ROM */
 
@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( svg_68k_mem, AS_PROGRAM, 16)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32, pgm_arm_type3_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM

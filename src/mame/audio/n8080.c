@@ -558,13 +558,13 @@ MACHINE_RESET( helifire_sound )
 }
 
 
-static ADDRESS_MAP_START( n8080_sound_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( n8080_sound_cpu_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( n8080_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( n8080_sound_io_map, AS_IO, 8, driver_device )
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(n8080_8035_t0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(n8080_8035_t1_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(n8080_8035_p1_r)
@@ -573,7 +573,7 @@ static ADDRESS_MAP_START( n8080_sound_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( helifire_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( helifire_sound_io_map, AS_IO, 8, driver_device )
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(helifire_8035_t0_r)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(helifire_8035_t1_r)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(helifire_8035_p2_r)

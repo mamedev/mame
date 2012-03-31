@@ -248,7 +248,7 @@ static WRITE8_HANDLER(supershot_output1_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( supershot_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( supershot_map, AS_PROGRAM, 8, supershot_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE( supershot_vidram_w ) AM_BASE_MEMBER( supershot_state, m_videoram )
 	AM_RANGE(0x4100, 0x41ff) AM_RAM

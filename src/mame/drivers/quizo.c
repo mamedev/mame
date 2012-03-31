@@ -131,7 +131,7 @@ static WRITE8_HANDLER(port60_w)
 	memory_set_bankptr(space->machine(),  "bank1", &space->machine().region("user1")->base()[rombankLookup[data]*0x4000] );
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, quizo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( portmap, AS_IO, 8, quizo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN1")

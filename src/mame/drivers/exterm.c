@@ -279,7 +279,7 @@ static WRITE8_HANDLER( sound_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, exterm_state )
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0xfc700000) AM_RAM AM_BASE_MEMBER(exterm_state, m_master_videoram)
 	AM_RANGE(0x00800000, 0x00bfffff) AM_MIRROR(0xfc400000) AM_RAM
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, exterm_state )
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0xfbf00000) AM_RAM AM_BASE_MEMBER(exterm_state, m_slave_videoram)
 	AM_RANGE(0x04000000, 0x047fffff) AM_MIRROR(0xfb800000) AM_RAM
@@ -310,7 +310,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_master_map, AS_PROGRAM, 8, exterm_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("ymsnd", ym2151_data_latch_w)
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(sound_nmi_rate_w)
@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( sound_master_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_slave_map, AS_PROGRAM, 8, exterm_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_READ(sound_slave_latch_r)
 	AM_RANGE(0x8000, 0xbfff) AM_DEVWRITE("dac", sound_slave_dac_w)

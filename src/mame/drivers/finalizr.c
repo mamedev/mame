@@ -97,7 +97,7 @@ static WRITE8_HANDLER( i8039_T0_w )
     */
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_BASE_MEMBER(finalizr_state, m_scroll)
 	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
@@ -125,11 +125,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, finalizr_state )
 	AM_RANGE(0x00, 0xff)                   AM_READ(soundlatch_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_w)

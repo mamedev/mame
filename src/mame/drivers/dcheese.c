@@ -214,7 +214,7 @@ static WRITE8_HANDLER( bsmt_data_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16, dcheese_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
@@ -236,7 +236,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, dcheese_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sound_status_r, sound_control_w)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(sound_command_r)

@@ -42,7 +42,7 @@ YM2151:
 #define YM_CLOCK    (XTAL1/4)
 
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(mustache_videoram_w) AM_BASE_MEMBER(mustache_state, m_videoram)

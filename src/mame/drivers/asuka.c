@@ -311,7 +311,7 @@ static WRITE16_HANDLER( cadash_share_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( bonzeadv_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bonzeadv_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
 	AM_RANGE(0x10c000, 0x10ffff) AM_RAM
@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( bonzeadv_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( asuka_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( asuka_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x1076f0, 0x1076f1) AM_READNOP	/* Mofflott init does dummy reads here */
@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( asuka_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xd00000, 0xd03fff) AM_DEVREADWRITE("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cadash_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cadash_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080003) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0x00ff)
@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( cadash_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc20000, 0xc2000f) AM_DEVREADWRITE("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( eto_map, AS_PROGRAM, 16 )	/* N.B. tc100scn mirror overlaps spriteram */
+static ADDRESS_MAP_START( eto_map, AS_PROGRAM, 16 	/* N.B. tc100scn mirror overlaps spriteram */, asuka_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10000f) AM_DEVREADWRITE("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
@@ -378,7 +378,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( bonzeadv_z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bonzeadv_z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -392,7 +392,7 @@ static ADDRESS_MAP_START( bonzeadv_z80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* no MSM5205 */
-static ADDRESS_MAP_START( cadash_z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cadash_z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -431,12 +431,12 @@ communicates with m68k S with its own shared ram. In short:
 m68k M -> z180 M <-> z180 S <- m68k S
 */
 
-static ADDRESS_MAP_START( cadash_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cadash_sub_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&cadash_shared_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cadash_sub_io, AS_IO, 8 )
+static ADDRESS_MAP_START( cadash_sub_io, AS_IO, 8, asuka_state )
 	AM_RANGE(0x00, 0x3f) AM_RAM // z180 internal I/O regs
 ADDRESS_MAP_END
 

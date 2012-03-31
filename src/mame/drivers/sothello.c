@@ -121,14 +121,14 @@ static READ8_HANDLER( soundcpu_status_r )
     return state->m_soundcpu_busy;
 }
 
-static ADDRESS_MAP_START( maincpu_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( maincpu_mem_map, AS_PROGRAM, 8, sothello_state )
     AM_RANGE(0x0000, 0x7fff) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
     AM_RANGE(0xc000, 0xdfff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("share1")
     AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, sothello_state )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE( 0x00, 0x0f) AM_READ_PORT("INPUT1")
     AM_RANGE( 0x10, 0x1f) AM_READ_PORT("INPUT2")
@@ -182,12 +182,12 @@ static WRITE8_HANDLER(soundcpu_int_clear_w)
     cputag_set_input_line(space->machine(), "soundcpu", 0, CLEAR_LINE );
 }
 
-static ADDRESS_MAP_START( soundcpu_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( soundcpu_mem_map, AS_PROGRAM, 8, sothello_state )
     AM_RANGE(0x0000, 0xdfff) AM_ROM
     AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundcpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( soundcpu_io_map, AS_IO, 8, sothello_state )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
     AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
     AM_RANGE(0x01, 0x01) AM_WRITE(msm_data_w)
@@ -223,7 +223,7 @@ static READ8_HANDLER(subcpu_status_r)
     return 0;
 }
 
-static ADDRESS_MAP_START( subcpu_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( subcpu_mem_map, AS_PROGRAM, 8, sothello_state )
     AM_RANGE(0x0000, 0x1fff) AM_READWRITE(subcpu_status_r,subcpu_status_w)
     AM_RANGE(0x2000, 0x77ff) AM_RAM
     AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")  /* upper 0x800 of 6264 is shared  with main cpu */

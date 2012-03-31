@@ -58,7 +58,7 @@ static SCREEN_UPDATE_IND16(royalgum)
 	return 0;
 }
 
-static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8, rgum_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //not all of it?
 
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)

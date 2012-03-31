@@ -167,7 +167,7 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0d00, 0xfe1807) AM_RAM		/* still part of OBJ RAM */
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tigeroad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
@@ -191,16 +191,16 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tigeroad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sample_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sample_map, AS_PROGRAM, 8, tigeroad_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sample_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sample_port_map, AS_IO, 8, tigeroad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("msm", msm5205_w)

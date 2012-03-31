@@ -333,7 +333,7 @@ static const ppi8255_interface sindbadm_ppi_intf =
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
 	AM_RANGE(0x0800, 0x7fff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM		/* PROM board ROM area */
@@ -343,7 +343,7 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segag80r_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
 	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE(coin_count_w)
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_ppi8255_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_ppi8255_portmap, AS_IO, 8, segag80r_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xbe, 0xbf) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
@@ -362,7 +362,7 @@ static ADDRESS_MAP_START( main_ppi8255_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sindbadm_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sindbadm_portmap, AS_IO, 8, segag80r_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x42, 0x43) AM_READWRITE(segag80r_video_port_r, segag80r_video_port_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
@@ -378,7 +378,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /* complete memory map derived from System 1 schematics */
-static ADDRESS_MAP_START( sindbadm_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sindbadm_sound_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE("sn1", sindbadm_SN76496_w)

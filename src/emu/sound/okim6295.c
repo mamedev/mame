@@ -75,7 +75,7 @@ const UINT8 okim6295_device::s_volume_table[16] =
 };
 
 // default address map
-static ADDRESS_MAP_START( okim6295, AS_0, 8 )
+static ADDRESS_MAP_START( okim6295, AS_0, 8, okim6295_device )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 ADDRESS_MAP_END
 

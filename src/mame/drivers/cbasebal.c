@@ -111,7 +111,7 @@ static const eeprom_interface cbasebal_eeprom_intf =
  *
  *************************************/
 
-static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8, cbasebal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_GENERIC(paletteram)	/* palette + vram + scrollram */
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(cbasebal_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cbasebal_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( cbasebal_portmap, AS_IO, 8, cbasebal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cbasebal_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE_PORT("IO_01")

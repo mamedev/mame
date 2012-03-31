@@ -117,7 +117,7 @@ static PALETTE_INIT( othello )
 	palette_set_color(machine, 0x0f, MAKE_RGB(0xff, 0xff, 0xff));
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_NOP /* not populated */
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(othello_state, m_videoram)
@@ -172,7 +172,7 @@ static WRITE8_HANDLER( tilebank_w )
 	logerror("tilebank -> %x\n", data);
 }
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, othello_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0x09, 0x09) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
@@ -222,12 +222,12 @@ static WRITE8_HANDLER( ay_data_w )
 	if (state->m_ay_select & 2) ay8910_data_w(state->m_ay2, 0, data);
 }
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, othello_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( audio_portmap, AS_IO, 8, othello_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(latch_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay_data_w)
@@ -301,7 +301,7 @@ static READ8_HANDLER( n7751_t1_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)

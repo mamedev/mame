@@ -33,7 +33,7 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 	memory_set_bank(device->machine(), "bank3", data & 0x01);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1")	/* extra ROM */
 	AM_RANGE(0x2c0000, 0x2dffff) AM_ROMBANK("bank2")
@@ -50,13 +50,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tail2nos_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tail2nos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_r) AM_WRITENOP	/* the write is a clear pending command */
 	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ymsnd", ym2608_w)

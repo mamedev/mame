@@ -109,7 +109,7 @@ static WRITE8_HANDLER( espial_master_soundlatch_w )
 }
 
 
-static ADDRESS_MAP_START( espial_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( espial_map, AS_PROGRAM, 8, espial_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5800, 0x5fff) AM_RAM
 	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("IN0")
@@ -134,7 +134,7 @@ ADDRESS_MAP_END
 
 /* there are a lot of unmapped reads from all over memory as the
    code uses POP instructions in a delay loop */
-static ADDRESS_MAP_START( netwars_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( netwars_map, AS_PROGRAM, 8, espial_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x5800, 0x5fff) AM_RAM
 	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("IN0")
@@ -155,14 +155,14 @@ static ADDRESS_MAP_START( netwars_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( espial_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( espial_sound_map, AS_PROGRAM, 8, espial_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(espial_sound_nmi_mask_w)
 	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( espial_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( espial_sound_io_map, AS_IO, 8, espial_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END

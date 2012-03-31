@@ -527,7 +527,7 @@ static WRITE16_DEVICE_HANDLER( calchase_dac_w )
 	dac_data_16_w(device, ((data & 0xfff) << 4));
 }
 
-static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
@@ -562,7 +562,7 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( calchase_io, AS_IO, 32)
+static ADDRESS_MAP_START( calchase_io, AS_IO, 32, calchase_state )
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)

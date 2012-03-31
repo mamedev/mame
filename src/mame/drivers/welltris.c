@@ -354,7 +354,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE_MEMBER(welltris_state,m_pixelram)	/* Graph_1 & 2*/
@@ -378,13 +378,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITENOP					/* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, welltris_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, welltris_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(welltris_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)

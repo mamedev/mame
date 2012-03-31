@@ -120,7 +120,7 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 }
 
 
-static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM // tilemap ram on the original, used as a buffer on the bootlegs
 	AM_RANGE(0x410000, 0x410fff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
@@ -176,7 +176,7 @@ static WRITE16_HANDLER( sys16_coinctrl_w )
 	}
 }
 
-static ADDRESS_MAP_START( passshtb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( passshtb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on original, buffer on bootleg
@@ -260,7 +260,7 @@ static READ16_HANDLER( passht4b_io3_r )
 	return state->m_passht4b_io3_val;
 }
 
-static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( passht4b_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on original, buffer on bootleg
 	AM_RANGE(0x409000, 0x40afff) AM_RAM AM_BASE_MEMBER(segas1x_bootleg_state, m_bg0_tileram)
@@ -309,7 +309,7 @@ static WRITE16_HANDLER( sys16_tilebank_w )
 	}
 }
 
-static ADDRESS_MAP_START( wb3bbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wb3bbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
 	AM_RANGE(0x400000, 0x407fff) AM_RAM // tilemap ram on the original, used as a buffer on the bootlegs
@@ -429,7 +429,7 @@ static WRITE8_HANDLER( tturfbl_soundbank_w )
 	}
 }
 
-static ADDRESS_MAP_START(tturfbl_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START(tturfbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(tturfbl_soundbank_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(tturfbl_soundbank_w)
@@ -438,7 +438,7 @@ static ADDRESS_MAP_START(tturfbl_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tturfbl_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tturfbl_sound_io_map, AS_IO, 8, segas1x_bootleg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP
@@ -447,13 +447,13 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, segas1x_bootleg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
@@ -461,7 +461,7 @@ ADDRESS_MAP_END
 
 
 // 7759
-static ADDRESS_MAP_START( sound_7759_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_7759_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)
@@ -479,7 +479,7 @@ static WRITE8_DEVICE_HANDLER( upd7759_bank_w ) //*
 }
 
 
-static ADDRESS_MAP_START( sound_7759_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_7759_io_map, AS_IO, 8, segas1x_bootleg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("7759", upd7759_bank_w)
@@ -516,7 +516,7 @@ static void set_bg_page( running_machine &machine, int data )
 }
 
 #ifdef UNUSED_CODE
-static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bayroute_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x100003) AM_WRITENOP // tilebank control?
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
@@ -541,7 +541,7 @@ ADDRESS_MAP_END
     Flash Point (Datsu bootlegs = fpointbl, fpointbj)
     Has sound latch at $E000 instead of I/O ports $C0-FF
 */
-static ADDRESS_MAP_START( fpointbl_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fpointbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -611,7 +611,7 @@ static WRITE16_HANDLER( s16bl_bgscrolly_w )
 }
 
 
-static ADDRESS_MAP_START( goldnaxeb1_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( goldnaxeb1_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
@@ -636,7 +636,7 @@ static ADDRESS_MAP_START( goldnaxeb1_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bayrouteb1_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
 	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
@@ -709,7 +709,7 @@ static WRITE16_HANDLER( datsu_page3_w )
 	datsu_set_pages(space->machine());
 }
 
-static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x500000, 0x503fff) AM_RAM // work ram
 	AM_RANGE(0x600000, 0x600fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
@@ -733,7 +733,7 @@ static ADDRESS_MAP_START( bayrouteb2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x901006, 0x901007) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dduxbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dduxbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE(sys16_tilebank_w)
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
@@ -832,7 +832,7 @@ static WRITE16_HANDLER( goldnaxeb2_bgpage_w )
 	set_bg_page(space->machine(), page ^ 0xffff);
 }
 
-static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
@@ -860,7 +860,7 @@ ADDRESS_MAP_END
 /***************************************************************************/
 
 
-static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( fpointbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
@@ -901,7 +901,7 @@ static WRITE16_HANDLER( eswat_tilebank0_w )
 	}
 }
 
-static ADDRESS_MAP_START( eswatbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( eswatbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x3e2000, 0x3e2001) AM_WRITE(eswat_tilebank0_w) // external tile bank ( > 0x4000 tiles )
@@ -930,7 +930,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( tetrisbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tetrisbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
@@ -966,7 +966,7 @@ static READ16_HANDLER( beautyb_unkx_r )
 	return state->m_beautyb_unkx;
 }
 
-static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( beautyb_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x010000, 0x03ffff) AM_WRITENOP
 
@@ -997,7 +997,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( tturfbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tturfbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // work ram
 	AM_RANGE(0x300000, 0x300fff) AM_RAM AM_BASE(&segaic16_spriteram_0)
@@ -1058,7 +1058,7 @@ static READ8_HANDLER( system18_bank_r )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( sound_18_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_18_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_READ(system18_bank_r)
 	/**** D/A register ****/
@@ -1083,7 +1083,7 @@ static WRITE8_HANDLER( sys18_soundbank_w )
 		state->m_sound_bank = NULL;
 }
 
-static ADDRESS_MAP_START( sound_18_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_18_io_map, AS_IO, 8, segas1x_bootleg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("3438.0", ym3438_r, ym3438_w)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("3438.1", ym3438_r, ym3438_w)
@@ -1145,7 +1145,7 @@ static WRITE16_HANDLER( sound_command_irq_w )
 	}
 }
 
-static ADDRESS_MAP_START( shdancbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shdancbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
@@ -1262,7 +1262,7 @@ static WRITE8_HANDLER( shdancbl_bankctrl_w )
 	}
 }
 
-static ADDRESS_MAP_START(shdancbl_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START(shdancbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(shdancbl_soundbank_r)
 	AM_RANGE(0xc000, 0xc00f) AM_WRITENOP
@@ -1276,7 +1276,7 @@ static ADDRESS_MAP_START(shdancbl_sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shdancbl_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( shdancbl_sound_io_map, AS_IO, 8, segas1x_bootleg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xa0, 0xbf) AM_WRITENOP
 	AM_RANGE(0xc0, 0xdf) AM_READNOP
@@ -1289,7 +1289,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mwalkbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mwalkbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)
@@ -1331,7 +1331,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* bootleg doesn't have real vdp or i/o */
-static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( astormbl_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM_WRITE(sys16_tileram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_tileram)
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(sys16_textram_w) AM_BASE_MEMBER(segas1x_bootleg_state, m_textram)

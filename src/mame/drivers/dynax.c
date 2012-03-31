@@ -471,26 +471,26 @@ static WRITE8_HANDLER( yarunara_layer_half2_w )
 	hnoridur_layer_half2_w(space, 0, data >> 1);
 }
 
-static ADDRESS_MAP_START( sprtmtch_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sprtmtch_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hnoridur_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hnoridur_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank1") AM_WRITE(hnoridur_palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcnpshnt_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcnpshnt_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank1") AM_WRITE(hnoridur_palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nanajign_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nanajign_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
@@ -498,14 +498,14 @@ static ADDRESS_MAP_START( nanajign_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjdialq2_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjdialq2_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0800, 0x0fff ) AM_RAM
 	AM_RANGE( 0x1000, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yarunara_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( yarunara_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
@@ -513,14 +513,14 @@ static ADDRESS_MAP_START( yarunara_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x8000, 0x81ff ) AM_WRITE(yarunara_palette_w)	// Palette or RTC
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jantouki_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jantouki_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jantouki_sound_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jantouki_sound_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank2")
@@ -528,7 +528,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(dynax_extra_scrollx_w)	// screen scroll X
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(dynax_extra_scrolly_w)	// screen scroll Y
@@ -564,7 +564,7 @@ static ADDRESS_MAP_START( hanamai_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hnoridur_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
@@ -641,14 +641,15 @@ static READ8_HANDLER( hjingi_keyboard_1_r )
 	return hanamai_keyboard_1_r(space, 0) | input_port_read(space->machine(), "BET");
 }
 
-static ADDRESS_MAP_START( hjingi_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hjingi_mem_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE( 0x0000, 0x01ff ) AM_ROM
 	AM_RANGE( 0x0200, 0x1fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x2000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank1") AM_WRITE(hnoridur_palette_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
+static ADDRESS_MAP_START( hjingi_io_map, AS_IO, 8, dynax_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
@@ -801,7 +802,7 @@ static WRITE8_HANDLER( yarunara_blit_romregion_w )
 	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(&space->device()), data);
 }
 
-static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( yarunara_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x01 ) AM_WRITE(yarunara_input_w)		// Controls
 	AM_RANGE( 0x02, 0x03 ) AM_READ(yarunara_input_r)		//
@@ -834,7 +835,7 @@ ADDRESS_MAP_END
 
 
 // Almost identical to hnoridur
-static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 //  AM_RANGE( 0x10, 0x10 ) AM_WRITENOP   // CRT Controller
@@ -872,7 +873,7 @@ static ADDRESS_MAP_START( mcnpshnt_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sprtmtch_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sprtmtch_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 	AM_RANGE( 0x10, 0x11 ) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	// 2 x DSW
@@ -900,7 +901,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( mjfriday_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mjfriday_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(dynax_blit_pen_w)		// Destination Pen
 	AM_RANGE( 0x01, 0x01 ) AM_WRITE(dynax_blit_palette01_w)	// Layers Palettes (Low Bits)
@@ -926,7 +927,7 @@ static ADDRESS_MAP_START( mjfriday_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nanajign_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( nanajign_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE("msm", adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
@@ -994,7 +995,7 @@ static WRITE8_HANDLER( jantouki_rombank_w )
 	set_led_status(space->machine(), 0, data & 0x10);	// maybe
 }
 
-static ADDRESS_MAP_START( jantouki_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( jantouki_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE( 0x40, 0x41 ) AM_WRITENOP   // CRT Controller
 	AM_RANGE( 0x48, 0x48 ) AM_WRITE(jantouki_rombank_w)		// BANK ROM Select
@@ -1052,7 +1053,7 @@ static READ8_HANDLER( jantouki_soundlatch_status_r )
 	return (state->m_soundlatch_full) ? 0 : 0x80;
 }
 
-static ADDRESS_MAP_START( jantouki_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( jantouki_sound_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE(jantouki_sound_rombank_w)		// BANK ROM Select
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE(jantouki_sound_vblank_ack_w)	// VBlank IRQ Ack
@@ -1092,7 +1093,7 @@ static WRITE8_HANDLER( mjelctrn_blitter_ack_w )
 	state->m_blitter_irq = 0;
 }
 
-static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mjelctrn_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_DEVWRITE("msm", adpcm_reset_w)	// MSM5205 reset
 	AM_RANGE( 0x02, 0x02 ) AM_WRITE(adpcm_data_w)			// MSM5205 data
@@ -1241,7 +1242,7 @@ static READ8_HANDLER( unk_r )
 	return 0x78;
 }
 
-static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( htengoku_io_map, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x01, 0x07 ) AM_WRITE(dynax_blitter_rev2_w)		// Blitter
 	AM_RANGE( 0x20, 0x20 ) AM_WRITE(htengoku_select_w)		// Controls
@@ -1539,7 +1540,7 @@ static WRITE8_HANDLER( tenkai_blit_romregion_w )
 	logerror("%04x: unmapped romregion=%02X\n", cpu_get_pc(&space->device()), data);
 }
 
-static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(  0x0000,  0x5fff ) AM_ROM
 	AM_RANGE(  0x6000,  0x6fff ) AM_RAM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
@@ -1567,7 +1568,7 @@ static ADDRESS_MAP_START( tenkai_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0x100e1, 0x100e7 ) AM_WRITE(tenkai_blitter_rev2_w)	// Blitter (inverted scroll values)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tenkai_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tenkai_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( T90_P3, T90_P3 ) AM_READWRITE(tenkai_p3_r, tenkai_p3_w)
 	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(tenkai_p4_w)
 	AM_RANGE( T90_P5, T90_P5 ) AM_READ(tenkai_p5_r)
@@ -1712,13 +1713,13 @@ static WRITE8_HANDLER( gekisha_8000_w )
 }
 
 
-static ADDRESS_MAP_START( gekisha_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gekisha_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(  0x0000,  0x6fff ) AM_ROM
 	AM_RANGE(  0x7000,  0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(  0x8000,  0xffff ) AM_READWRITE(gekisha_8000_r, gekisha_8000_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekisha_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( gekisha_io_map, AS_IO, 8, dynax_state )
 	AM_RANGE( T90_P4, T90_P4 ) AM_WRITE(gekisha_p4_w)
 ADDRESS_MAP_END
 

@@ -61,36 +61,36 @@ const device_type INTEL_E28F008SA = &device_creator<intel_e28f008sa_device>;
 const device_type INTEL_TE28F160 = &device_creator<intel_te28f160_device>;
 const device_type SHARP_UNK128MBIT = &device_creator<sharp_unk128mbit_device>;
 
-static ADDRESS_MAP_START( memory_map8_512Kb, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memory_map8_512Kb, AS_PROGRAM, 8, intelfsh_device )
 	AM_RANGE(0x00000, 0x00ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map8_1Mb, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memory_map8_1Mb, AS_PROGRAM, 8, intelfsh_device )
 	AM_RANGE(0x00000, 0x01ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map8_4Mb, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memory_map8_4Mb, AS_PROGRAM, 8, intelfsh_device )
 	AM_RANGE(0x00000, 0x07ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map8_8Mb, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memory_map8_8Mb, AS_PROGRAM, 8, intelfsh_device )
 	AM_RANGE(0x00000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map8_16Mb, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memory_map8_16Mb, AS_PROGRAM, 8, intelfsh_device )
 	AM_RANGE(0x00000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( memory_map16_4Mb, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( memory_map16_4Mb, AS_PROGRAM, 16, intelfsh_device )
 	AM_RANGE(0x00000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map16_16Mb, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( memory_map16_16Mb, AS_PROGRAM, 16, intelfsh_device )
 	AM_RANGE(0x00000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( memory_map16_64Mb, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( memory_map16_64Mb, AS_PROGRAM, 16, intelfsh_device )
 	AM_RANGE(0x00000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 

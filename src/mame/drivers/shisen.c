@@ -42,7 +42,7 @@ static WRITE8_HANDLER( sichuan2_coin_w )
 
 
 
-static ADDRESS_MAP_START( shisen_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shisen_map, AS_PROGRAM, 8, shisen_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(sichuan2_paletteram_w) AM_BASE_MEMBER(shisen_state, m_paletteram)
@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( shisen_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shisen_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( shisen_io_map, AS_IO, 8, shisen_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(sichuan2_dsw1_r, sichuan2_coin_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE("m72", m72_sound_command_byte_w)
@@ -59,12 +59,12 @@ static ADDRESS_MAP_START( shisen_io_map, AS_IO, 8 )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("COIN")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shisen_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shisen_sound_map, AS_PROGRAM, 8, shisen_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xfd00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shisen_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( shisen_sound_io_map, AS_IO, 8, shisen_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)

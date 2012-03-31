@@ -136,7 +136,7 @@ static READ8_HANDLER( striv_question_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE_SIZE_MEMBER(jack_state, m_spriteram, m_spriteram_size)
@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( jack_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE_SIZE_MEMBER(jack_state, m_spriteram, m_spriteram_size)
@@ -171,13 +171,13 @@ static ADDRESS_MAP_START( joinem_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, jack_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP  /* R/C filter ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, jack_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_address_w)

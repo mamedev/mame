@@ -92,7 +92,7 @@ static WRITE8_HANDLER( tile_bank_w )
 	state->m_tile_bank = (data & 4) >> 2;
 }
 
-static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8, poker72_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM //work ram
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(poker72_state, m_vram)

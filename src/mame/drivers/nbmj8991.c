@@ -190,70 +190,70 @@ static DRIVER_INIT( av2mj2rg )
 }
 
 
-static ADDRESS_MAP_START( pstadium_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pstadium_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// finalbny
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( triplew1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( triplew1_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf200, 0xf20f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// mjgottub
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( triplew2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( triplew2_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjlstory_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjlstory_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf700, 0xf70f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galkoku_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( galkoku_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(nbmj8991_palette_type1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// hyouban
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galkaika_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( galkaika_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(nbmj8991_palette_type2_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// tokimbsj
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tokyogal_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tokyogal_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type2_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( av2mj1bb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( av2mj1bb_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf500, 0xf50f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( av2mj2rg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( av2mj2rg_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galkoku_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( galkoku_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READWRITE(nb1413m3_sndrom_r,nbmj8991_blitter_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("fmsnd", ym3812_w)
@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( galkoku_io_map, AS_IO, 8 )
 	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyouban_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hyouban_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READWRITE(nb1413m3_sndrom_r,nbmj8991_blitter_w)
 	AM_RANGE(0x81, 0x81) AM_DEVREAD("fmsnd", ay8910_r)
@@ -282,7 +282,7 @@ static ADDRESS_MAP_START( hyouban_io_map, AS_IO, 8 )
 	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pstadium_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pstadium_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_WRITE(nbmj8991_blitter_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(nbmj8991_sound_w)
@@ -295,7 +295,7 @@ static ADDRESS_MAP_START( pstadium_io_map, AS_IO, 8 )
 	AM_RANGE(0xf8, 0xf8) AM_READ(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( av2mj1bb_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( av2mj1bb_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_WRITE(nbmj8991_blitter_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(nbmj8991_sound_w)
@@ -310,13 +310,13 @@ static ADDRESS_MAP_START( av2mj1bb_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nbmj8991_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nbmj8991_sound_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nbmj8991_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( nbmj8991_sound_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(nbmj8991_sound_r) AM_DEVWRITE("dac1", DAC_WRITE)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac2", DAC_WRITE)

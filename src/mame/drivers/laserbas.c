@@ -134,7 +134,7 @@ static WRITE8_HANDLER( protram_w )
 	state->m_protram[offset] = data;
 }
 
-static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8, laserbas_state )
 	//ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_READWRITE(vram_r, vram_w)
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( laserbas_io, AS_IO, 8 )
+static ADDRESS_MAP_START( laserbas_io, AS_IO, 8, laserbas_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)

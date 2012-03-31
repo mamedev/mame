@@ -260,7 +260,7 @@ static READ32_HANDLER(stadhr96_prot_146_r)
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM AM_MIRROR(0xff000000)
 	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_BASE_MEMBER(deco_mlc_state, m_mlc_ram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x020000f) AM_READNOP AM_MIRROR(0xff000000)/* IRQ control? */

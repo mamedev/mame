@@ -302,7 +302,7 @@ static WRITE8_HANDLER( input_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(mgakuen_paletteram_r, mgakuen_paletteram_w)	/* palette RAM */
@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r, mgakuen_objram_w)	/* OBJ RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
@@ -321,7 +321,7 @@ static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM	/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)			/* The Mahjong games and Block Block need special input treatment */
@@ -338,7 +338,7 @@ static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 /* spangbl */
-static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w)	/* Banked palette RAM */
@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM		/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
@@ -371,13 +371,13 @@ static WRITE8_HANDLER( spangbl_msm5205_data_w )
 }
 #endif
 
-static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 //  AM_RANGE(0xec00, 0xec00) AM_WRITE( spangbl_msm5205_data_w )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spangbl_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( spangbl_sound_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -389,7 +389,7 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 	state->m_oki->set_bank_base(0x40000 * (data & 3));
 }
 
-static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", oki_banking_w)
@@ -404,7 +404,7 @@ static WRITE8_HANDLER(mstworld_sound_w)
 	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mstworld_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

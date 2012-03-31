@@ -584,7 +584,7 @@ static SOUND_RESET(berzerk)
  *
  *************************************/
 
-static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8, berzerk_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x3fff) AM_ROM
@@ -595,7 +595,7 @@ static ADDRESS_MAP_START( berzerk_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( frenzy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( frenzy_map, AS_PROGRAM, 8, berzerk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(berzerk_state, m_videoram) AM_SIZE_MEMBER(berzerk_state, m_videoram_size) AM_SHARE("share1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("share1")
@@ -612,7 +612,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( berzerk_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( berzerk_io_map, AS_IO, 8, berzerk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_NOP
 	AM_RANGE(0x40, 0x47) AM_READWRITE(berzerk_audio_r, berzerk_audio_w)

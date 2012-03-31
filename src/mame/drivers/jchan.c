@@ -492,7 +492,7 @@ static WRITE16_HANDLER( jchan_suprnova_sprite32regs_2_w )
 }
 
 
-static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // Work RAM - [A] grid tested, cleared ($9d6-$a54)
 
@@ -517,7 +517,7 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM - grid tested, cleared ($612-$6dc)
 

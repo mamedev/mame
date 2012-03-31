@@ -223,7 +223,7 @@ static WRITE8_HANDLER( wiz_main_nmi_mask_w )
 	state->m_main_nmi_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(wiz_coin_counter_w)
@@ -262,7 +262,7 @@ static WRITE8_HANDLER( wiz_sound_nmi_mask_w )
 
 
 /* TODO: clean this up! */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,wiz_sound_nmi_mask_w)	/* Stinger/Scion */
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,wiz_sound_nmi_mask_w)	/* Wiz */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,wiz_sound_nmi_mask_w)	/* Stinger/Scion */

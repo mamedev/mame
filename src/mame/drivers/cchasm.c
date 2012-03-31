@@ -31,7 +31,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 16, cchasm_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04000f) AM_DEVREADWRITE8_MODERN("6840ptm", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0x050000, 0x050001) AM_WRITE(cchasm_refresh_control_w)
@@ -47,7 +47,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 8, cchasm_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM
@@ -62,7 +62,7 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0x7041, 0x7041) AM_NOP // TODO
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, cchasm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END

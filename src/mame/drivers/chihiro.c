@@ -1110,14 +1110,14 @@ static WRITE32_HANDLER( smbus_w )
 }
 
 
-static ADDRESS_MAP_START( xbox_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( xbox_map, AS_PROGRAM, 32, smbus_state )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM
 	AM_RANGE(0xfd000000, 0xfdffffff) AM_READWRITE(geforce_r, geforce_w)
 	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(usbctrl_r, usbctrl_w)
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32)
+static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, smbus_state )
 	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)

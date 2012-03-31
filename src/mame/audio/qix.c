@@ -154,7 +154,7 @@ static WRITE_LINE_DEVICE_HANDLER( qix_pia_sint )
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x5ffc) AM_DEVREADWRITE_MODERN("sndpia2", pia6821_device, read, write)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE_MODERN("sndpia1", pia6821_device, read, write)

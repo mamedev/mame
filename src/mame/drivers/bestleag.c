@@ -227,7 +227,7 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( bestleag_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bestleag_map, AS_PROGRAM, 16, bestleag_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d2000, 0x0d3fff) AM_NOP // left over from the original game (only read / written in memory test)
 	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bestleag_bgram_w) AM_BASE_MEMBER(bestleag_state, m_bgram)

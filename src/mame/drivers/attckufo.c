@@ -117,7 +117,7 @@ static WRITE8_HANDLER(attckufo_io_w)
     */
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, attckufo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(attckufo_state, m_mainram)
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("mos6560", mos6560_port_r, mos6560_port_w)

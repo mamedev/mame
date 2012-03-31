@@ -65,7 +65,7 @@ static INTERRUPT_GEN( mouser_sound_nmi_assert )
 		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8, mouser_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_WRITENOP /* unknown */
@@ -81,14 +81,14 @@ static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mouser_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mouser_sound_map, AS_PROGRAM, 8, mouser_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(mouser_sound_byte_r)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(mouser_sound_nmi_clear_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mouser_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mouser_sound_io_map, AS_IO, 8, mouser_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_data_address_w)

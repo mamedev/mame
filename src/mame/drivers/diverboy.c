@@ -139,7 +139,7 @@ static WRITE8_DEVICE_HANDLER( okibank_w )
 
 
 
-static ADDRESS_MAP_START( diverboy_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( diverboy_map, AS_PROGRAM, 16, diverboy_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_SIZE_MEMBER(diverboy_state, m_spriteram, m_spriteram_size)
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( diverboy_map, AS_PROGRAM, 16 )
 //  AM_RANGE(0x340002, 0x340003) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( snd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( snd_map, AS_PROGRAM, 8, diverboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", okibank_w)

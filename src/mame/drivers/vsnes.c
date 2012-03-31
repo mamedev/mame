@@ -210,7 +210,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 	nes_psg_w(device, 0x17, data);
 }
 
-static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(vsnes_state, m_work_ram)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu1", ppu2c0x_device, read, write)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac1", dac_w)
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( vsnes_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vsnes_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( vsnes_cpu2_map, AS_PROGRAM, 8, vsnes_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(vsnes_state, m_work_ram_1)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu2", ppu2c0x_device, read, write)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac2", dac_w)

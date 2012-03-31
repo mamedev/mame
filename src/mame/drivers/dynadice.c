@@ -92,13 +92,13 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 }
 
 
-static ADDRESS_MAP_START( dynadice_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dynadice_map, AS_PROGRAM, 8, dynadice_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_BASE_MEMBER(dynadice_state, m_videoram)
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynadice_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( dynadice_io_map, AS_IO, 8, dynadice_state )
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN0")
 	AM_RANGE(0x51, 0x51) AM_READ_PORT("IN1")
 	AM_RANGE(0x52, 0x52) AM_READ_PORT("DSW")
@@ -107,12 +107,12 @@ static ADDRESS_MAP_START( dynadice_io_map, AS_IO, 8 )
 	AM_RANGE(0x70, 0x77) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynadice_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dynadice_sound_map, AS_PROGRAM, 8, dynadice_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dynadice_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( dynadice_sound_io_map, AS_IO, 8, dynadice_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x01, 0x01) AM_WRITE(soundlatch_clear_w)

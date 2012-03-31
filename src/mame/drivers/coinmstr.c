@@ -198,7 +198,7 @@ static READ8_HANDLER( ff_r )
 
 // Common memory map
 
-static ADDRESS_MAP_START( coinmstr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( coinmstr_map, AS_PROGRAM, 8, coinmstr_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(quizmstr_bg_w) AM_BASE_MEMBER(coinmstr_state, m_videoram)
@@ -209,7 +209,7 @@ ADDRESS_MAP_END
 
 // Different I/O mappping for every game
 
-static ADDRESS_MAP_START( quizmstr_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( quizmstr_io_map, AS_IO, 8, coinmstr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(question_r)
@@ -226,7 +226,7 @@ static ADDRESS_MAP_START( quizmstr_io_map, AS_IO, 8 )
 	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trailblz_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( trailblz_io_map, AS_IO, 8, coinmstr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(question_r)
 	AM_RANGE(0x00, 0x03) AM_WRITE(question_w)
@@ -240,7 +240,7 @@ static ADDRESS_MAP_START( trailblz_io_map, AS_IO, 8 )
 	AM_RANGE(0xc1, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( supnudg2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( supnudg2_io_map, AS_IO, 8, coinmstr_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(question_r)
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( supnudg2_io_map, AS_IO, 8 )
 	AM_RANGE(0xc0, 0xc3) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pokeroul_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pokeroul_io_map, AS_IO, 8, coinmstr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0x41, 0x41) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)

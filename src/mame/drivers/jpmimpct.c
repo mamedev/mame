@@ -588,7 +588,7 @@ static WRITE16_HANDLER( jpmio_w )
  *  Main CPU memory handlers
  *
  *************************************/
-static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
 	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
@@ -618,7 +618,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, jpmimpct_state )
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0xf8000000) AM_RAM AM_BASE_MEMBER(jpmimpct_state, m_vram)
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0xf8000000) AM_ROM AM_REGION("user1", 0x100000)
@@ -1223,7 +1223,7 @@ static READ16_HANDLER( ump_r )
  *  Main CPU memory handlers
  *
  *************************************/
-static ADDRESS_MAP_START( awp68k_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( awp68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
 	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")

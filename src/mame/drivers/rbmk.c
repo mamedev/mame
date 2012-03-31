@@ -106,7 +106,7 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 }
 
 
-static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rbmk_mcu_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rbmk_mcu_mem, AS_PROGRAM, 8, rbmk_state )
 //  AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -166,7 +166,7 @@ static WRITE8_HANDLER( mcu_io_mux_w )
 	state->m_mux_data = ~data;
 }
 
-static ADDRESS_MAP_START( rbmk_mcu_io, AS_IO, 8 )
+static ADDRESS_MAP_START( rbmk_mcu_io, AS_IO, 8, rbmk_state )
 	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE( rbmk_mcu_io_r, rbmk_mcu_io_w )
 
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE( mcu_io_mux_w )

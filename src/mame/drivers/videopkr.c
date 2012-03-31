@@ -938,11 +938,11 @@ static TIMER_DEVICE_CALLBACK(sound_t1_callback)
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( i8039_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( i8039_map, AS_PROGRAM, 8, videopkr_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_io_port, AS_IO, 8 )
+static ADDRESS_MAP_START( i8039_io_port, AS_IO, 8, videopkr_state )
 	AM_RANGE(0x00,            0xff           ) AM_READWRITE(videopkr_io_r, videopkr_io_w)
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1  ) AM_READWRITE(videopkr_p1_data_r, videopkr_p1_data_w)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2  ) AM_READWRITE(videopkr_p2_data_r, videopkr_p2_data_w)
@@ -950,22 +950,22 @@ static ADDRESS_MAP_START( i8039_io_port, AS_IO, 8 )
 	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0  ) AM_READ(videopkr_t0_latch)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_sound_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( i8039_sound_mem, AS_PROGRAM, 8, videopkr_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_sound_port, AS_IO, 8 )
+static ADDRESS_MAP_START( i8039_sound_port, AS_IO, 8, videopkr_state )
 	AM_RANGE(0x00         , 0xff         ) AM_READWRITE(sound_io_r, sound_io_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(sound_p2_r, sound_p2_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( i8051_sound_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( i8051_sound_mem, AS_PROGRAM, 8, videopkr_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8051_sound_port, AS_IO, 8 )
+static ADDRESS_MAP_START( i8051_sound_port, AS_IO, 8, videopkr_state )
 	AM_RANGE(0x0000, 0x1ff) AM_RAM
 	/* ports */
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(baby_sound_p0_r, baby_sound_p0_w)

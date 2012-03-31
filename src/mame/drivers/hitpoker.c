@@ -237,7 +237,7 @@ static READ8_HANDLER( test_r )
 #endif
 
 /* overlap empty rom addresses */
-static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8, hitpoker_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
 	AM_RANGE(0x1000, 0x103f) AM_RAM // internal I/O
 	AM_RANGE(0x8000, 0xb5ff) AM_READWRITE(hitpoker_vram_r,hitpoker_vram_w)
@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xbf00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hitpoker_io, AS_IO, 8 )
+static ADDRESS_MAP_START( hitpoker_io, AS_IO, 8, hitpoker_state )
 	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) AM_BASE_MEMBER(hitpoker_state, m_sys_regs)
 ADDRESS_MAP_END
 

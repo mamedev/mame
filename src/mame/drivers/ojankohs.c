@@ -198,7 +198,7 @@ static WRITE8_HANDLER( ccasino_coinctr_w )
 }
 
 
-static ADDRESS_MAP_START( ojankohs_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ojankohs_map, AS_PROGRAM, 8, ojankohs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_BASE_MEMBER(ojankohs_state,m_videoram)
 	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(ojankohs_colorram_w) AM_BASE_MEMBER(ojankohs_state,m_colorram)
@@ -208,7 +208,7 @@ static ADDRESS_MAP_START( ojankohs_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ojankoy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ojankoy_map, AS_PROGRAM, 8, ojankohs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(ojankohs_videoram_w) AM_BASE_MEMBER(ojankohs_state,m_videoram)
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(ojankohs_colorram_w) AM_BASE_MEMBER(ojankohs_state,m_colorram)
@@ -217,14 +217,14 @@ static ADDRESS_MAP_START( ojankoy_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ojankoc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ojankoc_map, AS_PROGRAM, 8, ojankohs_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(ojankoc_videoram_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8, ojankohs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(ojankohs_keymatrix_r, ojankohs_rombank_w)
@@ -238,7 +238,7 @@ static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8 )
 	AM_RANGE(0x11, 0x11) AM_WRITENOP				// unknown
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ojankoy_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ojankoy_io_map, AS_IO, 8, ojankohs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(ojankohs_keymatrix_r, ojankoy_rombank_w)
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( ojankoy_io_map, AS_IO, 8 )
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ccasino_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ccasino_io_map, AS_IO, 8, ojankohs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(ojankohs_keymatrix_r, ojankohs_rombank_w)
@@ -264,7 +264,7 @@ static ADDRESS_MAP_START( ccasino_io_map, AS_IO, 8 )
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ojankoc_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ojankoc_io_map, AS_IO, 8, ojankohs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_WRITE(ojankoc_palette_w)
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(ojankohs_msm5205_w)

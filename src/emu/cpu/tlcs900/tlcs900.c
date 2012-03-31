@@ -1095,7 +1095,7 @@ static WRITE8_HANDLER( tlcs900_internal_w )
 }
 
 
-static ADDRESS_MAP_START( tlcs900_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tlcs900_mem, AS_PROGRAM, 8, legacy_cpu_device )
 	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE( tlcs900_internal_r, tlcs900_internal_w )
 ADDRESS_MAP_END
 

@@ -21,7 +21,7 @@ static READ8_HANDLER( markham_e004_r )
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( markham_master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( markham_master_map, AS_PROGRAM, 8, markham_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -45,7 +45,7 @@ static ADDRESS_MAP_START( markham_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(markham_flipscreen_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( markham_slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( markham_slave_map, AS_PROGRAM, 8, markham_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
 

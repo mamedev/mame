@@ -135,7 +135,7 @@ static READ8_HANDLER( key_matrix_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mayumi_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mayumi_map, AS_PROGRAM, 8, mayumi_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( mayumi_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mayumi_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mayumi_io_map, AS_IO, 8, mayumi_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0") AM_WRITE(bank_sel_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(input_sel_w)

@@ -164,7 +164,7 @@ static WRITE8_HANDLER( dominob_d008_w )
 	/* is there a purpose on this ? always set to 0x00 (read from 0xc47b in RAM) */
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM AM_WRITENOP // there are some garbage writes to ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 
@@ -190,7 +190,7 @@ static READ8_HANDLER( dominob_unk_port02_r )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( portmap, AS_IO, 8, dominob_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ(dominob_unk_port02_r)
 ADDRESS_MAP_END

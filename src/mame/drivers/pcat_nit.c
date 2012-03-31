@@ -176,7 +176,7 @@ static WRITE8_HANDLER(pcat_nit_rombank_w)
 	}
 }
 
-static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_nit_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
@@ -202,7 +202,7 @@ static READ8_HANDLER(pcat_nit_io_r)
 	}
 }
 
-static ADDRESS_MAP_START( pcat_nit_io, AS_IO, 32 )
+static ADDRESS_MAP_START( pcat_nit_io, AS_IO, 32, pcat_nit_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
 	AM_RANGE(0x0280, 0x0283) AM_READNOP

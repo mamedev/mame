@@ -466,7 +466,7 @@ static WRITE32_HANDLER( DMA1_w )
 }
 
 
-static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0x01200000, 0x0120000f) AM_READ(Input_r)

@@ -913,7 +913,7 @@ void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
  *************************************/
 
 /*------ Time Killers memory layout ------*/
-static ADDRESS_MAP_START( timekill_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( timekill_map, AS_PROGRAM, 16, itech32_state )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_BASE_MEMBER(itech32_state, m_main_ram) AM_SHARE("nvram")
 	AM_RANGE(0x040000, 0x040001) AM_READ_PORT("P1")
 	AM_RANGE(0x048000, 0x048001) AM_READ_PORT("P2")
@@ -931,7 +931,7 @@ ADDRESS_MAP_END
 
 
 /*------ BloodStorm and later games memory layout ------*/
-static ADDRESS_MAP_START( bloodstm_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bloodstm_map, AS_PROGRAM, 16, itech32_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE_MEMBER(itech32_state, m_main_ram) AM_SHARE("nvram")
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1") AM_WRITE(int1_ack_w)
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P2")
@@ -995,7 +995,7 @@ static WRITE32_HANDLER( test2_w )
 }
 #endif
 
-static ADDRESS_MAP_START( drivedge_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( drivedge_map, AS_PROGRAM, 32, itech32_state )
 #if LOG_DRIVEDGE_UNINIT_RAM
 AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE(test1_r, test1_w)
 AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
@@ -1023,20 +1023,20 @@ AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 	AM_RANGE(0x600000, 0x607fff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(itech32_state, m_main_rom)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drivedge_tms1_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( drivedge_tms1_map, AS_PROGRAM, 32, itech32_state )
 	AM_RANGE(0x000000, 0x001fff) AM_RAM AM_BASE_MEMBER(itech32_state, m_tms1_boot)
 	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x400) AM_RAM_WRITE(tms1_trigger_w) AM_SHARE("share1") AM_BASE_MEMBER(itech32_state, m_tms1_ram)
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drivedge_tms2_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( drivedge_tms2_map, AS_PROGRAM, 32, itech32_state )
 	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x8400) AM_RAM_WRITE(tms2_trigger_w) AM_SHARE("share2") AM_BASE_MEMBER(itech32_state, m_tms2_ram)
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 ADDRESS_MAP_END
 
 
 /*------ 68EC020-based memory layout ------*/
-static ADDRESS_MAP_START( itech020_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( itech020_map, AS_PROGRAM, 32, itech32_state )
 	AM_RANGE(0x000000, 0x007fff) AM_RAM AM_BASE_MEMBER(itech32_state, m_main_ram)
 	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("P1") AM_WRITE(int1_ack32_w)
 	AM_RANGE(0x100000, 0x100003) AM_READ_PORT("P2")
@@ -1067,7 +1067,7 @@ ADDRESS_MAP_END
  *************************************/
 
 /*------ Rev 1 sound board memory layout ------*/
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, itech32_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(sound_return_w)
 	AM_RANGE(0x0400, 0x0400) AM_READ(sound_data_r)
 	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE("ensoniq", es5506_r, es5506_w)
@@ -1081,7 +1081,7 @@ ADDRESS_MAP_END
 
 
 /*------ Rev 2 sound board memory layout ------*/
-static ADDRESS_MAP_START( sound_020_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_020_map, AS_PROGRAM, 8, itech32_state )
 	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x400) AM_READ(sound_data_r)
 	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE("ensoniq", es5506_r, es5506_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)

@@ -165,7 +165,7 @@ static WRITE8_HANDLER( lsasquad_bankswitch_w )
 	/* other bits unknown */
 }
 
-static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xee00, 0xee00) AM_READWRITE(lsasquad_mcu_r,lsasquad_mcu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_ROM		/* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lsasquad_m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lsasquad_m68705_map, AS_PROGRAM, 8, lsasquad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lsasquad_68705_port_a_r,lsasquad_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lsasquad_68705_port_b_r,lsasquad_68705_port_b_w)
@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( lsasquad_m68705_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
@@ -373,7 +373,7 @@ INPUT_PORTS_END
 
 /* DAIKAIJU */
 
-static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
@@ -393,7 +393,7 @@ static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xee00, 0xee00) AM_READWRITE(lsasquad_mcu_r, lsasquad_mcu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)

@@ -103,7 +103,7 @@ static WRITE8_HANDLER( ioboard_reg_w )
 	printf("REG %02x\n",data);
 }
 
-static ADDRESS_MAP_START( hotstuff_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hotstuff_map, AS_PROGRAM, 16, hotstuff_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_NOP //ROM AM_REGION("data", 0)
 

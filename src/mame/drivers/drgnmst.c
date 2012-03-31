@@ -192,7 +192,7 @@ static READ8_HANDLER( PIC16C5X_T0_clk_r )
 
 /***************************** 68000 Memory Map *****************************/
 
-static ADDRESS_MAP_START( drgnmst_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drgnmst_main_map, AS_PROGRAM, 16, drgnmst_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x800018, 0x800019) AM_READ_PORT("SYSTEM")
@@ -223,7 +223,7 @@ ADDRESS_MAP_END
 	/* $000 - 1FF  PIC16C55 Internal Program ROM. Note: code is 12bits wide */
 	/* $000 - 01F  PIC16C55 Internal Data RAM */
 
-static ADDRESS_MAP_START( drgnmst_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( drgnmst_sound_io_map, AS_IO, 8, drgnmst_state )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(pic16c5x_port0_r, drgnmst_pcm_banksel_w)	/* 4 bit port */
 	AM_RANGE(0x01, 0x01) AM_READWRITE(drgnmst_snd_command_r, drgnmst_oki_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(drgnmst_snd_flag_r, drgnmst_snd_control_w)

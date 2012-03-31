@@ -57,7 +57,7 @@ static READ8_HANDLER( circus_paddle_r )
 	return input_port_read(space->machine(), "PADDLE");
 }
 
-static ADDRESS_MAP_START( circus_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( circus_map, AS_PROGRAM, 8, circus_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(circus_clown_x_w)

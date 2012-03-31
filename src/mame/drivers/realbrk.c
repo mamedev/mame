@@ -157,7 +157,7 @@ static WRITE16_HANDLER( backup_ram_w )
 ***************************************************************************/
 
 /*Basic memory map for this HW*/
-static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM							    			// ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM                   AM_BASE_MEMBER(realbrk_state, m_spriteram)	// Sprites
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram	)	// Palette
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( base_mem, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /*realbrk specific memory map*/
-static ADDRESS_MAP_START( realbrk_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( realbrk_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_IMPORT_FROM(base_mem)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)	//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")							// P1 & P2 (Inputs)
@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( realbrk_mem, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /*pkgnsh specific memory map*/
-static ADDRESS_MAP_START( pkgnsh_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pkgnsh_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_w, 0xff00	)	// YM2413
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnsh_input_r		        )	// P1 & P2 (Inputs)
 	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_r,backup_ram_w) AM_BASE_MEMBER(realbrk_state, m_backup_ram)	// RAM
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( pkgnsh_mem, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /*pkgnshdx specific memory map*/
-static ADDRESS_MAP_START( pkgnshdx_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START( pkgnshdx_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)	//
 	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnshdx_input_r		        )	// P1 & P2 (Inputs)
 	AM_RANGE(0xc00004, 0xc00005) AM_WRITEONLY AM_BASE_MEMBER(realbrk_state, m_dsw_select) // DSW select
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( pkgnshdx_mem, AS_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /*dai2kaku specific memory map*/
-static ADDRESS_MAP_START( dai2kaku_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dai2kaku_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x605000, 0x6053ff) AM_RAM AM_BASE_MEMBER(realbrk_state, m_vram_0ras)	// rasterinfo   (0)
 	AM_RANGE(0x605400, 0x6057ff) AM_RAM AM_BASE_MEMBER(realbrk_state, m_vram_1ras)	// rasterinfo   (1)
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)	//

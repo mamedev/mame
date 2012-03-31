@@ -407,7 +407,7 @@ static READ8_HANDLER( drivfrcg_port0_r )
     return 0;
 }
 
-static ADDRESS_MAP_START( galaxold_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( galaxold_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( galaxold_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -463,7 +463,7 @@ static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rockclim_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rockclim_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(rockclim_videoram_r, rockclim_videoram_w) AM_BASE_MEMBER(galaxold_state, m_rockclim_videoram)//4800 - 4803 = bg scroll ?
 	AM_RANGE(0x4800, 0x4803) AM_WRITE(rockclim_scroll_w)
@@ -495,7 +495,7 @@ static ADDRESS_MAP_START( rockclim_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ckongg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ckongg_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -522,7 +522,7 @@ static ADDRESS_MAP_START( ckongg_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Memory map based on mooncrst_map according to Z80 code - seems to be good but needs further checking */
-static ADDRESS_MAP_START( ckongmc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ckongmc_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -549,7 +549,7 @@ static ADDRESS_MAP_START( ckongmc_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scramblb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( scramblb_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -584,7 +584,7 @@ static READ8_HANDLER( scramb2_port0_r ) { return (input_port_read(space->machine
 static READ8_HANDLER( scramb2_port1_r ) { return (input_port_read(space->machine(), "IN1") >> offset) & 0x1; }
 static READ8_HANDLER( scramb2_port2_r ) { return (input_port_read(space->machine(), "IN2") >> offset) & 0x1; }
 
-static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -609,7 +609,7 @@ static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( _4in1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( _4in1_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")	/* banked game code */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -640,7 +640,7 @@ static ADDRESS_MAP_START( _4in1_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bagmanmc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bagmanmc_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -661,7 +661,7 @@ static ADDRESS_MAP_START( bagmanmc_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dkongjrm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dkongjrm_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
@@ -687,7 +687,7 @@ static ADDRESS_MAP_START( dkongjrm_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW0") /* mirror */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -712,7 +712,7 @@ static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bongo, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bongo, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x8400, 0x87ff) AM_WRITENOP // not used
@@ -731,14 +731,14 @@ static ADDRESS_MAP_START( bongo, AS_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bongo_io, AS_IO, 8 )
+static ADDRESS_MAP_START( bongo_io, AS_IO, 8, galaxold_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ozon1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ozon1_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4200) AM_RAM
 	AM_RANGE(0x4300, 0x43ff) AM_RAM
@@ -756,7 +756,7 @@ static ADDRESS_MAP_START( ozon1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8103, 0x8103) AM_WRITENOP //only one 9b at reset
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ozon1_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ozon1_io_map, AS_IO, 8, galaxold_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
@@ -769,7 +769,7 @@ static WRITE8_HANDLER( harem_nmi_mask_w )
 	state->m_nmi_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( harem_cpu1, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( harem_cpu1, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
@@ -785,13 +785,13 @@ static ADDRESS_MAP_START( harem_cpu1, AS_PROGRAM, 8 )
 	AM_RANGE(0xffe6, 0xffff) AM_RAM AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( harem_cpu2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( harem_cpu2, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( harem_cpu2_io, AS_IO, 8 )
+static ADDRESS_MAP_START( harem_cpu2_io, AS_IO, 8, galaxold_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay1", ay8910_data_w)
@@ -802,7 +802,7 @@ static ADDRESS_MAP_START( harem_cpu2_io, AS_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
 	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
@@ -831,13 +831,13 @@ ADDRESS_MAP_END
 
 /* the nmi line seems to be inverted on the cpu plugin board */
 READ8_DEVICE_HANDLER( ttl7474_trampoline ) { return downcast<ttl7474_device *>(device)->output_comp_r(); }
-static ADDRESS_MAP_START( hunchbkg_io, AS_IO, 8 )
+static ADDRESS_MAP_START( hunchbkg_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(S2650_DATA_PORT,  S2650_DATA_PORT) AM_READNOP // not used
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_DEVREAD("7474_9m_1", ttl7474_trampoline)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( drivfrcg, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( drivfrcg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1480, 0x14bf) AM_MIRROR(0x6000) AM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
 	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0x6000) AM_WRITEONLY AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
@@ -859,13 +859,13 @@ static ADDRESS_MAP_START( drivfrcg, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drivfrcg_io, AS_IO, 8 )
+static ADDRESS_MAP_START( drivfrcg_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x00, 0x00) AM_READ(drivfrcg_port0_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE") AM_WRITENOP
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( racknrol, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( racknrol, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1400, 0x143f) AM_MIRROR(0x6000) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
 	AM_RANGE(0x1440, 0x14bf) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
@@ -886,7 +886,7 @@ static ADDRESS_MAP_START( racknrol, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( racknrol_io, AS_IO, 8 )
+static ADDRESS_MAP_START( racknrol_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0x1e, 0x1e) AM_DEVWRITE("sn2", sn76496_w)
 	AM_RANGE(0x1f, 0x1f) AM_DEVWRITE("sn3", sn76496_w)
@@ -908,7 +908,7 @@ static READ8_HANDLER( hexpoola_data_port_r )
     return 0;
 }
 
-static ADDRESS_MAP_START( hexpoola_io, AS_IO, 8 )
+static ADDRESS_MAP_START( hexpoola_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x20, 0x3f) AM_WRITE(racknrol_tiles_bank_w) AM_BASE_MEMBER(galaxold_state, m_racknrol_tiles_bank)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(hexpoola_data_port_r) AM_DEVWRITE("snsnd", sn76496_w)

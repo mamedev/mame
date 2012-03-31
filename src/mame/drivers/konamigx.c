@@ -1154,7 +1154,7 @@ static WRITE32_HANDLER( type1_cablamps_w )
 /* 68EC020 memory handlers */
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// BIOS ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM	// main program ROM
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM	// data ROM
@@ -1186,7 +1186,7 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32 )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd4a000, 0xd4a01f) AM_READ(gx6bppspr_r)	// sprite ROM readback
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM			// LAN RAM? (Racin' Force has, Open Golf doesn't)
@@ -1206,13 +1206,13 @@ static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32 )
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
@@ -1226,7 +1226,7 @@ static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32 )
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
 	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
@@ -1288,7 +1288,7 @@ static WRITE16_HANDLER(tms57002_control_word_w)
 }
 
 /* 68000 memory handling */
-static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16, konamigx_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&gx_sndram)
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8_MODERN("konami1", k054539_device, read, write, 0xff00)
@@ -1300,7 +1300,7 @@ static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16 )
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gxtmsmap, AS_DATA, 8 )
+static ADDRESS_MAP_START( gxtmsmap, AS_DATA, 8, konamigx_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END
 

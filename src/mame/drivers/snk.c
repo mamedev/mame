@@ -858,7 +858,7 @@ static CUSTOM_INPUT( snk_bonus_r )
 
 /************************************************************************/
 
-static ADDRESS_MAP_START( marvins_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( marvins_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(marvins_palette_bank_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
@@ -885,7 +885,7 @@ static ADDRESS_MAP_START( marvins_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xff00) AM_WRITE(marvins_scroll_msb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( marvins_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( marvins_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("share1")
@@ -906,7 +906,7 @@ ADDRESS_MAP_END
 
 
 // vangrd2 accesses video registers at xxF1 instead of xx00
-static ADDRESS_MAP_START( madcrash_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( madcrash_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN1")
@@ -933,7 +933,7 @@ static ADDRESS_MAP_START( madcrash_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xff00) AM_MIRROR(0xff) AM_WRITE(snk_fg_scrollx_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( madcrash_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( madcrash_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x8700, 0x8700) AM_WRITE(snk_cpuB_nmi_ack_w)	// vangrd2
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)	// madcrash
@@ -953,7 +953,7 @@ static ADDRESS_MAP_START( madcrash_cpuB_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( madcrush_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( madcrush_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN1")
@@ -980,7 +980,7 @@ static ADDRESS_MAP_START( madcrush_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xff00) AM_WRITE(marvins_scroll_msb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( madcrush_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( madcrush_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")	// + work ram
@@ -1001,7 +1001,7 @@ static ADDRESS_MAP_START( madcrush_cpuB_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jcross_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jcross_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN1")
@@ -1022,7 +1022,7 @@ static ADDRESS_MAP_START( jcross_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xffff, 0xffff) AM_WRITENOP	// simply a program patch to not write to two not existing video registers?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jcross_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jcross_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
@@ -1031,7 +1031,7 @@ static ADDRESS_MAP_START( jcross_cpuB_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sgladiat_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sgladiat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN1")
@@ -1053,7 +1053,7 @@ static ADDRESS_MAP_START( sgladiat_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE_MEMBER(snk_state, m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgladiat_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sgladiat_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)	// flip screen, bg palette bank
@@ -1069,7 +1069,7 @@ static ADDRESS_MAP_START( sgladiat_cpuB_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hal21_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hal21_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
@@ -1089,7 +1089,7 @@ static ADDRESS_MAP_START( hal21_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE_MEMBER(snk_state, m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hal21_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hal21_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
@@ -1098,7 +1098,7 @@ static ADDRESS_MAP_START( hal21_cpuB_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( aso_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( aso_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
@@ -1120,7 +1120,7 @@ static ADDRESS_MAP_START( aso_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE_MEMBER(snk_state, m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aso_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( aso_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
@@ -1130,7 +1130,7 @@ static ADDRESS_MAP_START( aso_cpuB_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tnk3_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tnk3_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
@@ -1153,7 +1153,7 @@ static ADDRESS_MAP_START( tnk3_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE_MEMBER(snk_state, m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tnk3_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tnk3_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tnk3, athena
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fitegolf
@@ -1164,7 +1164,7 @@ static ADDRESS_MAP_START( tnk3_cpuB_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ikari_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ikari_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
@@ -1199,7 +1199,7 @@ static ADDRESS_MAP_START( ikari_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE_MEMBER(snk_state, m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ikari_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ikari_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc980, 0xc980) AM_WRITE(ikari_unknown_video_w)
@@ -1219,7 +1219,7 @@ static ADDRESS_MAP_START( ikari_cpuB_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bermudat_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bermudat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
@@ -1263,7 +1263,7 @@ static ADDRESS_MAP_START( bermudat_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE_MEMBER(snk_state, m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bermudat_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bermudat_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(snk_bg_scrolly_w)
@@ -1282,7 +1282,7 @@ static ADDRESS_MAP_START( bermudat_cpuB_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gwar_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gwar_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
@@ -1309,7 +1309,7 @@ static ADDRESS_MAP_START( gwar_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE_MEMBER(snk_state, m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gwar_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gwar_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_tx_bank_w)	// char and palette bank
@@ -1320,7 +1320,7 @@ static ADDRESS_MAP_START( gwar_cpuB_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gwara_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gwara_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
@@ -1346,7 +1346,7 @@ static ADDRESS_MAP_START( gwara_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfac0, 0xfac0) AM_WRITE(snk_sprite_split_point_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gwara_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gwara_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("share1")
@@ -1357,7 +1357,7 @@ static ADDRESS_MAP_START( gwara_cpuB_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tdfever_cpuA_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tdfever_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("IN1")
@@ -1387,7 +1387,7 @@ static ADDRESS_MAP_START( tdfever_cpuA_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE_MEMBER(snk_state, m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tdfever_cpuB_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tdfever_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tdfever, tdfever2
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fsoccer
@@ -1400,7 +1400,7 @@ ADDRESS_MAP_END
 
 /***********************************************************************/
 
-static ADDRESS_MAP_START( marvins_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( marvins_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_READ(marvins_soundlatch_r)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
@@ -1410,13 +1410,13 @@ static ADDRESS_MAP_START( marvins_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( marvins_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( marvins_sound_portmap, AS_IO, 8, snk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READNOP	// read on startup, then the Z80 automatically pulls down the IORQ pin to ack irq
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jcross_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jcross_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
@@ -1426,13 +1426,13 @@ static ADDRESS_MAP_START( jcross_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe004, 0xe005) AM_DEVWRITE("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jcross_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( jcross_sound_portmap, AS_IO, 8, snk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sgladiat_sound_irq_ack_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hal21_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hal21_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
@@ -1442,13 +1442,13 @@ static ADDRESS_MAP_START( hal21_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hal21_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( hal21_sound_portmap, AS_IO, 8, snk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READNOP	// read on startup, then the Z80 automatically pulls down the IORQ pin to ack irq
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tnk3_YM3526_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tnk3_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
@@ -1458,7 +1458,7 @@ static ADDRESS_MAP_START( tnk3_YM3526_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe006, 0xe006) AM_READ(tnk3_ymirq_ack_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aso_YM3526_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( aso_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
@@ -1469,7 +1469,7 @@ static ADDRESS_MAP_START( aso_YM3526_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf006, 0xf006) AM_READ(tnk3_ymirq_ack_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( YM3526_YM3526_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( YM3526_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
@@ -1480,7 +1480,7 @@ static ADDRESS_MAP_START( YM3526_YM3526_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( YM3812_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( YM3812_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
@@ -1489,7 +1489,7 @@ static ADDRESS_MAP_START( YM3812_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( YM3526_Y8950_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( YM3526_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
@@ -1500,7 +1500,7 @@ static ADDRESS_MAP_START( YM3526_Y8950_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( YM3812_Y8950_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( YM3812_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
@@ -1511,7 +1511,7 @@ static ADDRESS_MAP_START( YM3812_Y8950_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( Y8950_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)

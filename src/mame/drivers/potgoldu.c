@@ -54,7 +54,7 @@ static MACHINE_RESET( potgold )
 }
 
 
-static ADDRESS_MAP_START( potgold_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( potgold_map, AS_PROGRAM, 16, potgold_state )
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 

@@ -570,7 +570,7 @@ static READ8_DEVICE_HANDLER( gfx_rom_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( spiders_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spiders_main_map, AS_PROGRAM, 8, spiders_state )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(spiders_state, m_ram)
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
@@ -585,7 +585,7 @@ static ADDRESS_MAP_START( spiders_main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spiders_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spiders_audio_map, AS_PROGRAM, 8, spiders_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE_MODERN("pia4", pia6821_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM

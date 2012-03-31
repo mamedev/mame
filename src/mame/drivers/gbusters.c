@@ -155,7 +155,7 @@ static WRITE8_HANDLER( k052109_051960_w )
 }
 
 
-static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8, gbusters_state )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_coin_counter_w)						/* coin counters */
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)									/* sound code # */
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(gbusters_sh_irqtrigger_w)						/* cause interrupt on audio CPU */
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM													/* ROM 878n02.rom */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gbusters_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gbusters_sound_map, AS_PROGRAM, 8, gbusters_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM													/* ROM 878h01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM													/* RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)									/* soundlatch_r */

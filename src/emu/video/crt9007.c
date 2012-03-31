@@ -215,7 +215,7 @@ const int STATUS_FRAME_TIMER_OCCURRED	= 0x01;
 //**************************************************************************
 
 // default address map
-static ADDRESS_MAP_START( crt9007, AS_0, 8 )
+static ADDRESS_MAP_START( crt9007, AS_0, 8, crt9007_device )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 

@@ -71,12 +71,12 @@ static CUSTOM_INPUT( mw18w_sensors_r )
 
 
 
-static ADDRESS_MAP_START( mw18w_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mw18w_map, AS_PROGRAM, 8, mw18w_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mw18w_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( mw18w_portmap, AS_IO, 8, mw18w_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mw18w_sound0_w)

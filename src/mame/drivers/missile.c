@@ -827,7 +827,7 @@ static READ8_HANDLER( missile_r )
  *************************************/
 
 /* complete memory map derived from schematics (implemented above) */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, missile_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(missile_r, missile_w) AM_BASE_MEMBER(missile_state, m_videoram)
 ADDRESS_MAP_END
 

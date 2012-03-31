@@ -593,7 +593,7 @@ static WRITE8_HANDLER( mux_port_w )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( magicfly_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( magicfly_map, AS_PROGRAM, 8, magicfly_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")    /* MK48Z02B NVRAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)

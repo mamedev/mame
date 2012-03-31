@@ -80,7 +80,7 @@ static READ8_DEVICE_HANDLER( kiki_ym2203_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					/* banked roms */
 	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE("share1")  				/* shared with sound cpu */
@@ -95,14 +95,14 @@ static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")					/* communication ram - to connect 4 players's subboard */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mexico86_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mexico86_sound_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa800, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", kiki_ym2203_r,ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mexico86_m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mexico86_m68705_map, AS_PROGRAM, 8, mexico86_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mexico86_68705_port_a_r,mexico86_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mexico86_68705_port_b_r,mexico86_68705_port_b_w)
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( mexico86_sub_output_w )
 	/*---- --x- <unknown, always high, irq ack?>*/
 }
 
-static ADDRESS_MAP_START( mexico86_sub_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mexico86_sub_cpu_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM /* sub cpu ram */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2")  /* shared with main */

@@ -163,7 +163,7 @@ static WRITE8_HANDLER( coin_lock_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(suprridr_bgram_w) AM_BASE_MEMBER(suprridr_state, m_bgram)
@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, suprridr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
@@ -198,13 +198,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, suprridr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay1", ay8910_address_data_w)

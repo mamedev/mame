@@ -292,7 +292,7 @@ static WRITE8_HANDLER( discoboy_ram_att_w )
 	state->m_ram_att[offset] = data;
 }
 
-static ADDRESS_MAP_START( discoboy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( discoboy_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(rambank_r, rambank_w)
@@ -308,7 +308,7 @@ static READ8_HANDLER( discoboy_port_06_r )
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, discoboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA") AM_WRITE(discoboy_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(discoboy_port_01_w)
@@ -340,7 +340,7 @@ static WRITE8_HANDLER( yunsung8_adpcm_w )
 	state->m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sndbank")
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm",yunsung8_sound_bankswitch_w)

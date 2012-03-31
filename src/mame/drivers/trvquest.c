@@ -58,7 +58,7 @@ static WRITE8_DEVICE_HANDLER( trvquest_misc_w )
 	// data & 1 -> led on/off ?
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") // cmos ram
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // main ram
 	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)

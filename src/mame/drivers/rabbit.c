@@ -732,7 +732,7 @@ static WRITE32_DEVICE_HANDLER( rabbit_eeprom_write )
 	}
 }
 
-static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x000000, 0x000003) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x000010, 0x000013) AM_WRITENOP // bug in code / emulation?

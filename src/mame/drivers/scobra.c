@@ -112,7 +112,7 @@ static WRITE8_DEVICE_HANDLER(hustler_ppi8255_w)
 	ppi8255_w(device, offset >> 3, data);
 }
 
-static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x883f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb00e, 0xb00e) AM_WRITE(galaxold_flip_screen_x_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe01f) AM_DEVREADWRITE("ppi8255_1", hustler_ppi8255_r, hustler_ppi8255_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -218,7 +218,7 @@ static WRITE8_HANDLER(scobra_soundram_w)
 	state->m_soundram[offset & 0x03ff] = data;
 }
 
-static ADDRESS_MAP_START( scobra_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( scobra_sound_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scobra_soundram_r, scobra_soundram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE_MEMBER(scobra_state, m_soundram)  /* only here to initialize pointer */
@@ -226,14 +226,14 @@ static ADDRESS_MAP_START( scobra_sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hustlerb_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hustlerb_sound_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ(scobra_soundram_r) AM_BASE_MEMBER(scobra_state, m_soundram)  /* only here to initialize pointer */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scobra_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( scobra_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)
@@ -241,20 +241,20 @@ static ADDRESS_MAP_START( scobra_sound_io_map, AS_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustler_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hustler_sound_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
     AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustler_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hustler_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_address_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hustlerb_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hustlerb_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("aysnd", ay8910_address_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)

@@ -99,7 +99,7 @@ static WRITE8_HANDLER( narc_slave_sync_w );
 ****************************************************************************/
 
 /* CVSD readmem/writemem structures */
-static ADDRESS_MAP_START( williams_cvsd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_cvsd_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x1ffe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE_MODERN("cvsdpia", pia6821_device, read, write)
@@ -111,7 +111,7 @@ ADDRESS_MAP_END
 
 
 /* NARC master readmem/writemem structures */
-static ADDRESS_MAP_START( williams_narc_master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_narc_master_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(narc_master_talkback_w)
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( williams_narc_master_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* NARC slave readmem/writemem structures */
-static ADDRESS_MAP_START( williams_narc_slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_narc_slave_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_DEVWRITE("cvsd", cvsd_clock_set_w)
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_DEVWRITE("cvsd", cvsd_digit_clock_clear_w)
@@ -140,7 +140,7 @@ ADDRESS_MAP_END
 
 
 /* ADPCM readmem/writemem structures */
-static ADDRESS_MAP_START( williams_adpcm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( williams_adpcm_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x03ff) AM_WRITE(adpcm_bank_select_w)
 	AM_RANGE(0x2400, 0x2401) AM_MIRROR(0x03fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

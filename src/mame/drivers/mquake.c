@@ -93,7 +93,7 @@ static READ8_HANDLER( es5503_sample_r )
 	return rom[offset + (es5503->get_channel_strobe() * 0x10000)];
 }
 
-static ADDRESS_MAP_START( mquake_es5503_map, AS_0, 8 )
+static ADDRESS_MAP_START( mquake_es5503_map, AS_0, 8, amiga_state )
 	AM_RANGE(0x000000, 0x1ffff) AM_READ(es5503_sample_r)
 ADDRESS_MAP_END
 
@@ -131,7 +131,7 @@ static WRITE16_HANDLER( coin_chip_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, amiga_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(amiga_state, m_chip_ram, m_chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)

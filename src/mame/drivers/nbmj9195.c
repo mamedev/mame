@@ -692,7 +692,7 @@ static DRIVER_INIT( nbmj9195 )
 	nbmj9195_soundbank_w(space, 0, 0);
 }
 
-static ADDRESS_MAP_START( tmpz84c011_regs, AS_IO, 8 )
+static ADDRESS_MAP_START( tmpz84c011_regs, AS_IO, 8, nbmj9195_state )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("main_ctc", z80ctc_r,z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r,tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r,tmpz84c011_0_pb_w)
@@ -706,31 +706,31 @@ static ADDRESS_MAP_START( tmpz84c011_regs, AS_IO, 8 )
 	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r,tmpz84c011_0_dir_pe_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sailorws_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sailorws_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjuraden_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjuraden_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf200, 0xf3ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( koinomp_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( koinomp_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ngpgal_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ngpgal_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd1ff) AM_READWRITE(nbmj9195_palette_r,nbmj9195_palette_w)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mscoutm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mscoutm_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe5ff) AM_RAM
 	AM_RANGE(0xe600, 0xebff) AM_READWRITE(nbmj9195_nb22090_palette_r,nbmj9195_nb22090_palette_w)
@@ -738,7 +738,7 @@ static ADDRESS_MAP_START( mscoutm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjegolf_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjegolf_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe5ff) AM_READWRITE(nbmj9195_nb22090_palette_r,nbmj9195_nb22090_palette_w)
 	AM_RANGE(0xe600, 0xebff) AM_RAM
@@ -746,7 +746,7 @@ static ADDRESS_MAP_START( mjegolf_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjuraden_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mjuraden_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -761,7 +761,7 @@ static ADDRESS_MAP_START( mjuraden_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -781,7 +781,7 @@ static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( patimono_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( patimono_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -799,7 +799,7 @@ static ADDRESS_MAP_START( patimono_io_map, AS_IO, 8 )
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mmehyou_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mmehyou_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -813,7 +813,7 @@ static ADDRESS_MAP_START( mmehyou_io_map, AS_IO, 8 )
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gal10ren_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( gal10ren_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -831,7 +831,7 @@ static ADDRESS_MAP_START( gal10ren_io_map, AS_IO, 8 )
 	AM_RANGE(0xd8, 0xd8) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( renaiclb_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( renaiclb_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -849,7 +849,7 @@ static ADDRESS_MAP_START( renaiclb_io_map, AS_IO, 8 )
 	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -868,7 +868,7 @@ static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -887,7 +887,7 @@ static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pachiten_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pachiten_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -905,7 +905,7 @@ static ADDRESS_MAP_START( pachiten_io_map, AS_IO, 8 )
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sailorws_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sailorws_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -923,7 +923,7 @@ static ADDRESS_MAP_START( sailorws_io_map, AS_IO, 8 )
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sailorwr_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sailorwr_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -942,7 +942,7 @@ static ADDRESS_MAP_START( sailorwr_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( psailor1_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( psailor1_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -960,7 +960,7 @@ static ADDRESS_MAP_START( psailor1_io_map, AS_IO, 8 )
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psailor2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( psailor2_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -978,7 +978,7 @@ static ADDRESS_MAP_START( psailor2_io_map, AS_IO, 8 )
 	AM_RANGE(0xf6, 0xf6) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( otatidai_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( otatidai_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -996,7 +996,7 @@ static ADDRESS_MAP_START( otatidai_io_map, AS_IO, 8 )
 	AM_RANGE(0xb8, 0xb8) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yosimoto_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( yosimoto_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -1014,7 +1014,7 @@ static ADDRESS_MAP_START( yosimoto_io_map, AS_IO, 8 )
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jituroku_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( jituroku_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -1032,7 +1032,7 @@ static ADDRESS_MAP_START( jituroku_io_map, AS_IO, 8 )
 	AM_RANGE(0xf8, 0xf8) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ngpgal_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ngpgal_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -1046,7 +1046,7 @@ static ADDRESS_MAP_START( ngpgal_io_map, AS_IO, 8 )
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjgottsu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mjgottsu_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -1060,7 +1060,7 @@ static ADDRESS_MAP_START( mjgottsu_io_map, AS_IO, 8 )
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cmehyou_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cmehyou_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -1074,7 +1074,7 @@ static ADDRESS_MAP_START( cmehyou_io_map, AS_IO, 8 )
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjkoiura_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mjkoiura_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -1088,7 +1088,7 @@ static ADDRESS_MAP_START( mjkoiura_io_map, AS_IO, 8 )
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(nbmj9195_inputportsel_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mkoiuraa_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mkoiuraa_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -1102,7 +1102,7 @@ static ADDRESS_MAP_START( mkoiuraa_io_map, AS_IO, 8 )
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(nbmj9195_clut_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -1122,7 +1122,7 @@ static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8 )
 	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -1142,7 +1142,7 @@ static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8 )
 	AM_RANGE(0xf0, 0xff) AM_WRITE(nbmj9195_clut_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjegolf_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mjegolf_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_IMPORT_FROM( tmpz84c011_regs )
 
@@ -1164,13 +1164,13 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( sailorws_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sailorws_sound_map, AS_PROGRAM, 8, nbmj9195_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sailorws_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sailorws_sound_io_map, AS_IO, 8, nbmj9195_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("audio_ctc", z80ctc_r,z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_1_pa_r,tmpz84c011_1_pa_w)

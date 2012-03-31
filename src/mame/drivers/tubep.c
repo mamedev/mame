@@ -144,7 +144,7 @@ static WRITE8_HANDLER( tubep_LS259_w )
 }
 
 
-static ADDRESS_MAP_START( tubep_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tubep_main_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE_MEMBER(tubep_state, m_textram)	/* RAM on GFX PCB @B13 */
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( tubep_soundlatch_w )
 	state->m_sound_latch = (data&0x7f) | 0x80;
 }
 
-static ADDRESS_MAP_START( tubep_main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( tubep_main_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW1")
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("DSW2")
@@ -200,7 +200,7 @@ static WRITE8_HANDLER( second_cpu_irq_line_clear_w )
 }
 
 
-static ADDRESS_MAP_START( tubep_second_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tubep_second_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tubep_background_a000_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(tubep_background_c000_w)
@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( tubep_second_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tubep_second_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( tubep_second_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(second_cpu_irq_line_clear_w)
 ADDRESS_MAP_END
@@ -241,14 +241,14 @@ static WRITE8_HANDLER( tubep_sound_unknown )
 }
 
 
-static ADDRESS_MAP_START( tubep_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tubep_sound_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xd000, 0xd000) AM_READ(tubep_sound_irq_ack)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM		/* 6116 #3 */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tubep_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( tubep_sound_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
@@ -364,7 +364,7 @@ static MACHINE_RESET( tubep )
  *************************************/
 
 /* MS2010-A CPU (equivalent to NSC8105 with one new opcode: 0xec) on graphics PCB */
-static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share3") AM_BASE_MEMBER(tubep_state, m_sprite_colorsharedram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x2000, 0x2009) AM_WRITE(tubep_sprite_control_w)
@@ -405,7 +405,7 @@ static WRITE8_HANDLER( rjammer_soundlatch_w )
 }
 
 
-static ADDRESS_MAP_START( rjammer_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rjammer_main_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM									/* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE_MEMBER(tubep_state, m_textram)/* RAM on GFX PCB @B13 */
@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( rjammer_main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rjammer_main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rjammer_main_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW2")	/* a bug in game code (during attract mode) */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW2")
@@ -428,7 +428,7 @@ static ADDRESS_MAP_START( rjammer_main_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rjammer_second_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rjammer_second_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM							/* M5M5117P @21G */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")				/* MB8416 on daughterboard (the one on the right) */
@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( rjammer_second_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rjammer_second_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rjammer_second_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(rjammer_background_page_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(rjammer_background_LS377_w)
@@ -604,13 +604,13 @@ static WRITE8_HANDLER( rjammer_voice_intensity_control_w )
 }
 
 
-static ADDRESS_MAP_START( rjammer_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rjammer_sound_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM		/* M5M5117P (M58125P @2C on schematics) */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rjammer_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rjammer_sound_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(rjammer_soundlatch_r)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("msm", rjammer_voice_startstop_w)

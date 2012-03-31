@@ -108,7 +108,7 @@
 
 
 /* todo: check all memory regions actually readable / read from */
-static ADDRESS_MAP_START( pass_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pass_map, AS_PROGRAM, 16, pass_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(pass_bg_videoram_w) AM_BASE_MEMBER(pass_state, m_bg_videoram) // Background
@@ -120,12 +120,12 @@ static ADDRESS_MAP_START( pass_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* sound cpu */
-static ADDRESS_MAP_START( pass_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pass_sound_map, AS_PROGRAM, 8, pass_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pass_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pass_sound_io_map, AS_IO, 8, pass_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)

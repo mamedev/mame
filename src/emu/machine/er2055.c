@@ -48,7 +48,7 @@
 // device type definition
 const device_type ER2055 = &device_creator<er2055_device>;
 
-static ADDRESS_MAP_START( er2055_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( er2055_map, AS_PROGRAM, 8, er2055_device )
 	AM_RANGE(0x0000, 0x003f) AM_RAM
 ADDRESS_MAP_END
 

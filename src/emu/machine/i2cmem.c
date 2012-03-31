@@ -58,7 +58,7 @@ INLINE void ATTR_PRINTF( 3, 4 ) verboselog( device_t *device, int n_level, const
 // device type definition
 const device_type I2CMEM = &device_creator<i2cmem_device>;
 
-static ADDRESS_MAP_START( i2cmem_map8, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( i2cmem_map8, AS_PROGRAM, 8, i2cmem_device )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 ADDRESS_MAP_END
 

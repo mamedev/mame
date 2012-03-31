@@ -289,7 +289,7 @@ static READ16_HANDLER( slapshot_msb_sound_r )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM	/* main RAM */
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(slapshot_state, m_spriteram, m_spriteram_size)	/* sprite ram */
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( slapshot_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xd00000, 0xd00003) AM_READWRITE(slapshot_msb_sound_r, slapshot_msb_sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( opwolf3_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( opwolf3_map, AS_PROGRAM, 16, slapshot_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM	/* main RAM */
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(slapshot_state, m_spriteram, m_spriteram_size)	/* sprite ram */
@@ -323,7 +323,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( opwolf3_z80_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( opwolf3_z80_sound_map, AS_PROGRAM, 8, slapshot_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

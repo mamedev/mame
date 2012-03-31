@@ -349,7 +349,7 @@ static SCREEN_UPDATE_IND16( sbrkout )
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbrkout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_BASE_MEMBER(sbrkout_state, m_videoram)

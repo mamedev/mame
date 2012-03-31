@@ -267,7 +267,7 @@ static WRITE16_HANDLER( lordgun_soundlatch_w )
 	cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(lordgun_state, m_priority_ram)						// PRIORITY
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(lordgun_state, m_priority_ram)						// PRIORITY
@@ -333,7 +333,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lordgun_soundmem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lordgun_soundmem_map, AS_PROGRAM, 8, lordgun_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -345,7 +345,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_okibank_w )
 //  popmessage("OKI %x", data);
 }
 
-static ADDRESS_MAP_START( lordgun_soundio_map, AS_IO, 8 )
+static ADDRESS_MAP_START( lordgun_soundio_map, AS_IO, 8, lordgun_state )
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE( "ymsnd", ym3812_w )
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
@@ -355,7 +355,7 @@ static ADDRESS_MAP_START( lordgun_soundio_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( aliencha_soundio_map, AS_IO, 8 )
+static ADDRESS_MAP_START( aliencha_soundio_map, AS_IO, 8, lordgun_state )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP	// writes 03 then 07 at end of NMI

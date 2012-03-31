@@ -80,7 +80,7 @@ static WRITE8_HANDLER( k052109_051960_w )
 
 /********************************************/
 
-static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1")					/* banked RAM */
 	AM_RANGE(0x0400, 0x1fff) AM_RAM												/* RAM */
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("SYSTEM")
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crimfght_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( crimfght_sound_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM 821l01.h4 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)			/* YM2151 */

@@ -123,7 +123,7 @@ static WRITE16_HANDLER( led_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, quantum_state )
 	AM_RANGE(0x000000, 0x013fff) AM_ROM
 	AM_RANGE(0x018000, 0x01cfff) AM_RAM
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE((UINT16 **)&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size)

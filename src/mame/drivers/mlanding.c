@@ -451,7 +451,7 @@ static WRITE16_HANDLER( ml_mecha_ram_w )
 	COMBINE_DATA(state->m_mecha_ram+offset*2);
 }
 
-static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 
@@ -489,7 +489,7 @@ ADDRESS_MAP_END
 
 /* Sub CPU Map */
 
-static ADDRESS_MAP_START( mlanding_sub_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mlanding_sub_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE("share3")
@@ -513,7 +513,7 @@ static WRITE8_HANDLER( ml_msm_start_msb_w )
 	state->m_adpcm_pos = (state->m_adpcm_pos & 0x00ff00) | ((data & 0x0f)<<16) | 0x20;
 }
 
-static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
@@ -554,7 +554,7 @@ static READ8_HANDLER( test_r )
 }
 
 //mecha driver ?
-static ADDRESS_MAP_START( mlanding_z80_sub_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mlanding_z80_sub_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(mlanding_state, m_mecha_ram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
@@ -563,15 +563,15 @@ static ADDRESS_MAP_START( mlanding_z80_sub_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x9803) AM_READ(test_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16 )
+static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16, mlanding_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ml_dotram_r,ml_dotram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( DSP_map_io, AS_IO, 16 )
+static ADDRESS_MAP_START( DSP_map_io, AS_IO, 16, mlanding_state )
 	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_HOLD_signal_r)
 //  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END

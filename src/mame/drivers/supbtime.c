@@ -59,7 +59,7 @@ static WRITE16_HANDLER( sound_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x11ffff) AM_WRITENOP /* Nothing there */
@@ -76,7 +76,7 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE_MEMBER(supbtime_state, m_pf2_rowscroll)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(sound_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(supbtime_state, m_spriteram, m_spriteram_size)
@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supbtime_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP /* YM2203 - this board doesn't have one */

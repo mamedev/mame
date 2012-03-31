@@ -70,7 +70,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	}
 }
 
-static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM	/* work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
@@ -130,7 +130,7 @@ static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 	return (victnine_mcu_status_r(space, 0) & 3);
 }
 
-static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
@@ -339,7 +339,7 @@ static WRITE8_HANDLER( rumba_mcu_w )
 		state->m_mcu_param = 1;
 }
 
-static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
 //  AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
@@ -445,7 +445,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
 }
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_ROM											/* space for diagnostics ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flstory_m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flstory_m68705_map, AS_PROGRAM, 8, flstory_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(flstory_68705_port_a_r, flstory_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(flstory_68705_port_b_r, flstory_68705_port_b_w)

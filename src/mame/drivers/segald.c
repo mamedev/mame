@@ -242,7 +242,7 @@ static WRITE8_HANDLER( astron_io_bankswitch_w )
 
 
 /* PROGRAM MAP */
-static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, segald_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 
@@ -260,7 +260,7 @@ ADDRESS_MAP_END
 
 
 /* I/O MAP */
-static ADDRESS_MAP_START( mainport, AS_IO, 8 )
+static ADDRESS_MAP_START( mainport, AS_IO, 8, segald_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(astron_io_bankswitch_w)
 ADDRESS_MAP_END

@@ -240,7 +240,7 @@ static WRITE8_HANDLER( i8257_LMSR_w )
 	}
 }
 
-static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, ddayjlc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE_MEMBER(ddayjlc_state, m_mainram)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_MEMBER(ddayjlc_state, m_spriteram)
@@ -266,7 +266,7 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, ddayjlc_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)

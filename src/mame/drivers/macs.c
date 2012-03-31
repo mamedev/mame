@@ -77,7 +77,7 @@ public:
 static MACHINE_RESET(macs);
 
 
-static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8, macs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank4")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
@@ -170,7 +170,7 @@ static WRITE8_HANDLER( macs_output_w )
 	}
 }
 
-static ADDRESS_MAP_START( macs_io, AS_IO, 8 )
+static ADDRESS_MAP_START( macs_io, AS_IO, 8, macs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
 	AM_RANGE(0xc0, 0xc7) AM_READWRITE(macs_input_r,macs_output_w)

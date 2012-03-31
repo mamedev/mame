@@ -101,7 +101,7 @@ static SCREEN_UPDATE_IND16( good )
 	return 0;
 }
 
-static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16, good_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	//AM_RANGE(0x270000, 0x270007) AM_RAM // scroll?

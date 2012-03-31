@@ -592,7 +592,7 @@ static WRITE8_HANDLER( tenpindx_lights_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( seawolf2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( seawolf2_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram)
@@ -600,14 +600,14 @@ static ADDRESS_MAP_START( seawolf2_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ebases_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ebases_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spacezap_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spacezap_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram)
@@ -616,7 +616,7 @@ static ADDRESS_MAP_START( spacezap_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( wow_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wow_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram)
@@ -626,7 +626,7 @@ static ADDRESS_MAP_START( wow_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( robby_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( robby_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(astrocde_state, m_videoram)
@@ -637,7 +637,7 @@ static ADDRESS_MAP_START( robby_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( profpac_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( profpac_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
@@ -649,7 +649,7 @@ static ADDRESS_MAP_START( profpac_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( demndrgn_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( demndrgn_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(astrocade_funcgen_w)
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(profpac_videoram_r, profpac_videoram_w)
@@ -660,7 +660,7 @@ static ADDRESS_MAP_START( demndrgn_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tenpin_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tenpin_sub_map, AS_PROGRAM, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -674,19 +674,19 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map, AS_IO, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map_mono_pattern, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map_mono_pattern, AS_IO, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
 	AM_RANGE(0xa55b, 0xa55b) AM_WRITE(protected_ram_enable_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map_stereo_pattern, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map_stereo_pattern, AS_IO, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("astrocade2", astrocade_sound_w)
 	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
@@ -694,7 +694,7 @@ static ADDRESS_MAP_START( port_map_stereo_pattern, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map_16col_pattern, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map_16col_pattern, AS_IO, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 	AM_RANGE(0x0050, 0x0058) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_DEVWRITE("astrocade2", astrocade_sound_w)
 	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
@@ -706,7 +706,7 @@ static ADDRESS_MAP_START( port_map_16col_pattern, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map_16col_pattern_nosound, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map_16col_pattern_nosound, AS_IO, 8, astrocde_state )
 	AM_RANGE(0x0000, 0x0019) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 	AM_RANGE(0x0078, 0x007e) AM_MIRROR(0xff00) AM_WRITE(astrocade_pattern_board_w)
 	AM_RANGE(0x00bf, 0x00bf) AM_MIRROR(0xff00) AM_WRITE(profpac_page_select_w)
@@ -717,7 +717,7 @@ static ADDRESS_MAP_START( port_map_16col_pattern_nosound, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tenpin_sub_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tenpin_sub_io_map, AS_IO, 8, astrocde_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x97, 0x97) AM_READ(soundlatch_r)

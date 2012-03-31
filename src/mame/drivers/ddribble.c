@@ -113,7 +113,7 @@ static WRITE8_DEVICE_HANDLER( ddribble_vlm5030_ctrl_w )
 }
 
 
-static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x0000, 0x0004) AM_WRITE(K005885_0_w)												/* video registers (005885 #1) */
 	AM_RANGE(0x0800, 0x0804) AM_WRITE(K005885_1_w)												/* video registers (005885 #2) */
 	AM_RANGE(0x1800, 0x187f) AM_RAM AM_BASE_MEMBER(ddribble_state, m_paletteram)										/* palette */
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xffff) AM_ROM																/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ddribble_sharedram_r, ddribble_sharedram_w)			/* shared RAM with CPU #0 */
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ddribble_snd_sharedram_r, ddribble_snd_sharedram_w)	/* shared RAM with CPU #2 */
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("DSW1")
@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM															/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(ddribble_state, m_snd_sharedram)		/* shared RAM with CPU #1 */
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	/* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("vlm", vlm5030_data_w)			/* Speech data */

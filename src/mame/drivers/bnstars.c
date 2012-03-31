@@ -1261,7 +1261,7 @@ static WRITE32_HANDLER( bnstars1_mahjong_select_w )
 //  printf("%08x\n",state->m_bnstars1_mahjong_select);
 }
 
-static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 
 	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ( bnstars1_r )
@@ -1301,7 +1301,7 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 #if 0
-static ADDRESS_MAP_START( bnstars_z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bnstars_z80_map, AS_PROGRAM, 8, bnstars_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 #endif

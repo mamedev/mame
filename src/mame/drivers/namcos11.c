@@ -691,7 +691,7 @@ static READ32_HANDLER( lightgun_r )
 	return data;
 }
 
-static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32, namcos11_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_RAM AM_BASE_MEMBER(namcos11_state, m_sharedram) /* shared ram with C76 */
 	AM_RANGE(0x1fa20000, 0x1fa2ffff) AM_WRITE(keycus_w) AM_BASE_SIZE_MEMBER(namcos11_state, m_keycus, m_keycus_size) /* keycus */
@@ -744,7 +744,7 @@ static READ16_HANDLER( c76_inputs_r )
 	return 0xff;
 }
 
-ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16 )
+ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16, namcos11_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
 	AM_RANGE(0x001000, 0x001007) AM_READ( c76_inputs_r )
 	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE( c76_shared_r, c76_shared_w )
@@ -806,7 +806,7 @@ static READ8_HANDLER(pocketrc_steer_r)
 	return input_port_read(space->machine(), "STEERING");
 }
 
-ADDRESS_MAP_START( c76_io_map, AS_IO, 8 )
+ADDRESS_MAP_START( c76_io_map, AS_IO, 8, namcos11_state )
 	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ(dac7_r)
 	AM_RANGE(M37710_ADC6_L, M37710_ADC6_L) AM_READ(dac6_r)
 	AM_RANGE(M37710_ADC5_L, M37710_ADC5_L) AM_READ(dac5_r)

@@ -459,7 +459,7 @@ static WRITE8_HANDLER( othunder_TC0310FAM_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( othunder_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( othunder_map, AS_PROGRAM, 16, othunder_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 	AM_RANGE(0x090000, 0x09000f) AM_READWRITE(othunder_tc0220ioc_r, othunder_tc0220ioc_w)
@@ -477,7 +477,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, othunder_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

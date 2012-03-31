@@ -256,7 +256,7 @@ static WRITE8_HANDLER( sprint2_lamp2_w )
 }
 
 
-static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(sprint2_wram_r,sprint2_wram_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_BASE_MEMBER(sprint2_state, m_video_ram)
 	AM_RANGE(0x0818, 0x081f) AM_READ(sprint2_input_A_r)

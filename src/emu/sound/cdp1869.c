@@ -60,7 +60,7 @@ enum
 const device_type CDP1869 = &device_creator<cdp1869_device>;
 
 // default address map
-static ADDRESS_MAP_START( cdp1869, AS_0, 8 )
+static ADDRESS_MAP_START( cdp1869, AS_0, 8, cdp1869_device )
 	AM_RANGE(0x000, 0x7ff) AM_RAM
 ADDRESS_MAP_END
 

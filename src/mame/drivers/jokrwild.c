@@ -191,7 +191,7 @@ static READ8_HANDLER( rng_r )
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( jokrwild_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jokrwild_map, AS_PROGRAM, 8, jokrwild_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_BASE_MEMBER(jokrwild_state, m_videoram)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM //FIXME: backup RAM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_BASE_MEMBER(jokrwild_state, m_colorram)

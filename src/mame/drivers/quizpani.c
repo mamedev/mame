@@ -51,7 +51,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "sound/okim6295.h"
 #include "includes/quizpani.h"
 
-static ADDRESS_MAP_START( quizpani_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( quizpani_map, AS_PROGRAM, 16, quizpani_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")

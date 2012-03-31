@@ -144,7 +144,7 @@ static WRITE8_HANDLER( sound_arm_nmi_w )
 
 /********************************************/
 
-static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(parodius_state, m_ram)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x3f8c, 0x3f8c) AM_READ_PORT("P1")
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xffff) AM_ROM					/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( parodius_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( parodius_sound_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)

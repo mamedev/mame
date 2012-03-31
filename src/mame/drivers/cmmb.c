@@ -167,7 +167,7 @@ static READ8_HANDLER( kludge_r )
 }
 
 /* overlap empty addresses */
-static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8, cmmb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram

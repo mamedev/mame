@@ -345,7 +345,7 @@ static WRITE8_HANDLER( nycaptor_generic_control_w )
 	memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x10000 + ((data&0x08)>>3)*0x4000 );
 }
 
-static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(nycaptor_videoram_r, nycaptor_videoram_w) AM_BASE_SIZE_MEMBER(nycaptor_state, m_videoram, m_videoram_size)
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( nycaptor_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(nycaptor_sharedram_r, nycaptor_sharedram_w) AM_BASE_MEMBER(nycaptor_state, m_sharedram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nycaptor_slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nycaptor_slave_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(nycaptor_videoram_r, nycaptor_videoram_w) AM_BASE_SIZE_MEMBER(nycaptor_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
@@ -390,7 +390,7 @@ static ADDRESS_MAP_START( nycaptor_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(nycaptor_sharedram_r, nycaptor_sharedram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nycaptor_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nycaptor_sound_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ay1", ay8910_address_data_w)
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( nycaptor_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nycaptor_m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nycaptor_m68705_map, AS_PROGRAM, 8, nycaptor_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(nycaptor_68705_port_a_r, nycaptor_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(nycaptor_68705_port_b_r, nycaptor_68705_port_b_w)
@@ -452,7 +452,7 @@ static WRITE8_HANDLER( cyclshtg_generic_control_w )
 }
 
 
-static ADDRESS_MAP_START( cyclshtg_master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cyclshtg_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(nycaptor_videoram_r, nycaptor_videoram_w) AM_BASE_SIZE_MEMBER(nycaptor_state, m_videoram, m_videoram_size)
@@ -477,7 +477,7 @@ static ADDRESS_MAP_START( cyclshtg_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(nycaptor_sharedram_r, nycaptor_sharedram_w) AM_BASE_MEMBER(nycaptor_state, m_sharedram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cyclshtg_slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cyclshtg_slave_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(nycaptor_videoram_r, nycaptor_videoram_w) AM_BASE_SIZE_MEMBER(nycaptor_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
@@ -501,7 +501,7 @@ static READ8_HANDLER( unk_r )
 	return space->machine().rand();
 }
 
-static ADDRESS_MAP_START( bronx_master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bronx_master_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(nycaptor_videoram_r, nycaptor_videoram_w) AM_BASE_SIZE_MEMBER(nycaptor_state, m_videoram, m_videoram_size)
@@ -526,7 +526,7 @@ static ADDRESS_MAP_START( bronx_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(nycaptor_sharedram_r, nycaptor_sharedram_w) AM_BASE_MEMBER(nycaptor_state, m_sharedram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bronx_slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bronx_slave_map, AS_PROGRAM, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(nycaptor_videoram_r, nycaptor_videoram_w) AM_BASE_SIZE_MEMBER(nycaptor_state, m_videoram, m_videoram_size)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
@@ -546,7 +546,7 @@ static ADDRESS_MAP_START( bronx_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(nycaptor_sharedram_r, nycaptor_sharedram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bronx_slave_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bronx_slave_io_map, AS_IO, 8, nycaptor_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 

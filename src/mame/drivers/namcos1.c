@@ -428,7 +428,7 @@ static WRITE8_HANDLER( namcos1_dac1_w )
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank3")
@@ -448,7 +448,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank9")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank10")
 	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank11")
@@ -466,7 +466,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank17")	/* Banked ROMs */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ymsnd", ym2151_status_port_r)
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -480,7 +480,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM /* built in RAM */
 	AM_RANGE(0x1000, 0x1003) AM_READ(dsw_r)
@@ -497,7 +497,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos1_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("COIN") AM_WRITE(namcos1_coin_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READNOP AM_WRITE(namcos1_dac_gain_w)
 ADDRESS_MAP_END

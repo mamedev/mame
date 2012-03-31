@@ -169,7 +169,7 @@ static READ16_HANDLER( alpha_mcu_r )
 
 
 
-static ADDRESS_MAP_START( meijinsn_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( meijinsn_map, AS_PROGRAM, 16, meijinsn_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080e00, 0x080fff) AM_READ(alpha_mcu_r) AM_WRITENOP
 	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_BASE_MEMBER(meijinsn_state, m_videoram)
@@ -180,12 +180,12 @@ static ADDRESS_MAP_START( meijinsn_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1a0000, 0x1a0001) AM_READ_PORT("P1") AM_WRITE(sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meijinsn_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( meijinsn_sound_map, AS_PROGRAM, 8, meijinsn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( meijinsn_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( meijinsn_sound_io_map, AS_IO, 8, meijinsn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)

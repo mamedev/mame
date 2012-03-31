@@ -160,7 +160,7 @@ static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 	/* unknown bit 2 -> (data & 4) */
 }
 
-static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM	/* ROM */
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_BASE_MEMBER(drtomy_state, m_videoram_fg)	/* Video RAM FG */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_BASE_MEMBER(drtomy_state, m_videoram_bg) /* Video RAM BG */

@@ -354,7 +354,7 @@ static WRITE8_HANDLER( flip_screen_w )
 }
 
 
-static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(cosmic_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cosmic_state, m_spriteram, m_spriteram_size)
@@ -369,7 +369,7 @@ static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(cosmic_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cosmic_state, m_spriteram, m_spriteram_size)
@@ -383,12 +383,12 @@ static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cosmicg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cosmicg_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(cosmic_state, m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8, cosmic_state )
 	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x00, 0x15) AM_WRITE(cosmicg_output_w)
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
 	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cosmic_state, m_spriteram, m_spriteram_size)

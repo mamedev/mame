@@ -209,7 +209,7 @@ static READ16_HANDLER( shared_ram_r )
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
@@ -238,7 +238,7 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(dassault_state, m_shared_ram) /* Shared ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE_MODERN("spriteram", buffered_spriteram16_device, write)
@@ -253,7 +253,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dassault_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r, ym2151_w)

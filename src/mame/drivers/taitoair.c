@@ -402,7 +402,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
              MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_BASE_MEMBER(taitoair_state, m_m68000_mainram)
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(system_control_w)	/* Pause the TMS32025 */
@@ -423,7 +423,7 @@ ADDRESS_MAP_END
 
 /************************** Z80 ****************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitoair_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -467,11 +467,11 @@ read to 0x3407, puts to line RAM (x) with offset + 0x5d
 
 */
 
-static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16 )
+static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16, taitoair_state )
 	AM_RANGE(0x2003, 0x2003) AM_READNOP //bit 0 DMA status flag or vblank
 	AM_RANGE(0x3000, 0x3002) AM_WRITE(dsp_flags_w)
 	AM_RANGE(0x3404, 0x3404) AM_WRITE(dsp_frustum_left_w)
@@ -490,7 +490,7 @@ static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16 )
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram_r, dspram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( DSP_map_io, AS_IO, 16 )
+static ADDRESS_MAP_START( DSP_map_io, AS_IO, 16, taitoair_state )
 	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_HOLD_signal_r)
 	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END

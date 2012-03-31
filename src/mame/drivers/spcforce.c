@@ -88,7 +88,7 @@ static WRITE8_HANDLER( irq_mask_w )
 	state->m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8, spcforce_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW") AM_WRITE(soundlatch_w)
@@ -102,11 +102,11 @@ static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE_MEMBER(spcforce_state, m_scrollram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spcforce_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spcforce_sound_map, AS_PROGRAM, 8, spcforce_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spcforce_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( spcforce_sound_io_map, AS_IO, 8, spcforce_state )
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(soundlatch_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(spcforce_SN76496_latch_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(spcforce_SN76496_select_r, spcforce_SN76496_select_w)

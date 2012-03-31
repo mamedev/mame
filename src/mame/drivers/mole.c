@@ -192,7 +192,7 @@ static READ8_HANDLER( mole_protection_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_READ(mole_protection_r)
 	AM_RANGE(0x0800, 0x0800) AM_WRITENOP // ???

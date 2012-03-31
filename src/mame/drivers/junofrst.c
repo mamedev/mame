@@ -276,7 +276,7 @@ static WRITE8_HANDLER( junofrst_irq_enable_w )
 		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(junofrst_state, m_videoram)
 	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE_MEMBER(junofrst_state, m_paletteram)
 	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
@@ -311,12 +311,12 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, junofrst_state )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)

@@ -969,7 +969,7 @@ static WRITE16_HANDLER( jalmah_flip_screen_w )
 //  popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16, jalmah_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
@@ -993,7 +993,7 @@ static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(jalmah_state, m_jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16, jalmah_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")

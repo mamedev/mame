@@ -62,7 +62,7 @@ static WRITE8_HANDLER( out_w )
 }
 
 
-static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, summit_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_MEMBER(summit_state, m_attr)

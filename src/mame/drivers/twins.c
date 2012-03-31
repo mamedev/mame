@@ -90,13 +90,13 @@ static WRITE16_HANDLER( porte_paloff0_w )
 	state->m_paloff = 0;
 }
 
-static ADDRESS_MAP_START( twins_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( twins_map, AS_PROGRAM, 16, twins_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE_MEMBER(twins_state, m_videoram)
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( twins_io, AS_IO, 16 )
+static ADDRESS_MAP_START( twins_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
@@ -260,7 +260,7 @@ static READ16_HANDLER( twinsa_unk_r )
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( twinsa_io, AS_IO, 16 )
+static ADDRESS_MAP_START( twinsa_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(twinsa_unk_r, porte_paloff0_w)
 	AM_RANGE(0x0002, 0x0003) AM_WRITE(porte_paloff0_w)
 	AM_RANGE(0x0004, 0x0005) AM_WRITE(twinsa_port4_w) // palette on this set

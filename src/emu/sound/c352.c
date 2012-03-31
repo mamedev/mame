@@ -23,7 +23,7 @@
 const device_type C352 = &device_creator<c352_device>;
 
 // default address map
-static ADDRESS_MAP_START( c352, AS_0, 8 )
+static ADDRESS_MAP_START( c352, AS_0, 8, c352_device )
 	AM_RANGE(0x000000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 

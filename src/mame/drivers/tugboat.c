@@ -210,7 +210,7 @@ static MACHINE_RESET( tugboat )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tugboat_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_BASE_MEMBER(tugboat_state, m_ram)
 	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(tugboat_hd46505_0_w)	/* scrolling is performed changing the start_addr register (0C/0D) */

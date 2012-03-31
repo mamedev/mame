@@ -53,7 +53,7 @@ static const ppi8255_interface ppi8255_intf =
 };
 
 
-static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_BASE_MEMBER(homerun_state, m_videoram)
@@ -69,7 +69,7 @@ static CUSTOM_INPUT( homerun_40_r )
 	return ret;
 }
 
-static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITENOP /* ?? */
 	AM_RANGE(0x20, 0x20) AM_WRITENOP /* ?? */

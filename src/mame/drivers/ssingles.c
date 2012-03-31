@@ -353,7 +353,7 @@ static CUSTOM_INPUT(controls_r)
 	return data;
 }
 
-static ADDRESS_MAP_START( ssingles_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssingles_map, AS_PROGRAM, 8, ssingles_state )
 	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -394,7 +394,7 @@ static WRITE8_HANDLER( atamanot_prot_w )
 }
 
 
-static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8, ssingles_state )
 	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -407,7 +407,7 @@ static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8 )
 //  AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8, ssingles_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_data_w)
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atamanot_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( atamanot_io_map, AS_IO, 8, ssingles_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_address_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_data_w)

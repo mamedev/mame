@@ -153,12 +153,12 @@ static WRITE8_HANDLER( cabaret_nmi_and_coins_w )
 
 
 
-static ADDRESS_MAP_START( cabaret_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cabaret_map, AS_PROGRAM, 8, cabaret_state )
 	AM_RANGE( 0x00000, 0x0efff ) AM_ROM
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ_PORT( "BUTTONS2" )

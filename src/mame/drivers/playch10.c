@@ -369,7 +369,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 /******************************************************************************/
 
 /* BIOS */
-static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	// 8V
 	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_BASE_MEMBER(playch10_state, m_ram_8w)	// 8W
@@ -378,7 +378,7 @@ static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(pc10_prot_r, pc10_prot_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bios_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, playch10_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("BIOS") AM_WRITE(pc10_SDCS_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SW1") AM_WRITE(pc10_CNTRLMASK_w)
@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8 )
 	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_BASE_MEMBER(playch10_state, m_timedata)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_BASE_MEMBER(playch10_state, m_work_ram)
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac", dac_w)

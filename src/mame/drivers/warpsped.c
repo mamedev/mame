@@ -213,13 +213,13 @@ static SCREEN_UPDATE_IND16( warpspeed )
 	return 0;
 }
 
-static ADDRESS_MAP_START( warpspeed_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( warpspeed_map, AS_PROGRAM, 8, warpspeed_state )
 	AM_RANGE(0x0000, 0x0dff) AM_ROM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE( warpspeed_vidram_w ) AM_BASE_MEMBER(warpspeed_state, m_videoram)
 	AM_RANGE(0x1c00, 0x1cff) AM_RAM AM_BASE_MEMBER(warpspeed_state, m_workram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START ( warpspeed_io_map, AS_IO, 8)
+static ADDRESS_MAP_START ( warpspeed_io_map, AS_IO, 8, warpspeed_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

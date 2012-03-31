@@ -170,14 +170,14 @@ static WRITE32_HANDLER( pgm_arm7_type1_shareram_w )
 /* 55857E? */
 /* Knights of Valor, Photo Y2k */
 /*  no execute only space? */
-static ADDRESS_MAP_START( kov_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START( kov_map, AS_PROGRAM, 16, pgm_arm_type1_state )
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK("bank1") /* Game ROM */
 	AM_RANGE(0x4f0000, 0x4f003f) AM_READWRITE(pgm_arm7_type1_ram_r, pgm_arm7_type1_ram_w) /* ARM7 Shared RAM */
 	AM_RANGE(0x500000, 0x500005) AM_READWRITE(pgm_arm7_type1_68k_protlatch_r, pgm_arm7_type1_68k_protlatch_w) /* ARM7 Latch */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 55857E_arm7_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( 55857E_arm7_map, AS_PROGRAM, 32, pgm_arm_type1_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08100000, 0x083fffff) AM_READ(pgm_arm7_type1_exrom_r) // unpopulated, returns 0 to keep checksum happy
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM // internal ram for asic
@@ -193,12 +193,12 @@ ADDRESS_MAP_END
 
 /**************************** SIMULATIONS *****************************/
 
-static ADDRESS_MAP_START( kov_sim_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START( kov_sim_map, AS_PROGRAM, 16, pgm_arm_type1_state )
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x4effff) AM_ROMBANK("bank1") /* Game ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cavepgm_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START( cavepgm_mem, AS_PROGRAM, 16, pgm_arm_type1_state )
 	AM_IMPORT_FROM(pgm_base_mem)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	/* protection devices installed (simulated) later */

@@ -527,7 +527,7 @@ static WRITE32_HANDLER( timer_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, metalmx_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x4000ff) AM_READWRITE(host_gsp_r, host_gsp_w)
@@ -559,11 +559,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, metalmx_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(metalmx_state, m_adsp_internal_program_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16 )
+static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, metalmx_state )
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
 	AM_RANGE(0x2000, 0x2007) AM_RAM
 	AM_RANGE(0x3fe0, 0x3fff) AM_RAM // TODO: CPU control registers
@@ -576,7 +576,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gsp_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gsp_map, AS_PROGRAM, 16, metalmx_state )
 	AM_RANGE(0x88800000, 0x8880000f) AM_RAM /* ? */
 	AM_RANGE(0x88c00000, 0x88c0000f) AM_RAM /* ? */
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_READWRITE(tms34020_io_register_r, tms34020_io_register_w)
@@ -591,7 +591,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsp32c_1_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dsp32c_1_map, AS_PROGRAM, 32, metalmx_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM
@@ -608,7 +608,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsp32c_2_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dsp32c_2_map, AS_PROGRAM, 32, metalmx_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM

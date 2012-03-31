@@ -109,7 +109,7 @@ static WRITE8_HANDLER( wolfpack_coldetres_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wolfpack_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_BASE_MEMBER(wolfpack_state, m_alpha_num_ram)

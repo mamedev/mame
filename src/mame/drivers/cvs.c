@@ -487,7 +487,7 @@ static WRITE8_HANDLER( audio_command_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cvs_main_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cvs_main_cpu_map, AS_PROGRAM, 8, cvs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, cvs_bullet_ram_or_palette_w) AM_BASE_MEMBER(cvs_state, m_bullet_ram)
@@ -502,7 +502,7 @@ static ADDRESS_MAP_START( cvs_main_cpu_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cvs_main_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cvs_main_cpu_io_map, AS_IO, 8, cvs_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(cvs_input_r, cvs_scroll_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(cvs_collision_clear, cvs_video_fx_w)
 	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(cvs_collision_r, audio_command_w)
@@ -518,7 +518,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8, cvs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x107f) AM_RAM
@@ -529,7 +529,7 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cvs_dac_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cvs_dac_cpu_io_map, AS_IO, 8, cvs_state )
 	/* doesn't look like it is used at all */
     //AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
 ADDRESS_MAP_END
@@ -542,7 +542,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cvs_speech_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cvs_speech_cpu_map, AS_PROGRAM, 8, cvs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(cvs_speech_rom_address_lo_w)
@@ -553,7 +553,7 @@ static ADDRESS_MAP_START( cvs_speech_cpu_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cvs_speech_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cvs_speech_cpu_io_map, AS_IO, 8, cvs_state )
 /* romclk is much more probable, 393 Hz results in timing issues */
 //  AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_DEVREAD("tms", tms_clock_r)

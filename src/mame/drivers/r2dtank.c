@@ -410,7 +410,7 @@ static WRITE8_DEVICE_HANDLER( pia_comp_w )
 }
 
 
-static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8, r2dtank_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(r2dtank_state, m_videoram)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(r2dtank_state, m_colorram)
@@ -424,7 +424,7 @@ static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( r2dtank_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( r2dtank_audio_map, AS_PROGRAM, 8, r2dtank_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE_MODERN("pia_audio", pia6821_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(audio_command_r, audio_answer_w)

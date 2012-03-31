@@ -422,7 +422,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
                                 Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(hyprduel_vram_0_w) AM_BASE_MEMBER(hyprduel_state, m_vram_0)		/* Layer 0 */
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE(hyprduel_vram_1_w) AM_BASE_MEMBER(hyprduel_state, m_vram_1)		/* Layer 1 */
@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("share3") AM_BASE_MEMBER(hyprduel_state, m_sharedram3)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyprduel_map2, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hyprduel_map2, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("share1")						/* shadow ($c00000 - $c03fff : vector) */
 	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("share3")			/* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff )
@@ -468,7 +468,7 @@ ADDRESS_MAP_END
 
 /* Magical Error - video is at 8x now */
 
-static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(hyprduel_subcpu_control_w)
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE(hyprduel_vram_0_w) AM_BASE_MEMBER(hyprduel_state, m_vram_0)		/* Layer 0 */
@@ -500,7 +500,7 @@ static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfe4000, 0xffffff) AM_RAM AM_SHARE("share3") AM_BASE_MEMBER(hyprduel_state, m_sharedram3)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magerror_map2, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( magerror_map2, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_SHARE("share1")						/* shadow ($c00000 - $c03fff : vector) */
 	AM_RANGE(0x004000, 0x007fff) AM_READONLY AM_WRITENOP AM_SHARE("share3")			/* shadow ($fe4000 - $fe7fff : read only) */
 	AM_RANGE(0x400000, 0x400003) AM_NOP

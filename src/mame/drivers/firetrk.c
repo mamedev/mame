@@ -330,7 +330,7 @@ static WRITE8_HANDLER( crash_reset_w )
 }
 
 
-static ADDRESS_MAP_START( firetrk_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( firetrk_map, AS_PROGRAM, 8, firetrk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(firetrk_state, m_alpha_num_ram)
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(firetrk_state, m_playfield_ram)
@@ -356,7 +356,7 @@ static ADDRESS_MAP_START( firetrk_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( superbug_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( superbug_map, AS_PROGRAM, 8, firetrk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x001f) AM_WRITEONLY AM_BASE_MEMBER(firetrk_state, m_scroll_y)
@@ -380,7 +380,7 @@ static ADDRESS_MAP_START( superbug_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( montecar_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( montecar_map, AS_PROGRAM, 8, firetrk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(firetrk_state, m_alpha_num_ram)
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(firetrk_state, m_playfield_ram)

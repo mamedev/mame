@@ -140,7 +140,7 @@ static WRITE8_HANDLER(mem_w)
 }
 
 
-static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8, pengadvb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank21")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank22")
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_mem, AS_IO, 8 )
+static ADDRESS_MAP_START( io_mem, AS_IO, 8, pengadvb_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, vram_read, vram_write )

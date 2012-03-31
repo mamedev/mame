@@ -110,7 +110,7 @@ WRITE16_HANDLER( region4_w )
 }
 
 /* this map is wrong because our VDP access is wrong! */
-static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16 )
+static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16, littlerb_state )
 	// it ends up writing some gfx here (the bubbles when you shoot an enemy)
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM
 	AM_RANGE(0x00080000, 0x003fffff) AM_RAM // temp so it doesn't fill the log
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16 )
 	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM_WRITE(region4_w)  AM_BASE_MEMBER(littlerb_state, m_region4)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, littlerb_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
@@ -324,7 +324,7 @@ static WRITE16_HANDLER( littlerb_r_sound_w )
 	//popmessage("%04x %04x",state->m_sound_index_l,state->m_sound_index_r);
 }
 
-static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16, littlerb_state )
 	AM_RANGE(0x000008, 0x000017) AM_WRITENOP
 	AM_RANGE(0x000020, 0x00002f) AM_WRITENOP
 	AM_RANGE(0x000070, 0x000073) AM_WRITENOP

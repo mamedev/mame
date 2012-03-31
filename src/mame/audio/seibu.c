@@ -489,7 +489,7 @@ const ym2203_interface seibu_ym2203_interface =
 
 /***************************************************************************/
 
-ADDRESS_MAP_START( seibu_sound_map, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( seibu_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(seibu_pending_w)
@@ -507,7 +507,7 @@ ADDRESS_MAP_START( seibu_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( seibu2_airraid_sound_map, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( seibu2_airraid_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(seibu_pending_w)
@@ -525,7 +525,7 @@ ADDRESS_MAP_START( seibu2_airraid_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( seibu2_sound_map, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( seibu2_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(seibu_pending_w)
@@ -543,7 +543,7 @@ ADDRESS_MAP_START( seibu2_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( seibu2_raiden2_sound_map, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( seibu2_raiden2_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(seibu_pending_w)
@@ -564,7 +564,7 @@ ADDRESS_MAP_START( seibu2_raiden2_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x401a, 0x401a) AM_NOP
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( seibu_newzeroteam_sound_map, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( seibu_newzeroteam_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(seibu_pending_w)
@@ -582,7 +582,7 @@ ADDRESS_MAP_START( seibu_newzeroteam_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( seibu3_sound_map, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( seibu3_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(seibu_pending_w)
@@ -600,7 +600,7 @@ ADDRESS_MAP_START( seibu3_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( seibu3_adpcm_sound_map, AS_PROGRAM, 8 )
+ADDRESS_MAP_START( seibu3_adpcm_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(seibu_pending_w)

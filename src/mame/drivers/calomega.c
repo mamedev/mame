@@ -835,7 +835,7 @@ static WRITE8_DEVICE_HANDLER( lamps_905_w )
 *             Memory map information             *
 *************************************************/
 
-static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8, calomega_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_address_data_w)
@@ -850,7 +850,7 @@ static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8, calomega_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_address_data_w)
@@ -863,7 +863,7 @@ static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1040, 0x1041) AM_DEVWRITE("ay8912", ay8910_address_data_w)
@@ -876,7 +876,7 @@ static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys906_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sys906_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x280c, 0x280f) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
 	AM_RANGE(0x2824, 0x2827) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)

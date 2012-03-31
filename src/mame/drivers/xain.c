@@ -399,7 +399,7 @@ READ8_HANDLER( mcu_comm_reset_r )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(xain_charram_w) AM_BASE_MEMBER(xain_state, m_charram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(xain_bgram1_w) AM_BASE_MEMBER(xain_state, m_bgram1)
@@ -427,7 +427,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(xain_irqA_assert_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(xain_irqB_clear_w)
@@ -436,7 +436,7 @@ static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, xain_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(xain_68705_port_a_r, xain_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(xain_68705_port_b_r, xain_68705_port_b_w)
@@ -450,7 +450,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ym1", ym2203_w)

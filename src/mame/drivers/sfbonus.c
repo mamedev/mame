@@ -1056,7 +1056,7 @@ static SCREEN_UPDATE_IND16(sfbonus)
 
 
 
-static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8, sfbonus_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(sfbonus_state, m_nvram) AM_SIZE_MEMBER(sfbonus_state, m_nvram_size)
 ADDRESS_MAP_END
@@ -1131,7 +1131,7 @@ static WRITE8_HANDLER( sfbonus_2c01_w )
 }
 
 
-static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8 )
+static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8, sfbonus_state )
 	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("KEY1")
 	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("KEY2")
 	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("KEY3")
@@ -1231,7 +1231,7 @@ static NVRAM_HANDLER( sfbonus )
 	}
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sfbonus_state )
 	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 

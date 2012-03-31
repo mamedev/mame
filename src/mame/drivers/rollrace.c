@@ -37,7 +37,7 @@ static WRITE8_HANDLER( sound_nmi_mask_w )
 }
 
 
-static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM			 /* only rollace2 */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,sound_nmi_mask_w)

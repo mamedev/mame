@@ -353,7 +353,7 @@ static WRITE8_HANDLER( quizpun2_soundlatch_w )
 	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank1")
 
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8 )
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizpun2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( quizpun2_io_map, AS_IO, 8, quizpun2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x40, 0x40 ) AM_WRITE( quizpun2_irq_ack )
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE( quizpun2_soundlatch_w )
@@ -381,12 +381,12 @@ ADDRESS_MAP_END
                             Memory Maps - Sound CPU
 ***************************************************************************/
 
-static ADDRESS_MAP_START( quizpun2_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( quizpun2_sound_map, AS_PROGRAM, 8, quizpun2_state )
 	AM_RANGE( 0x0000, 0xf7ff ) AM_ROM
 	AM_RANGE( 0xf800, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizpun2_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( quizpun2_sound_io_map, AS_IO, 8, quizpun2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP	// IRQ end
 	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP	// NMI end

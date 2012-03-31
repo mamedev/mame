@@ -220,7 +220,7 @@ static WRITE8_HANDLER( coin_lockout_w )
 	coin_lockout_w(space->machine(), 1,data & 1);
 }
 
-static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xd7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(mirax_state, m_videoram)
@@ -239,7 +239,7 @@ static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8 )
 //  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mirax_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mirax_sound_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)

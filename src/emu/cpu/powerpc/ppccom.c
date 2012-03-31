@@ -2146,7 +2146,7 @@ static WRITE8_HANDLER( ppc4xx_spu_w )
     the 4XX
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( internal_ppc4xx, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( internal_ppc4xx, AS_PROGRAM, 32, legacy_cpu_device )
 	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE8(ppc4xx_spu_r, ppc4xx_spu_w, 0xffffffff)
 ADDRESS_MAP_END
 

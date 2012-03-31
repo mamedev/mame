@@ -130,7 +130,7 @@ static READ8_HANDLER(controls_r)
     return output_bit;
 }
 
-static ADDRESS_MAP_START( pachifev_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pachifev_map, AS_PROGRAM, 8, pachifev_state )
     AM_RANGE(0x0000, 0xdfff) AM_ROM
 
     AM_RANGE(0xe000, 0xe7ff) AM_RAM
@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( pachifev_map, AS_PROGRAM, 8 )
     AM_RANGE(0xfffc, 0xffff) AM_NOP /* nmi */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pachifev_cru, AS_IO, 8 )
+static ADDRESS_MAP_START( pachifev_cru, AS_IO, 8, pachifev_state )
     AM_RANGE(0x000, 0x000) AM_READ(controls_r)
 ADDRESS_MAP_END
 

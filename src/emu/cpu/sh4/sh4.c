@@ -3458,7 +3458,7 @@ void sh4_set_ftcsr_callback(device_t *device, sh4_ftcsr_callback callback)
 
 #if 0
 /*When OC index mode is off (CCR.OIX = 0)*/
-static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64, legacy_cpu_device )
 	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x03FFD000)
 	AM_RANGE(0x1C002000, 0x1C002FFF) AM_RAM AM_MIRROR(0x03FFD000)
 	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0)
@@ -3466,7 +3466,7 @@ ADDRESS_MAP_END
 #endif
 
 /*When OC index mode is on (CCR.OIX = 1)*/
-static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64, legacy_cpu_device )
 	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0x1E000000, 0x1E000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0) // todo: store queues should be write only on DC's SH4, executing PREFM shouldn't cause an actual memory read access!
@@ -3474,7 +3474,7 @@ static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64 )
 	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_READWRITE32(sh4_internal_r, sh4_internal_w, U64(0xffffffffffffffff))
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sh3_internal_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( sh3_internal_map, AS_PROGRAM, 64, legacy_cpu_device )
 	AM_RANGE(SH3_LOWER_REGBASE, SH3_LOWER_REGEND) AM_READWRITE32(sh3_internal_r, sh3_internal_w, U64(0xffffffffffffffff))
 	AM_RANGE(SH3_UPPER_REGBASE, SH3_UPPER_REGEND) AM_READWRITE32(sh3_internal_high_r, sh3_internal_high_w, U64(0xffffffffffffffff))
 ADDRESS_MAP_END

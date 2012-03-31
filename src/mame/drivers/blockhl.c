@@ -96,7 +96,7 @@ static WRITE8_HANDLER( k052109_051960_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(blockhl_sh_irqtrigger_w)
 	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, blockhl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)

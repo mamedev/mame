@@ -309,7 +309,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
 	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)	/* I/O and ROM (repeats for each bank) */
 	AM_RANGE(0x400000, 0x5fffff) AM_READ(snes_r_bank3)						/* ROM (and reserved in Mode 20) */
@@ -330,7 +330,7 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 	spc_ram_w(device, offset + 0x100, data);
 }
 
-static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)  	/* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE("spc700", spc_ram_100_w)
@@ -412,7 +412,7 @@ static WRITE8_HANDLER( m50458_w )
 }
 
 
-static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM // vram perhaps?
@@ -484,7 +484,7 @@ static WRITE8_HANDLER( port82_w ) // EEPROM2?
     */
 }
 
-static ADDRESS_MAP_START( bios_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
 	AM_RANGE(0x01, 0x01) AM_READ(port01_r)

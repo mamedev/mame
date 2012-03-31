@@ -177,7 +177,7 @@ static READ8_HANDLER( some_changing_input )
 	return state->m_variable_data;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbust_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank2")
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	//AM_RANGE(0xf800, 0xffff) AM_READ(read_from_unmapped_memory)   /* a bug in game code ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( port_map_cpu2, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map_cpu2, AS_IO, 8, tankbust_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay2", ay8910_data_w)
 	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_address_w)
@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( port_map_cpu2, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( map_cpu2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( map_cpu2, AS_PROGRAM, 8, tankbust_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_WRITENOP	/* garbage, written in initialization loop */
 	//0x4000 and 0x4040-0x4045 seem to be used (referenced in the code)

@@ -112,7 +112,7 @@ static WRITE_LINE_DEVICE_HANDLER( hexion_nmi_ack_w )
 	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM

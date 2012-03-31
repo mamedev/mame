@@ -57,7 +57,7 @@ static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0000, 0x0002) AM_RAM
 	AM_RANGE(0x0003, 0x0003) AM_RAM_WRITE(ironhors_charbank_w)
 	AM_RANGE(0x0004, 0x0004) AM_RAM AM_BASE_MEMBER(ironhors_state, m_interrupt_enable)
@@ -85,18 +85,18 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, ironhors_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0000, 0x0002) AM_RAM
 	//20=31db
 
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( farwest_slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( farwest_slave_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)

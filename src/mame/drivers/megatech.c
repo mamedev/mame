@@ -371,7 +371,7 @@ static WRITE8_HANDLER( megatech_banked_ram_w )
 
 
 
-static ADDRESS_MAP_START( megatech_bios_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( megatech_bios_map, AS_PROGRAM, 8, mtech_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM // from bios rom (0x0000-0x2fff populated in ROM)
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(megatech_banked_ram_r, megatech_banked_ram_w) // copies instruction data here at startup, must be banked
 	AM_RANGE(0x4000, 0x5fff) AM_RAM // plain ram?
@@ -408,7 +408,7 @@ static WRITE8_HANDLER (megatech_bios_port_7f_w)
 
 
 
-static ADDRESS_MAP_START( megatech_bios_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( megatech_bios_portmap, AS_IO, 8, mtech_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x3f, 0x3f) AM_WRITE(megatech_bios_port_ctrl_w)
 

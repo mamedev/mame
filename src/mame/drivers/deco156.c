@@ -120,7 +120,7 @@ static WRITE32_HANDLER( wcvol95_pf2_rowscroll_w ) { deco156_state *state = space
 static WRITE32_HANDLER( wcvol95_spriteram_w )    { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff;	COMBINE_DATA(&state->m_spriteram[offset]); }
 
 
-static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x120000, 0x120003) AM_READ_PORT("INPUTS")
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)

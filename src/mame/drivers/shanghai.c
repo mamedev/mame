@@ -132,20 +132,20 @@ static WRITE16_HANDLER( shanghai_coin_w )
 	}
 }
 
-static ADDRESS_MAP_START( shanghai_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shanghai_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shangha2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shangha2_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x04000, 0x041ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16, shanghai_state )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8("ymsnd", ym2203_r, ym2203_w, 0x00ff)
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shangha2_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( shangha2_portmap, AS_IO, 16, shanghai_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x11) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x21) AM_READ_PORT("SYSTEM")
@@ -171,7 +171,7 @@ static READ16_HANDLER( kothello_hd63484_status_r )
 	return 0xff22;	/* write FIFO ready + command end + read FIFO ready */
 }
 
-static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
 	AM_RANGE(0x08010, 0x08011) AM_READ(kothello_hd63484_status_r) AM_DEVWRITE("hd63484", hd63484_address_w)
 	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)

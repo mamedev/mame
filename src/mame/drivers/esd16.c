@@ -81,7 +81,7 @@ static WRITE16_HANDLER( esd16_sound_command_w )
  AFAIK)
 */
 
-static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
@@ -134,7 +134,7 @@ static WRITE16_HANDLER( esd_eeprom_w )
 //  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(&space->device()), data, mem_mask);
 }
 
-static ADDRESS_MAP_START( hedpanic_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hedpanic_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
 	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
@@ -162,7 +162,7 @@ ADDRESS_MAP_END
 
 /* Multi Champ Deluxe, like Head Panic but different addresses */
 
-static ADDRESS_MAP_START( mchampdx_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mchampdx_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM																		// RAM
 	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_BASE_MEMBER(esd16_state, m_vram_0)							// Layers
@@ -190,7 +190,7 @@ ADDRESS_MAP_END
 
 /* Tang Tang & Deluxe 5 - like the others but again with different addresses */
 
-static ADDRESS_MAP_START( tangtang_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tangtang_map, AS_PROGRAM, 16, esd16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// RAM
 	AM_RANGE(0x200000, 0x2007ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(esd16_state, m_spriteram, m_spriteram_size)		// Sprites
@@ -233,7 +233,7 @@ static WRITE8_HANDLER( esd16_sound_rombank_w )
 	memory_set_bank(space->machine(), "bank1", bank);
 }
 
-static ADDRESS_MAP_START( multchmp_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( multchmp_sound_map, AS_PROGRAM, 8, esd16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM								// RAM
@@ -248,7 +248,7 @@ static READ8_HANDLER( esd16_sound_command_r )
 	return soundlatch_r(space, 0);
 }
 
-static ADDRESS_MAP_START( multchmp_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( multchmp_sound_io_map, AS_IO, 8, esd16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3812_w)	// YM3812
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)	// M6295

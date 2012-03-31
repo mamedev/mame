@@ -149,7 +149,7 @@ static WRITE8_HANDLER( albazc_vregs_w )
 
 /* main cpu */
 
-static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8, albazc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(albazc_state, m_spriteram1)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(albazc_state, m_spriteram2)

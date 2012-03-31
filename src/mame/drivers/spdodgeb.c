@@ -248,7 +248,7 @@ static READ8_HANDLER( port_0_r )
 
 
 
-static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(spdodgeb_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(spdodgeb_videoram_w) AM_BASE_MEMBER(spdodgeb_state, m_videoram)
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spdodgeb_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spdodgeb_sound_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
 	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ymsnd", ym3812_w)

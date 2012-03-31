@@ -33,7 +33,7 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE_MEMBER(kyugo_state, m_bgvideoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE_MEMBER(kyugo_state, m_bgattribram)
@@ -67,7 +67,7 @@ static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 	device_set_input_line(state->m_subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x00) AM_WRITE(kyugo_nmi_mask_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(kyugo_flipscreen_w)
@@ -82,7 +82,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gyrodine_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gyrodine_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( gyrodine_sub_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( repulse_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( repulse_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P2")
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( repulse_sub_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( srdmissn_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( srdmissn_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("SYSTEM")
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( srdmissn_sub_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( legend_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( legend_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("SYSTEM")
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( legend_sub_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( flashgala_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flashgala_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc040, 0xc040) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("P1")
@@ -139,7 +139,7 @@ static WRITE8_HANDLER( kyugo_coin_counter_w )
 	coin_counter_w(space->machine(), offset, data & 1);
 }
 
-static ADDRESS_MAP_START( gyrodine_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( gyrodine_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_r)
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( gyrodine_sub_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( repulse_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( repulse_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_r)
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( repulse_sub_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( flashgala_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( flashgala_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x42, 0x42) AM_DEVREAD("ay1", ay8910_r)
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( flashgala_sub_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( srdmissn_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( srdmissn_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x82, 0x82) AM_DEVREAD("ay1", ay8910_r)

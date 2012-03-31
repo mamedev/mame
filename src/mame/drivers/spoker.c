@@ -218,12 +218,12 @@ static READ8_HANDLER( spoker_magic_r )
 
 
 
-static ADDRESS_MAP_START( spoker_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spoker_map, AS_PROGRAM, 8, spoker_state )
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
 	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
 	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8 )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER( spoker_state,m_fg_color_ram )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
 //  AM_RANGE( 0x1000, 0x1fff ) AM_WRITENOP
 
 	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )

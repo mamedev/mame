@@ -385,12 +385,12 @@ static WRITE8_HANDLER( slave_com_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8, jangou_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu0_io, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -404,11 +404,11 @@ static ADDRESS_MAP_START( cpu0_io, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, jangou_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu1_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x01,0x01) AM_WRITE(cvsd_w)
@@ -422,18 +422,18 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( jngolady_cpu0_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jngolady_cpu0_map, AS_PROGRAM, 8, jangou_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(master_com_r,master_com_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jngolady_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jngolady_cpu1_map, AS_PROGRAM, 8, jangou_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jngolady_cpu1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( jngolady_cpu1_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00,0x00) AM_READ(sound_latch_r)
 	AM_RANGE(0x01,0x01) AM_WRITE(adpcm_w)
@@ -441,7 +441,7 @@ static ADDRESS_MAP_START( jngolady_cpu1_io, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8, jangou_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM //internal ram for irq etc.
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP //write-only,irq related?
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(slave_com_r,slave_com_w)
@@ -455,13 +455,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cntrygrl_cpu0_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cntrygrl_cpu0_map, AS_PROGRAM, 8, jangou_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 //  AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cntrygrl_cpu0_io, AS_IO, 8 )
+static ADDRESS_MAP_START( cntrygrl_cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -480,12 +480,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( roylcrdn_cpu0_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( roylcrdn_cpu0_map, AS_PROGRAM, 8, jangou_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("nvram")	/* MK48Z02B-15 ZEROPOWER RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roylcrdn_cpu0_io, AS_IO, 8 )
+static ADDRESS_MAP_START( roylcrdn_cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)

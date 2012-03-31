@@ -141,7 +141,7 @@ static SCREEN_UPDATE_RGB32( itgambl2 )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( itgambl2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( itgambl2_map, AS_PROGRAM, 16, itgambl2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0xffffff) AM_ROM
 ADDRESS_MAP_END

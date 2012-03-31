@@ -608,7 +608,7 @@ static WRITE8_HANDLER( volume_dac_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( game_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( game_cpu_map, AS_PROGRAM, 8, esripsys_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_BASE_MEMBER(esripsys_state, m_pal_ram)
 	AM_RANGE(0x4300, 0x4300) AM_WRITE(esripsys_bg_intensity_w)
@@ -623,7 +623,7 @@ static ADDRESS_MAP_START( game_cpu_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( frame_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( frame_cpu_map, AS_PROGRAM, 8, esripsys_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(fdt_r, fdt_w)
 	AM_RANGE(0x6000, 0x6000) AM_READWRITE(f_status_r, f_status_w)
@@ -632,7 +632,7 @@ static ADDRESS_MAP_START( frame_cpu_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, esripsys_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* Not installed on later PCBs */
 	AM_RANGE(0x2008, 0x2009) AM_READWRITE(tms5220_r, tms5220_w)
@@ -649,7 +649,7 @@ static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( video_cpu_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( video_cpu_map, AS_PROGRAM, 64, esripsys_state )
 	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 

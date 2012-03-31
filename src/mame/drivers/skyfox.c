@@ -35,7 +35,7 @@ Verified Dip locations and recommended settings with manual
                                 Sky Fox
 ***************************************************************************/
 
-static ADDRESS_MAP_START( skyfox_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( skyfox_map, AS_PROGRAM, 8, skyfox_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM							// ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM							// RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_SIZE_MEMBER(skyfox_state, m_spriteram, m_spriteram_size)	// Sprites
@@ -63,7 +63,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( skyfox_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( skyfox_sound_map, AS_PROGRAM, 8, skyfox_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								// RAM
 //  AM_RANGE(0x9000, 0x9001) AM_WRITENOP                        // ??

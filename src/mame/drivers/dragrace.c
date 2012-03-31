@@ -166,7 +166,7 @@ static READ8_HANDLER( dragrace_scanline_r )
 }
 
 
-static ADDRESS_MAP_START( dragrace_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dragrace_map, AS_PROGRAM, 8, dragrace_state )
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x0800, 0x083f) AM_READ(dragrace_input_r)
 	AM_RANGE(0x0900, 0x091f) AM_WRITE(dragrace_misc_w)

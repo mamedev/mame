@@ -82,13 +82,13 @@ static WRITE8_HANDLER( tonton_outport_w )
 *                  Memory Map                    *
 *************************************************/
 
-static ADDRESS_MAP_START( tonton_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tonton_map, AS_PROGRAM, 8, tonton_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tonton_io, AS_IO, 8 )
+static ADDRESS_MAP_START( tonton_io, AS_IO, 8, tonton_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

@@ -131,7 +131,7 @@ static WRITE8_HANDLER( b800_w )
 	state->m_b800_prev = data;
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, ettrivia_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ettrivia_control_w)
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ettrivia_bg_w) AM_BASE_MEMBER(ettrivia_state, m_bg_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, ettrivia_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ(ettrivia_question_r)
 ADDRESS_MAP_END
 

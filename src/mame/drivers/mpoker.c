@@ -468,7 +468,7 @@ static WRITE8_HANDLER( outport7_w )
 //}
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mpoker_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x0158, 0x0158) AM_WRITE (muxed_w)
 	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_SHARE("nvram")	/* NVRAM = 2x SCM5101E */

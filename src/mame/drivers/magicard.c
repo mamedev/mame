@@ -646,7 +646,7 @@ static WRITE16_HANDLER( scc68070_mmu_w )
 *      Memory Maps       *
 *************************/
 
-static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x00000000, 0x0017ffff) AM_MIRROR(0x7fe00000) AM_RAM AM_BASE_MEMBER(magicard_state, m_magicram) /*only 0-7ffff accessed in Magic Card*/
 	AM_RANGE(0x00180000, 0x001ffbff) AM_MIRROR(0x7fe00000) AM_RAM AM_REGION("maincpu", 0)

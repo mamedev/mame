@@ -745,7 +745,7 @@ static WRITE16_HANDLER( mcu_mailbox_w_mcu )
 	COMBINE_DATA(&state->m_mcu_mailbox[offset%8]);
 }
 
-static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE_MEMBER(namcona1_state, m_workram)
 	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
 	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
@@ -762,7 +762,7 @@ static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE_MEMBER(namcona1_state, m_workram)
 	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
 	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
@@ -832,7 +832,7 @@ static WRITE16_DEVICE_HANDLER(snd_w)
 	}
 }
 
-static ADDRESS_MAP_START( namcona1_mcu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( namcona1_mcu_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0x000800, 0x000fff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_mcu)	// "Mailslot" communications ports
 	AM_RANGE(0x001000, 0x001fff) AM_DEVREADWRITE("c140", snd_r, snd_w)	// C140-alike sound chip
 	AM_RANGE(0x002000, 0x002fff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w)	// mirror of first page of shared work RAM
@@ -963,7 +963,7 @@ static READ8_HANDLER( portana_r )
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }
 
-static ADDRESS_MAP_START( namcona1_mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( namcona1_mcu_io_map, AS_IO, 8, namcona1_state )
 	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READWRITE( port4_r, port4_w )
 	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READWRITE( port5_r, port5_w )
 	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE( port6_r, port6_w )

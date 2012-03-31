@@ -284,7 +284,7 @@ TODO:
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_videoram, m_videoram_size)
@@ -298,12 +298,12 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_BASE_MEMBER(bublbobl_state, m_mcu_sharedram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
@@ -314,7 +314,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM	// space for diagnostic ROM?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(bublbobl_mcu_ddr1_r, bublbobl_mcu_ddr1_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(bublbobl_mcu_ddr2_r, bublbobl_mcu_ddr2_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bublbobl_mcu_port1_r, bublbobl_mcu_port1_w)
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 // The 68705 is from a bootleg, the original MCU is a 6801U4
-static ADDRESS_MAP_START( bootlegmcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bootlegmcu_map, AS_PROGRAM, 8, bublbobl_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x000, 0x000) AM_READWRITE(bublbobl_68705_port_a_r, bublbobl_68705_port_a_w)
 	AM_RANGE(0x001, 0x001) AM_READWRITE(bublbobl_68705_port_b_r, bublbobl_68705_port_b_w)
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( bootlegmcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x080, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_videoram, m_videoram_size)
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_videoram, m_videoram_size)
@@ -384,12 +384,12 @@ static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xfe00) AM_READ(tokio_mcu_r) AM_WRITENOP // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tokio_slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tokio_slave_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tokio_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tokio_sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(soundlatch_r, bublbobl_sound_status_w)

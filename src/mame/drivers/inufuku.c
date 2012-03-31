@@ -127,7 +127,7 @@ static CUSTOM_INPUT( soundflag_r )
 
 ******************************************************************************/
 
-static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM			// main rom
 
 	AM_RANGE(0x100000, 0x100007) AM_WRITENOP	// ?
@@ -164,13 +164,13 @@ ADDRESS_MAP_END
 
 ******************************************************************************/
 
-static ADDRESS_MAP_START( inufuku_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( inufuku_sound_map, AS_PROGRAM, 8, inufuku_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( inufuku_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( inufuku_sound_io_map, AS_IO, 8, inufuku_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, pending_command_clear_w)

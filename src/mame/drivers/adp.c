@@ -443,7 +443,7 @@ static READ8_DEVICE_HANDLER(t2_r)
 	return res;
 }
 
-static ADDRESS_MAP_START( skattv_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( skattv_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE_MODERN("h63484", h63484_device, status_r, address_w)
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE_MODERN("h63484", h63484_device, data_r, data_w)
@@ -453,7 +453,7 @@ static ADDRESS_MAP_START( skattv_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 //  AM_RANGE(0x400000, 0x40001f) ?
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE_MODERN("h63484", h63484_device, status_r, address_w) // bad
@@ -463,7 +463,7 @@ static ADDRESS_MAP_START( quickjac_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( backgamn_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( backgamn_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10003f) AM_RAM
 	AM_RANGE(0x200000, 0x20003f) AM_RAM
@@ -508,7 +508,7 @@ static WRITE8_HANDLER( ramdac_io_w )
 	}
 }
 
-static ADDRESS_MAP_START( funland_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( funland_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE_MODERN("h63484", h63484_device, status_r, address_w)
 	AM_RANGE(0x800082, 0x800083) AM_DEVREADWRITE_MODERN("h63484", h63484_device, data_r, data_w)
@@ -519,7 +519,7 @@ static ADDRESS_MAP_START( funland_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fstation_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( fstation_mem, AS_PROGRAM, 16, adp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	//400000-40001f?
 	AM_RANGE(0x800080, 0x800081) AM_DEVREADWRITE_MODERN("h63484", h63484_device, status_r, address_w)
@@ -641,12 +641,12 @@ static READ8_HANDLER( h63484_rom_r )
 	return rom[offset];
 }
 
-static ADDRESS_MAP_START( adp_h63484_map, AS_0, 8 )
+static ADDRESS_MAP_START( adp_h63484_map, AS_0, 8, adp_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_DEVREADWRITE_MODERN("h63484",h63484_device, vram_r,vram_w)
 	AM_RANGE(0x80000, 0xbffff) AM_READ(h63484_rom_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fashiong_h63484_map, AS_0, 8 )
+static ADDRESS_MAP_START( fashiong_h63484_map, AS_0, 8, adp_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_DEVREADWRITE_MODERN("h63484",h63484_device, vram_r,vram_w)
 //  AM_RANGE(0x40000, 0x7ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END

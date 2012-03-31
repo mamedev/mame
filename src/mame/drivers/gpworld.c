@@ -291,7 +291,7 @@ static WRITE8_HANDLER( palette_write )
 }
 
 /* PROGRAM MAP */
-static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, gpworld_state )
 	AM_RANGE(0x0000,0xbfff) AM_ROM
 	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE_MEMBER(gpworld_state, m_sprite_RAM)
 	AM_RANGE(0xc800,0xcfff) AM_WRITE(palette_write) AM_BASE_MEMBER(gpworld_state, m_palette_RAM)	/* The memory test reads at 0xc800 */
@@ -308,7 +308,7 @@ ADDRESS_MAP_END
 
 
 /* I/O MAP */
-static ADDRESS_MAP_START( mainport, AS_IO, 8 )
+static ADDRESS_MAP_START( mainport, AS_IO, 8, gpworld_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01,0x01) AM_WRITE(misc_io_write)
 	AM_RANGE(0x80,0x80) AM_READ_PORT("IN0")

@@ -221,7 +221,7 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	}
 }
 
-static ADDRESS_MAP_START( cham24_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cham24_map, AS_PROGRAM, 8, cham24_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */

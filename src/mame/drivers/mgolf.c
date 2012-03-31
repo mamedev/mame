@@ -181,7 +181,7 @@ static WRITE8_HANDLER( mgolf_wram_w )
 
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, mgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0040, 0x0040) AM_READ_PORT("40")

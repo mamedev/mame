@@ -125,7 +125,7 @@ static const ay8910_interface redalert_ay8910_interface =
 };
 
 
-static ADDRESS_MAP_START( redalert_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( redalert_audio_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_DEVWRITE("aysnd", redalert_AY8910_w)
@@ -182,7 +182,7 @@ static I8085_CONFIG( redalert_voice_i8085_config )
 };
 
 
-static ADDRESS_MAP_START( redalert_voice_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( redalert_voice_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM
@@ -344,7 +344,7 @@ static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 }
 
 
-static ADDRESS_MAP_START( demoneye_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( demoneye_audio_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE_MODERN("sndpia", pia6821_device, read, write)

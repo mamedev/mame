@@ -61,7 +61,7 @@ const UINT32 okim9810_device::s_sampling_freq_table[16] =
 };
 
 // default address map
-static ADDRESS_MAP_START( okim9810, AS_0, 8 )
+static ADDRESS_MAP_START( okim9810, AS_0, 8, okim9810_device )
     AM_RANGE(0x000000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -241,7 +241,7 @@ static MACHINE_RESET( supdrapo )
                               Memory Map
 **********************************************************************/
 
-static ADDRESS_MAP_START( sdpoker_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sdpoker_mem, AS_PROGRAM, 8, supdrapo_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5000, 0x50ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x57ff, 0x57ff) AM_RAM AM_SHARE("share1")

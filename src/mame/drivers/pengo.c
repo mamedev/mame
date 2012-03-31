@@ -117,7 +117,7 @@ static WRITE8_HANDLER( irq_mask_w )
 	state->m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pengo_state, m_videoram) /* video and color RAM, scratchpad RAM, sprite codes */
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pengo_state, m_colorram)
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE_MEMBER(pengo_state, m_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM

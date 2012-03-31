@@ -647,7 +647,7 @@ static READ16_HANDLER( wgp_sound_r )
                          MEMORY STRUCTURES
 *****************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wgp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* main CPUA ram */
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_SIZE_MEMBER(wgp_state, m_sharedram, m_sharedram_size)
@@ -666,7 +666,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x701fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 16 )	/* LAN areas not mapped... */
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 16 	/* LAN areas not mapped... */, wgp_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x140000, 0x143fff) AM_READWRITE(sharedram_r,sharedram_w)
@@ -681,7 +681,7 @@ ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, wgp_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")	/* Fallthrough */
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

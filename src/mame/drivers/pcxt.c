@@ -533,7 +533,7 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge(state->m_pic8259_1);
 }
 
-static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8, pcxt_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM 640KB
 	AM_RANGE(0xa0000, 0xbffff) AM_RAM //CGA VRAM
 	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank1")
@@ -541,7 +541,7 @@ static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8 )
+static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", i8237_r, i8237_w ) //8237 DMA Controller
 	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
@@ -561,7 +561,7 @@ static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8 )
 	AM_RANGE(0x03f8, 0x03ff) AM_RAM //rs232c (serial) port
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( filetto_io, AS_IO, 8 )
+static ADDRESS_MAP_START( filetto_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_IMPORT_FROM( pcxt_io_common )
 //  AM_RANGE(0x0200, 0x020f) AM_RAM //game port
@@ -577,7 +577,7 @@ static WRITE8_HANDLER( tetriskr_bg_bank_w )
 	state->m_bg_bank = (data & 0x0f) ^ 8;
 }
 
-static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8 )
+static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_IMPORT_FROM( pcxt_io_common )
 	AM_RANGE(0x0200, 0x020f) AM_RAM //game port

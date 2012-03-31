@@ -1228,7 +1228,7 @@ static WRITE32_HANDLER( flash_w )
 	}
 }
 
-static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE( flash_r, flash_w )
 	AM_RANGE(0x1f400000, 0x1f400003) AM_READ_PORT( "IN0" ) AM_WRITE_PORT( "OUT0" )

@@ -32,7 +32,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, bartop52_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)

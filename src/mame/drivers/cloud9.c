@@ -268,7 +268,7 @@ static WRITE8_HANDLER( nvram_store_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cloud9_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cloud9_map, AS_PROGRAM, 8, cloud9_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(cloud9_bitmode_addr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(cloud9_bitmode_r, cloud9_bitmode_w)
 	AM_RANGE(0x0000, 0x4fff) AM_ROMBANK("bank1") AM_WRITE(cloud9_videoram_w)

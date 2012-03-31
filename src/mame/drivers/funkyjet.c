@@ -100,7 +100,7 @@ Notes:
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( funkyjet_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( funkyjet_map, AS_PROGRAM, 16, funkyjet_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
@@ -118,7 +118,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, funkyjet_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP /* YM2203 - this board doesn't have one */
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

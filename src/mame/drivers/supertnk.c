@@ -300,7 +300,7 @@ static MACHINE_RESET( supertnk )
  *
  *************************************/
 
-static ADDRESS_MAP_START( supertnk_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( supertnk_map, AS_PROGRAM, 8, supertnk_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x17ff) AM_ROMBANK("bank1")
 	AM_RANGE(0x1800, 0x1bff) AM_RAM
@@ -320,7 +320,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( supertnk_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( supertnk_io_map, AS_IO, 8, supertnk_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x0400, 0x0400) AM_WRITE(supertnk_bitplane_select_0_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(supertnk_bitplane_select_1_w)

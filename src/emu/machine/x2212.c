@@ -14,11 +14,11 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static ADDRESS_MAP_START( x2212_sram_map, AS_0, 8 )
+static ADDRESS_MAP_START( x2212_sram_map, AS_0, 8, x2212_device )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( x2212_e2prom_map, AS_1, 8 )
+static ADDRESS_MAP_START( x2212_e2prom_map, AS_1, 8, x2212_device )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 

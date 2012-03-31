@@ -134,7 +134,7 @@ static WRITE16_HANDLER( wizdfire_irq_ack_w )
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3f0000, 0x3f3fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfdc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
@@ -262,7 +262,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( rohga_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rohga_sound_map, AS_PROGRAM, 8, rohga_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)

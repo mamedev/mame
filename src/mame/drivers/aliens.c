@@ -122,7 +122,7 @@ static WRITE8_HANDLER( k052109_051960_w )
 		k051960_w(state->m_k051960, offset - 0x3c00, data);
 }
 
-static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8, aliens_state )
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(aliens_state, m_ram)		/* palette + work RAM */
 	AM_RANGE(0x0400, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")												/* banked ROM */
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM														/* ROM e24_j02.bin */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aliens_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( aliens_sound_map, AS_PROGRAM, 8, aliens_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM g04_b03.bin */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

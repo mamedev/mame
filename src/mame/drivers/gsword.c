@@ -330,7 +330,7 @@ static WRITE8_HANDLER( adpcm_soundcommand_w )
 	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8 )
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa37f) AM_RAM
@@ -344,24 +344,24 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8 )
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(gsword_videoram_w) AM_BASE_MEMBER(gsword_state, m_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu1_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7e, 0x7f) AM_WRITE(TAITO8741_0_w)  AM_READ(TAITO8741_0_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( josvolly_cpu1_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( josvolly_cpu1_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7e, 0x7f) AM_WRITE(josvolly_8741_0_w)  AM_READ(josvolly_8741_0_r)
 ADDRESS_MAP_END
 
 //
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(gsword_state, m_cpu2_ram)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_READWRITE(TAITO8741_2_r,TAITO8741_2_w)
 	AM_RANGE(0x20, 0x21) AM_READWRITE(TAITO8741_3_r,TAITO8741_3_w)
@@ -378,14 +378,14 @@ ADDRESS_MAP_END
 
 //
 
-static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("msm", gsword_adpcm_data_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(gsword_state, m_cpu2_ram)
 
@@ -398,7 +398,7 @@ static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xA000, 0xA001) AM_WRITE(josvolly_8741_1_w) AM_READ(josvolly_8741_1_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( josvolly_cpu2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( josvolly_cpu2_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("ay1", ay8910_r,        ay8910_data_w)

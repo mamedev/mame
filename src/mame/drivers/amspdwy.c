@@ -74,7 +74,7 @@ static WRITE8_HANDLER( amspdwy_sound_w )
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												// ROM
 	AM_RANGE(0x8000, 0x801f) AM_WRITE(amspdwy_paletteram_w) AM_BASE_GENERIC(paletteram)// Palette
 	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_BASE_MEMBER(amspdwy_state, m_videoram)	// Layer, mirrored?
@@ -98,7 +98,7 @@ static READ8_HANDLER( amspdwy_port_r )
 	return tracks[offset];
 }
 
-static ADDRESS_MAP_START( amspdwy_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( amspdwy_portmap, AS_IO, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(amspdwy_port_r)
 ADDRESS_MAP_END
 
@@ -112,7 +112,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( amspdwy_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( amspdwy_sound_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
 //  AM_RANGE(0x8000, 0x8000) AM_WRITENOP                            // ? Written with 0 at the start
 	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_r)					// From Main CPU

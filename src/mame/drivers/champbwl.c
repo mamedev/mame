@@ -195,7 +195,7 @@ static WRITE8_HANDLER( champbwl_misc_w )
 	memory_set_bank(space->machine(), "bank1", (data & 0x30) >> 4);
 }
 
-static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( champbwl_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -234,7 +234,7 @@ static WRITE8_HANDLER( doraemon_outputs_w )
 //  popmessage("%02x", data);
 }
 
-static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( doraemon, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")

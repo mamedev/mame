@@ -134,7 +134,7 @@ static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
 
 
 
-static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(pandoras_state, m_spriteram)				/* Work RAM (Shared with CPU B) */
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE("share2") AM_BASE_MEMBER(pandoras_state, m_colorram)	/* Color RAM (shared with CPU B) */
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE("share3") AM_BASE_MEMBER(pandoras_state, m_videoram)	/* Video RAM (shared with CPU B) */
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM															/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pandoras_slave_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")										/* Work RAM (Shared with CPU A) */
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(pandoras_cram_w) AM_SHARE("share2")				/* Color RAM (shared with CPU A) */
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(pandoras_vram_w) AM_SHARE("share3")				/* Video RAM (shared with CPU A) */
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( pandoras_slave_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM															/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pandoras_sound_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM															/* ROM */
 	AM_RANGE(0x2000, 0x23ff) AM_RAM															/* RAM */
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)											/* soundlatch_r */
@@ -178,11 +178,11 @@ static ADDRESS_MAP_START( pandoras_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch2_w)										/* sound command to the 8039 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_i8039_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pandoras_i8039_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pandoras_i8039_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pandoras_i8039_io_map, AS_IO, 8, pandoras_state )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)

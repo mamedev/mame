@@ -352,12 +352,12 @@ static WRITE8_HANDLER( vreg_data_w )
 	}
 }
 
-static ADDRESS_MAP_START( readport_master, AS_IO, 8 )
+static ADDRESS_MAP_START( readport_master, AS_IO, 8, imolagp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(trigger_slave_nmi_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( imolagp_master, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( imolagp_master, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")	/* gas */
@@ -374,7 +374,7 @@ static ADDRESS_MAP_START( imolagp_master, AS_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSWB")	/* DSWB */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport_slave, AS_IO, 8 )
+static ADDRESS_MAP_START( readport_slave, AS_IO, 8, imolagp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x05,0x05) AM_READ(imola_slave_port05r)
 	AM_RANGE(0x06,0x06) AM_READ(imola_slave_port06r)
@@ -382,7 +382,7 @@ static ADDRESS_MAP_START( readport_slave, AS_IO, 8 )
 	AM_RANGE(0x82,0x82) AM_READ(imola_slave_port82r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( imolagp_slave, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( imolagp_slave, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0800, 0x0bff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_ROM

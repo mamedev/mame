@@ -48,12 +48,12 @@ static DRIVER_INIT( hyhoo2 )
 }
 
 
-static ADDRESS_MAP_START( hyhoo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hyhoo_map, AS_PROGRAM, 8, hyhoo_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyhoo_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hyhoo_io_map, AS_IO, 8, hyhoo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_nmi_clock_w)
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)

@@ -1107,7 +1107,7 @@ static READ64_HANDLER(cpu_r)
 	return 0;
 }
 
-static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
 	AM_RANGE(0x00010040, 0x00010047) AM_READWRITE(irq_enable_r, irq_enable_w)
 	AM_RANGE(0x00010050, 0x00010057) AM_READ(irq_active_r)
 	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(unk4_r, unk4_w)

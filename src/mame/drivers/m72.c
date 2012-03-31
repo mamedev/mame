@@ -891,7 +891,7 @@ static READ16_HANDLER( poundfor_trackball_r )
 
 
 #define CPU1_MEMORY(NAME,ROMSIZE,WORKRAM)								\
-static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 )		\
+static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state )		\
 	AM_RANGE(0x00000, ROMSIZE-1) AM_ROM									\
 	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM	/* work RAM */			\
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_MEMBER(m72_state, m_spriteram, m_spriteram_size)	\
@@ -910,7 +910,7 @@ CPU1_MEMORY( rtype,       0x40000, 0x40000 )
 CPU1_MEMORY( xmultiplm72, 0x80000, 0x80000 )
 CPU1_MEMORY( dbreedm72,   0x80000, 0x90000 )
 
-static ADDRESS_MAP_START( xmultipl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( xmultipl_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x9c000, 0x9ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
@@ -922,7 +922,7 @@ static ADDRESS_MAP_START( xmultipl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbreed_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dbreed_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x88000, 0x8bfff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
@@ -934,7 +934,7 @@ static ADDRESS_MAP_START( dbreed_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rtype2_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
@@ -947,7 +947,7 @@ static ADDRESS_MAP_START( rtype2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majtitle_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( majtitle_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_BASE_MEMBER(m72_state, m_majtitle_rowscrollram)
 	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
@@ -963,7 +963,7 @@ static ADDRESS_MAP_START( majtitle_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharry_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hharry_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
@@ -975,7 +975,7 @@ static ADDRESS_MAP_START( hharry_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharryu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hharryu_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
@@ -989,7 +989,7 @@ static ADDRESS_MAP_START( hharryu_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kengo_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kengo_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
@@ -1003,7 +1003,7 @@ static ADDRESS_MAP_START( kengo_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m72_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( m72_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1019,7 +1019,7 @@ static ADDRESS_MAP_START( m72_portmap, AS_IO, 16 )
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype2_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( rtype2_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1032,7 +1032,7 @@ static ADDRESS_MAP_START( rtype2_portmap, AS_IO, 16 )
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
@@ -1045,7 +1045,7 @@ static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16 )
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1059,7 +1059,7 @@ static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16 )
 	AM_RANGE(0x8e, 0x8f) AM_WRITE(majtitle_gfx_ctrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1074,7 +1074,7 @@ static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16 )
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
@@ -1088,16 +1088,16 @@ static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_ram_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_ram_map, AS_PROGRAM, 8, m72_state )
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(m72_state, m_soundram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_rom_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_rom_map, AS_PROGRAM, 8, m72_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rtype_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
@@ -1105,7 +1105,7 @@ static ADDRESS_MAP_START( rtype_sound_portmap, AS_IO, 8 )
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
@@ -1114,7 +1114,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype2_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rtype2_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
@@ -1125,7 +1125,7 @@ static ADDRESS_MAP_START( rtype2_sound_portmap, AS_IO, 8 )
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poundfor_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( poundfor_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVWRITE("m72", poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -1133,7 +1133,7 @@ static ADDRESS_MAP_START( poundfor_sound_portmap, AS_IO, 8 )
 	AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_sound_irq_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, m72_state )
 	/* External access */
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m72_mcu_sample_r, m72_mcu_low_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(m72_mcu_high_w)

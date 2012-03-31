@@ -412,11 +412,11 @@ static DRIVER_INIT( drw80pkr )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( drw80pkr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( drw80pkr_map, AS_PROGRAM, 8, drw80pkr_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drw80pkr_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( drw80pkr_io_map, AS_IO, 8, drw80pkr_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(drw80pkr_io_r, drw80pkr_io_w)
 	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0) AM_READWRITE(t0_r, t0_w)
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READWRITE(t1_r, t1_w)

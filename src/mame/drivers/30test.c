@@ -125,7 +125,7 @@ static WRITE8_DEVICE_HANDLER( hc11_okibank_w )
 }
 
 
-static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8, namco_30test_state )
 	AM_RANGE(0x0000, 0x003f) AM_RAM // internal I/O
 	AM_RANGE(0x007c, 0x007c) AM_READWRITE(hc11_mux_r,hc11_mux_w)
 	AM_RANGE(0x007e, 0x007e) AM_DEVREADWRITE("oki",hc11_okibank_r,hc11_okibank_w)
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8 )
+static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8, namco_30test_state )
 	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ(namco_30test_mux_r)
 //  AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
 	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ_PORT("SYSTEM")

@@ -579,7 +579,7 @@ static WRITE8_HANDLER( megaplay_game_w )
 	state->m_mp_bios_bank_addr = ((state->m_mp_bios_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
-static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
@@ -600,7 +600,7 @@ static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* basically from src/drivers/segasyse.c */
-static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8, mplay_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_w)	/* SN76489 */
 	AM_RANGE(0xbe, 0xbe) AM_READWRITE(sms_vdp_data_r, sms_vdp_data_w)	/* VDP */

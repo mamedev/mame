@@ -145,7 +145,7 @@ static READ32_HANDLER( hidctch3_pen2_r )
 	return xpos + (ypos*168*2);
 }
 
-static ADDRESS_MAP_START( eolith_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( eolith_map, AS_PROGRAM, 32, eolith_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // fort2b wants ram here
 	AM_RANGE(0x40000000, 0x401fffff) AM_RAM
 	AM_RANGE(0x90000000, 0x9003ffff) AM_READWRITE(eolith_vram_r, eolith_vram_w)

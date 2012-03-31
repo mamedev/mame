@@ -20,7 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-static ADDRESS_MAP_START( at28c16_map8, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( at28c16_map8, AS_PROGRAM, 8, at28c16_device )
 	AM_RANGE(0x0000, 0x081f) AM_RAM
 ADDRESS_MAP_END
 

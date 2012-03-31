@@ -126,13 +126,13 @@ static const ppi8255_interface ppi8255_intf =
 };
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, iqblock_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(iqblock_state, m_rambase)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, iqblock_state )
 	AM_RANGE(0x2000, 0x23ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w)
 	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w)
 	AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)

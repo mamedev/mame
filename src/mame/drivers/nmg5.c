@@ -327,7 +327,7 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 
 ********************************************************************/
 
-static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(nmg5_state, m_bitmap)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -372,17 +372,17 @@ ADDRESS_MAP_END
 
 ********************************************************************/
 
-static ADDRESS_MAP_START( nmg5_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nmg5_sound_map, AS_PROGRAM, 8, nmg5_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pclubys_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pclubys_sound_map, AS_PROGRAM, 8, nmg5_state )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, nmg5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("oki", oki_banking_w)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)

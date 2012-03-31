@@ -165,7 +165,7 @@ static void sound_nmi( device_t *device )
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_MEMBER(gijoe_state, m_spriteram)								// Sprites
 	AM_RANGE(0x110000, 0x110007) AM_DEVWRITE("k053246", k053246_word_w)
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16 )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gijoe_state )
 	AM_RANGE(0x0000, 0xebff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE_MODERN("k054539", k054539_device, read, write)

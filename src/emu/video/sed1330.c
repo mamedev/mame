@@ -66,7 +66,7 @@ const device_type SED1330 = &device_creator<sed1330_device>;
 
 
 // default address map
-static ADDRESS_MAP_START( sed1330, AS_0, 8 )
+static ADDRESS_MAP_START( sed1330, AS_0, 8, sed1330_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

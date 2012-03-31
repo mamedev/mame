@@ -883,7 +883,7 @@ static WRITE8_HANDLER( irq_mask_w )
 	state->m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( pacman_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pacman_map, AS_PROGRAM, 8, pacman_state )
 	//A lot of games don't have an a15 at the cpu.  Generally only games with a cpu daughter board can access the full 32k of romspace.
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
@@ -911,7 +911,7 @@ ADDRESS_MAP_END
 // The Pacman code uses $5004 and $5005 for LED's and $5007 for coin lockout.  This hardware does not
 // exist on any Pacman or Puckman board I have seen.  DW
 
-static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
@@ -936,7 +936,7 @@ static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW2")		/* DSW2 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mspacman_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mspacman_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
@@ -975,7 +975,7 @@ static ADDRESS_MAP_START( mspacman_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( woodpek_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( woodpek_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
@@ -1002,7 +1002,7 @@ static ADDRESS_MAP_START( woodpek_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
@@ -1034,7 +1034,7 @@ static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
@@ -1064,7 +1064,7 @@ static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
@@ -1090,7 +1090,7 @@ static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( s2650games_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( s2650games_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x8000) AM_ROMBANK("bank1")
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0xe000) AM_WRITE(s2650games_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
 	AM_RANGE(0x1400, 0x141f) AM_MIRROR(0xe000) AM_WRITE(s2650games_scroll_w)
@@ -1120,7 +1120,7 @@ static ADDRESS_MAP_START( s2650games_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rocktrv2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rocktrv2_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
@@ -1147,7 +1147,7 @@ static ADDRESS_MAP_START( rocktrv2_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bigbucks_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bigbucks_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
@@ -1168,7 +1168,7 @@ static ADDRESS_MAP_START( bigbucks_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mschamp_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mschamp_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
@@ -1194,7 +1194,7 @@ static ADDRESS_MAP_START( mschamp_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crushs_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( crushs_map, AS_PROGRAM, 8, pacman_state )
 	//A lot of games don't have an a15 at the cpu.  Generally only games with a cpu daughter board can access the full 32k of romspace.
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
@@ -1226,63 +1226,63 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( writeport, AS_IO, 8 )
+static ADDRESS_MAP_START( writeport, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pacman_interrupt_vector_w)	/* Pac-Man only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vanvan_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( vanvan_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("namco", sn76496_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn2", sn76496_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dremshpr_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( dremshpr_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE("namco", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( piranha_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( piranha_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(piranha_interrupt_vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nmouse_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( nmouse_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(nmouse_interrupt_vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( theglobp_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( theglobp_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0xff) AM_READ(theglobp_decrypt_rom)	/* Switch protection logic */
 	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( acitya_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( acitya_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0xff) AM_READ(acitya_decrypt_rom) /* Switch protection logic */
 	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mschamp_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( mschamp_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0x00) AM_READ(mschamp_kludge_r)
 	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigbucks_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( bigbucks_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ(bigbucks_question_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s2650games_writeport, AS_IO, 8 )
+static ADDRESS_MAP_START( s2650games_writeport, AS_IO, 8, pacman_state )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_DEVWRITE("namco", sn76496_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drivfrcp_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( drivfrcp_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x01, 0x01) AM_READ(drivfrcp_port1_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
 	AM_IMPORT_FROM(s2650games_writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( _8bpm_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( _8bpm_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x01, 0x01) AM_READ(_8bpm_port1_r)
 	AM_RANGE(0xe0, 0xe0) AM_READNOP
@@ -1290,13 +1290,13 @@ static ADDRESS_MAP_START( _8bpm_portmap, AS_IO, 8 )
 	AM_IMPORT_FROM(s2650games_writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( porky_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( porky_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x01, 0x01) AM_READ(porky_port1_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
 	AM_IMPORT_FROM(s2650games_writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crushs_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( crushs_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("namco", ay8910_data_address_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")

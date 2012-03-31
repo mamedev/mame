@@ -127,7 +127,7 @@ static WRITE8_HANDLER( senjyo_paletteram_w )
 	palette_set_color_rgb(space->machine(), offset, pal4bit(rr), pal4bit(gg), pal4bit(bb) );
 }
 
-static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(senjyo_fgvideoram_w) AM_BASE_MEMBER(senjyo_state, m_fgvideoram)
@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( senjyo_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( senjyo_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_w)
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( senjyo_sound_map, AS_PROGRAM, 8 )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( senjyo_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( senjyo_sound_io_map, AS_IO, 8, senjyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc", z80ctc_r, z80ctc_w)
@@ -197,7 +197,7 @@ static WRITE8_HANDLER(starforb_scrollx2)
 	state->m_scrollx1[offset] = data;
 }
 
-static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(senjyo_fgvideoram_w) AM_BASE_MEMBER(senjyo_state, m_fgvideoram)
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( starforb_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( starforb_sound_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_w)

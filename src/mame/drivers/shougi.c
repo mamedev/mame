@@ -274,7 +274,7 @@ static INTERRUPT_GEN( shougi_vblank_nmi )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM		/* 2114 x 2 (0x400 x 4bit each) */
 
@@ -314,17 +314,17 @@ static READ8_HANDLER ( dummy_r )
 		return 0;
 }
 
-static ADDRESS_MAP_START( readport_sub, AS_IO, 8 )
+static ADDRESS_MAP_START( readport_sub, AS_IO, 8, shougi_state )
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
 	AM_RANGE(0x00, 0x00) AM_READ(dummy_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 

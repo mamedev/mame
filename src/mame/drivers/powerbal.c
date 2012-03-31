@@ -75,7 +75,7 @@ static WRITE16_DEVICE_HANDLER( oki_banking )
 	}
 }
 
-static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x088000, 0x0883ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP
@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x088000, 0x0883ff) AM_RAM_WRITE(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x094000, 0x094001) AM_WRITENOP

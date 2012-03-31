@@ -129,7 +129,7 @@ static WRITE8_HANDLER( sraider_misc_w )
 	}
 }
 
-static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sraider_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sraider_cpu1_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( sraider_cpu1_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sraider_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sraider_cpu2_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_READ(sraider_sound_low_r)
@@ -175,7 +175,7 @@ static ADDRESS_MAP_START( sraider_cpu2_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sraider_cpu2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sraider_cpu2_io_map, AS_IO, 8, ladybug_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("sn2", sn76496_w)

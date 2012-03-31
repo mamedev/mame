@@ -185,7 +185,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( pluto5_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( pluto5_map, AS_PROGRAM, 32, pluto5_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 ADDRESS_MAP_END
 

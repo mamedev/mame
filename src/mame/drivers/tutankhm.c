@@ -118,7 +118,7 @@ static WRITE8_HANDLER( tutankhm_coin_counter_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(tutankhm_state, m_videoram)
 	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_BASE_MEMBER(tutankhm_state, m_paletteram)
 	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_BASE_MEMBER(tutankhm_state, m_scroll)

@@ -266,7 +266,7 @@ static PALETTE_INIT( miniboy7 )
 *      Memory Map Information      *
 ***********************************/
 
-static ADDRESS_MAP_START( miniboy7_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( miniboy7_map, AS_PROGRAM, 8, miniboy7_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	AM_SHARE("nvram") /* battery backed RAM? */
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(miniboy7_videoram_w) AM_BASE_MEMBER(miniboy7_state, m_videoram)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(miniboy7_colorram_w) AM_BASE_MEMBER(miniboy7_state, m_colorram)

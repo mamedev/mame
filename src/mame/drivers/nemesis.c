@@ -297,7 +297,7 @@ static WRITE8_DEVICE_HANDLER( city_sound_bank_w )
 }
 
 
-static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_BASE_SIZE_MEMBER(nemesis_state, m_charram, m_charram_size)
 	AM_RANGE(0x050000, 0x051fff) AM_RAM
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x067fff) AM_RAM			/* WORK RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM		/* ROM BIOS */
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
@@ -363,7 +363,7 @@ static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM_WRITE(nemesis_charram_word_w) AM_BASE_SIZE_MEMBER(nemesis_state, m_charram, m_charram_size)
 	AM_RANGE(0x050000, 0x051fff) AM_RAM
@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM		/* ROM BIOS */
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("k007232", k005289_pitch_A_w)
@@ -447,7 +447,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe405, 0xe405) AM_DEVWRITE("ay2", ay8910_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gx400_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gx400_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x87ff) AM_RAM AM_BASE_MEMBER(nemesis_state, m_gx400_shared_ram)
 	AM_RANGE(0xa000, 0xafff) AM_DEVWRITE("k007232", k005289_pitch_A_w)
@@ -467,7 +467,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( salamand_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( salamand_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE(salamander_palette_word_w) AM_BASE_MEMBER(nemesis_state, m_paletteram)
@@ -492,7 +492,7 @@ static ADDRESS_MAP_START( salamand_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x190f80, 0x190fff) AM_BASE_MEMBER(nemesis_state, m_yscroll2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blkpnthr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( blkpnthr_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x081fff) AM_RAM_WRITE(salamander_palette_word_w) AM_BASE_MEMBER(nemesis_state, m_paletteram)
 	AM_RANGE(0x090000, 0x097fff) AM_RAM
@@ -517,7 +517,7 @@ static ADDRESS_MAP_START( blkpnthr_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x190000, 0x190fff) AM_RAM AM_BASE_SIZE_MEMBER(nemesis_state, m_spriteram, m_spriteram_size)		/* more sprite ram ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x0e0000, 0x0e1fff) AM_RAM_WRITE(salamander_palette_word_w) AM_BASE_MEMBER(nemesis_state, m_paletteram)
@@ -544,7 +544,7 @@ static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x310000, 0x310fff) AM_RAM AM_BASE_SIZE_MEMBER(nemesis_state, m_spriteram, m_spriteram_size)		/* more sprite ram ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x047fff) AM_RAM
 	AM_RANGE(0x060000, 0x061fff) AM_RAM_WRITE(salamander_palette_word_w) AM_BASE_MEMBER(nemesis_state, m_paletteram)
@@ -577,7 +577,7 @@ static READ8_HANDLER( wd_r )
 	return state->m_frame_counter;
 }
 
-static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
@@ -588,7 +588,7 @@ static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("vlm", salamand_speech_start_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blkpnthr_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( blkpnthr_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
@@ -597,7 +597,7 @@ static ADDRESS_MAP_START( blkpnthr_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( city_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( city_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("k051649", k051649_waveform_r, k051649_waveform_w)
@@ -613,7 +613,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( hcrash_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hcrash_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM

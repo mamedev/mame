@@ -350,7 +350,7 @@ static WRITE32_HANDLER(rso_w)
 }
 
 
-static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32, gal3_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x20000000, 0x20001fff) AM_RAM AM_BASE_MEMBER(gal3_state, m_nvmem) AM_SIZE_MEMBER(gal3_state, m_nvmem_size)	//NVRAM
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE() //
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xf2800000, 0xf2800fff) AM_READWRITE(rso_r, rso_w)	//RSO PCB
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32, gal3_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE() //
 	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_slv"	)
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xf2760000, 0xf2760003) AM_RAM	//AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rs_cpu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rs_cpu_map, AS_PROGRAM, 16, gal3_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM //64K working RAM
 
@@ -460,7 +460,7 @@ static ADDRESS_MAP_START( rs_cpu_map, AS_PROGRAM, 16 )
 /// AM_RANGE(0xc44000, 0xffffff) AM_RAM /////////////
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 16, gal3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 /// AM_RANGE(0x0c0000, 0x0cffff) AM_RAM //00, 20, 30, 40, 50
@@ -476,7 +476,7 @@ static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 16 )
 /// AM_RANGE(0x090000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psn_b1_cpu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( psn_b1_cpu_map, AS_PROGRAM, 16, gal3_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

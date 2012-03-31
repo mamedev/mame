@@ -227,7 +227,7 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_BASE_MEMBER(sidepckt_state,m_videoram) AM_SIZE_MEMBER(sidepckt_state,m_videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM // ???
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_w)

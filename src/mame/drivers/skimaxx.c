@@ -308,7 +308,7 @@ static READ32_HANDLER( skimaxx_analog_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x10000000, 0x10000003) AM_WRITE( skimaxx_sub_ctrl_w )
 	AM_RANGE(0x10100000, 0x1010000f) AM_READWRITE(m68k_tms_r, m68k_tms_w)//AM_NOP
@@ -341,7 +341,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( 68030_2_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( 68030_2_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
 
 	AM_RANGE(0x20000000, 0x2007ffff) AM_READ ( skimaxx_blitter_r )	// do blit
@@ -365,7 +365,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skimaxx_state )
 	AM_RANGE(0x00000000, 0x000100ff) AM_RAM
 	AM_RANGE(0x00008000, 0x0003ffff) AM_RAM
 	AM_RANGE(0x00050000, 0x0005ffff) AM_RAM

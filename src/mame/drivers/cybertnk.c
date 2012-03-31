@@ -659,7 +659,7 @@ static READ8_HANDLER( soundport_r )
 	return state->m_io_ram[0] & 0xff;
 }
 
-static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE_MEMBER(cybertnk_state, m_spr_ram) // non-tile based sprite ram
@@ -671,7 +671,7 @@ static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_BASE_MEMBER(cybertnk_state, m_io_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_BASE_MEMBER(cybertnk_state, m_roadram)
@@ -679,7 +679,7 @@ static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, cybertnk_state )
 	AM_RANGE(0x0000, 0x7fff ) AM_ROM
 	AM_RANGE(0x8000, 0x9fff ) AM_RAM
 	AM_RANGE(0xa001, 0xa001 ) AM_READ(soundport_r)

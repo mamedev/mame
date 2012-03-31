@@ -101,7 +101,7 @@ produces a high clock frequency, slow movements a low freq.
 #include "includes/wrally.h"
 
 
-static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(wrally_vram_w) AM_BASE_MEMBER(wrally_state, m_videoram)	/* encrypted Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_RAM AM_BASE_MEMBER(wrally_state, m_vregs)									/* Video Registers */
@@ -138,11 +138,11 @@ static WRITE8_HANDLER( dallas_share_w )
 	shareram[BYTE_XOR_LE(offset) ^ 1] = data;
 }
 
-static ADDRESS_MAP_START( dallas_rom, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dallas_rom, AS_PROGRAM, 8, wrally_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									/* Code in NVRAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dallas_ram, AS_IO, 8 )
+static ADDRESS_MAP_START( dallas_ram, AS_IO, 8, wrally_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dallas_share_r, dallas_share_w)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
 ADDRESS_MAP_END
 

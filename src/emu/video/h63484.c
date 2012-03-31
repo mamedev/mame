@@ -15,7 +15,7 @@
 #define FIFO_LOG 0
 
 // default address map
-static ADDRESS_MAP_START( h63484_vram, AS_0, 8 )
+static ADDRESS_MAP_START( h63484_vram, AS_0, 8, h63484_device )
 	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 	AM_RANGE(0x80000, 0xfffff) AM_NOP
 ADDRESS_MAP_END

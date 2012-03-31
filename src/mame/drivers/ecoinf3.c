@@ -15,19 +15,19 @@ static WRITE8_HANDLER( py_port58_out_w )
 	// Watchdog?
 }
 
-static ADDRESS_MAP_START( pyramid_memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pyramid_memmap, AS_PROGRAM, 8, ecoinf3_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pyramid_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( pyramid_portmap, AS_IO, 8, ecoinf3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x58, 0x58) AM_WRITE(py_port58_out_w)
 ADDRESS_MAP_END
 
 /*
-static ADDRESS_MAP_START( pyramid_submap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pyramid_submap, AS_PROGRAM, 8, ecoinf3_state )
     AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 */

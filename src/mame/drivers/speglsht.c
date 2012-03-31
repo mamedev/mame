@@ -124,7 +124,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, speglsht_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(speglsht_state, m_shared)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( st0016_io, AS_IO, 8 )
+static ADDRESS_MAP_START( st0016_io, AS_IO, 8, speglsht_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
@@ -221,7 +221,7 @@ static READ32_HANDLER(irq_ack_clear)
 	return 0;
 }
 
-static ADDRESS_MAP_START( speglsht_mem, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( speglsht_mem, AS_PROGRAM, 32, speglsht_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x01007fff) AM_RAM //tested - STATIC RAM
 	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE(cop_r, cop_w) AM_BASE_MEMBER(speglsht_state, m_cop_ram)

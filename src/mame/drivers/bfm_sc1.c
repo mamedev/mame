@@ -666,7 +666,7 @@ static MACHINE_RESET( bfm_sc1 )
 // scorpion1 board memory map ///////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_base, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sc1_base, AS_PROGRAM, 8, bfm_sc1_state )
 
 	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)				// reel 2+3 latch
@@ -706,7 +706,7 @@ ADDRESS_MAP_END
 // scorpion1 board + adder2 expansion memory map ////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_adder2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sc1_adder2, AS_PROGRAM, 8, bfm_sc1_state )
 	AM_IMPORT_FROM( sc1_base )
 
 	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE(vid_uart_ctrl_r,vid_uart_ctrl_w)	// video uart control reg read
@@ -718,7 +718,7 @@ ADDRESS_MAP_END
 // scorpion1 board + upd7759 soundcard memory map ///////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static ADDRESS_MAP_START( sc1_viper, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sc1_viper, AS_PROGRAM, 8, bfm_sc1_state )
 	AM_IMPORT_FROM( sc1_base )
 
 	AM_RANGE(0x3404, 0x3404) AM_READ(dipcoin_r ) // coin input on gamecard

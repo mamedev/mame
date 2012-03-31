@@ -222,7 +222,7 @@ static READ8_HANDLER( PIC16C5X_T0_clk_r )
 
 /***************************** 68000 Memory Maps ****************************/
 
-static ADDRESS_MAP_START( bigtwin_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bigtwin_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x304000, 0x304001) AM_NOP				/* watchdog? irq ack? */
 	AM_RANGE(0x440000, 0x4403ff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, m_spriteram, m_spriteram_size)
@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( bigtwin_main_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bigtwinb_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bigtwinb_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram3)
 	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram2)
@@ -265,7 +265,7 @@ static ADDRESS_MAP_START( bigtwinb_main_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, m_spriteram, m_spriteram_size)
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(wbeachvl_bgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram3)
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( excelsr_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( excelsr_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP				/* watchdog? irq ack? */
 	AM_RANGE(0x440000, 0x440cff) AM_RAM AM_BASE_SIZE_MEMBER(playmark_state, m_spriteram, m_spriteram_size)
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( excelsr_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotmind_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hotmind_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(hrdtimes_bgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram3)
 	AM_RANGE(0x104000, 0x107fff) AM_RAM_WRITE(hrdtimes_fgvideoram_w) AM_BASE_MEMBER(playmark_state, m_videoram2)
@@ -325,7 +325,7 @@ static ADDRESS_MAP_START( hotmind_main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0fffff) AM_ROM AM_REGION("maincpu", 0x0c0000)
@@ -353,7 +353,7 @@ ADDRESS_MAP_END
 	/* $000 - 7FF  PIC16C57 Internal Program ROM. Note: code is 12bits wide */
 	/* $000 - 07F  PIC16C57 Internal Data RAM */
 
-static ADDRESS_MAP_START( playmark_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( playmark_sound_io_map, AS_IO, 8, playmark_state )
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("oki", playmark_oki_banking_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, playmark_snd_control_w)

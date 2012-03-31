@@ -402,7 +402,7 @@ static MACHINE_START( zr107 )
 	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x000fffff, FALSE, state->m_workram);
 }
 
-static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM	AM_BASE_MEMBER(zr107_state, m_workram)	/* Work RAM */
 	AM_RANGE(0x74000000, 0x74003fff) AM_DEVREADWRITE("k056832", k056832_ram_long_r, k056832_ram_long_w)
 	AM_RANGE(0x74020000, 0x7402003f) AM_DEVREADWRITE("k056832", k056832_long_r, k056832_long_w)
@@ -430,7 +430,7 @@ static WRITE32_HANDLER( jetwave_palette_w )
 	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0x80000000) AM_RAM		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_DEVREADWRITE("k001604", k001604_reg_r, k001604_reg_w)
 	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(jetwave_palette_w) AM_BASE_GENERIC(paletteram)
@@ -455,7 +455,7 @@ ADDRESS_MAP_END
 
 /**********************************************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, zr107_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM		/* Work RAM */
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8_MODERN("konami1", k054539_device, read, write, 0xff00)
@@ -485,7 +485,7 @@ static WRITE32_HANDLER( dsp_dataram_w )
 	state->m_sharc_dataram[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc_map, AS_DATA, 32 )
+static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, zr107_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(dsp_dataram_r, dsp_dataram_w)
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(K001005_r, K001005_w)

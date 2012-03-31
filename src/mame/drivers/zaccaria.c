@@ -258,7 +258,7 @@ static WRITE8_HANDLER( nmi_mask_w )
 	state->m_nmi_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_READONLY
 	AM_RANGE(0x6400, 0x6407) AM_READ(zaccaria_prot1_r)
@@ -300,7 +300,7 @@ ADDRESS_MAP_END
 
      6821 PIA: CA1 comes from the master sound cpu's latch bit 7 (which is also connected to the AY chip at 4G's IOB1); CB1 comes from a periodic counter clocked by the 6802's clock, divided by 4096. CA2 and CB2 are disconnected. PA0-7 connect to the data busses of the AY-3-8910 chips; PB0 and PB1 connect to the BC1 and BDIR pins of the AY chip at 4G; PB2 and PB3 connect to the BC1 and BDIR pins of the AY chip at 4H.
 */
-static ADDRESS_MAP_START( sound_map_1, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map_1, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write) AM_MIRROR(0x1ff0)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_MIRROR(0x2000) // rom 13
@@ -327,7 +327,7 @@ ADDRESS_MAP_END
 
      6821 PIA: PA0-7, CA2 and CB1 connect to the TMS5200; CA1 and CB2 are disconnected, though the test mode assumes there's something connected to CB2 (possibly another LED like the one connected to PB4); PB3 connects to 'ACS' which goes to the z80.
 */
-static ADDRESS_MAP_START( sound_map_2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map_2, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM /* 6802 internal ram */
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write) AM_MIRROR(0x8F6C)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac2", mc1408_data_w) AM_MIRROR(0x83FF) /* MC1408 */

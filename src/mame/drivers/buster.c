@@ -56,7 +56,7 @@ static READ8_HANDLER( test_r )
 }
 #endif
 
-static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, buster_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM// AM_BASE_MEMBER(buster_state, m_rom)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("wram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE_MEMBER(buster_state, m_vram)

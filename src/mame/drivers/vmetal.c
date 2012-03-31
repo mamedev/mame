@@ -216,7 +216,7 @@ static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
 }
 
 
-static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16, vmetal_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_BASE_MEMBER(vmetal_state, m_texttileram)
 	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_BASE_MEMBER(vmetal_state, m_mid1tileram)

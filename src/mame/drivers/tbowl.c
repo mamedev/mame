@@ -87,7 +87,7 @@ static WRITE8_HANDLER( tbowl_sound_command_w )
 
 /* Board B */
 
-static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(tbowl_bg2videoram_w) AM_BASE_MEMBER(tbowl_state, m_bg2videoram)
@@ -128,7 +128,7 @@ static WRITE8_HANDLER ( tbowl_trigger_nmi )
 	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READONLY
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
@@ -186,7 +186,7 @@ static void tbowl_adpcm_int(device_t *device)
 	}
 }
 
-static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ym1", ym3812_w)

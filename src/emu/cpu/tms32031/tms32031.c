@@ -120,11 +120,11 @@ const device_type TMS32031 = &device_creator<tms32031_device>;
 const device_type TMS32032 = &device_creator<tms32032_device>;
 
 // internal memory maps
-static ADDRESS_MAP_START( internal_32031, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( internal_32031, AS_PROGRAM, 32, legacy_cpu_device )
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( internal_32032, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( internal_32032, AS_PROGRAM, 32, legacy_cpu_device )
 	AM_RANGE(0x87fe00, 0x87ffff) AM_RAM
 ADDRESS_MAP_END
 

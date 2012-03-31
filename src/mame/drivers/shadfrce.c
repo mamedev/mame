@@ -364,7 +364,7 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(shadfrce_bg0videoram_w) AM_BASE_MEMBER(shadfrce_state,m_bg0videoram) /* video */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
@@ -399,7 +399,7 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 	downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 }
 
-static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

@@ -206,7 +206,7 @@ static READ16_HANDLER( analogy_watchdog_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xtheball_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_BASE_MEMBER(xtheball_state, m_vram_bg)
 	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_BASE_MEMBER(xtheball_state, m_vram_fg)

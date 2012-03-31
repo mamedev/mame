@@ -191,7 +191,7 @@ static READ8_HANDLER( exerion_protection_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, exerion_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(exerion_state, m_main_ram)
@@ -216,7 +216,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, exerion_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)

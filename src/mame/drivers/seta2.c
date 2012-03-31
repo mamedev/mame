@@ -149,7 +149,7 @@ static WRITE16_HANDLER( grdians_lockout_w )
 //  popmessage("%04X", data & 0xffff);
 }
 
-static ADDRESS_MAP_START( grdians_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( grdians_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x304000, 0x30ffff) AM_RAM								// ? seems tile data
@@ -187,7 +187,7 @@ static WRITE16_DEVICE_HANDLER( gundamex_eeprom_w )
 	eeprom->set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x500000, 0x57ffff) AM_ROM								// ROM
@@ -253,7 +253,7 @@ static WRITE16_HANDLER( mj4simai_keyboard_w )
 		state->m_keyboard_row = data & 0xff;
 }
 
-static ADDRESS_MAP_START( mj4simai_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mj4simai_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x600000, 0x600001) AM_READ(mj4simai_p1_r)				// P1
@@ -277,7 +277,7 @@ ADDRESS_MAP_END
                             Kosodate Quiz My Angel
 ***************************************************************************/
 
-static ADDRESS_MAP_START( myangel_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( myangel_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")					// P1
@@ -300,7 +300,7 @@ ADDRESS_MAP_END
                             Kosodate Quiz My Angel 2
 ***************************************************************************/
 
-static ADDRESS_MAP_START( myangel2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( myangel2_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")					// P1
@@ -345,7 +345,7 @@ static WRITE16_HANDLER( pzlbowl_coin_counter_w )
 	}
 }
 
-static ADDRESS_MAP_START( pzlbowl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pzlbowl_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM									// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM									// RAM
 	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")					// DSW 1
@@ -368,7 +368,7 @@ ADDRESS_MAP_END
                             Penguin Bros
 ***************************************************************************/
 
-static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x210000, 0x23ffff) AM_RAM								// RAM
@@ -428,7 +428,7 @@ static WRITE16_HANDLER( reelquak_coin_w )
 //  popmessage("COIN %04X", data & 0xffff);
 }
 
-static ADDRESS_MAP_START( reelquak_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( reelquak_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("nvram")			// NVRAM (Battery Backed)
@@ -454,7 +454,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 // To be done:
-static ADDRESS_MAP_START( namcostr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( namcostr_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)		// Sprites
@@ -480,7 +480,7 @@ static WRITE16_HANDLER( samshoot_coin_w )
 //  popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM
 	AM_RANGE( 0x300000, 0x30ffff ) AM_RAM AM_SHARE("nvram")
@@ -625,7 +625,7 @@ static WRITE32_DEVICE_HANDLER( oki_write )
 }
 
 
-static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
 	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
 
@@ -646,7 +646,7 @@ ADDRESS_MAP_END
 
 // Sub CPU
 
-static ADDRESS_MAP_START( funcube_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( funcube_sub_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x20017f ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
@@ -761,7 +761,7 @@ static WRITE8_HANDLER( funcube_outputs_w )
 }
 
 
-static ADDRESS_MAP_START( funcube_sub_io, AS_IO, 8 )
+static ADDRESS_MAP_START( funcube_sub_io, AS_IO, 8, seta2_state )
 	AM_RANGE( H8_PORT_7,   H8_PORT_7   )	AM_READ( funcube_coins_r )
 	AM_RANGE( H8_PORT_4,   H8_PORT_4   )	AM_NOP	// unused
 	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE( funcube_outputs_r, funcube_outputs_w ) AM_BASE_MEMBER( seta2_state, m_funcube_outputs )

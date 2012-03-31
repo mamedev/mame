@@ -198,7 +198,7 @@ static CUSTOM_INPUT( input_port_4_f0_r )
 }
 
 
-static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -238,7 +238,7 @@ ADDRESS_MAP_END
 
 
 /* only difference is taitosj_fake_ replaced with taitosj_mcu_ */
-static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -301,7 +301,7 @@ static CUSTOM_INPUT( kikstart_gear_r )
 }
 
 
-static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -340,7 +340,7 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay2", ay8910_address_data_w)
@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( taitosj_mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( taitosj_mcu_map, AS_PROGRAM, 8, taitosj_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(taitosj_68705_portA_r, taitosj_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(taitosj_68705_portB_r, taitosj_68705_portB_w)

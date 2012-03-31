@@ -166,7 +166,7 @@ static READ32_HANDLER( mb89371_r )
 	return 0xffffffff;
 }
 
-static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( konamigv_map, AS_PROGRAM, 32, konamigv_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_READWRITE(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")

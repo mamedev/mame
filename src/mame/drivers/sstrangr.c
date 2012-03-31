@@ -138,7 +138,7 @@ static WRITE8_HANDLER( port_w )
 
 
 
-static ADDRESS_MAP_START( sstrangr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sstrangr_map, AS_PROGRAM, 8, sstrangr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(sstrangr_state,m_ram)
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( sstrangr_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sstrangr_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sstrangr_io_map, AS_IO, 8, sstrangr_state )
 	AM_RANGE(0x41, 0x41) AM_READ_PORT("DSW")
 	AM_RANGE(0x42, 0x42) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x44, 0x44) AM_READ_PORT("EXT") AM_WRITE(port_w)

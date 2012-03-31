@@ -111,7 +111,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("k053246", k053247_word_r, k053247_word_w)
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x18c000, 0x197fff) AM_DEVREADWRITE("k052109", k052109_lsb_r, k052109_lsb_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xmen_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( 6p_main_map, AS_PROGRAM, 16, xmen_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_MEMBER(xmen_state, m_xmen6p_spriteramleft)	/* sprites (screen 1) */

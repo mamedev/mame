@@ -98,7 +98,7 @@ static INTERRUPT_GEN( battlane_cpu1_interrupt )
  *
  *************************************/
 
-static ADDRESS_MAP_START( battlane_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( battlane_map, AS_PROGRAM, 8, battlane_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(battlane_tileram_w) AM_SHARE("share2") AM_BASE_MEMBER(battlane_state, m_tileram)
 	AM_RANGE(0x1800, 0x18ff) AM_RAM_WRITE(battlane_spriteram_w) AM_SHARE("share3") AM_BASE_MEMBER(battlane_state, m_spriteram)

@@ -57,7 +57,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( janshi_vdp_map8, AS_0, 8 )
+static ADDRESS_MAP_START( janshi_vdp_map8, AS_0, 8, pinkiri8_state )
 
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_BASE_MEMBER(pinkiri8_state, m_janshi_back_vram) // bg tilemap?
 	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_BASE_MEMBER(pinkiri8_state, m_janshi_vram1) // xpos, colour, tile number etc.
@@ -374,7 +374,7 @@ static SCREEN_UPDATE_IND16( pinkiri8 )
 	return 0;
 }
 
-static ADDRESS_MAP_START( pinkiri8_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pinkiri8_map, AS_PROGRAM, 8, pinkiri8_state )
 	AM_RANGE(0x00000, 0x0bfff) AM_ROM
 	AM_RANGE(0x0c000, 0x0dfff) AM_RAM
 	AM_RANGE(0x0e000, 0x0ffff) AM_ROM
@@ -462,7 +462,7 @@ static READ8_HANDLER( mux_p1_r )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( pinkiri8_io, AS_IO, 8 )
+static ADDRESS_MAP_START( pinkiri8_io, AS_IO, 8, pinkiri8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_RAM //Z180 internal I/O
 	AM_RANGE(0x60, 0x60) AM_WRITE(output_regs_w)

@@ -72,7 +72,7 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x080ff) AM_RAM AM_BASE_MEMBER(dynduke_state, m_scroll_ram)
@@ -86,7 +86,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(dynduke_background_w) AM_BASE_MEMBER(dynduke_state, m_back_data)
 	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(dynduke_foreground_w) AM_BASE_MEMBER(dynduke_state, m_fore_data)
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* Memory map used by DlbDyn - probably an addressing PAL is different */
-static ADDRESS_MAP_START( masterj_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( masterj_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE_MEMBER(dynduke_state, m_videoram)

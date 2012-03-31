@@ -150,7 +150,7 @@ static WRITE8_HANDLER( thedeep_e100_w )
 		logerror("pc %04x: e100 = %02x\n", cpu_get_pc(&space->device()),data);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	// ROM (banked)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
@@ -178,7 +178,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ymsnd", ym2203_w)	//
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)	// From Main CPU
@@ -260,7 +260,7 @@ static READ8_HANDLER( thedeep_p0_r )
 	return (input_port_read(space->machine(),"COINS") & 0xfe) | (coin_mux & 1);
 }
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, thedeep_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READ(thedeep_p0_r)
 	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1) AM_WRITE(thedeep_p1_w)

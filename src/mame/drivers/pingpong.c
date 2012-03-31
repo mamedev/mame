@@ -88,7 +88,7 @@ static TIMER_DEVICE_CALLBACK( merlinmm_interrupt )
 	}
 }
 
-static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE_MEMBER(pingpong_state, m_colorram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE_MEMBER(pingpong_state, m_videoram)
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5400, 0x57ff) AM_RAM

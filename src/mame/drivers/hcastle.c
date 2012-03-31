@@ -36,7 +36,7 @@ static WRITE8_HANDLER( hcastle_coin_w )
 
 
 
-static ADDRESS_MAP_START( hcastle_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hcastle_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(hcastle_pf1_control_w)
 	AM_RANGE(0x0020, 0x003f) AM_RAM	/* rowscroll? */
 	AM_RANGE(0x0200, 0x0207) AM_WRITE(hcastle_pf2_control_w)
@@ -71,7 +71,7 @@ static WRITE8_DEVICE_HANDLER( sound_bank_w )
 	k007232_set_bank(device, bank_A, bank_B );
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x987f) AM_DEVREADWRITE("konami2", k051649_waveform_r, k051649_waveform_w)

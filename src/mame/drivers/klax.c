@@ -83,7 +83,7 @@ static MACHINE_RESET( klax )
  *
  *************************************/
 
-static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16, klax_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r,atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)

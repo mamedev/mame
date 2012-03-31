@@ -20,7 +20,7 @@
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dcon_map, AS_PROGRAM, 16, dcon_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x80000, 0x8bfff) AM_RAM
 

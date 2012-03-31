@@ -417,7 +417,7 @@ static WRITE16_HANDLER( lastfght_sound_w )
                                 Memory Maps
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lastfght_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( lastfght_map, AS_PROGRAM, 16, lastfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)

@@ -696,7 +696,7 @@ static INTERRUPT_GEN( mastboy_interrupt )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // Internal ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM // External ROM
 
@@ -739,7 +739,7 @@ static READ8_HANDLER( mastboy_nmi_read )
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( mastboy_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mastboy_io_map, AS_IO, 8, mastboy_state )
 	AM_RANGE(0x38, 0x38) AM_READ(mastboy_port_38_read)
 	AM_RANGE(0x39, 0x39) AM_READ(mastboy_nmi_read)
 ADDRESS_MAP_END

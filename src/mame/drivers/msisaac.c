@@ -175,7 +175,7 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 #endif
 }
 
-static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
@@ -264,7 +264,7 @@ static WRITE8_HANDLER( sound_control_1_w )
 	//popmessage("SND1 0=%2x 1=%2x", state->m_snd_ctrl0, state->m_snd_ctrl1);
 }
 
-static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)

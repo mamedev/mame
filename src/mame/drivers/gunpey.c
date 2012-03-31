@@ -181,14 +181,14 @@ static WRITE8_HANDLER( gunpey_blitter_w )
 
 /***************************************************************************************/
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, gunpey_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 //  AM_RANGE(0x50000, 0x500ff) AM_RAM
 //  AM_RANGE(0x50100, 0x502ff) AM_NOP
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
 	AM_RANGE(0x7f40, 0x7f45) AM_READ8(gunpey_inputs_r,0xffff)
 
 //  AM_RANGE(0x7f48, 0x7f48) AM_WRITE(output_w)

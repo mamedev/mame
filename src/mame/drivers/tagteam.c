@@ -41,7 +41,7 @@ static WRITE8_HANDLER( irq_clear_w )
 	cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P2") AM_WRITE(tagteam_flipscreen_w)
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE(tagteam_control_w)
@@ -63,7 +63,7 @@ static WRITE8_HANDLER( sound_nmi_mask_w )
 }
 
 /* Same as Syusse Oozumou */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_data_address_w)

@@ -44,7 +44,7 @@ static WRITE8_HANDLER( sound_reset_w )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM		/* rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM		/* ram */
 	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(timelimt_videoram_w) AM_BASE_MEMBER(timelimt_state, m_videoram)	/* video ram */
@@ -64,17 +64,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITENOP		/* ???? not used */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, timelimt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, timelimt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_address_data_w)

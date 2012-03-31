@@ -144,7 +144,7 @@ static WRITE16_HANDLER( k3_soundbanks_w )
 	state->m_oki2->set_bank_base((data & 2) ? 0x40000 : 0);
 }
 
-static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16, k3_state )
 	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITENOP	// bug in code? (clean up log)
 	AM_RANGE(0x0009d2, 0x0009d3) AM_WRITENOP	// bug in code? (clean up log)
 

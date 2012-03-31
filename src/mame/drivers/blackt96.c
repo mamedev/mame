@@ -168,7 +168,7 @@ static WRITE16_HANDLER( blackt96_80000_w )
 }
 
 
-static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1_P2") AM_WRITE(blackt96_80000_w)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE(blackt96_c0000_w) // COIN INPUT
@@ -473,7 +473,7 @@ static WRITE8_HANDLER( blackt96_soundio_port02_w )
 
 }
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, blackt96_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE( blackt96_soundio_port00_w )
 	AM_RANGE(0x01, 0x01) AM_READWRITE( blackt96_soundio_port01_r, blackt96_soundio_port01_w )
 	AM_RANGE(0x02, 0x02) AM_READWRITE( blackt96_soundio_port02_r, blackt96_soundio_port02_w )

@@ -348,7 +348,7 @@ static WRITE16_HANDLER( mcu_table2_w )
 }
 
 
-static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
 	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
@@ -425,7 +425,7 @@ static WRITE16_HANDLER( nzerotea_sound_comms_w )
 	}
 }
 
-static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
 
 	/* results from cop? */

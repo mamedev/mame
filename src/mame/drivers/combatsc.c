@@ -383,7 +383,7 @@ static READ8_DEVICE_HANDLER ( combatsc_ym2203_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(combatsc_pf_control_w)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(combatsc_scrollram_r, combatsc_scrollram_w)
 //  AM_RANGE(0x0060, 0x00ff) AM_WRITEONLY                 /* RAM */
@@ -410,7 +410,7 @@ static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0000, 0x04ff) AM_RAM
 	AM_RANGE(0x0500, 0x0500) AM_WRITE(combatscb_bankselect_w)
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE_MEMBER(combatsc_state, m_paletteram)		/* palette */
@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( combatscb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
 
@@ -444,7 +444,7 @@ static WRITE8_DEVICE_HANDLER( combatscb_dac_w )
 	msm5205_vclk_w(device, 0);
 }
 
-static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM										/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM										/* RAM */
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	/* YM 2203 */

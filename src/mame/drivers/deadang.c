@@ -56,7 +56,7 @@ static READ16_HANDLER( ghunter_trackball_high_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x00000, 0x037ff) AM_RAM
 	AM_RANGE(0x03800, 0x03fff) AM_RAM AM_BASE_MEMBER(deadang_state, m_spriteram)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
@@ -74,7 +74,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x00000, 0x037ff) AM_RAM
 	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE(deadang_foreground_w) AM_BASE_MEMBER(deadang_state, m_video_data)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")

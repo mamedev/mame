@@ -84,11 +84,11 @@ static SCREEN_UPDATE_IND16(quake)
 	return 0;
 }
 
-static ADDRESS_MAP_START( quake_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( quake_map, AS_PROGRAM, 32, quakeat_state )
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM AM_REGION("pc_bios", 0) /* BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quake_io, AS_IO, 32 )
+static ADDRESS_MAP_START( quake_io, AS_IO, 32, quakeat_state )
 //  AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 //  AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)

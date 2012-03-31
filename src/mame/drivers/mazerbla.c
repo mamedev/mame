@@ -972,7 +972,7 @@ static WRITE8_HANDLER( sound_nmi_clear_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mazerbla_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mazerbla_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
@@ -980,7 +980,7 @@ static ADDRESS_MAP_START( mazerbla_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazerbla_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mazerbla_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x4c, 0x4f) AM_READWRITE(ls670_1_r, ls670_0_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
@@ -990,19 +990,19 @@ static ADDRESS_MAP_START( mazerbla_io_map, AS_IO, 8 )
 	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazerbla_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mazerbla_cpu2_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM /* main RAM (stack) */
 	AM_RANGE(0x8000, 0x83ff) AM_RAM /* waveform ???*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazerbla_cpu2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mazerbla_cpu2_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(vsb_ls273_audio_control_w)
 	AM_RANGE(0x80, 0x83) AM_READWRITE(ls670_0_r, ls670_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazerbla_cpu3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mazerbla_cpu3_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* GFX roms */
@@ -1013,7 +1013,7 @@ static ADDRESS_MAP_START( mazerbla_cpu3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_READ(vcu_set_clr_addr_r)	/* palette? LOAD */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazerbla_cpu3_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mazerbla_cpu3_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
@@ -1029,7 +1029,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( greatgun_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( greatgun_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x4c, 0x4c) AM_WRITE(main_sound_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
@@ -1040,7 +1040,7 @@ static ADDRESS_MAP_START( greatgun_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 /* Great Guns has a little different banking layout */
-static ADDRESS_MAP_START( greatgun_cpu3_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( greatgun_cpu3_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP
 	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
@@ -1050,7 +1050,7 @@ static ADDRESS_MAP_START( greatgun_cpu3_io_map, AS_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("ay1", ay8910_r)

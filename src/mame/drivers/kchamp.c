@@ -108,7 +108,7 @@ static WRITE8_HANDLER( sound_msm_w )
 	state->m_msm_play_lo_nibble = 1;
 }
 
-static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE_MEMBER(kchamp_state, m_videoram)
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(kchamp_flipscreen_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(control_w)
@@ -128,12 +128,12 @@ static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchampvs_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kchampvs_sound_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchampvs_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kchampvs_sound_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
@@ -163,7 +163,7 @@ static WRITE8_HANDLER( kc_sound_control_w )
 //      DAC_set_volume(0, (data == 1) ? 255 : 0, 0);
 }
 
-static ADDRESS_MAP_START( kchamp_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kchamp_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(kchamp_videoram_w) AM_BASE_MEMBER(kchamp_state, m_videoram)
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( kchamp_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xeb00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchamp_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kchamp_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW") AM_WRITE(kchamp_flipscreen_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(control_w)
@@ -182,12 +182,12 @@ static ADDRESS_MAP_START( kchamp_io_map, AS_IO, 8 )
 	AM_RANGE(0xa8, 0xa8) AM_READWRITE(sound_reset_r, sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchamp_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kchamp_sound_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe2ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kchamp_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kchamp_sound_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_data_address_w)

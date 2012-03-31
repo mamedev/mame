@@ -344,7 +344,7 @@ static MC6845_UPDATE_ROW( update_row )
  *
  *************************************/
 
-static ADDRESS_MAP_START( qix_video_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( qix_video_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -361,7 +361,7 @@ static ADDRESS_MAP_START( qix_video_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( zookeep_video_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( zookeep_video_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, qix_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")
@@ -380,7 +380,7 @@ static ADDRESS_MAP_START( zookeep_video_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slither_video_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slither_video_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(qix_videoram_r, slither_videoram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_SHARE("nvram")

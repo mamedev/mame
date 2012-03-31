@@ -42,7 +42,7 @@
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( nitedrvr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nitedrvr_map, AS_PROGRAM, 8, nitedrvr_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100) // SCRAM
 	AM_RANGE(0x0200, 0x027f) AM_RAM_WRITE(nitedrvr_videoram_w) AM_MIRROR(0x180) AM_BASE_MEMBER(nitedrvr_state, m_videoram) // PFW
 	AM_RANGE(0x0400, 0x05ff) AM_WRITE(nitedrvr_hvc_w) AM_BASE_MEMBER(nitedrvr_state, m_hvc) // POSH, POSV, CHAR, Watchdog

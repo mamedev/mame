@@ -2731,23 +2731,23 @@ static CPU_INIT( t90 )
 	cpustate->timer[4] = device->machine().scheduler().timer_alloc(FUNC(t90_timer4_callback), cpustate);
 }
 
-static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tmp90840_mem, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE(	0x0000,		0x1fff			)	AM_ROM	// 8KB ROM (internal)
 	AM_RANGE(	0xfec0,		0xffc0			)	AM_RAM	// 256b RAM (internal)
 	AM_RANGE(	T90_IOBASE,	T90_IOBASE+47	)	AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
-static ADDRESS_MAP_START(tmp90841_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tmp90841_mem, AS_PROGRAM, 8, legacy_cpu_device)
 //  AM_RANGE(   0x0000,     0x1fff          )   AM_ROM  // rom-less
 	AM_RANGE(	0xfec0,		0xffc0			)	AM_RAM	// 256b RAM (internal)
 	AM_RANGE(	T90_IOBASE,	T90_IOBASE+47	)	AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(tmp91640_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tmp91640_mem, AS_PROGRAM, 8, legacy_cpu_device )
 	AM_RANGE(	0x0000,		0x3fff			) AM_ROM	// 16KB ROM (internal)
 	AM_RANGE(	0xfdc0,		0xffc0			) AM_RAM	// 512b RAM (internal)
 	AM_RANGE(	T90_IOBASE, T90_IOBASE+47	) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
-static ADDRESS_MAP_START(tmp91641_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tmp91641_mem, AS_PROGRAM, 8, legacy_cpu_device )
 //  AM_RANGE(   0x0000,     0x3fff          ) AM_ROM    // rom-less
 	AM_RANGE(	0xfdc0,		0xffc0			) AM_RAM	// 512b RAM (internal)
 	AM_RANGE(	T90_IOBASE, T90_IOBASE+47	) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )

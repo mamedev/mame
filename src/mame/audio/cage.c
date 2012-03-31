@@ -653,7 +653,7 @@ static const tms3203x_config cage_config =
 };
 
 
-static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
@@ -664,7 +664,7 @@ static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cage_map_seattle, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( cage_map_seattle, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")

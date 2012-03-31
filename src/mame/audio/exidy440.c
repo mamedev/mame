@@ -944,7 +944,7 @@ static WRITE8_DEVICE_HANDLER( sound_banks_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( exidy440_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( exidy440_audio_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("custom", m6844_r, m6844_w)
 	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE("custom", sound_volume_r, sound_volume_w)

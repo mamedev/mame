@@ -513,12 +513,12 @@ static READ16_HANDLER( asci65_get_bio )
  *
  *************************************/
 
-static ADDRESS_MAP_START( asic65_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( asic65_program_map, AS_PROGRAM, 16, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( asic65_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( asic65_io_map, AS_IO, 16, driver_device )
 	AM_RANGE(0, 0) AM_MIRROR(6) AM_READWRITE(asic65_68k_r, asic65_68k_w)
 	AM_RANGE(1, 1) AM_MIRROR(6) AM_READWRITE(asic65_stat_r, asic65_stat_w)
 	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(asci65_get_bio)

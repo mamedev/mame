@@ -356,7 +356,7 @@ static WRITE16_HANDLER ( musobana_inputport_w )
 	state->m_musobana_inputport = data;
 }
 
-static ADDRESS_MAP_START( tmp68301_regs, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tmp68301_regs, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0xfffc00, 0xfffc0f) AM_READWRITE(tmp68301_address_decoder_r,tmp68301_address_decoder_w)
 	AM_RANGE(0xfffc80, 0xfffc9f) AM_READWRITE(tmp68301_interrupt_controller_r,tmp68301_interrupt_controller_w)
 	AM_RANGE(0xfffd00, 0xfffd0f) AM_READWRITE(tmp68301_parallel_interface_r,tmp68301_parallel_interface_w)
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( tmp68301_regs, AS_PROGRAM, 16 )
 	AM_RANGE(0xfffe00, 0xfffe4f) AM_READWRITE(tmp68301_timer_r,tmp68301_timer_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")
 
@@ -399,7 +399,7 @@ static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16 )
 	AM_IMPORT_FROM( tmp68301_regs )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
@@ -437,7 +437,7 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16 )
 	AM_IMPORT_FROM( tmp68301_regs )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
@@ -478,13 +478,13 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( niyanpai_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( niyanpai_sound_map, AS_PROGRAM, 8, niyanpai_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( niyanpai_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( niyanpai_sound_io_map, AS_IO, 8, niyanpai_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)

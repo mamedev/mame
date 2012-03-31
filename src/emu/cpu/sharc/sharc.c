@@ -1046,7 +1046,7 @@ static CPU_READOP( sharc )
 }
 
 // This is just used to stop the debugger from complaining about executing from I/O space
-static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64, adsp21062_device )
 	AM_RANGE(0x20000, 0x7ffff) AM_RAM
 ADDRESS_MAP_END
 

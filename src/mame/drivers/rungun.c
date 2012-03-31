@@ -183,7 +183,7 @@ static INTERRUPT_GEN(rng_interrupt)
 		device_set_input_line(device, M68K_IRQ_5, ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM											// main program + data
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM											// work RAM
@@ -244,7 +244,7 @@ static INTERRUPT_GEN(audio_interrupt)
 
 /* sound (this should be split into audio/xexex.c or pregx.c or so someday) */
 
-static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM

@@ -1181,7 +1181,7 @@ static WRITE16_HANDLER( jaguar_gpu_clut_w16 ) { if (!(offset&1)) { jaguar_gpu_cl
 static READ16_HANDLER( jaguar_gpu_ram_r16 )  { if (!(offset&1)) { return jaguar_gpu_ram_r(space, offset>>1, mem_mask<<16) >> 16;  } else { return jaguar_gpu_ram_r(space, offset>>1, mem_mask); } }
 static WRITE16_HANDLER( jaguar_gpu_ram_w16 ) { if (!(offset&1)) { jaguar_gpu_ram_w(space, offset>>1, data << 16, mem_mask << 16); } else { jaguar_gpu_ram_w(space, offset>>1, data, mem_mask); } }
 
-static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, cojag_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE( jaguar_shared_ram_r16, jaguar_shared_ram_w16 );
 	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE( jaguar_cart_base_r16, jaguar_cart_base_w16 )
@@ -1209,7 +1209,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE("share1")
 	AM_RANGE(0x04800000, 0x04bfffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x04c00000, 0x04dfffff) AM_ROMBANK("bank2")
@@ -1238,7 +1238,7 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE("share1")
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(cojag_state, m_rom_base)
 	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM
@@ -1271,7 +1271,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gpu_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gpu_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("bank8")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank9")
@@ -1292,7 +1292,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("bank8")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank9")
@@ -1305,7 +1305,7 @@ ADDRESS_MAP_END
 
 /* ToDo, these maps SHOULD be merged with the ones above */
 
-static ADDRESS_MAP_START( jag_gpu_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( jag_gpu_map, AS_PROGRAM, 32, cojag_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_MIRROR(0x200000)  AM_SHARE("share1") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE(&cart_base) AM_SIZE(&cart_size)  AM_SHARE("share15") AM_REGION("maincpu", 0x800000)
@@ -1323,7 +1323,7 @@ static ADDRESS_MAP_START( jag_gpu_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_BASE(&high_rom_base) AM_REGION("maincpu", 0xf1d000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jag_dsp_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( jag_dsp_map, AS_PROGRAM, 32, cojag_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE("share1") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_SHARE("share15") AM_REGION("maincpu", 0x800000)

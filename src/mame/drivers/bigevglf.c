@@ -306,7 +306,7 @@ INPUT_PORTS_END
 /*****************************************************************************/
 /* Main CPU */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1")
@@ -317,7 +317,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf840, 0xf8ff) AM_RAM AM_BASE_MEMBER(bigevglf_state, m_spriteram2)  /* spriteram (x,y,offset in spriteram1,palette) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigevglf_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( bigevglf_portmap, AS_IO, 8, bigevglf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* video ram enable ???*/
 	AM_RANGE(0x01, 0x01) AM_WRITE(bigevglf_gfxcontrol_w)  /* plane select */
@@ -332,7 +332,7 @@ ADDRESS_MAP_END
 /*********************************************************************************/
 /* Sub CPU */
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1") /* shared with main CPU */
@@ -352,7 +352,7 @@ static READ8_HANDLER( sub_cpu_mcu_coin_port_r )
 	return bigevglf_mcu_status_r(space, 0) | (input_port_read(space->machine(), "PORT04") & 3) | state->m_mcu_coin_bit5;	/* bit 0 and bit 1 - coin inputs */
 }
 
-static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("PORT00")
 	AM_RANGE(0x01, 0x01) AM_READNOP
@@ -378,7 +378,7 @@ ADDRESS_MAP_END
 /*********************************************************************************/
 /* Sound CPU */
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
@@ -396,7 +396,7 @@ ADDRESS_MAP_END
 /*********************************************************************************/
 /* MCU */
 
-static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8, bigevglf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(bigevglf_68705_port_a_r, bigevglf_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(bigevglf_68705_port_b_r, bigevglf_68705_port_b_w)

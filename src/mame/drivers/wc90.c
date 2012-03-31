@@ -108,7 +108,7 @@ static WRITE8_HANDLER( wc90_sound_command_w )
 
 
 
-static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM		/* Main RAM */
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90_fgvideoram_w) AM_BASE_MEMBER(wc90_state, m_fgvideoram)	/* fg video ram */
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8 )
 	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(wc90_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(wc90_state, m_spriteram, m_spriteram_size)
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ymsnd", ym2608_r, ym2608_w)

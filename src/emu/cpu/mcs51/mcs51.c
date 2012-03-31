@@ -2404,20 +2404,20 @@ static CPU_INIT( ds5002fp )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE(0x00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_13bit, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(program_13bit, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE(0x00, 0x1fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_7bit, AS_DATA, 8)
+static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, legacy_cpu_device)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_8bit, AS_DATA, 8)
+static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, legacy_cpu_device)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0100, 0x01ff) AM_RAM /* SFR */
 ADDRESS_MAP_END

@@ -190,7 +190,7 @@ static WRITE16_HANDLER( drill_irq_w )
 	COMBINE_DATA(&state->irq_reg);
 }
 
-static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, taito_f3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x3000ff) AM_RAM

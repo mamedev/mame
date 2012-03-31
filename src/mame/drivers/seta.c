@@ -1582,7 +1582,7 @@ static SCREEN_VBLANK( seta_buffer_sprites )
    writing to sharedram! */
 
 
-static ADDRESS_MAP_START( tndrcade_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tndrcade_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ? 0
 	AM_RANGE(0x280000, 0x280001) AM_WRITENOP						// ? 0 / 1 (sub cpu related?)
@@ -1605,7 +1605,7 @@ ADDRESS_MAP_END
         (with slight variations, and Meta Fox protection hooked in)
 ***************************************************************************/
 
-static ADDRESS_MAP_START( downtown_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( downtown_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM								// ROM
 	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0x200000, 0x200001) AM_NOP								// watchdog? (twineagl)
@@ -1663,7 +1663,7 @@ static WRITE16_HANDLER( calibr50_soundlatch_w )
 	}
 }
 
-static ADDRESS_MAP_START( calibr50_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( calibr50_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM								// ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM								// RAM
 	AM_RANGE(0x100000, 0x100007) AM_READNOP							// ? (same as a00010-a00017?)
@@ -1748,7 +1748,7 @@ static WRITE16_HANDLER( usclssic_lockout_w )
 }
 
 
-static ADDRESS_MAP_START( usclssic_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( usclssic_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// ROM
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM									// RAM
 	AM_RANGE(0x800000, 0x8005ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r16, spriteylow_w16) // Sprites Y
@@ -1776,7 +1776,7 @@ ADDRESS_MAP_END
                                 Athena no Hatena?
 ***************************************************************************/
 
-static ADDRESS_MAP_START( atehate_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( atehate_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM								// ROM
 	AM_RANGE(0x900000, 0x9fffff) AM_RAM								// RAM
 	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
@@ -1799,7 +1799,7 @@ ADDRESS_MAP_END
                         Blandia
 ***************************************************************************/
 
-static ADDRESS_MAP_START( blandia_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( blandia_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM (up to 2MB)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM (main ram for zingzip, wrofaero writes to 20f000-20ffff)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
@@ -1834,7 +1834,7 @@ ADDRESS_MAP_END
                         (with slight variations)
 ***************************************************************************/
 
-static ADDRESS_MAP_START( blandiap_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( blandiap_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM (up to 2MB)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM (main ram for zingzip, wrofaero writes to 20f000-20ffff)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
@@ -1916,7 +1916,7 @@ static WRITE16_HANDLER( zombraid_gun_w )
 	state->m_gun_old_clock = data & 1;
 }
 
-static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM (up to 2MB)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_MEMBER(seta_state, m_workram)		// RAM (pointer for zombraid crosshair hack)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
@@ -1955,7 +1955,7 @@ static READ16_HANDLER( zingzipbl_unknown_r )
 	return 0x0000;
 }
 
-static ADDRESS_MAP_START( zingzipbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( zingzipbl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM (up to 2MB)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_MEMBER(seta_state, m_workram)		// RAM (pointer for zombraid crosshair hack)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
@@ -1993,7 +1993,7 @@ static ADDRESS_MAP_START( zingzipbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITENOP						// ? Sound  IRQ Ack
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jjsquawb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jjsquawb_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM (up to 2MB)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_MEMBER(seta_state, m_workram)		// RAM (pointer for zombraid crosshair hack)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
@@ -2030,7 +2030,7 @@ ADDRESS_MAP_END
         Orbs
 ***************************************************************************/
 
-static ADDRESS_MAP_START( orbs_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( orbs_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM								// RAM
 	AM_RANGE(0x100000, 0x100001) AM_READNOP							// ?
@@ -2115,7 +2115,7 @@ static WRITE16_HANDLER( keroppi_prize_w )
 	}
 }
 
-static ADDRESS_MAP_START( keroppi_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( keroppi_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM								// RAM
 	AM_RANGE(0x100000, 0x100001) AM_READ(keroppi_protection_r)		//
@@ -2149,7 +2149,7 @@ static MACHINE_START( keroppi )
 ***************************************************************************/
 
 /* similar to krzybowl */
-static ADDRESS_MAP_START( blockcar_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( blockcar_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM								// ROM
 	AM_RANGE(0xf00000, 0xf03fff) AM_RAM								// RAM
 	AM_RANGE(0xf04000, 0xf041ff) AM_RAM								// Backup RAM?
@@ -2174,7 +2174,7 @@ ADDRESS_MAP_END
                                 Daioh
 ***************************************************************************/
 
-static ADDRESS_MAP_START( daioh_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( daioh_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM								// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM								// RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
@@ -2207,7 +2207,7 @@ ADDRESS_MAP_END
         Dragon Unit, Quiz Kokology, Quiz Kokology 2, Strike Gunner
 ***************************************************************************/
 
-static ADDRESS_MAP_START( drgnunit_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drgnunit_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM								// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM								// RAM (qzkklogy)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM								// RAM (drgnunit,stg)
@@ -2271,7 +2271,7 @@ static READ16_HANDLER( setaroul_spritecode_r )
 
 
 
-static ADDRESS_MAP_START( setaroul_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( setaroul_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM								// ROM
 
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_SHARE("nvram")
@@ -2303,7 +2303,7 @@ ADDRESS_MAP_END
                         Extreme Downhill / Sokonuke
 ***************************************************************************/
 
-static ADDRESS_MAP_START( extdwnhl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( extdwnhl_map, AS_PROGRAM, 16, seta_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
@@ -2337,7 +2337,7 @@ ADDRESS_MAP_END
         (Kamen) Masked Riders Club Battle Race / Mad Shark
 ***************************************************************************/
 
-static ADDRESS_MAP_START( kamenrid_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kamenrid_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")					// P1
@@ -2370,7 +2370,7 @@ static ADDRESS_MAP_START( kamenrid_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* almost identical to kamenrid */
-static ADDRESS_MAP_START( madshark_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( madshark_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")					// P1
@@ -2427,7 +2427,7 @@ static READ16_HANDLER( krzybowl_input_r )
 	}
 }
 
-static ADDRESS_MAP_START( krzybowl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( krzybowl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM 							// ROM
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM								// RAM
 	AM_RANGE(0x100000, 0x100001) AM_READNOP							// ?
@@ -2466,7 +2466,7 @@ static WRITE16_HANDLER( msgundam_vregs_w )
 
 /* Mirror RAM is necessary or startup, to clear Work RAM after the test */
 
-static ADDRESS_MAP_START( msgundam_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( msgundam_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_MIRROR(0x70000)			// RAM
@@ -2500,7 +2500,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* similar to wrofaero */
-static ADDRESS_MAP_START( oisipuzl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( oisipuzl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
@@ -2529,7 +2529,7 @@ ADDRESS_MAP_END
 
 /* Same as oisipuzl but with the sound system replaced */
 
-static ADDRESS_MAP_START( triplfun_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( triplfun_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
@@ -2594,7 +2594,7 @@ static READ16_HANDLER( kiwame_input_r )
 	}
 }
 
-static ADDRESS_MAP_START( kiwame_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kiwame_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(kiwame_nvram_r, kiwame_nvram_w) AM_BASE_MEMBER(seta_state, m_kiwame_nvram)	// NVRAM + Regs ?
@@ -2625,7 +2625,7 @@ static WRITE16_HANDLER( thunderl_protection_w )
 
 /* Similar to downtown etc. */
 
-static ADDRESS_MAP_START( thunderl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( thunderl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM								// ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM								// RAM
 	AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
@@ -2649,7 +2649,7 @@ static ADDRESS_MAP_START( thunderl_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( thunderlbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( thunderlbl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM								// ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM								// RAM
 //  AM_RANGE(0x100000, 0x103fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)  // Sound
@@ -2692,7 +2692,7 @@ static WRITE16_HANDLER( wiggie_soundlatch_w )
 }
 
 
-static ADDRESS_MAP_START( wiggie_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wiggie_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM								// ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM								// RAM
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ?
@@ -2714,7 +2714,7 @@ static ADDRESS_MAP_START( wiggie_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xe04000, 0xe07fff) AM_RAM	// (wits)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wiggie_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wiggie_sound_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
@@ -2726,7 +2726,7 @@ ADDRESS_MAP_END
                     Ultraman Club / SD Gundam Neo Battling
 ***************************************************************************/
 
-static ADDRESS_MAP_START( umanclub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( umanclub_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x300000, 0x3003ff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, m_paletteram, m_paletteram_size)	// Palette
@@ -2759,7 +2759,7 @@ static WRITE16_HANDLER( utoukond_soundlatch_w )
 	}
 }
 
-static ADDRESS_MAP_START( utoukond_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( utoukond_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
@@ -2802,7 +2802,7 @@ static WRITE16_HANDLER( pairlove_prot_w )
 	state->m_pairslove_protram[offset] = data;
 }
 
-static ADDRESS_MAP_START( pairlove_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pairlove_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM								// ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP						// ? 1 (start of interrupts, main loop: watchdog?)
 	AM_RANGE(0x200000, 0x200001) AM_WRITENOP						// ? 0/1 (IRQ acknowledge?)
@@ -2826,7 +2826,7 @@ ADDRESS_MAP_END
                             Crazy Fight
 ***************************************************************************/
 
-static ADDRESS_MAP_START( crazyfgt_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( crazyfgt_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
 	AM_RANGE(0x610000, 0x610001) AM_READ_PORT("COINS")
@@ -2886,7 +2886,7 @@ static READ16_HANDLER( inttoote_700000_r )
 	return state->m_inttoote_700000[offset] & 0x3f;
 }
 
-static ADDRESS_MAP_START( inttoote_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( inttoote_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// ROM (up to 2MB)
 
 	AM_RANGE(0x200000, 0x200001) AM_RAM_READ(inttoote_key_r) AM_BASE_MEMBER(seta_state, m_inttoote_key_select)
@@ -2951,7 +2951,7 @@ static READ16_HANDLER( unk_r )
 }
 
 /* same as International Toote but without the protection and different RTC hook-up */
-static ADDRESS_MAP_START( jockeyc_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jockeyc_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// ROM (up to 2MB)
 
 	AM_RANGE(0x200000, 0x200001) AM_READWRITE(jockeyc_mux_r,jockeyc_mux_w)
@@ -3017,7 +3017,7 @@ static WRITE8_HANDLER( sub_bankswitch_lockout_w )
 
 static READ8_HANDLER( ff_r )	{return 0xff;}
 
-static ADDRESS_MAP_START( tndrcade_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tndrcade_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM 							// RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(ff_r)						// ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
 	//AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)              //
@@ -3039,7 +3039,7 @@ ADDRESS_MAP_END
                                 Twin Eagle
 ***************************************************************************/
 
-static ADDRESS_MAP_START( twineagl_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( twineagl_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM							// RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)			//
 	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)			//
@@ -3081,7 +3081,7 @@ static READ8_HANDLER( downtown_ip_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( downtown_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( downtown_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM							// RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)			//
 	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)			//
@@ -3110,7 +3110,7 @@ static WRITE8_HANDLER( calibr50_soundlatch2_w )
 	device_spin_until_time(&space->device(), attotime::from_usec(50));	// Allow the other cpu to reply
 }
 
-static ADDRESS_MAP_START( calibr50_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( calibr50_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("x1snd", seta_sound_r,seta_sound_w)	// Sound
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)				// From Main CPU
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_bankswitch_w)			// Bankswitching
@@ -3124,7 +3124,7 @@ ADDRESS_MAP_END
                                 Meta Fox
 ***************************************************************************/
 
-static ADDRESS_MAP_START( metafox_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( metafox_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM							// RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)			//
 	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)			//
@@ -3144,13 +3144,13 @@ ADDRESS_MAP_END
                             Ultra Toukon Densetsu
 ***************************************************************************/
 
-static ADDRESS_MAP_START( utoukond_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( utoukond_sound_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_DEVREADWRITE("x1snd", seta_sound_r,seta_sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( utoukond_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( utoukond_sound_io_map, AS_IO, 8, seta_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_r, ym3438_w)
 	AM_RANGE(0x80, 0x80) AM_WRITENOP //?
@@ -8560,7 +8560,7 @@ static MACHINE_CONFIG_START( thunderl, seta_state )
 MACHINE_CONFIG_END
 
 
-static ADDRESS_MAP_START( thunderlbl_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( thunderlbl_sound_map, AS_PROGRAM, 8, seta_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xdfff) AM_ROM//ROMBANK("bank1")
@@ -8568,7 +8568,7 @@ static ADDRESS_MAP_START( thunderlbl_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thunderlbl_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( thunderlbl_sound_portmap, AS_IO, 8, seta_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

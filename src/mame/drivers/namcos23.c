@@ -2419,7 +2419,7 @@ static MACHINE_START( s23 )
 	c361.timer->adjust(attotime::never);
 }
 
-static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE( p3d_r, p3d_w )
@@ -2450,7 +2450,7 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32, namcos23_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE( p3d_r, p3d_w )
@@ -2496,14 +2496,14 @@ static WRITE32_HANDLER( sh2_shared_w )
 	COMBINE_DATA(&state->m_gmen_sh2_shared[offset]);
 }
 
-static ADDRESS_MAP_START( gmen_mips_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gmen_mips_map, AS_PROGRAM, 32, namcos23_state )
 	AM_IMPORT_FROM(ss23_map)
 	AM_RANGE(0x0e400000, 0x0e400003) AM_READ( gmen_trigger_sh2 )
 	AM_RANGE(0x0e700000, 0x0e707fff) AM_READWRITE( sh2_shared_r, sh2_shared_w )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gmen_sh2_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gmen_sh2_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE( 0x00000000, 0x00007fff ) AM_RAM AM_BASE_MEMBER(namcos23_state, m_gmen_sh2_shared)
 	AM_RANGE( 0x04000000, 0x043fffff ) AM_RAM	// SH-2 main work RAM
 ADDRESS_MAP_END
@@ -2552,7 +2552,7 @@ static WRITE16_HANDLER( sub_interrupt_main_w )
 }
 
 /* H8/3002 MCU stuff */
-static ADDRESS_MAP_START( s23h8rwmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( s23h8rwmap, AS_PROGRAM, 16, namcos23_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
@@ -2905,7 +2905,7 @@ static WRITE8_HANDLER(s23_mcu_p6_w)
 //  printf("%02x to port 6\n", data);
 }
 
-static ADDRESS_MAP_START( s23h8iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( s23h8iomap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE( s23_mcu_p6_r, s23_mcu_p6_w )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
@@ -2921,7 +2921,7 @@ static ADDRESS_MAP_START( s23h8iomap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 // version without serial hookup to I/O board for games where the PIC isn't dumped
-static ADDRESS_MAP_START( s23h8noiobmap, AS_IO, 8 )
+static ADDRESS_MAP_START( s23h8noiobmap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE( s23_mcu_p6_r, s23_mcu_p6_w )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
@@ -3001,7 +3001,7 @@ static READ8_HANDLER(iob_r)
 }
 
 /* H8/3334 (Namco C78) I/O board MCU */
-static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8, namcos23_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-1 = coin 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal
@@ -3013,7 +3013,7 @@ static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 8, namcos23_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")
@@ -3024,7 +3024,7 @@ static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gorgoniobrdmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gorgoniobrdmap, AS_PROGRAM, 8, namcos23_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("RRP0")	  // 0-5 = start
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("RRP1")	  //
@@ -3041,7 +3041,7 @@ ADDRESS_MAP_END
     port 5 bit 2 = LED to indicate transmitting packet to main
     port 4 bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
 */
-static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 8 )
+static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 8, namcos23_state )
 	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READWRITE( s23_iob_p4_r, s23_iob_p4_w )
 	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_NOP	// status LED in bit 2
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_NOP	// unknown

@@ -39,7 +39,7 @@ static WRITE8_HANDLER( labyrunr_bankswitch_w )
 	coin_counter_w(space->machine(), 1, data & 0x10);
 }
 
-static ADDRESS_MAP_START( labyrunr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( labyrunr_map, AS_PROGRAM, 8, labyrunr_state )
 	AM_RANGE(0x0000, 0x0007) AM_DEVWRITE("k007121", k007121_ctrl_w)
 	AM_RANGE(0x0020, 0x005f) AM_RAM AM_BASE_MEMBER(labyrunr_state, m_scrollram)
 	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("ym1", ym2203_read_port_r, ym2203_write_port_w)

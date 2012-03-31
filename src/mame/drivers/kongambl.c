@@ -73,7 +73,7 @@ static WRITE32_HANDLER( eeprom_w )
 	}
 }
 
-static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// main program
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM	// work RAM
 
@@ -102,7 +102,7 @@ static INPUT_PORTS_START( kongambl )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( kongamaud_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kongamaud_map, AS_PROGRAM, 16, kongambl_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// main program (mirrored?)
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// work RAM
 	AM_RANGE(0x200000, 0x2000ff) AM_RAM	// unknown (YMZ280b?  Shared with 68020?)

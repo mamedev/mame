@@ -78,7 +78,7 @@ static WRITE8_HANDLER( sonson_coin2_counter_w )
 	coin_counter_w(space->machine(), 1, data & 1);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sonson_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sonson_videoram_w) AM_BASE_SIZE_MEMBER(sonson_state, m_videoram, m_videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(sonson_colorram_w) AM_BASE_MEMBER(sonson_state, m_colorram)
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sonson_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay2", ay8910_address_data_w)

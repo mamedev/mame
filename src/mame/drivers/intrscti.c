@@ -30,14 +30,14 @@ static READ8_HANDLER( unk_r )
 	return space->machine().rand();
 }
 
-static ADDRESS_MAP_START( intrscti_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( intrscti_map, AS_PROGRAM, 8, intrscti_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(intrscti_state, m_ram) // video ram
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, AS_IO, 8 )
+static ADDRESS_MAP_START( readport, AS_IO, 8, intrscti_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ( unk_r )
 	AM_RANGE(0x01, 0x01) AM_READ( unk_r )

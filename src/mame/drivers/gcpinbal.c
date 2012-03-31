@@ -231,7 +231,7 @@ static void gcp_adpcm_int( device_t *device )
                      MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( gcpinbal_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gcpinbal_map, AS_PROGRAM, 16, gcpinbal_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_BASE_MEMBER(gcpinbal_state, m_tilemapram)
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_BASE_SIZE_MEMBER(gcpinbal_state, m_spriteram, m_spriteram_size)	/* sprite ram */

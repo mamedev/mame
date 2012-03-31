@@ -115,7 +115,7 @@ DIP locations verified for:
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( bloodbro_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bloodbro_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
 	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE_MEMBER(bloodbro_state, m_spriteram, m_spriteram_size)
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( bloodbro_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( weststry_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( weststry_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
 	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE_MEMBER(bloodbro_state, m_spriteram, m_spriteram_size)

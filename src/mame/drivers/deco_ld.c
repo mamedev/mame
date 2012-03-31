@@ -181,7 +181,7 @@ static READ8_HANDLER( test_r )
 	return space->machine().rand();
 }
 
-static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 //  AM_RANGE(0x1000, 0x1007) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(test_r)
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN1")
 	AM_RANGE(0x1001, 0x1001) AM_READ(test_r)//_PORT("IN2")
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 //  AM_RANGE(0x1000, 0x1007) AM_NOP
 	AM_RANGE(0x1001, 0x1001) AM_WRITENOP //???
@@ -250,7 +250,7 @@ static INTERRUPT_GEN ( sound_interrupt )
 }
 
 
-static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)

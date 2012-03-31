@@ -37,7 +37,7 @@ Notes:
 
 
 
-static ADDRESS_MAP_START( scramble_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( scramble_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -59,7 +59,7 @@ static ADDRESS_MAP_START( scramble_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( turpins_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( turpins_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( turpins_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_READONLY
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ckongs_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ckongs_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x7000, 0x7003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
@@ -118,7 +118,7 @@ static WRITE8_DEVICE_HANDLER(mars_ppi8255_w)
 }
 
 
-static ADDRESS_MAP_START( mars_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mars_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( mars_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( newsin7_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( newsin7_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( newsin7_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mrkougar_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrkougar_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( mrkougar_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hotshock_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hotshock_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( hotshock_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hunchbks_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hunchbks_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1210, 0x1213) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x1400, 0x143f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( hunchbks_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mimonscr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mimonscr_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)	/* mirror address?, probably not */
 	AM_RANGE(0x4400, 0x47ff) AM_RAM
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( mimonscr_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xebff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( triplep_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( triplep_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("8910.1", ay8910_data_address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("8910.1", ay8910_r)
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( triplep_io_map, AS_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_READ(triplep_pap_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotshock_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hotshock_sound_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("8910.1", ay8910_address_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("8910.1", ay8910_r, ay8910_data_w)
@@ -299,7 +299,7 @@ static READ8_HANDLER( hncholms_prot_r )
 		return 0;
 }
 
-static ADDRESS_MAP_START( hunchbks_readport, AS_IO, 8 )
+static ADDRESS_MAP_START( hunchbks_readport, AS_IO, 8, scramble_state )
 	AM_RANGE(0x00, 0x00) AM_READ(hncholms_prot_r)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
@@ -1219,14 +1219,14 @@ static WRITE8_HANDLER(scramble_soundram_w)
 	state->m_soundram[offset & 0x03ff] = data;
 }
 
-static ADDRESS_MAP_START( scramble_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( scramble_sound_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scramble_soundram_r, scramble_soundram_w)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE_MEMBER(scramble_state, m_soundram)  /* only here to initialize pointer */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scramble_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( scramble_sound_io_map, AS_IO, 8, scramble_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("8910.1", ay8910_address_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("8910.1", ay8910_r, ay8910_data_w)

@@ -304,7 +304,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 	if ((offset * 2) == 0x788) { state->m_788_data = data; return; }
 }
 
-static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
@@ -342,7 +342,7 @@ static READ8_HANDLER(irq_latch_r)
 	return state->m_sound_irq;
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_status_port_r,ym2151_w)
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io, AS_IO, 8, dblewing_state )
 	AM_RANGE(0x0000, 0xffff)  AM_ROM AM_REGION("audio_data", 0)
 ADDRESS_MAP_END
 

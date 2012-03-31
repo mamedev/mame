@@ -169,7 +169,7 @@ static WRITE8_HANDLER( starshp1_misc_w )
 }
 
 
-static ADDRESS_MAP_START( starshp1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( starshp1_map, AS_PROGRAM, 8, starshp1_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
 	AM_RANGE(0x2c00, 0x3fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("SYSTEM")

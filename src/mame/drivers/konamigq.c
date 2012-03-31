@@ -161,7 +161,7 @@ static READ32_HANDLER( pcmram_r )
 
 /* Video */
 
-static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_READWRITE(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f100000, 0x1f10000f) AM_WRITE(soundr3k_w)
@@ -224,7 +224,7 @@ static WRITE16_HANDLER(tms57002_control_word_w)
 }
 
 /* 68000 memory handling */
-static ADDRESS_MAP_START( konamigq_sound_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( konamigq_sound_map, AS_PROGRAM, 16, konamigq_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8_MODERN("konami1", k054539_device, read, write, 0xff00)

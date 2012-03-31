@@ -93,7 +93,7 @@ static READ32_HANDLER( vegaeo_custom_read )
 	return input_port_read(space->machine(), "SYSTEM");
 }
 
-static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32, vegaeo_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
 	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8("at28c16", at28c16_r, at28c16_w, 0x000000ff)

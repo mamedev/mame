@@ -99,12 +99,12 @@ INPUT_PORTS_END
 /* Main CPU */
 /* There's an OKI MSM5126-25RS in here - (2k RAM) */
 /* A 3.6V battery traces directly to U19, rendering it nvram */
-static ADDRESS_MAP_START( kingpin_program_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingpin_program_map, AS_PROGRAM, 8, kingpin_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingpin_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kingpin_io_map, AS_IO, 8, kingpin_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(io_read_missing_dips)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW")
@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 
 /* Sound CPU */
 /* There's an OKI MSM5126-25RS in here - (2k RAM) */
-static ADDRESS_MAP_START( kingpin_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingpin_sound_map, AS_PROGRAM, 8, kingpin_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8400, 0x8bff) AM_RAM
 ADDRESS_MAP_END

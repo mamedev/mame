@@ -48,7 +48,7 @@ static WRITE16_HANDLER ( crospang_soundlatch_w )
 
 /* main cpu */
 
-static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(crospang_fg_scrolly_w)
@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x320000, 0x32ffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
 
 	AM_RANGE(0x100004, 0x100005) AM_WRITE(bestri_fg_scrollx_w)
@@ -91,12 +91,12 @@ ADDRESS_MAP_END
 
 /* sound cpu */
 
-static ADDRESS_MAP_START( crospang_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( crospang_sound_map, AS_PROGRAM, 8, crospang_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crospang_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( crospang_sound_io_map, AS_IO, 8, crospang_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)

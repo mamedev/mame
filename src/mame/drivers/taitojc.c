@@ -850,7 +850,7 @@ static READ32_HANDLER( jc_lan_r )
 	return 0xffffffff;
 }
 
-static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x200000)
 	AM_RANGE(0x00400000, 0x01bfffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0x04000000, 0x040f7fff) AM_RAM AM_BASE_MEMBER(taitojc_state,m_vram)
@@ -914,12 +914,12 @@ static READ8_HANDLER(hc11_analog_r)
 }
 
 
-static ADDRESS_MAP_START( hc11_pgm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hc11_pgm_map, AS_PROGRAM, 8, taitojc_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8, taitojc_state )
 	AM_RANGE(MC68HC11_IO_PORTA,     MC68HC11_IO_PORTA    ) AM_NOP
 	AM_RANGE(MC68HC11_IO_PORTG,     MC68HC11_IO_PORTG    ) AM_READWRITE(hc11_comm_r, hc11_comm_w)
 	AM_RANGE(MC68HC11_IO_PORTH,     MC68HC11_IO_PORTH    ) AM_NOP
@@ -1120,12 +1120,12 @@ static WRITE16_HANDLER( dsp_to_main_w )
 	COMBINE_DATA(&state->m_dsp_shared_ram[0x7fe]);
 }
 
-static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitojc_state )
 //  AM_RANGE(0x0000, 0x1fff) AM_READ(dsp_internal_rom_r) // TODO: Dangerous Curves tries to access 0x207?
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16 )
+static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
 	AM_RANGE(0x6a01, 0x6a02) AM_WRITE(dsp_unk2_w)
 	AM_RANGE(0x6a11, 0x6a12) AM_NOP		// same as 0x6a01..02 for the second renderer chip?
 	AM_RANGE(0x6b20, 0x6b20) AM_WRITE(dsp_polygon_fifo_w)

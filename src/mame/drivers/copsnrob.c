@@ -101,7 +101,7 @@ static WRITE8_HANDLER( copsnrob_misc2_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, copsnrob_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0500, 0x0507) AM_WRITE(copsnrob_misc_w)

@@ -140,7 +140,7 @@ static WRITE16_HANDLER( soundcommand_w )
 	}
 }
 
-static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x43fff) AM_RAM	// main ram
 	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_BASE_MEMBER(spbactn_state,m_spvideoram)
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xa0206, 0xa0207) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spbactn_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spbactn_sound_map, AS_PROGRAM, 8, spbactn_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)

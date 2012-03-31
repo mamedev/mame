@@ -1005,7 +1005,7 @@ static INTERRUPT_GEN( mcu_irq_assert )
  *
  *************************************/
 
-static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x380000) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
@@ -1025,14 +1025,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe800, 0xe800) AM_READ(sound_data_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
@@ -1048,7 +1048,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, segas1x_state )
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READ(n7751_rom_r)
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(n7751_t1_r)
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_DEVWRITE("dac", dac_w)
@@ -1064,7 +1064,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP AM_WRITE(mcu_control_w)

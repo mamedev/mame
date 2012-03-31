@@ -90,7 +90,7 @@ static WRITE8_HANDLER( toki_adpcm_data_w )
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16, toki_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06d7ff) AM_RAM
 	AM_RANGE(0x06d800, 0x06dfff) AM_RAM AM_SHARE("spriteram")
@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* In the bootleg, sound and sprites are remapped to 0x70000 */
-static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16, toki_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06dfff) AM_RAM
 	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", toki_adpcm_control_w)	/* MSM5205 + ROM bank */

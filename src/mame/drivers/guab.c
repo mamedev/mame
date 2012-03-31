@@ -679,7 +679,7 @@ static WRITE16_HANDLER( io_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16, guab_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x0c0000, 0x0c007f) AM_READWRITE(io_r, io_w)

@@ -196,7 +196,7 @@ static WRITE8_HANDLER(quizshow_main_ram_w)
 }
 
 
-static ADDRESS_MAP_START( quizshow_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( quizshow_mem_map, AS_PROGRAM, 8, quizshow_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1802, 0x1802) AM_WRITE(quizshow_audio_w)
@@ -213,7 +213,7 @@ static ADDRESS_MAP_START( quizshow_mem_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM_WRITE(quizshow_main_ram_w) AM_BASE_MEMBER(quizshow_state, m_main_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizshow_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( quizshow_io_map, AS_IO, 8, quizshow_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_NOP // unused
 //	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // unused

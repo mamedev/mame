@@ -285,11 +285,11 @@ static WRITE8_DEVICE_HANDLER( carnival_music_port_2_w )
 }
 
 
-static ADDRESS_MAP_START( carnival_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( carnival_audio_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( carnival_audio_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( carnival_audio_io_map, AS_IO, 8, driver_device )
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(carnival_music_port_t1_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(carnival_music_port_1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE("psg", carnival_music_port_2_w)

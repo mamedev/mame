@@ -171,7 +171,7 @@ static TIMER_DEVICE_CALLBACK( megasys1A_scanline )
 		cputag_set_input_line(timer.machine(), "maincpu", 3, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
@@ -255,7 +255,7 @@ static WRITE16_HANDLER( ip_select_w )
 }
 
 
-static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x044000, 0x0443ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_BASE_MEMBER(megasys1_state, m_vregs)
@@ -278,7 +278,7 @@ ADDRESS_MAP_END
 #define INTERRUPT_NUM_C	INTERRUPT_NUM_B
 #define interrupt_C		interrupt_B
 
-static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE(megasys1_vregs_C_r,megasys1_vregs_C_w) AM_BASE_MEMBER(megasys1_state, m_vregs)
@@ -301,7 +301,7 @@ static INTERRUPT_GEN( megasys1D_irq )
 	device_set_input_line(device, 2, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c9fff) AM_RAM_WRITE(megasys1_vregs_D_w) AM_BASE_MEMBER(megasys1_state, m_vregs)
 	AM_RANGE(0x0ca000, 0x0cbfff) AM_RAM AM_BASE_MEMBER(megasys1_state, m_objectram)
@@ -395,7 +395,7 @@ static READ8_DEVICE_HANDLER( oki_status_r )
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	// to main cpu
@@ -413,7 +413,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( megasys1B_sound_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( megasys1B_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
 	AM_RANGE(0x060000, 0x060001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
@@ -432,14 +432,14 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, megasys1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( z80_sound_io_map, AS_IO, 8, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END

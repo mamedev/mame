@@ -1421,7 +1421,7 @@ static READ8_HANDLER( direct_input_r )
 
 
 
-static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
@@ -1472,7 +1472,7 @@ ADDRESS_MAP_END
 
 // memory map for scorpion2 board video addon /////////////////////////////
 
-static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_IMPORT_FROM( sc2_basemap )
 
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_hop_r)		// vfd status register

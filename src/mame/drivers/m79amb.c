@@ -132,7 +132,7 @@ static WRITE8_HANDLER( m79amb_8002_w )
 	output_set_value("EXP_LAMP", data ? 1 : 0);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m79amb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(ramtek_videoram_w) AM_BASE_MEMBER(m79amb_state, m_videoram)
 	AM_RANGE(0x6000, 0x63ff) AM_RAM					/* ?? */

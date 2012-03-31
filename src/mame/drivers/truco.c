@@ -259,7 +259,7 @@ static WRITE8_DEVICE_HANDLER( pia_irqb_w )
 *                Memory Map                *
 *******************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, truco_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM														/* General purpose RAM */
 	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_BASE_MEMBER(truco_state, m_videoram)				/* Video RAM */
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE_MEMBER(truco_state, m_battery_ram)			/* Battery backed RAM */

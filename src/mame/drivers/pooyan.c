@@ -49,7 +49,7 @@ static WRITE8_HANDLER( irq_enable_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pooyan_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pooyan_colorram_w) AM_BASE_MEMBER(pooyan_state, m_colorram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pooyan_videoram_w) AM_BASE_MEMBER(pooyan_state, m_videoram)

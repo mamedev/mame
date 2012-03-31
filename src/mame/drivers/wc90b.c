@@ -139,7 +139,7 @@ static WRITE8_HANDLER( adpcm_data_w )
 }
 
 
-static ADDRESS_MAP_START( wc90b_map1, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wc90b_map1, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Main RAM */
 	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90b_fgvideoram_w) AM_BASE_MEMBER(wc90b_state, m_fgvideoram)
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( wc90b_map1, AS_PROGRAM, 8 )
 	AM_RANGE(0xfd08, 0xfd08) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(wc90b_state, m_spriteram, m_spriteram_size)
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", adpcm_control_w)

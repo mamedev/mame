@@ -115,7 +115,7 @@ static WRITE8_HANDLER( output_w )
 //  popmessage("%02x|%02x|%02x|%02x|%02x|%02x|%02x|%02x|",state->m_io_port[0],state->m_io_port[1],state->m_io_port[2],state->m_io_port[3],state->m_io_port[4],state->m_io_port[5],state->m_io_port[6],state->m_io_port[7]);
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dmndrby_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc007) AM_READ(input_r)
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(dmndrby_state, m_dderby_vidattribs) // colours/ attrib ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dderby_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dderby_sound_map, AS_PROGRAM, 8, dmndrby_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1000) AM_RAM //???
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)

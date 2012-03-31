@@ -66,7 +66,7 @@ static WRITE16_HANDLER ( wwfwfest_irq_ack_w );
  still some unknown writes however, sound cpu memory map is the same as dd3
 *******************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(wwfwfest_fg0_videoram_w) AM_BASE_MEMBER(wwfwfest_state, m_fg0_videoram)	/* FG0 Ram - 4 bytes per tile */
 	AM_RANGE(0x0c2000, 0x0c3fff) AM_RAM AM_SHARE("spriteram")						/* SPR Ram */
@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* Work Ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wwfwfest_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)

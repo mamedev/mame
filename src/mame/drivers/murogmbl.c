@@ -73,7 +73,7 @@ static PALETTE_INIT( murogmbl )
 	}
 }
 
-static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8, murogmbl_state )
 	AM_RANGE(0x0000, 0x1fFf) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM

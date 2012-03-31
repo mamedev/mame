@@ -168,7 +168,7 @@ static WRITE8_HANDLER( k052109_051960_w )
 }
 
 
-static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)				/* probably */
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)	/* probably */
@@ -193,7 +193,7 @@ static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)				/* probably */
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)	/* probably */
@@ -217,7 +217,7 @@ static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mainevt_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mainevt_sound_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", upd7759_port_w)
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( mainevt_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mainevt_sh_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( devstors_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( devstors_sound_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)

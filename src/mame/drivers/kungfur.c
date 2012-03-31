@@ -211,7 +211,7 @@ static void kfr_adpcm2_int(device_t *device)
 }
 
 
-static ADDRESS_MAP_START( kungfur_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kungfur_map, AS_PROGRAM, 8, kungfur_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("adpcm1", kungfur_adpcm1_w)
 	AM_RANGE(0x4004, 0x4004) AM_DEVWRITE("adpcm2", kungfur_adpcm2_w)

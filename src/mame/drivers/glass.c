@@ -78,7 +78,7 @@ static WRITE16_HANDLER( glass_coin_w )
 	}
 }
 
-static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( glass_map, AS_PROGRAM, 16, glass_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		/* ROM */
 	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(glass_vram_w) AM_BASE_MEMBER(glass_state, m_videoram)						/* Video RAM */
 	AM_RANGE(0x102000, 0x102fff) AM_RAM																		/* Extra Video RAM */

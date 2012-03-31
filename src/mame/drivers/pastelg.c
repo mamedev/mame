@@ -50,7 +50,7 @@ static READ8_HANDLER( pastelg_sndrom_r )
 	return ROM[pastelg_blitter_src_addr_r(space) & 0x7fff];
 }
 
-static ADDRESS_MAP_START( pastelg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pastelg_map, AS_PROGRAM, 8, pastelg_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
@@ -61,7 +61,7 @@ static READ8_HANDLER( pastelg_irq_ack_r )
 	return 0;
 }
 
-static ADDRESS_MAP_START( pastelg_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pastelg_io_map, AS_IO, 8, pastelg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITENOP
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
@@ -114,7 +114,7 @@ static WRITE8_HANDLER( threeds_inputportsel_w )
 	state->m_mux_data = ~data;
 }
 
-static ADDRESS_MAP_START( threeds_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( threeds_io_map, AS_IO, 8, pastelg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x81, 0x81) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x82, 0x83) AM_DEVWRITE("aysnd", ay8910_data_address_w)

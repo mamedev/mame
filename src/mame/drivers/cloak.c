@@ -164,7 +164,7 @@ static WRITE8_HANDLER( cloak_nvram_enable_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, cloak_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(cloak_videoram_w) AM_BASE_MEMBER(cloak_state, m_videoram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1")
@@ -195,7 +195,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, cloak_state )
 	AM_RANGE(0x0000, 0x0007) AM_RAM
 	AM_RANGE(0x0008, 0x000f) AM_READWRITE(graph_processor_r, graph_processor_w)
 	AM_RANGE(0x0010, 0x07ff) AM_RAM

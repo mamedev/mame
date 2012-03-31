@@ -702,7 +702,7 @@ static WRITE8_HANDLER( gottlieb_sh_w )
 		state->m_r2_sound->write(*space, offset, data);
 }
 
-static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8, gottlieb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, m_spriteram)							/* FRSEL */
@@ -723,7 +723,7 @@ static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gottlieb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gottlieb_map, AS_PROGRAM, 8, gottlieb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_REGION("maincpu", 0x1000)	/* or ROM */

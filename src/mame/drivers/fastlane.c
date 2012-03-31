@@ -69,7 +69,7 @@ static WRITE8_DEVICE_HANDLER( fastlane_k007232_w )
 }
 
 
-static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
 	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_BASE_MEMBER(fastlane_state, m_k007121_regs)	/* 007121 registers */
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")

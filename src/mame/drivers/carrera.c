@@ -62,7 +62,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( carrera_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( carrera_map, AS_PROGRAM, 8, carrera_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( carrera_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(carrera_state, m_tileram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, carrera_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

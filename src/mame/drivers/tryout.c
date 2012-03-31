@@ -52,7 +52,7 @@ static WRITE8_HANDLER( tryout_bankswitch_w )
 	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);
 }
 
-static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(tryout_videoram_w) AM_BASE_MEMBER(tryout_state, m_videoram)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8 )
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xbff0) /* reset vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, tryout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)

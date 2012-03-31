@@ -254,7 +254,7 @@ static WRITE8_HANDLER(tomcat_nvram_w)
 	state->m_nvram[offset] = data;
 }
 
-static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x402000, 0x402001) AM_READ(tomcat_adcread_r) AM_WRITE(tomcat_adcon_w)
 	AM_RANGE(0x404000, 0x404001) AM_READ(tomcat_inputs_r) AM_WRITE(avgdvg_go_word_w)
@@ -284,11 +284,11 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffd000, 0xffdfff) AM_READWRITE8(tomcat_nvram_r, tomcat_nvram_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16, tomcat_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(tomcat_state, m_shared_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( dsp_io_map, AS_IO, 16, tomcat_state )
 	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(dsp_BIO_r)
 ADDRESS_MAP_END
 
@@ -306,7 +306,7 @@ static WRITE8_HANDLER(soundlatches_w)
 	}
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tomcat_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x3000, 0x30df) AM_WRITE(soundlatches_w)

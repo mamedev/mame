@@ -109,7 +109,7 @@ static WRITE8_HANDLER( sound_command_w )
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( flower_cpu1_2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flower_cpu1_2, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(flower_coin_lockout_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(flower_flipscreen_w)
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( flower_cpu1_2, AS_PROGRAM, 8 )
 	AM_RANGE(0xfa00, 0xfa00) AM_SHARE("share8") AM_RAM AM_BASE_MEMBER(flower_state, m_bg1_scroll)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flower_sound_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flower_sound_cpu, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(flower_soundcpu_irq_ack)
 	AM_RANGE(0x4001, 0x4001) AM_WRITEONLY AM_BASE_MEMBER(flower_state, m_sn_nmi_enable)

@@ -230,7 +230,7 @@ static MACHINE_RESET( uapce )
 	state->m_jamma_if_control_latch = 0;
 }
 
-static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, uapce_state )
 	AM_RANGE( 0x0000, 0x07FF) AM_ROM
 	AM_RANGE( 0x0800, 0x0FFF) AM_RAM
 	AM_RANGE( 0x1000, 0x17FF) AM_WRITE( jamma_if_control_latch_w )
@@ -281,7 +281,7 @@ static INPUT_PORTS_START( uapce )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, uapce_state )
 	AM_RANGE( 0x000000, 0x09FFFF) AM_ROM
 	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE( &pce_user_ram )
 	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_0_r, vdc_0_w )
@@ -292,7 +292,7 @@ static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
 	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE( h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io , AS_IO, 8)
+static ADDRESS_MAP_START( pce_io , AS_IO, 8, uapce_state )
 	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_0_r, vdc_0_w )
 ADDRESS_MAP_END
 

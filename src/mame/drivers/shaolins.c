@@ -26,7 +26,7 @@ static TIMER_DEVICE_CALLBACK( shaolins_interrupt )
 
 
 
-static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8, shaolins_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(shaolins_nmi_w)	/* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 														/* bit 3, bit 4 = coin counters */
 	AM_RANGE(0x0100, 0x0100) AM_WRITE(watchdog_reset_w)

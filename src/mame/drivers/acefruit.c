@@ -274,7 +274,7 @@ static PALETTE_INIT( acefruit )
 	palette_set_color( machine, 15, MAKE_RGB(0xff, 0x00, 0x00) );
 }
 
-static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(acefruit_state, m_videoram)
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( acefruit_io, AS_IO, 8 )
+static ADDRESS_MAP_START( acefruit_io, AS_IO, 8, acefruit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_NOP /* ? */
 ADDRESS_MAP_END

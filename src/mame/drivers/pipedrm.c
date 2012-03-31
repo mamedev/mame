@@ -263,7 +263,7 @@ static READ8_HANDLER( sound_command_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
@@ -293,14 +293,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0x16, 0x16) AM_READ(sound_command_r)
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hatris_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( hatris_sound_portmap, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x08) AM_DEVREADWRITE("ymsnd", ym2608_r, ym2608_w)
 	AM_RANGE(0x04, 0x04) AM_READ(sound_command_r)

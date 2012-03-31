@@ -126,7 +126,7 @@ static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
 
 /*** MEMORY MAPS *************************************************************/
 
-static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_BASE_MEMBER(suprslam_state, m_spriteram)
 	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_BASE_MEMBER(suprslam_state, m_sp_videoram)
@@ -148,13 +148,13 @@ static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITEONLY AM_BASE_MEMBER(suprslam_state, m_spr_ctrl)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprslam_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, suprslam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, pending_command_clear_w)

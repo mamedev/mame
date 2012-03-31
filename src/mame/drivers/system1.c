@@ -726,7 +726,7 @@ static WRITE8_HANDLER( nobb_outport24_w )
  *************************************/
 
 /* main memory map */
-static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(system1_state, m_ram)
@@ -740,7 +740,7 @@ static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
-static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
@@ -754,7 +754,7 @@ static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* I/O map for systems with an 8255 PPI */
-static ADDRESS_MAP_START( system1_ppi_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( system1_ppi_io_map, AS_IO, 8, system1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("P1")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("P2")
@@ -766,7 +766,7 @@ static ADDRESS_MAP_START( system1_ppi_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 /* I/O map for systems with a Z80 PIO chip */
-static ADDRESS_MAP_START( system1_pio_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( system1_pio_io_map, AS_IO, 8, system1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("P1")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("P2")
@@ -785,7 +785,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76496_w)
@@ -801,14 +801,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, system1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_control_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nob_mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( nob_mcu_io_map, AS_IO, 8, system1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_BASE_MEMBER(system1_state, m_nob_mcu_latch)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_BASE_MEMBER(system1_state, m_nob_mcu_status)

@@ -657,7 +657,7 @@ static WRITE16_HANDLER(coin_cnt_w)
 }
 
 
-static ADDRESS_MAP_START( wheelfir_main, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wheelfir_main, AS_PROGRAM, 16, wheelfir_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
@@ -677,7 +677,7 @@ static ADDRESS_MAP_START( wheelfir_main, AS_PROGRAM, 16 )
 
 
 /* sub is sound cpu? the program roms contain lots of samples */
-static ADDRESS_MAP_START( wheelfir_sub, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wheelfir_sub, AS_PROGRAM, 16, wheelfir_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 

@@ -79,7 +79,7 @@ static WRITE8_DEVICE_HANDLER( funybubl_oki_bank_sw )
 }
 
 
-static ADDRESS_MAP_START( funybubl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( funybubl_map, AS_PROGRAM, 8, funybubl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2") // banked port 1?
 	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(funybubl_paldatawrite) AM_BASE_MEMBER(funybubl_state, m_paletteram) // palette
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( funybubl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, funybubl_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(funybubl_vidram_bank_w)	// vidram bank
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(funybubl_cpurombank_w)		// rom bank?
@@ -100,7 +100,7 @@ ADDRESS_MAP_END
 
 /* Sound CPU */
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, funybubl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", funybubl_oki_bank_sw)

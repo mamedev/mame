@@ -265,7 +265,7 @@ static WRITE32_HANDLER( gstream_tilemap3_scrolly_w )
 	state->m_tmap3_scrolly = data;
 }
 
-static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
 	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE_MEMBER(gstream_state, m_workram) // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
 	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_BASE_MEMBER(gstream_state, m_vram) // video ram
@@ -351,7 +351,7 @@ static WRITE32_HANDLER( gstream_oki_4040_w )
 	// data == 0 or data == 0x81
 }
 
-static ADDRESS_MAP_START( gstream_io, AS_IO, 32 )
+static ADDRESS_MAP_START( gstream_io, AS_IO, 32, gstream_state )
 	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("IN0")
 	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("IN1")
 	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2")	// extra coin switches etc

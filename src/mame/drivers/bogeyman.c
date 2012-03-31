@@ -47,7 +47,7 @@ static WRITE8_HANDLER( bogeyman_8910_control_w )
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( bogeyman_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bogeyman_map, AS_PROGRAM, 8, bogeyman_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(bogeyman_videoram2_w) AM_BASE_MEMBER(bogeyman_state, m_videoram2)
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(bogeyman_colorram2_w) AM_BASE_MEMBER(bogeyman_state, m_colorram2)

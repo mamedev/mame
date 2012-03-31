@@ -108,7 +108,7 @@ Sound PCB
 
 /* memory maps */
 
-static ADDRESS_MAP_START( sbugger_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sbugger_map, AS_PROGRAM, 8, sbugger_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(sbugger_videoram_attr_w) AM_BASE_MEMBER(sbugger_state,m_videoram_attr)
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(sbugger_videoram_w) AM_BASE_MEMBER(sbugger_state,m_videoram)
@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( sbugger_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sbugger_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sbugger_io_map, AS_IO, 8, sbugger_state )
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP				// 8156 command/status reg (write c0 = command START = (start of timer)
 	AM_RANGE(0xe1, 0xe1) AM_READ_PORT("INPUTS")		// 8156 PA
 	AM_RANGE(0xe2, 0xe2) AM_READ_PORT("DSW1")		// 8156 PB

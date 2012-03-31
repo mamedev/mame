@@ -142,7 +142,7 @@ static INTERRUPT_GEN( coin_interrupt )
 
 
 /* memory mapping */
-static ADDRESS_MAP_START( polyplay_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( polyplay_map, AS_PROGRAM, 8, polyplay_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x8fff) AM_ROM
@@ -153,7 +153,7 @@ ADDRESS_MAP_END
 
 
 /* port mapping */
-static ADDRESS_MAP_START( polyplay_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( polyplay_io_map, AS_IO, 8, polyplay_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x81) AM_WRITE(polyplay_sound_channel)
 	AM_RANGE(0x82, 0x82) AM_WRITE(polyplay_start_timer2)

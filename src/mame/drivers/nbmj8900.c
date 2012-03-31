@@ -108,21 +108,21 @@ static DRIVER_INIT( togenkyo )
 }
 
 
-static ADDRESS_MAP_START( ohpaipee_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ohpaipee_map, AS_PROGRAM, 8, nbmj8900_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8900_clut_r, nbmj8900_clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8900_palette_type1_r, nbmj8900_palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( togenkyo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( togenkyo_map, AS_PROGRAM, 8, nbmj8900_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8900_clut_r, nbmj8900_clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8900_palette_type1_r, nbmj8900_palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ohpaipee_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ohpaipee_io_map, AS_IO, 8, nbmj8900_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_nmi_clock_w)

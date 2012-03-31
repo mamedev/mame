@@ -281,7 +281,7 @@ public:
 		: psx_state(mconfig, type, tag) { }
 };
 
-static ADDRESS_MAP_START( namcos10_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( namcos10_map, AS_PROGRAM, 32, namcos10_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x80ffffff) AM_RAM AM_SHARE("share1") /* ram mirror */

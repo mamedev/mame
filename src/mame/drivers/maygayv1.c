@@ -670,7 +670,7 @@ static WRITE16_HANDLER( vsync_int_ctrl )
 		cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, maygayv1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("maincpu", 0x80000)
@@ -762,15 +762,15 @@ static WRITE8_HANDLER( mcu_w )
 }
 
 
-static ADDRESS_MAP_START( sound_prg, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_prg, AS_PROGRAM, 8, maygayv1_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_data, AS_DATA, 8 )
+static ADDRESS_MAP_START( sound_data, AS_DATA, 8, maygayv1_state )
 	AM_RANGE(0x0000, 0xffff) AM_RAM // nothing?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io, AS_IO, 8, maygayv1_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(mcu_r, mcu_w)
 ADDRESS_MAP_END
 

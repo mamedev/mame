@@ -278,7 +278,7 @@ static WRITE8_HANDLER( nmi_mask_w )
 /* Note that River Patrol reads/writes to a000-a4f0. This is a bug in the code.
    The instruction at 0x0593 should say LD DE,$8000 */
 
-static ADDRESS_MAP_START( cclimber_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cclimber_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM				/* Crazy Kong only */
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START( cclimber_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cannonb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cannonb_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x5045, 0x505f) AM_WRITENOP		/* do not errorlog this */
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
@@ -324,7 +324,7 @@ static ADDRESS_MAP_START( cannonb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( swimmer_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( swimmer_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_MIRROR(0x0100) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_videoram)
@@ -345,7 +345,7 @@ static ADDRESS_MAP_START( swimmer_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM					/* Guzzler only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yamato_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( yamato_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
@@ -367,7 +367,7 @@ static ADDRESS_MAP_START( yamato_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xba00, 0xba00) AM_READ_PORT("START")	/* maybe a mirror of b800 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( toprollr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( toprollr_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_BASE_MEMBER(cclimber_state, m_bigsprite_videoram)
@@ -389,39 +389,39 @@ static ADDRESS_MAP_START( toprollr_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cclimber_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( cclimber_portmap, AS_IO, 8, cclimber_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yamato_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( yamato_portmap, AS_IO, 8, cclimber_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(yamato_p0_w)	/* ??? */
 	AM_RANGE(0x01, 0x01) AM_WRITE(yamato_p1_w)	/* ??? */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( swimmer_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( swimmer_audio_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 	AM_RANGE(0x4000, 0x4001) AM_RAM				/* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yamato_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( yamato_audio_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( swimmer_audio_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( swimmer_audio_portmap, AS_IO, 8, cclimber_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( yamato_audio_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( yamato_audio_portmap, AS_IO, 8, cclimber_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)

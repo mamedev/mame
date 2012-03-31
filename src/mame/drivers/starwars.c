@@ -153,7 +153,7 @@ DIRECT_UPDATE_HANDLER( esb_setdirect )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x0000, 0x2fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM								/* vector_rom */
 	AM_RANGE(0x4300, 0x431f) AM_READ_PORT("IN0")
@@ -190,7 +190,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(starwars_sout_w)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(starwars_sin_r)		/* SIN Read */
 	AM_RANGE(0x1000, 0x107f) AM_RAM							/* 6532 ram */

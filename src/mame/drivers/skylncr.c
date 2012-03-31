@@ -342,7 +342,7 @@ static WRITE8_HANDLER( skylncr_nmi_enable_w )
 *             Memory Map              *
 **************************************/
 
-static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8, skylncr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 
@@ -400,7 +400,7 @@ static ADDRESS_MAP_START( mem_map_skylncr, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map_skylncr, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map_skylncr, AS_IO, 8, skylncr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */

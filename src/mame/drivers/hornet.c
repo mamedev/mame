@@ -604,7 +604,7 @@ static WRITE32_HANDLER(gun_w)
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(hornet_state, m_workram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(hornet_k037122_reg_r, hornet_k037122_reg_w)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(hornet_k037122_sram_r, hornet_k037122_sram_w)
@@ -628,7 +628,7 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, hornet_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* Work RAM */
 	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
@@ -671,7 +671,7 @@ static WRITE16_HANDLER(gn680_latch_w)
 // WORD at 30000e: IRQ 4 tests bits 6 and 7, IRQ5 tests bits 4 and 5
 // (vsync and hsync status for each of the two screens?)
 
-static ADDRESS_MAP_START( gn680_memmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gn680_memmap, AS_PROGRAM, 16, hornet_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(gn680_sysctrl)
@@ -706,7 +706,7 @@ static WRITE32_HANDLER( dsp_dataram1_w )
 	state->m_sharc_dataram[1][offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32 )
+static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32, hornet_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_BASE_MEMBER(hornet_state, m_sharc_dataram[0])
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
@@ -716,7 +716,7 @@ static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32 )
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sharc1_map, AS_DATA, 32 )
+static ADDRESS_MAP_START( sharc1_map, AS_DATA, 32, hornet_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_BASE_MEMBER(hornet_state, m_sharc_dataram[1])
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM

@@ -180,7 +180,7 @@ static WRITE8_HANDLER( sound_nmi_mask_w )
 	state->m_sound_nmi_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, m_videoram)
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd03f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, m_attributesram)
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1fff) AM_READ(imago_sprites_offset_r)
 	AM_RANGE(0x2000, 0x6fff) AM_ROM
@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_WRITE(soundlatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r, sound_nmi_mask_w)

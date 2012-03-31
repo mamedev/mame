@@ -384,7 +384,7 @@ static MACHINE_START( bfm_sys85 )
 
 // memory map for bellfruit system85 board ////////////////////////////////
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, bfmsys85_state )
 
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k RAM
 	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)			// reel 3+4 latch

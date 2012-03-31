@@ -357,7 +357,7 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 ***********************************************************/
 
 
-static ADDRESS_MAP_START( opwolf_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( opwolf_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0f0000, 0x0f07ff) AM_MIRROR(0xf000) AM_READ(opwolf_cchip_data_r)
 	AM_RANGE(0x0f0802, 0x0f0803) AM_MIRROR(0xf000) AM_READ(opwolf_cchip_status_r)
@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( opwolf_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( opwolfb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( opwolfb_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0f0008, 0x0f000b) AM_READ(opwolf_in_r)			/* coins and buttons */
 	AM_RANGE(0x0ff000, 0x0fffff) AM_READWRITE(cchip_r,cchip_w)
@@ -406,7 +406,7 @@ ADDRESS_MAP_END
     This extra Z80 substitutes for the c-chip in the bootleg
  */
 
-static ADDRESS_MAP_START( opwolfb_sub_z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( opwolfb_sub_z80_map, AS_PROGRAM, 8, opwolf_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x8800) AM_READ(z80_input1_r)	/* read at PC=$637: poked to $c004 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITENOP			/* unknown write, 0 then 1 each interrupt */
@@ -541,7 +541,7 @@ static WRITE8_HANDLER( opwolf_adpcm_e_w )
 //  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(&space->device()) );
 }
 
-static ADDRESS_MAP_START( opwolf_sound_z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( opwolf_sound_z80_map, AS_PROGRAM, 8, opwolf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM

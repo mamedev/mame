@@ -14,7 +14,7 @@
 #include "video/ramdac.h"
 
 // default address map
-static ADDRESS_MAP_START( ramdac_palram, AS_0, 8 )
+static ADDRESS_MAP_START( ramdac_palram, AS_0, 8, ramdac_device )
 	AM_RANGE(0x000, 0x0ff) AM_RAM // R bank
 	AM_RANGE(0x100, 0x1ff) AM_RAM // G bank
 	AM_RANGE(0x200, 0x2ff) AM_RAM // B bank

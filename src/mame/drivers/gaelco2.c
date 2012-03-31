@@ -54,7 +54,7 @@ GFXDECODEINFO(0x0400000, 128)
                             MANIAC SQUARE (FINAL)
   ============================================================================*/
 
-static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM																				/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")		/* Video RAM */
@@ -211,7 +211,7 @@ static READ16_HANDLER(p1_gun_y) {return (input_port_read(space->machine(), "LIGH
 static READ16_HANDLER(p2_gun_x) {return (input_port_read(space->machine(), "LIGHT1_X") * 320 / 0x100) + 1;}
 static READ16_HANDLER(p2_gun_y) {return (input_port_read(space->machine(), "LIGHT1_Y") * 240 / 0x100) - 4;}
 
-static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, gaelco2_state )
     AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
     AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
     AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")	/* Video RAM */
@@ -429,7 +429,7 @@ ROM_END
   ============================================================================*/
 
 
-static ADDRESS_MAP_START( alighunt_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( alighunt_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																				/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")		/* Video RAM */
@@ -640,7 +640,7 @@ static READ16_HANDLER ( dallas_kludge_r )
 	return 0x0200;
 }
 
-static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																					/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)			/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")			/* Video RAM */
@@ -904,7 +904,7 @@ ROM_END
                             SNOW BOARD
   ============================================================================*/
 
-static ADDRESS_MAP_START( snowboar_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( snowboar_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																						/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)				/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")				/* Video RAM */
@@ -1089,7 +1089,7 @@ ROM_END
                             WORLD RALLY 2
   ============================================================================*/
 
-static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE("gaelco", gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(gaelco2_vram_w) AM_SHARE("spriteram")	/* Video RAM */

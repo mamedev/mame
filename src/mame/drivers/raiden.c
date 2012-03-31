@@ -46,7 +46,7 @@
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
@@ -59,7 +59,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
 	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE(raiden_background_w) AM_BASE_MEMBER(raiden_state, m_back_data)
 	AM_RANGE(0x02800, 0x02fff) AM_RAM_WRITE(raiden_foreground_w) AM_BASE_MEMBER(raiden_state, m_fore_data)
@@ -71,7 +71,7 @@ ADDRESS_MAP_END
 
 /************************* Alternate board set ************************/
 
-static ADDRESS_MAP_START( alt_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( alt_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( raidenu_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( raidenu_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x08000, 0x08035) AM_WRITEONLY AM_BASE_MEMBER(raiden_state, m_scroll_ram)
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( raidenu_main_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( raidenu_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( raidenu_sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(raiden_background_w) AM_BASE_MEMBER(raiden_state, m_back_data)
 	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(raiden_foreground_w) AM_BASE_MEMBER(raiden_state, m_fore_data)

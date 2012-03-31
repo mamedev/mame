@@ -308,7 +308,7 @@ static const pia6821_interface pia_u3_intf =
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, toratora_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x7fff) AM_ROM  /* not fully populated */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_SIZE_MEMBER(toratora_state, m_videoram, m_videoram_size)

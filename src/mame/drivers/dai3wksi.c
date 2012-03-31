@@ -502,7 +502,7 @@ static const sn76477_interface dai3wksi_sn76477_ic81 =
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dai3wksi_state )
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x2400, 0x24ff) AM_MIRROR(0x100) AM_READ_PORT("IN0")

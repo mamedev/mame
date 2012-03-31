@@ -21,12 +21,12 @@ public:
 };
 
 
-static ADDRESS_MAP_START( older_memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( older_memmap, AS_PROGRAM, 8, ecoinf1_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( older_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( older_portmap, AS_IO, 8, ecoinf1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

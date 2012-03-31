@@ -140,7 +140,7 @@ static WRITE8_HANDLER( aerfboot_okim6295_banking_w )
 		memcpy(&oki[0x20000], &oki[((data & 0x3) * 0x20000) + 0x40000], 0x20000);
 }
 
-static ADDRESS_MAP_START( pspikes_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pspikes_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_SIZE_MEMBER(aerofgt_state, m_spriteram1, m_spriteram1_size)
@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( pspikes_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(pending_command_r, sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pspikesb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pspikesb_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_SIZE_MEMBER(aerofgt_state, m_spriteram1, m_spriteram1_size)
@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( pspikesb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_DEVWRITE("oki", pspikesb_oki_banking_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spikes91_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( spikes91_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_SIZE_MEMBER(aerofgt_state, m_spriteram1, m_spriteram1_size)
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( spikes91_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(spikes91_lookup_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pspikesc_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pspikesc_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_SIZE_MEMBER(aerofgt_state, m_spriteram1, m_spriteram1_size)
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( pspikesc_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff006, 0xfff007) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( karatblz_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( karatblz_map, AS_PROGRAM, 16, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x081fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_BASE_MEMBER(aerofgt_state, m_bg1videoram)
@@ -227,7 +227,7 @@ static ADDRESS_MAP_START( karatblz_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0ff00e, 0x0ff00f) AM_WRITE(aerofgt_bg2scrolly_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spinlbrk_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( spinlbrk_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_BASE_MEMBER(aerofgt_state, m_bg1videoram)
 	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(aerofgt_bg2videoram_w) AM_BASE_MEMBER(aerofgt_state, m_bg2videoram)
@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( spinlbrk_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff006, 0xfff007) AM_WRITE(sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( turbofrc_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( turbofrc_map, AS_PROGRAM, 16, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM	/* work RAM */
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( turbofrc_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0ff00e, 0x0ff00f) AM_WRITE(turbofrc_sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aerofgtb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( aerofgtb_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x0d0000, 0x0d1fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_BASE_MEMBER(aerofgt_state, m_bg1videoram)
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( aerofgtb_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM AM_BASE_MEMBER(aerofgt_state, m_rasterram)	/* used only for the scroll registers */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aerofgt_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( aerofgt_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1b0000, 0x1b07ff) AM_RAM AM_BASE_MEMBER(aerofgt_state, m_rasterram)	/* used only for the scroll registers */
@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( aerofgt_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE(sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aerfboot_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( aerfboot_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x0d0000, 0x0d1fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_BASE_MEMBER(aerofgt_state, m_bg1videoram)
@@ -337,7 +337,7 @@ static ADDRESS_MAP_START( aerfboot_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x10c000, 0x117fff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aerfboo2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( aerfboo2_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x0d0000, 0x0d1fff) AM_RAM_WRITE(aerofgt_bg1videoram_w) AM_BASE_MEMBER(aerofgt_state, m_bg1videoram)
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( aerfboo2_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM AM_BASE_MEMBER(aerofgt_state, m_rasterram)	/* used only for the scroll registers */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wbbc97_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( wbbc97_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x600000, 0x605fff) AM_RAM AM_BASE_SIZE_MEMBER(aerofgt_state, m_spriteram1, m_spriteram1_size)
@@ -381,20 +381,20 @@ static ADDRESS_MAP_START( wbbc97_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITE(wbbc97_bitmap_enable_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( turbofrc_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( turbofrc_sound_portmap, AS_IO, 8, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(aerofgt_sh_bankswitch_w)
 	AM_RANGE(0x14, 0x14) AM_READWRITE(soundlatch_r, pending_command_clear_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aerofgt_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( aerofgt_sound_portmap, AS_IO, 8, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(aerofgt_sh_bankswitch_w)
@@ -402,7 +402,7 @@ static ADDRESS_MAP_START( aerofgt_sound_portmap, AS_IO, 8 )
 	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aerfboot_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( aerfboot_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(aerfboot_okim6295_banking_w)
@@ -410,7 +410,7 @@ static ADDRESS_MAP_START( aerfboot_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wbbc97_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wbbc97_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)

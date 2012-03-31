@@ -323,7 +323,7 @@ static NVRAM_HANDLER( bmcbowl )
 
 }
 
-static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x090000, 0x090001) AM_WRITE(bmc_RAMDAC_offset_w)

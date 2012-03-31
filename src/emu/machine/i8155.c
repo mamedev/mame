@@ -98,7 +98,7 @@ enum
 //**************************************************************************
 
 // default address map
-static ADDRESS_MAP_START( i8155, AS_0, 8 )
+static ADDRESS_MAP_START( i8155, AS_0, 8, i8155_device )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 

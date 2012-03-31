@@ -250,7 +250,7 @@ static WRITE8_HANDLER( cpu2_bankswitch_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cpu0_am, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu0_am, AS_PROGRAM, 8, djboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_ROMBANK("bank4")
 	AM_RANGE(0xb000, 0xbfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
@@ -260,14 +260,14 @@ static ADDRESS_MAP_START( cpu0_am, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu0_port_am, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu0_port_am, AS_IO, 8, djboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu0_bankswitch_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cpu1_am, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu1_am, AS_PROGRAM, 8, djboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE_MEMBER(djboy_state, m_videoram)
@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( cpu1_am, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu1_port_am, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu1_port_am, AS_IO, 8, djboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu1_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
@@ -290,13 +290,13 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( cpu2_am, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_am, AS_PROGRAM, 8, djboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_port_am, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu2_port_am, AS_IO, 8, djboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu2_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
@@ -398,7 +398,7 @@ static WRITE8_HANDLER( beast_p3_w )
 }
 /* Program/data maps are defined in the 8051 core */
 
-static ADDRESS_MAP_START( djboy_mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( djboy_mcu_io_map, AS_IO, 8, djboy_state )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(beast_p0_r, beast_p0_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(beast_p1_r, beast_p1_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(beast_p2_r, beast_p2_w)

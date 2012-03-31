@@ -160,7 +160,7 @@ static WRITE16_HANDLER( sync_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x16cc00, 0x16cc01) AM_RAM AM_SHARE("share2")
@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( guts_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( guts_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x16cc00, 0x16cc01) AM_RAM AM_SHARE("share2")
@@ -218,7 +218,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE(sync_r, sync_w) AM_SHARE("share2") AM_BASE_MEMBER(eprom_state, m_sync_data)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")

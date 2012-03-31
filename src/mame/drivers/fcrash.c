@@ -379,7 +379,7 @@ static SCREEN_UPDATE_IND16( kodb )
 }
 
 
-static ADDRESS_MAP_START( fcrash_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( fcrash_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
 	AM_RANGE(0x800100, 0x80013f) AM_RAM AM_BASE_MEMBER(cps_state, m_cps_a_regs)	/* CPS-A custom */
@@ -392,7 +392,7 @@ static ADDRESS_MAP_START( fcrash_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cps_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
@@ -405,7 +405,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( kodb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kodb_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")			/* Player input ports */
 	/* forgottn, willow, cawing, nemo, varth read from 800010. Probably debug input leftover from development */

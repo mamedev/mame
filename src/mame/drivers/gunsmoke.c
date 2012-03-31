@@ -97,7 +97,7 @@ static READ8_HANDLER( gunsmoke_protection_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8, gunsmoke_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(gunsmoke_state, m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gunsmoke_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)

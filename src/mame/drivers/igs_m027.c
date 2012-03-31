@@ -191,7 +191,7 @@ static SCREEN_UPDATE_IND16(igs_majhong)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( igs_majhong_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( igs_majhong_map, AS_PROGRAM, 32, igs_m027_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM /* Internal ROM */
 	AM_RANGE(0x08000000, 0x0807ffff) AM_ROM AM_REGION("user1", 0)/* Game ROM */
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_BASE_MEMBER(igs_m027_state, m_igs_mainram)// main ram for asic?

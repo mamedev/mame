@@ -475,7 +475,7 @@ static void midvplus_xf1_w(tms3203x_device &device, UINT8 val)
  *
  *************************************/
 
-static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_BASE_MEMBER(midvunit_state, m_ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 	AM_RANGE(0x600000, 0x600000) AM_WRITE(midvunit_dma_queue_w)
@@ -508,7 +508,7 @@ ADDRESS_MAP_END
 
 static const tms3203x_config midvplus_config = { 0, NULL, midvplus_xf1_w };
 
-static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_BASE_MEMBER(midvunit_state, m_ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_BASE_MEMBER(midvunit_state, m_fastram_base)
 	AM_RANGE(0x600000, 0x600000) AM_WRITE(midvunit_dma_queue_w)

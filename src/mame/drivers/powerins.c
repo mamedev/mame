@@ -72,7 +72,7 @@ static READ8_HANDLER( powerinb_fake_ym2203_r )
 }
 
 
-static ADDRESS_MAP_START( powerins_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( powerins_map, AS_PROGRAM, 16, powerins_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															// ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( powerins_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* powerina: same as the original one but without the sound cpu (and inferior sound HW) */
-static ADDRESS_MAP_START( powerina_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( powerina_map, AS_PROGRAM, 16, powerins_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															// ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P1_P2")
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( powerina_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE_MEMBER(powerins_state, m_spriteram)									// RAM + Sprites
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerins_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( powerins_sound_map, AS_PROGRAM, 8, powerins_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( powerins_sound_map, AS_PROGRAM, 8 )
 //  AM_RANGE(0xe001, 0xe001) AM_WRITENOP // ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerins_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( powerins_sound_io_map, AS_IO, 8, powerins_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( powerins_sound_io_map, AS_IO, 8 )
 	AM_RANGE(0x90, 0x97) AM_DEVWRITE("nmk112", nmk112_okibank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( powerinb_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( powerinb_sound_io_map, AS_IO, 8, powerins_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(powerinb_fake_ym2203_r) AM_WRITENOP
 	AM_RANGE(0x01, 0x01) AM_NOP

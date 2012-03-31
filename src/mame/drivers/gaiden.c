@@ -393,7 +393,7 @@ static READ16_HANDLER( raiga_protection_r )
 	return state->m_prot;
 }
 
-static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE_MEMBER(gaiden_state, m_videoram)
@@ -419,7 +419,7 @@ static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE_MEMBER(gaiden_state, m_videoram)
@@ -438,7 +438,7 @@ static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* raiga only */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
@@ -449,12 +449,12 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnbowl_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( drgnbowl_sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnbowl_sound_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( drgnbowl_sound_port_map, AS_IO, 8, gaiden_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
@@ -906,7 +906,7 @@ Others
 2x      8x2 switches DIP
 */
 
-static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE("ym1", ym2203_w)
@@ -915,7 +915,7 @@ static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8 )
 //  AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
 	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE_MEMBER(gaiden_state, m_videoram)

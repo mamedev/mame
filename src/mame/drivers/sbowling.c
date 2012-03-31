@@ -219,7 +219,7 @@ static READ8_HANDLER (controls_r)
 		return input_port_read(space->machine(), "TRACKX");
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbowling_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_BASE_MEMBER(sbowling_state,m_videoram)
 	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map, AS_IO, 8, sbowling_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)

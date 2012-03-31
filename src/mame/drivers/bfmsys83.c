@@ -17,7 +17,7 @@ public:
 
 
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, bfmsys83_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM						// 32K ROM
 ADDRESS_MAP_END
 

@@ -558,14 +558,14 @@ static const eeprom_interface forte_eeprom_intf =
 };
 
 
-static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8, fortecar_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(fortecar_state, m_vram,m_vram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8 )
+static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8, fortecar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)	// pc=444
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)

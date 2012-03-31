@@ -193,7 +193,7 @@ static WRITE8_DEVICE_HANDLER( videopin_note_dvsr_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, videopin_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(videopin_video_ram_w) AM_BASE_MEMBER(videopin_state, m_video_ram)
 	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r) AM_DEVWRITE("discrete", videopin_note_dvsr_w)

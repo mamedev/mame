@@ -597,12 +597,12 @@ static READ8_HANDLER(qc_b8_r)
 	return space->machine().rand();
 }
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, dwarfd_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, dwarfd_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -616,12 +616,12 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0xc1, 0xc1) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( qc_map, AS_PROGRAM, 8, dwarfd_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( qc_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( qc_io_map, AS_IO, 8, dwarfd_state )
 	AM_IMPORT_FROM( io_map )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xb8, 0xb8) AM_READ(qc_b8_r)

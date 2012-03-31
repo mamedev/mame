@@ -309,7 +309,7 @@ static MACHINE_RESET( tmspoker )
 * Memory Map Information *
 *************************/
 //59a
-static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8, tmspoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
@@ -326,7 +326,7 @@ static READ8_HANDLER(unk_r)
 	return 0;//0xff;//mame_rand(space->machine);
 }
 
-static ADDRESS_MAP_START( tmspoker_cru_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tmspoker_cru_map, AS_IO, 8, tmspoker_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ(unk_r)
 ADDRESS_MAP_END
 

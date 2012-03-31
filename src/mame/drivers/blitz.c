@@ -469,7 +469,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 *           Memory Map Information           *
 *********************************************/
 
-static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8, blitz_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0x7fff) // seems that hardware is playing with A14 & A15 CPU lines...
 
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram")   /* battery backed RAM */
@@ -590,7 +590,7 @@ ADDRESS_MAP_END
 
 
 /*
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, blitz_state )
     ADDRESS_MAP_GLOBAL_MASK(0x7ff)
     AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

@@ -580,13 +580,13 @@ static READ8_HANDLER( ssi263_register_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( thayers_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( thayers_map, AS_PROGRAM, 8, thayers_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thayers_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( thayers_io_map, AS_IO, 8, thayers_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(ssi263_register_r, ssi263_register_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(control_w)
@@ -604,7 +604,7 @@ static ADDRESS_MAP_START( thayers_io_map, AS_IO, 8 )
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(den2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thayers_cop_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( thayers_cop_io_map, AS_IO, 8, thayers_state )
 	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(cop_l_r, cop_l_w)
 	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_READWRITE(cop_g_r, cop_g_w)
 	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(cop_d_w)

@@ -94,7 +94,7 @@ static WRITE8_HANDLER( lemmings_sound_ack_w )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( lemmings_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( lemmings_map, AS_PROGRAM, 16, lemmings_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
@@ -114,7 +114,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lemmings_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)

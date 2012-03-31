@@ -46,7 +46,7 @@ PCB Layout
 #include "sound/okim6295.h"
 #include "includes/gumbo.h"
 
-static ADDRESS_MAP_START( gumbo_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gumbo_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
 	AM_RANGE(0x1b0000, 0x1b03ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -59,7 +59,7 @@ ADDRESS_MAP_END
 
 /* Miss Puzzle has a different memory map */
 
-static ADDRESS_MAP_START( mspuzzle_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mspuzzle_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM // main ram
 	AM_RANGE(0x190000, 0x197fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE_MEMBER(gumbo_state, m_fg_videoram) // fg tilemap
@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( mspuzzle_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE_MEMBER(gumbo_state, m_bg_videoram) // bg tilemap
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dblpoint_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dblpoint_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
 	AM_RANGE(0x1b0000, 0x1b03ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)

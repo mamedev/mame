@@ -103,7 +103,7 @@ static MACHINE_START( skykid )
 
 
 
-static ADDRESS_MAP_START( skykid_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( skykid_map, AS_PROGRAM, 8, skykid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")				/* banked ROM */
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE(skykid_videoram_r,skykid_videoram_w) AM_BASE_MEMBER(skykid_state, m_videoram)/* Video RAM (background) */
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(skykid_textram_r,skykid_textram_w) AM_BASE_MEMBER(skykid_state, m_textram)	/* video RAM (text layer) */
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( skykid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa001) AM_WRITE(skykid_flipscreen_priority_w)	/* flip screen & priority */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, skykid_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
@@ -136,7 +136,7 @@ static READ8_HANDLER( readFF )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, skykid_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(inputport_r)			/* input ports read */
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(inputport_select_w)	/* input port select */
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)	/* leds won't work otherwise */

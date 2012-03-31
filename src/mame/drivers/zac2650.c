@@ -17,7 +17,7 @@
 
 static WRITE8_HANDLER( tinvader_sound_w );
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zac2650_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tinvader_videoram_w) AM_BASE_MEMBER(zac2650_state, m_videoram)
 	AM_RANGE(0x1c00, 0x1cff) AM_RAM
@@ -30,7 +30,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1f00, 0x1fff) AM_READWRITE(zac_s2636_r, zac_s2636_w) AM_BASE_MEMBER(zac2650_state, m_s2636_0_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map, AS_IO, 8, zac2650_state )
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 

@@ -297,7 +297,7 @@ static READ16_HANDLER(unk_r)
 	return test1;
 }
 
-static ADDRESS_MAP_START( swisspkr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( swisspkr_map, AS_PROGRAM, 16, goldngam_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400002, 0x400003) AM_NOP // hopper status read ?
@@ -347,7 +347,7 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( moviecrd_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( moviecrd_map, AS_PROGRAM, 16, goldngam_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_MEMBER(goldngam_state, m_videoram)

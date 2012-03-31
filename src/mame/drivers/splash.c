@@ -88,7 +88,7 @@ static WRITE16_HANDLER( splash_coin_w )
 	}
 }
 
-static ADDRESS_MAP_START( splash_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( splash_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM													/* ROM */
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, m_pixelram)						/* Pixel Layer */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
@@ -120,7 +120,7 @@ static void splash_msm5205_int(device_t *device)
 	state->m_adpcm_data = (state->m_adpcm_data << 4) & 0xf0;
 }
 
-static ADDRESS_MAP_START( splash_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( splash_sound_map, AS_PROGRAM, 8, splash_state )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM										/* ROM */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)				/* ADPCM data for the MSM5205 chip */
 //  AM_RANGE(0xe000, 0xe000) AM_WRITENOP                                /* ??? */
@@ -168,7 +168,7 @@ static void ym_irq(device_t *device, int state)
 	roldfrog_update_irq(device->machine());
 }
 
-static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM													/* ROM */
 	AM_RANGE(0x400000, 0x407fff) AM_ROM AM_BASE_MEMBER(splash_state, m_protdata)						/* Protection Data */
 	AM_RANGE(0x408000, 0x4087ff) AM_RAM 												/* Extra Ram */
@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( roldfrog_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( roldfrog_sound_map, AS_PROGRAM, 8, splash_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_ROMBANK("sound_bank")
@@ -201,7 +201,7 @@ static READ8_HANDLER(roldfrog_unk_r)
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( roldfrog_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( roldfrog_sound_io_map, AS_IO, 8, splash_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x40, 0x40) AM_NOP
@@ -231,7 +231,7 @@ static WRITE16_HANDLER( funystrp_sh_irqtrigger_w )
 	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM													/* ROM */
 	AM_RANGE(0x100000, 0x1fffff) AM_RAM													/* protection? RAM */
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, m_pixelram)						/* Pixel Layer */
@@ -250,7 +250,7 @@ static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM	 AM_MASK(0xffff) /* there's fe0000 <-> ff0000 compare */				/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( funystrp_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( funystrp_sound_map, AS_PROGRAM, 8, splash_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_ROMBANK("sound_bank")
@@ -290,7 +290,7 @@ static WRITE8_HANDLER(msm2_data_w)
 	state->m_msm_toggle2=0;
 }
 
-static ADDRESS_MAP_START( funystrp_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( funystrp_sound_io_map, AS_IO, 8, splash_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(msm1_data_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm2_data_w)

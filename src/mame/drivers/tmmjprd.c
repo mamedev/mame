@@ -662,7 +662,7 @@ static WRITE32_HANDLER( tmmjprd_brt_2_w )
 	}
 }
 
-static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200010, 0x200013) AM_READ(randomtmmjprds) // gfx chip status?
 	AM_RANGE(0x200980, 0x200983) AM_READ(randomtmmjprds) // sound chip status?

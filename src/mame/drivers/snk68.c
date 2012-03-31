@@ -119,7 +119,7 @@ static WRITE16_HANDLER( sound_w )
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r)
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE_MEMBER(snk68_state, m_paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080005) AM_READ(protcontrols_r) /* Player 1 & 2 */
@@ -160,7 +160,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, snk68_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r) AM_WRITE(sound_status_w)
@@ -178,7 +178,7 @@ static WRITE8_DEVICE_HANDLER( D7759_upd_reset_w )
 	upd7759_reset_w(device, data & 0x80);
 }
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, snk68_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_write_port_w)

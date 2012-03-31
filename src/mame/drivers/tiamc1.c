@@ -131,13 +131,13 @@ static WRITE8_HANDLER( tiamc1_control_w )
 }
 
 
-static ADDRESS_MAP_START( tiamc1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tiamc1_map, AS_PROGRAM, 8, tiamc1_state )
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(tiamc1_videoram_w)
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8, tiamc1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x4f) AM_WRITE(tiamc1_sprite_y_w) /* sprites Y */
 	AM_RANGE(0x50, 0x5f) AM_WRITE(tiamc1_sprite_x_w) /* sprites X */

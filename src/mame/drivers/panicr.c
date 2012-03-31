@@ -186,7 +186,7 @@ static WRITE8_HANDLER(t5182shared_w)
 }
 
 
-static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE_MEMBER(panicr_state, m_mainram)
 	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE_MEMBER(panicr_state, m_spriteram)
 	AM_RANGE(0x03000, 0x03fff) AM_RAM

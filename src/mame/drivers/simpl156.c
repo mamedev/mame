@@ -248,7 +248,7 @@ static WRITE32_HANDLER( simpl156_pf2_rowscroll_w )
 /* Memory Map controled by PALs */
 
 /* Joe and Mac Returns */
-static ADDRESS_MAP_START( joemacr_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( joemacr_map, AS_PROGRAM, 32, simpl156_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(simpl156_mainram_r, simpl156_mainram_w) AM_BASE_MEMBER(simpl156_state, m_mainram) // main ram
 	AM_RANGE(0x110000, 0x111fff) AM_READWRITE(simpl156_spriteram_r, simpl156_spriteram_w)
@@ -269,7 +269,7 @@ ADDRESS_MAP_END
 
 
 /* Chain Reaction */
-static ADDRESS_MAP_START( chainrec_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( chainrec_map, AS_PROGRAM, 32, simpl156_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM // rom (32-bit)
 	AM_RANGE(0x200000, 0x200003) AM_READ(simpl156_inputs_read)
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, m_systemram) // work ram (32-bit)
@@ -290,7 +290,7 @@ ADDRESS_MAP_END
 
 
 /* Magical Drop */
-static ADDRESS_MAP_START( magdrop_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( magdrop_map, AS_PROGRAM, 32, simpl156_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200003) AM_READ(simpl156_inputs_read)
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, m_systemram) // work ram (32-bit)
@@ -311,7 +311,7 @@ ADDRESS_MAP_END
 
 
 /* Magical Drop Plus 1 */
-static ADDRESS_MAP_START( magdropp_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( magdropp_map, AS_PROGRAM, 32, simpl156_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200003) AM_READ(simpl156_inputs_read)
 	AM_RANGE(0x201000, 0x201fff) AM_RAM AM_BASE_MEMBER(simpl156_state, m_systemram) // work ram (32-bit)
@@ -332,7 +332,7 @@ ADDRESS_MAP_END
 
 
 /* Mitchell MT5601-0 PCB (prtytime, charlien, osman) */
-static ADDRESS_MAP_START( mitchell156_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( mitchell156_map, AS_PROGRAM, 32, simpl156_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8_MODERN("okisfx", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8_MODERN("okimusic", okim6295_device, read, write, 0x000000ff)

@@ -15,14 +15,14 @@
 #include "sound/dac.h"
 #include "includes/beezer.h"
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, beezer_state )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(beezer_state, m_videoram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xdfff) AM_ROM AM_WRITE(beezer_bankswitch_w) // ROM at G1, bankswitch
 	AM_RANGE(0xe000, 0xffff) AM_ROM // ROMS at G3, G5
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, beezer_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM // RAM at 0D
 	AM_RANGE(0x0800, 0x0fff) AM_RAM // optional RAM at 2D (can be rom here instead)
 	AM_RANGE(0x1000, 0x1007) AM_MIRROR(0x07f8) AM_DEVREADWRITE("custom", beezer_sh6840_r, beezer_sh6840_w)

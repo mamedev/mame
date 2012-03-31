@@ -342,12 +342,12 @@ static READ8_HANDLER( exp_rom_r )
 	return rom[offset+0x10000];
 }
 
-static ADDRESS_MAP_START( igspoker_prg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( igspoker_prg_map, AS_PROGRAM, 8, igspoker_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_REGION("maincpu", 0xf000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
@@ -1101,7 +1101,7 @@ static INPUT_PORTS_START( igs_ncs )
 INPUT_PORTS_END
 
 
-static ADDRESS_MAP_START( number10_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
@@ -1124,7 +1124,7 @@ static ADDRESS_MAP_START( number10_io_map, AS_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READ( exp_rom_r )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */

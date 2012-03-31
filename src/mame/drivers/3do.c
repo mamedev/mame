@@ -103,7 +103,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #define X601_CLOCK		XTAL_16_9344MHz
 
 
-static ADDRESS_MAP_START( 3do_mem, AS_PROGRAM, 32)
+static ADDRESS_MAP_START( 3do_mem, AS_PROGRAM, 32, _3do_state )
 	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_BASE_MEMBER(_3do_state,m_dram)						/* DRAM */
 	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM	AM_BASE_MEMBER(_3do_state,m_vram)									/* VRAM */
 	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")									/* BIOS */

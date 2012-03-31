@@ -138,7 +138,7 @@ static READ8_HANDLER( protection_r )
 	return data[state->m_dataoffset++];
 }
 
-static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( goldstar_readport, AS_IO, 8 )
+static ADDRESS_MAP_START( goldstar_readport, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
 ADDRESS_MAP_END
@@ -181,7 +181,7 @@ static WRITE8_HANDLER( ncb3_port81_w )
 }
 
 
-static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
@@ -206,7 +206,7 @@ static ADDRESS_MAP_START( ncb3_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf870, 0xf870) AM_DEVWRITE("snsnd", sn76496_w)	/* guess... device is initialized, but doesn't seems to be used.*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ncb3_readwriteport, AS_IO, 8 )
+static ADDRESS_MAP_START( ncb3_readwriteport, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_READ(ncb3_unkread_r)    // read from 0x00 when controls set1 is used...
 //  AM_RANGE(0x02, 0x02) AM_READ(ncb3_unkread_r)    // read from 0x02 when controls set2 is used...
@@ -253,7 +253,7 @@ static WRITE8_HANDLER( cm_outport1_w )
 	/* lamps? */
 }
 
-static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( cm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nfm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nfm_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM AM_WRITENOP
 
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
@@ -299,7 +299,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( cm_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -313,7 +313,7 @@ static ADDRESS_MAP_START( cm_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cmast91_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( cmast91_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
@@ -322,7 +322,7 @@ static ADDRESS_MAP_START( cmast91_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
@@ -361,7 +361,7 @@ static WRITE8_HANDLER( lucky8_outport_w )
 
 }
 
-static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,m_fg_vidram)
@@ -405,7 +405,7 @@ static WRITE8_HANDLER( magodds_outb860_w )
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
 
-static ADDRESS_MAP_START(magodds_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START(magodds_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1") AM_SHARE("nvram")
@@ -429,7 +429,7 @@ static ADDRESS_MAP_START(magodds_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0xc000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kkotnoli_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kkotnoli_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	/* definitely no NVRAM */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,m_fg_vidram)
@@ -468,7 +468,7 @@ ADDRESS_MAP_END
 //  popmessage("Output: %02X", data);
 //}
 
-static ADDRESS_MAP_START( ladylinr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ladylinr_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,m_fg_vidram)
@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( ladylinr_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wcat3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wcat3_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,m_fg_vidram)
@@ -523,7 +523,7 @@ static READ8_HANDLER( unkch_unk_r )
 
 
 /* newer / more capable hw */
-static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
@@ -575,7 +575,7 @@ static WRITE8_HANDLER( unkcm_0x12_w )
 }
 
 
-static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(unkcm_0x02_w)

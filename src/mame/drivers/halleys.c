@@ -1644,7 +1644,7 @@ static READ8_HANDLER( io_mirror_r )
 //**************************************************************************
 // Memory Maps
 
-static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(blitter_r, blitter_w) AM_BASE_MEMBER(halleys_state, m_blitter_ram) AM_SIZE_MEMBER(halleys_state, m_blitter_ramsize)
 	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(bgtile_w)		// background tiles?(Ben Bero Beh only)
 	AM_RANGE(0x1000, 0xefff) AM_ROM
@@ -1670,7 +1670,7 @@ static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4801) AM_DEVWRITE("ay2", ay8910_address_data_w)
