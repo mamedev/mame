@@ -534,7 +534,7 @@ void votrax_sc01_device::shift_hist(double val, double *hist_array, int hist_siz
 void votrax_sc01_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	// determine how many master half-clocks per sample
-	int clocks_per_sample = m_master_clock_freq / stream.sample_rate();
+	int half_clocks_per_sample = (m_master_clock_freq * 2) / stream.sample_rate();
 
 	// iterate over clocks (samples)
 	stream_sample_t *dest = outputs[0];
@@ -543,7 +543,7 @@ void votrax_sc01_device::sound_stream_update(sound_stream &stream, stream_sample
 		// run the digital logic at the master clock rate
 		double glottal_out = 0;
 		UINT8 noise_out_digital = 0;
-		for (int curclock = 0; curclock < clocks_per_sample; curclock++)
+		for (int curclock = 0; curclock < half_clocks_per_sample; curclock++)
 		{
 if (LOG_TIMING | LOG_LOWPARAM | LOG_GLOTTAL | LOG_TRANSITION)
 {
