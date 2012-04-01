@@ -436,7 +436,7 @@ static INPUT_PORTS_START( littlerb )
 INPUT_PORTS_END
 
 
-static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, int xsize,int ysize, UINT32 fulloffs, int xpos, int ypos )
+static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int xsize,int ysize, UINT32 fulloffs, int xpos, int ypos )
 {
 	int x,y;
 	fulloffs >>= 3;
@@ -453,14 +453,13 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap, int xsiz
 			drawxpos = xpos+x;
 			drawypos = ypos+y;
 
-			if ((drawxpos < 320) && (drawypos < 256) && (drawxpos >= 0) && (drawypos >=0))
+			if(cliprect.contains(drawxpos, drawypos))
 			{
 				if(pix&0xff) bitmap.pix16(drawypos, drawxpos) = pix;
 			}
+
 			drawxpos++;
-
 			fulloffs++;
-
 		}
 	}
 }
@@ -488,7 +487,7 @@ static SCREEN_UPDATE_IND16(littlerb)
 
 		//if (code!=0) printf("%04x %04x %04x %04x %04x %04x\n", spriteregion[offs+0], spriteregion[offs+1], spriteregion[offs+2], spriteregion[offs+3], spriteregion[offs+4], spriteregion[offs+5]);
 
-		draw_sprite(screen.machine(),bitmap,xsize,ysize,fullcode,x-8,y-16);
+		draw_sprite(screen.machine(),bitmap, cliprect,xsize,ysize,fullcode,x-8,y-16);
 	}
 
 	return 0;
