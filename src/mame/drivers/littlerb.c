@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16, littlerb_state )
 	AM_RANGE(0x00800002 ,0x00800003) AM_DEVWRITE8("^ramdac", ramdac_device, pal_w,   0x00ff)
 	AM_RANGE(0x00800004 ,0x00800005) AM_DEVWRITE8("^ramdac", ramdac_device, mask_w,  0x00ff)
 
-	AM_RANGE(0x1ff80804, 0x1ff80805) AM_READ(buffer_status_r)
+	AM_RANGE(0x1ff80804, 0x1ff80805) AM_READ_LEGACY(buffer_status_r)
 	// most gfx end up here including the sprite list
 	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM_WRITE_LEGACY(region4_w)  AM_BASE( m_region4)
 ADDRESS_MAP_END
