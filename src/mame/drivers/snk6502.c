@@ -1406,7 +1406,7 @@ ROM_START( nibbler6 ) /* revision 6 */
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
 ROM_END
 
-ROM_START( nibbler6 ) /* revision 6 + extra soundrom */
+ROM_START( nibblerp ) /* revision 6 + extra soundrom */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ic12",           0x3000, 0x1000, CRC(ac6a802b) SHA1(ac1072e30994f13097663dc24d9d1dc35a95d874) )
 	ROM_LOAD( "ic7",            0x4000, 0x1000, CRC(35971364) SHA1(6430c7be9e5f47d3f1f2cc157d949246e4085e8b) )
@@ -1427,7 +1427,7 @@ ROM_START( nibbler6 ) /* revision 6 + extra soundrom */
 	ROM_LOAD( "g-0708-05.ic7",  0x0000, 0x0020, CRC(a5709ff3) SHA1(fbd07b756235f2d03aea3d777ca741ade54be200) ) /* foreground colors */
 	ROM_LOAD( "g-0708-04.ic6",  0x0020, 0x0020, CRC(dacd592d) SHA1(c7709c680e2764885a40bc256d07dffc9e827cd6) ) /* background colors */
 
-	ROM_REGION( 0x1800, "snk6502", ROMREGION_ERASEFF )	/* sound ROMs */
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
 	ROM_LOAD( "sk7_ic51.bin",   0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) ) /* Rom from Pioneer Balloon */
 	ROM_LOAD( "g-0959-44.ic52", 0x0800, 0x0800, CRC(87d67dee) SHA1(bd292eab3671cb953279f3136a450deac3818367) )
 	ROM_LOAD( "g-0959-45.ic53", 0x1000, 0x0800, CRC(33189917) SHA1(01a1b1693db0172609780daeb60430fa0c8bcec2) )
