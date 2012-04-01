@@ -103,10 +103,15 @@ public:
 };
 
 
-WRITE16_HANDLER( region4_w )
+static WRITE16_HANDLER( region4_w )
 {
 	littlerb_state *state = space->machine().driver_data<littlerb_state>();
 	COMBINE_DATA(&state->m_region4[offset]);
+}
+
+static READ16_HANDLER( buffer_status_r )
+{
+	return 0;
 }
 
 /* this map is wrong because our VDP access is wrong! */
@@ -120,6 +125,7 @@ static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16, littlerb_state )
 	AM_RANGE(0x00800002 ,0x00800003) AM_DEVWRITE8("^ramdac", ramdac_device, pal_w,   0x00ff)
 	AM_RANGE(0x00800004 ,0x00800005) AM_DEVWRITE8("^ramdac", ramdac_device, mask_w,  0x00ff)
 
+	AM_RANGE(0x1ff80804, 0x1ff80805) AM_READ(buffer_status_r)
 	// most gfx end up here including the sprite list
 	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM_WRITE_LEGACY(region4_w)  AM_BASE( m_region4)
 ADDRESS_MAP_END
@@ -174,25 +180,32 @@ static void littlerb_recalc_regs(running_machine &machine)
 }
 
 
+static UINT16 littlerb_data_read(running_machine &machine, UINT16 mem_mask)
+{
+	littlerb_state *state = machine.driver_data<littlerb_state>();
+	UINT32 addr = state->m_write_address >> 3; // almost surely raw addresses are actually shifted by 3
+	address_space *vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
 
+	return vdp_space->read_word(addr, mem_mask);
+}
 
 static void littlerb_data_write(running_machine &machine, UINT16 data, UINT16 mem_mask)
 {
 	littlerb_state *state = machine.driver_data<littlerb_state>();
-	UINT32 addr = state->m_write_address>>4; // is this right? should we shift?
+	UINT32 addr = state->m_write_address >> 3; // almost surely raw addresses are actually shifted by 3
 	address_space *vdp_space = machine.device<littlerb_vdp_device>("littlerbvdp")->space();
 
 	int mode = state->m_vdp_writemode;
-	if ((mode!=0x3800) && (mode !=0x2000))
+	if ((mode!=0x3800) && (mode !=0x2000) && (mode != 0xe000) && (mode != 0xf800))
 	{
-		printf("mode %04x, data %04x, mem_mask %04x (address %08x)\n", mode,  data, mem_mask, state->m_write_address);
+		printf("mode %04x, data %04x, mem_mask %04x (address %08x)\n", mode,  data, mem_mask, state->m_write_address >> 3);
 	}
 	else
 	{
-		vdp_space->write_word(addr*2, data, mem_mask);
+		vdp_space->write_word(addr, data, mem_mask);
 
 		// 2000 is used for palette writes which appears to be a RAMDAC, no auto-inc.
-		if (mode!=0x2000) state->m_write_address+=0x10;
+		if (mode!=0x2000 && mode != 0xe000) state->m_write_address+=0x10;
 		littlerb_recalc_regs(machine);
 	}
 
@@ -214,23 +227,17 @@ static READ16_HANDLER( littlerb_vdp_r )
 {
 	littlerb_state *state = space->machine().driver_data<littlerb_state>();
 	logerror("%06x littlerb_vdp_r offs %04x mask %04x (address %08x)\n", cpu_get_pc(&space->device()), offset, mem_mask, state->m_write_address);
+	UINT16 res;
 
-	switch (offset)
+	switch (offset & 3)
 	{
-		case 0:
-		return state->m_vdp_address_low;
-
-		case 1:
-		return state->m_vdp_address_high;
-
-		case 2:
-		return 0; // data read? -- startup check expects 0 for something..
-
-		case 3:
-		return state->m_vdp_writemode;
+		case 0: res = state->m_vdp_address_low; break;
+		case 1: res = state->m_vdp_address_high; break;
+		case 2: res = littlerb_data_read(space->machine(), mem_mask); break;
+		case 3: res = state->m_vdp_writemode; break;
 	}
 
-	return -1;
+	return res;
 }
 
 #define LOG_VDP 0
@@ -245,7 +252,7 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 			if (state->m_type2_writes>2)
 			{
 				if (LOG_VDP) logerror("******************************* BIG WRITE OCCURRED BEFORE THIS!!! ****************************\n");
-				printf("big write occured with start %08x end %08x\n", state->m_write_address_laststart, state->m_write_address_lastend);
+				printf("big write occured with start %08x end %08x\n", state->m_write_address_laststart >> 3, state->m_write_address_lastend >> 3);
 			}
 
 			if (LOG_VDP) logerror("~%06x previously wrote %08x data bytes\n", state->m_lasttype2pc, state->m_type2_writes*2);
