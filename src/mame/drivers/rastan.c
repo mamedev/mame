@@ -525,7 +525,7 @@ ROM_END
 
  ROM       0x5203  0x520B
 -------------------------
-B04-41-1    0x00    0x00 <-- Same changes as seen with the word set's B04-43-1.9 & B04-43.9
+B04-41-1    0x00    0x00 <-- Same changes as seen with the World set's B04-43-1.9 & B04-43.9
 B04-41      0x01    0x03
 */
 ROM_START( rastanu ) /* This US set is based on newer code */
