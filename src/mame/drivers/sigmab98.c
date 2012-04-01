@@ -454,9 +454,9 @@ static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("rombank")
 
-	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_BASE_SIZE_MEMBER(sigmab98_state, m_spriteram, m_spriteram_size)
+	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 
-	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_be_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE( 0xc800, 0xc87f ) AM_RAM
 
@@ -471,23 +471,23 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gegege_io_map, AS_IO, 8, sigmab98_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE( 0x00, 0x01 ) AM_DEVWRITE( "ymz", ymz280b_w )
+	AM_RANGE( 0x00, 0x01 ) AM_DEVWRITE_LEGACY( "ymz", ymz280b_w )
 
-	AM_RANGE( 0xa0, 0xa1 ) AM_READWRITE( regs_r,  regs_w )
+	AM_RANGE( 0xa0, 0xa1 ) AM_READWRITE_LEGACY( regs_r,  regs_w )
 //  AM_RANGE( 0xa2, 0xa3 )
-	AM_RANGE( 0xa4, 0xa5 ) AM_READWRITE( regs2_r, regs2_w )
+	AM_RANGE( 0xa4, 0xa5 ) AM_READWRITE_LEGACY( regs2_r, regs2_w )
 
 	AM_RANGE( 0xc0, 0xc0 ) AM_READ_PORT( "EEPROM" )
-	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE("eeprom", eeprom_w)
+	AM_RANGE( 0xc0, 0xc0 ) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
 
 	AM_RANGE( 0xc2, 0xc2 ) AM_READ_PORT( "IN1" )
 
 	AM_RANGE( 0xc4, 0xc4 ) AM_READ_PORT( "IN2" )
-	AM_RANGE( 0xc4, 0xc4 ) AM_WRITE( c4_w )
+	AM_RANGE( 0xc4, 0xc4 ) AM_WRITE_LEGACY( c4_w )
 
-	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE( c6_w )
+	AM_RANGE( 0xc6, 0xc6 ) AM_WRITE_LEGACY( c6_w )
 
-	AM_RANGE( 0xc8, 0xc8 ) AM_WRITE( c8_w )
+	AM_RANGE( 0xc8, 0xc8 ) AM_WRITE_LEGACY( c8_w )
 
 	AM_RANGE( 0xe5, 0xe5 ) AM_READNOP	// during irq
 ADDRESS_MAP_END
@@ -705,37 +705,37 @@ static READ8_HANDLER( sammymdl_coin_hopper_r )
 static ADDRESS_MAP_START( animalc_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROM
 	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK( "rombank" )
-	AM_RANGE( 0x8000, 0x8fff ) AM_RAMBANK( "rambank" ) AM_SHARE( "nvram" ) AM_BASE_MEMBER( sigmab98_state, m_nvram )
+	AM_RANGE( 0x8000, 0x8fff ) AM_RAMBANK( "rambank" ) AM_SHARE( "nvram" ) AM_BASE(m_nvram )
 
 	AM_RANGE( 0x9000, 0x9fff ) AM_RAM
 	AM_RANGE( 0xa000, 0xafff ) AM_RAM
 	AM_RANGE( 0xb000, 0xbfff ) AM_RAMBANK("sprbank")
 
-	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_WRITE( paletteram_xRRRRRGGGGGBBBBB_be_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_WRITE_LEGACY( paletteram_xRRRRRGGGGGBBBBB_be_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0xd800, 0xd87f ) AM_RAM	// table?
 
 	AM_RANGE( 0xe011, 0xe011 ) AM_WRITENOP	// IRQ Enable? Screen disable?
-	AM_RANGE( 0xe013, 0xe013 ) AM_READWRITE( vblank_r, vblank_w )	// IRQ Ack?
+	AM_RANGE( 0xe013, 0xe013 ) AM_READWRITE_LEGACY( vblank_r, vblank_w )	// IRQ Ack?
 
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( animalc_io, AS_IO, 8, sigmab98_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x02, 0x03 ) AM_READWRITE( animalc_rombank_r, animalc_rombank_w )
-	AM_RANGE( 0x04, 0x05 ) AM_READWRITE( animalc_rambank_r, animalc_rambank_w )
+	AM_RANGE( 0x02, 0x03 ) AM_READWRITE_LEGACY( animalc_rombank_r, animalc_rombank_w )
+	AM_RANGE( 0x04, 0x05 ) AM_READWRITE_LEGACY( animalc_rambank_r, animalc_rambank_w )
 
-	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE( "eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
-	AM_RANGE( 0x2e, 0x2e ) AM_READ( sammymdl_coin_hopper_r )
+	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE_LEGACY( "eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2e, 0x2e ) AM_READ_LEGACY( sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
-	AM_RANGE( 0x34, 0x34 ) AM_READ( unk_34_r )
-	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
-	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
+	AM_RANGE( 0x31, 0x31 ) AM_WRITE_LEGACY( sammymdl_coin_w )
+	AM_RANGE( 0x32, 0x32 ) AM_WRITE_LEGACY( sammymdl_leds_w )
+	AM_RANGE( 0x34, 0x34 ) AM_READ_LEGACY( unk_34_r )
+	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
+	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE_LEGACY( sammymdl_hopper_w )
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE_LEGACY( watchdog_reset_w )	// 1
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -956,26 +956,26 @@ static WRITE8_HANDLER( haekaka_coin_w )
 
 static ADDRESS_MAP_START( haekaka_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
-	AM_RANGE( 0xb000, 0xcfff ) AM_READWRITE( haekaka_b000_r, haekaka_b000_w )
-	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE_MEMBER( sigmab98_state, m_nvram )
+	AM_RANGE( 0xb000, 0xcfff ) AM_READWRITE_LEGACY( haekaka_b000_r, haekaka_b000_w )
+	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE(m_nvram )
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( haekaka_io, AS_IO, 8, sigmab98_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x02, 0x03 ) AM_READWRITE( haekaka_rombank_r, haekaka_rombank_w )
-	AM_RANGE( 0x04, 0x05 ) AM_READWRITE( haekaka_rambank_r, haekaka_rambank_w )
+	AM_RANGE( 0x02, 0x03 ) AM_READWRITE_LEGACY( haekaka_rombank_r, haekaka_rombank_w )
+	AM_RANGE( 0x04, 0x05 ) AM_READWRITE_LEGACY( haekaka_rambank_r, haekaka_rambank_w )
 
-	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE( "eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
-	AM_RANGE( 0x2e, 0x2e ) AM_READ( sammymdl_coin_hopper_r )
+	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE_LEGACY( "eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2e, 0x2e ) AM_READ_LEGACY( sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE( haekaka_coin_w )
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE( haekaka_leds_w )
-	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
-	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
+	AM_RANGE( 0x31, 0x31 ) AM_WRITE_LEGACY( haekaka_coin_w )
+	AM_RANGE( 0x32, 0x32 ) AM_WRITE_LEGACY( haekaka_leds_w )
+	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
+	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE_LEGACY( sammymdl_hopper_w )
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE_LEGACY( watchdog_reset_w )	// 1
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1195,31 +1195,31 @@ static ADDRESS_MAP_START( itazuram_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x3800, 0x47ff ) AM_READ_BANK( "rombank0" ) AM_WRITE_BANK( "sprbank0" )
 	AM_RANGE( 0x4800, 0x57ff ) AM_READ_BANK( "rombank1" ) AM_WRITE_BANK( "sprbank1" )
 
-	AM_RANGE( 0x5800, 0x59ff ) AM_READWRITE( itazuram_palette_r, itazuram_palette_w )
+	AM_RANGE( 0x5800, 0x59ff ) AM_READWRITE_LEGACY( itazuram_palette_r, itazuram_palette_w )
 	AM_RANGE( 0x6000, 0x607f ) AM_RAM	// table?
 
 	AM_RANGE( 0x6811, 0x6811 ) AM_WRITENOP	// IRQ Enable? Screen disable?
 	AM_RANGE( 0x6813, 0x6813 ) AM_WRITENOP	// IRQ Ack?
-	AM_RANGE( 0xdc00, 0xfdff ) AM_READ_BANK( "palbank" ) AM_WRITE( itazuram_nvram_palette_w ) AM_SHARE( "nvram" ) AM_BASE_MEMBER( sigmab98_state, m_nvram )	// nvram | paletteram
+	AM_RANGE( 0xdc00, 0xfdff ) AM_READ_BANK( "palbank" ) AM_WRITE_LEGACY( itazuram_nvram_palette_w ) AM_SHARE( "nvram" ) AM_BASE(m_nvram )	// nvram | paletteram
 
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itazuram_io, AS_IO, 8, sigmab98_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x02, 0x03 ) AM_READWRITE( itazuram_rombank_r, itazuram_rombank_w )
-	AM_RANGE( 0x04, 0x05 ) AM_READWRITE( itazuram_rambank_r, itazuram_rambank_w )
+	AM_RANGE( 0x02, 0x03 ) AM_READWRITE_LEGACY( itazuram_rombank_r, itazuram_rombank_w )
+	AM_RANGE( 0x04, 0x05 ) AM_READWRITE_LEGACY( itazuram_rambank_r, itazuram_rambank_w )
 
-	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE( "eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
-	AM_RANGE( 0x2e, 0x2e ) AM_READ( sammymdl_coin_hopper_r )
+	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE_LEGACY( "eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2e, 0x2e ) AM_READ_LEGACY( sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
-	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
-	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
+	AM_RANGE( 0x31, 0x31 ) AM_WRITE_LEGACY( sammymdl_coin_w )
+	AM_RANGE( 0x32, 0x32 ) AM_WRITE_LEGACY( sammymdl_leds_w )
+	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
+	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE_LEGACY( sammymdl_hopper_w )
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE_LEGACY( watchdog_reset_w )	// 1
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1227,7 +1227,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( pyenaget_io, AS_IO, 8, sigmab98_state )
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
+	AM_RANGE( 0x31, 0x31 ) AM_WRITE_LEGACY( sammymdl_coin_w )
 	AM_IMPORT_FROM( haekaka_io )
 ADDRESS_MAP_END
 
@@ -1420,26 +1420,26 @@ static WRITE8_HANDLER( tdoboon_c000_w )
 
 static ADDRESS_MAP_START( tdoboon_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM
-	AM_RANGE( 0xc000, 0xcfff ) AM_READWRITE( tdoboon_c000_r, tdoboon_c000_w )
-	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE_MEMBER( sigmab98_state, m_nvram )
+	AM_RANGE( 0xc000, 0xcfff ) AM_READWRITE_LEGACY( tdoboon_c000_r, tdoboon_c000_w )
+	AM_RANGE( 0xd000, 0xefff ) AM_RAM AM_SHARE( "nvram" ) AM_BASE(m_nvram )
 	AM_RANGE( 0xfe00, 0xffff ) AM_RAM	// High speed internal RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdoboon_io, AS_IO, 8, sigmab98_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x02, 0x03 ) AM_READWRITE( tdoboon_rombank_r, tdoboon_rombank_w )
-	AM_RANGE( 0x04, 0x05 ) AM_READWRITE( tdoboon_rambank_r, tdoboon_rambank_w )
+	AM_RANGE( 0x02, 0x03 ) AM_READWRITE_LEGACY( tdoboon_rombank_r, tdoboon_rombank_w )
+	AM_RANGE( 0x04, 0x05 ) AM_READWRITE_LEGACY( tdoboon_rambank_r, tdoboon_rambank_w )
 
-	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE( "eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
-	AM_RANGE( 0x2e, 0x2e ) AM_READ( sammymdl_coin_hopper_r )
+	AM_RANGE( 0x2c, 0x2c ) AM_DEVREADWRITE_LEGACY( "eeprom", sammymdl_eeprom_r, sammymdl_eeprom_w )
+	AM_RANGE( 0x2e, 0x2e ) AM_READ_LEGACY( sammymdl_coin_hopper_r )
 	AM_RANGE( 0x30, 0x30 ) AM_READ_PORT( "BUTTON" )
-	AM_RANGE( 0x31, 0x31 ) AM_WRITE( sammymdl_coin_w )
-	AM_RANGE( 0x32, 0x32 ) AM_WRITE( sammymdl_leds_w )
-	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write )
-	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE_MODERN("oki", okim9810_device, write_TMP_register )
-	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD_MODERN("oki", okim9810_device, read )
-	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE( sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE( watchdog_reset_w )	// 1
+	AM_RANGE( 0x31, 0x31 ) AM_WRITE_LEGACY( sammymdl_coin_w )
+	AM_RANGE( 0x32, 0x32 ) AM_WRITE_LEGACY( sammymdl_leds_w )
+	AM_RANGE( 0x90, 0x90 ) AM_DEVWRITE("oki", okim9810_device, write )
+	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
+	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
+	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE_LEGACY( sammymdl_hopper_w )
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE_LEGACY( watchdog_reset_w )	// 1
 ADDRESS_MAP_END
 
 

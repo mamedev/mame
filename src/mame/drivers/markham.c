@@ -25,8 +25,8 @@ static ADDRESS_MAP_START( markham_master_map, AS_PROGRAM, 8, markham_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE_MEMBER(markham_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(markham_videoram_w) AM_BASE_MEMBER(markham_state, m_videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(markham_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
 
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW2")
@@ -34,23 +34,23 @@ static ADDRESS_MAP_START( markham_master_map, AS_PROGRAM, 8, markham_state )
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P1")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("P2")
 
-	AM_RANGE(0xe004, 0xe004) AM_READ(markham_e004_r) /* from CPU2 busack */
+	AM_RANGE(0xe004, 0xe004) AM_READ_LEGACY(markham_e004_r) /* from CPU2 busack */
 
 	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0xe008, 0xe008) AM_WRITENOP /* coin counter? */
 	AM_RANGE(0xe009, 0xe009) AM_WRITENOP /* to CPU2 busreq */
 
-	AM_RANGE(0xe00c, 0xe00d) AM_WRITEONLY AM_BASE_MEMBER(markham_state, m_xscroll)
-	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(markham_flipscreen_w)
+	AM_RANGE(0xe00c, 0xe00d) AM_WRITEONLY AM_BASE( m_xscroll)
+	AM_RANGE(0xe00e, 0xe00e) AM_WRITE_LEGACY(markham_flipscreen_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( markham_slave_map, AS_PROGRAM, 8, markham_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
 
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 
 	AM_RANGE(0xc002, 0xc002) AM_WRITENOP /* unknown */
 	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /* unknown */

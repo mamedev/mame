@@ -92,11 +92,11 @@ static SCREEN_UPDATE_RGB32( rotaryf )
 
 static ADDRESS_MAP_START( rotaryf_map, AS_PROGRAM, 8, rotaryf_state )
 	AM_RANGE(0x0000, 0x17ff) AM_MIRROR(0x4000) AM_ROM
-//  AM_RANGE(0x6ffb, 0x6ffb) AM_READ(random_r) ??
-//  AM_RANGE(0x6ffd, 0x6ffd) AM_READ(random_r) ??
-//  AM_RANGE(0x6fff, 0x6fff) AM_READ(random_r) ??
+//  AM_RANGE(0x6ffb, 0x6ffb) AM_READ_LEGACY(random_r) ??
+//  AM_RANGE(0x6ffd, 0x6ffd) AM_READ_LEGACY(random_r) ??
+//  AM_RANGE(0x6fff, 0x6fff) AM_READ_LEGACY(random_r) ??
 	AM_RANGE(0x7000, 0x73ff) AM_RAM // clears to 1ff ?
-	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_MEMBER(rotaryf_state, m_videoram) AM_SIZE_MEMBER(rotaryf_state, m_videoram_size)
+	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x4000) AM_RAM AM_BASE( m_videoram) AM_SIZE(m_videoram_size)
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM
 ADDRESS_MAP_END
 

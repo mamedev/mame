@@ -225,18 +225,18 @@ static WRITE8_HANDLER(photon2_misc_w)
 
 static ADDRESS_MAP_START (spectrum_mem, AS_PROGRAM, 8, photon2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE_MEMBER(photon2_state, m_spectrum_video_ram )
+	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE( m_spectrum_video_ram )
 	AM_RANGE(0x5b00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (spectrum_io, AS_IO, 8, photon2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x1f, 0x1f) AM_READ_PORT("JOY")
-	AM_RANGE(0x5b, 0x5b) AM_READ_PORT("COIN") AM_WRITE(photon2_misc_w)
-	AM_RANGE(0x7a, 0x7a) AM_WRITE(photon2_membank_w)
+	AM_RANGE(0x5b, 0x5b) AM_READ_PORT("COIN") AM_WRITE_LEGACY(photon2_misc_w)
+	AM_RANGE(0x7a, 0x7a) AM_WRITE_LEGACY(photon2_membank_w)
 	AM_RANGE(0x7b, 0x7b) AM_WRITENOP // unknown write
-	AM_RANGE(0x7e, 0x7e) AM_WRITE(photon2_membank_w)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE(photon2_fe_r, photon2_fe_w)
+	AM_RANGE(0x7e, 0x7e) AM_WRITE_LEGACY(photon2_membank_w)
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE_LEGACY(photon2_fe_r, photon2_fe_w)
 ADDRESS_MAP_END
 
 /*************************************

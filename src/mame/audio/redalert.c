@@ -128,8 +128,8 @@ static const ay8910_interface redalert_ay8910_interface =
 static ADDRESS_MAP_START( redalert_audio_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_DEVWRITE("aysnd", redalert_AY8910_w)
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x0ffe) AM_READWRITE(redalert_ay8910_latch_1_r, redalert_ay8910_latch_2_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0ffe) AM_READNOP AM_DEVWRITE_LEGACY("aysnd", redalert_AY8910_w)
+	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x0ffe) AM_READWRITE_LEGACY(redalert_ay8910_latch_1_r, redalert_ay8910_latch_2_w)
 	AM_RANGE(0x2000, 0x6fff) AM_NOP
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
 ADDRESS_MAP_END
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( redalert_voice_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x3fff) AM_READ(soundlatch2_r) AM_WRITENOP
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x3fff) AM_READ_LEGACY(soundlatch2_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -347,7 +347,7 @@ static WRITE8_DEVICE_HANDLER( demoneye_ay8910_data_w )
 static ADDRESS_MAP_START( demoneye_audio_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE_MODERN("sndpia", pia6821_device, read, write)
+	AM_RANGE(0x0500, 0x0503) AM_DEVREADWRITE("sndpia", pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 

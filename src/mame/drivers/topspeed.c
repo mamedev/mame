@@ -444,31 +444,31 @@ static WRITE8_DEVICE_HANDLER( topspeed_msm5205_stop_w )
 
 static ADDRESS_MAP_START( topspeed_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_SIZE_MEMBER(topspeed_state, m_sharedram, m_sharedram_size)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x600002, 0x600003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_BASE_MEMBER(topspeed_state, m_raster_ctrl)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE_SIZE( m_sharedram, m_sharedram_size)
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x600002, 0x600003) AM_WRITE_LEGACY(cpua_ctrl_w)
+	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
+	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_BASE( m_raster_ctrl)
 	AM_RANGE(0x800400, 0x80ffff) AM_RAM
-	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE("pc080sn_1", pc080sn_word_r, pc080sn_word_w)
-	AM_RANGE(0xa20000, 0xa20003) AM_DEVWRITE("pc080sn_1", pc080sn_yscroll_word_w)
-	AM_RANGE(0xa40000, 0xa40003) AM_DEVWRITE("pc080sn_1", pc080sn_xscroll_word_w)
-	AM_RANGE(0xa50000, 0xa50003) AM_DEVWRITE("pc080sn_1", pc080sn_ctrl_word_w)
-	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE("pc080sn_2", pc080sn_word_r, pc080sn_word_w)
-	AM_RANGE(0xb20000, 0xb20003) AM_DEVWRITE("pc080sn_2", pc080sn_yscroll_word_w)
-	AM_RANGE(0xb40000, 0xb40003) AM_DEVWRITE("pc080sn_2", pc080sn_xscroll_word_w)
-	AM_RANGE(0xb50000, 0xb50003) AM_DEVWRITE("pc080sn_2", pc080sn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_SIZE_MEMBER(topspeed_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE_MEMBER(topspeed_state, m_spritemap)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE_LEGACY("pc080sn_1", pc080sn_word_r, pc080sn_word_w)
+	AM_RANGE(0xa20000, 0xa20003) AM_DEVWRITE_LEGACY("pc080sn_1", pc080sn_yscroll_word_w)
+	AM_RANGE(0xa40000, 0xa40003) AM_DEVWRITE_LEGACY("pc080sn_1", pc080sn_xscroll_word_w)
+	AM_RANGE(0xa50000, 0xa50003) AM_DEVWRITE_LEGACY("pc080sn_1", pc080sn_ctrl_word_w)
+	AM_RANGE(0xb00000, 0xb0ffff) AM_DEVREADWRITE_LEGACY("pc080sn_2", pc080sn_word_r, pc080sn_word_w)
+	AM_RANGE(0xb20000, 0xb20003) AM_DEVWRITE_LEGACY("pc080sn_2", pc080sn_yscroll_word_w)
+	AM_RANGE(0xb40000, 0xb40003) AM_DEVWRITE_LEGACY("pc080sn_2", pc080sn_xscroll_word_w)
+	AM_RANGE(0xb50000, 0xb50003) AM_DEVWRITE_LEGACY("pc080sn_2", pc080sn_ctrl_word_w)
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE( m_spritemap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( topspeed_cpub_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(topspeed_state, m_sharedram)
-	AM_RANGE(0x880000, 0x880001) AM_READ8(topspeed_input_bypass_r, 0x00ff) AM_DEVWRITE8("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
-	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
-	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(topspeed_motor_r, topspeed_motor_w)	/* motor CPU */
+	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE( m_sharedram)
+	AM_RANGE(0x880000, 0x880001) AM_READ8_LEGACY(topspeed_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
+	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE_LEGACY(topspeed_motor_r, topspeed_motor_w)	/* motor CPU */
 ADDRESS_MAP_END
 
 
@@ -478,12 +478,12 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, topspeed_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank10")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("msm", topspeed_msm5205_address_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE_LEGACY("msm", topspeed_msm5205_address_w)
 //  AM_RANGE(0xb400, 0xb400) // msm5205 start? doesn't seem to work right
-	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("msm", topspeed_msm5205_stop_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE_LEGACY("msm", topspeed_msm5205_stop_w)
 //  AM_RANGE(0xc000, 0xc000) // ??
 //  AM_RANGE(0xc400, 0xc400) // ??
 //  AM_RANGE(0xc800, 0xc800) // ??

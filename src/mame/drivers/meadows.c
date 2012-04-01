@@ -343,38 +343,38 @@ static ADDRESS_MAP_START( meadows_main_map, AS_PROGRAM, 8, meadows_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("STICK")
-	AM_RANGE(0x0c02, 0x0c02) AM_READ(hsync_chain_r)
+	AM_RANGE(0x0c02, 0x0c02) AM_READ_LEGACY(hsync_chain_r)
 	AM_RANGE(0x0c03, 0x0c03) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c00, 0x0c03) AM_WRITE(meadows_audio_w)
-	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE_MEMBER(meadows_state, m_spriteram)
+	AM_RANGE(0x0c00, 0x0c03) AM_WRITE_LEGACY(meadows_audio_w)
+	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE_LEGACY(meadows_spriteram_w) AM_BASE( m_spriteram)
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 	AM_RANGE(0x1000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, m_videoram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE_LEGACY(meadows_videoram_w) AM_BASE( m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bowl3d_main_map, AS_PROGRAM, 8, meadows_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("INPUTS1")
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("INPUTS2")
-	AM_RANGE(0x0c02, 0x0c02) AM_READ(hsync_chain_r)
+	AM_RANGE(0x0c02, 0x0c02) AM_READ_LEGACY(hsync_chain_r)
 	AM_RANGE(0x0c03, 0x0c03) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c00, 0x0c03) AM_WRITE(meadows_audio_w)
-	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE_MEMBER(meadows_state, m_spriteram)
+	AM_RANGE(0x0c00, 0x0c03) AM_WRITE_LEGACY(meadows_audio_w)
+	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE_LEGACY(meadows_spriteram_w) AM_BASE( m_spriteram)
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 	AM_RANGE(0x1000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, m_videoram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE_LEGACY(meadows_videoram_w) AM_BASE( m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( minferno_main_map, AS_PROGRAM, 8, meadows_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1eff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, m_videoram)
+	AM_RANGE(0x1c00, 0x1eff) AM_RAM_WRITE_LEGACY(meadows_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x1f00, 0x1f00) AM_READ_PORT("JOY1")
 	AM_RANGE(0x1f01, 0x1f01) AM_READ_PORT("JOY2")
 	AM_RANGE(0x1f02, 0x1f02) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x1f03, 0x1f03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1f00, 0x1f03) AM_WRITE(meadows_audio_w)
-	AM_RANGE(0x1f04, 0x1f04) AM_READ(vsync_chain_hi_r)
-	AM_RANGE(0x1f05, 0x1f05) AM_READ(vsync_chain_lo_r)
+	AM_RANGE(0x1f00, 0x1f03) AM_WRITE_LEGACY(meadows_audio_w)
+	AM_RANGE(0x1f04, 0x1f04) AM_READ_LEGACY(vsync_chain_hi_r)
+	AM_RANGE(0x1f05, 0x1f05) AM_READ_LEGACY(vsync_chain_lo_r)
 ADDRESS_MAP_END
 
 
@@ -392,7 +392,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, meadows_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0c03) AM_READWRITE(audio_hardware_r, audio_hardware_w)
+	AM_RANGE(0x0c00, 0x0c03) AM_READWRITE_LEGACY(audio_hardware_r, audio_hardware_w)
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 ADDRESS_MAP_END
 

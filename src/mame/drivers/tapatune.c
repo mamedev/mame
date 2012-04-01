@@ -116,16 +116,16 @@ static READ16_HANDLER(irq_ack_r)
 
 static ADDRESS_MAP_START( tapatune_map, AS_PROGRAM, 16, tapatune_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM // program rom and graphics roms
-	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_BASE_MEMBER(tapatune_state, m_videoram) // hardware video buffer
+	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_BASE( m_videoram) // hardware video buffer
 	AM_RANGE(0x320000, 0x327fff) AM_RAM // workram
 	AM_RANGE(0x328000, 0x32ffff) AM_RAM
 	AM_RANGE(0x330000, 0x337fff) AM_RAM // ram used as system video buffer
 	AM_RANGE(0x338000, 0x33ffff) AM_RAM
-	AM_RANGE(0x400000, 0x400003) AM_READWRITE(read_from_z80, write_to_z80)
-	AM_RANGE(0x400010, 0x400011) AM_READ(irq_ack_r)
-	AM_RANGE(0x600000, 0x600005) AM_WRITE(palette_w)
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_MODERN("crtc", mc6845_device, address_w, 0xff00)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0x400000, 0x400003) AM_READWRITE_LEGACY(read_from_z80, write_to_z80)
+	AM_RANGE(0x400010, 0x400011) AM_READ_LEGACY(irq_ack_r)
+	AM_RANGE(0x600000, 0x600005) AM_WRITE_LEGACY(palette_w)
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0xff00)
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
 static READ8_HANDLER(sound_irq_clear)
@@ -217,19 +217,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START ( sound_io_map, AS_IO, 8, tapatune_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(bsmt_data_lo_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(bsmt_data_hi_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(bsmt_reg_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(controls_mux)
-	AM_RANGE(0x20, 0x20) AM_READ(sound_irq_clear)
-	AM_RANGE(0x28, 0x28) AM_READ(bsmt_status_r)
-	AM_RANGE(0x30, 0x30) AM_READ(controls_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(bsmt_data_lo_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(bsmt_data_hi_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(bsmt_reg_w)
+	AM_RANGE(0x18, 0x18) AM_WRITE_LEGACY(controls_mux)
+	AM_RANGE(0x20, 0x20) AM_READ_LEGACY(sound_irq_clear)
+	AM_RANGE(0x28, 0x28) AM_READ_LEGACY(bsmt_status_r)
+	AM_RANGE(0x30, 0x30) AM_READ_LEGACY(controls_r)
 	AM_RANGE(0x38, 0x38) AM_READ_PORT("COINS")
-	AM_RANGE(0x60, 0x60) AM_WRITE(write_index_to_68k)
-	AM_RANGE(0x61, 0x61) AM_WRITE(write_data_to_68k)
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(write_index_to_68k)
+	AM_RANGE(0x61, 0x61) AM_WRITE_LEGACY(write_data_to_68k)
 	AM_RANGE(0x63, 0x63) AM_WRITENOP // leds? lamps?
-	AM_RANGE(0x68, 0x68) AM_READ(read_index_from_68k)
-	AM_RANGE(0x69, 0x69) AM_READ(read_data_from_68k)
+	AM_RANGE(0x68, 0x68) AM_READ_LEGACY(read_index_from_68k)
+	AM_RANGE(0x69, 0x69) AM_READ_LEGACY(read_data_from_68k)
 	AM_RANGE(0x6b, 0x6b) AM_READ_PORT("BUTTONS")
 ADDRESS_MAP_END
 

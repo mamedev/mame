@@ -153,25 +153,25 @@ static WRITE8_HANDLER( bwp2_ctrl_w )
 
 // Main CPU
 static ADDRESS_MAP_START( bwp1_map, AS_PROGRAM, 8, bwing_state )
-	AM_RANGE(0x1b00, 0x1b07) AM_READ(bwp1_io_r)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE_MEMBER(bwing_state, m_bwp1_sharedram1)
+	AM_RANGE(0x1b00, 0x1b07) AM_READ_LEGACY(bwp1_io_r)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE_LEGACY(bwp12_sharedram1_w) AM_BASE( m_bwp1_sharedram1)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(bwing_videoram_w) AM_BASE_MEMBER(bwing_state, m_videoram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(bwing_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(bwing_spriteram_w) AM_BASE_MEMBER(bwing_state, m_spriteram)
-	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(bwing_paletteram_w) AM_BASE_MEMBER(bwing_state, m_paletteram)
-	AM_RANGE(0x1b00, 0x1b07) AM_RAM_WRITE(bwing_scrollreg_w)
-	AM_RANGE(0x1c00, 0x1c07) AM_RAM_WRITE(bwp1_ctrl_w)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bwing_scrollram_r, bwing_scrollram_w)
+	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE_LEGACY(bwing_spriteram_w) AM_BASE( m_spriteram)
+	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE_LEGACY(bwing_paletteram_w) AM_BASE( m_paletteram)
+	AM_RANGE(0x1b00, 0x1b07) AM_RAM_WRITE_LEGACY(bwing_scrollreg_w)
+	AM_RANGE(0x1c00, 0x1c07) AM_RAM_WRITE_LEGACY(bwp1_ctrl_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(bwing_scrollram_r, bwing_scrollram_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM // "B-Wings US" writes to 9631-9632(debug?)
 ADDRESS_MAP_END
 
 
 // Sub CPU
 static ADDRESS_MAP_START( bwp2_map, AS_PROGRAM, 8, bwing_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE_MEMBER(bwing_state, m_bwp2_sharedram1)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE_LEGACY(bwp12_sharedram1_w) AM_BASE( m_bwp2_sharedram1)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1800, 0x1803) AM_WRITE(bwp2_ctrl_w)
+	AM_RANGE(0x1800, 0x1803) AM_WRITE_LEGACY(bwp2_ctrl_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -179,20 +179,20 @@ ADDRESS_MAP_END
 // Sound CPU
 static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x0200) AM_DEVWRITE("dac", dac_signed_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(bwp3_nmiack_w)
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_SIZE_MEMBER(bwing_state, m_bwp3_rombase, m_bwp3_romsize)
+	AM_RANGE(0x0200, 0x0200) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(bwp3_nmiack_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(bwp3_nmimask_w)
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_SIZE( m_bwp3_rombase, m_bwp3_romsize)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bwp3_io_map, AS_IO, 8, bwing_state )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("VBLANK") AM_WRITE(bwp3_u8F_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("VBLANK") AM_WRITE_LEGACY(bwp3_u8F_w)
 ADDRESS_MAP_END
 
 //****************************************************************************

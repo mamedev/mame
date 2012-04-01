@@ -141,12 +141,12 @@ static WRITE8_HANDLER( fenraya_custom_map_w )
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enraya_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(fenraya_custom_map_r,fenraya_custom_map_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(fenraya_custom_map_r,fenraya_custom_map_w)
 	#if 0
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, m_videoram, m_videoram_size)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(fenraya_videoram_w)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE_LEGACY(fenraya_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE_LEGACY(fenraya_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_NOP
 	#endif
 ADDRESS_MAP_END
@@ -156,14 +156,14 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enraya_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x23, 0x23) AM_WRITE(sound_data_w)
-	AM_RANGE(0x33, 0x33) AM_DEVWRITE("aysnd", sound_control_w)
+	AM_RANGE(0x23, 0x23) AM_WRITE_LEGACY(sound_data_w)
+	AM_RANGE(0x33, 0x33) AM_DEVWRITE_LEGACY("aysnd", sound_control_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unkpacg_main_map, AS_PROGRAM, 8, _4enraya_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE_LEGACY(fenraya_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -172,8 +172,8 @@ static ADDRESS_MAP_START( unkpacg_main_portmap, AS_IO, 8, _4enraya_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x20, 0x20) AM_WRITE(sound_data_w)
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("aysnd", sound_control_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(sound_data_w)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE_LEGACY("aysnd", sound_control_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 4enraya )

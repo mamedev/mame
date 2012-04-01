@@ -91,25 +91,25 @@ static WRITE8_HANDLER( blueprnt_coin_counter_w )
 static ADDRESS_MAP_START( blueprnt_map, AS_PROGRAM, 8, blueprnt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM // service mode checks for 8 chips = 64K
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(blueprnt_videoram_w) AM_MIRROR(0x400) AM_BASE_MEMBER(blueprnt_state, m_videoram)
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_MEMBER(blueprnt_state, m_scrollram)
-	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE_SIZE_MEMBER(blueprnt_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1") AM_WRITE(blueprnt_coin_counter_w)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(blueprnt_videoram_w) AM_MIRROR(0x400) AM_BASE( m_videoram)
+	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE( m_scrollram)
+	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1") AM_WRITE_LEGACY(blueprnt_coin_counter_w)
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
-	AM_RANGE(0xc003, 0xc003) AM_READ(blueprnt_sh_dipsw_r)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(blueprnt_sound_command_w)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(watchdog_reset_r, blueprnt_flipscreen_w)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(blueprnt_colorram_w) AM_BASE_MEMBER(blueprnt_state, m_colorram)
+	AM_RANGE(0xc003, 0xc003) AM_READ_LEGACY(blueprnt_sh_dipsw_r)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(blueprnt_sound_command_w)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE_LEGACY(watchdog_reset_r, blueprnt_flipscreen_w)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE_LEGACY(blueprnt_colorram_w) AM_BASE( m_colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, blueprnt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x6002, 0x6002) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8002, 0x8002) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x6002, 0x6002) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8002, 0x8002) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 ADDRESS_MAP_END
 
 

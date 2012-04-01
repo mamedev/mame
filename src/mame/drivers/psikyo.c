@@ -319,14 +319,14 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 
 static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE_MEMBER(psikyo_state, m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_BASE_MEMBER(psikyo_state, m_vram_0)		// Layer 0
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_BASE_MEMBER(psikyo_state, m_vram_1)		// Layer 1
-	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE_MEMBER(psikyo_state, m_vregs)							// RAM + Vregs
-//  AM_RANGE(0xc00000, 0xc0000b) AM_READ(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
-//  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
-//  AM_RANGE(0xc00010, 0xc00013) AM_WRITE(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE_LEGACY(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(psikyo_vram_0_w) AM_BASE( m_vram_0)		// Layer 0
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(psikyo_vram_1_w) AM_BASE( m_vram_1)		// Layer 1
+	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE( m_vregs)							// RAM + Vregs
+//  AM_RANGE(0xc00000, 0xc0000b) AM_READ_LEGACY(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
+//  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE_LEGACY(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
+//  AM_RANGE(0xc00010, 0xc00013) AM_WRITE_LEGACY(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
@@ -366,18 +366,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psikyo_bootleg_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_MEMBER(psikyo_state, m_bootleg_spritebuffer)				// RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE( m_bootleg_spritebuffer)				// RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE_MEMBER(psikyo_state, m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_BASE_MEMBER(psikyo_state, m_vram_0)		// Layer 0
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_BASE_MEMBER(psikyo_state, m_vram_1)		// Layer 1
-	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE_MEMBER(psikyo_state, m_vregs)								// RAM + Vregs
-//  AM_RANGE(0xc00000, 0xc0000b) AM_READ(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
-//  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
-//  AM_RANGE(0xc00010, 0xc00013) AM_WRITE(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE_LEGACY(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(psikyo_vram_0_w) AM_BASE( m_vram_0)		// Layer 0
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(psikyo_vram_1_w) AM_BASE( m_vram_1)		// Layer 1
+	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE( m_vregs)								// RAM + Vregs
+//  AM_RANGE(0xc00000, 0xc0000b) AM_READ_LEGACY(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
+//  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE_LEGACY(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
+//  AM_RANGE(0xc00010, 0xc00013) AM_WRITE_LEGACY(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
 
-	AM_RANGE(0xC00018, 0xC0001b) AM_READWRITE(s1945bl_oki_r, s1945bl_oki_w)
+	AM_RANGE(0xC00018, 0xC0001b) AM_READWRITE_LEGACY(s1945bl_oki_r, s1945bl_oki_w)
 
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
 
@@ -428,10 +428,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sngkace_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(sngkace_sound_bankswitch_w)
-	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(sngkace_sound_bankswitch_w)
+	AM_RANGE(0x08, 0x08) AM_READ_LEGACY(psikyo_soundlatch_r)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(psikyo_clear_nmi_w)
 ADDRESS_MAP_END
 
 
@@ -452,10 +452,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gunbird_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(gunbird_sound_bankswitch_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x08, 0x08) AM_READ_LEGACY(psikyo_soundlatch_r)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(psikyo_clear_nmi_w)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -464,11 +464,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s1945_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(gunbird_sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITENOP
-	AM_RANGE(0x08, 0x0d) AM_DEVREADWRITE("ymf", ymf278b_r, ymf278b_w)
-	AM_RANGE(0x10, 0x10) AM_READ(psikyo_soundlatch_r)
-	AM_RANGE(0x18, 0x18) AM_WRITE(psikyo_clear_nmi_w)
+	AM_RANGE(0x08, 0x0d) AM_DEVREADWRITE_LEGACY("ymf", ymf278b_r, ymf278b_w)
+	AM_RANGE(0x10, 0x10) AM_READ_LEGACY(psikyo_soundlatch_r)
+	AM_RANGE(0x18, 0x18) AM_WRITE_LEGACY(psikyo_clear_nmi_w)
 ADDRESS_MAP_END
 
 /***************************************************************************

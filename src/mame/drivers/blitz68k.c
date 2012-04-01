@@ -483,26 +483,26 @@ static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blitter", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
 
-//  AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
-//  AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
+//  AM_RANGE(0x800000, 0x800001) AM_READ_LEGACY(test_r)
+//  AM_RANGE(0x880000, 0x880001) AM_READ_LEGACY(test_r)
 
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
-	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_transpen) //video registers for the blitter write
-	AM_RANGE(0x990000, 0x990007) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_vregs) //pens
-	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_romaddr)
-	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_attr1_ram)
-	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_dst_ram_loword)
-	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_attr2_ram)
-	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE( blit_copy_w ) AM_BASE_MEMBER(blitz68k_state, m_blit_dst_ram_hiword)
-	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE( m_blit_transpen) //video registers for the blitter write
+	AM_RANGE(0x990000, 0x990007) AM_RAM AM_BASE( m_blit_vregs) //pens
+	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE( m_blit_romaddr)
+	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE( m_blit_attr1_ram)
+	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE( m_blit_dst_ram_loword)
+	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE( m_blit_attr2_ram)
+	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE_LEGACY( blit_copy_w ) AM_BASE( m_blit_dst_ram_hiword)
+	AM_RANGE(0x9e0000, 0x9e0001) AM_READ_LEGACY(blitter_status_r)
 
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE_LEGACY(lamps_w)
 	AM_RANGE(0xc00180, 0xc00181) AM_READ_PORT("IN2")
-//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
+//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE_LEGACY(sound_write_w)
 	AM_RANGE(0xc00380, 0xc00381) AM_READ_PORT("IN3")
-//  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
+//  AM_RANGE(0xc00300, 0xc00301) AM_WRITE_LEGACY(irq_callback_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( steaser_map, AS_PROGRAM, 16, blitz68k_state )
@@ -510,32 +510,32 @@ static ADDRESS_MAP_START( steaser_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blitter", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
-//  AM_RANGE(0x840000, 0x840001) AM_WRITE(sound_write_w)
-	AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
-//  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(sound_write_w)
+	AM_RANGE(0x800000, 0x800001) AM_READ_LEGACY(test_r)
+//  AM_RANGE(0x840000, 0x840001) AM_WRITE_LEGACY(sound_write_w)
+	AM_RANGE(0x880000, 0x880001) AM_READ_LEGACY(test_r)
+//  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE_LEGACY(sound_write_w)
 
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
-	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 	AM_RANGE(0x940000, 0x940001) AM_WRITENOP //? Seems a dword write for some read, written consecutively
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_transpen)//probably transparency pens
-	AM_RANGE(0x990000, 0x990005) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_vregs)
-	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_romaddr)
-	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_attr1_ram)
-	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_dst_ram_loword)
-	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_attr2_ram)
-	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE( blit_copy_w ) AM_BASE_MEMBER(blitz68k_state, m_blit_dst_ram_hiword)
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE( m_blit_transpen)//probably transparency pens
+	AM_RANGE(0x990000, 0x990005) AM_RAM AM_BASE( m_blit_vregs)
+	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE( m_blit_romaddr)
+	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE( m_blit_attr1_ram)
+	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE( m_blit_dst_ram_loword)
+	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE( m_blit_attr2_ram)
+	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE_LEGACY( blit_copy_w ) AM_BASE( m_blit_dst_ram_hiword)
 	AM_RANGE(0x9c0002, 0x9c0003) AM_READNOP //pen control?
 	AM_RANGE(0x9d0000, 0x9d0001) AM_READNOP //?
-	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
+	AM_RANGE(0x9e0000, 0x9e0001) AM_READ_LEGACY(blitter_status_r)
 	AM_RANGE(0x9f0000, 0x9f0001) AM_WRITENOP //???
 
-//  AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
-	AM_RANGE(0xbd0000, 0xbd0001) AM_READ(test_r)
-//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(sound_write_w)
+//  AM_RANGE(0xc00000, 0xc00001) AM_WRITE_LEGACY(lamps_w)
+	AM_RANGE(0xbd0000, 0xbd0001) AM_READ_LEGACY(test_r)
+//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE_LEGACY(sound_write_w)
 //  AM_RANGE(0xc00380, 0xc00381) AM_READ_PORT("IN3")
-//  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
+//  AM_RANGE(0xc00300, 0xc00301) AM_WRITE_LEGACY(irq_callback_w)
 ADDRESS_MAP_END
 
 /*************************************************************************************************************
@@ -579,51 +579,51 @@ static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
-	AM_RANGE(0x220000, 0x220001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0xff00 )
+	AM_RANGE(0x220000, 0x220001) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0xff00 )
 
-	AM_RANGE(0x240000, 0x240001) AM_WRITE8(blit_addr0_w, 0xff00)
-	AM_RANGE(0x240002, 0x240003) AM_WRITE8(blit_addr1_w, 0xff00)
-	AM_RANGE(0x240004, 0x240005) AM_WRITE8(blit_addr2_w, 0xff00)
+	AM_RANGE(0x240000, 0x240001) AM_WRITE8_LEGACY(blit_addr0_w, 0xff00)
+	AM_RANGE(0x240002, 0x240003) AM_WRITE8_LEGACY(blit_addr1_w, 0xff00)
+	AM_RANGE(0x240004, 0x240005) AM_WRITE8_LEGACY(blit_addr2_w, 0xff00)
 
-	AM_RANGE(0x240006, 0x240007) AM_WRITE8(blit_x_w, 0xff00)
-	AM_RANGE(0x240008, 0x240009) AM_WRITE8(blit_y_w, 0xff00)
+	AM_RANGE(0x240006, 0x240007) AM_WRITE8_LEGACY(blit_x_w, 0xff00)
+	AM_RANGE(0x240008, 0x240009) AM_WRITE8_LEGACY(blit_y_w, 0xff00)
 
-	AM_RANGE(0x24000a, 0x24000b) AM_WRITE8(blit_w_w, 0xff00)
-	AM_RANGE(0x24000c, 0x24000d) AM_WRITE8(blit_h_w, 0xff00)
+	AM_RANGE(0x24000a, 0x24000b) AM_WRITE8_LEGACY(blit_w_w, 0xff00)
+	AM_RANGE(0x24000c, 0x24000d) AM_WRITE8_LEGACY(blit_h_w, 0xff00)
 
-	AM_RANGE(0x24000e, 0x24000f) AM_WRITE8(blit_draw_w, 0xff00)
+	AM_RANGE(0x24000e, 0x24000f) AM_WRITE8_LEGACY(blit_draw_w, 0xff00)
 
-	AM_RANGE(0x260000, 0x260001) AM_WRITE8(blit_pen0_w, 0xff00)
-	AM_RANGE(0x260002, 0x260003) AM_WRITE8(blit_pen1_w, 0xff00)
-	AM_RANGE(0x260004, 0x260005) AM_WRITE8(blit_pen2_w, 0xff00)
-	AM_RANGE(0x260006, 0x260007) AM_WRITE8(blit_pen3_w, 0xff00)
+	AM_RANGE(0x260000, 0x260001) AM_WRITE8_LEGACY(blit_pen0_w, 0xff00)
+	AM_RANGE(0x260002, 0x260003) AM_WRITE8_LEGACY(blit_pen1_w, 0xff00)
+	AM_RANGE(0x260004, 0x260005) AM_WRITE8_LEGACY(blit_pen2_w, 0xff00)
+	AM_RANGE(0x260006, 0x260007) AM_WRITE8_LEGACY(blit_pen3_w, 0xff00)
 
-	AM_RANGE(0x280000, 0x280001) AM_READ(blitter_status_r)
+	AM_RANGE(0x280000, 0x280001) AM_READ_LEGACY(blitter_status_r)
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITENOP	// 1->0
 
-	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE8(blit_flag0_w, 0xff00)
-	AM_RANGE(0x2e0002, 0x2e0003) AM_WRITE8(blit_flag1_w, 0xff00)
-	AM_RANGE(0x2e0004, 0x2e0005) AM_WRITE8(blit_flipx_w, 0xff00)
-	AM_RANGE(0x2e0006, 0x2e0007) AM_WRITE8(blit_flipy_w, 0xff00)
-	AM_RANGE(0x2e0008, 0x2e0009) AM_WRITE8(blit_solid_w, 0xff00)
-	AM_RANGE(0x2e000a, 0x2e000b) AM_WRITE8(blit_trans_w, 0xff00)
-	AM_RANGE(0x2e000c, 0x2e000d) AM_WRITE8(blit_flag6_w, 0xff00)
-	AM_RANGE(0x2e000e, 0x2e000f) AM_WRITE8(blit_flag7_w, 0xff00)
+	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE8_LEGACY(blit_flag0_w, 0xff00)
+	AM_RANGE(0x2e0002, 0x2e0003) AM_WRITE8_LEGACY(blit_flag1_w, 0xff00)
+	AM_RANGE(0x2e0004, 0x2e0005) AM_WRITE8_LEGACY(blit_flipx_w, 0xff00)
+	AM_RANGE(0x2e0006, 0x2e0007) AM_WRITE8_LEGACY(blit_flipy_w, 0xff00)
+	AM_RANGE(0x2e0008, 0x2e0009) AM_WRITE8_LEGACY(blit_solid_w, 0xff00)
+	AM_RANGE(0x2e000a, 0x2e000b) AM_WRITE8_LEGACY(blit_trans_w, 0xff00)
+	AM_RANGE(0x2e000c, 0x2e000d) AM_WRITE8_LEGACY(blit_flag6_w, 0xff00)
+	AM_RANGE(0x2e000e, 0x2e000f) AM_WRITE8_LEGACY(blit_flag7_w, 0xff00)
 
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
-	AM_RANGE(0x300004, 0x300005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x300004, 0x300005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 
-	AM_RANGE(0x400000, 0x400001) AM_READ8(bankrob_mcu_status_write_r, 0x00ff)
-	AM_RANGE(0x400002, 0x400003) AM_READ8(bankrob_mcu_status_read_r,  0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_READ8_LEGACY(bankrob_mcu_status_write_r, 0x00ff)
+	AM_RANGE(0x400002, 0x400003) AM_READ8_LEGACY(bankrob_mcu_status_read_r,  0x00ff)
 
-	AM_RANGE(0x400004, 0x400005) AM_READWRITE8(bankrob_mcu1_r, bankrob_mcu1_w, 0x00ff)
-	AM_RANGE(0x400006, 0x400007) AM_READWRITE8(bankrob_mcu2_r, bankrob_mcu2_w, 0xff00)
+	AM_RANGE(0x400004, 0x400005) AM_READWRITE8_LEGACY(bankrob_mcu1_r, bankrob_mcu1_w, 0x00ff)
+	AM_RANGE(0x400006, 0x400007) AM_READWRITE8_LEGACY(bankrob_mcu2_r, bankrob_mcu2_w, 0xff00)
 
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
 // bankroba:
@@ -664,51 +664,51 @@ static ADDRESS_MAP_START( bankroba_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITE8(bankroba_mcu1_r, 0x00ff)	// lev 4
-	AM_RANGE(0x840000, 0x840001) AM_WRITE8(bankroba_mcu1_w, 0x00ff)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE8_LEGACY(bankroba_mcu1_r, 0x00ff)	// lev 4
+	AM_RANGE(0x840000, 0x840001) AM_WRITE8_LEGACY(bankroba_mcu1_w, 0x00ff)
 
-	AM_RANGE(0x880000, 0x880001) AM_WRITE8(bankroba_mcu2_r, 0x00ff)	// lev 3
-	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE8(bankroba_mcu2_w, 0x00ff)
+	AM_RANGE(0x880000, 0x880001) AM_WRITE8_LEGACY(bankroba_mcu2_r, 0x00ff)	// lev 3
+	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE8_LEGACY(bankroba_mcu2_w, 0x00ff)
 
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
-	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 
 //  AM_RANGE(0x940000, 0x940001) AM_WRITE   // lev 6
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE8(blit_flag0_w, 0xff00)
-	AM_RANGE(0x980002, 0x980003) AM_WRITE8(blit_flag1_w, 0xff00)
-	AM_RANGE(0x980004, 0x980005) AM_WRITE8(blit_flipx_w, 0xff00)
-	AM_RANGE(0x980006, 0x980007) AM_WRITE8(blit_flipy_w, 0xff00)
-	AM_RANGE(0x980008, 0x980009) AM_WRITE8(blit_solid_w, 0xff00)
-	AM_RANGE(0x98000a, 0x98000b) AM_WRITE8(blit_trans_w, 0xff00)
-	AM_RANGE(0x98000c, 0x98000d) AM_WRITE8(blit_flag6_w, 0xff00)
-	AM_RANGE(0x98000e, 0x98000f) AM_WRITE8(blit_flag7_w, 0xff00)
+	AM_RANGE(0x980000, 0x980001) AM_WRITE8_LEGACY(blit_flag0_w, 0xff00)
+	AM_RANGE(0x980002, 0x980003) AM_WRITE8_LEGACY(blit_flag1_w, 0xff00)
+	AM_RANGE(0x980004, 0x980005) AM_WRITE8_LEGACY(blit_flipx_w, 0xff00)
+	AM_RANGE(0x980006, 0x980007) AM_WRITE8_LEGACY(blit_flipy_w, 0xff00)
+	AM_RANGE(0x980008, 0x980009) AM_WRITE8_LEGACY(blit_solid_w, 0xff00)
+	AM_RANGE(0x98000a, 0x98000b) AM_WRITE8_LEGACY(blit_trans_w, 0xff00)
+	AM_RANGE(0x98000c, 0x98000d) AM_WRITE8_LEGACY(blit_flag6_w, 0xff00)
+	AM_RANGE(0x98000e, 0x98000f) AM_WRITE8_LEGACY(blit_flag7_w, 0xff00)
 
-	AM_RANGE(0x990000, 0x990001) AM_WRITE8(blit_pen0_w, 0xff00)
-	AM_RANGE(0x990002, 0x990003) AM_WRITE8(blit_pen1_w, 0xff00)
-	AM_RANGE(0x990004, 0x990005) AM_WRITE8(blit_pen2_w, 0xff00)
-	AM_RANGE(0x990006, 0x990007) AM_WRITE8(blit_pen3_w, 0xff00)
+	AM_RANGE(0x990000, 0x990001) AM_WRITE8_LEGACY(blit_pen0_w, 0xff00)
+	AM_RANGE(0x990002, 0x990003) AM_WRITE8_LEGACY(blit_pen1_w, 0xff00)
+	AM_RANGE(0x990004, 0x990005) AM_WRITE8_LEGACY(blit_pen2_w, 0xff00)
+	AM_RANGE(0x990006, 0x990007) AM_WRITE8_LEGACY(blit_pen3_w, 0xff00)
 
-	AM_RANGE(0x998000, 0x998001) AM_WRITE8(blit_addr01_w, 0xffff)
-	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE8(blit_addr2_w,  0xff00)
+	AM_RANGE(0x998000, 0x998001) AM_WRITE8_LEGACY(blit_addr01_w, 0xffff)
+	AM_RANGE(0x9a0000, 0x9a0001) AM_WRITE8_LEGACY(blit_addr2_w,  0xff00)
 
-	AM_RANGE(0x9a8000, 0x9a8001) AM_WRITE8(blit_xy_w, 0xffff)
+	AM_RANGE(0x9a8000, 0x9a8001) AM_WRITE8_LEGACY(blit_xy_w, 0xffff)
 
-	AM_RANGE(0x9b0000, 0x9b0001) AM_WRITE8(blit_wh_w, 0xffff)
+	AM_RANGE(0x9b0000, 0x9b0001) AM_WRITE8_LEGACY(blit_wh_w, 0xffff)
 
-	AM_RANGE(0x9b8000, 0x9b8001) AM_WRITE8(blit_draw_w, 0x00ff)
+	AM_RANGE(0x9b8000, 0x9b8001) AM_WRITE8_LEGACY(blit_draw_w, 0x00ff)
 
-	AM_RANGE(0x9c0000, 0x9c0001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x9c0002, 0x9c0003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0xff00 )
+	AM_RANGE(0x9c0000, 0x9c0001) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x9c0002, 0x9c0003) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0xff00 )
 
-	AM_RANGE(0x9d0000, 0x9d0001) AM_READ8(bankroba_mcu1_status_write_r, 0xff00)
+	AM_RANGE(0x9d0000, 0x9d0001) AM_READ8_LEGACY(bankroba_mcu1_status_write_r, 0xff00)
 
-	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
+	AM_RANGE(0x9e0000, 0x9e0001) AM_READ_LEGACY(blitter_status_r)
 
 	AM_RANGE(0x9f0000, 0x9f0001) AM_WRITENOP // 1
 
-	AM_RANGE(0xbd0000, 0xbd0001) AM_READ8(bankroba_mcu2_status_write_r, 0xff00)
+	AM_RANGE(0xbd0000, 0xbd0001) AM_READ8_LEGACY(bankroba_mcu2_status_write_r, 0xff00)
 
 	// CRTC connected to MCU?
 ADDRESS_MAP_END
@@ -810,36 +810,36 @@ static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x480000, 0x4807ff) AM_RAM
 
-	AM_RANGE(0x820000, 0x820007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
+	AM_RANGE(0x820000, 0x820007) AM_WRITE8_LEGACY(blit_hwyxa_draw_w, 0xffff)
 
-	AM_RANGE(0x850000, 0x850001) AM_READ( cjffruit_mcu_r )
+	AM_RANGE(0x850000, 0x850001) AM_READ_LEGACY( cjffruit_mcu_r )
 
 	AM_RANGE(0x870000, 0x870001) AM_READ_PORT("IN0")
 	AM_RANGE(0x872000, 0x872001) AM_READ_PORT("IN1")
 	AM_RANGE(0x874000, 0x874001) AM_READ_PORT("IN2")
 	AM_RANGE(0x876000, 0x876001) AM_READ_PORT("DSW")
 
-	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
-	AM_RANGE(0x880002, 0x880003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
-	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
+	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x880002, 0x880003) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0x00ff )
 
-	AM_RANGE(0x8a0000, 0x8a0007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
+	AM_RANGE(0x8a0000, 0x8a0007) AM_WRITE8_LEGACY(blit_hwyxa_draw_w, 0xffff)
 
-	AM_RANGE(0x8b0000, 0x8b0003) AM_WRITE8(blit_pens_w, 0xffff)
+	AM_RANGE(0x8b0000, 0x8b0003) AM_WRITE8_LEGACY(blit_pens_w, 0xffff)
 
-	AM_RANGE(0x8e0000, 0x8e0001) AM_WRITE( cjffruit_mcu_w )
+	AM_RANGE(0x8e0000, 0x8e0001) AM_WRITE_LEGACY( cjffruit_mcu_w )
 
-	AM_RANGE(0x8f8000, 0x8f8001) AM_WRITE(cjffruit_leds1_w) AM_BASE_MEMBER(blitz68k_state, m_leds[0])
-	AM_RANGE(0x8fa000, 0x8fa001) AM_WRITE(cjffruit_leds2_w) AM_BASE_MEMBER(blitz68k_state, m_leds[1])
-	AM_RANGE(0x8fc000, 0x8fc001) AM_WRITE(cjffruit_leds3_w) AM_BASE_MEMBER(blitz68k_state, m_leds[2])
+	AM_RANGE(0x8f8000, 0x8f8001) AM_WRITE_LEGACY(cjffruit_leds1_w) AM_BASE( m_leds[0])
+	AM_RANGE(0x8fa000, 0x8fa001) AM_WRITE_LEGACY(cjffruit_leds2_w) AM_BASE( m_leds[1])
+	AM_RANGE(0x8fc000, 0x8fc001) AM_WRITE_LEGACY(cjffruit_leds3_w) AM_BASE( m_leds[2])
 
-	AM_RANGE(0x8fe000, 0x8fe003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
+	AM_RANGE(0x8fe000, 0x8fe003) AM_WRITE8_LEGACY(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x8fe004, 0x8fe005) AM_WRITEONLY
-	AM_RANGE(0x8fe006, 0x8fe007) AM_DEVWRITE("crtc", crtc_lpen_w)	// 0x8fe006: 0->1, 0x8fe007: 1->0
+	AM_RANGE(0x8fe006, 0x8fe007) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)	// 0x8fe006: 0->1, 0x8fe007: 1->0
 
-	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)
+	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE8_LEGACY(crtc_r, crtc_w, 0xffff)
 ADDRESS_MAP_END
 
 /*************************************************************************************************************
@@ -911,37 +911,37 @@ static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
-	AM_RANGE(0x800000, 0x800007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
+	AM_RANGE(0x800000, 0x800007) AM_WRITE8_LEGACY(blit_hwyxa_draw_w, 0xffff)
 
-	AM_RANGE(0x812000, 0x812001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x812000, 0x812001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
+	AM_RANGE(0x812000, 0x812001) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x812000, 0x812001) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0x00ff )
 
-	AM_RANGE(0x830000, 0x830001) AM_READ( deucesw2_mcu_r )
+	AM_RANGE(0x830000, 0x830001) AM_READ_LEGACY( deucesw2_mcu_r )
 
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("IN0")
 	AM_RANGE(0x850000, 0x850001) AM_READ_PORT("IN1")
 	AM_RANGE(0x860000, 0x860001) AM_READ_PORT("IN2")
 	AM_RANGE(0x870000, 0x870001) AM_READ_PORT("DSW")
 
-	AM_RANGE(0x880000, 0x880007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
+	AM_RANGE(0x880000, 0x880007) AM_WRITE8_LEGACY(blit_hwyxa_draw_w, 0xffff)
 
-	AM_RANGE(0x890000, 0x890001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x890000, 0x890001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
-	AM_RANGE(0x890002, 0x890003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x890000, 0x890001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x890000, 0x890001) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x890002, 0x890003) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 
-	AM_RANGE(0x894000, 0x894003) AM_WRITE8(blit_pens_w, 0xffff)
+	AM_RANGE(0x894000, 0x894003) AM_WRITE8_LEGACY(blit_pens_w, 0xffff)
 
-	AM_RANGE(0x896000, 0x896001) AM_WRITE( deucesw2_mcu_w )
+	AM_RANGE(0x896000, 0x896001) AM_WRITE_LEGACY( deucesw2_mcu_w )
 
-	AM_RANGE(0x898000, 0x898001) AM_WRITE(deucesw2_leds1_w) AM_BASE_MEMBER(blitz68k_state, m_leds[0])
-	AM_RANGE(0x89a000, 0x89a001) AM_WRITE(deucesw2_leds2_w) AM_BASE_MEMBER(blitz68k_state, m_leds[1])
-	AM_RANGE(0x89c000, 0x89c001) AM_WRITE(deucesw2_leds3_w) AM_BASE_MEMBER(blitz68k_state, m_leds[2])
+	AM_RANGE(0x898000, 0x898001) AM_WRITE_LEGACY(deucesw2_leds1_w) AM_BASE( m_leds[0])
+	AM_RANGE(0x89a000, 0x89a001) AM_WRITE_LEGACY(deucesw2_leds2_w) AM_BASE( m_leds[1])
+	AM_RANGE(0x89c000, 0x89c001) AM_WRITE_LEGACY(deucesw2_leds3_w) AM_BASE( m_leds[2])
 
-	AM_RANGE(0x89e000, 0x89e003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
+	AM_RANGE(0x89e000, 0x89e003) AM_WRITE8_LEGACY(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x89e004, 0x89e005) AM_WRITEONLY
-	AM_RANGE(0x89e006, 0x89e007) AM_DEVWRITE("crtc", crtc_lpen_w)	// 0x89e006: 0->1, 0x89e007: 1->0
+	AM_RANGE(0x89e006, 0x89e007) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)	// 0x89e006: 0->1, 0x89e007: 1->0
 
-	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE8_LEGACY(crtc_r, crtc_w, 0xffff)
 ADDRESS_MAP_END
 
 /*************************************************************************************************************
@@ -985,54 +985,54 @@ static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
-	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
+	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0x00ff )
 
-	AM_RANGE(0x240000, 0x240001) AM_WRITE8(blit_addr0_w, 0xff00)
-	AM_RANGE(0x240002, 0x240003) AM_WRITE8(blit_addr1_w, 0xff00)
-	AM_RANGE(0x240004, 0x240005) AM_WRITE8(blit_addr2_w, 0xff00)
+	AM_RANGE(0x240000, 0x240001) AM_WRITE8_LEGACY(blit_addr0_w, 0xff00)
+	AM_RANGE(0x240002, 0x240003) AM_WRITE8_LEGACY(blit_addr1_w, 0xff00)
+	AM_RANGE(0x240004, 0x240005) AM_WRITE8_LEGACY(blit_addr2_w, 0xff00)
 
-	AM_RANGE(0x240006, 0x240007) AM_WRITE8(blit_x_w, 0xff00)
-	AM_RANGE(0x240008, 0x240009) AM_WRITE8(blit_y_w, 0xff00)
+	AM_RANGE(0x240006, 0x240007) AM_WRITE8_LEGACY(blit_x_w, 0xff00)
+	AM_RANGE(0x240008, 0x240009) AM_WRITE8_LEGACY(blit_y_w, 0xff00)
 
-	AM_RANGE(0x24000a, 0x24000b) AM_WRITE8(blit_w_w, 0xff00)
-	AM_RANGE(0x24000c, 0x24000d) AM_WRITE8(blit_h_w, 0xff00)
+	AM_RANGE(0x24000a, 0x24000b) AM_WRITE8_LEGACY(blit_w_w, 0xff00)
+	AM_RANGE(0x24000c, 0x24000d) AM_WRITE8_LEGACY(blit_h_w, 0xff00)
 
-	AM_RANGE(0x24000e, 0x24000f) AM_WRITE8(blit_draw_w, 0xff00)
+	AM_RANGE(0x24000e, 0x24000f) AM_WRITE8_LEGACY(blit_draw_w, 0xff00)
 
-	AM_RANGE(0x260000, 0x260001) AM_WRITE8(blit_pen0_w, 0xff00)
-	AM_RANGE(0x260002, 0x260003) AM_WRITE8(blit_pen1_w, 0xff00)
-	AM_RANGE(0x260004, 0x260005) AM_WRITE8(blit_pen2_w, 0xff00)
-	AM_RANGE(0x260006, 0x260007) AM_WRITE8(blit_pen3_w, 0xff00)
+	AM_RANGE(0x260000, 0x260001) AM_WRITE8_LEGACY(blit_pen0_w, 0xff00)
+	AM_RANGE(0x260002, 0x260003) AM_WRITE8_LEGACY(blit_pen1_w, 0xff00)
+	AM_RANGE(0x260004, 0x260005) AM_WRITE8_LEGACY(blit_pen2_w, 0xff00)
+	AM_RANGE(0x260006, 0x260007) AM_WRITE8_LEGACY(blit_pen3_w, 0xff00)
 
-	AM_RANGE(0x280000, 0x280001) AM_READ8(blit_status_r, 0xff00)
+	AM_RANGE(0x280000, 0x280001) AM_READ8_LEGACY(blit_status_r, 0xff00)
 
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE("crtc", crtc_lpen_w)
+	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_READNOP
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITENOP	// 1->0 (MCU related?)
 
-	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE8(blit_flag0_w, 0xff00)
-	AM_RANGE(0x2e0002, 0x2e0003) AM_WRITE8(blit_flag1_w, 0xff00)
-	AM_RANGE(0x2e0004, 0x2e0005) AM_WRITE8(blit_flipx_w, 0xff00)	// flipx
-	AM_RANGE(0x2e0006, 0x2e0007) AM_WRITE8(blit_flipy_w, 0xff00)	// flipy
-	AM_RANGE(0x2e0008, 0x2e0009) AM_WRITE8(blit_solid_w, 0xff00)	// solid
-	AM_RANGE(0x2e000a, 0x2e000b) AM_WRITE8(blit_trans_w, 0xff00)	// transparency
-	AM_RANGE(0x2e000c, 0x2e000d) AM_WRITE8(blit_flag6_w, 0xff00)
-	AM_RANGE(0x2e000e, 0x2e000f) AM_WRITE8(blit_flag7_w, 0xff00)
+	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE8_LEGACY(blit_flag0_w, 0xff00)
+	AM_RANGE(0x2e0002, 0x2e0003) AM_WRITE8_LEGACY(blit_flag1_w, 0xff00)
+	AM_RANGE(0x2e0004, 0x2e0005) AM_WRITE8_LEGACY(blit_flipx_w, 0xff00)	// flipx
+	AM_RANGE(0x2e0006, 0x2e0007) AM_WRITE8_LEGACY(blit_flipy_w, 0xff00)	// flipy
+	AM_RANGE(0x2e0008, 0x2e0009) AM_WRITE8_LEGACY(blit_solid_w, 0xff00)	// solid
+	AM_RANGE(0x2e000a, 0x2e000b) AM_WRITE8_LEGACY(blit_trans_w, 0xff00)	// transparency
+	AM_RANGE(0x2e000c, 0x2e000d) AM_WRITE8_LEGACY(blit_flag6_w, 0xff00)
+	AM_RANGE(0x2e000e, 0x2e000f) AM_WRITE8_LEGACY(blit_flag7_w, 0xff00)
 
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
-	AM_RANGE(0x300004, 0x300005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x300004, 0x300005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 
-	AM_RANGE(0x400000, 0x400001) AM_READ8(dualgame_mcu_status_write_r, 0x00ff)
-	AM_RANGE(0x400002, 0x400003) AM_READ8(dualgame_mcu_status_read_r,  0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_READ8_LEGACY(dualgame_mcu_status_write_r, 0x00ff)
+	AM_RANGE(0x400002, 0x400003) AM_READ8_LEGACY(dualgame_mcu_status_read_r,  0x00ff)
 
-	AM_RANGE(0x400004, 0x400005) AM_READWRITE8(dualgame_mcu1_r, dualgame_mcu1_w, 0x00ff)
-	AM_RANGE(0x400006, 0x400007) AM_READWRITE8(dualgame_mcu2_r, dualgame_mcu2_w, 0xff00)
+	AM_RANGE(0x400004, 0x400005) AM_READWRITE8_LEGACY(dualgame_mcu1_r, dualgame_mcu1_w, 0x00ff)
+	AM_RANGE(0x400006, 0x400007) AM_READWRITE8_LEGACY(dualgame_mcu2_r, dualgame_mcu2_w, 0xff00)
 
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, status_r,   address_w,  0xff00)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0xff00)
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
 /*************************************************************************************************************
@@ -1090,36 +1090,36 @@ static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
-	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
-	AM_RANGE(0x840000, 0x840001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x840000, 0x840001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
-	AM_RANGE(0x840002, 0x840003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
-	AM_RANGE(0x840000, 0x840001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x840000, 0x840001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x840002, 0x840003) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0x00ff )
 
 
-	AM_RANGE(0x8c0000, 0x8c0003) AM_WRITE8( blit_pens_w, 0xffff )
+	AM_RANGE(0x8c0000, 0x8c0003) AM_WRITE8_LEGACY( blit_pens_w, 0xffff )
 
-	AM_RANGE(0x940000, 0x940001) AM_READ( hermit_mcu_r )
-	AM_RANGE(0x980000, 0x980001) AM_WRITE( hermit_mcu_w )
+	AM_RANGE(0x940000, 0x940001) AM_READ_LEGACY( hermit_mcu_r )
+	AM_RANGE(0x980000, 0x980001) AM_WRITE_LEGACY( hermit_mcu_w )
 
 	AM_RANGE(0x9c0000, 0x9c0001) AM_READ_PORT("IN0")
-	AM_RANGE(0x9c8000, 0x9c8001) AM_READ( hermit_track_r )
+	AM_RANGE(0x9c8000, 0x9c8001) AM_READ_LEGACY( hermit_track_r )
 	AM_RANGE(0x9d0000, 0x9d0001) AM_READ_PORT("IN2")
 	AM_RANGE(0x9d8000, 0x9d8001) AM_READ_PORT("DSW")
 
-	AM_RANGE(0x9e0000, 0x9e0001) AM_WRITE(hermit_leds1_w) AM_BASE_MEMBER(blitz68k_state, m_leds[0])
-	AM_RANGE(0x9e8000, 0x9e8001) AM_WRITE(hermit_leds2_w) AM_BASE_MEMBER(blitz68k_state, m_leds[1])
+	AM_RANGE(0x9e0000, 0x9e0001) AM_WRITE_LEGACY(hermit_leds1_w) AM_BASE( m_leds[0])
+	AM_RANGE(0x9e8000, 0x9e8001) AM_WRITE_LEGACY(hermit_leds2_w) AM_BASE( m_leds[1])
 
-	AM_RANGE(0x9f0000, 0x9f0003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
+	AM_RANGE(0x9f0000, 0x9f0003) AM_WRITE8_LEGACY(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x9f0004, 0x9f0005) AM_WRITEONLY
-	AM_RANGE(0x9f0006, 0x9f0007) AM_DEVWRITE("crtc", crtc_lpen_w)	// 0x9f0006: 0->1, 0x9f0007: 1->0
+	AM_RANGE(0x9f0006, 0x9f0007) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)	// 0x9f0006: 0->1, 0x9f0007: 1->0
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)	// triggered by MCU?
+	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE8_LEGACY(crtc_r, crtc_w, 0xffff)	// triggered by MCU?
 
-	AM_RANGE(0xc80000, 0xc80007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
+	AM_RANGE(0xc80000, 0xc80007) AM_WRITE8_LEGACY(blit_hwyxa_draw_w, 0xffff)
 ADDRESS_MAP_END
 
 /*************************************************************************************************************
@@ -1163,19 +1163,19 @@ static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_frame_buffer)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE( m_frame_buffer)
 
 	AM_RANGE(0x30000c, 0x30000d) AM_WRITENOP	// 0->1 (IRQ3 ack.?)
 	AM_RANGE(0x30000e, 0x30000f) AM_WRITENOP	// 1->0 (MCU related?)
 
-	AM_RANGE(0x500000, 0x500001) AM_READ8(maxidbl_mcu_status_write_r, 0x00ff)
-	AM_RANGE(0x500002, 0x500003) AM_READ8(maxidbl_mcu_status_read_r,  0x00ff)
+	AM_RANGE(0x500000, 0x500001) AM_READ8_LEGACY(maxidbl_mcu_status_write_r, 0x00ff)
+	AM_RANGE(0x500002, 0x500003) AM_READ8_LEGACY(maxidbl_mcu_status_read_r,  0x00ff)
 
-	AM_RANGE(0x500004, 0x500005) AM_READWRITE8(maxidbl_mcu1_r, maxidbl_mcu1_w, 0x00ff)
-	AM_RANGE(0x500006, 0x500007) AM_READWRITE8(maxidbl_mcu2_r, maxidbl_mcu2_w, 0xff00)
+	AM_RANGE(0x500004, 0x500005) AM_READWRITE8_LEGACY(maxidbl_mcu1_r, maxidbl_mcu1_w, 0x00ff)
+	AM_RANGE(0x500006, 0x500007) AM_READWRITE8_LEGACY(maxidbl_mcu2_r, maxidbl_mcu2_w, 0xff00)
 
-	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
-	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
+	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -1597,7 +1597,7 @@ const mc6845_interface mc6845_intf_irq5 =
 };
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, blitz68k_state )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 static RAMDAC_INTERFACE( ramdac_intf )

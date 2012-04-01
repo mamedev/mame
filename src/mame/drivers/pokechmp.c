@@ -107,19 +107,19 @@ static WRITE8_HANDLER( pokechmp_paletteram_w )
 
 static ADDRESS_MAP_START( pokechmp_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(pokechmp_videoram_w) AM_BASE_MEMBER(pokechmp_state, m_videoram)
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE_MEMBER(pokechmp_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE_LEGACY(pokechmp_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
-	AM_RANGE(0x1801, 0x1801) AM_WRITE(pokechmp_flipscreen_w)
+	AM_RANGE(0x1801, 0x1801) AM_WRITE_LEGACY(pokechmp_flipscreen_w)
 	/* 1800 - 0x181f are unused BAC-06 registers, see video/dec0.c */
 	AM_RANGE(0x1802, 0x181f) AM_WRITENOP
 
-	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2") AM_WRITE(pokechmp_sound_w)
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pokechmp_bank_w)
+	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2") AM_WRITE_LEGACY(pokechmp_sound_w)
+	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE_LEGACY(pokechmp_bank_w)
 
 	/* Extra on Poke Champ (not on Pocket Gal) */
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(pokechmp_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(pokechmp_paletteram_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")
@@ -131,13 +131,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pokechmp_sound_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP	/* MSM5205 chip on Pocket Gal, not connected here? */
-//  AM_RANGE(0x2000, 0x2000) AM_WRITE(pokechmp_sound_bank_w)/ * might still be sound bank */
-	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write) // extra
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-//  AM_RANGE(0x3400, 0x3400) AM_READ(pokechmp_adpcm_reset_r)    /* ? not sure */
+//  AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(pokechmp_sound_bank_w)/ * might still be sound bank */
+	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE("oki", okim6295_device, read, write) // extra
+	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r)
+//  AM_RANGE(0x3400, 0x3400) AM_READ_LEGACY(pokechmp_adpcm_reset_r)    /* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

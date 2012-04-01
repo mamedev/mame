@@ -155,19 +155,19 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	// ROM (banked)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM				            	// RAM (MCU data copied here)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(thedeep_protection_r, thedeep_protection_w)	// To MCU
-	AM_RANGE(0xe004, 0xe004) AM_READWRITE(thedeep_e004_r, thedeep_nmi_w)	//
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE_LEGACY(thedeep_protection_r, thedeep_protection_w)	// To MCU
+	AM_RANGE(0xe004, 0xe004) AM_READWRITE_LEGACY(thedeep_e004_r, thedeep_nmi_w)	//
 	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("e008")			// P1 (Inputs)
 	AM_RANGE(0xe009, 0xe009) AM_READ_PORT("e009")			// P2
 	AM_RANGE(0xe00a, 0xe00a) AM_READ_PORT("e00a")			// DSW1
 	AM_RANGE(0xe00b, 0xe00b) AM_READ_PORT("e00b")			// DSW2
-	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(thedeep_sound_w)	// To Sound CPU
-	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w)	// ?
-	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_BASE_MEMBER(thedeep_state, m_scroll)	// Scroll
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(thedeep_state, m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_BASE_MEMBER(thedeep_state, m_vram_1)	// Text Layer
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_BASE_MEMBER(thedeep_state, m_vram_0)	// Background Layer
-	AM_RANGE(0xf800, 0xf83f) AM_RAM AM_BASE_MEMBER(thedeep_state, m_scroll2				)	// Column Scroll
+	AM_RANGE(0xe00c, 0xe00c) AM_WRITE_LEGACY(thedeep_sound_w)	// To Sound CPU
+	AM_RANGE(0xe100, 0xe100) AM_WRITE_LEGACY(thedeep_e100_w)	// ?
+	AM_RANGE(0xe210, 0xe213) AM_WRITEONLY AM_BASE( m_scroll)	// Scroll
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(thedeep_vram_1_w) AM_BASE( m_vram_1)	// Text Layer
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(thedeep_vram_0_w) AM_BASE( m_vram_0)	// Background Layer
+	AM_RANGE(0xf800, 0xf83f) AM_RAM AM_BASE( m_scroll2				)	// Column Scroll
 	AM_RANGE(0xf840, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -180,8 +180,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ymsnd", ym2203_w)	//
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)	// From Main CPU
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)	//
+	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r)	// From Main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -262,10 +262,10 @@ static READ8_HANDLER( thedeep_p0_r )
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, thedeep_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READ(thedeep_p0_r)
-	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1) AM_WRITE(thedeep_p1_w)
-	AM_RANGE(MCS51_PORT_P2,MCS51_PORT_P2) AM_READWRITE(thedeep_from_main_r,thedeep_to_main_w)
-	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3) AM_WRITE(thedeep_p3_w)
+	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READ_LEGACY(thedeep_p0_r)
+	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1) AM_WRITE_LEGACY(thedeep_p1_w)
+	AM_RANGE(MCS51_PORT_P2,MCS51_PORT_P2) AM_READWRITE_LEGACY(thedeep_from_main_r,thedeep_to_main_w)
+	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3) AM_WRITE_LEGACY(thedeep_p3_w)
 ADDRESS_MAP_END
 
 

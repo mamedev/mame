@@ -3194,8 +3194,8 @@ static READ32_HANDLER(sh2_internal_a5)
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( sh2_internal_map, AS_PROGRAM, 32, legacy_cpu_device )
-	AM_RANGE(0x40000000, 0xbfffffff) AM_READ(sh2_internal_a5)
-	AM_RANGE(0xe0000000, 0xffffffff) AM_READWRITE(sh2_internal_r, sh2_internal_w)
+	AM_RANGE(0x40000000, 0xbfffffff) AM_READ_LEGACY(sh2_internal_a5)
+	AM_RANGE(0xe0000000, 0xffffffff) AM_READWRITE_LEGACY(sh2_internal_r, sh2_internal_w)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------

@@ -236,9 +236,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, beaminv_state )
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW")
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(controller_r)
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ(v128_r)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(beaminv_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ_LEGACY(controller_r)
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ_LEGACY(v128_r)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
@@ -251,7 +251,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, beaminv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(controller_select_w) /* to be confirmed */
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(controller_select_w) /* to be confirmed */
 ADDRESS_MAP_END
 
 

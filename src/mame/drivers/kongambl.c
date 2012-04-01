@@ -77,18 +77,18 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// main program
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM	// work RAM
 
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("k056832", k056832_ram_long_r, k056832_ram_long_w)
+	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)
 
-	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w)
+	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE_LEGACY("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w)
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_long_w)
+	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE_LEGACY("k056832", k056832_long_w)
 
-	AM_RANGE(0x700000, 0x700003) AM_READ( eeprom_r )
-	AM_RANGE(0x780000, 0x780003) AM_WRITE( eeprom_w )
+	AM_RANGE(0x700000, 0x700003) AM_READ_LEGACY( eeprom_r )
+	AM_RANGE(0x780000, 0x780003) AM_WRITE_LEGACY( eeprom_w )
 ADDRESS_MAP_END
 
 

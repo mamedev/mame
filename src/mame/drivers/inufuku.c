@@ -140,17 +140,17 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("P3")
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x280000, 0x280001) AM_WRITE(inufuku_soundcommand_w)	// sound command
+	AM_RANGE(0x280000, 0x280001) AM_WRITE_LEGACY(inufuku_soundcommand_w)	// sound command
 
-	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)						// palette ram
-	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_BASE_MEMBER(inufuku_state, m_bg_rasterram)									// bg raster ram
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_BASE_MEMBER(inufuku_state, m_bg_videoram)		// bg ram
-	AM_RANGE(0x402000, 0x403fff) AM_READWRITE(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_BASE_MEMBER(inufuku_state, m_tx_videoram)		// text ram
-	AM_RANGE(0x580000, 0x580fff) AM_RAM AM_BASE_SIZE_MEMBER(inufuku_state, m_spriteram1, m_spriteram1_size)							// sprite table + sprite attribute
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE_MEMBER(inufuku_state, m_spriteram2)											// cell table
+	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)						// palette ram
+	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_BASE( m_bg_rasterram)									// bg raster ram
+	AM_RANGE(0x400000, 0x401fff) AM_READWRITE_LEGACY(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_BASE( m_bg_videoram)		// bg ram
+	AM_RANGE(0x402000, 0x403fff) AM_READWRITE_LEGACY(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_BASE( m_tx_videoram)		// text ram
+	AM_RANGE(0x580000, 0x580fff) AM_RAM AM_BASE_SIZE( m_spriteram1, m_spriteram1_size)							// sprite table + sprite attribute
+	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE( m_spriteram2)											// cell table
 
-	AM_RANGE(0x780000, 0x780013) AM_WRITE(inufuku_palettereg_w)	// bg & text palettebank register
-	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE(inufuku_scrollreg_w)	// bg & text scroll register
+	AM_RANGE(0x780000, 0x780013) AM_WRITE_LEGACY(inufuku_palettereg_w)	// bg & text palettebank register
+	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE_LEGACY(inufuku_scrollreg_w)	// bg & text scroll register
 	AM_RANGE(0x7e0000, 0x7e0001) AM_WRITENOP					// ?
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM	// data rom
@@ -172,9 +172,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( inufuku_sound_io_map, AS_IO, 8, inufuku_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, pending_command_clear_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(inufuku_soundrombank_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(soundlatch_r, pending_command_clear_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 
 /******************************************************************************

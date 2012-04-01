@@ -178,14 +178,14 @@ static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("P1")
 	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("P2")
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("DSW")
-	AM_RANGE(0x080008, 0x080009) AM_READ(soundlatch2_word_r)	/* from sound cpu */
-	AM_RANGE(0x084000, 0x0843ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_BASE_MEMBER(megasys1_state, m_vregs)
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x08e000, 0x08ffff) AM_RAM AM_BASE_MEMBER(megasys1_state, m_objectram)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[0])
-	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[1])
-	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[2])
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE_MEMBER(megasys1_state, m_ram)
+	AM_RANGE(0x080008, 0x080009) AM_READ_LEGACY(soundlatch2_word_r)	/* from sound cpu */
+	AM_RANGE(0x084000, 0x0843ff) AM_RAM_WRITE_LEGACY(megasys1_vregs_A_w) AM_BASE( m_vregs)
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x08e000, 0x08ffff) AM_RAM AM_BASE( m_objectram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_0_w) AM_BASE( m_scrollram[0])
+	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_1_w) AM_BASE( m_scrollram[1])
+	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_2_w) AM_BASE( m_scrollram[2])
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE( m_ram)
 ADDRESS_MAP_END
 
 
@@ -258,15 +258,15 @@ static WRITE16_HANDLER( ip_select_w )
 static ADDRESS_MAP_START( megasys1B_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x044000, 0x0443ff) AM_RAM_WRITE(megasys1_vregs_A_w) AM_BASE_MEMBER(megasys1_state, m_vregs)
-	AM_RANGE(0x048000, 0x0487ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x04e000, 0x04ffff) AM_RAM AM_BASE_MEMBER(megasys1_state, m_objectram)
-	AM_RANGE(0x050000, 0x053fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[0])
-	AM_RANGE(0x054000, 0x057fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[1])
-	AM_RANGE(0x058000, 0x05bfff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[2])
-	AM_RANGE(0x060000, 0x07ffff) AM_RAM AM_BASE_MEMBER(megasys1_state, m_ram)
+	AM_RANGE(0x044000, 0x0443ff) AM_RAM_WRITE_LEGACY(megasys1_vregs_A_w) AM_BASE( m_vregs)
+	AM_RANGE(0x048000, 0x0487ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x04e000, 0x04ffff) AM_RAM AM_BASE( m_objectram)
+	AM_RANGE(0x050000, 0x053fff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_0_w) AM_BASE( m_scrollram[0])
+	AM_RANGE(0x054000, 0x057fff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_1_w) AM_BASE( m_scrollram[1])
+	AM_RANGE(0x058000, 0x05bfff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_2_w) AM_BASE( m_scrollram[2])
+	AM_RANGE(0x060000, 0x07ffff) AM_RAM AM_BASE( m_ram)
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0001) AM_READWRITE(ip_select_r,ip_select_w)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_READWRITE_LEGACY(ip_select_r,ip_select_w)
 ADDRESS_MAP_END
 
 
@@ -281,14 +281,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( megasys1C_map, AS_PROGRAM, 16, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE(megasys1_vregs_C_r,megasys1_vregs_C_w) AM_BASE_MEMBER(megasys1_state, m_vregs)
-	AM_RANGE(0x0d2000, 0x0d3fff) AM_RAM AM_BASE_MEMBER(megasys1_state, m_objectram)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[0])
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[1])
-	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[2])
-	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0d8000, 0x0d8001) AM_READWRITE(ip_select_r,ip_select_w)
-	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM AM_BASE_MEMBER(megasys1_state, m_ram) //0x1f****, Cybattler reads attract mode inputs at 0x1d****
+	AM_RANGE(0x0c0000, 0x0cffff) AM_READWRITE_LEGACY(megasys1_vregs_C_r,megasys1_vregs_C_w) AM_BASE( m_vregs)
+	AM_RANGE(0x0d2000, 0x0d3fff) AM_RAM AM_BASE( m_objectram)
+	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_0_w) AM_BASE( m_scrollram[0])
+	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_1_w) AM_BASE( m_scrollram[1])
+	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_2_w) AM_BASE( m_scrollram[2])
+	AM_RANGE(0x0f8000, 0x0f87ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0d8000, 0x0d8001) AM_READWRITE_LEGACY(ip_select_r,ip_select_w)
+	AM_RANGE(0x1c0000, 0x1cffff) AM_MIRROR(0x30000) AM_RAM AM_BASE( m_ram) //0x1f****, Cybattler reads attract mode inputs at 0x1d****
 ADDRESS_MAP_END
 
 
@@ -303,17 +303,17 @@ static INTERRUPT_GEN( megasys1D_irq )
 
 static ADDRESS_MAP_START( megasys1D_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0c9fff) AM_RAM_WRITE(megasys1_vregs_D_w) AM_BASE_MEMBER(megasys1_state, m_vregs)
-	AM_RANGE(0x0ca000, 0x0cbfff) AM_RAM AM_BASE_MEMBER(megasys1_state, m_objectram)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_WRITE(megasys1_scrollram_1_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[1])
-	AM_RANGE(0x0d4000, 0x0d7fff) AM_RAM_WRITE(megasys1_scrollram_2_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[2])
-	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0c0000, 0x0c9fff) AM_RAM_WRITE_LEGACY(megasys1_vregs_D_w) AM_BASE( m_vregs)
+	AM_RANGE(0x0ca000, 0x0cbfff) AM_RAM AM_BASE( m_objectram)
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_1_w) AM_BASE( m_scrollram[1])
+	AM_RANGE(0x0d4000, 0x0d7fff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_2_w) AM_BASE( m_scrollram[2])
+	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("DSW")
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(megasys1_scrollram_0_w) AM_BASE_MEMBER(megasys1_state, m_scrollram[0])
+	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE_LEGACY(megasys1_scrollram_0_w) AM_BASE( m_scrollram[0])
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0f8000, 0x0f8001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x0f8000, 0x0f8001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 //  AM_RANGE(0x100000, 0x100001) // protection
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE_MEMBER(megasys1_state, m_ram)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE( m_ram)
 ADDRESS_MAP_END
 
 
@@ -397,13 +397,13 @@ static READ8_DEVICE_HANDLER( oki_status_r )
 
 static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)
-	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	// to main cpu
-	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_r,ym2151_w, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8("oki1", oki_status_r, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8_MODERN("oki1", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8("oki2", oki_status_r, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8_MODERN("oki2", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x040000, 0x040001) AM_READ_LEGACY(soundlatch_word_r)
+	AM_RANGE(0x060000, 0x060001) AM_WRITE_LEGACY(soundlatch2_word_w)	// to main cpu
+	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r,ym2151_w, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8_LEGACY("oki1", oki_status_r, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8_LEGACY("oki2", oki_status_r, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8("oki2", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -415,13 +415,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megasys1B_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
-	AM_RANGE(0x060000, 0x060001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
-	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8("ymsnd", ym2151_r,ym2151_w, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8("oki1", oki_status_r, 0x00ff)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8_MODERN("oki1", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8("oki2", oki_status_r, 0x00ff)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8_MODERN("oki2", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x040000, 0x040001) AM_READWRITE_LEGACY(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
+	AM_RANGE(0x060000, 0x060001) AM_READWRITE_LEGACY(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
+	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r,ym2151_w, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8_LEGACY("oki1", oki_status_r, 0x00ff)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_DEVREAD8_LEGACY("oki2", oki_status_r, 0x00ff)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVWRITE8("oki2", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x0e0000, 0x0effff) AM_RAM
 ADDRESS_MAP_END
 
@@ -435,13 +435,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, megasys1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_sound_io_map, AS_IO, 8, megasys1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 

@@ -75,19 +75,19 @@ Ignore the warnings about writing to unmapped memory.
 static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x0000, 0x1dff) AM_RAM  /* RAM (of 1 sort or another) */
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(srumbler_background_w) AM_BASE_MEMBER(srumbler_state, m_backgroundram)
-	AM_RANGE(0x4008, 0x4008) AM_READ_PORT("SYSTEM") AM_WRITE(srumbler_bankswitch_w)
-	AM_RANGE(0x4009, 0x4009) AM_READ_PORT("P1") AM_WRITE(srumbler_4009_w)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE_LEGACY(srumbler_background_w) AM_BASE( m_backgroundram)
+	AM_RANGE(0x4008, 0x4008) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(srumbler_bankswitch_w)
+	AM_RANGE(0x4009, 0x4009) AM_READ_PORT("P1") AM_WRITE_LEGACY(srumbler_4009_w)
 	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("P2")
 	AM_RANGE(0x400b, 0x400b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x400c, 0x400c) AM_READ_PORT("DSW2")
-	AM_RANGE(0x400a, 0x400d) AM_WRITE(srumbler_scroll_w)
-	AM_RANGE(0x400e, 0x400e) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("5000")	AM_WRITE(srumbler_foreground_w) AM_BASE_MEMBER(srumbler_state, m_foregroundram) /* Banked ROM */
+	AM_RANGE(0x400a, 0x400d) AM_WRITE_LEGACY(srumbler_scroll_w)
+	AM_RANGE(0x400e, 0x400e) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x5000, 0x5fff) AM_ROMBANK("5000")	AM_WRITE_LEGACY(srumbler_foreground_w) AM_BASE( m_foregroundram) /* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("6000")	/* Banked ROM */
 	AM_RANGE(0x6000, 0x6fff) AM_WRITENOP	/* Video RAM 2 ??? (not used) */
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("7000")	/* Banked ROM */
-	AM_RANGE(0x7000, 0x73ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x7000, 0x73ff) AM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("8000")	/* Banked ROM */
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("9000")	/* Banked ROM */
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("a000")	/* Banked ROM */
@@ -100,10 +100,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srumbler_sound_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym2", ym2203_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

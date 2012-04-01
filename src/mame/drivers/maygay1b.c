@@ -848,29 +848,29 @@ static READ8_HANDLER( latch_st_lo )
 static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(reel12_w)
-	AM_RANGE(0x2010, 0x2010) AM_WRITE(reel34_w)
-	AM_RANGE(0x2020, 0x2020) AM_WRITE(reel56_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(reel12_w)
+	AM_RANGE(0x2010, 0x2010) AM_WRITE_LEGACY(reel34_w)
+	AM_RANGE(0x2020, 0x2020) AM_WRITE_LEGACY(reel56_w)
 
-	AM_RANGE(0x2030, 0x2031) AM_READWRITE(m1_8279_r,m1_8279_w)
-	AM_RANGE(0x2040, 0x2041) AM_READWRITE(m1_8279_2_r,m1_8279_2_w)
+	AM_RANGE(0x2030, 0x2031) AM_READWRITE_LEGACY(m1_8279_r,m1_8279_w)
+	AM_RANGE(0x2040, 0x2041) AM_READWRITE_LEGACY(m1_8279_2_r,m1_8279_2_w)
 	AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 
-	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE( "duart68681", duart68681_r, duart68681_w )
+	AM_RANGE(0x2070, 0x207f) AM_DEVREADWRITE_LEGACY( "duart68681", duart68681_r, duart68681_w )
 
-	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x20B0, 0x20B0) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x2090, 0x2091) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x20B0, 0x20B0) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 
-	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE_MODERN("pia", pia6821_device, write)
-	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD_MODERN("pia", pia6821_device, read)
+	AM_RANGE(0x20A0, 0x20A3) AM_DEVWRITE("pia", pia6821_device, write)
+	AM_RANGE(0x20A0, 0x20A3) AM_DEVREAD("pia", pia6821_device, read)
 
-	AM_RANGE(0x20C0, 0x20C7) AM_WRITE(m1_latch_w)
+	AM_RANGE(0x20C0, 0x20C7) AM_WRITE_LEGACY(m1_latch_w)
 
-	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE( "ymsnd", ym2413_w )
-	AM_RANGE(0x2404, 0x2405) AM_READ(latch_st_lo)
-	AM_RANGE(0x2406, 0x2407) AM_READ(latch_st_hi)
+	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_w )
+	AM_RANGE(0x2404, 0x2405) AM_READ_LEGACY(latch_st_lo)
+	AM_RANGE(0x2406, 0x2407) AM_READ_LEGACY(latch_st_hi)
 
-	AM_RANGE(0x2420, 0x2421) AM_WRITE( latch_ch2_w ) // oki
+	AM_RANGE(0x2420, 0x2421) AM_WRITE_LEGACY( latch_ch2_w ) // oki
 
 	AM_RANGE(0x2800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -4412,7 +4412,7 @@ static WRITE8_HANDLER( m1ab_no_oki_w )
 static DRIVER_INIT( m1 )
 {
 
-	//AM_RANGE(0x2420, 0x2421) AM_WRITE( latch_ch2_w ) // oki
+	//AM_RANGE(0x2420, 0x2421) AM_WRITE_LEGACY( latch_ch2_w ) // oki
 	// if there is no OKI region disable writes here, the rom might be missing, so alert user
 
 	UINT8 *okirom = machine.region( "oki" )->base();

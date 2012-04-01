@@ -218,20 +218,20 @@ static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
 
 static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16, vmetal_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_BASE_MEMBER(vmetal_state, m_texttileram)
-	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_BASE_MEMBER(vmetal_state, m_mid1tileram)
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(vmetal_mid2tileram_w) AM_BASE_MEMBER(vmetal_state, m_mid2tileram)
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE_LEGACY(vmetal_texttileram_w) AM_BASE( m_texttileram)
+	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE_LEGACY(vmetal_mid1tileram_w) AM_BASE( m_mid1tileram)
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE_LEGACY(vmetal_mid2tileram_w) AM_BASE( m_mid2tileram)
 
-	AM_RANGE(0x160000, 0x16ffff) AM_READ(varia_crom_read) // cgrom read window ..
+	AM_RANGE(0x160000, 0x16ffff) AM_READ_LEGACY(varia_crom_read) // cgrom read window ..
 
-	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE_MEMBER(vmetal_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE_LEGACY(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x175000, 0x177fff) AM_RAM
-	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_tlookup)
-	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_vmetal_videoregs)
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE_MEMBER(vmetal_state, m_videoregs)	// Metro sprite chip Video Registers
+	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE( m_tlookup)
+	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE( m_vmetal_videoregs)
+	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE( m_videoregs)	// Metro sprite chip Video Registers
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8("essnd", vmetal_control_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8_LEGACY("essnd", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 
 	/* same weird way to read Dip Switches as in many games in metro.c driver - use balcube_dsw_r read handler once the driver is merged */
@@ -243,18 +243,18 @@ static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16, vmetal_state )
 	AM_RANGE(0x31f7fe, 0x31f7ff) AM_READNOP					// 0x40 = dip1-11 -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
 	AM_RANGE(0x31fbfe, 0x31fbff) AM_READNOP					// 0x40 = dip1-10 -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
 	AM_RANGE(0x31fdfe, 0x31fdff) AM_READNOP					// 0x40 = dip1-9  -> 0xff0086 (doesn't exist in this game : address is NEVER read back)
-	AM_RANGE(0x31fefe, 0x31feff) AM_READ(varia_dips_bit8_r)	// 0x40 = dip1-8  -> 0xff0085 , 0x80 = dip2-8 -> 0xff0084
-	AM_RANGE(0x31ff7e, 0x31ff7f) AM_READ(varia_dips_bit7_r)	// 0x40 = dip1-7  -> 0xff0085 , 0x80 = dip2-7 -> 0xff0084
-	AM_RANGE(0x31ffbe, 0x31ffbf) AM_READ(varia_dips_bit6_r)	// 0x40 = dip1-6  -> 0xff0085 , 0x80 = dip2-6 -> 0xff0084
-	AM_RANGE(0x31ffde, 0x31ffdf) AM_READ(varia_dips_bit5_r)	// 0x40 = dip1-5  -> 0xff0085 , 0x80 = dip2-5 -> 0xff0084
-	AM_RANGE(0x31ffee, 0x31ffef) AM_READ(varia_dips_bit4_r)	// 0x40 = dip1-4  -> 0xff0085 , 0x80 = dip2-4 -> 0xff0084
-	AM_RANGE(0x31fff6, 0x31fff7) AM_READ(varia_dips_bit3_r)	// 0x40 = dip1-3  -> 0xff0085 , 0x80 = dip2-3 -> 0xff0084
-	AM_RANGE(0x31fffa, 0x31fffb) AM_READ(varia_dips_bit2_r)	// 0x40 = dip1-2  -> 0xff0085 , 0x80 = dip2-2 -> 0xff0084
-	AM_RANGE(0x31fffc, 0x31fffd) AM_READ(varia_dips_bit1_r)	// 0x40 = dip1-1  -> 0xff0085 , 0x80 = dip2-1 -> 0xff0084
+	AM_RANGE(0x31fefe, 0x31feff) AM_READ_LEGACY(varia_dips_bit8_r)	// 0x40 = dip1-8  -> 0xff0085 , 0x80 = dip2-8 -> 0xff0084
+	AM_RANGE(0x31ff7e, 0x31ff7f) AM_READ_LEGACY(varia_dips_bit7_r)	// 0x40 = dip1-7  -> 0xff0085 , 0x80 = dip2-7 -> 0xff0084
+	AM_RANGE(0x31ffbe, 0x31ffbf) AM_READ_LEGACY(varia_dips_bit6_r)	// 0x40 = dip1-6  -> 0xff0085 , 0x80 = dip2-6 -> 0xff0084
+	AM_RANGE(0x31ffde, 0x31ffdf) AM_READ_LEGACY(varia_dips_bit5_r)	// 0x40 = dip1-5  -> 0xff0085 , 0x80 = dip2-5 -> 0xff0084
+	AM_RANGE(0x31ffee, 0x31ffef) AM_READ_LEGACY(varia_dips_bit4_r)	// 0x40 = dip1-4  -> 0xff0085 , 0x80 = dip2-4 -> 0xff0084
+	AM_RANGE(0x31fff6, 0x31fff7) AM_READ_LEGACY(varia_dips_bit3_r)	// 0x40 = dip1-3  -> 0xff0085 , 0x80 = dip2-3 -> 0xff0084
+	AM_RANGE(0x31fffa, 0x31fffb) AM_READ_LEGACY(varia_dips_bit2_r)	// 0x40 = dip1-2  -> 0xff0085 , 0x80 = dip2-2 -> 0xff0084
+	AM_RANGE(0x31fffc, 0x31fffd) AM_READ_LEGACY(varia_dips_bit1_r)	// 0x40 = dip1-1  -> 0xff0085 , 0x80 = dip2-1 -> 0xff0084
 
-	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0x00ff)	// Volume/channel info
-	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8("essnd", vmetal_es8712_w, 0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
+	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)	// Volume/channel info
+	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8_LEGACY("essnd", vmetal_es8712_w, 0x00ff)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

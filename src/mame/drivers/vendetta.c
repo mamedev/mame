@@ -239,25 +239,25 @@ static READ8_DEVICE_HANDLER( vendetta_sound_r )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x5f80, 0x5f9f) AM_DEVREADWRITE("k054000", k054000_r, k054000_w)
-	AM_RANGE(0x5fa0, 0x5faf) AM_DEVWRITE("k053251", k053251_w)
-	AM_RANGE(0x5fb0, 0x5fb7) AM_DEVWRITE("k053246", k053246_w)
+	AM_RANGE(0x5f80, 0x5f9f) AM_DEVREADWRITE_LEGACY("k054000", k054000_r, k054000_w)
+	AM_RANGE(0x5fa0, 0x5faf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
+	AM_RANGE(0x5fb0, 0x5fb7) AM_DEVWRITE_LEGACY("k053246", k053246_w)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ_PORT("P1")
 	AM_RANGE(0x5fc1, 0x5fc1) AM_READ_PORT("P2")
 	AM_RANGE(0x5fc2, 0x5fc2) AM_READ_PORT("P3")
 	AM_RANGE(0x5fc3, 0x5fc3) AM_READ_PORT("P4")
 	AM_RANGE(0x5fd0, 0x5fd0) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x5fd1, 0x5fd1) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(vendetta_5fe0_w)
-	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(vendetta_eeprom_w)
-	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE("k053260", vendetta_sound_r, k053260_w)
-	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD("k053246", k053246_r)
-	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE_LEGACY(vendetta_5fe0_w)
+	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE_LEGACY(vendetta_eeprom_w)
+	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE_LEGACY(vendetta_sound_interrupt_r, z80_irq_w)
+	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE_LEGACY("k053260", vendetta_sound_r, k053260_w)
+	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD_LEGACY("k053246", k053246_r)
+	AM_RANGE(0x5fea, 0x5fea) AM_READ_LEGACY(watchdog_reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_r, k052109_w)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -269,19 +269,19 @@ static ADDRESS_MAP_START( esckids_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x3f83, 0x3f83) AM_READ_PORT("P4")				// ???  (But not used)
 	AM_RANGE(0x3f92, 0x3f92) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x3f93, 0x3f93) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x3fa0, 0x3fa7) AM_DEVWRITE("k053246", k053246_w)			// 053246 (Sprite)
-	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE("k053251", k053251_w)			// 053251 (Priority Encoder)
-	AM_RANGE(0x3fc0, 0x3fcf) AM_DEVREADWRITE("k053252",k053252_r,k053252_w)				// Not Emulated (053252 ???)
-	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)		// Coin Counter, 052109 RMRD, 053246 OBJCHA
-	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)	// EEPROM, Video banking
-	AM_RANGE(0x3fd4, 0x3fd4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)			// Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE("k053260", vendetta_sound_r, k053260_w)		// Sound
-	AM_RANGE(0x3fd8, 0x3fd9) AM_DEVREAD("k053246", k053246_r)				// 053246 (Sprite)
+	AM_RANGE(0x3fa0, 0x3fa7) AM_DEVWRITE_LEGACY("k053246", k053246_w)			// 053246 (Sprite)
+	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)			// 053251 (Priority Encoder)
+	AM_RANGE(0x3fc0, 0x3fcf) AM_DEVREADWRITE_LEGACY("k053252",k053252_r,k053252_w)				// Not Emulated (053252 ???)
+	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE_LEGACY(vendetta_5fe0_w)		// Coin Counter, 052109 RMRD, 053246 OBJCHA
+	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE_LEGACY(vendetta_eeprom_w)	// EEPROM, Video banking
+	AM_RANGE(0x3fd4, 0x3fd4) AM_READWRITE_LEGACY(vendetta_sound_interrupt_r, z80_irq_w)			// Sound
+	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE_LEGACY("k053260", vendetta_sound_r, k053260_w)		// Sound
+	AM_RANGE(0x3fd8, 0x3fd9) AM_DEVREAD_LEGACY("k053246", k053246_r)				// 053246 (Sprite)
 	AM_RANGE(0x3fda, 0x3fda) AM_WRITENOP				// Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")					// 052109 (Tilemap) 0x0000-0x0fff
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank2")					// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
-	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE("k052109", k052109_r, k052109_w)			// 052109 (Tilemap)
+	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)			// 052109 (Tilemap)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")					// 053248 '975r01' 1M ROM (Banked)
 	AM_RANGE(0x8000, 0xffff) AM_ROM							// 053248 '975r01' 1M ROM (0x18000-0x1ffff)
 ADDRESS_MAP_END
@@ -290,9 +290,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_r, k053260_w)
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(z80_arm_nmi_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r, k053260_w)
 ADDRESS_MAP_END
 
 

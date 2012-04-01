@@ -149,30 +149,30 @@ static WRITE8_HANDLER( nmi_mask_w )
 static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8, mermaid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(mermaid_videoram2_w) AM_BASE_MEMBER(mermaid_state, m_videoram2)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(mermaid_videoram_w) AM_BASE_MEMBER(mermaid_state, m_videoram)
-	AM_RANGE(0xd800, 0xd81f) AM_RAM_WRITE(mermaid_bg_scroll_w) AM_BASE_MEMBER(mermaid_state, m_bg_scrollram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM_WRITE(mermaid_fg_scroll_w) AM_BASE_MEMBER(mermaid_state, m_fg_scrollram)
-	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_BASE_SIZE_MEMBER(mermaid_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(mermaid_colorram_w) AM_BASE_MEMBER(mermaid_state, m_colorram)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(mermaid_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(mermaid_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xd800, 0xd81f) AM_RAM_WRITE_LEGACY(mermaid_bg_scroll_w) AM_BASE( m_bg_scrollram)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM_WRITE_LEGACY(mermaid_fg_scroll_w) AM_BASE( m_fg_scrollram)
+	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE_LEGACY(mermaid_colorram_w) AM_BASE( m_colorram)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
-	AM_RANGE(0xe000, 0xe001) AM_RAM AM_BASE_MEMBER(mermaid_state, m_ay8910_enable)
+	AM_RANGE(0xe000, 0xe001) AM_RAM AM_BASE( m_ay8910_enable)
 	AM_RANGE(0xe002, 0xe004) AM_WRITENOP // ???
-	AM_RANGE(0xe005, 0xe005) AM_WRITE(mermaid_flip_screen_x_w)
-	AM_RANGE(0xe006, 0xe006) AM_WRITE(mermaid_flip_screen_y_w)
-	AM_RANGE(0xe007, 0xe007) AM_WRITE(nmi_mask_w)
+	AM_RANGE(0xe005, 0xe005) AM_WRITE_LEGACY(mermaid_flip_screen_x_w)
+	AM_RANGE(0xe006, 0xe006) AM_WRITE_LEGACY(mermaid_flip_screen_y_w)
+	AM_RANGE(0xe007, 0xe007) AM_WRITE_LEGACY(nmi_mask_w)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("P1") AM_WRITENOP // ???
 	AM_RANGE(0xe801, 0xe801) AM_WRITENOP	// ???
 	AM_RANGE(0xe802, 0xe802) AM_WRITENOP	// ???
 	AM_RANGE(0xe803, 0xe803) AM_WRITENOP	// ???
-	AM_RANGE(0xe804, 0xe804) AM_WRITE(rougien_gfxbankswitch1_w)
-	AM_RANGE(0xe805, 0xe805) AM_WRITE(rougien_gfxbankswitch2_w)
+	AM_RANGE(0xe804, 0xe804) AM_WRITE_LEGACY(rougien_gfxbankswitch1_w)
+	AM_RANGE(0xe805, 0xe805) AM_WRITE_LEGACY(rougien_gfxbankswitch2_w)
 	AM_RANGE(0xe807, 0xe807) AM_WRITENOP	// ???
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P2")
-	AM_RANGE(0xf800, 0xf800) AM_READ(mermaid_collision_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(mermaid_collision_r)
 	AM_RANGE(0xf802, 0xf802) AM_WRITENOP	// ???
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(mermaid_ay8910_write_port_w)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(mermaid_ay8910_control_port_w)
+	AM_RANGE(0xf806, 0xf806) AM_WRITE_LEGACY(mermaid_ay8910_write_port_w)
+	AM_RANGE(0xf807, 0xf807) AM_WRITE_LEGACY(mermaid_ay8910_control_port_w)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( rougien_sample_rom_lo_w )
@@ -205,9 +205,9 @@ static WRITE8_HANDLER( rougien_sample_playback_w )
 }
 
 static ADDRESS_MAP_START( rougien_map, AS_PROGRAM, 8, mermaid_state )
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(rougien_sample_playback_w)
-	AM_RANGE(0xe802, 0xe802) AM_WRITE(rougien_sample_rom_hi_w)
-	AM_RANGE(0xe803, 0xe803) AM_WRITE(rougien_sample_rom_lo_w)
+	AM_RANGE(0xe002, 0xe002) AM_WRITE_LEGACY(rougien_sample_playback_w)
+	AM_RANGE(0xe802, 0xe802) AM_WRITE_LEGACY(rougien_sample_rom_hi_w)
+	AM_RANGE(0xe803, 0xe803) AM_WRITE_LEGACY(rougien_sample_rom_lo_w)
 	AM_IMPORT_FROM( mermaid_map )
 ADDRESS_MAP_END
 

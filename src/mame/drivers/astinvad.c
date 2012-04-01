@@ -398,20 +398,20 @@ static ADDRESS_MAP_START( kamikaze_map, AS_PROGRAM, 8, astinvad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(astinvad_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spaceint_map, AS_PROGRAM, 8, astinvad_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_BASE_SIZE_MEMBER(astinvad_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE_LEGACY(spaceint_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( kamikaze_portmap, AS_IO, 8, astinvad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE(kamikaze_ppi_r, kamikaze_ppi_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(kamikaze_ppi_r, kamikaze_ppi_w)
 ADDRESS_MAP_END
 
 
@@ -419,9 +419,9 @@ static ADDRESS_MAP_START( spaceint_portmap, AS_IO, 8, astinvad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_WRITE(spaceint_sound1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(color_latch_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(spaceint_sound2_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(spaceint_sound1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(color_latch_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(spaceint_sound2_w)
 ADDRESS_MAP_END
 
 

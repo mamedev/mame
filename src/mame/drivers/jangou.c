@@ -392,15 +392,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
-	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
-	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w)
+	AM_RANGE(0x10,0x10) AM_WRITE_LEGACY(output_w)
+	AM_RANGE(0x11,0x11) AM_WRITE_LEGACY(mux_w)
+	AM_RANGE(0x12,0x17) AM_WRITE_LEGACY(blitter_process_w)
+	AM_RANGE(0x20,0x2f) AM_WRITE_LEGACY(blit_vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
-	AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
+	AM_RANGE(0x31,0x31) AM_WRITE_LEGACY(sound_latch_w)
 ADDRESS_MAP_END
 
 
@@ -410,8 +410,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x01,0x01) AM_WRITE(cvsd_w)
+	AM_RANGE(0x00,0x00) AM_READ_LEGACY(sound_latch_r)
+	AM_RANGE(0x01,0x01) AM_WRITE_LEGACY(cvsd_w)
 	AM_RANGE(0x02,0x02) AM_WRITENOP // Echoes sound command - acknowledge?
 ADDRESS_MAP_END
 
@@ -425,7 +425,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jngolady_cpu0_map, AS_PROGRAM, 8, jangou_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(master_com_r,master_com_w)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE_LEGACY(master_com_r,master_com_w)
 ADDRESS_MAP_END
 
 
@@ -435,8 +435,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jngolady_cpu1_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x01,0x01) AM_WRITE(adpcm_w)
+	AM_RANGE(0x00,0x00) AM_READ_LEGACY(sound_latch_r)
+	AM_RANGE(0x01,0x01) AM_WRITE_LEGACY(adpcm_w)
 	AM_RANGE(0x02,0x02) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -444,7 +444,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8, jangou_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM //internal ram for irq etc.
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP //write-only,irq related?
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(slave_com_r,slave_com_w)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE_LEGACY(slave_com_r,slave_com_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -463,15 +463,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntrygrl_cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW") //dsw + blitter busy flag
-	AM_RANGE(0x10,0x10) AM_WRITE(output_w)
-	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w )
+	AM_RANGE(0x10,0x10) AM_WRITE_LEGACY(output_w)
+	AM_RANGE(0x11,0x11) AM_WRITE_LEGACY(mux_w)
+	AM_RANGE(0x12,0x17) AM_WRITE_LEGACY(blitter_process_w)
+	AM_RANGE(0x20,0x2f) AM_WRITE_LEGACY(blit_vregs_w )
 	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
-//  AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
+//  AM_RANGE(0x31,0x31) AM_WRITE_LEGACY(sound_latch_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -487,14 +487,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roylcrdn_cpu0_io, AS_IO, 8, jangou_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSW")			/* DSW + blitter busy flag */
 	AM_RANGE(0x10,0x10) AM_WRITENOP					/* Writes continuosly 0's in attract mode, and 1's in game */
-	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
+	AM_RANGE(0x11,0x11) AM_WRITE_LEGACY(mux_w)
 	AM_RANGE(0x13,0x13) AM_READNOP					/* Often reads bit7 with unknown purposes */
-	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
-	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w)
+	AM_RANGE(0x12,0x17) AM_WRITE_LEGACY(blitter_process_w)
+	AM_RANGE(0x20,0x2f) AM_WRITE_LEGACY(blit_vregs_w)
 	AM_RANGE(0x30,0x30) AM_WRITENOP					/* Seems to write 0x10 on each sound event */
 ADDRESS_MAP_END
 

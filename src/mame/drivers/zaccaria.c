@@ -261,21 +261,21 @@ static WRITE8_HANDLER( nmi_mask_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_READONLY
-	AM_RANGE(0x6400, 0x6407) AM_READ(zaccaria_prot1_r)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE(zaccaria_videoram_w) AM_BASE_MEMBER(zaccaria_state, m_videoram)	/* 6400-67ff is 4 bits wide */
-	AM_RANGE(0x6800, 0x683f) AM_WRITE(zaccaria_attributes_w) AM_BASE_MEMBER(zaccaria_state, m_attributesram)
-	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE_MEMBER(zaccaria_state, m_spriteram)
-	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_BASE_MEMBER(zaccaria_state, m_spriteram2)
-	AM_RANGE(0x6c00, 0x6c00) AM_WRITE(zaccaria_flip_screen_x_w)
-	AM_RANGE(0x6c01, 0x6c01) AM_WRITE(zaccaria_flip_screen_y_w)
+	AM_RANGE(0x6400, 0x6407) AM_READ_LEGACY(zaccaria_prot1_r)
+	AM_RANGE(0x6000, 0x67ff) AM_WRITE_LEGACY(zaccaria_videoram_w) AM_BASE( m_videoram)	/* 6400-67ff is 4 bits wide */
+	AM_RANGE(0x6800, 0x683f) AM_WRITE_LEGACY(zaccaria_attributes_w) AM_BASE( m_attributesram)
+	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_BASE( m_spriteram2)
+	AM_RANGE(0x6c00, 0x6c00) AM_WRITE_LEGACY(zaccaria_flip_screen_x_w)
+	AM_RANGE(0x6c01, 0x6c01) AM_WRITE_LEGACY(zaccaria_flip_screen_y_w)
 	AM_RANGE(0x6c02, 0x6c02) AM_WRITENOP    /* sound reset */
-	AM_RANGE(0x6c06, 0x6c06) AM_WRITE(coin_w)
-	AM_RANGE(0x6c07, 0x6c07) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x6c00, 0x6c07) AM_READ(zaccaria_prot2_r)
-	AM_RANGE(0x6e00, 0x6e00) AM_READWRITE(zaccaria_dsw_r, sound_command_w)
+	AM_RANGE(0x6c06, 0x6c06) AM_WRITE_LEGACY(coin_w)
+	AM_RANGE(0x6c07, 0x6c07) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0x6c00, 0x6c07) AM_READ_LEGACY(zaccaria_prot2_r)
+	AM_RANGE(0x6e00, 0x6e00) AM_READWRITE_LEGACY(zaccaria_dsw_r, sound_command_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x7c00, 0x7c00) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x7c00, 0x7c00) AM_READ_LEGACY(watchdog_reset_r)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
@@ -302,7 +302,7 @@ ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START( sound_map_1, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write) AM_MIRROR(0x1ff0)
+	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia0", pia6821_device, read, write) AM_MIRROR(0x1ff0)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_MIRROR(0x2000) // rom 13
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_MIRROR(0x2000) // rom 9
 ADDRESS_MAP_END
@@ -329,10 +329,10 @@ ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START( sound_map_2, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM /* 6802 internal ram */
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write) AM_MIRROR(0x8F6C)
-	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac2", mc1408_data_w) AM_MIRROR(0x83FF) /* MC1408 */
-	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w) AM_MIRROR(0xC3FF)
-	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r) AM_MIRROR(0xC3FF)
+	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia6821_device, read, write) AM_MIRROR(0x8F6C)
+	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE_LEGACY("dac2", mc1408_data_w) AM_MIRROR(0x83FF) /* MC1408 */
+	AM_RANGE(0x1400, 0x1400) AM_WRITE_LEGACY(sound1_command_w) AM_MIRROR(0xC3FF)
+	AM_RANGE(0x1800, 0x1800) AM_READ_LEGACY(soundlatch_r) AM_MIRROR(0xC3FF)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 low
 	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_MIRROR(0x8000) // rom 7 with A12 low
 	AM_RANGE(0x6000, 0x6fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 high

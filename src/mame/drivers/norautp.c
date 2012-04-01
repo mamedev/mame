@@ -817,13 +817,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( norautp_portmap, AS_IO, 8, norautp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xa0, 0xa3) AM_MIRROR(0x1c) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
-//  AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
-	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
-	AM_RANGE(0xef, 0xef) AM_READ(test2_r)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xa0, 0xa3) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+//  AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE_LEGACY(vram_data_r, vram_data_w)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE_LEGACY(vram_addr_w)
+	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ_LEGACY(test_r)
+	AM_RANGE(0xef, 0xef) AM_READ_LEGACY(test2_r)
 ADDRESS_MAP_END
 
 /*

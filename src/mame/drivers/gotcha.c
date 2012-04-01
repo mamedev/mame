@@ -97,29 +97,29 @@ static WRITE16_DEVICE_HANDLER( gotcha_oki_bank_w )
 
 static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
-	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE("oki", gotcha_oki_bank_w)
+	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(soundlatch_word_w)
+	AM_RANGE(0x100002, 0x100003) AM_WRITE_LEGACY(gotcha_lamps_w)
+	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE_LEGACY("oki", gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(gotcha_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("DSW")
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(gotcha_gfxbank_select_w)
-	AM_RANGE(0x300002, 0x300009) AM_WRITE(gotcha_scroll_w)
+	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(gotcha_gfxbank_select_w)
+	AM_RANGE(0x300002, 0x300009) AM_WRITE_LEGACY(gotcha_scroll_w)
 //  { 0x30000c, 0x30000d,
-	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(gotcha_gfxbank_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(gotcha_fgvideoram_w) AM_BASE_MEMBER(gotcha_state, m_fgvideoram)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(gotcha_bgvideoram_w) AM_BASE_MEMBER(gotcha_state, m_bgvideoram)
+	AM_RANGE(0x30000e, 0x30000f) AM_WRITE_LEGACY(gotcha_gfxbank_w)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE_LEGACY(gotcha_fgvideoram_w) AM_BASE( m_fgvideoram)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(gotcha_bgvideoram_w) AM_BASE( m_bgvideoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gotcha_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_MODERN("oki", okim6295_device, write)	// TWO addresses!
-	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("oki", okim6295_device, write)	// TWO addresses!
+	AM_RANGE(0xc006, 0xc006) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
 

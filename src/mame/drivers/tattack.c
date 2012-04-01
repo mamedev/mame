@@ -70,8 +70,8 @@ static VIDEO_START( tattack )
 static ADDRESS_MAP_START( mem, AS_PROGRAM, 8, tattack_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 //  AM_RANGE(0x4000, 0x4000) AM_READNOP $315
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(tattack_state, m_videoram)
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE_MEMBER(tattack_state, m_colorram)	// color map ? something else .. only bits 1-3 are used
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE( m_colorram)	// color map ? something else .. only bits 1-3 are used
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")		// dsw ? something else ?
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP

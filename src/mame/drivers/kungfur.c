@@ -213,10 +213,10 @@ static void kfr_adpcm2_int(device_t *device)
 
 static ADDRESS_MAP_START( kungfur_map, AS_PROGRAM, 8, kungfur_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("adpcm1", kungfur_adpcm1_w)
-	AM_RANGE(0x4004, 0x4004) AM_DEVWRITE("adpcm2", kungfur_adpcm2_w)
-	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x400c, 0x400f) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("adpcm1", kungfur_adpcm1_w)
+	AM_RANGE(0x4004, 0x4004) AM_DEVWRITE_LEGACY("adpcm2", kungfur_adpcm2_w)
+	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x400c, 0x400f) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -279,27 +279,27 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x4000, 0x43ff) AM_RAM		/* 2114 x 2 (0x400 x 4bit each) */
 
 	/* 4800-480f connected to the 74LS259, A3 is data line so 4800-4807 write 0, and 4808-480f write 1 */
-	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(cpu_shared_ctrl_sub_w)
-	AM_RANGE(0x4801, 0x4801) AM_WRITE(nmi_disable_and_clear_line_w)
+	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE_LEGACY(cpu_shared_ctrl_sub_w)
+	AM_RANGE(0x4801, 0x4801) AM_WRITE_LEGACY(nmi_disable_and_clear_line_w)
 	AM_RANGE(0x4802, 0x4802) AM_NOP
 	AM_RANGE(0x4803, 0x4803) AM_NOP
-	AM_RANGE(0x4804, 0x4804) AM_WRITE(shougi_mcu_halt_off_w)
+	AM_RANGE(0x4804, 0x4804) AM_WRITE_LEGACY(shougi_mcu_halt_off_w)
 	AM_RANGE(0x4807, 0x4807) AM_WRITENOP	//?????? connected to +5v via resistor
-	AM_RANGE(0x4808, 0x4808) AM_WRITE(cpu_shared_ctrl_main_w)
-	AM_RANGE(0x4809, 0x4809) AM_WRITE(nmi_enable_w)
+	AM_RANGE(0x4808, 0x4808) AM_WRITE_LEGACY(cpu_shared_ctrl_main_w)
+	AM_RANGE(0x4809, 0x4809) AM_WRITE_LEGACY(nmi_enable_w)
 	AM_RANGE(0x480a, 0x480a) AM_NOP
 	AM_RANGE(0x480b, 0x480b) AM_NOP
-	AM_RANGE(0x480c, 0x480c) AM_WRITE(shougi_mcu_halt_on_w)
+	AM_RANGE(0x480c, 0x480c) AM_WRITE_LEGACY(shougi_mcu_halt_on_w)
 	AM_RANGE(0x480f, 0x480f) AM_NOP
 
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1")
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(shougi_watchdog_reset_w)	/* game won't boot if watchdog doesn't work */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE_LEGACY(shougi_watchdog_reset_w)	/* game won't boot if watchdog doesn't work */
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1") /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
 
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(shougi_state,m_videoram)	/* 4116 x 16 (32K) */
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(m_videoram)	/* 4116 x 16 (32K) */
 ADDRESS_MAP_END
 
 /* sub */
@@ -316,7 +316,7 @@ static READ8_HANDLER ( dummy_r )
 
 static ADDRESS_MAP_START( readport_sub, AS_IO, 8, shougi_state )
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
-	AM_RANGE(0x00, 0x00) AM_READ(dummy_r)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(dummy_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, shougi_state )

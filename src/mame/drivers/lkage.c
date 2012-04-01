@@ -137,11 +137,11 @@ static READ8_HANDLER(sound_status_r)
 static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE_MEMBER(lkage_state, m_vreg) /* video registers */
-	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
-	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ(sound_status_r)
-	AM_RANGE(0xf062, 0xf062) AM_READWRITE(lkage_mcu_r,lkage_mcu_w)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE( m_vreg) /* video registers */
+	AM_RANGE(0xf060, 0xf060) AM_WRITE_LEGACY(lkage_sound_command_w)
+	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ_LEGACY(sound_status_r)
+	AM_RANGE(0xf062, 0xf062) AM_READWRITE_LEGACY(lkage_mcu_r,lkage_mcu_w)
 	AM_RANGE(0xf063, 0xf063) AM_WRITENOP /* pulsed; nmi on sound cpu? */
 	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
@@ -149,13 +149,13 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0xf083, 0xf083) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("P1")
 	AM_RANGE(0xf086, 0xf086) AM_READ_PORT("P2")
-	AM_RANGE(0xf087, 0xf087) AM_READ(lkage_mcu_status_r)
+	AM_RANGE(0xf087, 0xf087) AM_READ_LEGACY(lkage_mcu_status_r)
 	AM_RANGE(0xf0a0, 0xf0a3) AM_RAM /* unknown */
-	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE_MEMBER(lkage_state, m_scroll)
+	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE( m_scroll)
 	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITENOP /* pulsed */
-	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE_MEMBER(lkage_state, m_spriteram)
+	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0xf160, 0xf1ff) AM_RAM /* unknown - no valid sprite data */
-	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_BASE_MEMBER(lkage_state, m_videoram)
+	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE_LEGACY(lkage_videoram_w) AM_BASE( m_videoram)
 ADDRESS_MAP_END
 
 
@@ -165,17 +165,17 @@ static READ8_HANDLER( port_fetch_r )
 }
 
 static ADDRESS_MAP_START( lkage_io_map, AS_IO, 8, lkage_state )
-	AM_RANGE(0x4000, 0x7fff) AM_READ(port_fetch_r)
+	AM_RANGE(0x4000, 0x7fff) AM_READ_LEGACY(port_fetch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lkage_m68705_map, AS_PROGRAM, 8, lkage_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lkage_68705_port_a_r,lkage_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lkage_68705_port_b_r,lkage_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(lkage_68705_port_c_r,lkage_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(lkage_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(lkage_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(lkage_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(lkage_68705_port_a_r,lkage_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(lkage_68705_port_b_r,lkage_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(lkage_68705_port_c_r,lkage_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(lkage_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(lkage_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(lkage_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -187,11 +187,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lkage_sound_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r,ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r) AM_WRITENOP	/* ??? */
-	AM_RANGE(0xb001, 0xb001) AM_READNOP	/* ??? */ AM_WRITE(lkage_sh_nmi_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP	/* ??? */
+	AM_RANGE(0xb001, 0xb001) AM_READNOP	/* ??? */ AM_WRITE_LEGACY(lkage_sh_nmi_enable_w)
+	AM_RANGE(0xb002, 0xb002) AM_WRITE_LEGACY(lkage_sh_nmi_disable_w)
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostic ROM? */
 ADDRESS_MAP_END

@@ -249,18 +249,18 @@ static ADDRESS_MAP_START( flyball_map, AS_PROGRAM, 8, flyball_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_NOP
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(flyball_pitcher_pic_w)
-	AM_RANGE(0x0802, 0x0802) AM_READ(flyball_scanline_r)
-	AM_RANGE(0x0803, 0x0803) AM_READ(flyball_potsense_r)
-	AM_RANGE(0x0804, 0x0804) AM_WRITE(flyball_ball_vert_w)
-	AM_RANGE(0x0805, 0x0805) AM_WRITE(flyball_ball_horz_w)
-	AM_RANGE(0x0806, 0x0806) AM_WRITE(flyball_pitcher_vert_w)
-	AM_RANGE(0x0807, 0x0807) AM_WRITE(flyball_pitcher_horz_w)
-	AM_RANGE(0x0900, 0x0900) AM_WRITE(flyball_potmask_w)
-	AM_RANGE(0x0a00, 0x0a07) AM_WRITE(flyball_misc_w)
-	AM_RANGE(0x0b00, 0x0b00) AM_READ(flyball_input_r)
-	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_BASE_MEMBER(flyball_state, m_playfield_ram)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE_MEMBER(flyball_state, m_rombase) /* program */
+	AM_RANGE(0x0801, 0x0801) AM_WRITE_LEGACY(flyball_pitcher_pic_w)
+	AM_RANGE(0x0802, 0x0802) AM_READ_LEGACY(flyball_scanline_r)
+	AM_RANGE(0x0803, 0x0803) AM_READ_LEGACY(flyball_potsense_r)
+	AM_RANGE(0x0804, 0x0804) AM_WRITE_LEGACY(flyball_ball_vert_w)
+	AM_RANGE(0x0805, 0x0805) AM_WRITE_LEGACY(flyball_ball_horz_w)
+	AM_RANGE(0x0806, 0x0806) AM_WRITE_LEGACY(flyball_pitcher_vert_w)
+	AM_RANGE(0x0807, 0x0807) AM_WRITE_LEGACY(flyball_pitcher_horz_w)
+	AM_RANGE(0x0900, 0x0900) AM_WRITE_LEGACY(flyball_potmask_w)
+	AM_RANGE(0x0a00, 0x0a07) AM_WRITE_LEGACY(flyball_misc_w)
+	AM_RANGE(0x0b00, 0x0b00) AM_READ_LEGACY(flyball_input_r)
+	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_BASE( m_playfield_ram)
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE( m_rombase) /* program */
 ADDRESS_MAP_END
 
 

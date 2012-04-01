@@ -869,12 +869,12 @@ DEFINE_LEGACY_SOUND_DEVICE(EXIDY_VENTURE, venture_sound);
 static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
-	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_DEVREADWRITE("custom", exidy_sh8253_r, exidy_sh8253_w)
-	AM_RANGE(0x2000, 0x27ff) AM_DEVWRITE("custom", exidy_sound_filter_w)
-	AM_RANGE(0x2800, 0x2807) AM_MIRROR(0x07f8) AM_DEVREADWRITE("custom", exidy_sh6840_r, exidy_sh6840_w)
-	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x07fc) AM_DEVWRITE("custom", exidy_sfxctrl_w)
+	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x1800, 0x1803) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("custom", exidy_sh8253_r, exidy_sh8253_w)
+	AM_RANGE(0x2000, 0x27ff) AM_DEVWRITE_LEGACY("custom", exidy_sound_filter_w)
+	AM_RANGE(0x2800, 0x2807) AM_MIRROR(0x07f8) AM_DEVREADWRITE_LEGACY("custom", exidy_sh6840_r, exidy_sh6840_w)
+	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x07fc) AM_DEVWRITE_LEGACY("custom", exidy_sfxctrl_w)
 	AM_RANGE(0x5800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -943,7 +943,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE("custom", mtrap_voiceio_r, mtrap_voiceio_w)
+	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE_LEGACY("custom", mtrap_voiceio_r, mtrap_voiceio_w)
 ADDRESS_MAP_END
 
 
@@ -1107,12 +1107,12 @@ DEFINE_LEGACY_SOUND_DEVICE(EXIDY_VICTORY, victory_sound);
 
 static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
-	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("custom", exidy_sh8253_r, exidy_sh8253_w)
+	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x3000, 0x3003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE_LEGACY("custom", exidy_sh8253_r, exidy_sh8253_w)
 	AM_RANGE(0x4000, 0x4fff) AM_NOP
-	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x0ff8) AM_DEVREADWRITE("custom", exidy_sh6840_r, exidy_sh6840_w)
-	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x0ffc) AM_DEVWRITE("custom", exidy_sfxctrl_w)
+	AM_RANGE(0x5000, 0x5007) AM_MIRROR(0x0ff8) AM_DEVREADWRITE_LEGACY("custom", exidy_sh6840_r, exidy_sh6840_w)
+	AM_RANGE(0x6000, 0x6003) AM_MIRROR(0x0ffc) AM_DEVWRITE_LEGACY("custom", exidy_sfxctrl_w)
 	AM_RANGE(0x7000, 0xafff) AM_NOP
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END

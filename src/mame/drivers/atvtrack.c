@@ -343,15 +343,15 @@ static MACHINE_RESET(atvtrack)
 
 static ADDRESS_MAP_START( atvtrack_main_map, AS_PROGRAM, 64, atvtrack_state )
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
-	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(area1_r, area1_w)
-	AM_RANGE(0x14000000, 0x14000007) AM_READWRITE(area2_r, area2_w) // data
-	AM_RANGE(0x14100000, 0x14100007) AM_READWRITE(area3_r, area3_w) // command
-	AM_RANGE(0x14200000, 0x14200007) AM_READWRITE(area4_r, area4_w) // address
+	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE_LEGACY(area1_r, area1_w)
+	AM_RANGE(0x14000000, 0x14000007) AM_READWRITE_LEGACY(area2_r, area2_w) // data
+	AM_RANGE(0x14100000, 0x14100007) AM_READWRITE_LEGACY(area3_r, area3_w) // command
+	AM_RANGE(0x14200000, 0x14200007) AM_READWRITE_LEGACY(area4_r, area4_w) // address
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atvtrack_main_port, AS_IO, 64, atvtrack_state )
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(ioport_r, ioport_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE_LEGACY(ioport_r, ioport_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atvtrack_sub_map, AS_PROGRAM, 64, atvtrack_state )
@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( atvtrack_sub_map, AS_PROGRAM, 64, atvtrack_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atvtrack_sub_port, AS_IO, 64, atvtrack_state )
-	/*AM_RANGE(0x00, 0x1f) AM_READWRITE(ioport_r, ioport_w) */
+	/*AM_RANGE(0x00, 0x1f) AM_READWRITE_LEGACY(ioport_r, ioport_w) */
 ADDRESS_MAP_END
 
 

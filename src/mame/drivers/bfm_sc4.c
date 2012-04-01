@@ -175,7 +175,7 @@ static WRITE16_HANDLER( sc4_mem_w )
 }
 
 static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16, sc4_adder4_state )
-	AM_RANGE(0x000000000, 0xffffffff) AM_READWRITE(sc4_mem_r, sc4_mem_w) 
+	AM_RANGE(0x000000000, 0xffffffff) AM_READWRITE_LEGACY(sc4_mem_r, sc4_mem_w) 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sc4_adder4_map, AS_PROGRAM, 32, sc4_adder4_state )

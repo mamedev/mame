@@ -142,10 +142,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, sg1000a_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("snsnd", sn76496_w)
-	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)
-	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
+	AM_RANGE(0xbe, 0xbe) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0xbf, 0xbf) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 /*************************************

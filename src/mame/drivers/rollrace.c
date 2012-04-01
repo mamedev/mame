@@ -42,34 +42,34 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROM			 /* only rollace2 */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd806, 0xd806) AM_READNOP /* looks like a watchdog, bit4 checked*/
-	AM_RANGE(0xd900, 0xd900) AM_READWRITE(ra_fake_d800_r,ra_fake_d800_w) /* protection ??*/
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(rollrace_state, m_videoram)
-	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_BASE_MEMBER(rollrace_state, m_colorram)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xd900, 0xd900) AM_READWRITE_LEGACY(ra_fake_d800_r,ra_fake_d800_w) /* protection ??*/
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xec00, 0xec0f) AM_NOP /* Analog sound effects ?? ec00 sound enable ?*/
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE_MEMBER(rollrace_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(rollrace_backgroundcolor_w)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE_LEGACY(rollrace_backgroundcolor_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(rollrace_bkgpen_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM") AM_WRITE(rollrace_backgroundpage_w)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(rollrace_flipy_w)
+	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE_LEGACY(rollrace_bkgpen_w)
+	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(rollrace_backgroundpage_w)
+	AM_RANGE(0xf803, 0xf803) AM_WRITE_LEGACY(rollrace_flipy_w)
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(rollrace_flipx_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_mask_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(rollrace_flipx_w)
+	AM_RANGE(0xfc01, 0xfc01) AM_WRITE_LEGACY(nmi_mask_w)
 	AM_RANGE(0xfc02, 0xfc03) AM_WRITENOP /* coin counters */
-	AM_RANGE(0xfc04, 0xfc05) AM_WRITE(rollrace_charbank_w)
-	AM_RANGE(0xfc06, 0xfc06) AM_WRITE(rollrace_spritebank_w)
+	AM_RANGE(0xfc04, 0xfc05) AM_WRITE_LEGACY(rollrace_charbank_w)
+	AM_RANGE(0xfc06, 0xfc06) AM_WRITE_LEGACY(rollrace_spritebank_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,sound_nmi_mask_w)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay3", ay8910_address_data_w)
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(soundlatch_r,sound_nmi_mask_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

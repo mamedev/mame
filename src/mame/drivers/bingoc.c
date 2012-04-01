@@ -106,10 +106,10 @@ static WRITE8_DEVICE_HANDLER( bingoc_play_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bingoc_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10007f) AM_READ(bingoc_rand_r) //comms? lamps?
-	AM_RANGE(0x180000, 0x18007f) AM_READ(bingoc_rand_r) //comms? lamps?
+	AM_RANGE(0x100000, 0x10007f) AM_READ_LEGACY(bingoc_rand_r) //comms? lamps?
+	AM_RANGE(0x180000, 0x18007f) AM_READ_LEGACY(bingoc_rand_r) //comms? lamps?
 #if !SOUND_TEST
-	AM_RANGE(0x180010, 0x180011) AM_WRITE(main_sound_latch_w) //WRONG there...
+	AM_RANGE(0x180010, 0x180011) AM_WRITE_LEGACY(main_sound_latch_w) //WRONG there...
 #endif
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -121,13 +121,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, bingoc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("upd", bingoc_play_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("upd", upd7759_port_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("upd", bingoc_play_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
 #if !SOUND_TEST
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r) //soundlatch
+	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(soundlatch_r) //soundlatch
 #else
-	AM_RANGE(0xc0, 0xc0) AM_READ(sound_test_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(sound_test_r)
 #endif
 ADDRESS_MAP_END
 

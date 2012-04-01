@@ -193,17 +193,17 @@ static WRITE32_HANDLER( gunbustr_gun_w )
 
 static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32, gunbustr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(gunbustr_state, m_ram)										/* main CPUA ram */
-	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_BASE_SIZE_MEMBER(gunbustr_state, m_spriteram, m_spriteram_size)				/* Sprite ram */
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)											/* motor, lamps etc. */
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE( m_ram)										/* main CPUA ram */
+	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)				/* Sprite ram */
+	AM_RANGE(0x380000, 0x380003) AM_WRITE_LEGACY(motor_control_w)											/* motor, lamps etc. */
 	AM_RANGE(0x390000, 0x3907ff) AM_RAM AM_SHARE("f3_shared")										/* Sound shared ram */
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x400000, 0x400007) AM_WRITE(gunbustr_input_w)											/* eerom etc. */
-	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)						/* gun coord read */
-	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)
-	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
-	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE(gunbustr_palette_w) AM_BASE_GENERIC(paletteram)			/* Palette ram */
+	AM_RANGE(0x400000, 0x400007) AM_WRITE_LEGACY(gunbustr_input_w)											/* eerom etc. */
+	AM_RANGE(0x500000, 0x500003) AM_READWRITE_LEGACY(gunbustr_gun_r, gunbustr_gun_w)						/* gun coord read */
+	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)
+	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
+	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE_LEGACY(gunbustr_palette_w) AM_BASE_GENERIC(paletteram)			/* Palette ram */
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM																/* network ram ?? */
 ADDRESS_MAP_END
 

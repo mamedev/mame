@@ -444,33 +444,33 @@ static void ide_interrupt(device_t *device, int state)
 static ADDRESS_MAP_START( memory_map, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM							// PRG ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM							// WORK RAM
-	AM_RANGE(0x480000, 0x48443f) AM_RAM_WRITE(paletteram32_w)		// COLOR RAM
+	AM_RANGE(0x480000, 0x48443f) AM_RAM_WRITE_LEGACY(paletteram32_w)		// COLOR RAM
 	                             AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)				// SOUND RAM
-	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE("k056832", k056832_long_r, k056832_long_w)		// VIDEO REG (tilemap)
-	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)					// ??
-	AM_RANGE(0x5a0000, 0x5a005f) AM_DEVWRITE("k055555", k055555_long_w)					// 055555: priority encoder
-	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8_MODERN("konami1", k054539_device, read, write, 0xff00ff00)
-	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8_MODERN("konami2", k054539_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x5c0000, 0x5c0003) AM_READ8(inp1_r, 0xffffffff)  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
-	AM_RANGE(0x5c8000, 0x5c8003) AM_READ8(inp2_r, 0xffffffff)  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
-	AM_RANGE(0x5d0000, 0x5d0003) AM_WRITE(light_ctrl_1_w)					// light/coin blocker control
-	AM_RANGE(0x5d2000, 0x5d2003) AM_WRITE(light_ctrl_2_w)					// light/coin blocker control
-	AM_RANGE(0x5d4000, 0x5d4003) AM_WRITE(v_ctrl_w)						// VIDEO control
-	AM_RANGE(0x5d6000, 0x5d6003) AM_WRITE(sndram_bank_w)					// SOUND RAM bank
-	AM_RANGE(0x5e0000, 0x5e0003) AM_READWRITE(turntable_r, turntable_select_w)		// input port control (turn tables)
-	AM_RANGE(0x600000, 0x601fff) AM_READ(v_rom_r)						// VIDEO ROM readthrough (for POST)
-	AM_RANGE(0x801000, 0x8017ff) AM_RAM AM_BASE_MEMBER(djmain_state, m_obj_ram)				// OBJECT RAM
-	AM_RANGE(0x802000, 0x802fff) AM_WRITE(unknown802000_w)					// ??
-	AM_RANGE(0x803000, 0x80309f) AM_READWRITE(obj_ctrl_r, obj_ctrl_w)			// OBJECT REGS
-	AM_RANGE(0x803800, 0x803fff) AM_READ(obj_rom_r)						// OBJECT ROM readthrough (for POST)
-	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE("k056832", k056832_ram_long_r, k056832_ram_long_w)	// VIDEO RAM (tilemap) (beatmania)
-	AM_RANGE(0xc02000, 0xc02047) AM_WRITE(unknownc02000_w)					// ??
-	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE("ide", ide_std_r, ide_std_w)				// IDE control regs (hiphopmania)
-	AM_RANGE(0xd4000c, 0xd4000f) AM_DEVREADWRITE("ide", ide_alt_r, ide_alt_w)				// IDE status control reg (hiphopmania)
-	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE("k056832", k056832_ram_long_r, k056832_ram_long_w)	// VIDEO RAM (tilemap) (hiphopmania)
-	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE("ide", ide_std_r, ide_std_w)				// IDE control regs (beatmania)
-	AM_RANGE(0xf4000c, 0xf4000f) AM_DEVREADWRITE("ide", ide_alt_r, ide_alt_w)				// IDE status control reg (beatmania)
+	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE_LEGACY(sndram_r, sndram_w)				// SOUND RAM
+	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE_LEGACY("k056832", k056832_long_r, k056832_long_w)		// VIDEO REG (tilemap)
+	AM_RANGE(0x590000, 0x590007) AM_WRITE_LEGACY(unknown590000_w)					// ??
+	AM_RANGE(0x5a0000, 0x5a005f) AM_DEVWRITE_LEGACY("k055555", k055555_long_w)					// 055555: priority encoder
+	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("konami1", k054539_device, read, write, 0xff00ff00)
+	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("konami2", k054539_device, read, write, 0x00ff00ff)
+	AM_RANGE(0x5c0000, 0x5c0003) AM_READ8_LEGACY(inp1_r, 0xffffffff)  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
+	AM_RANGE(0x5c8000, 0x5c8003) AM_READ8_LEGACY(inp2_r, 0xffffffff)  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
+	AM_RANGE(0x5d0000, 0x5d0003) AM_WRITE_LEGACY(light_ctrl_1_w)					// light/coin blocker control
+	AM_RANGE(0x5d2000, 0x5d2003) AM_WRITE_LEGACY(light_ctrl_2_w)					// light/coin blocker control
+	AM_RANGE(0x5d4000, 0x5d4003) AM_WRITE_LEGACY(v_ctrl_w)						// VIDEO control
+	AM_RANGE(0x5d6000, 0x5d6003) AM_WRITE_LEGACY(sndram_bank_w)					// SOUND RAM bank
+	AM_RANGE(0x5e0000, 0x5e0003) AM_READWRITE_LEGACY(turntable_r, turntable_select_w)		// input port control (turn tables)
+	AM_RANGE(0x600000, 0x601fff) AM_READ_LEGACY(v_rom_r)						// VIDEO ROM readthrough (for POST)
+	AM_RANGE(0x801000, 0x8017ff) AM_RAM AM_BASE( m_obj_ram)				// OBJECT RAM
+	AM_RANGE(0x802000, 0x802fff) AM_WRITE_LEGACY(unknown802000_w)					// ??
+	AM_RANGE(0x803000, 0x80309f) AM_READWRITE_LEGACY(obj_ctrl_r, obj_ctrl_w)			// OBJECT REGS
+	AM_RANGE(0x803800, 0x803fff) AM_READ_LEGACY(obj_rom_r)						// OBJECT ROM readthrough (for POST)
+	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)	// VIDEO RAM (tilemap) (beatmania)
+	AM_RANGE(0xc02000, 0xc02047) AM_WRITE_LEGACY(unknownc02000_w)					// ??
+	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE_LEGACY("ide", ide_std_r, ide_std_w)				// IDE control regs (hiphopmania)
+	AM_RANGE(0xd4000c, 0xd4000f) AM_DEVREADWRITE_LEGACY("ide", ide_alt_r, ide_alt_w)				// IDE status control reg (hiphopmania)
+	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)	// VIDEO RAM (tilemap) (hiphopmania)
+	AM_RANGE(0xf00000, 0xf0000f) AM_DEVREADWRITE_LEGACY("ide", ide_std_r, ide_std_w)				// IDE control regs (beatmania)
+	AM_RANGE(0xf4000c, 0xf4000f) AM_DEVREADWRITE_LEGACY("ide", ide_alt_r, ide_alt_w)				// IDE status control reg (beatmania)
 ADDRESS_MAP_END
 
 

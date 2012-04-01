@@ -108,15 +108,15 @@ static WRITE8_HANDLER( canyon_led_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, canyon_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
-	AM_RANGE(0x0400, 0x0401) AM_DEVWRITE("discrete", canyon_motor_w)
-	AM_RANGE(0x0500, 0x0500) AM_DEVWRITE("discrete", canyon_explode_w)
-	AM_RANGE(0x0501, 0x0501) AM_WRITE(watchdog_reset_w) /* watchdog, disabled in service mode */
-	AM_RANGE(0x0600, 0x0603) AM_DEVWRITE("discrete", canyon_whistle_w)
-	AM_RANGE(0x0680, 0x0683) AM_WRITE(canyon_led_w)
-	AM_RANGE(0x0700, 0x0703) AM_DEVWRITE("discrete", canyon_attract_w)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(canyon_videoram_w) AM_BASE_MEMBER(canyon_state, m_videoram)
-	AM_RANGE(0x1000, 0x17ff) AM_READ(canyon_switches_r) AM_WRITENOP  /* sloppy code writes here */
-	AM_RANGE(0x1800, 0x1fff) AM_READ(canyon_options_r)
+	AM_RANGE(0x0400, 0x0401) AM_DEVWRITE_LEGACY("discrete", canyon_motor_w)
+	AM_RANGE(0x0500, 0x0500) AM_DEVWRITE_LEGACY("discrete", canyon_explode_w)
+	AM_RANGE(0x0501, 0x0501) AM_WRITE_LEGACY(watchdog_reset_w) /* watchdog, disabled in service mode */
+	AM_RANGE(0x0600, 0x0603) AM_DEVWRITE_LEGACY("discrete", canyon_whistle_w)
+	AM_RANGE(0x0680, 0x0683) AM_WRITE_LEGACY(canyon_led_w)
+	AM_RANGE(0x0700, 0x0703) AM_DEVWRITE_LEGACY("discrete", canyon_attract_w)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(canyon_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x1000, 0x17ff) AM_READ_LEGACY(canyon_switches_r) AM_WRITENOP  /* sloppy code writes here */
+	AM_RANGE(0x1800, 0x1fff) AM_READ_LEGACY(canyon_options_r)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 

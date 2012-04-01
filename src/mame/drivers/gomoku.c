@@ -41,16 +41,16 @@ static READ8_HANDLER( input_port_r )
 static ADDRESS_MAP_START( gomoku_map, AS_PROGRAM, 8, gomoku_state )
 	AM_RANGE(0x0000, 0x47ff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(gomoku_videoram_w) AM_BASE_MEMBER(gomoku_state, m_videoram)
-	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(gomoku_colorram_w) AM_BASE_MEMBER(gomoku_state, m_colorram)
-	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_BASE_MEMBER(gomoku_state, m_bgram)
-	AM_RANGE(0x6000, 0x601f) AM_DEVWRITE("gomoku", gomoku_sound1_w)
-	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("gomoku", gomoku_sound2_w)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE_LEGACY(gomoku_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE_LEGACY(gomoku_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE_LEGACY(gomoku_bgram_w) AM_BASE( m_bgram)
+	AM_RANGE(0x6000, 0x601f) AM_DEVWRITE_LEGACY("gomoku", gomoku_sound1_w)
+	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE_LEGACY("gomoku", gomoku_sound2_w)
 	AM_RANGE(0x7000, 0x7000) AM_WRITENOP
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(gomoku_flipscreen_w)
-	AM_RANGE(0x7002, 0x7002) AM_WRITE(gomoku_bg_dispsw_w)
+	AM_RANGE(0x7001, 0x7001) AM_WRITE_LEGACY(gomoku_flipscreen_w)
+	AM_RANGE(0x7002, 0x7002) AM_WRITE_LEGACY(gomoku_bg_dispsw_w)
 	AM_RANGE(0x7003, 0x7007) AM_WRITENOP
-	AM_RANGE(0x7800, 0x7807) AM_READ(input_port_r)
+	AM_RANGE(0x7800, 0x7807) AM_READ_LEGACY(input_port_r)
 	AM_RANGE(0x7800, 0x7800) AM_WRITENOP
 ADDRESS_MAP_END
 

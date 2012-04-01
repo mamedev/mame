@@ -107,12 +107,12 @@ static ADDRESS_MAP_START( d9final_map, AS_PROGRAM, 8, d9final_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_BASE_MEMBER(d9final_state, m_lo_vram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_BASE_MEMBER(d9final_state, m_hi_vram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_BASE_MEMBER(d9final_state, m_cram)
-	AM_RANGE(0xf000, 0xf000) AM_READ(prot_latch_r)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(sc0_lovram) AM_BASE( m_lo_vram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(sc0_hivram) AM_BASE( m_hi_vram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(sc0_cram) AM_BASE( m_cram)
+	AM_RANGE(0xf000, 0xf000) AM_READ_LEGACY(prot_latch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( d9final_io, AS_IO, 8, d9final_state )
@@ -121,10 +121,10 @@ static ADDRESS_MAP_START( d9final_io, AS_IO, 8, d9final_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWB")
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWC")
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ymsnd",ym2413_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ymsnd",ym2413_w)
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("DSWD")
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN1") AM_WRITE(d9final_bank_w)
+	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN1") AM_WRITE_LEGACY(d9final_bank_w)
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 

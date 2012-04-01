@@ -161,56 +161,56 @@ WRITE16_HANDLER( paletteram16_xbgr_word_be_tilehigh_w )
 
 static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_BASE_MEMBER(sshangha_state, m_sound_shared_ram)
+	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_BASE( m_sound_shared_ram)
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(sshangha_state, m_pf1_rowscroll)
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(sshangha_state, m_pf2_rowscroll)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE( m_pf1_rowscroll)
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE( m_pf2_rowscroll)
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
-	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x320000, 0x320001) AM_WRITE_LEGACY(sshangha_video_w)
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
 
 	AM_RANGE(0x340000, 0x340fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x350000, 0x350001) AM_READ(deco_71_r)
+	AM_RANGE(0x350000, 0x350001) AM_READ_LEGACY(deco_71_r)
 	AM_RANGE(0x350000, 0x350007) AM_WRITENOP
 	AM_RANGE(0x360000, 0x360fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
+	AM_RANGE(0x370000, 0x370001) AM_READ_LEGACY(deco_71_r)
 	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
 
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_BASE_MEMBER(sshangha_state, m_sprite_paletteram)
-	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE_MEMBER(sshangha_state, m_tile_paletteram2)
-	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_BASE_MEMBER(sshangha_state, m_sprite_paletteram2)
-	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE_MEMBER(sshangha_state, m_tile_paletteram1)
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_sprites_w) AM_BASE( m_sprite_paletteram)
+	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE( m_tile_paletteram2)
+	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_sprites2_w) AM_BASE( m_sprite_paletteram2)
+	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_tilelow_w) AM_BASE( m_tile_paletteram1)
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_BASE_MEMBER(sshangha_state, m_prot_data)
+	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE_LEGACY(sshangha_protection16_r,sshangha_protection16_w) AM_BASE( m_prot_data)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
-	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE_MEMBER(sshangha_state, m_sound_shared_ram) /* the bootleg writes here */
+	AM_RANGE(0x084000, 0x0847ff) AM_READ_LEGACY(sshanghb_protection16_r)
+	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE( m_sound_shared_ram) /* the bootleg writes here */
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(sshangha_state, m_pf1_rowscroll)
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(sshangha_state, m_pf2_rowscroll)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE( m_pf1_rowscroll)
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE( m_pf2_rowscroll)
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
-	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x320000, 0x320001) AM_WRITE_LEGACY(sshangha_video_w)
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
 
 	AM_RANGE(0x340000, 0x340fff) AM_RAM // original spriteram
 
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_BASE_MEMBER(sshangha_state, m_sprite_paletteram)
-	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE_MEMBER(sshangha_state, m_tile_paletteram2)
-	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_BASE_MEMBER(sshangha_state, m_sprite_paletteram2)
-	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE_MEMBER(sshangha_state, m_tile_paletteram1)
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_sprites_w) AM_BASE( m_sprite_paletteram)
+	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE( m_tile_paletteram2)
+	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_sprites2_w) AM_BASE( m_sprite_paletteram2)
+	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_tilelow_w) AM_BASE( m_tile_paletteram1)
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
 
 	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM AM_SHARE("spriteram") // bootleg spriteram
@@ -237,9 +237,9 @@ static WRITE8_HANDLER(sshangha_sound_shared_w)
 /* Note: there's rom data after 0x8000 but the game never seem to call a rom bank, left-over? */
 static ADDRESS_MAP_START( sshangha_sound_map, AS_PROGRAM, 8, sshangha_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
-	AM_RANGE(0xc200, 0xc201) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xf800, 0xf807) AM_READWRITE(sshangha_sound_shared_r,sshangha_sound_shared_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
+	AM_RANGE(0xc200, 0xc201) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xf800, 0xf807) AM_READWRITE_LEGACY(sshangha_sound_shared_r,sshangha_sound_shared_w)
 	AM_RANGE(0xf808, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

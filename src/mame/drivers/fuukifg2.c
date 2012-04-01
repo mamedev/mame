@@ -90,19 +90,19 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																		// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																		// RAM
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(fuuki16_vram_0_w) AM_BASE_MEMBER(fuuki16_state, m_vram[0])					// Layers
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(fuuki16_vram_1_w) AM_BASE_MEMBER(fuuki16_state, m_vram[1])					//
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE(fuuki16_vram_2_w) AM_BASE_MEMBER(fuuki16_state, m_vram[2])					//
-	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE(fuuki16_vram_3_w) AM_BASE_MEMBER(fuuki16_state, m_vram[3])					//
-	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_RAM AM_BASE_SIZE_MEMBER(fuuki16_state, m_spriteram, m_spriteram_size)	// Sprites, mirrored?
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(fuuki16_vram_0_w) AM_BASE( m_vram[0])					// Layers
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE_LEGACY(fuuki16_vram_1_w) AM_BASE( m_vram[1])					//
+	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE_LEGACY(fuuki16_vram_2_w) AM_BASE( m_vram[2])					//
+	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE_LEGACY(fuuki16_vram_3_w) AM_BASE( m_vram[3])					//
+	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	// Sprites, mirrored?
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x810000, 0x810001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("DSW")
-	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(fuuki16_sound_command_w)											// To Sound CPU
-	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(fuuki16_vregs_w) AM_BASE_MEMBER(fuuki16_state, m_vregs )						// Video Registers
-	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM AM_BASE_MEMBER(fuuki16_state, m_unknown)											//
-	AM_RANGE(0x8e0000, 0x8e0001) AM_RAM AM_BASE_MEMBER(fuuki16_state, m_priority)											//
+	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE_LEGACY(fuuki16_sound_command_w)											// To Sound CPU
+	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE_LEGACY(fuuki16_vregs_w) AM_BASE( m_vregs )						// Video Registers
+	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM AM_BASE( m_unknown)											//
+	AM_RANGE(0x8e0000, 0x8e0001) AM_RAM AM_BASE( m_priority)											//
 ADDRESS_MAP_END
 
 
@@ -141,14 +141,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki16_sound_io_map, AS_IO, 8, fuuki16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki16_sound_rombank_w)	// ROM Bank
-	AM_RANGE(0x11, 0x11) AM_READ(soundlatch_r) AM_WRITENOP	// From Main CPU / ? To Main CPU ?
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("oki", fuuki16_oki_banking_w)	// Oki Banking
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(fuuki16_sound_rombank_w)	// ROM Bank
+	AM_RANGE(0x11, 0x11) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP	// From Main CPU / ? To Main CPU ?
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("oki", fuuki16_oki_banking_w)	// Oki Banking
 	AM_RANGE(0x30, 0x30) AM_WRITENOP	// ? In the NMI routine
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ym2", ym3812_r, ym3812_w)
-	AM_RANGE(0x60, 0x60) AM_DEVREAD_MODERN("oki", okim6295_device, read)	// M6295
-	AM_RANGE(0x61, 0x61) AM_DEVWRITE_MODERN("oki", okim6295_device, write)	// M6295
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE_LEGACY("ym2", ym3812_r, ym3812_w)
+	AM_RANGE(0x60, 0x60) AM_DEVREAD("oki", okim6295_device, read)	// M6295
+	AM_RANGE(0x61, 0x61) AM_DEVWRITE("oki", okim6295_device, write)	// M6295
 ADDRESS_MAP_END
 
 

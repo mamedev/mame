@@ -90,19 +90,19 @@ static TIMER_DEVICE_CALLBACK( merlinmm_interrupt )
 
 static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE_MEMBER(pingpong_state, m_colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE_MEMBER(pingpong_state, m_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(pingpong_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(pingpong_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x9000, 0x9002) AM_RAM
-	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE_MEMBER(pingpong_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa880, 0xa880) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa900, 0xa900) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa980, 0xa980) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* coin counters + irq enables */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(coin_w)	/* coin counters + irq enables */
 	AM_RANGE(0xa200, 0xa200) AM_WRITENOP		/* SN76496 data latch */
-	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("snsnd", sn76496_w)	/* trigger read */
-	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* trigger read */
+	AM_RANGE(0xa600, 0xa600) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
@@ -111,19 +111,19 @@ static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
 	AM_RANGE(0x6000, 0x6007) AM_WRITENOP /* solenoid writes */
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN4")
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE_MEMBER(pingpong_state, m_colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE_MEMBER(pingpong_state, m_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(pingpong_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(pingpong_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x9000, 0x9002) AM_RAM
-	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE_MEMBER(pingpong_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* irq enables */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(coin_w)	/* irq enables */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("IN1")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN2")
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("IN3")
 	AM_RANGE(0xa200, 0xa200) AM_WRITENOP		/* SN76496 data latch */
-	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("snsnd", sn76496_w)	/* trigger read */
-	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* trigger read */
+	AM_RANGE(0xa600, 0xa600) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 
 

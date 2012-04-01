@@ -190,31 +190,31 @@ static ADDRESS_MAP_START( fromanc2_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// MAIN ROM
 
 	AM_RANGE(0x802000, 0x802fff) AM_READNOP								// ???
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromanc2_videoram_0_w)		// VRAM 0, 1 (1P)
-	AM_RANGE(0x880000, 0x883fff) AM_WRITE(fromanc2_videoram_1_w)		// VRAM 2, 3 (1P)
-	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromanc2_videoram_2_w)		// VRAM 0, 1 (2P)
-	AM_RANGE(0x980000, 0x983fff) AM_WRITE(fromanc2_videoram_3_w)		// VRAM 2, 3 (2P)
+	AM_RANGE(0x800000, 0x803fff) AM_WRITE_LEGACY(fromanc2_videoram_0_w)		// VRAM 0, 1 (1P)
+	AM_RANGE(0x880000, 0x883fff) AM_WRITE_LEGACY(fromanc2_videoram_1_w)		// VRAM 2, 3 (1P)
+	AM_RANGE(0x900000, 0x903fff) AM_WRITE_LEGACY(fromanc2_videoram_2_w)		// VRAM 0, 1 (2P)
+	AM_RANGE(0x980000, 0x983fff) AM_WRITE_LEGACY(fromanc2_videoram_3_w)		// VRAM 2, 3 (2P)
 
-	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(fromanc2_paletteram_0_r, fromanc2_paletteram_0_w)	// PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE(fromanc2_paletteram_1_r, fromanc2_paletteram_1_w)	// PALETTE (2P)
+	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE_LEGACY(fromanc2_paletteram_0_r, fromanc2_paletteram_0_w)	// PALETTE (1P)
+	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE_LEGACY(fromanc2_paletteram_1_r, fromanc2_paletteram_1_w)	// PALETTE (2P)
 
-	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromanc2_gfxreg_0_w)			// SCROLL REG (1P/2P)
-	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromanc2_gfxreg_2_w)			// SCROLL REG (1P/2P)
-	AM_RANGE(0xd00200, 0xd00223) AM_WRITE(fromanc2_gfxreg_1_w)			// SCROLL REG (1P/2P)
-	AM_RANGE(0xd00300, 0xd00323) AM_WRITE(fromanc2_gfxreg_3_w)			// SCROLL REG (1P/2P)
+	AM_RANGE(0xd00000, 0xd00023) AM_WRITE_LEGACY(fromanc2_gfxreg_0_w)			// SCROLL REG (1P/2P)
+	AM_RANGE(0xd00100, 0xd00123) AM_WRITE_LEGACY(fromanc2_gfxreg_2_w)			// SCROLL REG (1P/2P)
+	AM_RANGE(0xd00200, 0xd00223) AM_WRITE_LEGACY(fromanc2_gfxreg_1_w)			// SCROLL REG (1P/2P)
+	AM_RANGE(0xd00300, 0xd00323) AM_WRITE_LEGACY(fromanc2_gfxreg_3_w)			// SCROLL REG (1P/2P)
 
 	AM_RANGE(0xd00400, 0xd00413) AM_WRITENOP							// ???
 	AM_RANGE(0xd00500, 0xd00513) AM_WRITENOP							// ???
 
-	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(fromanc2_sndcmd_w)			// SOUND REQ (1P/2P)
+	AM_RANGE(0xd01000, 0xd01001) AM_WRITE_LEGACY(fromanc2_sndcmd_w)			// SOUND REQ (1P/2P)
 	AM_RANGE(0xd01100, 0xd01101) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)			// SUB CPU WRITE
-	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r	)			// SUB CPU READ
-	AM_RANGE(0xd01400, 0xd01401) AM_WRITE(fromanc2_gfxbank_0_w)			// GFXBANK (1P)
-	AM_RANGE(0xd01500, 0xd01501) AM_WRITE(fromanc2_gfxbank_1_w)			// GFXBANK (2P)
-	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromanc2_eeprom_w)			// EEPROM DATA
-	AM_RANGE(0xd01800, 0xd01801) AM_READ(fromanc2_keymatrix_r)			// INPUT KEY MATRIX
-	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(fromanc2_portselect_w)		// PORT SELECT (1P/2P)
+	AM_RANGE(0xd01200, 0xd01201) AM_WRITE_LEGACY(fromanc2_subcpu_w)			// SUB CPU WRITE
+	AM_RANGE(0xd01300, 0xd01301) AM_READ_LEGACY(fromanc2_subcpu_r	)			// SUB CPU READ
+	AM_RANGE(0xd01400, 0xd01401) AM_WRITE_LEGACY(fromanc2_gfxbank_0_w)			// GFXBANK (1P)
+	AM_RANGE(0xd01500, 0xd01501) AM_WRITE_LEGACY(fromanc2_gfxbank_1_w)			// GFXBANK (2P)
+	AM_RANGE(0xd01600, 0xd01601) AM_WRITE_LEGACY(fromanc2_eeprom_w)			// EEPROM DATA
+	AM_RANGE(0xd01800, 0xd01801) AM_READ_LEGACY(fromanc2_keymatrix_r)			// INPUT KEY MATRIX
+	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE_LEGACY(fromanc2_portselect_w)		// PORT SELECT (1P/2P)
 
 	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM									// WORK RAM
 ADDRESS_MAP_END
@@ -222,27 +222,27 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fromancr_main_map, AS_PROGRAM, 16, fromanc2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// MAIN ROM
 
-	AM_RANGE(0x800000, 0x803fff) AM_WRITE(fromancr_videoram_0_w)		// VRAM BG (1P/2P)
-	AM_RANGE(0x880000, 0x883fff) AM_WRITE(fromancr_videoram_1_w)		// VRAM FG (1P/2P)
-	AM_RANGE(0x900000, 0x903fff) AM_WRITE(fromancr_videoram_2_w)		// VRAM TEXT (1P/2P)
+	AM_RANGE(0x800000, 0x803fff) AM_WRITE_LEGACY(fromancr_videoram_0_w)		// VRAM BG (1P/2P)
+	AM_RANGE(0x880000, 0x883fff) AM_WRITE_LEGACY(fromancr_videoram_1_w)		// VRAM FG (1P/2P)
+	AM_RANGE(0x900000, 0x903fff) AM_WRITE_LEGACY(fromancr_videoram_2_w)		// VRAM TEXT (1P/2P)
 	AM_RANGE(0x980000, 0x983fff) AM_WRITENOP							// VRAM Unused ?
 
-	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(fromancr_paletteram_0_r, fromancr_paletteram_0_w)	// PALETTE (1P)
-	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE(fromancr_paletteram_1_r, fromancr_paletteram_1_w)	// PALETTE (2P)
+	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE_LEGACY(fromancr_paletteram_0_r, fromancr_paletteram_0_w)	// PALETTE (1P)
+	AM_RANGE(0xa80000, 0xa80fff) AM_READWRITE_LEGACY(fromancr_paletteram_1_r, fromancr_paletteram_1_w)	// PALETTE (2P)
 
-	AM_RANGE(0xd00000, 0xd00023) AM_WRITE(fromancr_gfxreg_1_w)			// SCROLL REG (1P/2P)
+	AM_RANGE(0xd00000, 0xd00023) AM_WRITE_LEGACY(fromancr_gfxreg_1_w)			// SCROLL REG (1P/2P)
 	AM_RANGE(0xd00200, 0xd002ff) AM_WRITENOP							// ?
 	AM_RANGE(0xd00400, 0xd00413) AM_WRITENOP							// ???
 	AM_RANGE(0xd00500, 0xd00513) AM_WRITENOP							// ???
-	AM_RANGE(0xd01000, 0xd01001) AM_WRITE(fromanc2_sndcmd_w)			// SOUND REQ (1P/2P)
-	AM_RANGE(0xd00100, 0xd00123) AM_WRITE(fromancr_gfxreg_0_w)			// SCROLL REG (1P/2P)
+	AM_RANGE(0xd01000, 0xd01001) AM_WRITE_LEGACY(fromanc2_sndcmd_w)			// SOUND REQ (1P/2P)
+	AM_RANGE(0xd00100, 0xd00123) AM_WRITE_LEGACY(fromancr_gfxreg_0_w)			// SCROLL REG (1P/2P)
 	AM_RANGE(0xd01100, 0xd01101) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd01200, 0xd01201) AM_WRITE(fromanc2_subcpu_w)			// SUB CPU WRITE
-	AM_RANGE(0xd01300, 0xd01301) AM_READ(fromanc2_subcpu_r)				// SUB CPU READ
+	AM_RANGE(0xd01200, 0xd01201) AM_WRITE_LEGACY(fromanc2_subcpu_w)			// SUB CPU WRITE
+	AM_RANGE(0xd01300, 0xd01301) AM_READ_LEGACY(fromanc2_subcpu_r)				// SUB CPU READ
 	AM_RANGE(0xd01400, 0xd01401) AM_WRITENOP							// COIN COUNTER ?
-	AM_RANGE(0xd01600, 0xd01601) AM_WRITE(fromancr_eeprom_w)			// EEPROM DATA, GFXBANK (1P/2P)
-	AM_RANGE(0xd01800, 0xd01801) AM_READ(fromanc2_keymatrix_r)			// INPUT KEY MATRIX
-	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE(fromanc2_portselect_w)		// PORT SELECT (1P/2P)
+	AM_RANGE(0xd01600, 0xd01601) AM_WRITE_LEGACY(fromancr_eeprom_w)			// EEPROM DATA, GFXBANK (1P/2P)
+	AM_RANGE(0xd01800, 0xd01801) AM_READ_LEGACY(fromanc2_keymatrix_r)			// INPUT KEY MATRIX
+	AM_RANGE(0xd01a00, 0xd01a01) AM_WRITE_LEGACY(fromanc2_portselect_w)		// PORT SELECT (1P/2P)
 
 	AM_RANGE(0xd80000, 0xd8ffff) AM_RAM									// WORK RAM
 ADDRESS_MAP_END
@@ -253,27 +253,27 @@ static ADDRESS_MAP_START( fromanc4_main_map, AS_PROGRAM, 16, fromanc2_state )
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM								// WORK RAM
 
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(fromanc2_portselect_w)	// PORT SELECT (1P/2P)
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE_LEGACY(fromanc2_portselect_w)	// PORT SELECT (1P/2P)
 
 	AM_RANGE(0xd10000, 0xd10001) AM_WRITENOP				// ?
 	AM_RANGE(0xd30000, 0xd30001) AM_WRITENOP				// ?
-	AM_RANGE(0xd50000, 0xd50001) AM_WRITE(fromanc4_eeprom_w)		// EEPROM DATA
+	AM_RANGE(0xd50000, 0xd50001) AM_WRITE_LEGACY(fromanc4_eeprom_w)		// EEPROM DATA
 
-	AM_RANGE(0xd70000, 0xd70001) AM_WRITE(fromanc2_sndcmd_w)		// SOUND REQ (1P/2P)
+	AM_RANGE(0xd70000, 0xd70001) AM_WRITE_LEGACY(fromanc2_sndcmd_w)		// SOUND REQ (1P/2P)
 
-	AM_RANGE(0xd80000, 0xd8ffff) AM_WRITE(fromanc4_videoram_0_w)	// VRAM FG (1P/2P)
-	AM_RANGE(0xd90000, 0xd9ffff) AM_WRITE(fromanc4_videoram_1_w)	// VRAM BG (1P/2P)
-	AM_RANGE(0xda0000, 0xdaffff) AM_WRITE(fromanc4_videoram_2_w)	// VRAM TEXT (1P/2P)
+	AM_RANGE(0xd80000, 0xd8ffff) AM_WRITE_LEGACY(fromanc4_videoram_0_w)	// VRAM FG (1P/2P)
+	AM_RANGE(0xd90000, 0xd9ffff) AM_WRITE_LEGACY(fromanc4_videoram_1_w)	// VRAM BG (1P/2P)
+	AM_RANGE(0xda0000, 0xdaffff) AM_WRITE_LEGACY(fromanc4_videoram_2_w)	// VRAM TEXT (1P/2P)
 
-	AM_RANGE(0xdb0000, 0xdb0fff) AM_READWRITE(fromanc4_paletteram_0_r, fromanc4_paletteram_0_w)	// PALETTE (1P)
-	AM_RANGE(0xdc0000, 0xdc0fff) AM_READWRITE(fromanc4_paletteram_1_r, fromanc4_paletteram_1_w)	// PALETTE (2P)
+	AM_RANGE(0xdb0000, 0xdb0fff) AM_READWRITE_LEGACY(fromanc4_paletteram_0_r, fromanc4_paletteram_0_w)	// PALETTE (1P)
+	AM_RANGE(0xdc0000, 0xdc0fff) AM_READWRITE_LEGACY(fromanc4_paletteram_1_r, fromanc4_paletteram_1_w)	// PALETTE (2P)
 
-	AM_RANGE(0xd10000, 0xd10001) AM_READ(fromanc2_keymatrix_r)	// INPUT KEY MATRIX
+	AM_RANGE(0xd10000, 0xd10001) AM_READ_LEGACY(fromanc2_keymatrix_r)	// INPUT KEY MATRIX
 	AM_RANGE(0xd20000, 0xd20001) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xe00000, 0xe0001d) AM_WRITE(fromanc4_gfxreg_0_w)	// SCROLL, GFXBANK (1P/2P)
-	AM_RANGE(0xe10000, 0xe1001d) AM_WRITE(fromanc4_gfxreg_1_w)	// SCROLL, GFXBANK (1P/2P)
-	AM_RANGE(0xe20000, 0xe2001d) AM_WRITE(fromanc4_gfxreg_2_w)	// SCROLL, GFXBANK (1P/2P)
+	AM_RANGE(0xe00000, 0xe0001d) AM_WRITE_LEGACY(fromanc4_gfxreg_0_w)	// SCROLL, GFXBANK (1P/2P)
+	AM_RANGE(0xe10000, 0xe1001d) AM_WRITE_LEGACY(fromanc4_gfxreg_1_w)	// SCROLL, GFXBANK (1P/2P)
+	AM_RANGE(0xe20000, 0xe2001d) AM_WRITE_LEGACY(fromanc4_gfxreg_2_w)	// SCROLL, GFXBANK (1P/2P)
 
 	AM_RANGE(0xe30000, 0xe30013) AM_WRITENOP				// ???
 	AM_RANGE(0xe40000, 0xe40013) AM_WRITENOP				// ???
@@ -292,10 +292,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_sub_io_map, AS_IO, 8, fromanc2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(fromanc2_subcpu_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(fromanc2_maincpu_r_l, fromanc2_maincpu_w_l)	// to/from MAIN CPU
-	AM_RANGE(0x04, 0x04) AM_READWRITE(fromanc2_maincpu_r_h, fromanc2_maincpu_w_h)	// to/from MAIN CPU
-	AM_RANGE(0x06, 0x06) AM_WRITE(fromanc2_subcpu_nmi_clr)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(fromanc2_subcpu_rombank_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(fromanc2_maincpu_r_l, fromanc2_maincpu_w_l)	// to/from MAIN CPU
+	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(fromanc2_maincpu_r_h, fromanc2_maincpu_w_h)	// to/from MAIN CPU
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(fromanc2_subcpu_nmi_clr)
 ADDRESS_MAP_END
 
 
@@ -306,10 +306,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_sound_io_map, AS_IO, 8, fromanc2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r) AM_WRITENOP			// snd cmd (1P) / ?
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch2_r)							// snd cmd (2P)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(fromanc2_sndcpu_nmi_clr)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP			// snd cmd (1P) / ?
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(soundlatch2_r)							// snd cmd (2P)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ_LEGACY(fromanc2_sndcpu_nmi_clr)
 ADDRESS_MAP_END
 
 

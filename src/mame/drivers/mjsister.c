@@ -281,23 +281,23 @@ static READ8_HANDLER( mjsister_keys_r )
 static ADDRESS_MAP_START( mjsister_map, AS_PROGRAM, 8, mjsister_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(mjsister_videoram_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(mjsister_videoram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjsister_io_map, AS_IO, 8, mjsister_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITENOP /* HD46505? */
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x12, 0x12) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x20, 0x20) AM_READ(mjsister_keys_r)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x12, 0x12) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x20, 0x20) AM_READ_LEGACY(mjsister_keys_r)
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
-	AM_RANGE(0x30, 0x30) AM_WRITE(mjsister_banksel1_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(mjsister_banksel2_w)
-	AM_RANGE(0x32, 0x32) AM_WRITE(mjsister_input_sel1_w)
-	AM_RANGE(0x33, 0x33) AM_WRITE(mjsister_input_sel2_w)
-	AM_RANGE(0x34, 0x34) AM_WRITE(mjsister_dac_adr_s_w)
-	AM_RANGE(0x35, 0x35) AM_WRITE(mjsister_dac_adr_e_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(mjsister_banksel1_w)
+	AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(mjsister_banksel2_w)
+	AM_RANGE(0x32, 0x32) AM_WRITE_LEGACY(mjsister_input_sel1_w)
+	AM_RANGE(0x33, 0x33) AM_WRITE_LEGACY(mjsister_input_sel2_w)
+	AM_RANGE(0x34, 0x34) AM_WRITE_LEGACY(mjsister_dac_adr_s_w)
+	AM_RANGE(0x35, 0x35) AM_WRITE_LEGACY(mjsister_dac_adr_e_w)
 ADDRESS_MAP_END
 
 

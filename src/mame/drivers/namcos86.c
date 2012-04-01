@@ -334,47 +334,47 @@ static MACHINE_RESET( namco86 )
 
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, namcos86_state )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w) AM_BASE_MEMBER(namcos86_state, m_rthunder_videoram1)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w) AM_BASE_MEMBER(namcos86_state, m_rthunder_videoram2)
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_LEGACY(rthunder_videoram1_r,rthunder_videoram1_w) AM_BASE( m_rthunder_videoram1)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(rthunder_videoram2_r,rthunder_videoram2_w) AM_BASE( m_rthunder_videoram2)
 
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
 
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w)
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE_LEGACY(rthunder_spriteram_r,rthunder_spriteram_w)
 
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 
 	/* ROM & Voice expansion board - only some games have it */
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(cus115_w)	/* ROM bank select and 63701X sample player control */
+	AM_RANGE(0x6000, 0x7fff) AM_WRITE_LEGACY(cus115_w)	/* ROM bank select and 63701X sample player control */
 
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog1_w)
-	AM_RANGE(0x8400, 0x8400) AM_WRITE(int_ack1_w) /* IRQ acknowledge */
-	AM_RANGE(0x8800, 0x8fff) AM_WRITE(rthunder_tilebank_select_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(watchdog1_w)
+	AM_RANGE(0x8400, 0x8400) AM_WRITE_LEGACY(int_ack1_w) /* IRQ acknowledge */
+	AM_RANGE(0x8800, 0x8fff) AM_WRITE_LEGACY(rthunder_tilebank_select_w)
 
-	AM_RANGE(0x9000, 0x9002) AM_WRITE(rthunder_scroll0_w)	/* scroll + priority */
-	AM_RANGE(0x9003, 0x9003) AM_WRITE(bankswitch1_w)
-	AM_RANGE(0x9004, 0x9006) AM_WRITE(rthunder_scroll1_w)	/* scroll + priority */
+	AM_RANGE(0x9000, 0x9002) AM_WRITE_LEGACY(rthunder_scroll0_w)	/* scroll + priority */
+	AM_RANGE(0x9003, 0x9003) AM_WRITE_LEGACY(bankswitch1_w)
+	AM_RANGE(0x9004, 0x9006) AM_WRITE_LEGACY(rthunder_scroll1_w)	/* scroll + priority */
 
-	AM_RANGE(0x9400, 0x9402) AM_WRITE(rthunder_scroll2_w)	/* scroll + priority */
+	AM_RANGE(0x9400, 0x9402) AM_WRITE_LEGACY(rthunder_scroll2_w)	/* scroll + priority */
 //  { 0x9403, 0x9403 } sub CPU rom bank select would be here
-	AM_RANGE(0x9404, 0x9406) AM_WRITE(rthunder_scroll3_w)	/* scroll + priority */
+	AM_RANGE(0x9404, 0x9406) AM_WRITE_LEGACY(rthunder_scroll3_w)	/* scroll + priority */
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(rthunder_backcolor_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(rthunder_backcolor_w)
 ADDRESS_MAP_END
 
 
 #define CPU2_MEMORY(NAME,ADDR_SPRITE,ADDR_VIDEO1,ADDR_VIDEO2,ADDR_ROM,ADDR_BANK,ADDR_WDOG,ADDR_INT)	\
 static ADDRESS_MAP_START( NAME##_cpu2_map, AS_PROGRAM, 8, namcos86_state ) 							\
-	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w) AM_BASE_MEMBER(namcos86_state, m_rthunder_spriteram)	\
-	AM_RANGE(ADDR_VIDEO1+0x0000, ADDR_VIDEO1+0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w)	\
-	AM_RANGE(ADDR_VIDEO2+0x0000, ADDR_VIDEO2+0x1fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w)	\
+	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_READWRITE_LEGACY(rthunder_spriteram_r,rthunder_spriteram_w) AM_BASE( m_rthunder_spriteram)	\
+	AM_RANGE(ADDR_VIDEO1+0x0000, ADDR_VIDEO1+0x1fff) AM_READWRITE_LEGACY(rthunder_videoram1_r,rthunder_videoram1_w)	\
+	AM_RANGE(ADDR_VIDEO2+0x0000, ADDR_VIDEO2+0x1fff) AM_READWRITE_LEGACY(rthunder_videoram2_r,rthunder_videoram2_w)	\
 	AM_RANGE(ADDR_ROM+0x0000, ADDR_ROM+0x1fff) AM_ROMBANK("bank2")								\
 	AM_RANGE(0x8000, 0xffff) AM_ROM																\
 /*  { ADDR_BANK+0x00, ADDR_BANK+0x02 } layer 2 scroll registers would be here */				\
-	AM_RANGE(ADDR_BANK+0x03, ADDR_BANK+0x03) AM_WRITE(bankswitch2_w)							\
+	AM_RANGE(ADDR_BANK+0x03, ADDR_BANK+0x03) AM_WRITE_LEGACY(bankswitch2_w)							\
 /*  { ADDR_BANK+0x04, ADDR_BANK+0x06 } layer 3 scroll registers would be here */				\
-	AM_RANGE(ADDR_WDOG, ADDR_WDOG) AM_WRITE(watchdog2_w)										\
-	AM_RANGE(ADDR_INT, ADDR_INT) AM_WRITE(int_ack2_w)	/* IRQ acknowledge */					\
+	AM_RANGE(ADDR_WDOG, ADDR_WDOG) AM_WRITE_LEGACY(watchdog2_w)										\
+	AM_RANGE(ADDR_INT, ADDR_INT) AM_WRITE_LEGACY(int_ack2_w)	/* IRQ acknowledge */					\
 ADDRESS_MAP_END
 
 #define UNUSED 0x4000
@@ -390,15 +390,15 @@ CPU2_MEMORY( wndrmomo, 0x2000, 0x4000, 0x6000, UNUSED, UNUSED, 0xc000, 0xc800 )
 
 #define MCU_MEMORY(NAME,ADDR_LOWROM,ADDR_INPUT,ADDR_UNK1,ADDR_UNK2)			\
 static ADDRESS_MAP_START( NAME##_mcu_map, AS_PROGRAM, 8, namcos86_state )	\
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r,m6801_io_w)	\
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r,m6801_io_w)	\
 	AM_RANGE(0x0080, 0x00ff) AM_RAM														\
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */	\
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */	\
 	AM_RANGE(0x1400, 0x1fff) AM_RAM														\
-	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	\
+	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	\
 	AM_RANGE(ADDR_INPUT+0x20, ADDR_INPUT+0x20) AM_READ_PORT("IN0")						\
 	AM_RANGE(ADDR_INPUT+0x21, ADDR_INPUT+0x21) AM_READ_PORT("IN1")						\
-	AM_RANGE(ADDR_INPUT+0x30, ADDR_INPUT+0x30) AM_READ(dsw0_r)							\
-	AM_RANGE(ADDR_INPUT+0x31, ADDR_INPUT+0x31) AM_READ(dsw1_r)							\
+	AM_RANGE(ADDR_INPUT+0x30, ADDR_INPUT+0x30) AM_READ_LEGACY(dsw0_r)							\
+	AM_RANGE(ADDR_INPUT+0x31, ADDR_INPUT+0x31) AM_READ_LEGACY(dsw1_r)							\
 	AM_RANGE(ADDR_LOWROM, ADDR_LOWROM+0x3fff) AM_ROM									\
 	AM_RANGE(0x8000, 0xbfff) AM_ROM														\
 	AM_RANGE(0xf000, 0xffff) AM_ROM														\
@@ -424,9 +424,9 @@ static READ8_HANDLER( readFF )
 
 static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos86_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("IN2")
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)	/* leds won't work otherwise */
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(namcos86_coin_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITE(namcos86_led_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ_LEGACY(readFF)	/* leds won't work otherwise */
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE_LEGACY(namcos86_coin_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_WRITE_LEGACY(namcos86_led_w)
 ADDRESS_MAP_END
 
 

@@ -33,12 +33,12 @@
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 16, cchasm_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04000f) AM_DEVREADWRITE8_MODERN("6840ptm", ptm6840_device, read, write, 0xff)
-	AM_RANGE(0x050000, 0x050001) AM_WRITE(cchasm_refresh_control_w)
-	AM_RANGE(0x060000, 0x060001) AM_READ_PORT("DSW") AM_WRITE(cchasm_led_w)
-	AM_RANGE(0x070000, 0x070001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0xf80000, 0xf800ff) AM_READWRITE(cchasm_io_r,cchasm_io_w)
-	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_BASE_MEMBER(cchasm_state, m_ram)
+	AM_RANGE(0x040000, 0x04000f) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff)
+	AM_RANGE(0x050000, 0x050001) AM_WRITE_LEGACY(cchasm_refresh_control_w)
+	AM_RANGE(0x060000, 0x060001) AM_READ_PORT("DSW") AM_WRITE_LEGACY(cchasm_led_w)
+	AM_RANGE(0x070000, 0x070001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0xf80000, 0xf800ff) AM_READWRITE_LEGACY(cchasm_io_r,cchasm_io_w)
+	AM_RANGE(0xffb000, 0xffffff) AM_RAM AM_BASE( m_ram)
 ADDRESS_MAP_END
 
 /*************************************
@@ -51,20 +51,20 @@ static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 8, cchasm_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_RAM
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0xf9e) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0xf9e) AM_READ(cchasm_coin_sound_r)
-	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0xf9e) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x6020, 0x6021) AM_MIRROR(0xf9e) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x6021, 0x6021) AM_MIRROR(0xf9e) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_READWRITE(soundlatch_r, soundlatch3_w)
-	AM_RANGE(0x6041, 0x6041) AM_MIRROR(0xf9e) AM_READWRITE(cchasm_soundlatch2_r, cchasm_soundlatch4_w)
-	AM_RANGE(0x6061, 0x6061) AM_MIRROR(0xf9e) AM_WRITE(cchasm_reset_coin_flag_w)
+	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0xf9e) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0xf9e) AM_READ_LEGACY(cchasm_coin_sound_r)
+	AM_RANGE(0x6001, 0x6001) AM_MIRROR(0xf9e) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x6020, 0x6021) AM_MIRROR(0xf9e) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x6021, 0x6021) AM_MIRROR(0xf9e) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x6040, 0x6040) AM_MIRROR(0xf9e) AM_READWRITE_LEGACY(soundlatch_r, soundlatch3_w)
+	AM_RANGE(0x6041, 0x6041) AM_MIRROR(0xf9e) AM_READWRITE_LEGACY(cchasm_soundlatch2_r, cchasm_soundlatch4_w)
+	AM_RANGE(0x6061, 0x6061) AM_MIRROR(0xf9e) AM_WRITE_LEGACY(cchasm_reset_coin_flag_w)
 	AM_RANGE(0x7041, 0x7041) AM_NOP // TODO
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, cchasm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 static WRITE_LINE_DEVICE_HANDLER( cchasm_6840_irq )

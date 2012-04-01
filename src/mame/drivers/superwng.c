@@ -287,35 +287,35 @@ static WRITE8_HANDLER(superwng_cointcnt2_w)
 static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8, superwng_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(superwng_bg_vram_w) AM_BASE_MEMBER(superwng_state, m_videoram_bg)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(superwng_fg_vram_w) AM_BASE_MEMBER(superwng_state, m_videoram_fg)
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(superwng_bg_cram_w) AM_BASE_MEMBER(superwng_state, m_colorram_bg)
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(superwng_fg_cram_w) AM_BASE_MEMBER(superwng_state, m_colorram_fg)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(superwng_bg_vram_w) AM_BASE( m_videoram_bg)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(superwng_fg_vram_w) AM_BASE( m_videoram_fg)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(superwng_bg_cram_w) AM_BASE( m_colorram_bg)
+	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE_LEGACY(superwng_fg_cram_w) AM_BASE( m_colorram_fg)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM  //collision map
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP //unknown
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(superwng_sound_interrupt_w)
+	AM_RANGE(0xa100, 0xa100) AM_WRITE_LEGACY(superwng_sound_interrupt_w)
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa180, 0xa180) AM_WRITENOP //watchdog ? int ack ?
-	AM_RANGE(0xa181, 0xa181) AM_WRITE(superwng_nmi_enable_w)
-	AM_RANGE(0xa182, 0xa182) AM_WRITE(superwng_tilebank_w)
-	AM_RANGE(0xa183, 0xa183) AM_WRITE(superwng_flip_screen_w)
-	AM_RANGE(0xa184, 0xa184) AM_WRITE(superwng_cointcnt1_w)
+	AM_RANGE(0xa181, 0xa181) AM_WRITE_LEGACY(superwng_nmi_enable_w)
+	AM_RANGE(0xa182, 0xa182) AM_WRITE_LEGACY(superwng_tilebank_w)
+	AM_RANGE(0xa183, 0xa183) AM_WRITE_LEGACY(superwng_flip_screen_w)
+	AM_RANGE(0xa184, 0xa184) AM_WRITE_LEGACY(superwng_cointcnt1_w)
 	AM_RANGE(0xa185, 0xa185) AM_WRITENOP //unknown , always(?) 0
-	AM_RANGE(0xa186, 0xa186) AM_WRITE(superwng_cointcnt2_w)
+	AM_RANGE(0xa186, 0xa186) AM_WRITE_LEGACY(superwng_cointcnt2_w)
 	AM_RANGE(0xa187, 0xa187) AM_WRITENOP //unknown , always(?) 0
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superwng_sound_map, AS_PROGRAM, 8, superwng_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(superwng_sound_nmi_clear_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(superwng_sound_nmi_clear_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( superwng )

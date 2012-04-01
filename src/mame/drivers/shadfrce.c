@@ -366,29 +366,29 @@ static TIMER_DEVICE_CALLBACK( shadfrce_scanline )
 
 static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(shadfrce_bg0videoram_w) AM_BASE_MEMBER(shadfrce_state,m_bg0videoram) /* video */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(shadfrce_bg0videoram_w) AM_BASE(m_bg0videoram) /* video */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(shadfrce_bg1videoram_w) AM_BASE_MEMBER(shadfrce_state,m_bg1videoram) /* bg 2 */
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE_LEGACY(shadfrce_bg1videoram_w) AM_BASE(m_bg1videoram) /* bg 2 */
 	AM_RANGE(0x102800, 0x103fff) AM_RAM
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(shadfrce_fgvideoram_w) AM_BASE_MEMBER(shadfrce_state,m_fgvideoram)
-	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_BASE_MEMBER(shadfrce_state,m_spvideoram) AM_SIZE_MEMBER(shadfrce_state,m_spvideoram_size) /* sprites */
-	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(shadfrce_bg0scrollx_w) /* SCROLL X */
-	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(shadfrce_bg0scrolly_w) /* SCROLL Y */
-	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE(shadfrce_bg1scrollx_w) /* SCROLL X */
-	AM_RANGE(0x1c0006, 0x1c0007) AM_WRITE(shadfrce_bg1scrolly_w) /* SCROLL Y */
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE_LEGACY(shadfrce_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_BASE(m_spvideoram) AM_SIZE(m_spvideoram_size) /* sprites */
+	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE_LEGACY(shadfrce_bg0scrollx_w) /* SCROLL X */
+	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE_LEGACY(shadfrce_bg0scrolly_w) /* SCROLL Y */
+	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE_LEGACY(shadfrce_bg1scrollx_w) /* SCROLL X */
+	AM_RANGE(0x1c0006, 0x1c0007) AM_WRITE_LEGACY(shadfrce_bg1scrolly_w) /* SCROLL Y */
 	AM_RANGE(0x1c0008, 0x1c0009) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1c000a, 0x1c000b) AM_READNOP AM_WRITE(shadfrce_flip_screen)
+	AM_RANGE(0x1c000a, 0x1c000b) AM_READNOP AM_WRITE_LEGACY(shadfrce_flip_screen)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1d0000, 0x1d0005) AM_WRITE(shadfrce_irq_ack_w)
-	AM_RANGE(0x1d0006, 0x1d0007) AM_WRITE(shadfrce_irq_w)
-	AM_RANGE(0x1d0008, 0x1d0009) AM_WRITE(shadfrce_scanline_w)
-	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_WRITE(shadfrce_sound_brt_w)	/* sound command + screen brightness */
+	AM_RANGE(0x1d0000, 0x1d0005) AM_WRITE_LEGACY(shadfrce_irq_ack_w)
+	AM_RANGE(0x1d0006, 0x1d0007) AM_WRITE_LEGACY(shadfrce_irq_w)
+	AM_RANGE(0x1d0008, 0x1d0009) AM_WRITE_LEGACY(shadfrce_scanline_w)
+	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_WRITE_LEGACY(shadfrce_sound_brt_w)	/* sound command + screen brightness */
 	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1d0016, 0x1d0017) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x1d0020, 0x1d0027) AM_READ(shadfrce_input_ports_r)
+	AM_RANGE(0x1d0016, 0x1d0017) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x1d0020, 0x1d0027) AM_READ_LEGACY(shadfrce_input_ports_r)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -402,10 +402,10 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("oki", oki_bankswitch_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -853,25 +853,25 @@ static READ32_HANDLER( jc_lan_r )
 static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_MIRROR(0x200000)
 	AM_RANGE(0x00400000, 0x01bfffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0x04000000, 0x040f7fff) AM_RAM AM_BASE_MEMBER(taitojc_state,m_vram)
-	AM_RANGE(0x040f8000, 0x040fbfff) AM_READWRITE(taitojc_tile_r, taitojc_tile_w)
-	AM_RANGE(0x040fc000, 0x040fefff) AM_READWRITE(taitojc_char_r, taitojc_char_w)
-	AM_RANGE(0x040ff000, 0x040fffff) AM_RAM AM_BASE_MEMBER(taitojc_state,m_objlist)
-	AM_RANGE(0x05800000, 0x0580003f) AM_READ8(jc_pcbid_r,0xffffffff)
-	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE(mcu_comm_r, mcu_comm_w)
+	AM_RANGE(0x04000000, 0x040f7fff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x040f8000, 0x040fbfff) AM_READWRITE_LEGACY(taitojc_tile_r, taitojc_tile_w)
+	AM_RANGE(0x040fc000, 0x040fefff) AM_READWRITE_LEGACY(taitojc_char_r, taitojc_char_w)
+	AM_RANGE(0x040ff000, 0x040fffff) AM_RAM AM_BASE(m_objlist)
+	AM_RANGE(0x05800000, 0x0580003f) AM_READ8_LEGACY(jc_pcbid_r,0xffffffff)
+	AM_RANGE(0x05900000, 0x05900007) AM_READWRITE_LEGACY(mcu_comm_r, mcu_comm_w)
 	//AM_RANGE(0x05a00000, 0x05a01fff)
 	//AM_RANGE(0x05fc0000, 0x05fc3fff)
-	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE(taitojc_palette_r, taitojc_palette_w) AM_BASE_MEMBER(taitojc_state,m_palette_ram)
-	AM_RANGE(0x06600000, 0x0660001f) AM_READ(jc_control_r)
-	AM_RANGE(0x06600000, 0x06600003) AM_WRITE(jc_control1_w) // watchdog
-	AM_RANGE(0x06600010, 0x06600013) AM_WRITE(jc_coin_counters_w)
-	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE(jc_control_w)
+	AM_RANGE(0x06400000, 0x0641ffff) AM_READWRITE_LEGACY(taitojc_palette_r, taitojc_palette_w) AM_BASE(m_palette_ram)
+	AM_RANGE(0x06600000, 0x0660001f) AM_READ_LEGACY(jc_control_r)
+	AM_RANGE(0x06600000, 0x06600003) AM_WRITE_LEGACY(jc_control1_w) // watchdog
+	AM_RANGE(0x06600010, 0x06600013) AM_WRITE_LEGACY(jc_coin_counters_w)
+	AM_RANGE(0x06600040, 0x0660004f) AM_WRITE_LEGACY(jc_control_w)
 	//AM_RANGE(0x06800000, 0x06801fff) AM_NOP       // unknown
-	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(f3_share_r, f3_share_w) AM_SHARE("f3_shared") AM_BASE_MEMBER(taitojc_state,m_f3_shared_ram)
-	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ(jc_lan_r) AM_WRITENOP // Dangerous Curves
-	AM_RANGE(0x06e00000, 0x06e00007) AM_WRITE(jc_meters_w)
-	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_BASE_MEMBER(taitojc_state,m_main_ram)
-	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
+	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE_LEGACY(f3_share_r, f3_share_w) AM_SHARE("f3_shared") AM_BASE(m_f3_shared_ram)
+	AM_RANGE(0x06c00000, 0x06c0001f) AM_READ_LEGACY(jc_lan_r) AM_WRITENOP // Dangerous Curves
+	AM_RANGE(0x06e00000, 0x06e00007) AM_WRITE_LEGACY(jc_meters_w)
+	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_BASE(m_main_ram)
+	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE_LEGACY(dsp_shared_r, dsp_shared_w)
 ADDRESS_MAP_END
 
 
@@ -921,10 +921,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8, taitojc_state )
 	AM_RANGE(MC68HC11_IO_PORTA,     MC68HC11_IO_PORTA    ) AM_NOP
-	AM_RANGE(MC68HC11_IO_PORTG,     MC68HC11_IO_PORTG    ) AM_READWRITE(hc11_comm_r, hc11_comm_w)
+	AM_RANGE(MC68HC11_IO_PORTG,     MC68HC11_IO_PORTG    ) AM_READWRITE_LEGACY(hc11_comm_r, hc11_comm_w)
 	AM_RANGE(MC68HC11_IO_PORTH,     MC68HC11_IO_PORTH    ) AM_NOP
-	AM_RANGE(MC68HC11_IO_SPI2_DATA, MC68HC11_IO_SPI2_DATA) AM_READWRITE(hc11_data_r, hc11_data_w)
-	AM_RANGE(MC68HC11_IO_AD0,       MC68HC11_IO_AD7      ) AM_READ(hc11_analog_r)
+	AM_RANGE(MC68HC11_IO_SPI2_DATA, MC68HC11_IO_SPI2_DATA) AM_READWRITE_LEGACY(hc11_data_r, hc11_data_w)
+	AM_RANGE(MC68HC11_IO_AD0,       MC68HC11_IO_AD7      ) AM_READ_LEGACY(hc11_analog_r)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1121,25 +1121,25 @@ static WRITE16_HANDLER( dsp_to_main_w )
 }
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, taitojc_state )
-//  AM_RANGE(0x0000, 0x1fff) AM_READ(dsp_internal_rom_r) // TODO: Dangerous Curves tries to access 0x207?
+//  AM_RANGE(0x0000, 0x1fff) AM_READ_LEGACY(dsp_internal_rom_r) // TODO: Dangerous Curves tries to access 0x207?
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tms_data_map, AS_DATA, 16, taitojc_state )
-	AM_RANGE(0x6a01, 0x6a02) AM_WRITE(dsp_unk2_w)
+	AM_RANGE(0x6a01, 0x6a02) AM_WRITE_LEGACY(dsp_unk2_w)
 	AM_RANGE(0x6a11, 0x6a12) AM_NOP		// same as 0x6a01..02 for the second renderer chip?
-	AM_RANGE(0x6b20, 0x6b20) AM_WRITE(dsp_polygon_fifo_w)
-	AM_RANGE(0x6b22, 0x6b22) AM_WRITE(dsp_texture_w)
-	AM_RANGE(0x6b23, 0x6b23) AM_READWRITE(dsp_texaddr_r, dsp_texaddr_w)
-	AM_RANGE(0x6c00, 0x6c01) AM_READWRITE(dsp_rom_r, dsp_rom_w)
-	AM_RANGE(0x7000, 0x7002) AM_WRITE(dsp_projection_w)
-	AM_RANGE(0x7010, 0x7012) AM_WRITE(dsp_intersection_w)
-	AM_RANGE(0x7013, 0x7015) AM_WRITE(dsp_viewport_w)
-	AM_RANGE(0x701b, 0x701b) AM_READ(dsp_intersection_r)
-	AM_RANGE(0x701d, 0x701f) AM_READ(dsp_projection_r)
-	AM_RANGE(0x7022, 0x7022) AM_READ(dsp_unk_r)
-	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE(dsp_to_main_r,dsp_to_main_w)
-	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE_MEMBER(taitojc_state,m_dsp_shared_ram)
+	AM_RANGE(0x6b20, 0x6b20) AM_WRITE_LEGACY(dsp_polygon_fifo_w)
+	AM_RANGE(0x6b22, 0x6b22) AM_WRITE_LEGACY(dsp_texture_w)
+	AM_RANGE(0x6b23, 0x6b23) AM_READWRITE_LEGACY(dsp_texaddr_r, dsp_texaddr_w)
+	AM_RANGE(0x6c00, 0x6c01) AM_READWRITE_LEGACY(dsp_rom_r, dsp_rom_w)
+	AM_RANGE(0x7000, 0x7002) AM_WRITE_LEGACY(dsp_projection_w)
+	AM_RANGE(0x7010, 0x7012) AM_WRITE_LEGACY(dsp_intersection_w)
+	AM_RANGE(0x7013, 0x7015) AM_WRITE_LEGACY(dsp_viewport_w)
+	AM_RANGE(0x701b, 0x701b) AM_READ_LEGACY(dsp_intersection_r)
+	AM_RANGE(0x701d, 0x701f) AM_READ_LEGACY(dsp_projection_r)
+	AM_RANGE(0x7022, 0x7022) AM_READ_LEGACY(dsp_unk_r)
+	AM_RANGE(0x7ffe, 0x7ffe) AM_READWRITE_LEGACY(dsp_to_main_r,dsp_to_main_w)
+	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(m_dsp_shared_ram)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

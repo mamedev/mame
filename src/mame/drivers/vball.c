@@ -207,7 +207,7 @@ static WRITE8_HANDLER(vb_scrollx_lo_w)
 //Cheaters note: Scores are stored in ram @ 0x57-0x58 (though the space is used for other things between matches)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_BASE_SIZE_MEMBER(vball_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("SYSTEM")
@@ -215,14 +215,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x1004, 0x1004) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1005, 0x1005) AM_READ_PORT("P3")
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P4")
-	AM_RANGE(0x1008, 0x1008) AM_WRITE(vb_scrollx_hi_w)
-	AM_RANGE(0x1009, 0x1009) AM_WRITE(vb_bankswitch_w)
-	AM_RANGE(0x100a, 0x100b) AM_WRITE(vball_irq_ack_w)	/* is there a scanline counter here? */
-	AM_RANGE(0x100c, 0x100c) AM_WRITE(vb_scrollx_lo_w)
-	AM_RANGE(0x100d, 0x100d) AM_WRITE(cpu_sound_command_w)
-	AM_RANGE(0x100e, 0x100e) AM_WRITEONLY AM_BASE_MEMBER(vball_state, m_vb_scrolly_lo)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(vb_videoram_w) AM_BASE_MEMBER(vball_state, m_vb_videoram)
-	AM_RANGE(0x3000, 0x3fff) AM_WRITE(vb_attrib_w) AM_BASE_MEMBER(vball_state, m_vb_attribram)
+	AM_RANGE(0x1008, 0x1008) AM_WRITE_LEGACY(vb_scrollx_hi_w)
+	AM_RANGE(0x1009, 0x1009) AM_WRITE_LEGACY(vb_bankswitch_w)
+	AM_RANGE(0x100a, 0x100b) AM_WRITE_LEGACY(vball_irq_ack_w)	/* is there a scanline counter here? */
+	AM_RANGE(0x100c, 0x100c) AM_WRITE_LEGACY(vb_scrollx_lo_w)
+	AM_RANGE(0x100d, 0x100d) AM_WRITE_LEGACY(cpu_sound_command_w)
+	AM_RANGE(0x100e, 0x100e) AM_WRITEONLY AM_BASE( m_vb_scrolly_lo)
+	AM_RANGE(0x2000, 0x2fff) AM_WRITE_LEGACY(vb_videoram_w) AM_BASE( m_vb_videoram)
+	AM_RANGE(0x3000, 0x3fff) AM_WRITE_LEGACY(vb_attrib_w) AM_BASE( m_vb_attribram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -230,9 +230,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xA000, 0xA000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

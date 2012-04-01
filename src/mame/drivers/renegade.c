@@ -658,43 +658,43 @@ static WRITE8_HANDLER( renegade_coin_counter_w )
 
 static ADDRESS_MAP_START( renegade_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(renegade_videoram2_w) AM_BASE_MEMBER(renegade_state, m_videoram2)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_MEMBER(renegade_state, m_spriteram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(renegade_videoram_w) AM_BASE_MEMBER(renegade_state, m_videoram)
-	AM_RANGE(0x3000, 0x30ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3100, 0x31ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0") AM_WRITE(renegade_scroll0_w)		/* Player#1 controls, P1,P2 start */
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE(renegade_scroll1_w)		/* Player#2 controls, coin triggers */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_WRITE(sound_w)	/* DIP2  various IO ports */
-	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE(renegade_flipscreen_w)	/* DIP1 */
-	AM_RANGE(0x3804, 0x3804) AM_READWRITE(mcu_r, mcu_w)
-	AM_RANGE(0x3805, 0x3805) AM_READWRITE(mcu_reset_r, bankswitch_w)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(renegade_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY(renegade_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x3000, 0x30ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3100, 0x31ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0") AM_WRITE_LEGACY(renegade_scroll0_w)		/* Player#1 controls, P1,P2 start */
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE_LEGACY(renegade_scroll1_w)		/* Player#2 controls, coin triggers */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(sound_w)	/* DIP2  various IO ports */
+	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(renegade_flipscreen_w)	/* DIP1 */
+	AM_RANGE(0x3804, 0x3804) AM_READWRITE_LEGACY(mcu_r, mcu_w)
+	AM_RANGE(0x3805, 0x3805) AM_READWRITE_LEGACY(mcu_reset_r, bankswitch_w)
 	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
-	AM_RANGE(0x3807, 0x3807) AM_WRITE(renegade_coin_counter_w)
+	AM_RANGE(0x3807, 0x3807) AM_WRITE_LEGACY(renegade_coin_counter_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
+	AM_RANGE(0x1000, 0x1000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // this gets written the same values as 0x2000
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("adpcm", adpcm_play_w)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym3526_r,ym3526_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("adpcm", adpcm_play_w)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE_LEGACY("ymsnd", ym3526_r,ym3526_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITENOP /* adpcm related? stereo pan? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_mcu_map, AS_PROGRAM, 8, renegade_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(renegade_68705_port_a_r, renegade_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(renegade_68705_port_b_r, renegade_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(renegade_68705_port_c_r, renegade_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(renegade_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(renegade_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(renegade_68705_ddr_c_w)
-//  AM_RANGE(0x0008, 0x0008) AM_READWRITE(m68705_tdr_r, m68705_tdr_w)
-//  AM_RANGE(0x0009, 0x0009) AM_READWRITE(m68705_tcr_r, m68705_tcr_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(renegade_68705_port_a_r, renegade_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(renegade_68705_port_b_r, renegade_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(renegade_68705_port_c_r, renegade_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(renegade_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(renegade_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(renegade_68705_ddr_c_w)
+//  AM_RANGE(0x0008, 0x0008) AM_READWRITE_LEGACY(m68705_tdr_r, m68705_tdr_w)
+//  AM_RANGE(0x0009, 0x0009) AM_READWRITE_LEGACY(m68705_tcr_r, m68705_tcr_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

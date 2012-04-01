@@ -37,17 +37,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1")	/* extra ROM */
 	AM_RANGE(0x2c0000, 0x2dffff) AM_ROMBANK("bank2")
-	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(tail2nos_zoomdata_r, tail2nos_zoomdata_w)
-	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8("k051316", k051316_r, k051316_w, 0x00ff)
-	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8("k051316", k051316_ctrl_w, 0x00ff)
+	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE_LEGACY(tail2nos_zoomdata_r, tail2nos_zoomdata_w)
+	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8_LEGACY("k051316", k051316_r, k051316_w, 0x00ff)
+	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8_LEGACY("k051316", k051316_ctrl_w, 0x00ff)
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work RAM */
-	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE_MEMBER(tail2nos_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_bgvideoram_w) AM_BASE_MEMBER(tail2nos_state, m_bgvideoram)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(tail2nos_gfxbank_w)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(tail2nos_bgvideoram_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(tail2nos_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE_LEGACY(sound_command_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tail2nos_state )
@@ -58,10 +58,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tail2nos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_r) AM_WRITENOP	/* the write is a clear pending command */
-	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ymsnd", ym2608_w)
+	AM_RANGE(0x07, 0x07) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP	/* the write is a clear pending command */
+	AM_RANGE(0x08, 0x0b) AM_DEVWRITE_LEGACY("ymsnd", ym2608_w)
 #if 0
-	AM_RANGE(0x18, 0x1b) AM_DEVREAD("ymsnd", ym2608_r)
+	AM_RANGE(0x18, 0x1b) AM_DEVREAD_LEGACY("ymsnd", ym2608_r)
 #endif
 ADDRESS_MAP_END
 

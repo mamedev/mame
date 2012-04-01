@@ -582,40 +582,40 @@ static DRIVER_INIT( splus )
 *************************/
 
 static ADDRESS_MAP_START( splus_map, AS_PROGRAM, 8, splus_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE_MEMBER(splus_state, m_program_ram)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE( m_program_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
 	// Serial I/O
-    AM_RANGE(0x0000, 0x0000) AM_READ(splus_serial_r) AM_WRITE(splus_serial_w)
+    AM_RANGE(0x0000, 0x0000) AM_READ_LEGACY(splus_serial_r) AM_WRITE_LEGACY(splus_serial_w)
 
     // Battery-backed RAM (Lower 4K) 0x1500-0x16ff eeprom staging area
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("cmosl")
 
     // Watchdog, 7-segment Display
-    AM_RANGE(0x2000, 0x2000) AM_READWRITE(splus_watchdog_r, splus_7seg_w)
+    AM_RANGE(0x2000, 0x2000) AM_READWRITE_LEGACY(splus_watchdog_r, splus_7seg_w)
 
     // DUART
-    AM_RANGE(0x3000, 0x300f) AM_READWRITE(splus_duart_r, splus_duart_w)
+    AM_RANGE(0x3000, 0x300f) AM_READWRITE_LEGACY(splus_duart_r, splus_duart_w)
 
 	// Dip Switches, Sound
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SW1") AM_DEVWRITE("aysnd", ay8910_address_w)
-    AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SW1") AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+    AM_RANGE(0x4001, 0x4001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 
     // Reel Optics, EEPROM
-    AM_RANGE(0x5000, 0x5000) AM_DEVREAD("i2cmem", splus_reel_optics_r) AM_DEVWRITE("i2cmem", i2c_nvram_w)
+    AM_RANGE(0x5000, 0x5000) AM_DEVREAD_LEGACY("i2cmem", splus_reel_optics_r) AM_DEVWRITE_LEGACY("i2cmem", i2c_nvram_w)
 
 	// Reset Registers in Realtime Clock, Serial I/O Load Pulse
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(splus_registers_r, splus_load_pulse_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE_LEGACY(splus_registers_r, splus_load_pulse_w)
 
     // Battery-backed RAM (Upper 4K)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("cmosh")
 
     // SSxxxx Reel Chip
-    AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_BASE_MEMBER(splus_state, m_reel_ram)
+    AM_RANGE(0x8000, 0x9fff) AM_READ_LEGACY(splus_m_reel_ram_r) AM_BASE( m_reel_ram)
 
 	// Ports start here
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(splus_io_r) AM_WRITE(splus_io_w) AM_BASE_MEMBER(splus_state, m_io_port)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ_LEGACY(splus_io_r) AM_WRITE_LEGACY(splus_io_w) AM_BASE( m_io_port)
 ADDRESS_MAP_END
 
 /*************************

@@ -471,27 +471,27 @@ static WRITE8_HANDLER( led_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_ROM	/* slapstic maps here */
-	AM_RANGE(0x2e0000, 0x2e0001) AM_READ(atarisy1_int3state_r)
+	AM_RANGE(0x2e0000, 0x2e0001) AM_READ_LEGACY(atarisy1_int3state_r)
 	AM_RANGE(0x400000, 0x401fff) AM_RAM
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(atarisy1_xscroll_w) AM_BASE_MEMBER(atarisy1_state, m_xscroll)
-	AM_RANGE(0x820000, 0x820001) AM_WRITE(atarisy1_yscroll_w) AM_BASE_MEMBER(atarisy1_state, m_yscroll)
-	AM_RANGE(0x840000, 0x840001) AM_WRITE(atarisy1_priority_w)
-	AM_RANGE(0x860000, 0x860001) AM_WRITE(atarisy1_bankselect_w) AM_BASE_MEMBER(atarisy1_state, m_bankselect)
-	AM_RANGE(0x880000, 0x880001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(atarigen_video_int_ack_w)
-	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(atarigen_eeprom_enable_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(atarisy1_xscroll_w) AM_BASE( m_xscroll)
+	AM_RANGE(0x820000, 0x820001) AM_WRITE_LEGACY(atarisy1_yscroll_w) AM_BASE( m_yscroll)
+	AM_RANGE(0x840000, 0x840001) AM_WRITE_LEGACY(atarisy1_priority_w)
+	AM_RANGE(0x860000, 0x860001) AM_WRITE_LEGACY(atarisy1_bankselect_w) AM_BASE( m_bankselect)
+	AM_RANGE(0x880000, 0x880001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
+	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0x900000, 0x9fffff) AM_RAM
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(atarisy1_state, m_playfield)
-	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE(atarimo_0_spriteram_r, atarisy1_spriteram_w)
-	AM_RANGE(0xa03000, 0xa03fff) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(atarisy1_state, m_alpha)
-	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf00000, 0xf00fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0xf20000, 0xf20007) AM_READ(trakball_r)
-	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE(joystick_r, joystick_w)
-	AM_RANGE(0xf60000, 0xf60003) AM_READ(port4_r)
-	AM_RANGE(0xf80000, 0xf80001) AM_WRITE(atarigen_sound_w)	/* used by roadbls2 */
-	AM_RANGE(0xfc0000, 0xfc0001) AM_READ(atarigen_sound_r)
-	AM_RANGE(0xfe0000, 0xfe0001) AM_WRITE(atarigen_sound_w)
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE( m_playfield)
+	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarisy1_spriteram_w)
+	AM_RANGE(0xa03000, 0xa03fff) AM_RAM_WRITE_LEGACY(atarigen_alpha_w) AM_BASE( m_alpha)
+	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE_LEGACY(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf00000, 0xf00fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0xf20000, 0xf20007) AM_READ_LEGACY(trakball_r)
+	AM_RANGE(0xf40000, 0xf4001f) AM_READWRITE_LEGACY(joystick_r, joystick_w)
+	AM_RANGE(0xf60000, 0xf60003) AM_READ_LEGACY(port4_r)
+	AM_RANGE(0xf80000, 0xf80001) AM_WRITE_LEGACY(atarigen_sound_w)	/* used by roadbls2 */
+	AM_RANGE(0xfc0000, 0xfc0001) AM_READ_LEGACY(atarigen_sound_r)
+	AM_RANGE(0xfe0000, 0xfe0001) AM_WRITE_LEGACY(atarigen_sound_w)
 ADDRESS_MAP_END
 
 
@@ -504,12 +504,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, atarisy1_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
-	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x1810, 0x1810) AM_READWRITE(atarigen_6502_sound_r, atarigen_6502_sound_w)
-	AM_RANGE(0x1820, 0x1820) AM_READ(switch_6502_r)
-	AM_RANGE(0x1824, 0x1825) AM_WRITE(led_w)
-	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
+	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x1810, 0x1810) AM_READWRITE_LEGACY(atarigen_6502_sound_r, atarigen_6502_sound_w)
+	AM_RANGE(0x1820, 0x1820) AM_READ_LEGACY(switch_6502_r)
+	AM_RANGE(0x1824, 0x1825) AM_WRITE_LEGACY(led_w)
+	AM_RANGE(0x1870, 0x187f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

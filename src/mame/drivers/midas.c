@@ -262,21 +262,21 @@ static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("PLAYER2")
 	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("START")
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE( livequiz_coin_w )
+	AM_RANGE(0x980000, 0x980001) AM_WRITE_LEGACY( livequiz_coin_w )
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE( "eeprom", midas_eeprom_w )
+	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE_LEGACY( "eeprom", midas_eeprom_w )
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE( midas_gfxregs_w ) AM_BASE_MEMBER(midas_state, m_gfxregs )
+	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE_LEGACY( midas_gfxregs_w ) AM_BASE( m_gfxregs )
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE( paletteram16_xrgb_word_be_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE_LEGACY( paletteram16_xrgb_word_be_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ( ret_ffff )
-	AM_RANGE(0xb20000, 0xb20001) AM_READ( ret_ffff )
-	AM_RANGE(0xb40000, 0xb40001) AM_READ( ret_ffff )
-	AM_RANGE(0xb60000, 0xb60001) AM_READ( ret_ffff )
+	AM_RANGE(0xb00000, 0xb00001) AM_READ_LEGACY( ret_ffff )
+	AM_RANGE(0xb20000, 0xb20001) AM_READ_LEGACY( ret_ffff )
+	AM_RANGE(0xb40000, 0xb40001) AM_READ_LEGACY( ret_ffff )
+	AM_RANGE(0xb60000, 0xb60001) AM_READ_LEGACY( ret_ffff )
 
-	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8( "ymz", ymz280b_r, ymz280b_w, 0x00ff )
+	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8_LEGACY( "ymz", ymz280b_r, ymz280b_w, 0x00ff )
 
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("START3")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("PLAYER3")
@@ -339,30 +339,30 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("IN0")
 	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("TILT")
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE( hammer_coin_w )
+	AM_RANGE(0x980000, 0x980001) AM_WRITE_LEGACY( hammer_coin_w )
 	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP	// IRQ Ack
-	AM_RANGE(0x9c000e, 0x9c000f) AM_WRITE( hammer_led_w )
+	AM_RANGE(0x9c000e, 0x9c000f) AM_WRITE_LEGACY( hammer_led_w )
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE( "eeprom", midas_eeprom_w )
+	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE_LEGACY( "eeprom", midas_eeprom_w )
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE( midas_gfxregs_w ) AM_BASE_MEMBER(midas_state, m_gfxregs )
+	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE_LEGACY( midas_gfxregs_w ) AM_BASE( m_gfxregs )
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE( paletteram16_xrgb_word_be_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE_LEGACY( paletteram16_xrgb_word_be_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ( ret_ffff )
-	AM_RANGE(0xb20000, 0xb20001) AM_READ( ret_ffff )
-	AM_RANGE(0xb40000, 0xb40001) AM_READ( ret_ffff )
-	AM_RANGE(0xb60000, 0xb60001) AM_READ( ret_ffff )
+	AM_RANGE(0xb00000, 0xb00001) AM_READ_LEGACY( ret_ffff )
+	AM_RANGE(0xb20000, 0xb20001) AM_READ_LEGACY( ret_ffff )
+	AM_RANGE(0xb40000, 0xb40001) AM_READ_LEGACY( ret_ffff )
+	AM_RANGE(0xb60000, 0xb60001) AM_READ_LEGACY( ret_ffff )
 
-	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8( "ymz", ymz280b_r, ymz280b_w, 0x00ff )
+	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8_LEGACY( "ymz", ymz280b_r, ymz280b_w, 0x00ff )
 
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("IN1")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("HAMMER")
 
-	AM_RANGE(0xbc0002, 0xbc0003) AM_WRITE( hammer_motor_w )
+	AM_RANGE(0xbc0002, 0xbc0003) AM_WRITE_LEGACY( hammer_motor_w )
 
-	AM_RANGE(0xbc0004, 0xbc0005) AM_READ( hammer_sensor_r )
+	AM_RANGE(0xbc0004, 0xbc0005) AM_READ_LEGACY( hammer_sensor_r )
 
 	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM	// zoom table?
 

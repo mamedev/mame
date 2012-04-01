@@ -462,29 +462,29 @@ static READ8_HANDLER( gunsaux_r )
 static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM				// work RAM
-	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE("k056832", k056832_w)
-	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE("k056832", k056832_b_w)
+	AM_RANGE(0x4000, 0x403f) AM_DEVWRITE_LEGACY("k056832", k056832_w)
+	AM_RANGE(0x4040, 0x404f) AM_DEVWRITE_LEGACY("k056832", k056832_b_w)
 	AM_RANGE(0x4080, 0x4080) AM_READNOP		// watchdog
 	AM_RANGE(0x4090, 0x4090) AM_READNOP
 	AM_RANGE(0x40a0, 0x40a0) AM_READNOP
-	AM_RANGE(0x40c4, 0x40c4) AM_WRITE(control2_w)
-	AM_RANGE(0x40c8, 0x40d0) AM_WRITE(lethalen_palette_control)	// PCU1-PCU3 on the schematics
-	AM_RANGE(0x40d4, 0x40d7) AM_READ(guns_r)
+	AM_RANGE(0x40c4, 0x40c4) AM_WRITE_LEGACY(control2_w)
+	AM_RANGE(0x40c8, 0x40d0) AM_WRITE_LEGACY(lethalen_palette_control)	// PCU1-PCU3 on the schematics
+	AM_RANGE(0x40d4, 0x40d7) AM_READ_LEGACY(guns_r)
 	AM_RANGE(0x40d8, 0x40d8) AM_READ_PORT("DSW")
 	AM_RANGE(0x40d9, 0x40d9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)		// top X bit of guns
-	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
-	AM_RANGE(0x47fe, 0x47ff) AM_WRITE(le_bgcolor_w)		// BG color
-	AM_RANGE(0x4800, 0x7fff) AM_READWRITE(le_4800_r, le_4800_w) // bankswitched: RAM and registers
+	AM_RANGE(0x40db, 0x40db) AM_READ_LEGACY(gunsaux_r)		// top X bit of guns
+	AM_RANGE(0x40dc, 0x40dc) AM_WRITE_LEGACY(le_bankswitch_w)
+	AM_RANGE(0x47fe, 0x47ff) AM_WRITE_LEGACY(le_bgcolor_w)		// BG color
+	AM_RANGE(0x4800, 0x7fff) AM_READWRITE_LEGACY(le_4800_r, le_4800_w) // bankswitched: RAM and registers
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( le_sound, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE_MODERN("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(soundlatch2_w)
+	AM_RANGE(0xfc02, 0xfc02) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xfc03, 0xfc03) AM_READNOP
 ADDRESS_MAP_END
 

@@ -163,13 +163,13 @@ static WRITE32_HANDLER( output_w )
 static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 	AM_RANGE(0x02000000, 0x0203dfff) AM_RAM //work ram
-	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_BASE_MEMBER(feversoc_state, m_spriteram)
-	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
+	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x06000000, 0x06000003) AM_WRITE_LEGACY(output_w)
 	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
-	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
-	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff0000)
+	AM_RANGE(0x06000008, 0x0600000b) AM_READ_LEGACY(in0_r)
+	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
 //  AM_RANGE(0x06010000, 0x06017fff) AM_RAM //contains RISE11 keys and other related stuff.
-	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE_LEGACY(fs_paletteram_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 static const gfx_layout spi_spritelayout =

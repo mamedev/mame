@@ -128,24 +128,24 @@ static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
 
 static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_BASE_MEMBER(suprslam_state, m_spriteram)
-	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_BASE_MEMBER(suprslam_state, m_sp_videoram)
+	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_BASE( m_sp_videoram)
 	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_BASE_MEMBER(suprslam_state, m_screen_videoram)
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_BASE_MEMBER(suprslam_state, m_bg_videoram)
-	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_BASE_MEMBER(suprslam_state,m_screen_vregs)
+	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE_LEGACY(suprslam_screen_videoram_w) AM_BASE( m_screen_videoram)
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE_LEGACY(suprslam_bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_BASE(m_screen_vregs)
 //  AM_RANGE(0xff3000, 0xff3001) AM_WRITENOP // sprite buffer trigger?
-	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)
-	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
-	AM_RANGE(0xffa000, 0xffafff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffd000, 0xffd01f) AM_DEVWRITE("k053936", k053936_ctrl_w)
-	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
+	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)
+	AM_RANGE(0xff9000, 0xff9001) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xffa000, 0xffafff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xffd000, 0xffd01f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
+	AM_RANGE(0xffe000, 0xffe001) AM_WRITE_LEGACY(suprslam_bank_w)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITEONLY AM_BASE_MEMBER(suprslam_state, m_spr_ctrl)
+	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITEONLY AM_BASE( m_spr_ctrl)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprslam_state )
@@ -156,9 +156,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, suprslam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, pending_command_clear_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(suprslam_sh_bankswitch_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(soundlatch_r, pending_command_clear_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/

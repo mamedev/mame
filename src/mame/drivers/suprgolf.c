@@ -302,20 +302,20 @@ static READ8_DEVICE_HANDLER( p2_r )
 static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x4000) AM_WRITE( rom2_bank_select_w )
+	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY( rom2_bank_select_w )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE( suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE_MEMBER(suprgolf_state,m_videoram) //foreground vram + paletteram
-	AM_RANGE(0xf000, 0xf000) AM_WRITE( suprgolf_pen_w )
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY( suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE(m_videoram) //foreground vram + paletteram
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY( suprgolf_pen_w )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, suprgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(adpcm_data_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(adpcm_data_w)
  ADDRESS_MAP_END
 
 static INPUT_PORTS_START( suprgolf )

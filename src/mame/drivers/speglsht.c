@@ -127,26 +127,26 @@ public:
 static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, speglsht_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
+	AM_RANGE(0xc000, 0xcfff) AM_READ_LEGACY(st0016_sprite_ram_r) AM_WRITE_LEGACY(st0016_sprite_ram_w)
+	AM_RANGE(0xd000, 0xdfff) AM_READ_LEGACY(st0016_sprite2_ram_r) AM_WRITE_LEGACY(st0016_sprite2_ram_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe87f) AM_RAM
-	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_snd_r, st0016_snd_w)
-	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
-	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(speglsht_state, m_shared)
+	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE_LEGACY("stsnd", st0016_snd_r, st0016_snd_w)
+	AM_RANGE(0xea00, 0xebff) AM_READ_LEGACY(st0016_palette_ram_r) AM_WRITE_LEGACY(st0016_palette_ram_w)
+	AM_RANGE(0xec00, 0xec1f) AM_READ_LEGACY(st0016_character_ram_r) AM_WRITE_LEGACY(st0016_character_ram_w)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE( m_shared)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, speglsht_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
-	AM_RANGE(0xe2, 0xe2) AM_WRITE(st0016_sprite_bank_w)
-	AM_RANGE(0xe3, 0xe4) AM_WRITE(st0016_character_bank_w)
-	AM_RANGE(0xe5, 0xe5) AM_WRITE(st0016_palette_bank_w)
+	AM_RANGE(0x00, 0xbf) AM_READ_LEGACY(st0016_vregs_r) AM_WRITE_LEGACY(st0016_vregs_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
+	AM_RANGE(0xe2, 0xe2) AM_WRITE_LEGACY(st0016_sprite_bank_w)
+	AM_RANGE(0xe3, 0xe4) AM_WRITE_LEGACY(st0016_character_bank_w)
+	AM_RANGE(0xe5, 0xe5) AM_WRITE_LEGACY(st0016_palette_bank_w)
 	AM_RANGE(0xe6, 0xe6) AM_WRITENOP
 	AM_RANGE(0xe7, 0xe7) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(st0016_dma_r)
 ADDRESS_MAP_END
 
 static READ32_HANDLER(shared_r)
@@ -224,16 +224,16 @@ static READ32_HANDLER(irq_ack_clear)
 static ADDRESS_MAP_START( speglsht_mem, AS_PROGRAM, 32, speglsht_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x01007fff) AM_RAM //tested - STATIC RAM
-	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE(cop_r, cop_w) AM_BASE_MEMBER(speglsht_state, m_cop_ram)
-	AM_RANGE(0x01800200, 0x01800203) AM_WRITE(videoreg_w)
+	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE_LEGACY(cop_r, cop_w) AM_BASE( m_cop_ram)
+	AM_RANGE(0x01800200, 0x01800203) AM_WRITE_LEGACY(videoreg_w)
 	AM_RANGE(0x01800300, 0x01800303) AM_READ_PORT("IN0")
 	AM_RANGE(0x01800400, 0x01800403) AM_READ_PORT("IN1")
-	AM_RANGE(0x01a00000, 0x01afffff) AM_RAM AM_BASE_MEMBER(speglsht_state, m_framebuffer)
+	AM_RANGE(0x01a00000, 0x01afffff) AM_RAM AM_BASE( m_framebuffer)
 	AM_RANGE(0x01b00000, 0x01b07fff) AM_RAM //cleared ...  video related ?
 	AM_RANGE(0x01c00000, 0x01dfffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x0a000000, 0x0a003fff) AM_READWRITE(shared_r, shared_w)
+	AM_RANGE(0x0a000000, 0x0a003fff) AM_READWRITE_LEGACY(shared_r, shared_w)
 	AM_RANGE(0x1eff0000, 0x1eff001f) AM_RAM
-	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
+	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ_LEGACY(irq_ack_clear)
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_ROM AM_REGION("user1", 0) // mirror for interrupts
 ADDRESS_MAP_END

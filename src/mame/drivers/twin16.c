@@ -234,13 +234,13 @@ static WRITE16_HANDLER( cuebrickj_nvram_bank_w )
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("upd", twin16_upd_reset_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("upd", upd7759_port_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("upd", twin16_upd_start_w)
-	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("upd", twin16_upd_busy_r)	// miaj writes 0 to it
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("upd", twin16_upd_reset_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("upd", twin16_upd_start_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREAD_LEGACY("upd", twin16_upd_busy_r)	// miaj writes 0 to it
 	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
@@ -248,19 +248,19 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(twin16_paletteram_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(twin16_paletteram_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x081000, 0x081fff) AM_WRITENOP
-	AM_RANGE(0x0a0000, 0x0a001b) AM_READ(twin16_input_r)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(twin16_CPUA_register_w)
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(sound_command_w)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrickj_nvram_r, cuebrickj_nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrickj_nvram_bank_w)
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(twin16_video_register_w)
-	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(twin16_text_ram_w) AM_BASE_MEMBER(twin16_state, m_text_ram)
+	AM_RANGE(0x0a0000, 0x0a001b) AM_READ_LEGACY(twin16_input_r)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE_LEGACY(twin16_CPUA_register_w)
+	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x0a0010, 0x0a0011) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE_LEGACY(cuebrickj_nvram_r, cuebrickj_nvram_w) AM_SHARE("nvram")
+	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE_LEGACY(cuebrickj_nvram_bank_w)
+	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE_LEGACY(twin16_video_register_w)
+	AM_RANGE(0x0c000e, 0x0c000f) AM_READ_LEGACY(twin16_sprite_status_r)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE_LEGACY(twin16_text_ram_w) AM_BASE( m_text_ram)
 //  AM_RANGE(0x104000, 0x105fff) AM_NOP             // miaj
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(twin16_state, m_videoram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
@@ -269,32 +269,32 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x09ffff) AM_READ(extra_rom_r)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(twin16_CPUB_register_w)
+	AM_RANGE(0x080000, 0x09ffff) AM_READ_LEGACY(extra_rom_r)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE_LEGACY(twin16_CPUB_register_w)
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(videoram16_r, videoram16_w)
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_BASE_MEMBER(twin16_state, m_tile_gfx_ram)
-	AM_RANGE(0x600000, 0x6fffff) AM_READ(twin16_gfx_rom1_r)
-	AM_RANGE(0x700000, 0x77ffff) AM_READ(twin16_gfx_rom2_r)
-	AM_RANGE(0x780000, 0x79ffff) AM_RAM AM_BASE_MEMBER(twin16_state, m_sprite_gfx_ram)
+	AM_RANGE(0x480000, 0x483fff) AM_READWRITE_LEGACY(videoram16_r, videoram16_w)
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM AM_BASE( m_tile_gfx_ram)
+	AM_RANGE(0x600000, 0x6fffff) AM_READ_LEGACY(twin16_gfx_rom1_r)
+	AM_RANGE(0x700000, 0x77ffff) AM_READ_LEGACY(twin16_gfx_rom2_r)
+	AM_RANGE(0x780000, 0x79ffff) AM_RAM AM_BASE( m_sprite_gfx_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(twin16_paletteram_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0a0000, 0x0a001b) AM_READ(twin16_input_r)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(fround_CPU_register_w)
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(sound_command_w)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(twin16_video_register_w)
-	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(fround_gfx_bank_w)
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(twin16_text_ram_w) AM_BASE_MEMBER(twin16_state, m_text_ram)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(twin16_state, m_videoram)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(twin16_paletteram_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0a0000, 0x0a001b) AM_READ_LEGACY(twin16_input_r)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE_LEGACY(fround_CPU_register_w)
+	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x0a0010, 0x0a0011) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE_LEGACY(twin16_video_register_w)
+	AM_RANGE(0x0c000e, 0x0c000f) AM_READ_LEGACY(twin16_sprite_status_r)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE_LEGACY(fround_gfx_bank_w)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE_LEGACY(twin16_text_ram_w) AM_BASE( m_text_ram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x500000, 0x6fffff) AM_READ(twin16_gfx_rom1_r)
+	AM_RANGE(0x500000, 0x6fffff) AM_READ_LEGACY(twin16_gfx_rom1_r)
 ADDRESS_MAP_END
 
 /* Input Ports */

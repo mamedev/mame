@@ -530,24 +530,24 @@ static WRITE32_HANDLER( timer_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, metalmx_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x4000ff) AM_READWRITE(host_gsp_r, host_gsp_w)
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(host_dram_r, host_dram_w)
-	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(host_vram_r, host_vram_w)
-	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(dsp32c_2_r, dsp32c_2_w)
+	AM_RANGE(0x400000, 0x4000ff) AM_READWRITE_LEGACY(host_gsp_r, host_gsp_w)
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(host_dram_r, host_dram_w)
+	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE_LEGACY(host_vram_r, host_vram_w)
+	AM_RANGE(0x800000, 0x80001f) AM_READWRITE_LEGACY(dsp32c_2_r, dsp32c_2_w)
 	AM_RANGE(0x800000, 0x85ffff) AM_NOP			/* Unknown */
-	AM_RANGE(0x880000, 0x88001f) AM_READWRITE(dsp32c_1_r, dsp32c_1_w)
-	AM_RANGE(0x980000, 0x9800ff) AM_WRITE(reset_w)
-	AM_RANGE(0xb40000, 0xb40003) AM_READWRITE(sound_data_r, sound_data_w)
+	AM_RANGE(0x880000, 0x88001f) AM_READWRITE_LEGACY(dsp32c_1_r, dsp32c_1_w)
+	AM_RANGE(0x980000, 0x9800ff) AM_WRITE_LEGACY(reset_w)
+	AM_RANGE(0xb40000, 0xb40003) AM_READWRITE_LEGACY(sound_data_r, sound_data_w)
 	AM_RANGE(0xf00000, 0xf00003) AM_RAM			/* Network message port */
-	AM_RANGE(0xf02000, 0xf02003) AM_READWRITE(watchdog_r, shifter_w)
-	AM_RANGE(0xf03000, 0xf03003) AM_READ_PORT("P1") AM_WRITE(motor_w)
+	AM_RANGE(0xf02000, 0xf02003) AM_READWRITE_LEGACY(watchdog_r, shifter_w)
+	AM_RANGE(0xf03000, 0xf03003) AM_READ_PORT("P1") AM_WRITE_LEGACY(motor_w)
 	AM_RANGE(0xf04000, 0xf04003) AM_READ_PORT("P2")
 	AM_RANGE(0xf05000, 0xf05fff) AM_WRITENOP	/* Lamps */ // f06000 = ADC  // f01xxx = ADC
 	AM_RANGE(0xf19000, 0xf19003) AM_WRITENOP	/* Network */
 	AM_RANGE(0xf1a000, 0xf1a003) AM_WRITENOP
 	AM_RANGE(0xf1b000, 0xf1b003) AM_WRITENOP
 	AM_RANGE(0xf1e000, 0xf1e003) AM_RAM			/* Network status flags : 1000 = LIRQ  4000 = SFLAG  8000 = 68FLAG */
-	AM_RANGE(0xf20000, 0xf2ffff) AM_WRITE(timer_w)
+	AM_RANGE(0xf20000, 0xf2ffff) AM_WRITE_LEGACY(timer_w)
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM			/* Zero power RAM */
 	AM_RANGE(0xfd0000, 0xffffff) AM_RAM			/* Scratch RAM */
 ADDRESS_MAP_END
@@ -560,7 +560,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, metalmx_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(metalmx_state, m_adsp_internal_program_ram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE( m_adsp_internal_program_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, metalmx_state )
@@ -579,9 +579,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gsp_map, AS_PROGRAM, 16, metalmx_state )
 	AM_RANGE(0x88800000, 0x8880000f) AM_RAM /* ? */
 	AM_RANGE(0x88c00000, 0x88c0000f) AM_RAM /* ? */
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_READWRITE(tms34020_io_register_r, tms34020_io_register_w)
-	AM_RANGE(0xff000000, 0xff7fffff) AM_RAM AM_BASE_MEMBER(metalmx_state, m_gsp_dram)
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE_MEMBER(metalmx_state, m_gsp_vram)
+	AM_RANGE(0xc0000000, 0xc00003ff) AM_READWRITE_LEGACY(tms34020_io_register_r, tms34020_io_register_w)
+	AM_RANGE(0xff000000, 0xff7fffff) AM_RAM AM_BASE( m_gsp_dram)
+	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE( m_gsp_vram)
 ADDRESS_MAP_END
 
 
@@ -596,8 +596,8 @@ static ADDRESS_MAP_START( dsp32c_1_map, AS_PROGRAM, 32, metalmx_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM
 	AM_RANGE(0x700000, 0x700003) AM_WRITENOP	/* LEDs? */
-	AM_RANGE(0xa00000, 0xa00003) AM_READ(unk_r)
-	AM_RANGE(0xb00000, 0xb00003) AM_READ(unk_r)
+	AM_RANGE(0xa00000, 0xa00003) AM_READ_LEGACY(unk_r)
+	AM_RANGE(0xb00000, 0xb00003) AM_READ_LEGACY(unk_r)
 	AM_RANGE(0xc00000, 0xc00003) AM_RAM			/* FIFO? */
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM			/* 3D registers */
 ADDRESS_MAP_END
@@ -613,8 +613,8 @@ static ADDRESS_MAP_START( dsp32c_2_map, AS_PROGRAM, 32, metalmx_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM
 	AM_RANGE(0x700000, 0x700003) AM_WRITENOP	/* LEDs? */
-	AM_RANGE(0xa00000, 0xa00003) AM_READ(unk_r)
-	AM_RANGE(0xb00000, 0xb00003) AM_READ(unk_r)
+	AM_RANGE(0xa00000, 0xa00003) AM_READ_LEGACY(unk_r)
+	AM_RANGE(0xb00000, 0xb00003) AM_READ_LEGACY(unk_r)
 	AM_RANGE(0xc00000, 0xc00003) AM_RAM			/* FIFO? */
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM			/* 3D registers */
 ADDRESS_MAP_END

@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( wink_map, AS_PROGRAM, 8, wink_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_BASE_MEMBER(wink_state, m_videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(bgram_w) AM_BASE( m_videoram)
 ADDRESS_MAP_END
 
 
@@ -137,37 +137,37 @@ static WRITE8_HANDLER( prot_w )
 
 static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE_GENERIC(paletteram) //0x10-0x1f is likely to be something else
+	AM_RANGE(0x00, 0x1f) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE_GENERIC(paletteram) //0x10-0x1f is likely to be something else
 //  AM_RANGE(0x20, 0x20) AM_WRITENOP                //??? seems unused..
-	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)		//??? no mux on the pcb.
-	AM_RANGE(0x22, 0x22) AM_WRITE(tile_banking_w)
+	AM_RANGE(0x21, 0x21) AM_WRITE_LEGACY(player_mux_w)		//??? no mux on the pcb.
+	AM_RANGE(0x22, 0x22) AM_WRITE_LEGACY(tile_banking_w)
 //  AM_RANGE(0x23, 0x23) AM_WRITENOP                //?
 //  AM_RANGE(0x24, 0x24) AM_WRITENOP                //cab Knocker like in q-bert!
-	AM_RANGE(0x25, 0x27) AM_WRITE(wink_coin_counter_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x80, 0x80) AM_READ(analog_port_r)
-	AM_RANGE(0xa0, 0xa0) AM_READ(player_inputs_r)
+	AM_RANGE(0x25, 0x27) AM_WRITE_LEGACY(wink_coin_counter_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(sound_irq_w)
+	AM_RANGE(0x80, 0x80) AM_READ_LEGACY(analog_port_r)
+	AM_RANGE(0xa0, 0xa0) AM_READ_LEGACY(player_inputs_r)
 	AM_RANGE(0xa4, 0xa4) AM_READ_PORT("DSW1")	//dipswitch bank2
 	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("DSW2")	//dipswitch bank1
 //  AM_RANGE(0xac, 0xac) AM_WRITENOP            //protection - loads video xor unit (written only once at startup)
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("DSW3")	//unused inputs
 	AM_RANGE(0xb4, 0xb4) AM_READ_PORT("DSW4")	//dipswitch bank3
-	AM_RANGE(0xc0, 0xdf) AM_WRITE(prot_w)		//load load protection-buffer from upper address bus
+	AM_RANGE(0xc0, 0xdf) AM_WRITE_LEGACY(prot_w)		//load load protection-buffer from upper address bus
 	AM_RANGE(0xc3, 0xc3) AM_READNOP				//watchdog?
-	AM_RANGE(0xe0, 0xff) AM_READ(prot_r)		//load math unit from buffer & lower address-bus
+	AM_RANGE(0xe0, 0xff) AM_READ_LEGACY(prot_r)		//load math unit from buffer & lower address-bus
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wink_sound_map, AS_PROGRAM, 8, wink_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wink_sound_io, AS_IO, 8, wink_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wink )

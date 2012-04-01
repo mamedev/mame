@@ -74,22 +74,22 @@ static WRITE16_DEVICE_HANDLER(pktgaldx_oki_bank_w)
 static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x110000, 0x1107ff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, m_pf1_rowscroll)
-	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, m_pf2_rowscroll)
+	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x102000, 0x102fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x110000, 0x1107ff) AM_RAM AM_BASE( m_pf1_rowscroll)
+	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_BASE( m_pf2_rowscroll)
 
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(pktgaldx_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8_MODERN("oki1", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8_MODERN("oki1", okim6295_device, read, 0x00ff)
-	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8_MODERN("oki2", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8_MODERN("oki2", okim6295_device, read, 0x00ff)
+	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8("oki1", okim6295_device, read, 0x00ff)
+	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8("oki2", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_device, read, 0x00ff)
 
-	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
-	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE("oki2", pktgaldx_oki_bank_w)
-	AM_RANGE(0x167800, 0x167fff) AM_READWRITE(deco16_104_pktgaldx_prot_r,deco16_104_pktgaldx_prot_w) AM_BASE(&deco16_prot_ram)
+	AM_RANGE(0x161800, 0x16180f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE_LEGACY("oki2", pktgaldx_oki_bank_w)
+	AM_RANGE(0x167800, 0x167fff) AM_READWRITE_LEGACY(deco16_104_pktgaldx_prot_r,deco16_104_pktgaldx_prot_w) AM_BASE_LEGACY(&deco16_prot_ram)
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -122,21 +122,21 @@ cpu #0 (PC=0000923C): unmapped program memory word read from 00167DB2 & 00FF
 
 static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, m_pktgaldb_fgram) // fgram on original?
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE( m_pktgaldb_fgram) // fgram on original?
 	AM_RANGE(0x102000, 0x102fff) AM_RAM // bgram on original?
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(pktgaldx_state, m_pktgaldb_sprites)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE( m_pktgaldb_sprites)
 
 	AM_RANGE(0x130000, 0x130fff) AM_RAM // palette on original?
 
-	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8_MODERN("oki1", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8_MODERN("oki1", okim6295_device, read, 0x00ff)
-	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8_MODERN("oki2", okim6295_device, write, 0x00ff)
-	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8_MODERN("oki2", okim6295_device, read, 0x00ff)
+	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8("oki1", okim6295_device, read, 0x00ff)
+	AM_RANGE(0x150000, 0x15000f) AM_DEVWRITE8("oki2", okim6295_device, write, 0x00ff)
+	AM_RANGE(0x150006, 0x150007) AM_DEVREAD8("oki2", okim6295_device, read, 0x00ff)
 
 //  AM_RANGE(0x160000, 0x167fff) AM_RAM
-	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE("oki2", pktgaldx_oki_bank_w)
+	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE_LEGACY("oki2", pktgaldx_oki_bank_w)
 	AM_RANGE(0x160000, 0x167fff) AM_WRITENOP
-	AM_RANGE(0x16500a, 0x16500b) AM_READ(pckgaldx_unknown_r)
+	AM_RANGE(0x16500a, 0x16500b) AM_READ_LEGACY(pckgaldx_unknown_r)
 
 	/* should we really be using these to read the i/o in the BOOTLEG?
       these look like i/o through protection ... */
@@ -144,14 +144,14 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x167c4c, 0x167c4d) AM_READ_PORT("DSW")
 	AM_RANGE(0x167db2, 0x167db3) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x167d10, 0x167d11) AM_READ(pckgaldx_protection_r) // check code at 6ea
-	AM_RANGE(0x167d1a, 0x167d1b) AM_READ(pckgaldx_protection_r) // check code at 7C4
+	AM_RANGE(0x167d10, 0x167d11) AM_READ_LEGACY(pckgaldx_protection_r) // check code at 6ea
+	AM_RANGE(0x167d1a, 0x167d1b) AM_READ_LEGACY(pckgaldx_protection_r) // check code at 7C4
 
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 
 	AM_RANGE(0x300000, 0x30000f) AM_RAM // ??
 
-	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram) // extra colours?
+	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram) // extra colours?
 ADDRESS_MAP_END
 
 

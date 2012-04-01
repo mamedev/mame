@@ -155,8 +155,8 @@ static WRITE8_HANDLER(nmi_line_w)
 static ADDRESS_MAP_START( z80_0_mem, AS_PROGRAM, 8, esh_state )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 	AM_RANGE(0xe000,0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_BASE_MEMBER(esh_state, m_tile_ram)
-	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_BASE_MEMBER(esh_state, m_tile_control_ram)
+	AM_RANGE(0xf000,0xf3ff) AM_RAM AM_BASE( m_tile_ram)
+	AM_RANGE(0xf400,0xf7ff) AM_RAM AM_BASE( m_tile_control_ram)
 ADDRESS_MAP_END
 
 
@@ -167,10 +167,10 @@ static ADDRESS_MAP_START( z80_0_io, AS_IO, 8, esh_state )
 	AM_RANGE(0xf1,0xf1) AM_READ_PORT("IN1")
 	AM_RANGE(0xf2,0xf2) AM_READ_PORT("IN2")
 	AM_RANGE(0xf3,0xf3) AM_READ_PORT("IN3")
-	AM_RANGE(0xf4,0xf4) AM_READWRITE(ldp_read,ldp_write)
-	AM_RANGE(0xf5,0xf5) AM_WRITE(misc_write)	/* Continuously writes repeating patterns */
-	AM_RANGE(0xf8,0xfd) AM_WRITE(led_writes)
-	AM_RANGE(0xfe,0xfe) AM_WRITE(nmi_line_w)	/* Both 0xfe and 0xff flip quickly between 0 and 1 */
+	AM_RANGE(0xf4,0xf4) AM_READWRITE_LEGACY(ldp_read,ldp_write)
+	AM_RANGE(0xf5,0xf5) AM_WRITE_LEGACY(misc_write)	/* Continuously writes repeating patterns */
+	AM_RANGE(0xf8,0xfd) AM_WRITE_LEGACY(led_writes)
+	AM_RANGE(0xfe,0xfe) AM_WRITE_LEGACY(nmi_line_w)	/* Both 0xfe and 0xff flip quickly between 0 and 1 */
 	AM_RANGE(0xff,0xff) AM_NOP					/*   (they're probably not NMI enables - likely LED's like their neighbors :) */
 ADDRESS_MAP_END									/*   (someday 0xf8-0xff will probably be a single handler) */
 

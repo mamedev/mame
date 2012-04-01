@@ -68,30 +68,30 @@ static WRITE16_HANDLER ( wwfwfest_irq_ack_w );
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(wwfwfest_fg0_videoram_w) AM_BASE_MEMBER(wwfwfest_state, m_fg0_videoram)	/* FG0 Ram - 4 bytes per tile */
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE_LEGACY(wwfwfest_fg0_videoram_w) AM_BASE( m_fg0_videoram)	/* FG0 Ram - 4 bytes per tile */
 	AM_RANGE(0x0c2000, 0x0c3fff) AM_RAM AM_SHARE("spriteram")						/* SPR Ram */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfwfest_bg0_videoram_w) AM_BASE_MEMBER(wwfwfest_state, m_bg0_videoram)	/* BG0 Ram - 4 bytes per tile */
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(wwfwfest_bg1_videoram_w) AM_BASE_MEMBER(wwfwfest_state, m_bg1_videoram)	/* BG1 Ram - 2 bytes per tile */
-	AM_RANGE(0x100000, 0x100007) AM_WRITE(wwfwfest_scroll_write)
-	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(wwfwfest_flipscreen_w)
-	AM_RANGE(0x140000, 0x140003) AM_WRITE(wwfwfest_irq_ack_w)
-	AM_RANGE(0x14000c, 0x14000d) AM_WRITE(wwfwfest_soundwrite)
-	AM_RANGE(0x140010, 0x140011) AM_WRITE(wwfwfest_1410_write)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(wwfwfest_bg0_videoram_w) AM_BASE( m_bg0_videoram)	/* BG0 Ram - 4 bytes per tile */
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE_LEGACY(wwfwfest_bg1_videoram_w) AM_BASE( m_bg1_videoram)	/* BG1 Ram - 2 bytes per tile */
+	AM_RANGE(0x100000, 0x100007) AM_WRITE_LEGACY(wwfwfest_scroll_write)
+	AM_RANGE(0x10000a, 0x10000b) AM_WRITE_LEGACY(wwfwfest_flipscreen_w)
+	AM_RANGE(0x140000, 0x140003) AM_WRITE_LEGACY(wwfwfest_irq_ack_w)
+	AM_RANGE(0x14000c, 0x14000d) AM_WRITE_LEGACY(wwfwfest_soundwrite)
+	AM_RANGE(0x140010, 0x140011) AM_WRITE_LEGACY(wwfwfest_1410_write)
 	AM_RANGE(0x140020, 0x140021) AM_READ_PORT("P1")
 	AM_RANGE(0x140022, 0x140023) AM_READ_PORT("P2")
 	AM_RANGE(0x140024, 0x140025) AM_READ_PORT("P3")
 	AM_RANGE(0x140026, 0x140027) AM_READ_PORT("P4")
-	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r,wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE_LEGACY(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r,wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* Work Ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wwfwfest_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("oki", oki_bankswitch_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
 ADDRESS_MAP_END
 
 /*******************************************************************************

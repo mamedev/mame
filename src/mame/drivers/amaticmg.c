@@ -466,20 +466,20 @@ static PALETTE_INIT( amaticmg3 )
 static ADDRESS_MAP_START( amaticmg_map, AS_PROGRAM, 8, amaticmg_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 //  AM_RANGE(0x0000, 0x0000) AM_RAM // AM_SHARE("nvram")
-//  AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("crtc", mc6845_address_w)
-//  AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-//  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE(amaticmg_videoram_w) AM_BASE(&amaticmg_videoram)
-//  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE(amaticmg_colorram_w) AM_BASE(&amaticmg_colorram)
+//  AM_RANGE(0x0000, 0x0000) AM_DEVWRITE_LEGACY("crtc", mc6845_address_w)
+//  AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r, mc6845_register_w)
+//  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE_LEGACY(amaticmg_videoram_w) AM_BASE_LEGACY(&amaticmg_videoram)
+//  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE_LEGACY(amaticmg_colorram_w) AM_BASE_LEGACY(&amaticmg_colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amaticmg_portmap, AS_IO, 8, amaticmg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("ymsnd", ym3812_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_signed_w)
-//  AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac2", dac_signed_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
+//  AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
 
 ADDRESS_MAP_END
 

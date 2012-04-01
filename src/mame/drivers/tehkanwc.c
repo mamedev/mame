@@ -221,58 +221,58 @@ static ADDRESS_MAP_START( main_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(tehkanwc_videoram_w) AM_SHARE("share2") AM_BASE_MEMBER(tehkanwc_state, m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(tehkanwc_colorram_w) AM_SHARE("share3") AM_BASE_MEMBER(tehkanwc_state, m_colorram)
-	AM_RANGE(0xd800, 0xddff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(tehkanwc_videoram_w) AM_SHARE("share2") AM_BASE( m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(tehkanwc_colorram_w) AM_SHARE("share3") AM_BASE( m_colorram)
+	AM_RANGE(0xd800, 0xddff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("share5") /* unused part of the palette RAM, I think? Gridiron uses it */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(tehkanwc_videoram2_w) AM_SHARE("share6") AM_BASE_MEMBER(tehkanwc_state, m_videoram2)
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("share7") AM_BASE_SIZE_MEMBER(tehkanwc_state, m_spriteram, m_spriteram_size) /* sprites */
-	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(tehkanwc_scroll_x_w)
-	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(tehkanwc_scroll_y_w)
-	AM_RANGE(0xf800, 0xf801) AM_READWRITE(tehkanwc_track_0_r, tehkanwc_track_0_reset_w)	/* track 0 x/y */
-	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM")	AM_WRITE(gridiron_led0_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(tehkanwc_videoram2_w) AM_SHARE("share6") AM_BASE( m_videoram2)
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("share7") AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* sprites */
+	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE_LEGACY(tehkanwc_scroll_x_w)
+	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE_LEGACY(tehkanwc_scroll_y_w)
+	AM_RANGE(0xf800, 0xf801) AM_READWRITE_LEGACY(tehkanwc_track_0_r, tehkanwc_track_0_reset_w)	/* track 0 x/y */
+	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM")	AM_WRITE_LEGACY(gridiron_led0_w)
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("P1BUT")
 	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf810, 0xf811) AM_READWRITE(tehkanwc_track_1_r, tehkanwc_track_1_reset_w)	/* track 1 x/y */
-	AM_RANGE(0xf812, 0xf812) AM_WRITE(gridiron_led1_w)
+	AM_RANGE(0xf810, 0xf811) AM_READWRITE_LEGACY(tehkanwc_track_1_r, tehkanwc_track_1_reset_w)	/* track 1 x/y */
+	AM_RANGE(0xf812, 0xf812) AM_WRITE_LEGACY(gridiron_led1_w)
 	AM_RANGE(0xf813, 0xf813) AM_READ_PORT("P2BUT")
-	AM_RANGE(0xf820, 0xf820) AM_READWRITE(soundlatch2_r, sound_command_w)	/* answer from the sound CPU */
-	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE(sub_cpu_halt_w)
+	AM_RANGE(0xf820, 0xf820) AM_READWRITE_LEGACY(soundlatch2_r, sound_command_w)	/* answer from the sound CPU */
+	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(sub_cpu_halt_w)
 	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITENOP			/* ?? writes 0x00 or 0xff */
-	AM_RANGE(0xf860, 0xf860) AM_READWRITE(watchdog_reset_r, tehkanwc_flipscreen_x_w)
-	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE(tehkanwc_flipscreen_y_w)
+	AM_RANGE(0xf860, 0xf860) AM_READWRITE_LEGACY(watchdog_reset_r, tehkanwc_flipscreen_x_w)
+	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE_LEGACY(tehkanwc_flipscreen_y_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(tehkanwc_videoram_w) AM_SHARE("share2")
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(tehkanwc_colorram_w) AM_SHARE("share3")
-	AM_RANGE(0xd800, 0xddff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(tehkanwc_videoram_w) AM_SHARE("share2")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(tehkanwc_colorram_w) AM_SHARE("share3")
+	AM_RANGE(0xd800, 0xddff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("share5") /* unused part of the palette RAM, I think? Gridiron uses it */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(tehkanwc_videoram2_w) AM_SHARE("share6")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(tehkanwc_videoram2_w) AM_SHARE("share6")
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("share7") /* sprites */
-	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(tehkanwc_scroll_x_w)
-	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(tehkanwc_scroll_y_w)
-	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE_LEGACY(tehkanwc_scroll_x_w)
+	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE_LEGACY(tehkanwc_scroll_y_w)
+	AM_RANGE(0xf860, 0xf860) AM_READ_LEGACY(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8001, 0x8001) AM_DEVWRITE("msm", msm_reset_w)/* MSM51xx reset */
+	AM_RANGE(0x8001, 0x8001) AM_DEVWRITE_LEGACY("msm", msm_reset_w)/* MSM51xx reset */
 	AM_RANGE(0x8002, 0x8002) AM_WRITENOP	/* ?? written in the IRQ handler */
 	AM_RANGE(0x8003, 0x8003) AM_WRITENOP	/* ?? written in the NMI handler */
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(soundlatch_r, sound_answer_w)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE_LEGACY(soundlatch_r, sound_answer_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, AS_IO, 8, tehkanwc_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 

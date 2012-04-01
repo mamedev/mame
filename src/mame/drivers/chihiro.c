@@ -1112,20 +1112,20 @@ static WRITE32_HANDLER( smbus_w )
 
 static ADDRESS_MAP_START( xbox_map, AS_PROGRAM, 32, smbus_state )
 	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM
-	AM_RANGE(0xfd000000, 0xfdffffff) AM_READWRITE(geforce_r, geforce_w)
-	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE(usbctrl_r, usbctrl_w)
+	AM_RANGE(0xfd000000, 0xfdffffff) AM_READWRITE_LEGACY(geforce_r, geforce_w)
+	AM_RANGE(0xfed00000, 0xfed003ff) AM_READWRITE_LEGACY(usbctrl_r, usbctrl_w)
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(xbox_map_io, AS_IO, 32, smbus_state )
-	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE(ide_r, ide_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r, pci_32le_w)
-	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w)
-	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(smbus_r, smbus_w)
-	AM_RANGE(0xff60, 0xff67) AM_DEVREADWRITE("ide", ide_bus_master32_r, ide_bus_master32_w)
+	AM_RANGE(0x0020, 0x0023) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00a3) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x01f0, 0x01f7) AM_READWRITE_LEGACY(ide_r, ide_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r, pci_32le_w)
+	AM_RANGE(0x8000, 0x80ff) AM_READWRITE_LEGACY(dummy_r, dummy_w)
+	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE_LEGACY(smbus_r, smbus_w)
+	AM_RANGE(0xff60, 0xff67) AM_DEVREADWRITE_LEGACY("ide", ide_bus_master32_r, ide_bus_master32_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chihiro )

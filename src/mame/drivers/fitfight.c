@@ -126,7 +126,7 @@ static WRITE16_HANDLER(fitfight_700000_w)
 static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_100000)
+	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE( m_fof_100000)
 	//written at scanline 5, allways 1. Used by histryma/fitfight @0x0000ec2c/@0x0000f076
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2")
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM_DSW2")
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3_DSW1")
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_600000)
+	AM_RANGE(0x600000, 0x600001) AM_WRITEONLY AM_BASE( m_fof_600000)
 	//  Is 0x600000 controlling the slave audio CPU? data is 0x1111000zzzzzzzzz (9 sign. bits)
 	//  Used by histryma/fitfight:
 	//      @0x000031ae/0x00002b3a: 0xF000, once, during POST
@@ -144,33 +144,33 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	//      @0x000036bc/?: 0xF0FD when inserting coin
 	//      @0x000037a6/0x000030e6: 0x??dd byte from 0xe08c05, 0xF101 then 0xF001/0xF157 then 0xF057
 
-//  AM_RANGE(0x700000, 0x700001) AM_READ(xxxx) /* see init */
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(fitfight_700000_w) AM_BASE_MEMBER(fitfight_state, m_fof_700000)
+//  AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(xxxx) /* see init */
+	AM_RANGE(0x700000, 0x700001) AM_WRITE_LEGACY(fitfight_700000_w) AM_BASE( m_fof_700000)
 	//  kept at 0xe07900/0xe04c56
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_800000)
+	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE( m_fof_800000)
 	//written at scanline 1, allways 0. Used by histryma/fitfight @0x00001d76/@0x00000f6a
 
-	AM_RANGE(0x900000, 0x900001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_900000) //mid tilemap scroll
+	AM_RANGE(0x900000, 0x900001) AM_WRITEONLY AM_BASE( m_fof_900000) //mid tilemap scroll
 	//  fitfigth: @0x00002b42,@0x00000f76
 	//  histryma: @0x000031b6,@0x00001d82
 
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_a00000) //bak tilemap scroll
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITEONLY AM_BASE( m_fof_a00000) //bak tilemap scroll
 	//  fitfight: @0x00002b4a,@0x00000f82
 	//  histryma: @0x000031be,@0x00001d8e
 
 	AM_RANGE(0xb00000, 0xb03fff) AM_WRITENOP /* unused layer? */
-	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE(fof_bak_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_bak_tileram)
-	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE(fof_mid_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_mid_tileram)
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_txt_tileram)
+	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE_LEGACY(fof_bak_tileram_w) AM_BASE( m_fof_bak_tileram)
+	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE_LEGACY(fof_mid_tileram_w) AM_BASE( m_fof_mid_tileram)
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE_LEGACY(fof_txt_tileram_w) AM_BASE( m_fof_txt_tileram)
 
 	AM_RANGE(0xb10000, 0xb13fff) AM_WRITENOP //used by histryma @0x0000b25a
 	AM_RANGE(0xb14000, 0xb17fff) AM_WRITENOP //used by histryma @0x0000b25a,b270
 	AM_RANGE(0xb18000, 0xb1bfff) AM_WRITENOP //used by histryma @0x0000b25a,b270,b286
 
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(fitfight_state, m_spriteram)
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE( m_spriteram)
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM
 ADDRESS_MAP_END
@@ -178,30 +178,30 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_100000)
+	AM_RANGE(0x100000, 0x100001) AM_WRITEONLY AM_BASE( m_fof_100000)
 
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM_DSW2")
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW3_DSW1")
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_600000)
+	AM_RANGE(0x600000, 0x600001) AM_WRITEONLY AM_BASE( m_fof_600000)
 
-	AM_RANGE(0x700000, 0x700001) AM_READWRITE(bbprot_700000_r, fitfight_700000_w) AM_BASE_MEMBER(fitfight_state, m_fof_700000)
+	AM_RANGE(0x700000, 0x700001) AM_READWRITE_LEGACY(bbprot_700000_r, fitfight_700000_w) AM_BASE( m_fof_700000)
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_800000)
-	AM_RANGE(0x900000, 0x900001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_900000)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITEONLY AM_BASE_MEMBER(fitfight_state, m_fof_a00000)
+	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE( m_fof_800000)
+	AM_RANGE(0x900000, 0x900001) AM_WRITEONLY AM_BASE( m_fof_900000)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITEONLY AM_BASE( m_fof_a00000)
 
 	AM_RANGE(0xb00000, 0xb03fff) AM_WRITENOP /* unused layer? */
-	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE(fof_bak_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_bak_tileram)
-	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE(fof_mid_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_mid_tileram)
-	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE(fof_txt_tileram_w) AM_BASE_MEMBER(fitfight_state, m_fof_txt_tileram)
+	AM_RANGE(0xb04000, 0xb07fff) AM_RAM_WRITE_LEGACY(fof_bak_tileram_w) AM_BASE( m_fof_bak_tileram)
+	AM_RANGE(0xb08000, 0xb0bfff) AM_RAM_WRITE_LEGACY(fof_mid_tileram_w) AM_BASE( m_fof_mid_tileram)
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_RAM_WRITE_LEGACY(fof_txt_tileram_w) AM_BASE( m_fof_txt_tileram)
 
 	AM_RANGE(0xc00000, 0xc00fff) AM_READONLY
-	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE_MEMBER(fitfight_state, m_spriteram)
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE( m_spriteram)
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM
 ADDRESS_MAP_END
@@ -250,9 +250,9 @@ static WRITE8_HANDLER(snd_portc_w)
 }
 
 static ADDRESS_MAP_START( snd_io, AS_IO, 8, fitfight_state )
-		AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READ(snd_porta_r) AM_WRITE(snd_porta_w)
-		AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_READ(snd_portb_r) AM_WRITE(snd_portb_w)
-		AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READ(snd_portc_r) AM_WRITE(snd_portc_w)
+		AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READ_LEGACY(snd_porta_r) AM_WRITE_LEGACY(snd_porta_w)
+		AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_READ_LEGACY(snd_portb_r) AM_WRITE_LEGACY(snd_portb_w)
+		AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READ_LEGACY(snd_portc_r) AM_WRITE_LEGACY(snd_portc_w)
 ADDRESS_MAP_END
 
 static INTERRUPT_GEN( snd_irq )

@@ -212,11 +212,11 @@ static WRITE8_HANDLER(port3_w)
 */
 
 static ADDRESS_MAP_START( monzagp_io, AS_IO, 8, monzagp_state )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(rng_r,port_w)
-	AM_RANGE(0x100, 0x100) AM_WRITE(port0_w)
-	AM_RANGE(0x101, 0x101) AM_WRITE(port1_w)
-	AM_RANGE(0x102, 0x102) AM_WRITE(port2_w)
-	AM_RANGE(0x104, 0x104) AM_READ(rng_r)
+	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(rng_r,port_w)
+	AM_RANGE(0x100, 0x100) AM_WRITE_LEGACY(port0_w)
+	AM_RANGE(0x101, 0x101) AM_WRITE_LEGACY(port1_w)
+	AM_RANGE(0x102, 0x102) AM_WRITE_LEGACY(port2_w)
+	AM_RANGE(0x104, 0x104) AM_READ_LEGACY(rng_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( monzagp )

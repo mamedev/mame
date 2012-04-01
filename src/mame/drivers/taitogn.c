@@ -920,26 +920,26 @@ static MACHINE_RESET( coh3002t )
 static ADDRESS_MAP_START( taitogn_map, AS_PROGRAM, 32, taitogn_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x00400000, 0x007fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
-	AM_RANGE(0x1f000000, 0x1f1fffff) AM_READWRITE(flash_s1_r, flash_s1_w)
-	AM_RANGE(0x1f200000, 0x1f3fffff) AM_READWRITE(flash_s2_r, flash_s2_w)
-	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READWRITE(flash_s3_r, flash_s3_w)
+	AM_RANGE(0x1f000000, 0x1f1fffff) AM_READWRITE_LEGACY(flash_s1_r, flash_s1_w)
+	AM_RANGE(0x1f200000, 0x1f3fffff) AM_READWRITE_LEGACY(flash_s2_r, flash_s2_w)
+	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READWRITE_LEGACY(flash_s3_r, flash_s3_w)
 	AM_RANGE(0x1fa00000, 0x1fa00003) AM_READ_PORT("P1")
 	AM_RANGE(0x1fa00100, 0x1fa00103) AM_READ_PORT("P2")
 	AM_RANGE(0x1fa00200, 0x1fa00203) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x1fa00300, 0x1fa00303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1fa10000, 0x1fa10003) AM_READ_PORT("P3")
 	AM_RANGE(0x1fa10100, 0x1fa10103) AM_READ_PORT("P4")
-	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ(boardconfig_r)
-	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE(znsecsel_r, znsecsel_w)
-	AM_RANGE(0x1fa20000, 0x1fa20003) AM_READWRITE(coin_r, coin_w)
-	AM_RANGE(0x1fa30000, 0x1fa30003) AM_READWRITE(control3_r, control3_w)
-	AM_RANGE(0x1fa51c00, 0x1fa51dff) AM_READWRITE16(spu_r, spu_w, 0xffffffff) // systematic read at spu_address + 250000, result dropped, maybe other accesses
-	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READ(hack1_r)
-	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8("at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
-	AM_RANGE(0x1fb00000, 0x1fb0ffff) AM_READWRITE(rf5c296_io_r, rf5c296_io_w)
-	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE(control_r, control_w)
-	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE(control2_w)
-	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE(gn_1fb70000_r, gn_1fb70000_w)
+	AM_RANGE(0x1fa10200, 0x1fa10203) AM_READ_LEGACY(boardconfig_r)
+	AM_RANGE(0x1fa10300, 0x1fa10303) AM_READWRITE_LEGACY(znsecsel_r, znsecsel_w)
+	AM_RANGE(0x1fa20000, 0x1fa20003) AM_READWRITE_LEGACY(coin_r, coin_w)
+	AM_RANGE(0x1fa30000, 0x1fa30003) AM_READWRITE_LEGACY(control3_r, control3_w)
+	AM_RANGE(0x1fa51c00, 0x1fa51dff) AM_READWRITE16_LEGACY(spu_r, spu_w, 0xffffffff) // systematic read at spu_address + 250000, result dropped, maybe other accesses
+	AM_RANGE(0x1fa60000, 0x1fa60003) AM_READ_LEGACY(hack1_r)
+	AM_RANGE(0x1faf0000, 0x1faf07ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0xffffffff) /* eeprom */
+	AM_RANGE(0x1fb00000, 0x1fb0ffff) AM_READWRITE_LEGACY(rf5c296_io_r, rf5c296_io_w)
+	AM_RANGE(0x1fb40000, 0x1fb40003) AM_READWRITE_LEGACY(control_r, control_w)
+	AM_RANGE(0x1fb60000, 0x1fb60003) AM_WRITE_LEGACY(control2_w)
+	AM_RANGE(0x1fb70000, 0x1fb70003) AM_READWRITE_LEGACY(gn_1fb70000_r, gn_1fb70000_w)
 	AM_RANGE(0x1fbe0000, 0x1fbe01ff) AM_RAM // 256 bytes com zone with the mn102, low bytes of words only, with additional comm at 1fb80000
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("mainbios", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */

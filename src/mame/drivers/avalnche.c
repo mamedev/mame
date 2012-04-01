@@ -112,37 +112,37 @@ static WRITE8_HANDLER( avalance_start_lamp_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_MEMBER(avalnche_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1")
 	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x2003, 0x2003) AM_MIRROR(0x0ffc) AM_READNOP
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_1_lamp_w)
-	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_DEVWRITE("discrete", avalnche_attract_enable_w)
-	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE(avalance_video_invert_w)
-	AM_RANGE(0x4003, 0x4003) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_2_lamp_w)
-	AM_RANGE(0x4004, 0x4006) AM_MIRROR(0x0ff8) AM_DEVWRITE("discrete", avalnche_audio_w)
-	AM_RANGE(0x4007, 0x4007) AM_MIRROR(0x0ff8) AM_WRITE(avalance_start_lamp_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE("discrete", avalnche_noise_amplitude_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE_LEGACY(avalance_credit_1_lamp_w)
+	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_DEVWRITE_LEGACY("discrete", avalnche_attract_enable_w)
+	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE_LEGACY(avalance_video_invert_w)
+	AM_RANGE(0x4003, 0x4003) AM_MIRROR(0x0ff8) AM_WRITE_LEGACY(avalance_credit_2_lamp_w)
+	AM_RANGE(0x4004, 0x4006) AM_MIRROR(0x0ff8) AM_DEVWRITE_LEGACY("discrete", avalnche_audio_w)
+	AM_RANGE(0x4007, 0x4007) AM_MIRROR(0x0ff8) AM_WRITE_LEGACY(avalance_start_lamp_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_DEVWRITE_LEGACY("discrete", avalnche_noise_amplitude_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( catch_map, AS_PROGRAM, 8, avalnche_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_MEMBER(avalnche_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1")
 	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x2003, 0x2003) AM_MIRROR(0x0ffc) AM_READNOP
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_1_lamp_w)
-//  AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_DEVWRITE("discrete", avalnche_attract_enable_w) /* It is attract_enable just like avalnche, but not hooked up yet. */
-	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE(avalance_video_invert_w)
-	AM_RANGE(0x4003, 0x4003) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_2_lamp_w)
-	AM_RANGE(0x4004, 0x4006) AM_MIRROR(0x0ff8) AM_WRITE(catch_audio_w)
-	AM_RANGE(0x4007, 0x4007) AM_MIRROR(0x0ff8) AM_WRITE(avalance_start_lamp_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_WRITE(catch_coin_counter_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE_LEGACY(avalance_credit_1_lamp_w)
+//  AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_DEVWRITE_LEGACY("discrete", avalnche_attract_enable_w) /* It is attract_enable just like avalnche, but not hooked up yet. */
+	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE_LEGACY(avalance_video_invert_w)
+	AM_RANGE(0x4003, 0x4003) AM_MIRROR(0x0ff8) AM_WRITE_LEGACY(avalance_credit_2_lamp_w)
+	AM_RANGE(0x4004, 0x4006) AM_MIRROR(0x0ff8) AM_WRITE_LEGACY(catch_audio_w)
+	AM_RANGE(0x4007, 0x4007) AM_MIRROR(0x0ff8) AM_WRITE_LEGACY(avalance_start_lamp_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_WRITE_LEGACY(catch_coin_counter_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 

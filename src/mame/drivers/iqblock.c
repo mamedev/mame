@@ -128,24 +128,24 @@ static const ppi8255_interface ppi8255_intf =
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, iqblock_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(iqblock_state, m_rambase)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE( m_rambase)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, iqblock_state )
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w)
-	AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)
-	AM_RANGE(0x6800, 0x69ff) AM_WRITE(iqblock_fgvideoram_w)	/* initialized up to 6fff... bug or larger tilemap? */
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(iqblock_bgvideoram_w)
-	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE("ppi8255", ppi8255_w)
-	AM_RANGE(0x5080, 0x5083) AM_DEVREAD("ppi8255", ppi8255_r)
+	AM_RANGE(0x2000, 0x23ff) AM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split1_w)
+	AM_RANGE(0x2800, 0x2bff) AM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split2_w)
+	AM_RANGE(0x6000, 0x603f) AM_WRITE_LEGACY(iqblock_fgscroll_w)
+	AM_RANGE(0x6800, 0x69ff) AM_WRITE_LEGACY(iqblock_fgvideoram_w)	/* initialized up to 6fff... bug or larger tilemap? */
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE_LEGACY(iqblock_bgvideoram_w)
+	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE_LEGACY("ppi8255", ppi8255_w)
+	AM_RANGE(0x5080, 0x5083) AM_DEVREAD_LEGACY("ppi8255", ppi8255_r)
 	AM_RANGE(0x5090, 0x5090) AM_READ_PORT("SW0")
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("SW1")
-	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ymsnd", ym2413_w) // UM3567_data_port_0_w
-	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(iqblock_irqack_w)
-	AM_RANGE(0x7000, 0x7fff) AM_READ(iqblock_bgvideoram_r)
-	AM_RANGE(0x8000, 0xffff) AM_READ(extrarom_r)
+	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w) // UM3567_data_port_0_w
+	AM_RANGE(0x50c0, 0x50c0) AM_WRITE_LEGACY(iqblock_irqack_w)
+	AM_RANGE(0x7000, 0x7fff) AM_READ_LEGACY(iqblock_bgvideoram_r)
+	AM_RANGE(0x8000, 0xffff) AM_READ_LEGACY(extrarom_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( iqblock )

@@ -119,34 +119,34 @@ static WRITE8_HANDLER(ee00_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fcombat_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(fcombat_state, m_videoram, m_videoram_size)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(fcombat_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xe000, 0xe000) AM_READ(fcombat_port01_r)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(fcombat_port01_r)
 	AM_RANGE(0xe100, 0xe100) AM_READ_PORT("DSW0")
 	AM_RANGE(0xe200, 0xe200) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe300, 0xe300) AM_READ(e300_r)
-	AM_RANGE(0xe400, 0xe400) AM_READ(fcombat_protection_r) // protection?
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(fcombat_videoreg_w)	// at least bit 0 for flip screen and joystick input multiplexor
-	AM_RANGE(0xe900, 0xe900) AM_WRITE(e900_w)
-	AM_RANGE(0xea00, 0xea00) AM_WRITE(ea00_w)
-	AM_RANGE(0xeb00, 0xeb00) AM_WRITE(eb00_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ec00_w)
-	AM_RANGE(0xed00, 0xed00) AM_WRITE(ed00_w)
-	AM_RANGE(0xee00, 0xee00) AM_WRITE(ee00_w)	// related to protection ? - doesn't seem to have any effect
-	AM_RANGE(0xef00, 0xef00) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xe300, 0xe300) AM_READ_LEGACY(e300_r)
+	AM_RANGE(0xe400, 0xe400) AM_READ_LEGACY(fcombat_protection_r) // protection?
+	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(fcombat_videoreg_w)	// at least bit 0 for flip screen and joystick input multiplexor
+	AM_RANGE(0xe900, 0xe900) AM_WRITE_LEGACY(e900_w)
+	AM_RANGE(0xea00, 0xea00) AM_WRITE_LEGACY(ea00_w)
+	AM_RANGE(0xeb00, 0xeb00) AM_WRITE_LEGACY(eb00_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE_LEGACY(ec00_w)
+	AM_RANGE(0xed00, 0xed00) AM_WRITE_LEGACY(ed00_w)
+	AM_RANGE(0xee00, 0xee00) AM_WRITE_LEGACY(ee00_w)	// related to protection ? - doesn't seem to have any effect
+	AM_RANGE(0xef00, 0xef00) AM_WRITE_LEGACY(soundlatch_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, fcombat_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ay3", ay8910_r)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("ay3", ay8910_data_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREAD_LEGACY("ay3", ay8910_r)
+	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 

@@ -238,41 +238,41 @@ GFXDECODE_END
 static ADDRESS_MAP_START( chinhero_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(shangkid_bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(shangkid_sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(shangkid_cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE_MEMBER(shangkid_state, m_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, m_videoram) AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE( m_videoreg)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(shangkid_videoram_w) AM_BASE( m_videoram) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_MEMBER(shangkid_state, m_spriteram) AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE( m_spriteram) AM_SHARE("share3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(shangkid_bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(shangkid_sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(shangkid_cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(shangkid_maincpu_bank_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(shangkid_maincpu_bank_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE_MEMBER(shangkid_state, m_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, m_videoram) AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE( m_videoreg)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(shangkid_videoram_w) AM_BASE( m_videoram) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_MEMBER(shangkid_state, m_spriteram) AM_SHARE("share3")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE( m_spriteram) AM_SHARE("share3")
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -280,17 +280,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( chinhero_bbx_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(shangkid_bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(shangkid_sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(shangkid_cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(shangkid_videoram_w) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("share3")
 ADDRESS_MAP_END
@@ -298,30 +298,30 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shangkid_bbx_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(shangkid_bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(shangkid_sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(shangkid_cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(shangkid_maincpu_bank_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(shangkid_maincpu_bank_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(shangkid_videoram_w) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("share3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinhero_bbx_portmap, AS_IO, 8, shangkid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shangkid_bbx_portmap, AS_IO, 8, shangkid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -338,7 +338,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, shangkid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(shangkid_soundlatch_r) AM_DEVWRITE("dac", dac_w)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(shangkid_soundlatch_r) AM_DEVWRITE_LEGACY("dac", dac_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -437,7 +437,7 @@ MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( dynamski_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(shangkid_state, m_videoram) /* tilemap */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE( m_videoram) /* tilemap */
 	AM_RANGE(0xc800, 0xcbff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM
 	AM_RANGE(0xd800, 0xdbff) AM_RAM
@@ -453,7 +453,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dynamski_portmap, AS_IO, 8, shangkid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* ports are reversed */
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( dynamski, shangkid_state )

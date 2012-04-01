@@ -374,13 +374,13 @@ static WRITE8_HANDLER( famibox_system_w )
 
 static ADDRESS_MAP_START( famibox_map, AS_PROGRAM, 8, famibox_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
-	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(famibox_IN0_r, famibox_IN0_w)	/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(famibox_IN1_r) AM_DEVWRITE("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(famibox_system_r, famibox_system_w)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
+	AM_RANGE(0x4014, 0x4014) AM_WRITE_LEGACY(sprite_dma_w)
+	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE_LEGACY(famibox_IN0_r, famibox_IN0_w)	/* IN0 - input port 1 */
+	AM_RANGE(0x4017, 0x4017) AM_READ_LEGACY(famibox_IN1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x5000, 0x5fff) AM_READWRITE_LEGACY(famibox_system_r, famibox_system_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpubank1")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("cpubank2")

@@ -293,22 +293,22 @@ static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xc000, 0xddff) AM_RAM
 	AM_RANGE(0xde00, 0xdf7f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdf80, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, m_fgvideoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, m_bg1videoram)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(lwings_bg1_scrollx_w)
-	AM_RANGE(0xf802, 0xf803) AM_WRITE(lwings_bg1_scrolly_w)
-	AM_RANGE(0xf804, 0xf804) AM_WRITE(trojan_bg2_scrollx_w)
-	AM_RANGE(0xf805, 0xf805) AM_WRITE(trojan_bg2_image_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(lwings_fgvideoram_w) AM_BASE( m_fgvideoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(lwings_bg1videoram_w) AM_BASE( m_bg1videoram)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xf801) AM_WRITE_LEGACY(lwings_bg1_scrollx_w)
+	AM_RANGE(0xf802, 0xf803) AM_WRITE_LEGACY(lwings_bg1_scrolly_w)
+	AM_RANGE(0xf804, 0xf804) AM_WRITE_LEGACY(trojan_bg2_scrollx_w)
+	AM_RANGE(0xf805, 0xf805) AM_WRITE_LEGACY(trojan_bg2_image_w)
 
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE") AM_WRITENOP /* ? */
-	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1") AM_WRITE(avengers_protection_w)
+	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1") AM_WRITE_LEGACY(avengers_protection_w)
 	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWB")
-	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWA") AM_WRITE(avengers_prot_bank_w)
-	AM_RANGE(0xf80d, 0xf80d) AM_READWRITE(avengers_protection_r,avengers_adpcm_w)
-	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
+	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWA") AM_WRITE_LEGACY(avengers_prot_bank_w)
+	AM_RANGE(0xf80d, 0xf80d) AM_READWRITE_LEGACY(avengers_protection_r,avengers_adpcm_w)
+	AM_RANGE(0xf80e, 0xf80e) AM_WRITE_LEGACY(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
@@ -316,20 +316,20 @@ static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xddff) AM_RAM
 	AM_RANGE(0xde00, 0xdfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, m_fgvideoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, m_bg1videoram)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(lwings_fgvideoram_w) AM_BASE( m_fgvideoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(lwings_bg1videoram_w) AM_BASE( m_bg1videoram)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1")
-	AM_RANGE(0xf808, 0xf809) AM_WRITE(lwings_bg1_scrollx_w)
+	AM_RANGE(0xf808, 0xf809) AM_WRITE_LEGACY(lwings_bg1_scrollx_w)
 	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
-	AM_RANGE(0xf80a, 0xf80b) AM_WRITE(lwings_bg1_scrolly_w)
-	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_WRITE(soundlatch_w)
-	AM_RANGE(0xf80d, 0xf80d) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
+	AM_RANGE(0xf80a, 0xf80b) AM_WRITE_LEGACY(lwings_bg1_scrolly_w)
+	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xf80d, 0xf80d) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xf80e, 0xf80e) AM_WRITE_LEGACY(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8, lwings_state )
@@ -338,32 +338,32 @@ static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xc000, 0xddff) AM_RAM
 	AM_RANGE(0xde00, 0xdf7f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xdf80, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lwings_fgvideoram_w) AM_BASE_MEMBER(lwings_state, m_fgvideoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lwings_bg1videoram_w) AM_BASE_MEMBER(lwings_state, m_bg1videoram)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(lwings_fgvideoram_w) AM_BASE( m_fgvideoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(lwings_bg1videoram_w) AM_BASE( m_bg1videoram)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(lwings_bg1_scrollx_w)
-	AM_RANGE(0xf802, 0xf803) AM_WRITE(lwings_bg1_scrolly_w)
-	AM_RANGE(0xf804, 0xf804) AM_WRITE(trojan_bg2_scrollx_w)
-	AM_RANGE(0xf805, 0xf805) AM_WRITE(trojan_bg2_image_w)
+	AM_RANGE(0xf800, 0xf801) AM_WRITE_LEGACY(lwings_bg1_scrollx_w)
+	AM_RANGE(0xf802, 0xf803) AM_WRITE_LEGACY(lwings_bg1_scrolly_w)
+	AM_RANGE(0xf804, 0xf804) AM_WRITE_LEGACY(trojan_bg2_scrollx_w)
+	AM_RANGE(0xf805, 0xf805) AM_WRITE_LEGACY(trojan_bg2_image_w)
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE") AM_WRITENOP //watchdog
 	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1")
 	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
-	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_WRITE(soundlatch_w)
-	AM_RANGE(0xf80d, 0xf80d) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
+	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xf80d, 0xf80d) AM_WRITE_LEGACY(soundlatch2_w)
+	AM_RANGE(0xf80e, 0xf80e) AM_WRITE_LEGACY(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lwings_sound_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("2203a", ym2203_w)
-	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE("2203b", ym2203_w)
-	AM_RANGE(0xe006, 0xe006) AM_READ(avengers_soundlatch2_r) //AT: (avengers061gre)
-	AM_RANGE(0xe006, 0xe006) AM_WRITEONLY AM_BASE_MEMBER(lwings_state, m_soundlatch2)
+	AM_RANGE(0xc800, 0xc800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("2203a", ym2203_w)
+	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE_LEGACY("2203b", ym2203_w)
+	AM_RANGE(0xe006, 0xe006) AM_READ_LEGACY(avengers_soundlatch2_r) //AT: (avengers061gre)
+	AM_RANGE(0xe006, 0xe006) AM_WRITEONLY AM_BASE( m_soundlatch2)
 ADDRESS_MAP_END
 
 /* Yes, _no_ ram */
@@ -373,14 +373,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avengers_adpcm_io_map, AS_IO, 8, lwings_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(avengers_adpcm_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("5205", msm5205_w)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(avengers_adpcm_r)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("5205", msm5205_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trojan_adpcm_io_map, AS_IO, 8, lwings_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("5205", msm5205_w)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("5205", msm5205_w)
 ADDRESS_MAP_END
 
 /*************************************

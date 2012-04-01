@@ -451,28 +451,28 @@ static WRITE32_HANDLER( dreamwld_palette_w )
 static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_spriteram)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE(dreamwld_palette_w) AM_BASE_MEMBER(dreamwld_state, m_paletteram)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE_MEMBER(dreamwld_state, m_bg_videoram)
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE_MEMBER(dreamwld_state, m_bg2_videoram)
-	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_vregs)  // scroll regs etc.
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE_LEGACY(dreamwld_palette_w) AM_BASE( m_paletteram)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(dreamwld_bg_videoram_w ) AM_BASE( m_bg_videoram)
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(dreamwld_bg2_videoram_w ) AM_BASE( m_bg2_videoram)
+	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE( m_vregs)  // scroll regs etc.
 
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
 
-	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE(dreamwld_6295_0_bank_w) // sfx
-	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0xff000000) // sfx
+	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE_LEGACY(dreamwld_6295_0_bank_w) // sfx
+	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0xff000000) // sfx
 
-	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
+	AM_RANGE(0xc00030, 0xc00033) AM_READ_LEGACY(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
 
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_BASE_MEMBER(dreamwld_state, m_workram) // work ram
+	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_BASE( m_workram) // work ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dreamwld_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_IMPORT_FROM( baryon_map )
 
-	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE(dreamwld_6295_1_bank_w) // sfx
-	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0xff000000) // sfx
+	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE_LEGACY(dreamwld_6295_1_bank_w) // sfx
+	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0xff000000) // sfx
 ADDRESS_MAP_END
 
 

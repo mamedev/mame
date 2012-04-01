@@ -112,17 +112,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
-	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
-	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
+	AM_RANGE(0x100010, 0x100011) AM_WRITE_LEGACY(blockout_irq6_ack_w)
+	AM_RANGE(0x100012, 0x100013) AM_WRITE_LEGACY(blockout_irq5_ack_w)
+	AM_RANGE(0x100014, 0x100015) AM_WRITE_LEGACY(blockout_sound_command_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE_MEMBER(blockout_state, m_videoram)
+	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE_LEGACY(blockout_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM	/* work RAM */
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_MEMBER(blockout_state, m_frontvideoram)
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE( m_frontvideoram)
 	AM_RANGE(0x208000, 0x21ffff) AM_RAM	/* ??? */
-	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE_MEMBER(blockout_state, m_paletteram)
+	AM_RANGE(0x280002, 0x280003) AM_WRITE_LEGACY(blockout_frontcolor_w)
+	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE_LEGACY(blockout_paletteram_w) AM_BASE( m_paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16, blockout_state )
@@ -132,25 +132,25 @@ static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
-	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
-	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
+	AM_RANGE(0x100010, 0x100011) AM_WRITE_LEGACY(blockout_irq6_ack_w)
+	AM_RANGE(0x100012, 0x100013) AM_WRITE_LEGACY(blockout_irq5_ack_w)
+	AM_RANGE(0x100014, 0x100015) AM_WRITE_LEGACY(blockout_sound_command_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE_MEMBER(blockout_state, m_videoram)
+	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE_LEGACY(blockout_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM	/* work RAM */
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_MEMBER(blockout_state, m_frontvideoram) AM_MIRROR(0x004000) // agress checks at F3A that this is mirrored, blockout glitches if you do it to it
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE( m_frontvideoram) AM_MIRROR(0x004000) // agress checks at F3A that this is mirrored, blockout glitches if you do it to it
 	AM_RANGE(0x208000, 0x21ffff) AM_RAM	/* ??? */
-	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE_MEMBER(blockout_state, m_paletteram)
+	AM_RANGE(0x280002, 0x280003) AM_WRITE_LEGACY(blockout_frontcolor_w)
+	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE_LEGACY(blockout_paletteram_w) AM_BASE( m_paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, blockout_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

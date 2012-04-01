@@ -158,15 +158,15 @@ static ADDRESS_MAP_START( grdians_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
-	AM_RANGE(0x70000c, 0x70000d) AM_READ(watchdog_reset16_r)		// Watchdog
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x70000c, 0x70000d) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(grdians_lockout_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)	// Video Registers
-	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE_LEGACY(seta2_vregs_w) AM_BASE( m_vregs)	// Video Registers
+	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -198,16 +198,16 @@ static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN0")				// P1
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN1")				// P2
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(grdians_lockout_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(grdians_lockout_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)	// Video Registers
-	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xfffd0a, 0xfffd0b) AM_DEVREADWRITE("eeprom", gundamex_eeprom_r,gundamex_eeprom_w)	// parallel data register
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE_LEGACY(seta2_vregs_w) AM_BASE( m_vregs)	// Video Registers
+	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0xfffd0a, 0xfffd0b) AM_DEVREADWRITE_LEGACY("eeprom", gundamex_eeprom_r,gundamex_eeprom_w)	// parallel data register
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -256,20 +256,20 @@ static WRITE16_HANDLER( mj4simai_keyboard_w )
 static ADDRESS_MAP_START( mj4simai_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
-	AM_RANGE(0x600000, 0x600001) AM_READ(mj4simai_p1_r)				// P1
-	AM_RANGE(0x600002, 0x600003) AM_READ(mj4simai_p2_r)				// P2
-	AM_RANGE(0x600004, 0x600005) AM_WRITE(mj4simai_keyboard_w)		// select keyboard row to read
-	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x600000, 0x600001) AM_READ_LEGACY(mj4simai_p1_r)				// P1
+	AM_RANGE(0x600002, 0x600003) AM_READ_LEGACY(mj4simai_p2_r)				// P2
+	AM_RANGE(0x600004, 0x600005) AM_WRITE_LEGACY(mj4simai_keyboard_w)		// select keyboard row to read
+	AM_RANGE(0x600006, 0x600007) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x600100, 0x600101) AM_READ_PORT("SYSTEM")				//
 	AM_RANGE(0x600200, 0x600201) AM_WRITENOP						// Leds? Coins?
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)	// Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
+	AM_RANGE(0x600300, 0x60030f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE_LEGACY(seta2_vregs_w) AM_BASE( m_vregs)	// Video Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -283,16 +283,16 @@ static ADDRESS_MAP_START( myangel_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
-	AM_RANGE(0x700006, 0x700007) AM_READ(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x700006, 0x700007) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x700200, 0x700201) AM_WRITENOP						// Leds? Coins?
 	AM_RANGE(0x700300, 0x700301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0x700310, 0x70031f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)				// Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
+	AM_RANGE(0x700310, 0x70031f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE_LEGACY(seta2_vregs_w) AM_BASE( m_vregs)				// Video Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -306,16 +306,16 @@ static ADDRESS_MAP_START( myangel2_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
-	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x600006, 0x600007) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x600200, 0x600201) AM_WRITENOP						// Leds? Coins?
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0x600300, 0x60030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0xd40000, 0xd4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xd60000, 0xd6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)			// Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
+	AM_RANGE(0x600300, 0x60030f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites
+	AM_RANGE(0xd40000, 0xd4ffff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xd60000, 0xd6003f) AM_WRITE_LEGACY(seta2_vregs_w) AM_BASE( m_vregs)			// Video Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -350,17 +350,17 @@ static ADDRESS_MAP_START( pzlbowl_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM									// RAM
 	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")					// DSW 1
 	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")					// DSW 2
-	AM_RANGE(0x400300, 0x40030f) AM_WRITE(seta2_sound_bank_w)			// Samples Banks
+	AM_RANGE(0x400300, 0x40030f) AM_WRITE_LEGACY(seta2_sound_bank_w)			// Samples Banks
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")						// P1
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")						// P2
-	AM_RANGE(0x500004, 0x500005) AM_READWRITE(pzlbowl_coins_r,pzlbowl_coin_counter_w)	// Coins + Protection?
-	AM_RANGE(0x500006, 0x500007) AM_READ(watchdog_reset16_r)			// Watchdog
-	AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)			// Protection
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0x840000, 0x84ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x860000, 0x86003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)				// Video Registers
-	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
+	AM_RANGE(0x500004, 0x500005) AM_READWRITE_LEGACY(pzlbowl_coins_r,pzlbowl_coin_counter_w)	// Coins + Protection?
+	AM_RANGE(0x500006, 0x500007) AM_READ_LEGACY(watchdog_reset16_r)			// Watchdog
+	AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(pzlbowl_protection_r)			// Protection
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites
+	AM_RANGE(0x840000, 0x84ffff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x860000, 0x86003f) AM_WRITE_LEGACY(seta2_vregs_w) AM_BASE( m_vregs)				// Video Registers
+	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -375,18 +375,18 @@ static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM								// RAM
 	AM_RANGE(0x500300, 0x500301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x500302, 0x500303) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0x500300, 0x50030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0x500300, 0x50030f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
-	AM_RANGE(0x600004, 0x600005) AM_WRITE(pzlbowl_coin_counter_w)	// Coins Counter
-	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
-	//AM_RANGE(0x700000, 0x700001) AM_READ(pzlbowl_protection_r)      // Protection
-	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)
-	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
+	AM_RANGE(0x600004, 0x600005) AM_WRITE_LEGACY(pzlbowl_coin_counter_w)	// Coins Counter
+	AM_RANGE(0x600006, 0x600007) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	//AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(pzlbowl_protection_r)      // Protection
+	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites
+	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE_LEGACY(seta2_vregs_w) AM_BASE( m_vregs)
+	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -435,17 +435,17 @@ static ADDRESS_MAP_START( reelquak_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("TICKET")				// Tickets
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("SYSTEM")				// Coins
-	AM_RANGE(0x400006, 0x400007) AM_READ(watchdog_reset16_r)		// Watchdog
-	AM_RANGE(0x400200, 0x400201) AM_WRITE(reelquak_coin_w)			// Coin Counters / IRQ Ack
+	AM_RANGE(0x400006, 0x400007) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x400200, 0x400201) AM_WRITE_LEGACY(reelquak_coin_w)			// Coin Counters / IRQ Ack
 	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0x400300, 0x40030f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)				// Video Registers
-	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE( reelquak_leds_w )		// parallel data register (leds)
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
+	AM_RANGE(0x400300, 0x40030f) AM_WRITE_LEGACY(seta2_sound_bank_w)		// Samples Banks
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites
+	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE_LEGACY(seta2_vregs_w) AM_BASE( m_vregs)				// Video Registers
+	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE_LEGACY( reelquak_leds_w )		// parallel data register (leds)
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -457,9 +457,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( namcostr_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM								// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)	// Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites
+	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE_LEGACY(seta2_vregs_w) AM_BASE( m_vregs)	// Video Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -488,24 +488,24 @@ static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE( 0x400000, 0x400001 ) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE( 0x400002, 0x400003 ) AM_READ_PORT("BUTTONS")			// Buttons
 
-	AM_RANGE( 0x400300, 0x40030f ) AM_WRITE( seta2_sound_bank_w )	// Samples Banks
+	AM_RANGE( 0x400300, 0x40030f ) AM_WRITE_LEGACY( seta2_sound_bank_w )	// Samples Banks
 
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("GUN1")				// P1
 	AM_RANGE( 0x580000, 0x580001 ) AM_READ_PORT("GUN2")				// P2
 
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT("TRIGGER")			// Trigger
 	AM_RANGE( 0x700002, 0x700003 ) AM_READ_PORT("PUMP")				// Pump
-	AM_RANGE( 0x700004, 0x700005 ) AM_READ_PORT("COIN")	AM_WRITE( samshoot_coin_w )	// Coins
-	AM_RANGE( 0x700006, 0x700007 ) AM_READ( watchdog_reset16_r )	// Watchdog?
+	AM_RANGE( 0x700004, 0x700005 ) AM_READ_PORT("COIN")	AM_WRITE_LEGACY( samshoot_coin_w )	// Coins
+	AM_RANGE( 0x700006, 0x700007 ) AM_READ_LEGACY( watchdog_reset16_r )	// Watchdog?
 
-	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE( 0x860000, 0x86003f ) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, m_vregs)	// Video Registers
+	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE( 0x860000, 0x86003f ) AM_WRITE_LEGACY(seta2_vregs_w) AM_BASE( m_vregs)	// Video Registers
 
-	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w	)	// Sound
+	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE_LEGACY( "x1snd", seta_sound_word_r, seta_sound_word_w	)	// Sound
 
 	AM_RANGE( 0xfffd0a, 0xfffd0b ) AM_READ_PORT("DSW2")				// parallel data register (DSW 2)
-	AM_RANGE( 0xfffc00, 0xffffff ) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
+	AM_RANGE( 0xfffc00, 0xffffff ) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -629,18 +629,18 @@ static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
 	AM_RANGE( 0x00000000, 0x0007ffff ) AM_ROM
 	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
 
-	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ( funcube_debug_r )
-	AM_RANGE( 0x00500004, 0x00500007 ) AM_READ( watchdog_reset32_r ) AM_WRITENOP
+	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ_LEGACY( funcube_debug_r )
+	AM_RANGE( 0x00500004, 0x00500007 ) AM_READ_LEGACY( watchdog_reset32_r ) AM_WRITENOP
 
-	AM_RANGE( 0x00600000, 0x00600003 ) AM_DEVREADWRITE("oki", oki_read, oki_write)
+	AM_RANGE( 0x00600000, 0x00600003 ) AM_DEVREADWRITE_LEGACY("oki", oki_read, oki_write)
 
-	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE( spriteram32_dword_r,  spriteram32_dword_w  ) AM_BASE_SIZE_MEMBER(seta2_state, m_spriteram, m_spriteram_size)
-	AM_RANGE( 0x00840000, 0x0084ffff ) AM_READWRITE( paletteram32_dword_r, paletteram32_dword_w ) AM_BASE_GENERIC(paletteram)
-	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE( seta2_vregs_dword_w )                            AM_BASE_MEMBER(seta2_state, m_vregs)
+	AM_RANGE( 0x00800000, 0x0083ffff ) AM_READWRITE_LEGACY( spriteram32_dword_r,  spriteram32_dword_w  ) AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE( 0x00840000, 0x0084ffff ) AM_READWRITE_LEGACY( paletteram32_dword_r, paletteram32_dword_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0x00860000, 0x0086003f ) AM_WRITE_LEGACY( seta2_vregs_dword_w )                            AM_BASE( m_vregs)
 
-	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE( funcube_nvram_dword_r, funcube_nvram_dword_w )
+	AM_RANGE( 0x00c00000, 0x00c002ff ) AM_READWRITE_LEGACY( funcube_nvram_dword_r, funcube_nvram_dword_w )
 
-	AM_RANGE(0xf0000000, 0xf00001ff ) AM_READWRITE( coldfire_regs_r, coldfire_regs_w ) AM_BASE_MEMBER(seta2_state, m_coldfire_regs)	// Module
+	AM_RANGE(0xf0000000, 0xf00001ff ) AM_READWRITE_LEGACY( coldfire_regs_r, coldfire_regs_w ) AM_BASE( m_coldfire_regs)	// Module
 	AM_RANGE(0xffffe000, 0xffffffff ) AM_RAM	// SRAM
 ADDRESS_MAP_END
 
@@ -762,12 +762,12 @@ static WRITE8_HANDLER( funcube_outputs_w )
 
 
 static ADDRESS_MAP_START( funcube_sub_io, AS_IO, 8, seta2_state )
-	AM_RANGE( H8_PORT_7,   H8_PORT_7   )	AM_READ( funcube_coins_r )
+	AM_RANGE( H8_PORT_7,   H8_PORT_7   )	AM_READ_LEGACY( funcube_coins_r )
 	AM_RANGE( H8_PORT_4,   H8_PORT_4   )	AM_NOP	// unused
-	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE( funcube_outputs_r, funcube_outputs_w ) AM_BASE_MEMBER( seta2_state, m_funcube_outputs )
-	AM_RANGE( H8_PORT_B,   H8_PORT_B   )	AM_WRITE( funcube_leds_w )                           AM_BASE_MEMBER( seta2_state, m_funcube_leds )
+	AM_RANGE( H8_PORT_A,   H8_PORT_A   )	AM_READWRITE_LEGACY( funcube_outputs_r, funcube_outputs_w ) AM_BASE(m_funcube_outputs )
+	AM_RANGE( H8_PORT_B,   H8_PORT_B   )	AM_WRITE_LEGACY( funcube_leds_w )                           AM_BASE(m_funcube_leds )
 //  AM_RANGE( H8_SERIAL_0, H8_SERIAL_0 )    // cabinets linking (jpunit)
-	AM_RANGE( H8_SERIAL_1, H8_SERIAL_1 )	AM_READ( funcube_serial_r )
+	AM_RANGE( H8_SERIAL_1, H8_SERIAL_1 )	AM_READ_LEGACY( funcube_serial_r )
 ADDRESS_MAP_END
 
 

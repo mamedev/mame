@@ -543,21 +543,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", i8237_r, i8237_w ) //8237 DMA Controller
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)    //8253 PIT
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
-	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE_MODERN("rtc", mc146818_device, read, write)
-	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_r, pic8259_w )
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE_LEGACY("dma8237_1", i8237_r, i8237_w ) //8237 DMA Controller
+	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE_LEGACY("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)    //8253 PIT
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE("rtc", mc146818_device, read, write)
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE_LEGACY(dma_page_select_r,dma_page_select_w)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE_LEGACY("pic8259_2", pic8259_r, pic8259_w )
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
 	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
 	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
 	AM_RANGE(0x03bc, 0x03bf) AM_RAM //printer port
-	AM_RANGE(0x03f2, 0x03f2) AM_WRITE(drive_selection_w)
-	AM_RANGE(0x03f4, 0x03f4) AM_READ(fdc765_status_r) //765 Floppy Disk Controller (FDC) Status
-	AM_RANGE(0x03f5, 0x03f5) AM_READWRITE(fdc765_data_r,fdc765_data_w)//FDC Data
+	AM_RANGE(0x03f2, 0x03f2) AM_WRITE_LEGACY(drive_selection_w)
+	AM_RANGE(0x03f4, 0x03f4) AM_READ_LEGACY(fdc765_status_r) //765 Floppy Disk Controller (FDC) Status
+	AM_RANGE(0x03f5, 0x03f5) AM_READWRITE_LEGACY(fdc765_data_r,fdc765_data_w)//FDC Data
 	AM_RANGE(0x03f8, 0x03ff) AM_RAM //rs232c (serial) port
 ADDRESS_MAP_END
 
@@ -566,7 +566,7 @@ static ADDRESS_MAP_START( filetto_io, AS_IO, 8, pcxt_state )
 	AM_IMPORT_FROM( pcxt_io_common )
 //  AM_RANGE(0x0200, 0x020f) AM_RAM //game port
 	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
-	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
+	AM_RANGE(0x0310, 0x0311) AM_READWRITE_LEGACY(disk_iobank_r,disk_iobank_w) //Prototyping card
 	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
 ADDRESS_MAP_END
 
@@ -581,7 +581,7 @@ static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_IMPORT_FROM( pcxt_io_common )
 	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
-	AM_RANGE(0x03c0, 0x03c0) AM_WRITE(tetriskr_bg_bank_w)
+	AM_RANGE(0x03c0, 0x03c0) AM_WRITE_LEGACY(tetriskr_bg_bank_w)
 	AM_RANGE(0x03c8, 0x03c8) AM_READ_PORT("IN0")
 	AM_RANGE(0x03c9, 0x03c9) AM_READ_PORT("IN1")
 //  AM_RANGE(0x03ce, 0x03ce) AM_READ_PORT("IN1") //read then discarded?

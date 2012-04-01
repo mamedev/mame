@@ -108,20 +108,20 @@ static WRITE16_DEVICE_HANDLER( soundbank_w )
 static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x120000, 0x120fff) AM_RAM AM_BASE_MEMBER(oneshot_state, m_sprites)
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(oneshot_mid_videoram_w) AM_BASE_MEMBER(oneshot_state, m_mid_videoram) // some people , girl etc.
-	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE(oneshot_fg_videoram_w) AM_BASE_MEMBER(oneshot_state, m_fg_videoram) // credits etc.
-	AM_RANGE(0x182000, 0x182fff) AM_RAM_WRITE(oneshot_bg_videoram_w) AM_BASE_MEMBER(oneshot_state, m_bg_videoram) // credits etc.
-	AM_RANGE(0x188000, 0x18800f) AM_WRITEONLY AM_BASE_MEMBER(oneshot_state, m_scroll)	// scroll registers
-	AM_RANGE(0x190002, 0x190003) AM_READ(soundlatch_word_r)
-	AM_RANGE(0x190010, 0x190011) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x190018, 0x190019) AM_DEVWRITE("oki", soundbank_w)
-	AM_RANGE(0x190026, 0x190027) AM_READ(oneshot_gun_x_p1_r)
-	AM_RANGE(0x19002e, 0x19002f) AM_READ(oneshot_gun_x_p2_r)
-	AM_RANGE(0x190036, 0x190037) AM_READ(oneshot_gun_y_p1_r)
-	AM_RANGE(0x19003e, 0x19003f) AM_READ(oneshot_gun_y_p2_r)
-	AM_RANGE(0x19c020, 0x19c021) AM_READ(oneshot_in0_word_r)
+	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x120000, 0x120fff) AM_RAM AM_BASE( m_sprites)
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE_LEGACY(oneshot_mid_videoram_w) AM_BASE( m_mid_videoram) // some people , girl etc.
+	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE_LEGACY(oneshot_fg_videoram_w) AM_BASE( m_fg_videoram) // credits etc.
+	AM_RANGE(0x182000, 0x182fff) AM_RAM_WRITE_LEGACY(oneshot_bg_videoram_w) AM_BASE( m_bg_videoram) // credits etc.
+	AM_RANGE(0x188000, 0x18800f) AM_WRITEONLY AM_BASE( m_scroll)	// scroll registers
+	AM_RANGE(0x190002, 0x190003) AM_READ_LEGACY(soundlatch_word_r)
+	AM_RANGE(0x190010, 0x190011) AM_WRITE_LEGACY(soundlatch_word_w)
+	AM_RANGE(0x190018, 0x190019) AM_DEVWRITE_LEGACY("oki", soundbank_w)
+	AM_RANGE(0x190026, 0x190027) AM_READ_LEGACY(oneshot_gun_x_p1_r)
+	AM_RANGE(0x19002e, 0x19002f) AM_READ_LEGACY(oneshot_gun_x_p2_r)
+	AM_RANGE(0x190036, 0x190037) AM_READ_LEGACY(oneshot_gun_y_p1_r)
+	AM_RANGE(0x19003e, 0x19003f) AM_READ_LEGACY(oneshot_gun_y_p2_r)
+	AM_RANGE(0x19c020, 0x19c021) AM_READ_LEGACY(oneshot_in0_word_r)
 	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSW2")
 	AM_RANGE(0x19c02c, 0x19c02d) AM_READ_PORT("CREDITS")
 	AM_RANGE(0x19c030, 0x19c031) AM_READ_PORT("P1")
@@ -130,10 +130,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oneshot_sound_map, AS_PROGRAM, 8, oneshot_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(soundlatch_r,soundlatch_w)
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE_LEGACY(soundlatch_r,soundlatch_w)
 	AM_RANGE(0x8001, 0x87ff) AM_RAM
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym3812_r,ym3812_w)
-	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)
+	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 

@@ -170,14 +170,14 @@ static WRITE8_HANDLER( ay8910_w )
  *************************************/
 
 static ADDRESS_MAP_START( hc11_pgm_map, AS_PROGRAM, 8, skeetsht_state )
-	AM_RANGE(0x2800, 0x2807) AM_READWRITE(tms_r, tms_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(ay8910_w)
+	AM_RANGE(0x2800, 0x2807) AM_READWRITE_LEGACY(tms_r, tms_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(ay8910_w)
 	AM_RANGE(0xb600, 0xbdff) AM_RAM //internal EEPROM
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_REGION("68hc11", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hc11_io_map, AS_IO, 8, skeetsht_state )
-	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE(hc11_porta_r, hc11_porta_w)
+	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE_LEGACY(hc11_porta_r, hc11_porta_w)
 ADDRESS_MAP_END
 
 
@@ -188,9 +188,9 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skeetsht_state )
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(skeetsht_state,m_tms_vram)
-	AM_RANGE(0x00440000, 0x004fffff) AM_READWRITE(ramdac_r, ramdac_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(m_tms_vram)
+	AM_RANGE(0x00440000, 0x004fffff) AM_READWRITE_LEGACY(ramdac_r, ramdac_w)
 	AM_RANGE(0xff800000, 0xffbfffff) AM_ROM AM_MIRROR(0x00400000) AM_REGION("tms", 0)
 ADDRESS_MAP_END
 

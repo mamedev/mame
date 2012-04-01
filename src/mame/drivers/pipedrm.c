@@ -267,22 +267,22 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w) AM_BASE_SIZE_MEMBER(fromance_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd000, 0xffff) AM_READWRITE_LEGACY(fromance_videoram_r, fromance_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
-	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1") AM_WRITE(sound_command_w)
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("P2") AM_WRITE(pipedrm_bankswitch_w)
-	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(fromance_crtc_data_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(fromance_crtc_register_w)
+	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1") AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x21, 0x21) AM_READ_PORT("P2") AM_WRITE_LEGACY(pipedrm_bankswitch_w)
+	AM_RANGE(0x22, 0x25) AM_WRITE_LEGACY(fromance_scroll_w)
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("DSW1")
 	AM_RANGE(0x23, 0x23) AM_READ_PORT("DSW2")
 	AM_RANGE(0x24, 0x24) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x25, 0x25) AM_READ(pending_command_r)
+	AM_RANGE(0x25, 0x25) AM_READ_LEGACY(pending_command_r)
 ADDRESS_MAP_END
 
 
@@ -302,18 +302,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x16, 0x16) AM_READ(sound_command_r)
-	AM_RANGE(0x17, 0x17) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(sound_bankswitch_w)
+	AM_RANGE(0x16, 0x16) AM_READ_LEGACY(sound_command_r)
+	AM_RANGE(0x17, 0x17) AM_WRITE_LEGACY(pending_command_clear_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hatris_sound_portmap, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x08) AM_DEVREADWRITE("ymsnd", ym2608_r, ym2608_w)
-	AM_RANGE(0x04, 0x04) AM_READ(sound_command_r)
-	AM_RANGE(0x05, 0x05) AM_READWRITE(pending_command_r, pending_command_clear_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x08) AM_DEVREADWRITE_LEGACY("ymsnd", ym2608_r, ym2608_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(sound_command_r)
+	AM_RANGE(0x05, 0x05) AM_READWRITE_LEGACY(pending_command_r, pending_command_clear_w)
 ADDRESS_MAP_END
 
 

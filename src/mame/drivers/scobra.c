@@ -115,93 +115,93 @@ static WRITE8_DEVICE_HANDLER(hustler_ppi8255_w)
 static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(galaxold_videoram_w)	/* mirror */
-	AM_RANGE(0x8c00, 0x8fff) AM_READ(galaxold_videoram_r)	/* mirror */
-	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_bulletsram) AM_SIZE_MEMBER(galaxold_state, m_bulletsram_size)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(galaxold_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE_LEGACY(galaxold_videoram_w)	/* mirror */
+	AM_RANGE(0x8c00, 0x8fff) AM_READ_LEGACY(galaxold_videoram_r)	/* mirror */
+	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE_LEGACY(galaxold_attributesram_w) AM_BASE(m_attributesram)
+	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
 	AM_RANGE(0x9080, 0x90ff) AM_RAM
-	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xa802, 0xa802) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0xa804, 0xa804) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa801, 0xa801) AM_WRITE_LEGACY(galaxold_nmi_enable_w)
+	AM_RANGE(0xa802, 0xa802) AM_WRITE_LEGACY(galaxold_coin_counter_w)
+	AM_RANGE(0xa804, 0xa804) AM_WRITE_LEGACY(galaxold_stars_enable_w)
+	AM_RANGE(0xa806, 0xa806) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
+	AM_RANGE(0xa807, 0xa807) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x883f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
-	AM_RANGE(0x8840, 0x885f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
-	AM_RANGE(0x8860, 0x887f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_bulletsram) AM_SIZE_MEMBER(galaxold_state, m_bulletsram_size)
+	AM_RANGE(0x8800, 0x883f) AM_RAM_WRITE_LEGACY(galaxold_attributesram_w) AM_BASE(m_attributesram)
+	AM_RANGE(0x8840, 0x885f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x8860, 0x887f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
 	AM_RANGE(0x8880, 0x88ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)	/* mirror */
-	AM_RANGE(0x9800, 0x9800) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE("ppi8255_0", scobra_type2_ppi8255_r, scobra_type2_ppi8255_w)
-	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE("ppi8255_1", scobra_type2_ppi8255_r, scobra_type2_ppi8255_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_coin_counter_0_w)
-	AM_RANGE(0xb008, 0xb008) AM_WRITE(galaxold_coin_counter_1_w)
-	AM_RANGE(0xb00c, 0xb00c) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb00e, 0xb00e) AM_WRITE(galaxold_flip_screen_x_w)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(galaxold_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_READWRITE_LEGACY(galaxold_videoram_r, galaxold_videoram_w)	/* mirror */
+	AM_RANGE(0x9800, 0x9800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE_LEGACY("ppi8255_0", scobra_type2_ppi8255_r, scobra_type2_ppi8255_w)
+	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE_LEGACY("ppi8255_1", scobra_type2_ppi8255_r, scobra_type2_ppi8255_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(galaxold_stars_enable_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(galaxold_nmi_enable_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(galaxold_coin_counter_0_w)
+	AM_RANGE(0xb008, 0xb008) AM_WRITE_LEGACY(galaxold_coin_counter_1_w)
+	AM_RANGE(0xb00c, 0xb00c) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
+	AM_RANGE(0xb00e, 0xb00e) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
-	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_bulletsram) AM_SIZE_MEMBER(galaxold_state, m_bulletsram_size)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(galaxold_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE_LEGACY(galaxold_attributesram_w) AM_BASE(m_attributesram)
+	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
 	AM_RANGE(0x9080, 0x90ff) AM_RAM
-	AM_RANGE(0xa802, 0xa802) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xa804, 0xa804) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
+	AM_RANGE(0xa802, 0xa802) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
+	AM_RANGE(0xa804, 0xa804) AM_WRITE_LEGACY(galaxold_nmi_enable_w)
+	AM_RANGE(0xa806, 0xa806) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa80e, 0xa80e) AM_WRITENOP	/* coin counters */
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xd000, 0xd01f) AM_DEVREADWRITE("ppi8255_0", hustler_ppi8255_r, hustler_ppi8255_w)
-	AM_RANGE(0xe000, 0xe01f) AM_DEVREADWRITE("ppi8255_1", hustler_ppi8255_r, hustler_ppi8255_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xd000, 0xd01f) AM_DEVREADWRITE_LEGACY("ppi8255_0", hustler_ppi8255_r, hustler_ppi8255_w)
+	AM_RANGE(0xe000, 0xe01f) AM_DEVREADWRITE_LEGACY("ppi8255_1", hustler_ppi8255_r, hustler_ppi8255_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
-	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_bulletsram) AM_SIZE_MEMBER(galaxold_state, m_bulletsram_size)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(galaxold_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE_LEGACY(galaxold_attributesram_w) AM_BASE(m_attributesram)
+	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
 	AM_RANGE(0x9080, 0x90ff) AM_RAM
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
+	AM_RANGE(0xa801, 0xa801) AM_WRITE_LEGACY(galaxold_nmi_enable_w)
 	AM_RANGE(0xa802, 0xa802) AM_WRITENOP	/* coin counters */
-	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xc100, 0xc103) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa806, 0xa806) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
+	AM_RANGE(0xa807, 0xa807) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xc100, 0xc103) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
-	AM_RANGE(0x8c00, 0x8fff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)	/* mirror */
-	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_bulletsram) AM_SIZE_MEMBER(galaxold_state, m_bulletsram_size)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(galaxold_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x8c00, 0x8fff) AM_READWRITE_LEGACY(galaxold_videoram_r, galaxold_videoram_w)	/* mirror */
+	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE_LEGACY(galaxold_attributesram_w) AM_BASE(m_attributesram)
+	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
 	AM_RANGE(0x9080, 0x90ff) AM_RAM
-	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xa800, 0xa802) AM_WRITE(galaxold_gfxbank_w)
-	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa801, 0xa801) AM_WRITE_LEGACY(galaxold_nmi_enable_w)
+	AM_RANGE(0xa800, 0xa802) AM_WRITE_LEGACY(galaxold_gfxbank_w)
+	AM_RANGE(0xa806, 0xa806) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
+	AM_RANGE(0xa807, 0xa807) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(watchdog_reset_r)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -220,44 +220,44 @@ static WRITE8_HANDLER(scobra_soundram_w)
 
 static ADDRESS_MAP_START( scobra_sound_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(scobra_soundram_r, scobra_soundram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE_MEMBER(scobra_state, m_soundram)  /* only here to initialize pointer */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(scobra_soundram_r, scobra_soundram_w)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE( m_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE_LEGACY(scramble_filter_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hustlerb_sound_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ(scobra_soundram_r) AM_BASE_MEMBER(scobra_state, m_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE_LEGACY(frogger_filter_w)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_READ_LEGACY(scobra_soundram_r) AM_BASE( m_soundram)  /* only here to initialize pointer */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( scobra_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_sound_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-    AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
+    AM_RANGE(0x6000, 0x6fff) AM_WRITE_LEGACY(frogger_filter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hustlerb_sound_io_map, AS_IO, 8, scobra_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
 /* stratgyx coinage DIPs are spread across two input ports */

@@ -116,36 +116,36 @@ static INPUT_CHANGED( coin_inserted )
  *************************************/
 
 static ADDRESS_MAP_START( brkthru_map, AS_PROGRAM, 8, brkthru_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_SIZE_MEMBER(brkthru_state, m_fg_videoram, m_fg_videoram_size)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE_LEGACY(brkthru_fgram_w) AM_BASE_SIZE( m_fg_videoram, m_fg_videoram_size)
 	AM_RANGE(0x0400, 0x0bff) AM_RAM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_SIZE_MEMBER(brkthru_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE_MEMBER(brkthru_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE_LEGACY(brkthru_bgram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1100, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("P2")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW2/COIN")
-	AM_RANGE(0x1800, 0x1801) AM_WRITE(brkthru_1800_w)	/* bg scroll and color, ROM bank selection, flip screen */
-	AM_RANGE(0x1802, 0x1802) AM_WRITE(brkthru_soundlatch_w)
-	AM_RANGE(0x1803, 0x1803) AM_WRITE(brkthru_1803_w)	/* NMI enable, + ? */
+	AM_RANGE(0x1800, 0x1801) AM_WRITE_LEGACY(brkthru_1800_w)	/* bg scroll and color, ROM bank selection, flip screen */
+	AM_RANGE(0x1802, 0x1802) AM_WRITE_LEGACY(brkthru_soundlatch_w)
+	AM_RANGE(0x1803, 0x1803) AM_WRITE_LEGACY(brkthru_1803_w)	/* NMI enable, + ? */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* same as brktrhu, but xor 0x1000 below 8k */
 static ADDRESS_MAP_START( darwin_map, AS_PROGRAM, 8, brkthru_state )
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(brkthru_fgram_w) AM_BASE_SIZE_MEMBER(brkthru_state, m_fg_videoram, m_fg_videoram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(brkthru_fgram_w) AM_BASE_SIZE( m_fg_videoram, m_fg_videoram_size)
 	AM_RANGE(0x1400, 0x1bff) AM_RAM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(brkthru_bgram_w) AM_BASE_SIZE_MEMBER(brkthru_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_SIZE_MEMBER(brkthru_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE_LEGACY(brkthru_bgram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x0100, 0x01ff) AM_WRITENOP /*tidyup, nothing really here?*/
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("P1")
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
 	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("DSW2/COIN")
-	AM_RANGE(0x0800, 0x0801) AM_WRITE(brkthru_1800_w)     /* bg scroll and color, ROM bank selection, flip screen */
-	AM_RANGE(0x0802, 0x0802) AM_WRITE(brkthru_soundlatch_w)
-	AM_RANGE(0x0803, 0x0803) AM_WRITE(darwin_0803_w)     /* NMI enable, + ? */
+	AM_RANGE(0x0800, 0x0801) AM_WRITE_LEGACY(brkthru_1800_w)     /* bg scroll and color, ROM bank selection, flip screen */
+	AM_RANGE(0x0802, 0x0802) AM_WRITE_LEGACY(brkthru_soundlatch_w)
+	AM_RANGE(0x0803, 0x0803) AM_WRITE_LEGACY(darwin_0803_w)     /* NMI enable, + ? */
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -153,9 +153,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, brkthru_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
-	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

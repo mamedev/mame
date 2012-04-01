@@ -35,15 +35,15 @@
 
 static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE_MEMBER(kyugo_state, m_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE_MEMBER(kyugo_state, m_bgattribram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(kyugo_fgvideoram_w) AM_BASE_MEMBER(kyugo_state, m_fgvideoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(kyugo_spriteram_2_r) AM_BASE_MEMBER(kyugo_state, m_spriteram_2)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(kyugo_state, m_spriteram_1)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(kyugo_scroll_x_lo_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(kyugo_gfxctrl_w)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(kyugo_scroll_y_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(kyugo_state, m_shared_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(kyugo_bgvideoram_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(kyugo_bgattribram_w) AM_BASE( m_bgattribram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(kyugo_fgvideoram_w) AM_BASE( m_fgvideoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ_LEGACY(kyugo_spriteram_2_r) AM_BASE( m_spriteram_2)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE( m_spriteram_1)
+	AM_RANGE(0xa800, 0xa800) AM_WRITE_LEGACY(kyugo_scroll_x_lo_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(kyugo_gfxctrl_w)
+	AM_RANGE(0xb800, 0xb800) AM_WRITE_LEGACY(kyugo_scroll_y_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("share1") AM_BASE( m_shared_ram)
 ADDRESS_MAP_END
 
 
@@ -69,9 +69,9 @@ static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 
 static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x00) AM_WRITE(kyugo_nmi_mask_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(kyugo_flipscreen_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(kyugo_sub_cpu_control_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(kyugo_nmi_mask_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(kyugo_flipscreen_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(kyugo_sub_cpu_control_w)
 ADDRESS_MAP_END
 
 
@@ -141,36 +141,36 @@ static WRITE8_HANDLER( kyugo_coin_counter_w )
 
 static ADDRESS_MAP_START( gyrodine_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( repulse_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE_LEGACY(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( flashgala_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x42, 0x42) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x42, 0x42) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE_LEGACY(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( srdmissn_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x82, 0x82) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x84, 0x85) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x90, 0x91) AM_WRITE(kyugo_coin_counter_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x82, 0x82) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x84, 0x85) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x90, 0x91) AM_WRITE_LEGACY(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
 

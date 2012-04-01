@@ -358,14 +358,14 @@ static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
 
 //  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
 //  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE_MEMBER(coinmvga_state, m_vram)
-//  AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
-//  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
+	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE( m_vram)
+//  AM_RANGE(0x40746e, 0x40746f) AM_READ_LEGACY(test_r) AM_WRITENOP //touch screen related, colorama
+//  AM_RANGE(0x403afa, 0x403afb) AM_READ_LEGACY(test_r) AM_WRITENOP //touch screen related, cmrltv75
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(ramdac_bg_w)
-	AM_RANGE(0x600004, 0x600005) AM_WRITE(ramdac_fg_w)
-	AM_RANGE(0x600008, 0x600009) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xffff)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE_LEGACY(ramdac_bg_w)
+	AM_RANGE(0x600004, 0x600005) AM_WRITE_LEGACY(ramdac_fg_w)
+	AM_RANGE(0x600008, 0x600009) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff)
 	AM_RANGE(0x610000, 0x61000f) AM_RAM //touch screen i/o
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1") //"arrow" r?

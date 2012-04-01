@@ -2422,28 +2422,28 @@ static MACHINE_START( s23 )
 static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE( p3d_r, p3d_w )
-	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16( s23_c417_r, s23_c417_w, 0xffffffff )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE( gorgon_sharedram_r, gorgon_sharedram_w ) AM_BASE_MEMBER(namcos23_state, m_shared_ram)
+	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE_LEGACY( p3d_r, p3d_w )
+	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16_LEGACY( s23_c417_r, s23_c417_w, 0xffffffff )
+	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE_LEGACY( gorgon_sharedram_r, gorgon_sharedram_w ) AM_BASE( m_shared_ram)
 
-	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
+	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE_LEGACY( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
 
 	AM_RANGE(0x06080000, 0x06081fff) AM_RAM
 
 	AM_RANGE(0x06108000, 0x061087ff) AM_RAM		// GAMMA (C404-3S)
-	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE( namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x06400000, 0x06403fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE_MEMBER(namcos23_state, m_charram)	// text layer characters
+	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE_LEGACY( namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06400000, 0x06403fff) AM_RAM_WRITE_LEGACY( s23_txtchar_w ) AM_BASE( m_charram)	// text layer characters
 	AM_RANGE(0x06404000, 0x0641dfff) AM_RAM
-	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE( namcos23_textram_w ) AM_BASE_MEMBER(namcos23_state, m_textram)
+	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE_LEGACY( namcos23_textram_w ) AM_BASE( m_textram)
 
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs
 
 	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_SHARE("nvram") // BACKUP
 
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16( s23_ctl_r, s23_ctl_w, 0xffffffff ) // write for LEDs at d000000, watchdog at d000004
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16_LEGACY( s23_ctl_r, s23_ctl_w, 0xffffffff ) // write for LEDs at d000000, watchdog at d000004
 
-	AM_RANGE(0x0f000000, 0x0f000003) AM_READ( s23_unk_status_r )
+	AM_RANGE(0x0f000000, 0x0f000003) AM_READ_LEGACY( s23_unk_status_r )
 
 	AM_RANGE(0x0f200000, 0x0f201fff) AM_RAM
 
@@ -2453,26 +2453,26 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32, namcos23_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
 	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
-	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE( p3d_r, p3d_w )
-	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16( s23_c417_r, s23_c417_w, 0xffffffff )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE_MEMBER(namcos23_state, m_shared_ram)
-	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
+	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE_LEGACY( p3d_r, p3d_w )
+	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16_LEGACY( s23_c417_r, s23_c417_w, 0xffffffff )
+	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE( m_shared_ram)
+	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE_LEGACY( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
 	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_SHARE("nvram") // Backup
 	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422
-	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16( s23_c422_r, s23_c422_w, 0xffffffff ) // C422 registers
-	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE_MEMBER(namcos23_state, m_charram) // text layer characters (shown as CGRAM in POST)
+	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16_LEGACY( s23_c422_r, s23_c422_w, 0xffffffff ) // C422 registers
+	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE_LEGACY( s23_txtchar_w ) AM_BASE( m_charram) // text layer characters (shown as CGRAM in POST)
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
-	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE( namcos23_textram_w ) AM_BASE_MEMBER(namcos23_state, m_textram)
-	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16( s23_c361_r, s23_c361_w, 0xffffffff ) // C361
+	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE_LEGACY( namcos23_textram_w ) AM_BASE( m_textram)
+	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16_LEGACY( s23_c361_r, s23_c361_w, 0xffffffff ) // C361
 	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM // Blending control & GAMMA (C404)
-	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE( namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE_LEGACY( namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x1000000) // data ROMs
 	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x1000000)
-	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16( s23_c412_r, s23_c412_w, 0xffffffff )
-	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16( s23_c421_r, s23_c421_w, 0xffffffff )
-	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16( s23_ctl_r, s23_ctl_w, 0xffffffff )
-	AM_RANGE(0x0e800000, 0x0e800003) AM_READ( s23_unk_status_r )
+	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16_LEGACY( s23_c412_r, s23_c412_w, 0xffffffff )
+	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16_LEGACY( s23_c421_r, s23_c421_w, 0xffffffff )
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16_LEGACY( s23_ctl_r, s23_ctl_w, 0xffffffff )
+	AM_RANGE(0x0e800000, 0x0e800003) AM_READ_LEGACY( s23_unk_status_r )
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -2498,13 +2498,13 @@ static WRITE32_HANDLER( sh2_shared_w )
 
 static ADDRESS_MAP_START( gmen_mips_map, AS_PROGRAM, 32, namcos23_state )
 	AM_IMPORT_FROM(ss23_map)
-	AM_RANGE(0x0e400000, 0x0e400003) AM_READ( gmen_trigger_sh2 )
-	AM_RANGE(0x0e700000, 0x0e707fff) AM_READWRITE( sh2_shared_r, sh2_shared_w )
+	AM_RANGE(0x0e400000, 0x0e400003) AM_READ_LEGACY( gmen_trigger_sh2 )
+	AM_RANGE(0x0e700000, 0x0e707fff) AM_READWRITE_LEGACY( sh2_shared_r, sh2_shared_w )
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gmen_sh2_map, AS_PROGRAM, 32, namcos23_state )
-	AM_RANGE( 0x00000000, 0x00007fff ) AM_RAM AM_BASE_MEMBER(namcos23_state, m_gmen_sh2_shared)
+	AM_RANGE( 0x00000000, 0x00007fff ) AM_RAM AM_BASE( m_gmen_sh2_shared)
 	AM_RANGE( 0x04000000, 0x043fffff ) AM_RAM	// SH-2 main work RAM
 ADDRESS_MAP_END
 
@@ -2554,11 +2554,11 @@ static WRITE16_HANDLER( sub_interrupt_main_w )
 /* H8/3002 MCU stuff */
 static ADDRESS_MAP_START( s23h8rwmap, AS_PROGRAM, 16, namcos23_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
-	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
+	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE_LEGACY( sharedram_sub_r, sharedram_sub_w )
+	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x300000, 0x300003) AM_NOP	// seems to be more inputs, maybe false leftover code from System 12?
 	AM_RANGE(0x300010, 0x300011) AM_NOP
-	AM_RANGE(0x300020, 0x300021) AM_WRITE( sub_interrupt_main_w )
+	AM_RANGE(0x300020, 0x300021) AM_WRITE_LEGACY( sub_interrupt_main_w )
 	AM_RANGE(0x300030, 0x300031) AM_WRITENOP	// timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
 ADDRESS_MAP_END
 
@@ -2906,14 +2906,14 @@ static WRITE8_HANDLER(s23_mcu_p6_w)
 }
 
 static ADDRESS_MAP_START( s23h8iomap, AS_IO, 8, namcos23_state )
-	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE( s23_mcu_p6_r, s23_mcu_p6_w )
+	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE_LEGACY( s23_mcu_p6_r, s23_mcu_p6_w )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
-	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ_LEGACY( s23_mcu_p8_r ) AM_WRITENOP
 	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP	// read on Gorgon, purpose unknown
-	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s23_mcu_pa_r, s23_mcu_pa_w )
-	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE( s23_mcu_portB_r, s23_mcu_portB_w )
-	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE( s23_mcu_iob_r, s23_mcu_iob_w )
-	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READWRITE( s23_mcu_rtc_r, s23_mcu_settings_w )
+	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE_LEGACY( s23_mcu_pa_r, s23_mcu_pa_w )
+	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE_LEGACY( s23_mcu_portB_r, s23_mcu_portB_w )
+	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE_LEGACY( s23_mcu_iob_r, s23_mcu_iob_w )
+	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READWRITE_LEGACY( s23_mcu_rtc_r, s23_mcu_settings_w )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
 	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_NOP
 	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_NOP
@@ -2922,12 +2922,12 @@ ADDRESS_MAP_END
 
 // version without serial hookup to I/O board for games where the PIC isn't dumped
 static ADDRESS_MAP_START( s23h8noiobmap, AS_IO, 8, namcos23_state )
-	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE( s23_mcu_p6_r, s23_mcu_p6_w )
+	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE_LEGACY( s23_mcu_p6_r, s23_mcu_p6_w )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
-	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
-	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s23_mcu_pa_r, s23_mcu_pa_w )
-	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE( s23_mcu_portB_r, s23_mcu_portB_w )
-	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READWRITE( s23_mcu_rtc_r, s23_mcu_settings_w )
+	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ_LEGACY( s23_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE_LEGACY( s23_mcu_pa_r, s23_mcu_pa_w )
+	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE_LEGACY( s23_mcu_portB_r, s23_mcu_portB_w )
+	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READWRITE_LEGACY( s23_mcu_rtc_r, s23_mcu_settings_w )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
 	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_NOP
 	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_NOP
@@ -3005,10 +3005,10 @@ static ADDRESS_MAP_START( s23iobrdmap, AS_PROGRAM, 8, namcos23_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-1 = coin 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal
-	AM_RANGE(0x6002, 0x6003) AM_READ( iob_r )
+	AM_RANGE(0x6002, 0x6003) AM_READ_LEGACY( iob_r )
 	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
 	AM_RANGE(0x6006, 0x6007) AM_NOP
-	AM_RANGE(0x7000, 0x700f) AM_READ( iob_r )
+	AM_RANGE(0x7000, 0x700f) AM_READ_LEGACY( iob_r )
 
 	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
@@ -3019,7 +3019,7 @@ static ADDRESS_MAP_START( timecrs2iobrdmap, AS_PROGRAM, 8, namcos23_state )
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")
 	AM_RANGE(0x6002, 0x6005) AM_WRITENOP
 	AM_RANGE(0x6006, 0x6007) AM_NOP
-	AM_RANGE(0x7000, 0x700f) AM_READ( s23_gun_r )
+	AM_RANGE(0x7000, 0x700f) AM_READ_LEGACY( s23_gun_r )
 
 	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
@@ -3032,7 +3032,7 @@ static ADDRESS_MAP_START( gorgoniobrdmap, AS_PROGRAM, 8, namcos23_state )
 	AM_RANGE(0x6003, 0x6003) AM_READ_PORT("RRP3")	  // 1-1 = button?  1-4 = start?
 	AM_RANGE(0x6004, 0x6005) AM_WRITENOP
 	AM_RANGE(0x6006, 0x6007) AM_NOP
-	AM_RANGE(0x7000, 0x700f) AM_READ( iob_r )
+	AM_RANGE(0x7000, 0x700f) AM_READ_LEGACY( iob_r )
 
 	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
@@ -3042,12 +3042,12 @@ ADDRESS_MAP_END
     port 4 bit 2 = SENSE line back to main (0 = asserted, 1 = dropped)
 */
 static ADDRESS_MAP_START( s23iobrdiomap, AS_IO, 8, namcos23_state )
-	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READWRITE( s23_iob_p4_r, s23_iob_p4_w )
+	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READWRITE_LEGACY( s23_iob_p4_r, s23_iob_p4_w )
 	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_NOP	// status LED in bit 2
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_NOP	// unknown
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_NOP	// unknown - used on ASCA-5 only
 	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP	// unknown - used on ASCA-5 only
-	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE( s23_iob_mcu_r, s23_iob_mcu_w )
+	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE_LEGACY( s23_iob_mcu_r, s23_iob_mcu_w )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_3_L) AM_NOP
 ADDRESS_MAP_END
 

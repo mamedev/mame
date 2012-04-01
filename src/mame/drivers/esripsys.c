@@ -610,14 +610,14 @@ static WRITE8_HANDLER( volume_dac_w )
 
 static ADDRESS_MAP_START( game_cpu_map, AS_PROGRAM, 8, esripsys_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_BASE_MEMBER(esripsys_state, m_pal_ram)
-	AM_RANGE(0x4300, 0x4300) AM_WRITE(esripsys_bg_intensity_w)
+	AM_RANGE(0x4000, 0x42ff) AM_RAM AM_BASE( m_pal_ram)
+	AM_RANGE(0x4300, 0x4300) AM_WRITE_LEGACY(esripsys_bg_intensity_w)
 	AM_RANGE(0x4400, 0x47ff) AM_NOP /* Collision detection RAM */
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(g_status_r, g_status_w)
-	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(g_iobus_r, g_iobus_w)
-	AM_RANGE(0x5000, 0x53ff) AM_WRITE(g_ioadd_w)
+	AM_RANGE(0x4800, 0x4bff) AM_READWRITE_LEGACY(g_status_r, g_status_w)
+	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE_LEGACY(g_iobus_r, g_iobus_w)
+	AM_RANGE(0x5000, 0x53ff) AM_WRITE_LEGACY(g_ioadd_w)
 	AM_RANGE(0x5400, 0x57ff) AM_NOP
-	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE(uart_r, uart_w)
+	AM_RANGE(0x5c00, 0x5fff) AM_READWRITE_LEGACY(uart_r, uart_w)
 	AM_RANGE(0x6000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -625,9 +625,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( frame_cpu_map, AS_PROGRAM, 8, esripsys_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(fdt_r, fdt_w)
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE(f_status_r, f_status_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(frame_w)
+	AM_RANGE(0x4000, 0x4fff) AM_READWRITE_LEGACY(fdt_r, fdt_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE_LEGACY(f_status_r, f_status_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(frame_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -635,13 +635,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, esripsys_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM /* Not installed on later PCBs */
-	AM_RANGE(0x2008, 0x2009) AM_READWRITE(tms5220_r, tms5220_w)
-	AM_RANGE(0x200a, 0x200b) AM_DEVWRITE("dac", esripsys_dac_w)
-	AM_RANGE(0x200c, 0x200c) AM_WRITE(volume_dac_w)
-	AM_RANGE(0x200d, 0x200d) AM_WRITE(control_w)
-	AM_RANGE(0x200e, 0x200e) AM_READWRITE(s_200e_r, s_200e_w)
-	AM_RANGE(0x200f, 0x200f) AM_READWRITE(s_200f_r, s_200f_w)
-	AM_RANGE(0x2020, 0x2027) AM_DEVREADWRITE_MODERN("6840ptm", ptm6840_device, read, write)
+	AM_RANGE(0x2008, 0x2009) AM_READWRITE_LEGACY(tms5220_r, tms5220_w)
+	AM_RANGE(0x200a, 0x200b) AM_DEVWRITE_LEGACY("dac", esripsys_dac_w)
+	AM_RANGE(0x200c, 0x200c) AM_WRITE_LEGACY(volume_dac_w)
+	AM_RANGE(0x200d, 0x200d) AM_WRITE_LEGACY(control_w)
+	AM_RANGE(0x200e, 0x200e) AM_READWRITE_LEGACY(s_200e_r, s_200e_w)
+	AM_RANGE(0x200f, 0x200f) AM_READWRITE_LEGACY(s_200f_r, s_200f_w)
+	AM_RANGE(0x2020, 0x2027) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank4")

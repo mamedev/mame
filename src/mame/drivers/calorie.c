@@ -241,33 +241,33 @@ static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_BASE_MEMBER(calorie_state, m_fg_ram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE_MEMBER(calorie_state, m_sprites)
-	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xde00, 0xde00) AM_WRITE(bg_bank_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(fg_ram_w) AM_BASE( m_fg_ram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE( m_sprites)
+	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xde00, 0xde00) AM_WRITE_LEGACY(bg_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("P2")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW1") AM_WRITE(calorie_flipscreen_w)
+	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(calorie_flipscreen_w)
 	AM_RANGE(0xf005, 0xf005) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(soundlatch_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( calorie_sound_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_READ(calorie_soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(calorie_soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( calorie_sound_io_map, AS_IO, 8, calorie_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	// 3rd ?
-	AM_RANGE(0x00, 0xff) AM_WRITE(bogus_w)
+	AM_RANGE(0x00, 0xff) AM_WRITE_LEGACY(bogus_w)
 ADDRESS_MAP_END
 
 

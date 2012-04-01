@@ -855,43 +855,43 @@ static WRITE32_HANDLER(namconb_share_w)
 
 static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_READ(gunbulet_gun_r)
+	AM_RANGE(0x100000, 0x10001f) AM_READ_LEGACY(gunbulet_gun_r)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
-	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
+	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE_LEGACY(randgen_r,srand_w)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE_LEGACY(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
-	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namconb_cpureg_r, namconb1_cpureg_w)
-	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_BASE_MEMBER(namconb1_state, m_nvmem32)
-	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE(namco_obj32_r,namco_obj32_w)
-	AM_RANGE(0x620000, 0x620007) AM_READWRITE(namco_spritepos32_r,namco_spritepos32_w)
-	AM_RANGE(0x640000, 0x64ffff) AM_READWRITE(namco_tilemapvideoram32_r,namco_tilemapvideoram32_w )
-	AM_RANGE(0x660000, 0x66003f) AM_READWRITE(namco_tilemapcontrol32_r,namco_tilemapcontrol32_w)
-	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_BASE_MEMBER(namconb1_state, m_spritebank32)
-	AM_RANGE(0x6e0000, 0x6e001f) AM_READ(custom_key_r) AM_WRITENOP
+	AM_RANGE(0x400000, 0x40001f) AM_READWRITE_LEGACY(namconb_cpureg_r, namconb1_cpureg_w)
+	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_BASE( m_nvmem32)
+	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE_LEGACY(namco_obj32_r,namco_obj32_w)
+	AM_RANGE(0x620000, 0x620007) AM_READWRITE_LEGACY(namco_spritepos32_r,namco_spritepos32_w)
+	AM_RANGE(0x640000, 0x64ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_r,namco_tilemapvideoram32_w )
+	AM_RANGE(0x660000, 0x66003f) AM_READWRITE_LEGACY(namco_tilemapcontrol32_r,namco_tilemapcontrol32_w)
+	AM_RANGE(0x680000, 0x68000f) AM_RAM AM_BASE( m_spritebank32)
+	AM_RANGE(0x6e0000, 0x6e001f) AM_READ_LEGACY(custom_key_r) AM_WRITENOP
 	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
-	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namconb_share_r, namconb_share_w)
+	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE_LEGACY(randgen_r,srand_w)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE_LEGACY(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("data", 0)
-	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE(namco_obj32_r,namco_obj32_w)
-	AM_RANGE(0x620000, 0x620007) AM_READWRITE(namco_spritepos32_r,namco_spritepos32_w)
+	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE_LEGACY(namco_obj32_r,namco_obj32_w)
+	AM_RANGE(0x620000, 0x620007) AM_READWRITE_LEGACY(namco_spritepos32_r,namco_spritepos32_w)
 	AM_RANGE(0x640000, 0x64000f) AM_RAM /* unknown xy offset */
-	AM_RANGE(0x680000, 0x68ffff) AM_READWRITE(namco_tilemapvideoram32_r, namco_tilemapvideoram32_w )
-	AM_RANGE(0x6c0000, 0x6c003f) AM_READWRITE(namco_tilemapcontrol32_r, namco_tilemapcontrol32_w )
-	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE(namco_rozvideoram32_r,namco_rozvideoram32_w)
-	AM_RANGE(0x740000, 0x74001f) AM_READWRITE(namco_rozcontrol32_r,namco_rozcontrol32_w)
+	AM_RANGE(0x680000, 0x68ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_r, namco_tilemapvideoram32_w )
+	AM_RANGE(0x6c0000, 0x6c003f) AM_READWRITE_LEGACY(namco_tilemapcontrol32_r, namco_tilemapcontrol32_w )
+	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE_LEGACY(namco_rozvideoram32_r,namco_rozvideoram32_w)
+	AM_RANGE(0x740000, 0x74001f) AM_READWRITE_LEGACY(namco_rozcontrol32_r,namco_rozcontrol32_w)
 	AM_RANGE(0x800000, 0x807fff) AM_RAM AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_BASE_MEMBER(namconb1_state, m_spritebank32)
-	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_BASE_MEMBER(namconb1_state, m_tilebank32)
-	AM_RANGE(0x980000, 0x98000f) AM_READ(namco_rozbank32_r) AM_WRITE(namco_rozbank32_w)
-	AM_RANGE(0xa00000, 0xa007ff) AM_RAM AM_BASE_MEMBER(namconb1_state, m_nvmem32)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITENOP
-	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE(namconb_cpureg_r, namconb2_cpureg_w)
+	AM_RANGE(0x900008, 0x90000f) AM_RAM AM_BASE( m_spritebank32)
+	AM_RANGE(0x940000, 0x94000f) AM_RAM AM_BASE( m_tilebank32)
+	AM_RANGE(0x980000, 0x98000f) AM_READ_LEGACY(namco_rozbank32_r) AM_WRITE_LEGACY(namco_rozbank32_w)
+	AM_RANGE(0xa00000, 0xa007ff) AM_RAM AM_BASE( m_nvmem32)
+	AM_RANGE(0xc00000, 0xc0001f) AM_READ_LEGACY(custom_key_r) AM_WRITENOP
+	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE_LEGACY(namconb_cpureg_r, namconb2_cpureg_w)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( nbmcu_shared_w )
@@ -917,8 +917,8 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 }
 
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namconb1_state )
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(nbmcu_shared_w) AM_BASE_MEMBER(namconb1_state, m_namconb_shareram)
+	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
+	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE_LEGACY(nbmcu_shared_w) AM_BASE( m_namconb_shareram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
 ADDRESS_MAP_END
@@ -1004,16 +1004,16 @@ static READ8_HANDLER(dac0_r)		// bit 6
 }
 
 static ADDRESS_MAP_START( namcoc75_io, AS_IO, 8, namconb1_state )
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE(port6_r, port6_w)
-	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ(port7_r)
-	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ(dac7_r)
-	AM_RANGE(M37710_ADC6_L, M37710_ADC6_L) AM_READ(dac6_r)
-	AM_RANGE(M37710_ADC5_L, M37710_ADC5_L) AM_READ(dac5_r)
-	AM_RANGE(M37710_ADC4_L, M37710_ADC4_L) AM_READ(dac4_r)
-	AM_RANGE(M37710_ADC3_L, M37710_ADC3_L) AM_READ(dac3_r)
-	AM_RANGE(M37710_ADC2_L, M37710_ADC2_L) AM_READ(dac2_r)
-	AM_RANGE(M37710_ADC1_L, M37710_ADC1_L) AM_READ(dac1_r)
-	AM_RANGE(M37710_ADC0_L, M37710_ADC0_L) AM_READ(dac0_r)
+	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE_LEGACY(port6_r, port6_w)
+	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ_LEGACY(port7_r)
+	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ_LEGACY(dac7_r)
+	AM_RANGE(M37710_ADC6_L, M37710_ADC6_L) AM_READ_LEGACY(dac6_r)
+	AM_RANGE(M37710_ADC5_L, M37710_ADC5_L) AM_READ_LEGACY(dac5_r)
+	AM_RANGE(M37710_ADC4_L, M37710_ADC4_L) AM_READ_LEGACY(dac4_r)
+	AM_RANGE(M37710_ADC3_L, M37710_ADC3_L) AM_READ_LEGACY(dac3_r)
+	AM_RANGE(M37710_ADC2_L, M37710_ADC2_L) AM_READ_LEGACY(dac2_r)
+	AM_RANGE(M37710_ADC1_L, M37710_ADC1_L) AM_READ_LEGACY(dac1_r)
+	AM_RANGE(M37710_ADC0_L, M37710_ADC0_L) AM_READ_LEGACY(dac0_r)
 ADDRESS_MAP_END
 
 #define MASTER_CLOCK_HZ 48384000

@@ -185,29 +185,29 @@ static INTERRUPT_GEN(rng_interrupt)
 
 static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM											// main program + data
-	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM											// work RAM
-	AM_RANGE(0x400000, 0x43ffff) AM_READNOP	// AM_READ( K053936_0_rom_r )       // '936 ROM readback window
-	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_BASE_MEMBER(rungun_state, m_sysreg)
-	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8("k053252", k053252_r, k053252_w,0x00ff)						// CCU (for scanline and vblank polling)
-	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x58000c, 0x58000d) AM_WRITE(sound_cmd1_w)
-	AM_RANGE(0x58000e, 0x58000f) AM_WRITE(sound_cmd2_w)
-	AM_RANGE(0x580014, 0x580015) AM_READ(sound_status_msb_r)
+	AM_RANGE(0x400000, 0x43ffff) AM_READNOP	// AM_READ_LEGACY( K053936_0_rom_r )       // '936 ROM readback window
+	AM_RANGE(0x480000, 0x48001f) AM_READWRITE_LEGACY(rng_sysregs_r, rng_sysregs_w) AM_BASE( m_sysreg)
+	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8_LEGACY("k053252", k053252_r, k053252_w,0x00ff)						// CCU (for scanline and vblank polling)
+	AM_RANGE(0x540000, 0x540001) AM_WRITE_LEGACY(sound_irq_w)
+	AM_RANGE(0x58000c, 0x58000d) AM_WRITE_LEGACY(sound_cmd1_w)
+	AM_RANGE(0x58000e, 0x58000f) AM_WRITE_LEGACY(sound_cmd2_w)
+	AM_RANGE(0x580014, 0x580015) AM_READ_LEGACY(sound_status_msb_r)
 	AM_RANGE(0x580000, 0x58001f) AM_RAM											// sound regs read/write fall-through
-	AM_RANGE(0x5c0000, 0x5c000d) AM_DEVREAD("k055673", k053246_word_r)						// 246A ROM readback window
-	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE("k055673", k053247_reg_word_w)
-	AM_RANGE(0x600000, 0x600fff) AM_DEVREADWRITE("k055673", k053247_word_r, k053247_word_w)	// OBJ RAM
+	AM_RANGE(0x5c0000, 0x5c000d) AM_DEVREAD_LEGACY("k055673", k053246_word_r)						// 246A ROM readback window
+	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE_LEGACY("k055673", k053247_reg_word_w)
+	AM_RANGE(0x600000, 0x600fff) AM_DEVREADWRITE_LEGACY("k055673", k053247_word_r, k053247_word_w)	// OBJ RAM
 	AM_RANGE(0x601000, 0x601fff) AM_RAM											// communication? second monitor buffer?
-	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE("k055673", k053246_word_w)						// '246A registers
-	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE("k053936", k053936_ctrl_w)			// '936 registers
-	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE(rng_936_videoram_w) AM_BASE_MEMBER(rungun_state, m_936_videoram)	// PSAC2 ('936) RAM (34v + 35v)
-	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)			// PSAC "Line RAM"
-	AM_RANGE(0x740000, 0x741fff) AM_READWRITE(rng_ttl_ram_r, rng_ttl_ram_w)		// text plane RAM
+	AM_RANGE(0x640000, 0x640007) AM_DEVWRITE_LEGACY("k055673", k053246_word_w)						// '246A registers
+	AM_RANGE(0x680000, 0x68001f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)			// '936 registers
+	AM_RANGE(0x6c0000, 0x6cffff) AM_RAM_WRITE_LEGACY(rng_936_videoram_w) AM_BASE( m_936_videoram)	// PSAC2 ('936) RAM (34v + 35v)
+	AM_RANGE(0x700000, 0x7007ff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)			// PSAC "Line RAM"
+	AM_RANGE(0x740000, 0x741fff) AM_READWRITE_LEGACY(rng_ttl_ram_r, rng_ttl_ram_w)		// text plane RAM
 	AM_RANGE(0x7c0000, 0x7c0001) AM_WRITENOP									// watchdog
 #if RNG_DEBUG
-	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVREAD("k055673", k053247_reg_word_r)
-	AM_RANGE(0x640000, 0x640007) AM_DEVREAD("k055673", k053246_reg_word_r)
+	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVREAD_LEGACY("k055673", k053247_reg_word_r)
+	AM_RANGE(0x640000, 0x640007) AM_DEVREAD_LEGACY("k055673", k053246_reg_word_r)
 #endif
 ADDRESS_MAP_END
 
@@ -248,14 +248,14 @@ static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE_MODERN("k054539_1", k054539_device, read, write)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE_MODERN("k054539_1", k054539_device, read, write)
+	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(z80ctrl_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(sound_status_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(z80ctrl_w)
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END
 

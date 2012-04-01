@@ -175,31 +175,31 @@ static ADDRESS_MAP_START( laserbat_map, AS_PROGRAM, 8, laserbat_state )
 	AM_RANGE(0x7800, 0x7bff) AM_ROM
 
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_WRITENOP // always 0 (bullet ram in Quasar)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE("s2636_3", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(laserbat_videoram_w)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_3", s2636_work_ram_r, s2636_work_ram_w)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE_LEGACY(laserbat_videoram_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( laserbat_io_map, AS_IO, 8, laserbat_state )
-	AM_RANGE(0x00, 0x00) AM_WRITE(laserbat_cnteff_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(video_extra_w)
-	AM_RANGE(0x02, 0x02) AM_READ(laserbat_input_r) AM_WRITE(laserbat_csound1_w)
-	AM_RANGE(0x04, 0x05) AM_WRITE(sprite_x_y_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(laserbat_csound2_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(laserbat_cnteff_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(video_extra_w)
+	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(laserbat_input_r) AM_WRITE_LEGACY(laserbat_csound1_w)
+	AM_RANGE(0x04, 0x05) AM_WRITE_LEGACY(sprite_x_y_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(laserbat_input_mux_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(laserbat_csound2_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( catnmous_io_map, AS_IO, 8, laserbat_state )
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_w) // soundlatch ?
-	AM_RANGE(0x01, 0x01) AM_WRITE(video_extra_w)
-	AM_RANGE(0x02, 0x02) AM_READ(laserbat_input_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(soundlatch_w) // soundlatch ?
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(video_extra_w)
+	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(laserbat_input_r)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP // unknown
-	AM_RANGE(0x04, 0x05) AM_WRITE(sprite_x_y_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
+	AM_RANGE(0x04, 0x05) AM_WRITE_LEGACY(sprite_x_y_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // unknown
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
@@ -207,7 +207,7 @@ ADDRESS_MAP_END
 // the same as in zaccaria.c ?
 static ADDRESS_MAP_START( catnmous_sound_map, AS_PROGRAM, 8, laserbat_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read, write)
+	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

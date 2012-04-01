@@ -90,17 +90,17 @@ static WRITE16_HANDLER( csplayh5_sound_w )
 static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_WRITE(csplayh5_sound_w)
-	AM_RANGE(0x200200, 0x200201) AM_READWRITE(csplayh5_mux_r,csplayh5_mux_w)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_WRITE_LEGACY(csplayh5_sound_w)
+	AM_RANGE(0x200200, 0x200201) AM_READWRITE_LEGACY(csplayh5_mux_r,csplayh5_mux_w)
 	AM_RANGE(0x200400, 0x200401) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x200600, 0x200607) AM_DEVREADWRITE8_MODERN("v9958", v9958_device, read, write, 0x00ff)
+	AM_RANGE(0x200600, 0x200607) AM_DEVREADWRITE8("v9958", v9958_device, read, write, 0x00ff)
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("blit_gfx",0) // GFX ROM routes here
 
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x380000) // work RAM
 
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 #if USE_H8
@@ -112,8 +112,8 @@ static READ16_HANDLER( test_r )
 static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
-	AM_RANGE(0x04002a, 0x04002b) AM_READ(test_r)
-	AM_RANGE(0x040036, 0x040037) AM_READ(test_r)
+	AM_RANGE(0x04002a, 0x04002b) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x040036, 0x040037) AM_READ_LEGACY(test_r)
 
 	AM_RANGE(0x078000, 0x07ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x080000, 0x0fffff) AM_RAM
@@ -350,18 +350,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csplayh5_sound_io_map, AS_IO, 8, csplayh5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
-	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
-	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(tmpz84c011_0_pd_r, tmpz84c011_0_pd_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(tmpz84c011_0_pe_r, tmpz84c011_0_pe_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE(tmpz84c011_0_dir_pa_r, tmpz84c011_0_dir_pa_w)
-	AM_RANGE(0x55, 0x55) AM_READWRITE(tmpz84c011_0_dir_pb_r, tmpz84c011_0_dir_pb_w)
-	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
-	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
-	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym3812_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x50, 0x50) AM_READWRITE_LEGACY(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
+	AM_RANGE(0x51, 0x51) AM_READWRITE_LEGACY(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
+	AM_RANGE(0x52, 0x52) AM_READWRITE_LEGACY(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
+	AM_RANGE(0x30, 0x30) AM_READWRITE_LEGACY(tmpz84c011_0_pd_r, tmpz84c011_0_pd_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE_LEGACY(tmpz84c011_0_pe_r, tmpz84c011_0_pe_w)
+	AM_RANGE(0x54, 0x54) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pa_r, tmpz84c011_0_dir_pa_w)
+	AM_RANGE(0x55, 0x55) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pb_r, tmpz84c011_0_dir_pb_w)
+	AM_RANGE(0x56, 0x56) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
+	AM_RANGE(0x34, 0x34) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
+	AM_RANGE(0x44, 0x44) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 ADDRESS_MAP_END
 
 

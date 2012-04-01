@@ -81,15 +81,15 @@ static WRITE8_HANDLER( irq_mask_w )
 static ADDRESS_MAP_START( marineb_map, AS_PROGRAM, 8, marineb_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(marineb_videoram_w) AM_BASE_MEMBER(marineb_state, m_videoram)
-	AM_RANGE(0x8c00, 0x8c3f) AM_RAM AM_BASE_MEMBER(marineb_state, m_spriteram)  /* Hoccer only */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(marineb_colorram_w) AM_BASE_MEMBER(marineb_state, m_colorram)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(marineb_column_scroll_w)
-	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(marineb_palette_bank_0_w)
-	AM_RANGE(0x9c00, 0x9c00) AM_WRITE(marineb_palette_bank_1_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2") AM_WRITE(irq_mask_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(marineb_flipscreen_y_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(marineb_flipscreen_x_w)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(marineb_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x8c00, 0x8c3f) AM_RAM AM_BASE( m_spriteram)  /* Hoccer only */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(marineb_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE_LEGACY(marineb_column_scroll_w)
+	AM_RANGE(0x9a00, 0x9a00) AM_WRITE_LEGACY(marineb_palette_bank_0_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_WRITE_LEGACY(marineb_palette_bank_1_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2") AM_WRITE_LEGACY(irq_mask_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE_LEGACY(marineb_flipscreen_y_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(marineb_flipscreen_x_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM") AM_WRITENOP		/* also watchdog */
@@ -98,13 +98,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( marineb_io_map, AS_IO, 8, marineb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wanted_io_map, AS_IO, 8, marineb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

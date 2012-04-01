@@ -198,21 +198,21 @@ static ADDRESS_MAP_START( drgnmst_main_map, AS_PROGRAM, 16, drgnmst_state )
 	AM_RANGE(0x800018, 0x800019) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80001a, 0x80001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x80001c, 0x80001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800030, 0x800031) AM_WRITE(drgnmst_coin_w)
-	AM_RANGE(0x800100, 0x80011f) AM_WRITEONLY AM_BASE_MEMBER(drgnmst_state, m_vidregs)
+	AM_RANGE(0x800030, 0x800031) AM_WRITE_LEGACY(drgnmst_coin_w)
+	AM_RANGE(0x800100, 0x80011f) AM_WRITEONLY AM_BASE( m_vidregs)
 	AM_RANGE(0x800120, 0x800121) AM_WRITENOP
 	AM_RANGE(0x80014a, 0x80014b) AM_WRITENOP
-	AM_RANGE(0x800154, 0x800155) AM_WRITEONLY AM_BASE_MEMBER(drgnmst_state, m_vidregs2) // seems to be priority control
+	AM_RANGE(0x800154, 0x800155) AM_WRITEONLY AM_BASE( m_vidregs2) // seems to be priority control
 	AM_RANGE(0x800176, 0x800177) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x800180, 0x800181) AM_WRITE(drgnmst_snd_command_w)
-	AM_RANGE(0x800188, 0x800189) AM_WRITE(drgnmst_snd_flag_w)
+	AM_RANGE(0x800180, 0x800181) AM_WRITE_LEGACY(drgnmst_snd_command_w)
+	AM_RANGE(0x800188, 0x800189) AM_WRITE_LEGACY(drgnmst_snd_flag_w)
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE(drgnmst_md_videoram_w) AM_BASE_MEMBER(drgnmst_state, m_md_videoram)
-	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(drgnmst_bg_videoram_w) AM_BASE_MEMBER(drgnmst_state, m_bg_videoram)
-	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE(drgnmst_fg_videoram_w) AM_BASE_MEMBER(drgnmst_state, m_fg_videoram)
-	AM_RANGE(0x920000, 0x923fff) AM_RAM AM_BASE_MEMBER(drgnmst_state, m_rowscrollram) // rowscroll ram
-	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE_MEMBER(drgnmst_state, m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE_LEGACY(drgnmst_md_videoram_w) AM_BASE( m_md_videoram)
+	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE_LEGACY(drgnmst_bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE_LEGACY(drgnmst_fg_videoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0x920000, 0x923fff) AM_RAM AM_BASE( m_rowscrollram) // rowscroll ram
+	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -224,10 +224,10 @@ ADDRESS_MAP_END
 	/* $000 - 01F  PIC16C55 Internal Data RAM */
 
 static ADDRESS_MAP_START( drgnmst_sound_io_map, AS_IO, 8, drgnmst_state )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(pic16c5x_port0_r, drgnmst_pcm_banksel_w)	/* 4 bit port */
-	AM_RANGE(0x01, 0x01) AM_READWRITE(drgnmst_snd_command_r, drgnmst_oki_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(drgnmst_snd_flag_r, drgnmst_snd_control_w)
-	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(pic16c5x_port0_r, drgnmst_pcm_banksel_w)	/* 4 bit port */
+	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(drgnmst_snd_command_r, drgnmst_oki_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(drgnmst_snd_flag_r, drgnmst_snd_control_w)
+	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ_LEGACY(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 
 

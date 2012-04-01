@@ -54,10 +54,10 @@ void squawkntalk_reset_w(running_machine &machine, int state);
 /************ SSIO input ports ***************/
 
 #define SSIO_INPUT_PORTS \
-	AM_RANGE(0x00, 0x04) AM_MIRROR(0x18) AM_READ(ssio_input_port_r) \
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READ(ssio_status_r) \
-	AM_RANGE(0x00, 0x07) AM_MIRROR(0x03) AM_WRITE(ssio_output_port_w) \
-	AM_RANGE(0x1c, 0x1f) AM_WRITE(ssio_data_w)
+	AM_RANGE(0x00, 0x04) AM_MIRROR(0x18) AM_READ_LEGACY(ssio_input_port_r) \
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READ_LEGACY(ssio_status_r) \
+	AM_RANGE(0x00, 0x07) AM_MIRROR(0x03) AM_WRITE_LEGACY(ssio_output_port_w) \
+	AM_RANGE(0x1c, 0x1f) AM_WRITE_LEGACY(ssio_data_w)
 
 
 

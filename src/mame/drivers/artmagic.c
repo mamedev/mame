@@ -434,10 +434,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("300006")
 	AM_RANGE(0x300008, 0x300009) AM_READ_PORT("300008")
 	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE_MEMBER(artmagic_state, m_control)
-	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x360000, 0x360001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
+	AM_RANGE(0x300000, 0x300003) AM_WRITE_LEGACY(control_w) AM_BASE( m_control)
+	AM_RANGE(0x300004, 0x300007) AM_WRITE_LEGACY(protection_bit_w)
+	AM_RANGE(0x360000, 0x360001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x380000, 0x380007) AM_READWRITE_LEGACY(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 
 
@@ -453,10 +453,10 @@ static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
 	AM_RANGE(0x30000c, 0x30000d) AM_READ_PORT("30000c")
 	AM_RANGE(0x30000e, 0x30000f) AM_READ_PORT("30000e")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE_MEMBER(artmagic_state, m_control)
-	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
+	AM_RANGE(0x300000, 0x300003) AM_WRITE_LEGACY(control_w) AM_BASE( m_control)
+	AM_RANGE(0x300004, 0x300007) AM_WRITE_LEGACY(protection_bit_w)
+	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x380000, 0x380007) AM_READWRITE_LEGACY(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 
 static READ16_HANDLER(unk_r)
@@ -476,13 +476,13 @@ static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x3c0008, 0x3c0009) AM_READ_PORT("3c0008")
 	AM_RANGE(0x3c000a, 0x3c000b) AM_READ_PORT("3c000a")
 
-	AM_RANGE(0x3c0012, 0x3c0013) AM_READ(unk_r)
+	AM_RANGE(0x3c0012, 0x3c0013) AM_READ_LEGACY(unk_r)
 	AM_RANGE(0x3c0014, 0x3c0015) AM_NOP
 
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE_MEMBER(artmagic_state, m_control)
-	AM_RANGE(0x3c0004, 0x3c0007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
+	AM_RANGE(0x300000, 0x300003) AM_WRITE_LEGACY(control_w) AM_BASE( m_control)
+	AM_RANGE(0x3c0004, 0x3c0007) AM_WRITE_LEGACY(protection_bit_w)
+	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x380000, 0x380007) AM_READWRITE_LEGACY(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 
 
@@ -507,21 +507,21 @@ static const tms34010_config tms_config =
 
 
 static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16, artmagic_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, m_vram0)
-	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, m_vram1)
-	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
-	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE( m_vram0)
+	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE( m_vram1)
+	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE_LEGACY(artmagic_blitter_r, artmagic_blitter_w)
+	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( stonebal_tms_map, AS_PROGRAM, 16, artmagic_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, m_vram0)
-	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, m_vram1)
-	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
-	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE( m_vram0)
+	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE( m_vram1)
+	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE_LEGACY(artmagic_blitter_r, artmagic_blitter_w)
+	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 

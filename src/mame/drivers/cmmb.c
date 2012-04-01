@@ -171,14 +171,14 @@ static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8, cmmb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(cmmb_state, m_videoram)
-	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
-	AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE_LEGACY(cmmb_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x4000, 0x400f) AM_READWRITE_LEGACY(cmmb_input_r,cmmb_output_w) //i/o
+	AM_RANGE(0x4900, 0x4900) AM_READ_LEGACY(kludge_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(cmmb_charram_r,cmmb_charram_w)
-	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
+	AM_RANGE(0xb000, 0xbfff) AM_READWRITE_LEGACY(cmmb_charram_r,cmmb_charram_w)
+	AM_RANGE(0xc000, 0xc00f) AM_READWRITE_LEGACY(cmmb_input_r,cmmb_output_w) //i/o
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -411,42 +411,42 @@ static WRITE8_HANDLER( mermaid_p3_w )
 static ADDRESS_MAP_START( master_memory, AS_PROGRAM, 8, hvyunit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_io, AS_IO, 8, hvyunit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(master_bankswitch_w) // correct?
-	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_slave_cpu)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(master_bankswitch_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(master_bankswitch_w) // correct?
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(trigger_nmi_on_slave_cpu)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( slave_memory, AS_PROGRAM, 8, hvyunit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_BASE_MEMBER(hvyunit_state, m_videoram)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_BASE_MEMBER(hvyunit_state, m_colorram)
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(hu_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(hu_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io, AS_IO, 8, hvyunit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(mermaid_data_r, mermaid_data_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(hu_scrolly_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(hu_scrollx_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(mermaid_status_r)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(coin_count_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(slave_bankswitch_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(trigger_nmi_on_sound_cpu2)
+	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(mermaid_data_r, mermaid_data_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(hu_scrolly_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(hu_scrollx_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ_LEGACY(mermaid_status_r)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE_LEGACY(coin_count_w)
 
-//  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
-//  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
+//  AM_RANGE(0x22, 0x22) AM_READ_LEGACY(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
+//  AM_RANGE(0xa2, 0xa2) AM_READ_LEGACY(hu_scrolly_hi_set)
 ADDRESS_MAP_END
 
 
@@ -458,17 +458,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, hvyunit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(sound_bankswitch_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_io, AS_IO, 8, hvyunit_state )
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(mermaid_p0_r, mermaid_p0_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(mermaid_p1_r, mermaid_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(mermaid_p2_r, mermaid_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(mermaid_p3_r, mermaid_p3_w)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE_LEGACY(mermaid_p0_r, mermaid_p0_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE_LEGACY(mermaid_p1_r, mermaid_p1_w)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE_LEGACY(mermaid_p2_r, mermaid_p2_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE_LEGACY(mermaid_p3_r, mermaid_p3_w)
 ADDRESS_MAP_END
 
 

@@ -133,15 +133,15 @@ static ADDRESS_MAP_START( maincpu_io_map, AS_IO, 8, sothello_state )
     AM_RANGE( 0x00, 0x0f) AM_READ_PORT("INPUT1")
     AM_RANGE( 0x10, 0x1f) AM_READ_PORT("INPUT2")
     AM_RANGE( 0x20, 0x2f) AM_READ_PORT("SYSTEM")
-    AM_RANGE( 0x30, 0x30) AM_READ(subcpu_halt_set)
-    AM_RANGE( 0x31, 0x31) AM_READ(subcpu_halt_clear)
-    AM_RANGE( 0x32, 0x32) AM_READ(subcpu_comm_status)
-    AM_RANGE( 0x33, 0x33) AM_READ(soundcpu_status_r)
-    AM_RANGE( 0x40, 0x4f) AM_WRITE(soundlatch_w)
-    AM_RANGE( 0x50, 0x50) AM_WRITE(bank_w)
-    AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+    AM_RANGE( 0x30, 0x30) AM_READ_LEGACY(subcpu_halt_set)
+    AM_RANGE( 0x31, 0x31) AM_READ_LEGACY(subcpu_halt_clear)
+    AM_RANGE( 0x32, 0x32) AM_READ_LEGACY(subcpu_comm_status)
+    AM_RANGE( 0x33, 0x33) AM_READ_LEGACY(soundcpu_status_r)
+    AM_RANGE( 0x40, 0x4f) AM_WRITE_LEGACY(soundlatch_w)
+    AM_RANGE( 0x50, 0x50) AM_WRITE_LEGACY(bank_w)
+    AM_RANGE( 0x60, 0x61) AM_MIRROR(0x02) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 						/* not sure, but the A1 line is ignored, code @ $8b8 */
-    AM_RANGE( 0x70, 0x73) AM_DEVREADWRITE_MODERN( "v9938", v9938_device, read, write )
+    AM_RANGE( 0x70, 0x73) AM_DEVREADWRITE( "v9938", v9938_device, read, write )
 ADDRESS_MAP_END
 
 /* sound Z80 */
@@ -189,12 +189,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundcpu_io_map, AS_IO, 8, sothello_state )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
-    AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-    AM_RANGE(0x01, 0x01) AM_WRITE(msm_data_w)
-    AM_RANGE(0x02, 0x02) AM_DEVWRITE("msm", msm_cfg_w)
-    AM_RANGE(0x03, 0x03) AM_WRITE(soundcpu_busyflag_set_w)
-    AM_RANGE(0x04, 0x04) AM_WRITE(soundcpu_busyflag_reset_w)
-    AM_RANGE(0x05, 0x05) AM_WRITE(soundcpu_int_clear_w)
+    AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch_r)
+    AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(msm_data_w)
+    AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("msm", msm_cfg_w)
+    AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(soundcpu_busyflag_set_w)
+    AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(soundcpu_busyflag_reset_w)
+    AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(soundcpu_int_clear_w)
 ADDRESS_MAP_END
 
 /* sub 6809 */
@@ -224,7 +224,7 @@ static READ8_HANDLER(subcpu_status_r)
 }
 
 static ADDRESS_MAP_START( subcpu_mem_map, AS_PROGRAM, 8, sothello_state )
-    AM_RANGE(0x0000, 0x1fff) AM_READWRITE(subcpu_status_r,subcpu_status_w)
+    AM_RANGE(0x0000, 0x1fff) AM_READWRITE_LEGACY(subcpu_status_r,subcpu_status_w)
     AM_RANGE(0x2000, 0x77ff) AM_RAM
     AM_RANGE(0x7800, 0x7fff) AM_RAM AM_SHARE("share1")  /* upper 0x800 of 6264 is shared  with main cpu */
     AM_RANGE(0x8000, 0xffff) AM_ROM

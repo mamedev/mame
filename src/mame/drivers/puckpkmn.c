@@ -133,10 +133,10 @@ static ADDRESS_MAP_START( puckpkmn_map, AS_PROGRAM, 16, md_boot_state )
 	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("UNK")
 	AM_RANGE(0x700016, 0x700017) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("DSW2")
-	AM_RANGE(0x700022, 0x700023) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+	AM_RANGE(0x700022, 0x700023) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8_LEGACY("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE_LEGACY(megadriv_vdp_r, megadriv_vdp_w)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
 
 	/* Unknown reads/writes: */
 	AM_RANGE(0xa00000, 0xa00551) AM_WRITENOP							/* ? */
@@ -160,8 +160,8 @@ static READ16_HANDLER(puckpkmna_4b2476_r)
 
 static ADDRESS_MAP_START( puckpkmna_map, AS_PROGRAM, 16, md_boot_state )
 	AM_IMPORT_FROM( puckpkmn_map )
-	AM_RANGE(0x4b2476, 0x4b2477) AM_READ(puckpkmna_4b2476_r)
-	AM_RANGE(0x70001c, 0x70001d) AM_READ(puckpkmna_70001c_r)
+	AM_RANGE(0x4b2476, 0x4b2477) AM_READ_LEGACY(puckpkmna_4b2476_r)
+	AM_RANGE(0x70001c, 0x70001d) AM_READ_LEGACY(puckpkmna_70001c_r)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( puckpkmn, md_boot_state )

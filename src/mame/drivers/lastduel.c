@@ -136,30 +136,30 @@ static ADDRESS_MAP_START( lastduel_map, AS_PROGRAM, 16, lastduel_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc0003) AM_WRITENOP /* Written rarely */
 	AM_RANGE(0xfc0800, 0xfc0fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("P1_P2") AM_WRITE(lastduel_flip_w)
-	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("SYSTEM") AM_WRITE(lastduel_sound_w)
+	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("P1_P2") AM_WRITE_LEGACY(lastduel_flip_w)
+	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(lastduel_sound_w)
 	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc8000, 0xfc800f) AM_WRITE(lastduel_scroll_w)
-	AM_RANGE(0xfcc000, 0xfcdfff) AM_RAM_WRITE(lastduel_vram_w) AM_BASE_MEMBER(lastduel_state, m_vram)
-	AM_RANGE(0xfd0000, 0xfd3fff) AM_RAM_WRITE(lastduel_scroll1_w) AM_BASE_MEMBER(lastduel_state, m_scroll1)
-	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE(lastduel_scroll2_w) AM_BASE_MEMBER(lastduel_state, m_scroll2)
-	AM_RANGE(0xfd8000, 0xfd87ff) AM_RAM_WRITE(lastduel_palette_word_w) AM_BASE_MEMBER(lastduel_state, m_paletteram)
+	AM_RANGE(0xfc8000, 0xfc800f) AM_WRITE_LEGACY(lastduel_scroll_w)
+	AM_RANGE(0xfcc000, 0xfcdfff) AM_RAM_WRITE_LEGACY(lastduel_vram_w) AM_BASE( m_vram)
+	AM_RANGE(0xfd0000, 0xfd3fff) AM_RAM_WRITE_LEGACY(lastduel_scroll1_w) AM_BASE( m_scroll1)
+	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE_LEGACY(lastduel_scroll2_w) AM_BASE( m_scroll2)
+	AM_RANGE(0xfd8000, 0xfd87ff) AM_RAM_WRITE_LEGACY(lastduel_palette_word_w) AM_BASE( m_paletteram)
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( madgear_map, AS_PROGRAM, 16, lastduel_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xfc1800, 0xfc1fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("DSW1") AM_WRITE(lastduel_flip_w)
-	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("DSW2") AM_WRITE(lastduel_sound_w)
+	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(lastduel_flip_w)
+	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(lastduel_sound_w)
 	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfc8000, 0xfc9fff) AM_RAM_WRITE(lastduel_vram_w) AM_BASE_MEMBER(lastduel_state, m_vram)
-	AM_RANGE(0xfcc000, 0xfcc7ff) AM_RAM_WRITE(lastduel_palette_word_w) AM_BASE_MEMBER(lastduel_state, m_paletteram)
-	AM_RANGE(0xfd0000, 0xfd000f) AM_WRITE(lastduel_scroll_w)
-	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE(madgear_scroll1_w) AM_BASE_MEMBER(lastduel_state, m_scroll1)
-	AM_RANGE(0xfd8000, 0xfdffff) AM_RAM_WRITE(madgear_scroll2_w) AM_BASE_MEMBER(lastduel_state, m_scroll2)
+	AM_RANGE(0xfc8000, 0xfc9fff) AM_RAM_WRITE_LEGACY(lastduel_vram_w) AM_BASE( m_vram)
+	AM_RANGE(0xfcc000, 0xfcc7ff) AM_RAM_WRITE_LEGACY(lastduel_palette_word_w) AM_BASE( m_paletteram)
+	AM_RANGE(0xfd0000, 0xfd000f) AM_WRITE_LEGACY(lastduel_scroll_w)
+	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE_LEGACY(madgear_scroll1_w) AM_BASE( m_scroll1)
+	AM_RANGE(0xfd8000, 0xfdffff) AM_RAM_WRITE_LEGACY(madgear_scroll2_w) AM_BASE( m_scroll2)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -168,9 +168,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lastduel_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym2", ym2203_r,ym2203_w)
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mg_bankswitch_w )
@@ -182,11 +182,11 @@ static ADDRESS_MAP_START( madgear_sound_map, AS_PROGRAM, 8, lastduel_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xcfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
-	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_r,ym2203_w)
-	AM_RANGE(0xf004, 0xf004) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
-	AM_RANGE(0xf006, 0xf006) AM_READ(soundlatch_r)
-	AM_RANGE(0xf00a, 0xf00a) AM_WRITE(mg_bankswitch_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
+	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)
+	AM_RANGE(0xf004, 0xf004) AM_DEVWRITE("oki", okim6295_device, write)
+	AM_RANGE(0xf006, 0xf006) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf00a, 0xf00a) AM_WRITE_LEGACY(mg_bankswitch_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

@@ -189,15 +189,15 @@ static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, gunpey_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
-	AM_RANGE(0x7f40, 0x7f45) AM_READ8(gunpey_inputs_r,0xffff)
+	AM_RANGE(0x7f40, 0x7f45) AM_READ8_LEGACY(gunpey_inputs_r,0xffff)
 
-//  AM_RANGE(0x7f48, 0x7f48) AM_WRITE(output_w)
-	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xffff)
+//  AM_RANGE(0x7f48, 0x7f48) AM_WRITE_LEGACY(output_w)
+	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff)
 
-	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff00)
+	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 
-	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8( gunpey_status_r,  gunpey_status_w, 0xffff )
-	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8( gunpey_blitter_w, 0xffff )
+	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8_LEGACY( gunpey_status_r,  gunpey_status_w, 0xffff )
+	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8_LEGACY( gunpey_blitter_w, 0xffff )
 ADDRESS_MAP_END
 
 

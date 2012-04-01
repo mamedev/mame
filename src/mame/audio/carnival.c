@@ -290,9 +290,9 @@ static ADDRESS_MAP_START( carnival_audio_map, AS_PROGRAM, 8, driver_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( carnival_audio_io_map, AS_IO, 8, driver_device )
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(carnival_music_port_t1_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(carnival_music_port_1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE("psg", carnival_music_port_2_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_LEGACY(carnival_music_port_t1_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE_LEGACY(carnival_music_port_1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_DEVWRITE_LEGACY("psg", carnival_music_port_2_w)
 ADDRESS_MAP_END
 
 

@@ -605,7 +605,7 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 static ADDRESS_MAP_START( ampoker2_map, AS_PROGRAM, 8, ampoker2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(ampoker2_videoram_w) AM_BASE_MEMBER(ampoker2_state, m_videoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(ampoker2_videoram_w) AM_BASE( m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ampoker2_io_map, AS_IO, 8, ampoker2_state )
@@ -620,16 +620,16 @@ static ADDRESS_MAP_START( ampoker2_io_map, AS_IO, 8, ampoker2_state )
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("IN6")
 	AM_RANGE(0x17, 0x17) AM_READ_PORT("IN7")
 //  AM_RANGE(0x21, 0x21) AM_WRITENOP                    /* undocumented, write 0x1a after each reset */
-	AM_RANGE(0x30, 0x30) AM_WRITE (ampoker2_port30_w)	/* see write handlers */
-	AM_RANGE(0x31, 0x31) AM_WRITE (ampoker2_port31_w)	/* see write handlers */
-	AM_RANGE(0x32, 0x32) AM_WRITE (ampoker2_port32_w)	/* see write handlers */
-	AM_RANGE(0x33, 0x33) AM_WRITE (ampoker2_port33_w)	/* see write handlers */
-	AM_RANGE(0x34, 0x34) AM_WRITE (ampoker2_port34_w)	/* see write handlers */
-	AM_RANGE(0x35, 0x35) AM_WRITE (ampoker2_port35_w)	/* see write handlers */
-	AM_RANGE(0x36, 0x36) AM_WRITE (ampoker2_port36_w)	/* see write handlers */
-	AM_RANGE(0x37, 0x37) AM_WRITE(ampoker2_watchdog_reset_w)
-	AM_RANGE(0x38, 0x39) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x3A, 0x3A) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(ampoker2_port30_w)	/* see write handlers */
+	AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(ampoker2_port31_w)	/* see write handlers */
+	AM_RANGE(0x32, 0x32) AM_WRITE_LEGACY(ampoker2_port32_w)	/* see write handlers */
+	AM_RANGE(0x33, 0x33) AM_WRITE_LEGACY(ampoker2_port33_w)	/* see write handlers */
+	AM_RANGE(0x34, 0x34) AM_WRITE_LEGACY(ampoker2_port34_w)	/* see write handlers */
+	AM_RANGE(0x35, 0x35) AM_WRITE_LEGACY(ampoker2_port35_w)	/* see write handlers */
+	AM_RANGE(0x36, 0x36) AM_WRITE_LEGACY(ampoker2_port36_w)	/* see write handlers */
+	AM_RANGE(0x37, 0x37) AM_WRITE_LEGACY(ampoker2_watchdog_reset_w)
+	AM_RANGE(0x38, 0x39) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x3A, 0x3A) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 /*

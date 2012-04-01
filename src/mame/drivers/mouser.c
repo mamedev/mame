@@ -69,29 +69,29 @@ static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8, mouser_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_WRITENOP /* unknown */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_MEMBER(mouser_state, m_videoram)
-	AM_RANGE(0x9800, 0x9cff) AM_RAM AM_BASE_SIZE_MEMBER(mouser_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE_MEMBER(mouser_state, m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(mouser_nmi_enable_w) /* bit 0 = NMI Enable */
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(mouser_flip_screen_x_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(mouser_flip_screen_y_w)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x9800, 0x9cff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE_LEGACY(mouser_nmi_enable_w) /* bit 0 = NMI Enable */
+	AM_RANGE(0xa001, 0xa001) AM_WRITE_LEGACY(mouser_flip_screen_x_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(mouser_flip_screen_y_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("P2") AM_WRITE(mouser_sound_interrupt_w) /* byte to sound cpu */
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("P2") AM_WRITE_LEGACY(mouser_sound_interrupt_w) /* byte to sound cpu */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mouser_sound_map, AS_PROGRAM, 8, mouser_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(mouser_sound_byte_r)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(mouser_sound_nmi_clear_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(mouser_sound_byte_r)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(mouser_sound_nmi_clear_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mouser_sound_io_map, AS_IO, 8, mouser_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mouser )

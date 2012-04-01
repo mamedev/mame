@@ -404,44 +404,44 @@ static WRITE32_HANDLER( macrossp_palette_fade_w )
 
 static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_BASE_SIZE_MEMBER(macrossp_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x800000, 0x802fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	/* SCR A Layer */
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(macrossp_scra_videoram_w) AM_BASE_MEMBER(macrossp_state, m_scra_videoram)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE_LEGACY(macrossp_scra_videoram_w) AM_BASE( m_scra_videoram)
 	AM_RANGE(0x904200, 0x9043ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x905000, 0x90500b) AM_WRITEONLY AM_BASE_MEMBER(macrossp_state, m_scra_videoregs) /* W/O? */
+	AM_RANGE(0x905000, 0x90500b) AM_WRITEONLY AM_BASE( m_scra_videoregs) /* W/O? */
 	/* SCR B Layer */
-	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(macrossp_scrb_videoram_w) AM_BASE_MEMBER(macrossp_state, m_scrb_videoram)
+	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE_LEGACY(macrossp_scrb_videoram_w) AM_BASE( m_scrb_videoram)
 	AM_RANGE(0x90c200, 0x90c3ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x90d000, 0x90d00b) AM_WRITEONLY AM_BASE_MEMBER(macrossp_state, m_scrb_videoregs) /* W/O? */
+	AM_RANGE(0x90d000, 0x90d00b) AM_WRITEONLY AM_BASE( m_scrb_videoregs) /* W/O? */
 	/* SCR C Layer */
-	AM_RANGE(0x910000, 0x913fff) AM_RAM_WRITE(macrossp_scrc_videoram_w) AM_BASE_MEMBER(macrossp_state, m_scrc_videoram)
+	AM_RANGE(0x910000, 0x913fff) AM_RAM_WRITE_LEGACY(macrossp_scrc_videoram_w) AM_BASE( m_scrc_videoram)
 	AM_RANGE(0x914200, 0x9143ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x915000, 0x91500b) AM_WRITEONLY AM_BASE_MEMBER(macrossp_state, m_scrc_videoregs) /* W/O? */
+	AM_RANGE(0x915000, 0x91500b) AM_WRITEONLY AM_BASE( m_scrc_videoregs) /* W/O? */
 	/* Text Layer */
-	AM_RANGE(0x918000, 0x91bfff) AM_RAM_WRITE(macrossp_text_videoram_w) AM_BASE_MEMBER(macrossp_state, m_text_videoram)
+	AM_RANGE(0x918000, 0x91bfff) AM_RAM_WRITE_LEGACY(macrossp_text_videoram_w) AM_BASE( m_text_videoram)
 	AM_RANGE(0x91c200, 0x91c3ff) AM_WRITEONLY /* W/O? */
-	AM_RANGE(0x91d000, 0x91d00b) AM_WRITEONLY AM_BASE_MEMBER(macrossp_state, m_text_videoregs) /* W/O? */
+	AM_RANGE(0x91d000, 0x91d00b) AM_WRITEONLY AM_BASE( m_text_videoregs) /* W/O? */
 
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(paletteram32_macrossp_w) AM_BASE_MEMBER(macrossp_state, m_paletteram)
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE_LEGACY(paletteram32_macrossp_w) AM_BASE( m_paletteram)
 
 	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?
+	AM_RANGE(0xb00004, 0xb00007) AM_READ_LEGACY(macrossp_soundstatus_r) AM_WRITENOP // irq related?
 	AM_RANGE(0xb00008, 0xb0000b) AM_WRITENOP	// irq related?
 	AM_RANGE(0xb0000c, 0xb0000f) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xb00010, 0xb00013) AM_WRITE(macrossp_palette_fade_w)	// macrossp palette fade
+	AM_RANGE(0xb00010, 0xb00013) AM_WRITE_LEGACY(macrossp_palette_fade_w)	// macrossp palette fade
 	AM_RANGE(0xb00020, 0xb00023) AM_WRITENOP
 
-	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(macrossp_soundcmd_w)
+	AM_RANGE(0xc00000, 0xc00003) AM_WRITE_LEGACY(macrossp_soundcmd_w)
 
-	AM_RANGE(0xf00000, 0xf1ffff) AM_RAM AM_BASE_MEMBER(macrossp_state, m_mainram) /* Main Ram */
+	AM_RANGE(0xf00000, 0xf1ffff) AM_RAM AM_BASE( m_mainram) /* Main Ram */
 //  AM_RANGE(0xfe0000, 0xfe0003) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macrossp_sound_map, AS_PROGRAM, 16, macrossp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM
-	AM_RANGE(0x400000, 0x40007f) AM_DEVREADWRITE8("ensoniq", es5506_r, es5506_w, 0x00ff)
-	AM_RANGE(0x600000, 0x600001) AM_READ(macrossp_soundcmd_r)
+	AM_RANGE(0x400000, 0x40007f) AM_DEVREADWRITE8_LEGACY("ensoniq", es5506_r, es5506_w, 0x00ff)
+	AM_RANGE(0x600000, 0x600001) AM_READ_LEGACY(macrossp_soundcmd_r)
 ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/

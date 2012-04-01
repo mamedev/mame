@@ -178,25 +178,25 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(msisaac_bg2_textbank_w)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(msisaac_bg2_textbank_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP					//???
 	AM_RANGE(0xf002, 0xf002) AM_WRITENOP					//???
 
-	AM_RANGE(0xf060, 0xf060) AM_WRITE(sound_command_w)		//sound command
+	AM_RANGE(0xf060, 0xf060) AM_WRITE_LEGACY(sound_command_w)		//sound command
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP /*sound_reset*/	//????
 
-	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE(ms_unknown_w)			//???? written in interrupt routine
+	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE_LEGACY(ms_unknown_w)			//???? written in interrupt routine
 
-	AM_RANGE(0xf0c0, 0xf0c0) AM_WRITE(msisaac_fg_scrollx_w)
-	AM_RANGE(0xf0c1, 0xf0c1) AM_WRITE(msisaac_fg_scrolly_w)
-	AM_RANGE(0xf0c2, 0xf0c2) AM_WRITE(msisaac_bg2_scrollx_w)
-	AM_RANGE(0xf0c3, 0xf0c3) AM_WRITE(msisaac_bg2_scrolly_w)
-	AM_RANGE(0xf0c4, 0xf0c4) AM_WRITE(msisaac_bg_scrollx_w)
-	AM_RANGE(0xf0c5, 0xf0c5) AM_WRITE(msisaac_bg_scrolly_w)
+	AM_RANGE(0xf0c0, 0xf0c0) AM_WRITE_LEGACY(msisaac_fg_scrollx_w)
+	AM_RANGE(0xf0c1, 0xf0c1) AM_WRITE_LEGACY(msisaac_fg_scrolly_w)
+	AM_RANGE(0xf0c2, 0xf0c2) AM_WRITE_LEGACY(msisaac_bg2_scrollx_w)
+	AM_RANGE(0xf0c3, 0xf0c3) AM_WRITE_LEGACY(msisaac_bg2_scrolly_w)
+	AM_RANGE(0xf0c4, 0xf0c4) AM_WRITE_LEGACY(msisaac_bg_scrollx_w)
+	AM_RANGE(0xf0c5, 0xf0c5) AM_WRITE_LEGACY(msisaac_bg_scrolly_w)
 
-	AM_RANGE(0xf0e0, 0xf0e0) AM_READWRITE(msisaac_mcu_r, msisaac_mcu_w)
-	AM_RANGE(0xf0e1, 0xf0e1) AM_READ(msisaac_mcu_status_r)
+	AM_RANGE(0xf0e0, 0xf0e0) AM_READWRITE_LEGACY(msisaac_mcu_r, msisaac_mcu_w)
+	AM_RANGE(0xf0e1, 0xf0e1) AM_READ_LEGACY(msisaac_mcu_status_r)
 
 	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
@@ -205,13 +205,13 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("IN1")
 //  AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
 
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE_MEMBER(msisaac_state, m_spriteram)	//sprites
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_BASE_MEMBER(msisaac_state, m_videoram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_BASE_MEMBER(msisaac_state, m_videoram3)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_BASE_MEMBER(msisaac_state, m_videoram2)
-//  AM_RANGE(0xf801, 0xf801) AM_WRITE(msisaac_bgcolor_w)
-//  AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
-//  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE( m_spriteram)	//sprites
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE_LEGACY(msisaac_fg_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE_LEGACY(msisaac_bg2_videoram_w) AM_BASE( m_videoram3)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE_LEGACY(msisaac_bg_videoram_w) AM_BASE( m_videoram2)
+//  AM_RANGE(0xf801, 0xf801) AM_WRITE_LEGACY(msisaac_bgcolor_w)
+//  AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(flip_screen_w)
+//  AM_RANGE(0xfc03, 0xfc04) AM_WRITE_LEGACY(msisaac_coin_counter_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( ta7630 )
@@ -267,14 +267,14 @@ static WRITE8_HANDLER( sound_control_1_w )
 static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8010, 0x801d) AM_DEVWRITE("msm", msm5232_w)
-	AM_RANGE(0x8020, 0x8020) AM_DEVWRITE("msm", sound_control_0_w)
-	AM_RANGE(0x8030, 0x8030) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(nmi_disable_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8010, 0x801d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
+	AM_RANGE(0x8020, 0x8020) AM_DEVWRITE_LEGACY("msm", sound_control_0_w)
+	AM_RANGE(0x8030, 0x8030) AM_WRITE_LEGACY(sound_control_1_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE_LEGACY(nmi_enable_w)
+	AM_RANGE(0xc002, 0xc002) AM_WRITE_LEGACY(nmi_disable_w)
 	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /*???*/ /* this is NOT mixer_enable */
 	AM_RANGE(0xe000, 0xffff) AM_READNOP /*space for diagnostic ROM (not dumped, not reachable) */
 ADDRESS_MAP_END

@@ -84,12 +84,12 @@ static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					/* banked roms */
 	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE("share1")  				/* shared with sound cpu */
-	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(mexico86_state, m_objectram, m_objectram_size)
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE_MEMBER(mexico86_state, m_protection_ram)  /* shared with mcu */
+	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_BASE_SIZE( m_objectram, m_objectram_size)
+	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE( m_protection_ram)  /* shared with mcu */
 	AM_RANGE(0xe900, 0xefff) AM_RAM
-	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_BASE_MEMBER(mexico86_state, m_videoram)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)	/* program and gfx ROM banks */
-	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)  		/* cpu reset lines + other unknown stuff */
+	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(mexico86_bankswitch_w)	/* program and gfx ROM banks */
+	AM_RANGE(0xf008, 0xf008) AM_WRITE_LEGACY(mexico86_f008_w)  		/* cpu reset lines + other unknown stuff */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN3")
 	AM_RANGE(0xf018, 0xf018) AM_WRITENOP						/* watchdog? */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")					/* communication ram - to connect 4 players's subboard */
@@ -99,16 +99,16 @@ static ADDRESS_MAP_START( mexico86_sound_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa800, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", kiki_ym2203_r,ym2203_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", kiki_ym2203_r,ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mexico86_m68705_map, AS_PROGRAM, 8, mexico86_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mexico86_68705_port_a_r,mexico86_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mexico86_68705_port_b_r,mexico86_68705_port_b_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(mexico86_68705_port_a_r,mexico86_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(mexico86_68705_port_b_r,mexico86_68705_port_b_w)
 	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("IN0") /* COIN */
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(mexico86_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(mexico86_68705_ddr_b_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(mexico86_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(mexico86_68705_ddr_b_w)
 	AM_RANGE(0x000a, 0x000a) AM_WRITENOP    /* looks like a bug in the code, writes to */
 											/* 0x0a (=10dec) instead of 0x10 */
 	AM_RANGE(0x0010, 0x007f) AM_RAM
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( mexico86_sub_cpu_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN5")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN6")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("IN7")
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(mexico86_sub_output_w)
+	AM_RANGE(0xc004, 0xc004) AM_WRITE_LEGACY(mexico86_sub_output_w)
 ADDRESS_MAP_END
 
 /*************************************

@@ -1264,9 +1264,9 @@ static WRITE32_HANDLER( bnstars1_mahjong_select_w )
 static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 
-	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ( bnstars1_r )
-	AM_RANGE(0xfcc00008, 0xfcc0000b) AM_READ( bnstars2_r )
-	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ( bnstars3_r )
+	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_LEGACY( bnstars1_r )
+	AM_RANGE(0xfcc00008, 0xfcc0000b) AM_READ_LEGACY( bnstars2_r )
+	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_LEGACY( bnstars3_r )
 
 	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP
 
@@ -1274,27 +1274,27 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0xfce00058, 0xfce0005b) AM_WRITENOP
 	AM_RANGE(0xfce0005c, 0xfce0005f) AM_WRITENOP
 
-	AM_RANGE(0xfce00400, 0xfce0045f) AM_WRITEONLY AM_BASE_MEMBER(bnstars_state, m_ms32_roz_ctrl[0])
-	AM_RANGE(0xfce00700, 0xfce0075f) AM_WRITEONLY AM_BASE_MEMBER(bnstars_state, m_ms32_roz_ctrl[1]) // guess
-	AM_RANGE(0xfce00a00, 0xfce00a17) AM_WRITEONLY AM_BASE_MEMBER(bnstars_state, m_ms32_tx0_scroll)
-	AM_RANGE(0xfce00a20, 0xfce00a37) AM_WRITEONLY AM_BASE_MEMBER(bnstars_state, m_ms32_bg0_scroll)
-	AM_RANGE(0xfce00c00, 0xfce00c17) AM_WRITEONLY AM_BASE_MEMBER(bnstars_state, m_ms32_tx1_scroll)
-	AM_RANGE(0xfce00c20, 0xfce00c37) AM_WRITEONLY AM_BASE_MEMBER(bnstars_state, m_ms32_bg1_scroll)
+	AM_RANGE(0xfce00400, 0xfce0045f) AM_WRITEONLY AM_BASE( m_ms32_roz_ctrl[0])
+	AM_RANGE(0xfce00700, 0xfce0075f) AM_WRITEONLY AM_BASE( m_ms32_roz_ctrl[1]) // guess
+	AM_RANGE(0xfce00a00, 0xfce00a17) AM_WRITEONLY AM_BASE( m_ms32_tx0_scroll)
+	AM_RANGE(0xfce00a20, 0xfce00a37) AM_WRITEONLY AM_BASE( m_ms32_bg0_scroll)
+	AM_RANGE(0xfce00c00, 0xfce00c17) AM_WRITEONLY AM_BASE( m_ms32_tx1_scroll)
+	AM_RANGE(0xfce00c20, 0xfce00c37) AM_WRITEONLY AM_BASE( m_ms32_bg1_scroll)
 
-	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(bnstars1_mahjong_select_w) // ?
+	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE_LEGACY(bnstars1_mahjong_select_w) // ?
 
 	/* wrote together */
 	AM_RANGE(0xfd040000, 0xfd047fff) AM_RAM // priority ram
 	AM_RANGE(0xfd080000, 0xfd087fff) AM_RAM
-	AM_RANGE(0xfd200000, 0xfd237fff) AM_RAM_WRITE(ms32_pal1_ram_w) AM_BASE_MEMBER(bnstars_state, m_ms32_pal_ram[1])
-	AM_RANGE(0xfd400000, 0xfd437fff) AM_RAM_WRITE(ms32_pal0_ram_w) AM_BASE_MEMBER(bnstars_state, m_ms32_pal_ram[0])
-	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE(ms32_roz1_ram_w) AM_BASE_MEMBER(bnstars_state, m_ms32_roz1_ram)
-	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE(ms32_roz0_ram_w) AM_BASE_MEMBER(bnstars_state, m_ms32_roz0_ram)
-	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM_WRITE(ms32_spramx_w) AM_BASE_MEMBER(bnstars_state, m_ms32_spram)
-	AM_RANGE(0xfea00000, 0xfea07fff) AM_RAM_WRITE(ms32_tx1_ram_w) AM_BASE_MEMBER(bnstars_state, m_ms32_tx1_ram)
-	AM_RANGE(0xfea08000, 0xfea0ffff) AM_RAM_WRITE(ms32_bg1_ram_w) AM_BASE_MEMBER(bnstars_state, m_ms32_bg1_ram)
-	AM_RANGE(0xfec00000, 0xfec07fff) AM_RAM_WRITE(ms32_tx0_ram_w) AM_BASE_MEMBER(bnstars_state, m_ms32_tx0_ram)
-	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM_WRITE(ms32_bg0_ram_w) AM_BASE_MEMBER(bnstars_state, m_ms32_bg0_ram)
+	AM_RANGE(0xfd200000, 0xfd237fff) AM_RAM_WRITE_LEGACY(ms32_pal1_ram_w) AM_BASE( m_ms32_pal_ram[1])
+	AM_RANGE(0xfd400000, 0xfd437fff) AM_RAM_WRITE_LEGACY(ms32_pal0_ram_w) AM_BASE( m_ms32_pal_ram[0])
+	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE_LEGACY(ms32_roz1_ram_w) AM_BASE( m_ms32_roz1_ram)
+	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE_LEGACY(ms32_roz0_ram_w) AM_BASE( m_ms32_roz0_ram)
+	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM_WRITE_LEGACY(ms32_spramx_w) AM_BASE( m_ms32_spram)
+	AM_RANGE(0xfea00000, 0xfea07fff) AM_RAM_WRITE_LEGACY(ms32_tx1_ram_w) AM_BASE( m_ms32_tx1_ram)
+	AM_RANGE(0xfea08000, 0xfea0ffff) AM_RAM_WRITE_LEGACY(ms32_bg1_ram_w) AM_BASE( m_ms32_bg1_ram)
+	AM_RANGE(0xfec00000, 0xfec07fff) AM_RAM_WRITE_LEGACY(ms32_tx0_ram_w) AM_BASE( m_ms32_tx0_ram)
+	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM_WRITE_LEGACY(ms32_bg0_ram_w) AM_BASE( m_ms32_bg0_ram)
 
 	AM_RANGE(0xfee00000, 0xfee1ffff) AM_RAM
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROMBANK("bank1")

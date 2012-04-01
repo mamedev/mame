@@ -252,9 +252,9 @@ static WRITE8_HANDLER( depthch_io_w )
 
 static ADDRESS_MAP_START( depthch_map, AS_PROGRAM, 8, vicdual_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE_LEGACY(vicdual_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE_LEGACY(vicdual_characterram_w) AM_BASE( m_characterram)
 ADDRESS_MAP_END
 
 
@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( depthch_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(depthch_io_r, depthch_io_w)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE_LEGACY(depthch_io_r, depthch_io_w)
 ADDRESS_MAP_END
 
 
@@ -336,9 +336,9 @@ static ADDRESS_MAP_START( safari_map, AS_PROGRAM, 8, vicdual_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
     AM_RANGE(0x4000, 0x7fff) AM_NOP	/* unused */
 	AM_RANGE(0x8000, 0x8fff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(vicdual_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(vicdual_characterram_w) AM_BASE( m_characterram)
 ADDRESS_MAP_END
 
 
@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( safari_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(safari_io_r, safari_io_w)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE_LEGACY(safari_io_r, safari_io_w)
 ADDRESS_MAP_END
 
 
@@ -418,9 +418,9 @@ static WRITE8_HANDLER( frogs_io_w )
 
 static ADDRESS_MAP_START( frogs_map, AS_PROGRAM, 8, vicdual_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE_LEGACY(vicdual_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE_LEGACY(vicdual_characterram_w) AM_BASE( m_characterram)
 ADDRESS_MAP_END
 
 
@@ -429,7 +429,7 @@ static ADDRESS_MAP_START( frogs_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(frogs_io_r, frogs_io_w)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE_LEGACY(frogs_io_r, frogs_io_w)
 ADDRESS_MAP_END
 
 
@@ -540,9 +540,9 @@ static WRITE8_HANDLER( headon_io_w )
 static ADDRESS_MAP_START( headon_map, AS_PROGRAM, 8, vicdual_state )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_NOP	/* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(vicdual_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(vicdual_characterram_w) AM_BASE( m_characterram)
 ADDRESS_MAP_END
 
 
@@ -551,7 +551,7 @@ static ADDRESS_MAP_START( headon_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(headon_io_r, headon_io_w)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE_LEGACY(headon_io_r, headon_io_w)
 ADDRESS_MAP_END
 
 
@@ -560,7 +560,7 @@ static ADDRESS_MAP_START( sspaceat_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_READWRITE(sspaceat_io_r, headon_io_w)
+	AM_RANGE(0x00, 0x0f) AM_READWRITE_LEGACY(sspaceat_io_r, headon_io_w)
 ADDRESS_MAP_END
 
 
@@ -760,9 +760,9 @@ static WRITE8_HANDLER( digger_io_w )
 static ADDRESS_MAP_START( headon2_map, AS_PROGRAM, 8, vicdual_state )
 	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
  /* AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x3f00) */  /* schematics show this as battery backed RAM, but doesn't appear to be used */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(vicdual_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(vicdual_characterram_w) AM_BASE( m_characterram)
 ADDRESS_MAP_END
 
 
@@ -771,7 +771,7 @@ static ADDRESS_MAP_START( headon2_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(headon2_io_r, headon2_io_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE_LEGACY(headon2_io_r, headon2_io_w)
 ADDRESS_MAP_END
 
 
@@ -780,7 +780,7 @@ static ADDRESS_MAP_START( digger_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(headon2_io_r, digger_io_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE_LEGACY(headon2_io_r, digger_io_w)
 ADDRESS_MAP_END
 
 
@@ -1039,9 +1039,9 @@ static WRITE8_HANDLER( alphaho_io_w )
 
 static ADDRESS_MAP_START( vicdual_dualgame_map, AS_PROGRAM, 8, vicdual_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE_LEGACY(vicdual_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE_LEGACY(vicdual_characterram_w) AM_BASE( m_characterram)
 ADDRESS_MAP_END
 
 
@@ -1055,7 +1055,7 @@ static ADDRESS_MAP_START( invho2_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(invho2_io_w)
+	AM_RANGE(0x00, 0x7f) AM_WRITE_LEGACY(invho2_io_w)
 ADDRESS_MAP_END
 
 
@@ -1069,7 +1069,7 @@ static ADDRESS_MAP_START( invds_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(invds_io_w)
+	AM_RANGE(0x00, 0x7f) AM_WRITE_LEGACY(invds_io_w)
 ADDRESS_MAP_END
 
 
@@ -1083,7 +1083,7 @@ static ADDRESS_MAP_START( sspacaho_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(sspacaho_io_w)
+	AM_RANGE(0x00, 0x7f) AM_WRITE_LEGACY(sspacaho_io_w)
 ADDRESS_MAP_END
 
 
@@ -1097,7 +1097,7 @@ static ADDRESS_MAP_START( tranqgun_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_WRITE(tranqgun_io_w)
+	AM_RANGE(0x00, 0x0f) AM_WRITE_LEGACY(tranqgun_io_w)
 ADDRESS_MAP_END
 
 
@@ -1111,7 +1111,7 @@ static ADDRESS_MAP_START( spacetrk_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(spacetrk_io_w)
+	AM_RANGE(0x00, 0x7f) AM_WRITE_LEGACY(spacetrk_io_w)
 ADDRESS_MAP_END
 
 
@@ -1125,7 +1125,7 @@ static ADDRESS_MAP_START( carnival_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(carnival_io_w)
+	AM_RANGE(0x00, 0x7f) AM_WRITE_LEGACY(carnival_io_w)
 ADDRESS_MAP_END
 
 
@@ -1139,7 +1139,7 @@ static ADDRESS_MAP_START( brdrline_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_WRITE(brdrline_io_w)
+	AM_RANGE(0x00, 0x0f) AM_WRITE_LEGACY(brdrline_io_w)
 ADDRESS_MAP_END
 
 
@@ -1153,7 +1153,7 @@ static ADDRESS_MAP_START( pulsar_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(pulsar_io_w)
+	AM_RANGE(0x00, 0x7f) AM_WRITE_LEGACY(pulsar_io_w)
 ADDRESS_MAP_END
 
 
@@ -1167,7 +1167,7 @@ static ADDRESS_MAP_START( heiankyo_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x0f) AM_WRITE(heiankyo_io_w)
+	AM_RANGE(0x00, 0x0f) AM_WRITE_LEGACY(heiankyo_io_w)
 ADDRESS_MAP_END
 
 
@@ -1181,7 +1181,7 @@ static ADDRESS_MAP_START( alphaho_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(alphaho_io_w)
+	AM_RANGE(0x00, 0x7f) AM_WRITE_LEGACY(alphaho_io_w)
 ADDRESS_MAP_END
 
 
@@ -2075,10 +2075,10 @@ static WRITE8_HANDLER( samurai_io_w )
 
 /* dual game hardware */
 static ADDRESS_MAP_START( samurai_map, AS_PROGRAM, 8, vicdual_state )
-	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM AM_WRITE(samurai_protection_w)
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM AM_WRITE_LEGACY(samurai_protection_w)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x7000) AM_RAM_WRITE_LEGACY(vicdual_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x8400, 0x87ff) AM_MIRROR(0x7000) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
+	AM_RANGE(0x8800, 0x8fff) AM_MIRROR(0x7000) AM_RAM_WRITE_LEGACY(vicdual_characterram_w) AM_BASE( m_characterram)
 ADDRESS_MAP_END
 
 
@@ -2092,7 +2092,7 @@ static ADDRESS_MAP_START( samurai_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can write to multiple locations at once */
-	AM_RANGE(0x00, 0x7f) AM_WRITE(samurai_io_w)
+	AM_RANGE(0x00, 0x7f) AM_WRITE_LEGACY(samurai_io_w)
 ADDRESS_MAP_END
 
 
@@ -2190,9 +2190,9 @@ static WRITE8_HANDLER( nsub_io_w )
 static ADDRESS_MAP_START( nsub_map, AS_PROGRAM, 8, vicdual_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_NOP	/* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(vicdual_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(vicdual_characterram_w) AM_BASE( m_characterram)
 ADDRESS_MAP_END
 
 
@@ -2201,7 +2201,7 @@ static ADDRESS_MAP_START( nsub_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(nsub_io_r, nsub_io_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE_LEGACY(nsub_io_r, nsub_io_w)
 ADDRESS_MAP_END
 
 
@@ -2286,9 +2286,9 @@ static WRITE8_HANDLER( invinco_io_w )
 static ADDRESS_MAP_START( invinco_map, AS_PROGRAM, 8, vicdual_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x4000) AM_ROM
     AM_RANGE(0x8000, 0xbfff) AM_NOP	/* unused */
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_videoram_w) AM_BASE_MEMBER(vicdual_state, m_videoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(vicdual_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xc400, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE(vicdual_characterram_w) AM_BASE_MEMBER(vicdual_state, m_characterram)
+	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_RAM_WRITE_LEGACY(vicdual_characterram_w) AM_BASE( m_characterram)
 ADDRESS_MAP_END
 
 
@@ -2297,7 +2297,7 @@ static ADDRESS_MAP_START( invinco_io_map, AS_IO, 8, vicdual_state )
 
 	/* no decoder, just logic gates, so in theory the
        game can read/write from multiple locations at once */
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(invinco_io_r, invinco_io_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE_LEGACY(invinco_io_r, invinco_io_w)
 ADDRESS_MAP_END
 
 

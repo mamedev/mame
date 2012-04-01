@@ -184,11 +184,11 @@ static WRITE8_HANDLER( mcu_port_p_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, arabian_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w)
+	AM_RANGE(0x8000, 0xbfff) AM_WRITE_LEGACY(arabian_videoram_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x01ff) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd7ff) AM_MIRROR(0x0800) AM_RAM AM_BASE_MEMBER(arabian_state, m_custom_cpu_ram)
-	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_BASE_MEMBER(arabian_state, m_blitter)
+	AM_RANGE(0xd000, 0xd7ff) AM_MIRROR(0x0800) AM_RAM AM_BASE( m_custom_cpu_ram)
+	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE_LEGACY(arabian_blitter_w) AM_BASE( m_blitter)
 ADDRESS_MAP_END
 
 
@@ -200,8 +200,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, arabian_state )
-	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -213,10 +213,10 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, arabian_state )
-	AM_RANGE(MB88_PORTK,  MB88_PORTK ) AM_READ(mcu_portk_r)
-	AM_RANGE(MB88_PORTO,  MB88_PORTO ) AM_WRITE(mcu_port_o_w)
-	AM_RANGE(MB88_PORTP,  MB88_PORTP ) AM_WRITE(mcu_port_p_w)
-	AM_RANGE(MB88_PORTR0, MB88_PORTR3) AM_READWRITE(mcu_port_r_r, mcu_port_r_w)
+	AM_RANGE(MB88_PORTK,  MB88_PORTK ) AM_READ_LEGACY(mcu_portk_r)
+	AM_RANGE(MB88_PORTO,  MB88_PORTO ) AM_WRITE_LEGACY(mcu_port_o_w)
+	AM_RANGE(MB88_PORTP,  MB88_PORTP ) AM_WRITE_LEGACY(mcu_port_p_w)
+	AM_RANGE(MB88_PORTR0, MB88_PORTR3) AM_READWRITE_LEGACY(mcu_port_r_r, mcu_port_r_w)
 ADDRESS_MAP_END
 
 

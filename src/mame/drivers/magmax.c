@@ -207,31 +207,31 @@ static WRITE16_HANDLER( magmax_vreg_w )
 static ADDRESS_MAP_START( magmax_map, AS_PROGRAM, 16, magmax_state )
 	AM_RANGE(0x000000, 0x013fff) AM_ROM
 	AM_RANGE(0x018000, 0x018fff) AM_RAM
-	AM_RANGE(0x020000, 0x0207ff) AM_RAM AM_BASE_MEMBER(magmax_state, m_videoram)
-	AM_RANGE(0x028000, 0x0281ff) AM_RAM AM_BASE_SIZE_MEMBER(magmax_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x020000, 0x0207ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x028000, 0x0281ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x030000, 0x030001) AM_READ_PORT("P1")
 	AM_RANGE(0x030002, 0x030003) AM_READ_PORT("P2")
 	AM_RANGE(0x030004, 0x030005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x030006, 0x030007) AM_READ_PORT("DSW")
-	AM_RANGE(0x030010, 0x030011) AM_WRITE(magmax_vreg_w) AM_BASE_MEMBER(magmax_state, m_vreg)
-	AM_RANGE(0x030012, 0x030013) AM_WRITEONLY AM_BASE_MEMBER(magmax_state, m_scroll_x)
-	AM_RANGE(0x030014, 0x030015) AM_WRITEONLY AM_BASE_MEMBER(magmax_state, m_scroll_y)
-	AM_RANGE(0x03001c, 0x03001d) AM_WRITE(magmax_sound_w)
+	AM_RANGE(0x030010, 0x030011) AM_WRITE_LEGACY(magmax_vreg_w) AM_BASE( m_vreg)
+	AM_RANGE(0x030012, 0x030013) AM_WRITEONLY AM_BASE( m_scroll_x)
+	AM_RANGE(0x030014, 0x030015) AM_WRITEONLY AM_BASE( m_scroll_y)
+	AM_RANGE(0x03001c, 0x03001d) AM_WRITE_LEGACY(magmax_sound_w)
 	AM_RANGE(0x03001e, 0x03001f) AM_WRITENOP	/* IRQ ack */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magmax_sound_map, AS_PROGRAM, 8, magmax_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_READ(magmax_sound_irq_ack)
+	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(magmax_sound_irq_ack)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magmax_sound_io_map, AS_IO, 8, magmax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay3", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_READ(magmax_sound_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
+	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(magmax_sound_r)
 ADDRESS_MAP_END
 
 

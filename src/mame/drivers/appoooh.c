@@ -220,23 +220,23 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, appoooh_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM /* RAM ? */
 
-	AM_RANGE(0xf000, 0xf01f) AM_BASE_MEMBER(appoooh_state, m_spriteram)
-	AM_RANGE(0xf020, 0xf3ff) AM_WRITE(appoooh_fg_videoram_w) AM_BASE_MEMBER(appoooh_state, m_fg_videoram)
-	AM_RANGE(0xf420, 0xf7ff) AM_WRITE(appoooh_fg_colorram_w) AM_BASE_MEMBER(appoooh_state, m_fg_colorram)
-	AM_RANGE(0xf800, 0xf81f) AM_BASE_MEMBER(appoooh_state, m_spriteram_2)
-	AM_RANGE(0xf820, 0xfbff) AM_WRITE(appoooh_bg_videoram_w) AM_BASE_MEMBER(appoooh_state, m_bg_videoram)
-	AM_RANGE(0xfc20, 0xffff) AM_WRITE(appoooh_bg_colorram_w) AM_BASE_MEMBER(appoooh_state, m_bg_colorram)
+	AM_RANGE(0xf000, 0xf01f) AM_BASE( m_spriteram)
+	AM_RANGE(0xf020, 0xf3ff) AM_WRITE_LEGACY(appoooh_fg_videoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0xf420, 0xf7ff) AM_WRITE_LEGACY(appoooh_fg_colorram_w) AM_BASE( m_fg_colorram)
+	AM_RANGE(0xf800, 0xf81f) AM_BASE( m_spriteram_2)
+	AM_RANGE(0xf820, 0xfbff) AM_WRITE_LEGACY(appoooh_bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0xfc20, 0xffff) AM_WRITE_LEGACY(appoooh_bg_colorram_w) AM_BASE( m_bg_colorram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, appoooh_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76496_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(appoooh_adpcm_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("BUTTON3") AM_WRITE(appoooh_out_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(appoooh_scroll_w) /* unknown */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(appoooh_adpcm_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("BUTTON3") AM_WRITE_LEGACY(appoooh_out_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(appoooh_scroll_w) /* unknown */
 ADDRESS_MAP_END
 
 

@@ -166,11 +166,11 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 static ADDRESS_MAP_START( sauro_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE_MEMBER(sauro_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_BASE_MEMBER(sauro_state, m_videoram)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_BASE_MEMBER(sauro_state, m_colorram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(tecfri_videoram2_w) AM_BASE_MEMBER(sauro_state, m_videoram2)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(tecfri_colorram2_w) AM_BASE_MEMBER(sauro_state, m_colorram2)
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE_LEGACY(tecfri_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE_LEGACY(tecfri_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE_LEGACY(tecfri_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE_LEGACY(tecfri_colorram2_w) AM_BASE( m_colorram2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
@@ -179,31 +179,31 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW2")
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("P1")
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("P2")
-	AM_RANGE(0x80, 0x80) AM_WRITE(sauro_sound_command_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(tecfri_scroll_bg_w)
-	AM_RANGE(0xa1, 0xa1) AM_WRITE(sauro_scroll_fg_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(flip_screen_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(sauro_sound_command_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE_LEGACY(tecfri_scroll_bg_w)
+	AM_RANGE(0xa1, 0xa1) AM_WRITE_LEGACY(sauro_scroll_fg_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(flip_screen_w)
 	AM_RANGE(0xc2, 0xc2) AM_WRITENOP		/* coin reset */
-	AM_RANGE(0xc3, 0xc3) AM_WRITE(sauro_coin1_w)
+	AM_RANGE(0xc3, 0xc3) AM_WRITE_LEGACY(sauro_coin1_w)
 	AM_RANGE(0xc4, 0xc4) AM_WRITENOP		/* coin reset */
-	AM_RANGE(0xc5, 0xc5) AM_WRITE(sauro_coin2_w)
+	AM_RANGE(0xc5, 0xc5) AM_WRITE_LEGACY(sauro_coin2_w)
 	AM_RANGE(0xc6, 0xc7) AM_WRITENOP		/* same as 0x80 - verified with debugger */
 	AM_RANGE(0xc8, 0xc8) AM_WRITENOP		/* written every int: 0 written at end   of isr */
 	AM_RANGE(0xc9, 0xc9) AM_WRITENOP		/* written every int: 1 written at start of isr */
-	AM_RANGE(0xca, 0xcb) AM_WRITE(sauro_palette_bank_w)	/* 1 written upon death, cleared 2 vblanks later */
+	AM_RANGE(0xca, 0xcb) AM_WRITE_LEGACY(sauro_palette_bank_w)	/* 1 written upon death, cleared 2 vblanks later */
 														/* Sequence 3,2,1 written during intro screen */
 	AM_RANGE(0xcc, 0xcc) AM_WRITENOP		/* same as 0xca */
 	AM_RANGE(0xcd, 0xcd) AM_WRITENOP		/* same as 0xcb */
 	AM_RANGE(0xce, 0xce) AM_WRITENOP		/* only written at startup */
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", adpcm_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("speech", adpcm_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(sauro_sound_command_r)
 	AM_RANGE(0xe000, 0xe006) AM_WRITENOP	/* echo from write to e0000 */
 	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP
 ADDRESS_MAP_END
@@ -212,21 +212,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_BASE_SIZE_MEMBER(sauro_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_BASE_MEMBER(sauro_state, m_videoram)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_BASE_MEMBER(sauro_state, m_colorram)
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE_LEGACY(tecfri_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE_LEGACY(tecfri_colorram_w) AM_BASE( m_colorram)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("P1")
 	AM_RANGE(0xf818, 0xf818) AM_READ_PORT("P2")
-	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ymsnd", ym3812_w)
-	AM_RANGE(0xf828, 0xf828) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xf830, 0xf830) AM_WRITE(tecfri_scroll_bg_w)
+	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0xf828, 0xf828) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xf830, 0xf830) AM_WRITE_LEGACY(tecfri_scroll_bg_w)
 	AM_RANGE(0xf838, 0xf838) AM_WRITENOP				/* only written at startup */
-	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xf83a, 0xf83a) AM_WRITE(sauro_coin1_w)
-	AM_RANGE(0xf83b, 0xf83b) AM_WRITE(sauro_coin2_w)
-	AM_RANGE(0xf83c, 0xf83c) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf839, 0xf839) AM_WRITE_LEGACY(flip_screen_w)
+	AM_RANGE(0xf83a, 0xf83a) AM_WRITE_LEGACY(sauro_coin1_w)
+	AM_RANGE(0xf83b, 0xf83b) AM_WRITE_LEGACY(sauro_coin2_w)
+	AM_RANGE(0xf83c, 0xf83c) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP				/* only written at startup */
 ADDRESS_MAP_END
 

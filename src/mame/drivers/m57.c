@@ -66,11 +66,11 @@
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m57_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(m57_videoram_w) AM_BASE_MEMBER(m57_state, m_videoram)
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_MEMBER(m57_state, m_scrollram)
-	AM_RANGE(0xc820, 0xc8ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(m57_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(m57_flipscreen_w)	/* + coin counters */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(m57_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE( m_scrollram)
+	AM_RANGE(0xc820, 0xc8ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(irem_sound_cmd_w)
+	AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(m57_flipscreen_w)	/* + coin counters */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("IN1")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN2")

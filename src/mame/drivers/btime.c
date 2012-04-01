@@ -356,36 +356,36 @@ static WRITE8_HANDLER( disco_w )
 
 
 static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(btime_w)	/* override the following entries to */
+	AM_RANGE(0x0000, 0xffff) AM_WRITE_LEGACY(btime_w)	/* override the following entries to */
 												/* support ROM decryption */
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
-	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(btime_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE( m_rambase)
+	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE_LEGACY(btime_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE_LEGACY(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
+	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE_LEGACY(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITENOP
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("P2")
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_WRITE(audio_command_w)
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE(bnj_scroll1_w)
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(btime_video_control_w)
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(audio_command_w)
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(bnj_scroll1_w)
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE( m_rambase)
 	AM_RANGE(0x0500, 0x3fff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0xc800, 0xcbff) AM_READWRITE_LEGACY(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE_LEGACY(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
 	AM_RANGE(0xd000, 0xd0ff) AM_RAM							/* background? */
 	AM_RANGE(0xd100, 0xd3ff) AM_RAM							/* ? */
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_bnj_backgroundram, m_bnj_backgroundram_size)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1") AM_WRITE(bnj_video_control_w)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_SIZE( m_bnj_backgroundram, m_bnj_backgroundram_size)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(bnj_video_control_w)
 	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1")	/* mirror address used on high score name entry */
 													/* screen */
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
+	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(audio_command_w)
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P1")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("P2")
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("SYSTEM")
@@ -393,132 +393,132 @@ static ADDRESS_MAP_START( cookrace_map, AS_PROGRAM, 8, btime_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(tisland_w)	/* override the following entries to */
+	AM_RANGE(0x0000, 0xffff) AM_WRITE_LEGACY(tisland_w)	/* override the following entries to */
 													/* support ROM decryption */
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
-	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(btime_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE( m_rambase)
+	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE_LEGACY(btime_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE_LEGACY(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
+	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE_LEGACY(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITENOP
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("P2")
-	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_WRITE(audio_command_w)
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE(bnj_scroll1_w)
-	AM_RANGE(0x4005, 0x4005) AM_WRITE(bnj_scroll2_w)
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(btime_video_control_w)
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(audio_command_w)
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(bnj_scroll1_w)
+	AM_RANGE(0x4005, 0x4005) AM_WRITE_LEGACY(bnj_scroll2_w)
 	AM_RANGE(0x9000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zoar_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(zoar_w)	/* override the following entries to */
+	AM_RANGE(0x0000, 0xffff) AM_WRITE_LEGACY(zoar_w)	/* override the following entries to */
 												/* support ROM decryption */
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_WRITEONLY AM_BASE_MEMBER(btime_state, m_colorram)
-	AM_RANGE(0x8800, 0x8bff) AM_WRITE(btime_mirrorvideoram_w)
-	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(btime_mirrorcolorram_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(zoar_video_control_w)
-	AM_RANGE(0x9800, 0x9800) AM_READ(zoar_dsw1_read)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE( m_rambase)
+	AM_RANGE(0x8000, 0x83ff) AM_WRITEONLY AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x8400, 0x87ff) AM_WRITEONLY AM_BASE( m_colorram)
+	AM_RANGE(0x8800, 0x8bff) AM_WRITE_LEGACY(btime_mirrorvideoram_w)
+	AM_RANGE(0x8c00, 0x8fff) AM_WRITE_LEGACY(btime_mirrorcolorram_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(zoar_video_control_w)
+	AM_RANGE(0x9800, 0x9800) AM_READ_LEGACY(zoar_dsw1_read)
 	AM_RANGE(0x9801, 0x9801) AM_READ_PORT("DSW2")
 	AM_RANGE(0x9802, 0x9802) AM_READ_PORT("P1")
 	AM_RANGE(0x9803, 0x9803) AM_READ_PORT("P2")
-	AM_RANGE(0x9800, 0x9803) AM_WRITEONLY AM_BASE_MEMBER(btime_state, m_zoar_scrollram)
-	AM_RANGE(0x9804, 0x9804) AM_READ_PORT("SYSTEM") AM_WRITE(bnj_scroll2_w)
-	AM_RANGE(0x9805, 0x9805) AM_WRITE(bnj_scroll1_w)
-	AM_RANGE(0x9806, 0x9806) AM_WRITE(audio_command_w)
+	AM_RANGE(0x9800, 0x9803) AM_WRITEONLY AM_BASE( m_zoar_scrollram)
+	AM_RANGE(0x9804, 0x9804) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(bnj_scroll2_w)
+	AM_RANGE(0x9805, 0x9805) AM_WRITE_LEGACY(bnj_scroll1_w)
+	AM_RANGE(0x9806, 0x9806) AM_WRITE_LEGACY(audio_command_w)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lnc_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(lnc_w)	/* override the following entries to */
+	AM_RANGE(0x0000, 0xffff) AM_WRITE_LEGACY(lnc_w)	/* override the following entries to */
 												/* support ROM decryption */
-	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_BASE_MEMBER(btime_state, m_colorram)  /* this is just here to initialize the pointer */
-	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
+	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE( m_rambase)
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE_LEGACY(lnc_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_BASE( m_colorram)  /* this is just here to initialize the pointer */
+	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE_LEGACY(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW1") AM_WRITENOP     /* ??? */
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_BASE_MEMBER(btime_state, m_lnc_charbank)
+	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(bnj_video_control_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_BASE( m_lnc_charbank)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("P1") AM_WRITENOP     /* IRQ ack??? */
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("P2")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_WRITE(audio_command_w)
+	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(audio_command_w)
 	AM_RANGE(0xb000, 0xb1ff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmonkey_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(mmonkey_w)	/* override the following entries to */
+	AM_RANGE(0x0000, 0xffff) AM_WRITE_LEGACY(mmonkey_w)	/* override the following entries to */
 													/* support ROM decryption */
-	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(lnc_videoram_w) AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_BASE_MEMBER(btime_state, m_colorram)		/* this is just here to initialize the pointer */
-	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
+	AM_RANGE(0x0000, 0x3bff) AM_RAM AM_BASE( m_rambase)
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE_LEGACY(lnc_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x7800, 0x7bff) AM_WRITEONLY AM_BASE( m_colorram)		/* this is just here to initialize the pointer */
+	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE_LEGACY(btime_mirrorvideoram_r, lnc_mirrorvideoram_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_BASE_MEMBER(btime_state, m_lnc_charbank)
+	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(bnj_video_control_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_BASE( m_lnc_charbank)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("P1") AM_WRITENOP	/* IRQ ack??? */
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("P2")
-	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_WRITE(audio_command_w)
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(mmonkey_protection_r, mmonkey_protection_w)
+	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(audio_command_w)
+	AM_RANGE(0xb000, 0xbfff) AM_READWRITE_LEGACY(mmonkey_protection_r, mmonkey_protection_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE( m_rambase)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW2") AM_WRITE(bnj_video_control_w)
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1") AM_WRITE(audio_command_w)
+	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(bnj_video_control_w)
+	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1") AM_WRITE_LEGACY(audio_command_w)
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("P2")
 	AM_RANGE(0x1004, 0x1004) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
-	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
-	AM_RANGE(0x5000, 0x51ff) AM_WRITE(bnj_background_w) AM_BASE_SIZE_MEMBER(btime_state, m_bnj_backgroundram, m_bnj_backgroundram_size)
-	AM_RANGE(0x5400, 0x5400) AM_WRITE(bnj_scroll1_w)
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(bnj_scroll2_w)
-	AM_RANGE(0x5c00, 0x5c0f) AM_WRITE(btime_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_READWRITE_LEGACY(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
+	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE_LEGACY(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
+	AM_RANGE(0x5000, 0x51ff) AM_WRITE_LEGACY(bnj_background_w) AM_BASE_SIZE( m_bnj_backgroundram, m_bnj_backgroundram_size)
+	AM_RANGE(0x5400, 0x5400) AM_WRITE_LEGACY(bnj_scroll1_w)
+	AM_RANGE(0x5800, 0x5800) AM_WRITE_LEGACY(bnj_scroll2_w)
+	AM_RANGE(0x5c00, 0x5c0f) AM_WRITE_LEGACY(btime_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( disco_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(disco_w)	/* override the following entries to */
+	AM_RANGE(0x0000, 0xffff) AM_WRITE_LEGACY(disco_w)	/* override the following entries to */
 												/* support ROM decryption */
-	AM_RANGE(0x0000, 0x04ff) AM_RAM AM_BASE_MEMBER(btime_state, m_rambase)
-	AM_RANGE(0x2000, 0x7fff) AM_RAM_WRITE(deco_charram_w) AM_BASE_MEMBER(btime_state, m_deco_charram)
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
-	AM_RANGE(0x8800, 0x881f) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0000, 0x04ff) AM_RAM AM_BASE( m_rambase)
+	AM_RANGE(0x2000, 0x7fff) AM_RAM_WRITE_LEGACY(deco_charram_w) AM_BASE( m_deco_charram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0x8800, 0x881f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1")
 	AM_RANGE(0x9400, 0x9400) AM_READ_PORT("P2")
 	AM_RANGE(0x9800, 0x9800) AM_READ_PORT("DSW1")
-	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_WRITE(audio_command_w)
-	AM_RANGE(0x9c00, 0x9c00) AM_READ_PORT("VBLANK") AM_WRITE(disco_video_control_w)
+	AM_RANGE(0x9a00, 0x9a00) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(audio_command_w)
+	AM_RANGE(0x9c00, 0x9c00) AM_READ_PORT("VBLANK") AM_WRITE_LEGACY(disco_video_control_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, btime_state )
-	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_BASE_MEMBER(btime_state, m_audio_rambase)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x7fff) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xbfff) AM_READ(audio_command_r)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(audio_nmi_enable_w)
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM AM_BASE( m_audio_rambase)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x5fff) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x7fff) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x9fff) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa000, 0xbfff) AM_READ_LEGACY(audio_command_r)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE_LEGACY(audio_nmi_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0x8000, 0x8fff) AM_READ(soundlatch_r) AM_WRITENOP /* ack ? */
+	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0x8000, 0x8fff) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP /* ack ? */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

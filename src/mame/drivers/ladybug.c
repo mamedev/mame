@@ -132,17 +132,17 @@ static WRITE8_HANDLER( sraider_misc_w )
 static ADDRESS_MAP_START( ladybug_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8000, 0x8fff) AM_READNOP
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
 	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
 	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(ladybug_flipscreen_w)
-	AM_RANGE(0xb000, 0xbfff) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(ladybug_videoram_w) AM_BASE_MEMBER(ladybug_state, m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(ladybug_colorram_w) AM_BASE_MEMBER(ladybug_state, m_colorram)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(ladybug_flipscreen_w)
+	AM_RANGE(0xb000, 0xbfff) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(ladybug_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(ladybug_colorram_w) AM_BASE( m_colorram)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
@@ -150,16 +150,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sraider_cpu1_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x8005, 0x8005) AM_READ(sraider_8005_r)  // protection check?
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(sraider_sound_low_w)
-	AM_RANGE(0x8007, 0x8007) AM_WRITE(sraider_sound_high_w)
+	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8005, 0x8005) AM_READ_LEGACY(sraider_8005_r)  // protection check?
+	AM_RANGE(0x8006, 0x8006) AM_WRITE_LEGACY(sraider_sound_low_w)
+	AM_RANGE(0x8007, 0x8007) AM_WRITE_LEGACY(sraider_sound_high_w)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
 	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
 	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(ladybug_videoram_w) AM_BASE_MEMBER(ladybug_state, m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(ladybug_colorram_w) AM_BASE_MEMBER(ladybug_state, m_colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_WRITE_LEGACY(ladybug_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_WRITE_LEGACY(ladybug_colorram_w) AM_BASE( m_colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITENOP  //unknown 0x10 when in attract, 0x20 when coined/playing
 ADDRESS_MAP_END
 
@@ -167,22 +167,22 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sraider_cpu2_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(sraider_sound_low_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(sraider_sound_high_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(sraider_sound_low_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(sraider_sound_high_r)
 	AM_RANGE(0xc000, 0xc000) AM_READNOP //some kind of sync
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_MEMBER(ladybug_state, m_grid_data)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(sraider_io_w)
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE( m_grid_data)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(sraider_io_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sraider_cpu2_io_map, AS_IO, 8, ladybug_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("sn3", sn76496_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("sn4", sn76496_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn5", sn76496_w)
-	AM_RANGE(0x28, 0x3f) AM_WRITE(sraider_misc_w)  // lots unknown
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE_LEGACY("sn4", sn76496_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("sn5", sn76496_w)
+	AM_RANGE(0x28, 0x3f) AM_WRITE_LEGACY(sraider_misc_w)  // lots unknown
 ADDRESS_MAP_END
 
 

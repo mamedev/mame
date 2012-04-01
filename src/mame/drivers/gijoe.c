@@ -167,41 +167,41 @@ static void sound_nmi( device_t *device )
 
 static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE_MEMBER(gijoe_state, m_spriteram)								// Sprites
-	AM_RANGE(0x110000, 0x110007) AM_DEVWRITE("k053246", k053246_word_w)
-	AM_RANGE(0x120000, 0x121fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)		// Graphic planes
-	AM_RANGE(0x122000, 0x123fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)		// Graphic planes mirror read
-	AM_RANGE(0x130000, 0x131fff) AM_DEVREAD("k056832", k056832_rom_word_r)								// Passthrough to tile roms
-	AM_RANGE(0x160000, 0x160007) AM_DEVWRITE("k056832", k056832_b_word_w)									// VSCCS (board dependent)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE( m_spriteram)								// Sprites
+	AM_RANGE(0x110000, 0x110007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
+	AM_RANGE(0x120000, 0x121fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)		// Graphic planes
+	AM_RANGE(0x122000, 0x123fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)		// Graphic planes mirror read
+	AM_RANGE(0x130000, 0x131fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)								// Passthrough to tile roms
+	AM_RANGE(0x160000, 0x160007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)									// VSCCS (board dependent)
 	AM_RANGE(0x170000, 0x170001) AM_WRITENOP												// Watchdog
-	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE_MEMBER(gijoe_state, m_workram)					// Main RAM.  Spec. 180000-1803ff, 180400-187fff
-	AM_RANGE(0x190000, 0x190fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE("k053251", k053251_lsb_w)
-	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE("k056832", k056832_word_w)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0x1c0014, 0x1c0015) AM_READ(sound_status_r)
+	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE( m_workram)					// Main RAM.  Spec. 180000-1803ff, 180400-187fff
+	AM_RANGE(0x190000, 0x190fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
+	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)
+	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE_LEGACY(sound_cmd_w)
+	AM_RANGE(0x1c0014, 0x1c0015) AM_READ_LEGACY(sound_status_r)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM
-	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE_LEGACY(sound_irq_w)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1e0002, 0x1e0003) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x1e4000, 0x1e4001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1e4002, 0x1e4003) AM_READ_PORT("START")
-	AM_RANGE(0x1e8000, 0x1e8001) AM_READWRITE(control2_r, control2_w)
-	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVREAD("k053246", k053246_word_r)
+	AM_RANGE(0x1e8000, 0x1e8001) AM_READWRITE_LEGACY(control2_r, control2_w)
+	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
 #if JOE_DEBUG
-	AM_RANGE(0x110000, 0x110007) AM_DEVREAD("k053246", k053246_reg_word_r)
-	AM_RANGE(0x160000, 0x160007) AM_DEVREAD("k056832", k056832_b_word_r)
-	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREAD("k053251", k053251_lsb_r)
-	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVREAD("k056832", k056832_word_r)
+	AM_RANGE(0x110000, 0x110007) AM_DEVREAD_LEGACY("k053246", k053246_reg_word_r)
+	AM_RANGE(0x160000, 0x160007) AM_DEVREAD_LEGACY("k056832", k056832_b_word_r)
+	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVREAD_LEGACY("k053251", k053251_lsb_r)
+	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVREAD_LEGACY("k056832", k056832_word_r)
 #endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gijoe_state )
 	AM_RANGE(0x0000, 0xebff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE_MODERN("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(soundlatch2_w)
+	AM_RANGE(0xfc02, 0xfc02) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gijoe )

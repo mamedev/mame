@@ -517,21 +517,21 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32, psikyosh_state )
 	AM_RANGE(0x02000000, 0x021fffff) AM_ROMBANK("bank1") // data ROM
 // video chip
 	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_SHARE("spriteram") // video banks0-7 (sprites and sprite list)
-	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_bgram) // video banks 7-0x1f (backgrounds and other effects)
-	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, m_paletteram) // palette..
-	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_zoomram) // sprite zoom lookup table
-	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
-	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE_MEMBER(psikyosh_state, m_vidregs) //  video registers
+	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE( m_bgram) // video banks 7-0x1f (backgrounds and other effects)
+	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE_LEGACY(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE( m_paletteram) // palette..
+	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE( m_zoomram) // sprite zoom lookup table
+	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP AM_WRITE_LEGACY(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
+	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE_LEGACY(psikyosh_vidregs_w) AM_BASE( m_vidregs) //  video registers
 	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx) (Mirrored?)
 // sound chip
-	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
+	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8_LEGACY("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
 // inputs/eeprom
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x05800004, 0x05800007) AM_DEVREADWRITE("eeprom", psh_eeprom_r, psh_eeprom_w)
+	AM_RANGE(0x05800004, 0x05800007) AM_DEVREADWRITE_LEGACY("eeprom", psh_eeprom_r, psh_eeprom_w)
 // ram
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_ram) // main RAM (1 meg)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE( m_ram) // main RAM (1 meg)
 ADDRESS_MAP_END
 
 // ps5, ps5v2
@@ -540,21 +540,21 @@ static ADDRESS_MAP_START( ps5_map, AS_PROGRAM, 32, psikyosh_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM // program ROM (1 meg)
 // inputs/eeprom
 	AM_RANGE(0x03000000, 0x03000003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x03000004, 0x03000007) AM_DEVREADWRITE("eeprom", psh_eeprom_r, psh_eeprom_w)
+	AM_RANGE(0x03000004, 0x03000007) AM_DEVREADWRITE_LEGACY("eeprom", psh_eeprom_r, psh_eeprom_w)
 // sound chip
-	AM_RANGE(0x03100000, 0x03100007) AM_DEVREADWRITE8("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
+	AM_RANGE(0x03100000, 0x03100007) AM_DEVREADWRITE8_LEGACY("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
 // video chip
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("spriteram") // video banks0-7 (sprites and sprite list)
-	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_bgram) // video banks 7-0x1f (backgrounds and other effects)
-	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE_MEMBER(psikyosh_state, m_paletteram)
-	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_zoomram) // sprite zoom lookup table
-	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
-	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE_MEMBER(psikyosh_state, m_vidregs) // video registers
+	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE( m_bgram) // video banks 7-0x1f (backgrounds and other effects)
+	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE_LEGACY(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE( m_paletteram)
+	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE( m_zoomram) // sprite zoom lookup table
+	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE_LEGACY(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
+	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE_LEGACY(psikyosh_vidregs_w) AM_BASE( m_vidregs) // video registers
 	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	AM_RANGE(0x05000000, 0x0507ffff) AM_ROMBANK("bank1") // data ROM
 // ram
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(psikyosh_state, m_ram)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE( m_ram)
 ADDRESS_MAP_END
 
 

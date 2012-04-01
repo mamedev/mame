@@ -78,13 +78,13 @@ Notes:
 
 static ADDRESS_MAP_START( namcond1_map, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_BASE_MEMBER(namcond1_state, m_shared_ram)
-	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(ygv608_r,ygv608_w)
-	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8("at28c16", at28c16_r, at28c16_w, 0xff00)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_BASE( m_shared_ram)
+	AM_RANGE(0x800000, 0x80000f) AM_READWRITE_LEGACY(ygv608_r,ygv608_w)
+	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0xff00)
 #ifdef MAME_DEBUG
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(ygv608_debug_trigger)
+	AM_RANGE(0xb00000, 0xb00001) AM_READ_LEGACY(ygv608_debug_trigger)
 #endif
-	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE(namcond1_cuskey_r,namcond1_cuskey_w)
+	AM_RANGE(0xc3ff00, 0xc3ffff) AM_READWRITE_LEGACY(namcond1_cuskey_r,namcond1_cuskey_w)
 ADDRESS_MAP_END
 
 /*************************************************************/
@@ -253,8 +253,8 @@ static WRITE8_HANDLER( mcu_pa_write )
 /* H8/3002 MCU stuff */
 static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
-	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
+	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE_LEGACY( sharedram_sub_r, sharedram_sub_w )
+	AM_RANGE(0xa00000, 0xa07fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xc00010, 0xc00011) AM_NOP
@@ -263,8 +263,8 @@ static ADDRESS_MAP_START( nd1h8rwmap, AS_PROGRAM, 16, namcond1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 8, namcond1_state )
-	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ( mcu_p7_read )
-	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( mcu_pa_read, mcu_pa_write )
+	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_LEGACY( mcu_p7_read )
+	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE_LEGACY( mcu_pa_read, mcu_pa_write )
 	AM_RANGE(H8_ADC_0_L, H8_ADC_3_H) AM_NOP // MCU reads these, but the games have no analog controls
 ADDRESS_MAP_END
 

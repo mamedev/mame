@@ -147,17 +147,17 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 *****************************************************************************************************/
 
 static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32, limenko_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE_MEMBER(limenko_state, m_mainram)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE( m_mainram)
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("user2",0)
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(limenko_state, m_fg_videoram)
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE_MEMBER(limenko_state, m_md_videoram)
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE_MEMBER(limenko_state, m_bg_videoram)
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE_MEMBER(limenko_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE_MEMBER(limenko_state, m_spriteram2)
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE_LEGACY(fg_videoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE_LEGACY(md_videoram_w) AM_BASE( m_md_videoram)
+	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE_LEGACY(bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE( m_spriteram2)
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE_LEGACY(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
-	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE_MEMBER(limenko_state, m_videoreg)
-	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
+	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE( m_videoreg)
+	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE_LEGACY(spriteram_buffer_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -165,7 +165,7 @@ static ADDRESS_MAP_START( limenko_io_map, AS_IO, 32, limenko_state )
 	AM_RANGE(0x0000, 0x0003) AM_READ_PORT("IN0")
 	AM_RANGE(0x0800, 0x0803) AM_READ_PORT("IN1")
 	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
-	AM_RANGE(0x4000, 0x4003) AM_WRITE(limenko_coincounter_w)
+	AM_RANGE(0x4000, 0x4003) AM_WRITE_LEGACY(limenko_coincounter_w)
 	AM_RANGE(0x4800, 0x4803) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x5000, 0x5003) AM_WRITENOP // sound latch
 ADDRESS_MAP_END
@@ -174,17 +174,17 @@ ADDRESS_MAP_END
 /* Spotty memory map */
 
 static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32, limenko_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE_MEMBER(limenko_state, m_mainram)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE( m_mainram)
 	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(limenko_state, m_fg_videoram)
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE_MEMBER(limenko_state, m_md_videoram)
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE_MEMBER(limenko_state, m_bg_videoram)
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE_MEMBER(limenko_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE_MEMBER(limenko_state, m_spriteram2)
-	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE_LEGACY(fg_videoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE_LEGACY(md_videoram_w) AM_BASE( m_md_videoram)
+	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE_LEGACY(bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE( m_spriteram2)
+	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE_LEGACY(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
-	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE_MEMBER(limenko_state, m_videoreg)
-	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
+	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE( m_videoreg)
+	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE_LEGACY(spriteram_buffer_w)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( spotty_io_map, AS_IO, 32, limenko_state )
 	AM_RANGE(0x0800, 0x0803) AM_WRITENOP // hopper related
 	AM_RANGE(0x1000, 0x1003) AM_READ_PORT("IN2")
 	AM_RANGE(0x4800, 0x4803) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x5000, 0x5003) AM_WRITE(spotty_soundlatch_w)
+	AM_RANGE(0x5000, 0x5003) AM_WRITE_LEGACY(spotty_soundlatch_w)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( spotty_sound_cmd_w )
@@ -220,8 +220,8 @@ static READ8_HANDLER( spotty_sound_r )
 }
 
 static ADDRESS_MAP_START( spotty_sound_io_map, AS_IO, 8, limenko_state )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(spotty_sound_r) AM_DEVWRITE_MODERN("oki", okim6295_device, write) //? sound latch and ?
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_LEGACY(spotty_sound_r) AM_DEVWRITE("oki", okim6295_device, write) //? sound latch and ?
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE_LEGACY(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
 ADDRESS_MAP_END
 
 /*****************************************************************************************************

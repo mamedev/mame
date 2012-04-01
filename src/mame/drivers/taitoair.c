@@ -404,20 +404,20 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_BASE_MEMBER(taitoair_state, m_m68000_mainram)
-	AM_RANGE(0x140000, 0x140001) AM_WRITE(system_control_w)	/* Pause the TMS32025 */
-	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(airsys_gradram_w) AM_BASE_MEMBER(taitoair_state, m_gradram)           		/* "gradiation ram (0/1)" */
-	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE(airsys_paletteram16_w) AM_BASE_MEMBER(taitoair_state, m_paletteram)
-	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)	/* tilemaps, sprites */
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_BASE( m_m68000_mainram)
+	AM_RANGE(0x140000, 0x140001) AM_WRITE_LEGACY(system_control_w)	/* Pause the TMS32025 */
+	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE_LEGACY(airsys_gradram_w) AM_BASE( m_gradram)           		/* "gradiation ram (0/1)" */
+	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE_LEGACY(airsys_paletteram16_w) AM_BASE( m_paletteram)
+	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE_LEGACY("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)	/* tilemaps, sprites */
 	AM_RANGE(0x906000, 0x906007) AM_RAM // DMA?
-	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_BASE_MEMBER(taitoair_state, m_line_ram)	/* "line ram" */
-	AM_RANGE(0x910000, 0x91ffff) AM_RAM	AM_BASE_MEMBER(taitoair_state, m_dsp_ram)	/* "dsp common ram" (TMS320C25) */
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE_MEMBER(taitoair_state, m_backregs)
-	AM_RANGE(0xa00000, 0xa00007) AM_READ(stick_input_r)
-	AM_RANGE(0xa00100, 0xa00107) AM_READ(stick2_input_r)
-	AM_RANGE(0xa00200, 0xa0020f) AM_DEVREADWRITE8("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)	/* other I/O */
-	AM_RANGE(0xa80000, 0xa80001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_port_w, 0x00ff)
-	AM_RANGE(0xa80002, 0xa80003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
+	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_BASE( m_line_ram)	/* "line ram" */
+	AM_RANGE(0x910000, 0x91ffff) AM_RAM	AM_BASE( m_dsp_ram)	/* "dsp common ram" (TMS320C25) */
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE( m_backregs)
+	AM_RANGE(0xa00000, 0xa00007) AM_READ_LEGACY(stick_input_r)
+	AM_RANGE(0xa00100, 0xa00107) AM_READ_LEGACY(stick2_input_r)
+	AM_RANGE(0xa00200, 0xa0020f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)	/* other I/O */
+	AM_RANGE(0xa80000, 0xa80001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
+	AM_RANGE(0xa80002, 0xa80003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM						/* "power common ram" (mecha drive) */
 ADDRESS_MAP_END
 
@@ -427,14 +427,14 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitoair_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP		/* pan control */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP		/* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP		/* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(sound_bankswitch_w)
 ADDRESS_MAP_END
 
 /********************************** TMS32025 ********************************/
@@ -473,26 +473,26 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16, taitoair_state )
 	AM_RANGE(0x2003, 0x2003) AM_READNOP //bit 0 DMA status flag or vblank
-	AM_RANGE(0x3000, 0x3002) AM_WRITE(dsp_flags_w)
-	AM_RANGE(0x3404, 0x3404) AM_WRITE(dsp_frustum_left_w)
-	AM_RANGE(0x3405, 0x3405) AM_WRITE(dsp_x_eyecoord_w)
-	AM_RANGE(0x3406, 0x3406) AM_WRITE(dsp_z_eyecoord_w)
-	AM_RANGE(0x3407, 0x3407) AM_READ(dsp_x_return_r)
-	AM_RANGE(0x3408, 0x3408) AM_WRITE(dsp_frustum_bottom_w)
-	AM_RANGE(0x3409, 0x3409) AM_WRITE(dsp_y_eyecoord_w)
-	AM_RANGE(0x340a, 0x340a) AM_WRITE(dsp_rasterize_w)      /* Just a (lame) guess */
-	AM_RANGE(0x340b, 0x340b) AM_READ(dsp_y_return_r)
-//  AM_RANGE(0x3418, 0x341a) AM_WRITE(dsp_sqrt_w)
-//  AM_RANGE(0x341b, 0x341b) AM_WRITE(dsp_sqrt_r)
-//  AM_RANGE(0x341c, 0x341c) AM_READ(dsp_sqrt_flags1_r)
-//  AM_RANGE(0x341d, 0x341d) AM_READ(dsp_sqrt_flags2_r)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(lineram_r, lineram_w)
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram_r, dspram_w)
+	AM_RANGE(0x3000, 0x3002) AM_WRITE_LEGACY(dsp_flags_w)
+	AM_RANGE(0x3404, 0x3404) AM_WRITE_LEGACY(dsp_frustum_left_w)
+	AM_RANGE(0x3405, 0x3405) AM_WRITE_LEGACY(dsp_x_eyecoord_w)
+	AM_RANGE(0x3406, 0x3406) AM_WRITE_LEGACY(dsp_z_eyecoord_w)
+	AM_RANGE(0x3407, 0x3407) AM_READ_LEGACY(dsp_x_return_r)
+	AM_RANGE(0x3408, 0x3408) AM_WRITE_LEGACY(dsp_frustum_bottom_w)
+	AM_RANGE(0x3409, 0x3409) AM_WRITE_LEGACY(dsp_y_eyecoord_w)
+	AM_RANGE(0x340a, 0x340a) AM_WRITE_LEGACY(dsp_rasterize_w)      /* Just a (lame) guess */
+	AM_RANGE(0x340b, 0x340b) AM_READ_LEGACY(dsp_y_return_r)
+//  AM_RANGE(0x3418, 0x341a) AM_WRITE_LEGACY(dsp_sqrt_w)
+//  AM_RANGE(0x341b, 0x341b) AM_WRITE_LEGACY(dsp_sqrt_r)
+//  AM_RANGE(0x341c, 0x341c) AM_READ_LEGACY(dsp_sqrt_flags1_r)
+//  AM_RANGE(0x341d, 0x341d) AM_READ_LEGACY(dsp_sqrt_flags2_r)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_LEGACY(lineram_r, lineram_w)
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE_LEGACY(dspram_r, dspram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_io, AS_IO, 16, taitoair_state )
-	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_HOLD_signal_r)
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
+	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ_LEGACY(dsp_HOLD_signal_r)
+	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE_LEGACY(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 
 

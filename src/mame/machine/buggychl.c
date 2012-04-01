@@ -185,12 +185,12 @@ READ8_DEVICE_HANDLER( buggychl_mcu_status_r )
 
 ADDRESS_MAP_START( buggychl_mcu_map, AS_PROGRAM, 8, buggychl_mcu_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("bmcu", buggychl_68705_port_a_r, buggychl_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_DEVREADWRITE("bmcu", buggychl_68705_port_b_r, buggychl_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_DEVREADWRITE("bmcu", buggychl_68705_port_c_r, buggychl_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_DEVWRITE("bmcu", buggychl_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_DEVWRITE("bmcu", buggychl_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_DEVWRITE("bmcu", buggychl_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_68705_port_a_r, buggychl_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_68705_port_b_r, buggychl_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_68705_port_c_r, buggychl_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_DEVWRITE_LEGACY("bmcu", buggychl_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_DEVWRITE_LEGACY("bmcu", buggychl_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_DEVWRITE_LEGACY("bmcu", buggychl_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

@@ -59,28 +59,28 @@ static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0000, 0x0002) AM_RAM
-	AM_RANGE(0x0003, 0x0003) AM_RAM_WRITE(ironhors_charbank_w)
-	AM_RANGE(0x0004, 0x0004) AM_RAM AM_BASE_MEMBER(ironhors_state, m_interrupt_enable)
+	AM_RANGE(0x0003, 0x0003) AM_RAM_WRITE_LEGACY(ironhors_charbank_w)
+	AM_RANGE(0x0004, 0x0004) AM_RAM AM_BASE( m_interrupt_enable)
 	AM_RANGE(0x0005, 0x001f) AM_RAM
-	AM_RANGE(0x0020, 0x003f) AM_RAM AM_BASE_MEMBER(ironhors_state, m_scroll)
+	AM_RANGE(0x0020, 0x003f) AM_RAM AM_BASE( m_scroll)
 	AM_RANGE(0x0040, 0x005f) AM_RAM
 	AM_RANGE(0x0060, 0x00df) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW3") AM_WRITE(ironhors_sh_irqtrigger_w)
-	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW2") AM_WRITE(ironhors_palettebank_w)
-	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW1") AM_WRITE(ironhors_flipscreen_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW3") AM_WRITE_LEGACY(ironhors_sh_irqtrigger_w)
+	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(ironhors_palettebank_w)
+	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(ironhors_flipscreen_w)
 	AM_RANGE(0x0b01, 0x0b01) AM_READ_PORT("P2")
 	AM_RANGE(0x0b02, 0x0b02) AM_READ_PORT("P1")
 	AM_RANGE(0x0b03, 0x0b03) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // ???
 	AM_RANGE(0x1a00, 0x1a01) AM_WRITENOP // ???
 	AM_RANGE(0x1c00, 0x1dff) AM_WRITENOP // ???
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE_MEMBER(ironhors_state, m_colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE_MEMBER(ironhors_state, m_videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(ironhors_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(ironhors_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE_MEMBER(ironhors_state, m_spriteram2)
+	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE( m_spriteram2)
 	AM_RANGE(0x3100, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE_SIZE_MEMBER(ironhors_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3900, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -88,12 +88,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, ironhors_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ym2203", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8, ironhors_state )
@@ -101,31 +101,31 @@ static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8, ironhors_state )
 	//20=31db
 
 	AM_RANGE(0x0005, 0x001f) AM_RAM
-	AM_RANGE(0x31db, 0x31fa) AM_RAM AM_BASE_MEMBER(ironhors_state, m_scroll)
+	AM_RANGE(0x31db, 0x31fa) AM_RAM AM_BASE( m_scroll)
 	AM_RANGE(0x0040, 0x005f) AM_RAM
 	AM_RANGE(0x0060, 0x00ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x0900, 0x0900) /*AM_READ_PORT("DSW3") */AM_WRITE(ironhors_sh_irqtrigger_w)
-	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW2") //AM_WRITE(ironhors_palettebank_w)
-	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW1") AM_WRITE(ironhors_flipscreen_w)
-	AM_RANGE(0x0b01, 0x0b01) AM_READ_PORT("DSW2") //AM_WRITE(ironhors_palettebank_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x0900, 0x0900) /*AM_READ_PORT("DSW3") */AM_WRITE_LEGACY(ironhors_sh_irqtrigger_w)
+	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW2") //AM_WRITE_LEGACY(ironhors_palettebank_w)
+	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(ironhors_flipscreen_w)
+	AM_RANGE(0x0b01, 0x0b01) AM_READ_PORT("DSW2") //AM_WRITE_LEGACY(ironhors_palettebank_w)
 	AM_RANGE(0x0b02, 0x0b02) AM_READ_PORT("P1")
 	AM_RANGE(0x0b03, 0x0b03) AM_READ_PORT("SYSTEM")
 
 
 
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(ironhors_sh_irqtrigger_w)
-	AM_RANGE(0x1a00, 0x1a00) AM_RAM AM_BASE_MEMBER(ironhors_state, m_interrupt_enable)
-	AM_RANGE(0x1a01, 0x1a01) AM_RAM_WRITE(ironhors_charbank_w)
-	AM_RANGE(0x1a02, 0x1a02) AM_WRITE(ironhors_palettebank_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(ironhors_sh_irqtrigger_w)
+	AM_RANGE(0x1a00, 0x1a00) AM_RAM AM_BASE( m_interrupt_enable)
+	AM_RANGE(0x1a01, 0x1a01) AM_RAM_WRITE_LEGACY(ironhors_charbank_w)
+	AM_RANGE(0x1a02, 0x1a02) AM_WRITE_LEGACY(ironhors_palettebank_w)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 //  AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ironhors_colorram_w) AM_BASE_MEMBER(ironhors_state, m_colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ironhors_videoram_w) AM_BASE_MEMBER(ironhors_state, m_videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(ironhors_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(ironhors_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM
-	AM_RANGE(0x1c00, 0x1dff) AM_RAM AM_BASE_MEMBER(ironhors_state, m_spriteram2)
+	AM_RANGE(0x1c00, 0x1dff) AM_RAM AM_BASE( m_spriteram2)
 	AM_RANGE(0x3000, 0x38ff) AM_RAM
-	AM_RANGE(0x1e00, 0x1eff) AM_RAM AM_BASE_SIZE_MEMBER(ironhors_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1e00, 0x1eff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3900, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( farwest_slave_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym2203", ym2203_r, ym2203_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym2203", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 

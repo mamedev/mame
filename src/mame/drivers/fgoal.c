@@ -209,31 +209,31 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, fgoal_state )
 
 	AM_RANGE(0x0000, 0x00ef) AM_RAM
 
-	AM_RANGE(0x00f0, 0x00f0) AM_READ(fgoal_row_r)
-	AM_RANGE(0x00f1, 0x00f1) AM_READ(fgoal_analog_r)
+	AM_RANGE(0x00f0, 0x00f0) AM_READ_LEGACY(fgoal_row_r)
+	AM_RANGE(0x00f1, 0x00f1) AM_READ_LEGACY(fgoal_analog_r)
 	AM_RANGE(0x00f2, 0x00f2) AM_READ_PORT("IN0")
 	AM_RANGE(0x00f3, 0x00f3) AM_READ_PORT("IN1")
-	AM_RANGE(0x00f4, 0x00f4) AM_READ(fgoal_address_hi_r)
-	AM_RANGE(0x00f5, 0x00f5) AM_READ(fgoal_address_lo_r)
-	AM_RANGE(0x00f6, 0x00f6) AM_READ(fgoal_shifter_r)
-	AM_RANGE(0x00f7, 0x00f7) AM_READ(fgoal_shifter_reverse_r)
-	AM_RANGE(0x00f8, 0x00fb) AM_READ(fgoal_nmi_reset_r)
-	AM_RANGE(0x00fc, 0x00ff) AM_READ(fgoal_irq_reset_r)
+	AM_RANGE(0x00f4, 0x00f4) AM_READ_LEGACY(fgoal_address_hi_r)
+	AM_RANGE(0x00f5, 0x00f5) AM_READ_LEGACY(fgoal_address_lo_r)
+	AM_RANGE(0x00f6, 0x00f6) AM_READ_LEGACY(fgoal_shifter_r)
+	AM_RANGE(0x00f7, 0x00f7) AM_READ_LEGACY(fgoal_shifter_reverse_r)
+	AM_RANGE(0x00f8, 0x00fb) AM_READ_LEGACY(fgoal_nmi_reset_r)
+	AM_RANGE(0x00fc, 0x00ff) AM_READ_LEGACY(fgoal_irq_reset_r)
 
-	AM_RANGE(0x00f0, 0x00f0) AM_WRITE(fgoal_row_w)
-	AM_RANGE(0x00f1, 0x00f1) AM_WRITE(fgoal_col_w)
-	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(fgoal_row_w)
-	AM_RANGE(0x00f3, 0x00f3) AM_WRITE(fgoal_col_w)
-	AM_RANGE(0x00f4, 0x00f7) AM_DEVWRITE("mb14241", mb14241_shift_data_w)
-	AM_RANGE(0x00f8, 0x00fb) AM_WRITE(fgoal_sound1_w)
-	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(fgoal_sound2_w)
+	AM_RANGE(0x00f0, 0x00f0) AM_WRITE_LEGACY(fgoal_row_w)
+	AM_RANGE(0x00f1, 0x00f1) AM_WRITE_LEGACY(fgoal_col_w)
+	AM_RANGE(0x00f2, 0x00f2) AM_WRITE_LEGACY(fgoal_row_w)
+	AM_RANGE(0x00f3, 0x00f3) AM_WRITE_LEGACY(fgoal_col_w)
+	AM_RANGE(0x00f4, 0x00f7) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
+	AM_RANGE(0x00f8, 0x00fb) AM_WRITE_LEGACY(fgoal_sound1_w)
+	AM_RANGE(0x00fc, 0x00ff) AM_WRITE_LEGACY(fgoal_sound2_w)
 
 	AM_RANGE(0x0100, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(fgoal_state, m_video_ram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE( m_video_ram)
 
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(fgoal_ypos_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(fgoal_xpos_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE(fgoal_color_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(fgoal_ypos_w)
+	AM_RANGE(0x8001, 0x8001) AM_WRITE_LEGACY(fgoal_xpos_w)
+	AM_RANGE(0x8002, 0x8002) AM_WRITE_LEGACY(fgoal_color_w)
 
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xffff) AM_ROM

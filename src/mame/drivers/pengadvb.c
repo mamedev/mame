@@ -147,17 +147,17 @@ static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8, pengadvb_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank31")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank32")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank4")
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(mem_w)
+	AM_RANGE(0x0000, 0xffff) AM_WRITE_LEGACY(mem_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_mem, AS_IO, 8, pengadvb_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, vram_read, vram_write )
-	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, register_read, register_write )
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0xa8, 0xab) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
+	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE( "tms9928a", tms9928a_device, vram_read, vram_write )
+	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE( "tms9928a", tms9928a_device, register_read, register_write )
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pengadvb )

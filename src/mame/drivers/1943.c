@@ -58,31 +58,31 @@ static ADDRESS_MAP_START( c1943_map, AS_PROGRAM, 8, _1943_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSWB")
-	AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(c1943_c804_w)	// ROM bank switch, screen flip
-	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc007, 0xc007) AM_READ_LEGACY(c1943_protection_r)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(c1943_c804_w)	// ROM bank switch, screen flip
+	AM_RANGE(0xc806, 0xc806) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITENOP // ???
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(c1943_videoram_w) AM_BASE_MEMBER(_1943_state, m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(c1943_colorram_w) AM_BASE_MEMBER(_1943_state, m_colorram)
-	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE_MEMBER(_1943_state, m_scrollx)
-	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE_MEMBER(_1943_state, m_scrolly)
-	AM_RANGE(0xd803, 0xd804) AM_RAM AM_BASE_MEMBER(_1943_state, m_bgscrollx)
-	AM_RANGE(0xd806, 0xd806) AM_WRITE(c1943_d806_w)	// sprites, bg1, bg2 enable
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(c1943_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(c1943_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE( m_scrollx)
+	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE( m_scrolly)
+	AM_RANGE(0xd803, 0xd804) AM_RAM AM_BASE( m_bgscrollx)
+	AM_RANGE(0xd806, 0xd806) AM_WRITE_LEGACY(c1943_d806_w)	// sprites, bg1, bg2 enable
 	AM_RANGE(0xd808, 0xd808) AM_WRITENOP // ???
 	AM_RANGE(0xd868, 0xd868) AM_WRITENOP // ???
 	AM_RANGE(0xd888, 0xd888) AM_WRITENOP // ???
 	AM_RANGE(0xd8a8, 0xd8a8) AM_WRITENOP // ???
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(_1943_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _1943_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE("ym2", ym2203_w)
+	AM_RANGE(0xc800, 0xc800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -653,7 +653,7 @@ static DRIVER_INIT( 1943b )
 {
 	DRIVER_INIT_CALL( 1943 );
 	//it expects 0x00 to be returned from the protection reads because the protection has been patched out.
-	//AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
+	//AM_RANGE(0xc007, 0xc007) AM_READ_LEGACY(c1943_protection_r)
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc007, 0xc007, FUNC(_1943b_c007_r));
 
 }

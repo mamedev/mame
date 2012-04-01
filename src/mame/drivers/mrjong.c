@@ -71,16 +71,16 @@ static ADDRESS_MAP_START( mrjong_map, AS_PROGRAM, 8, mrjong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(mrjong_videoram_w) AM_BASE_MEMBER(mrjong_state, m_videoram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(mrjong_colorram_w) AM_BASE_MEMBER(mrjong_state, m_colorram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(mrjong_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(mrjong_colorram_w) AM_BASE( m_colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrjong_io_map, AS_IO, 8, mrjong_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P2") AM_WRITE(mrjong_flipscreen_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW") AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x03, 0x03) AM_READ(io_0x03_r)		// Unknown
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P2") AM_WRITE_LEGACY(mrjong_flipscreen_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW") AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(io_0x03_r)		// Unknown
 ADDRESS_MAP_END
 
 /*************************************

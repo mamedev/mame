@@ -89,22 +89,22 @@ static READ8_DEVICE_HANDLER( munchmo_ayreset_r )
 static ADDRESS_MAP_START( mnchmobl_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, m_sprite_xpos)
-	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, m_sprite_tile)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(munchmo_state, m_sprite_attr)
-	AM_RANGE(0xb800, 0xb8ff) AM_MIRROR(0x0100) AM_RAM AM_BASE_MEMBER(munchmo_state, m_videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE( m_sprite_xpos)
+	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM AM_BASE( m_sprite_tile)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE( m_sprite_attr)
+	AM_RANGE(0xb800, 0xb8ff) AM_MIRROR(0x0100) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0xbaba, 0xbaba) AM_WRITENOP /* ? */
-	AM_RANGE(0xbc00, 0xbc7f) AM_RAM AM_BASE_MEMBER(munchmo_state, m_status_vram)
-	AM_RANGE(0xbe00, 0xbe00) AM_WRITE(mnchmobl_soundlatch_w)
-	AM_RANGE(0xbe01, 0xbe01) AM_WRITE(mnchmobl_palette_bank_w)
+	AM_RANGE(0xbc00, 0xbc7f) AM_RAM AM_BASE( m_status_vram)
+	AM_RANGE(0xbe00, 0xbe00) AM_WRITE_LEGACY(mnchmobl_soundlatch_w)
+	AM_RANGE(0xbe01, 0xbe01) AM_WRITE_LEGACY(mnchmobl_palette_bank_w)
 	AM_RANGE(0xbe02, 0xbe02) AM_READ_PORT("DSW1")
 	AM_RANGE(0xbe03, 0xbe03) AM_READ_PORT("DSW2")
 	AM_RANGE(0xbe11, 0xbe11) AM_WRITENOP /* ? */
 	AM_RANGE(0xbe21, 0xbe21) AM_WRITENOP /* ? */
 	AM_RANGE(0xbe31, 0xbe31) AM_WRITENOP /* ? */
-	AM_RANGE(0xbe41, 0xbe41) AM_WRITE(mnchmobl_flipscreen_w)
-	AM_RANGE(0xbe61, 0xbe61) AM_WRITE(mnchmobl_nmi_enable_w) /* ENI 1-10C */
-	AM_RANGE(0xbf00, 0xbf07) AM_WRITEONLY AM_BASE_MEMBER(munchmo_state, m_vreg) /* MY0 1-8C */
+	AM_RANGE(0xbe41, 0xbe41) AM_WRITE_LEGACY(mnchmobl_flipscreen_w)
+	AM_RANGE(0xbe61, 0xbe61) AM_WRITE_LEGACY(mnchmobl_nmi_enable_w) /* ENI 1-10C */
+	AM_RANGE(0xbf00, 0xbf07) AM_WRITEONLY AM_BASE( m_vreg) /* MY0 1-8C */
 	AM_RANGE(0xbf01, 0xbf01) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xbf02, 0xbf02) AM_READ_PORT("P1")
 	AM_RANGE(0xbf03, 0xbf03) AM_READ_PORT("P2")
@@ -113,14 +113,14 @@ ADDRESS_MAP_END
 /* memory map provided thru schematics */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_READ(soundlatch_r)
-	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE("ay1", munchmo_ayreset_r, ay8910_reset_w)
-	AM_RANGE(0xa000, 0xbfff) AM_DEVREADWRITE("ay2", munchmo_ayreset_r, ay8910_reset_w)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(sound_nmi_ack_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE_LEGACY("ay1", munchmo_ayreset_r, ay8910_reset_w)
+	AM_RANGE(0xa000, 0xbfff) AM_DEVREADWRITE_LEGACY("ay2", munchmo_ayreset_r, ay8910_reset_w)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE_LEGACY(sound_nmi_ack_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM // is mirror ok?
 ADDRESS_MAP_END
 

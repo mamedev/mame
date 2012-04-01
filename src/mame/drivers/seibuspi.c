@@ -1034,30 +1034,30 @@ static READ32_HANDLER( soundrom_r )
 
 static ADDRESS_MAP_START( spi_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x00000417) AM_RAM
-	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
+	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE_LEGACY(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_READNOP
-	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w)
-	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_BASE_MEMBER(seibuspi_state, m_spi_scrollram)
-	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
-	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
-	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
-	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
-	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
-	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_int_r)				/* Clear Interrupt */
+	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE_LEGACY(spi_layer_enable_w)
+	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_BASE( m_spi_scrollram)
+	AM_RANGE(0x00000480, 0x00000483) AM_WRITE_LEGACY(tilemap_dma_start_w)
+	AM_RANGE(0x00000484, 0x00000487) AM_WRITE_LEGACY(palette_dma_start_w)
+	AM_RANGE(0x00000490, 0x00000493) AM_WRITE_LEGACY(video_dma_length_w)
+	AM_RANGE(0x00000494, 0x00000497) AM_WRITE_LEGACY(video_dma_address_w)
+	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE_LEGACY(sprite_dma_start_w)
+	AM_RANGE(0x00000600, 0x00000603) AM_READ_LEGACY(spi_int_r)				/* Clear Interrupt */
 	AM_RANGE(0x00000600, 0x00000603) AM_WRITENOP				/* Unknown */
-	AM_RANGE(0x00000604, 0x00000607) AM_READ(spi_controls1_r)	/* Player controls */
-	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)		/* Unknown */
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls2_r)	/* Player controls (start) */
-	AM_RANGE(0x00000680, 0x00000683) AM_WRITE(sound_fifo_w)
-	AM_RANGE(0x00000684, 0x00000687) AM_READ(sound_fifo_status_r)
+	AM_RANGE(0x00000604, 0x00000607) AM_READ_LEGACY(spi_controls1_r)	/* Player controls */
+	AM_RANGE(0x00000608, 0x0000060b) AM_READ_LEGACY(spi_unknown_r)		/* Unknown */
+	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_LEGACY(spi_controls2_r)	/* Player controls (start) */
+	AM_RANGE(0x00000680, 0x00000683) AM_WRITE_LEGACY(sound_fifo_w)
+	AM_RANGE(0x00000684, 0x00000687) AM_READ_LEGACY(sound_fifo_status_r)
 	AM_RANGE(0x00000684, 0x00000687) AM_WRITENOP				/* Unknown */
-	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8("ds2404", ds2404_1w_reset_w, 0x000000ff)
-	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8("ds2404", ds2404_data_w, 0x000000ff)
-	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8("ds2404", ds2404_clk_w, 0x000000ff)
-	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8("ds2404", ds2404_data_r, 0x000000ff)
-	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE_MEMBER(seibuspi_state, m_spimainram)
+	AM_RANGE(0x000006d0, 0x000006d3) AM_DEVWRITE8_LEGACY("ds2404", ds2404_1w_reset_w, 0x000000ff)
+	AM_RANGE(0x000006d4, 0x000006d7) AM_DEVWRITE8_LEGACY("ds2404", ds2404_data_w, 0x000000ff)
+	AM_RANGE(0x000006d8, 0x000006db) AM_DEVWRITE8_LEGACY("ds2404", ds2404_clk_w, 0x000000ff)
+	AM_RANGE(0x000006dc, 0x000006df) AM_DEVREAD8_LEGACY("ds2404", ds2404_data_r, 0x000000ff)
+	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE( m_spimainram)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
-	AM_RANGE(0x00a00000, 0x013fffff) AM_READ(soundrom_r)
+	AM_RANGE(0x00a00000, 0x013fffff) AM_READ_LEGACY(soundrom_r)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")		/* ROM location in real-mode */
 ADDRESS_MAP_END
 
@@ -1065,14 +1065,14 @@ static ADDRESS_MAP_START( spisound_map, AS_PROGRAM, 8, seibuspi_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank5")
 	AM_RANGE(0x4002, 0x4002) AM_WRITENOP			/* ack RST 10 */
 	AM_RANGE(0x4003, 0x4003) AM_WRITENOP			/* Unknown */
-	AM_RANGE(0x4004, 0x4004) AM_WRITE(sb_coin_w)	/* single board systems */
-	AM_RANGE(0x4008, 0x4008) AM_READWRITE(z80_soundfifo_r, z80_soundfifo_w)
-	AM_RANGE(0x4009, 0x4009) AM_READ(z80_soundfifo_status_r)
-	AM_RANGE(0x400a, 0x400a) AM_READ(z80_jp1_r)
+	AM_RANGE(0x4004, 0x4004) AM_WRITE_LEGACY(sb_coin_w)	/* single board systems */
+	AM_RANGE(0x4008, 0x4008) AM_READWRITE_LEGACY(z80_soundfifo_r, z80_soundfifo_w)
+	AM_RANGE(0x4009, 0x4009) AM_READ_LEGACY(z80_soundfifo_status_r)
+	AM_RANGE(0x400a, 0x400a) AM_READ_LEGACY(z80_jp1_r)
 	AM_RANGE(0x400b, 0x400b) AM_WRITENOP			/* Unknown */
-	AM_RANGE(0x4013, 0x4013) AM_READ(z80_coin_r)
-	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)		/* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
-	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("ymf", ymf271_r, ymf271_w)
+	AM_RANGE(0x4013, 0x4013) AM_READ_LEGACY(z80_coin_r)
+	AM_RANGE(0x401b, 0x401b) AM_WRITE_LEGACY(z80_bank_w)		/* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
+	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE_LEGACY("ymf", ymf271_r, ymf271_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
@@ -1132,24 +1132,24 @@ static const ymf271_interface ymf271_config =
 
 static ADDRESS_MAP_START( seibu386_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x00000417) AM_RAM
-	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE(spi_layer_bank_r, spi_layer_bank_w)
+	AM_RANGE(0x00000418, 0x0000041b) AM_READWRITE_LEGACY(spi_layer_bank_r, spi_layer_bank_w)
 	AM_RANGE(0x0000041c, 0x0000041f) AM_READNOP
-	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE(spi_layer_enable_w)
-	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_BASE_MEMBER(seibuspi_state, m_spi_scrollram)
-	AM_RANGE(0x00000480, 0x00000483) AM_WRITE(tilemap_dma_start_w)
-	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
-	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
-	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
-	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE(sprite_dma_start_w)
-	AM_RANGE(0x00000600, 0x00000603) AM_READ(spi_int_r)				/* Unknown */
-	AM_RANGE(0x00000604, 0x00000607) AM_READ(spi_controls1_r)	/* Player controls */
-	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls2_r)	/* Player controls (start) */
-	AM_RANGE(0x0000068c, 0x0000068f) AM_DEVWRITE("eeprom", eeprom_w)
-	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE_MEMBER(seibuspi_state, m_spimainram)
+	AM_RANGE(0x0000041c, 0x0000041f) AM_WRITE_LEGACY(spi_layer_enable_w)
+	AM_RANGE(0x00000420, 0x0000042b) AM_RAM AM_BASE( m_spi_scrollram)
+	AM_RANGE(0x00000480, 0x00000483) AM_WRITE_LEGACY(tilemap_dma_start_w)
+	AM_RANGE(0x00000484, 0x00000487) AM_WRITE_LEGACY(palette_dma_start_w)
+	AM_RANGE(0x00000490, 0x00000493) AM_WRITE_LEGACY(video_dma_length_w)
+	AM_RANGE(0x00000494, 0x00000497) AM_WRITE_LEGACY(video_dma_address_w)
+	AM_RANGE(0x0000050c, 0x0000050f) AM_WRITE_LEGACY(sprite_dma_start_w)
+	AM_RANGE(0x00000600, 0x00000603) AM_READ_LEGACY(spi_int_r)				/* Unknown */
+	AM_RANGE(0x00000604, 0x00000607) AM_READ_LEGACY(spi_controls1_r)	/* Player controls */
+	AM_RANGE(0x00000608, 0x0000060b) AM_READ_LEGACY(spi_unknown_r)
+	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_LEGACY(spi_controls2_r)	/* Player controls (start) */
+	AM_RANGE(0x0000068c, 0x0000068f) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE( m_spimainram)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
-	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x000000ff)
-	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x000000ff)
+	AM_RANGE(0x01200000, 0x01200003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
+	AM_RANGE(0x01200004, 0x01200007) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")		/* ROM location in real-mode */
 ADDRESS_MAP_END
 
@@ -1161,20 +1161,20 @@ static WRITE32_HANDLER(input_select_w)
 
 static ADDRESS_MAP_START( sys386f2_map, AS_PROGRAM, 32, seibuspi_state )
 	AM_RANGE(0x00000000, 0x0000000f) AM_RAM
-	AM_RANGE(0x00000010, 0x00000013) AM_READ(spi_int_r)				/* Unknown */
+	AM_RANGE(0x00000010, 0x00000013) AM_READ_LEGACY(spi_int_r)				/* Unknown */
 	AM_RANGE(0x00000090, 0x00000097) AM_RAM /* Unknown */
-	AM_RANGE(0x00000400, 0x00000403) AM_READNOP AM_WRITE(input_select_w)
-	AM_RANGE(0x00000404, 0x00000407) AM_DEVWRITE("eeprom", sys386f2_eeprom_w)
-	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8("ymz", ymz280b_w, 0x000000ff)
-	AM_RANGE(0x00000484, 0x00000487) AM_WRITE(palette_dma_start_w)
-	AM_RANGE(0x00000490, 0x00000493) AM_WRITE(video_dma_length_w)
-	AM_RANGE(0x00000494, 0x00000497) AM_WRITE(video_dma_address_w)
+	AM_RANGE(0x00000400, 0x00000403) AM_READNOP AM_WRITE_LEGACY(input_select_w)
+	AM_RANGE(0x00000404, 0x00000407) AM_DEVWRITE_LEGACY("eeprom", sys386f2_eeprom_w)
+	AM_RANGE(0x00000408, 0x0000040f) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x000000ff)
+	AM_RANGE(0x00000484, 0x00000487) AM_WRITE_LEGACY(palette_dma_start_w)
+	AM_RANGE(0x00000490, 0x00000493) AM_WRITE_LEGACY(video_dma_length_w)
+	AM_RANGE(0x00000494, 0x00000497) AM_WRITE_LEGACY(video_dma_address_w)
 	AM_RANGE(0x00000500, 0x0000054f) AM_RAM /* Unknown */
-	AM_RANGE(0x00000560, 0x00000563) AM_WRITE(sprite_dma_start_w)
-	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8("ymz", ymz280b_r, 0x000000ff)
-	AM_RANGE(0x00000608, 0x0000060b) AM_READ(spi_unknown_r)
-	AM_RANGE(0x0000060c, 0x0000060f) AM_READ(spi_controls1_r)	/* Player controls */
-	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE_MEMBER(seibuspi_state, m_spimainram)
+	AM_RANGE(0x00000560, 0x00000563) AM_WRITE_LEGACY(sprite_dma_start_w)
+	AM_RANGE(0x00000600, 0x00000607) AM_DEVREAD8_LEGACY("ymz", ymz280b_r, 0x000000ff)
+	AM_RANGE(0x00000608, 0x0000060b) AM_READ_LEGACY(spi_unknown_r)
+	AM_RANGE(0x0000060c, 0x0000060f) AM_READ_LEGACY(spi_controls1_r)	/* Player controls */
+	AM_RANGE(0x00000800, 0x0003ffff) AM_RAM AM_BASE( m_spimainram)
 	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("share2")		/* ROM location in real-mode */
 ADDRESS_MAP_END

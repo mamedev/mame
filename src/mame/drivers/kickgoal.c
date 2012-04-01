@@ -482,20 +482,20 @@ static WRITE16_HANDLER( kickgoal_eeprom_w )
 
 static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16, kickgoal_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-/// AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE("oki", kickgoal_snd_w)
+/// AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE_LEGACY("oki", kickgoal_snd_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("SYSTEM")
-/// AM_RANGE(0x800004, 0x800005) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x800004, 0x800005) AM_DEVWRITE("oki", actionhw_snd_w)
-	AM_RANGE(0x900000, 0x900005) AM_WRITE(kickgoal_eeprom_w)
-	AM_RANGE(0x900006, 0x900007) AM_READ(kickgoal_eeprom_r)
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(kickgoal_fgram_w) AM_BASE_MEMBER(kickgoal_state, m_fgram) /* FG Layer */
-	AM_RANGE(0xa04000, 0xa07fff) AM_RAM_WRITE(kickgoal_bgram_w) AM_BASE_MEMBER(kickgoal_state, m_bgram) /* Higher BG Layer */
-	AM_RANGE(0xa08000, 0xa0bfff) AM_RAM_WRITE(kickgoal_bg2ram_w) AM_BASE_MEMBER(kickgoal_state, m_bg2ram) /* Lower BG Layer */
+/// AM_RANGE(0x800004, 0x800005) AM_WRITE_LEGACY(soundlatch_word_w)
+	AM_RANGE(0x800004, 0x800005) AM_DEVWRITE_LEGACY("oki", actionhw_snd_w)
+	AM_RANGE(0x900000, 0x900005) AM_WRITE_LEGACY(kickgoal_eeprom_w)
+	AM_RANGE(0x900006, 0x900007) AM_READ_LEGACY(kickgoal_eeprom_r)
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE_LEGACY(kickgoal_fgram_w) AM_BASE( m_fgram) /* FG Layer */
+	AM_RANGE(0xa04000, 0xa07fff) AM_RAM_WRITE_LEGACY(kickgoal_bgram_w) AM_BASE( m_bgram) /* Higher BG Layer */
+	AM_RANGE(0xa08000, 0xa0bfff) AM_RAM_WRITE_LEGACY(kickgoal_bg2ram_w) AM_BASE( m_bg2ram) /* Lower BG Layer */
 	AM_RANGE(0xa0c000, 0xa0ffff) AM_RAM // more tilemap?
-	AM_RANGE(0xa10000, 0xa1000f) AM_WRITEONLY AM_BASE_MEMBER(kickgoal_state, m_scrram) /* Scroll Registers */
-	AM_RANGE(0xb00000, 0xb007ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(kickgoal_state, m_spriteram, m_spriteram_size) /* Sprites */
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram) /* Palette */ // actionhw reads this
+	AM_RANGE(0xa10000, 0xa1000f) AM_WRITEONLY AM_BASE( m_scrram) /* Scroll Registers */
+	AM_RANGE(0xb00000, 0xb007ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* Sprites */
+	AM_RANGE(0xc00000, 0xc007ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram) /* Palette */ // actionhw reads this
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

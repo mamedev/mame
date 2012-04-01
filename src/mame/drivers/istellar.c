@@ -169,9 +169,9 @@ static WRITE8_HANDLER(z80_2_ldp_write)
 static ADDRESS_MAP_START( z80_0_mem, AS_PROGRAM, 8, istellar_state )
 	AM_RANGE(0x0000,0x9fff) AM_ROM
 	AM_RANGE(0xa000,0xa7ff) AM_RAM
-	AM_RANGE(0xa800,0xabff) AM_RAM AM_BASE_MEMBER(istellar_state, m_tile_ram)
-	AM_RANGE(0xac00,0xafff) AM_RAM AM_BASE_MEMBER(istellar_state, m_tile_control_ram)
-	AM_RANGE(0xb000,0xb3ff) AM_RAM AM_BASE_MEMBER(istellar_state, m_sprite_ram)
+	AM_RANGE(0xa800,0xabff) AM_RAM AM_BASE( m_tile_ram)
+	AM_RANGE(0xac00,0xafff) AM_RAM AM_BASE( m_tile_control_ram)
+	AM_RANGE(0xb000,0xb3ff) AM_RAM AM_BASE( m_sprite_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_1_mem, AS_PROGRAM, 8, istellar_state )
@@ -182,7 +182,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_2_mem, AS_PROGRAM, 8, istellar_state )
 	AM_RANGE(0x0000,0x17ff) AM_ROM
 	AM_RANGE(0x1800,0x1fff) AM_RAM
-	AM_RANGE(0xc000,0xc000) AM_READ(z80_2_unknown_read)		/* Seems to be thrown away every time it's read - maybe interrupt related? */
+	AM_RANGE(0xc000,0xc000) AM_READ_LEGACY(z80_2_unknown_read)		/* Seems to be thrown away every time it's read - maybe interrupt related? */
 ADDRESS_MAP_END
 
 
@@ -192,23 +192,23 @@ static ADDRESS_MAP_START( z80_0_io, AS_IO, 8, istellar_state )
 	AM_RANGE(0x00,0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x02,0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03,0x03) AM_READ_PORT("DSW2")
-	/*AM_RANGE(0x04,0x04) AM_WRITE(volatile_palette_write)*/
-	AM_RANGE(0x05,0x05) AM_READWRITE(z80_0_latch1_read,z80_0_latch2_write)
+	/*AM_RANGE(0x04,0x04) AM_WRITE_LEGACY(volatile_palette_write)*/
+	AM_RANGE(0x05,0x05) AM_READWRITE_LEGACY(z80_0_latch1_read,z80_0_latch2_write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_1_io, AS_IO, 8, istellar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_NOP /*AM_READWRITE(z80_1_slatch_read,z80_1_slatch_write)*/
-	AM_RANGE(0x01,0x01) AM_NOP /*AM_READWRITE(z80_1_nmienable,z80_1_soundwrite_front)*/
-	AM_RANGE(0x02,0x02) AM_NOP /*AM_WRITE(z80_1_soundwrite_rear)*/
+	AM_RANGE(0x00,0x00) AM_NOP /*AM_READWRITE_LEGACY(z80_1_slatch_read,z80_1_slatch_write)*/
+	AM_RANGE(0x01,0x01) AM_NOP /*AM_READWRITE_LEGACY(z80_1_nmienable,z80_1_soundwrite_front)*/
+	AM_RANGE(0x02,0x02) AM_NOP /*AM_WRITE_LEGACY(z80_1_soundwrite_rear)*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_2_io, AS_IO, 8, istellar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READWRITE(z80_2_ldp_read,z80_2_ldp_write)
-	AM_RANGE(0x01,0x01) AM_READWRITE(z80_2_latch2_read,z80_2_latch1_write)
-	AM_RANGE(0x02,0x02) AM_READ(z80_2_nmienable)
-/*  AM_RANGE(0x03,0x03) AM_WRITE(z80_2_ldtrans_write)*/
+	AM_RANGE(0x00,0x00) AM_READWRITE_LEGACY(z80_2_ldp_read,z80_2_ldp_write)
+	AM_RANGE(0x01,0x01) AM_READWRITE_LEGACY(z80_2_latch2_read,z80_2_latch1_write)
+	AM_RANGE(0x02,0x02) AM_READ_LEGACY(z80_2_nmienable)
+/*  AM_RANGE(0x03,0x03) AM_WRITE_LEGACY(z80_2_ldtrans_write)*/
 ADDRESS_MAP_END
 
 

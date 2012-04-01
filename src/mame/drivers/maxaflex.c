@@ -271,25 +271,25 @@ static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, maxaflex_state )
 	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0x5000)	/* self test */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM	/* game cartridge */
 	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-    AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+    AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8, maxaflex_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ( mcu_portA_r ) AM_WRITE( mcu_portA_w )
-	AM_RANGE(0x0001, 0x0001) AM_READ( mcu_portB_r ) AM_WRITE( mcu_portB_w )
-	AM_RANGE(0x0002, 0x0002) AM_READ( mcu_portC_r ) AM_WRITE( mcu_portC_w )
-	AM_RANGE(0x0004, 0x0004) AM_READ( mcu_ddr_r ) AM_WRITE( mcu_portA_ddr_w )
-	AM_RANGE(0x0005, 0x0005) AM_READ( mcu_ddr_r ) AM_WRITE( mcu_portB_ddr_w )
-	AM_RANGE(0x0006, 0x0006) AM_READ( mcu_ddr_r ) AM_WRITE( mcu_portC_ddr_w )
-	AM_RANGE(0x0008, 0x0008) AM_READ( mcu_tdr_r ) AM_WRITE( mcu_tdr_w )
-	AM_RANGE(0x0009, 0x0009) AM_READ( mcu_tcr_r ) AM_WRITE( mcu_tcr_w )
+	AM_RANGE(0x0000, 0x0000) AM_READ_LEGACY( mcu_portA_r ) AM_WRITE_LEGACY( mcu_portA_w )
+	AM_RANGE(0x0001, 0x0001) AM_READ_LEGACY( mcu_portB_r ) AM_WRITE_LEGACY( mcu_portB_w )
+	AM_RANGE(0x0002, 0x0002) AM_READ_LEGACY( mcu_portC_r ) AM_WRITE_LEGACY( mcu_portC_w )
+	AM_RANGE(0x0004, 0x0004) AM_READ_LEGACY( mcu_ddr_r ) AM_WRITE_LEGACY( mcu_portA_ddr_w )
+	AM_RANGE(0x0005, 0x0005) AM_READ_LEGACY( mcu_ddr_r ) AM_WRITE_LEGACY( mcu_portB_ddr_w )
+	AM_RANGE(0x0006, 0x0006) AM_READ_LEGACY( mcu_ddr_r ) AM_WRITE_LEGACY( mcu_portC_ddr_w )
+	AM_RANGE(0x0008, 0x0008) AM_READ_LEGACY( mcu_tdr_r ) AM_WRITE_LEGACY( mcu_tdr_w )
+	AM_RANGE(0x0009, 0x0009) AM_READ_LEGACY( mcu_tcr_r ) AM_WRITE_LEGACY( mcu_tcr_w )
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

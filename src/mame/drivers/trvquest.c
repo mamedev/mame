@@ -61,14 +61,14 @@ static WRITE8_DEVICE_HANDLER( trvquest_misc_w )
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") // cmos ram
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // main ram
-	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)
-	AM_RANGE(0x3810, 0x381f) AM_DEVREADWRITE_MODERN("via6522_2", via6522_device, read, write)
-	AM_RANGE(0x3820, 0x382f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
-	AM_RANGE(0x3830, 0x3831) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x3840, 0x3841) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)
+	AM_RANGE(0x3810, 0x381f) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)
+	AM_RANGE(0x3820, 0x382f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
+	AM_RANGE(0x3830, 0x3831) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x3840, 0x3841) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x3850, 0x3850) AM_READNOP //watchdog_reset_r ?
-	AM_RANGE(0x8000, 0x9fff) AM_READ(trvquest_question_r)
-	AM_RANGE(0xa000, 0xa000) AM_WRITEONLY AM_BASE_MEMBER(gameplan_state, m_trvquest_question)
+	AM_RANGE(0x8000, 0x9fff) AM_READ_LEGACY(trvquest_question_r)
+	AM_RANGE(0xa000, 0xa000) AM_WRITEONLY AM_BASE( m_trvquest_question)
 	AM_RANGE(0xa000, 0xa000) AM_READNOP	// bogus read from the game code when reads question roms
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END

@@ -244,10 +244,10 @@ static READ8_HANDLER( vblank_r )
 }
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
-	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE_MEMBER(exprraid_state, m_main_ram)
-	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_SIZE_MEMBER(exprraid_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_BASE_MEMBER(exprraid_state, m_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(exprraid_colorram_w) AM_BASE_MEMBER(exprraid_state, m_colorram)
+	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE( m_main_ram)
+	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(exprraid_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE_LEGACY(exprraid_colorram_w) AM_BASE( m_colorram)
 	AM_RANGE(0x1317, 0x1317) AM_READNOP // ???
 	AM_RANGE(0x1700, 0x1700) AM_READNOP // ???
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW0")	/* DSW 0 */
@@ -255,13 +255,13 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")	/* Coins */
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW1")	/* DSW 1 */
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP // ???
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(sound_cpu_command_w)
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(exprraid_flipscreen_w)
+	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(sound_cpu_command_w)
+	AM_RANGE(0x2002, 0x2002) AM_WRITE_LEGACY(exprraid_flipscreen_w)
 	AM_RANGE(0x2003, 0x2003) AM_WRITENOP // ???
-	AM_RANGE(0x2800, 0x2801) AM_READ(exprraid_protection_r)
-	AM_RANGE(0x2800, 0x2803) AM_WRITE(exprraid_bgselect_w)
-	AM_RANGE(0x2804, 0x2804) AM_WRITE(exprraid_scrolly_w)
-	AM_RANGE(0x2805, 0x2806) AM_WRITE(exprraid_scrollx_w)
+	AM_RANGE(0x2800, 0x2801) AM_READ_LEGACY(exprraid_protection_r)
+	AM_RANGE(0x2800, 0x2803) AM_WRITE_LEGACY(exprraid_bgselect_w)
+	AM_RANGE(0x2804, 0x2804) AM_WRITE_LEGACY(exprraid_scrolly_w)
+	AM_RANGE(0x2805, 0x2806) AM_WRITE_LEGACY(exprraid_scrollx_w)
 	AM_RANGE(0x2807, 0x2807) AM_WRITENOP	// Scroll related ?
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -272,9 +272,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_r, ym3526_w)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ym2", ym3526_r, ym3526_w)
+	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

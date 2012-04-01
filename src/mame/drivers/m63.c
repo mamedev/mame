@@ -448,19 +448,19 @@ static ADDRESS_MAP_START( m63_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
-	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_SIZE_MEMBER(m63_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xe300, 0xe3ff) AM_RAM AM_BASE_MEMBER(m63_state, m_scrollram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m63_videoram2_w) AM_BASE_MEMBER(m63_state, m_videoram2)
-	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(m63_videoram_w) AM_BASE_MEMBER(m63_state, m_videoram)
-	AM_RANGE(0xec00, 0xefff) AM_RAM_WRITE(m63_colorram_w) AM_BASE_MEMBER(m63_state, m_colorram)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(m63_flipscreen_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(m63_palbank_w)
-	AM_RANGE(0xf006, 0xf007) AM_WRITE(coin_w)
-	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_WRITE(soundlatch_w)
+	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe300, 0xe3ff) AM_RAM AM_BASE( m_scrollram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(m63_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE_LEGACY(m63_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xec00, 0xefff) AM_RAM_WRITE_LEGACY(m63_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(m63_flipscreen_w)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(m63_palbank_w)
+	AM_RANGE(0xf006, 0xf007) AM_WRITE_LEGACY(coin_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITENOP	/* continues game when in stop mode (cleared by NMI handler) */
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(snd_irq_w)
+	AM_RANGE(0xf803, 0xf803) AM_WRITE_LEGACY(snd_irq_w)
 	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
@@ -469,26 +469,26 @@ static ADDRESS_MAP_START( fghtbskt_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
-	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_BASE_SIZE_MEMBER(m63_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd300, 0xd3ff) AM_RAM AM_BASE_MEMBER(m63_state, m_scrollram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(m63_videoram2_w) AM_BASE_MEMBER(m63_state, m_videoram2)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(m63_videoram_w) AM_BASE_MEMBER(m63_state, m_videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(m63_colorram_w) AM_BASE_MEMBER(m63_state, m_colorram)
-	AM_RANGE(0xf000, 0xf000) AM_READ(snd_status_r)
+	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd300, 0xd3ff) AM_RAM AM_BASE( m_scrollram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(m63_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(m63_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE_LEGACY(m63_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xf000, 0xf000) AM_READ_LEGACY(snd_status_r)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("P1")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("P2")
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("DSW")
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(snd_irq_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(snd_irq_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xf802, 0xf802) AM_WRITE(fghtbskt_flipscreen_w)
+	AM_RANGE(0xf801, 0xf801) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xf802, 0xf802) AM_WRITE_LEGACY(fghtbskt_flipscreen_w)
 	AM_RANGE(0xf803, 0xf803) AM_WRITENOP
 	AM_RANGE(0xf804, 0xf804) AM_WRITENOP
 	AM_RANGE(0xf805, 0xf805) AM_WRITENOP
 	AM_RANGE(0xf806, 0xf806) AM_WRITENOP
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(fghtbskt_samples_w)
+	AM_RANGE(0xf807, 0xf807) AM_WRITE_LEGACY(fghtbskt_samples_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_map, AS_PROGRAM, 8, m63_state )
@@ -497,10 +497,10 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( i8039_port_map, AS_IO, 8, m63_state )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(snddata_r, snddata_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(irq_r)
+	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(snddata_r, snddata_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE_LEGACY(p1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE_LEGACY(p2_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_LEGACY(irq_r)
 ADDRESS_MAP_END
 
 

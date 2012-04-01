@@ -262,38 +262,38 @@ static WRITE32_HANDLER( backfire_spriteram2_w )
 
 static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
-	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(backfire_pf1_rowscroll_r, backfire_pf1_rowscroll_w)
-	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(backfire_pf2_rowscroll_r, backfire_pf2_rowscroll_w)
-	AM_RANGE(0x130000, 0x13001f) AM_DEVREADWRITE("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
-	AM_RANGE(0x140000, 0x141fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
-	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
-	AM_RANGE(0x150000, 0x150fff) AM_READWRITE(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
-	AM_RANGE(0x154000, 0x154fff) AM_READWRITE(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
-	AM_RANGE(0x160000, 0x161fff) AM_WRITE(backfire_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_BASE_MEMBER(backfire_state, m_mainram)// main ram
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x120000, 0x120fff) AM_READWRITE_LEGACY(backfire_pf1_rowscroll_r, backfire_pf1_rowscroll_w)
+	AM_RANGE(0x124000, 0x124fff) AM_READWRITE_LEGACY(backfire_pf2_rowscroll_r, backfire_pf2_rowscroll_w)
+	AM_RANGE(0x130000, 0x13001f) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
+	AM_RANGE(0x140000, 0x141fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
+	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
+	AM_RANGE(0x150000, 0x150fff) AM_READWRITE_LEGACY(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
+	AM_RANGE(0x154000, 0x154fff) AM_READWRITE_LEGACY(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
+	AM_RANGE(0x160000, 0x161fff) AM_WRITE_LEGACY(backfire_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_BASE( m_mainram)// main ram
 
-//  AM_RANGE(0x180010, 0x180013) AM_RAM AM_BASE(&backfire_180010) // always 180010 ?
-//  AM_RANGE(0x188010, 0x188013) AM_RAM AM_BASE(&backfire_188010) // always 188010 ?
+//  AM_RANGE(0x180010, 0x180013) AM_RAM AM_BASE_LEGACY(&backfire_180010) // always 180010 ?
+//  AM_RANGE(0x188010, 0x188013) AM_RAM AM_BASE_LEGACY(&backfire_188010) // always 188010 ?
 
-	AM_RANGE(0x184000, 0x185fff) AM_READWRITE(backfire_spriteram1_r, backfire_spriteram1_w)
-	AM_RANGE(0x18c000, 0x18dfff) AM_READWRITE(backfire_spriteram2_r, backfire_spriteram2_w)
-	AM_RANGE(0x190000, 0x190003) AM_DEVREAD("eeprom", backfire_eeprom_r)
-	AM_RANGE(0x194000, 0x194003) AM_READ(backfire_control2_r)
-	AM_RANGE(0x1a4000, 0x1a4003) AM_DEVWRITE("eeprom", backfire_eeprom_w)
+	AM_RANGE(0x184000, 0x185fff) AM_READWRITE_LEGACY(backfire_spriteram1_r, backfire_spriteram1_w)
+	AM_RANGE(0x18c000, 0x18dfff) AM_READWRITE_LEGACY(backfire_spriteram2_r, backfire_spriteram2_w)
+	AM_RANGE(0x190000, 0x190003) AM_DEVREAD_LEGACY("eeprom", backfire_eeprom_r)
+	AM_RANGE(0x194000, 0x194003) AM_READ_LEGACY(backfire_control2_r)
+	AM_RANGE(0x1a4000, 0x1a4003) AM_DEVWRITE_LEGACY("eeprom", backfire_eeprom_w)
 
-	AM_RANGE(0x1a8000, 0x1a8003) AM_RAM AM_BASE_MEMBER(backfire_state, m_left_priority)
-	AM_RANGE(0x1ac000, 0x1ac003) AM_RAM AM_BASE_MEMBER(backfire_state, m_right_priority)
+	AM_RANGE(0x1a8000, 0x1a8003) AM_RAM AM_BASE( m_left_priority)
+	AM_RANGE(0x1ac000, 0x1ac003) AM_RAM AM_BASE( m_right_priority)
 //  AM_RANGE(0x1b0000, 0x1b0003) AM_WRITENOP // always 1b0000
 
 	/* when set to pentometer in test mode */
-//  AM_RANGE(0x1e4000, 0x1e4003) AM_READ(backfire_unknown_wheel_r)
-//  AM_RANGE(0x1e8000, 0x1e8003) AM_READ(backfire_wheel1_r)
-//  AM_RANGE(0x1e8004, 0x1e8007) AM_READ(backfire_wheel2_r)
+//  AM_RANGE(0x1e4000, 0x1e4003) AM_READ_LEGACY(backfire_unknown_wheel_r)
+//  AM_RANGE(0x1e8000, 0x1e8003) AM_READ_LEGACY(backfire_wheel1_r)
+//  AM_RANGE(0x1e8004, 0x1e8007) AM_READ_LEGACY(backfire_wheel2_r)
 
-	AM_RANGE(0x1c0000, 0x1c0007) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x000000ff)
+	AM_RANGE(0x1c0000, 0x1c0007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x000000ff)
 ADDRESS_MAP_END
 
 

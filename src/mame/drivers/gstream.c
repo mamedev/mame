@@ -266,17 +266,17 @@ static WRITE32_HANDLER( gstream_tilemap3_scrolly_w )
 }
 
 static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
-	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE_MEMBER(gstream_state, m_workram) // work ram
+	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE( m_workram) // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
-	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_BASE_MEMBER(gstream_state, m_vram) // video ram
+	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE_LEGACY(gstream_vram_w) AM_BASE( m_vram) // video ram
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
-	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
-	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_BASE_MEMBER(gstream_state, m_paletteram)
-	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
-	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
-	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
-	AM_RANGE(0x4FE00000, 0x4FE00003) AM_WRITE(gstream_tilemap2_scrolly_w)
+	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE_LEGACY(gstream_tilemap3_scrollx_w)
+	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE_LEGACY(gstream_tilemap3_scrolly_w)
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE_LEGACY(gstream_palette_w) AM_BASE( m_paletteram)
+	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE_LEGACY(gstream_tilemap1_scrollx_w)
+	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE_LEGACY(gstream_tilemap1_scrolly_w)
+	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE_LEGACY(gstream_tilemap2_scrollx_w)
+	AM_RANGE(0x4FE00000, 0x4FE00003) AM_WRITE_LEGACY(gstream_tilemap2_scrolly_w)
 	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_SHARE("nvram") // Backup RAM
 	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
@@ -355,10 +355,10 @@ static ADDRESS_MAP_START( gstream_io, AS_IO, 32, gstream_state )
 	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("IN0")
 	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("IN1")
 	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2")	// extra coin switches etc
-	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w)	// oki banking
-	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w)	// ??
-	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x000000ff)	// music and samples
-	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x000000ff)	// music and samples
+	AM_RANGE(0x4030, 0x4033) AM_WRITE_LEGACY(gstream_oki_banking_w)	// oki banking
+	AM_RANGE(0x4040, 0x4043) AM_WRITE_LEGACY(gstream_oki_4040_w)	// ??
+	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)	// music and samples
+	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)	// music and samples
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gstream )

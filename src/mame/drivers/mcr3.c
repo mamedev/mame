@@ -491,10 +491,10 @@ static ADDRESS_MAP_START( mcrmono_map, AS_PROGRAM, 8, mcr3_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_SIZE_MEMBER(mcr3_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xea00, 0xebff) AM_RAM
-	AM_RANGE(0xec00, 0xec7f) AM_MIRROR(0x0380) AM_WRITE(mcr3_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr3_videoram_w) AM_BASE_MEMBER(mcr3_state, m_videoram)
+	AM_RANGE(0xec00, 0xec7f) AM_MIRROR(0x0380) AM_WRITE_LEGACY(mcr3_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(mcr3_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xf800, 0xffff) AM_ROM		/* schematics show a 2716 @ 2B here, but nobody used it */
 ADDRESS_MAP_END
 
@@ -507,9 +507,9 @@ static ADDRESS_MAP_START( mcrmono_portmap, AS_IO, 8, mcr3_state )
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP2")
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP3")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP4")
-	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_WRITE(mcrmono_control_port_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x78) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xf0, 0xf3) AM_MIRROR(0x0c) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_WRITE_LEGACY(mcrmono_control_port_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x78) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xf0, 0xf3) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 
@@ -524,11 +524,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spyhunt_map, AS_PROGRAM, 8, mcr3_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_BASE_MEMBER(mcr3_state, m_videoram)
-	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_BASE_MEMBER(mcr3_state, m_spyhunt_alpharam)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(spyhunt_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE_LEGACY(spyhunt_alpharam_w) AM_BASE( m_spyhunt_alpharam)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_BASE_SIZE_MEMBER(mcr3_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_WRITE(mcr3_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xfa00, 0xfa7f) AM_MIRROR(0x0180) AM_WRITE_LEGACY(mcr3_paletteram_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 /* upper I/O map determined by PAL; only SSIO ports and scroll registers are verified from schematics */
@@ -536,10 +536,10 @@ static ADDRESS_MAP_START( spyhunt_portmap, AS_IO, 8, mcr3_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS
-	AM_RANGE(0x84, 0x86) AM_WRITE(spyhunt_scroll_value_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x84, 0x86) AM_WRITE_LEGACY(spyhunt_scroll_value_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 

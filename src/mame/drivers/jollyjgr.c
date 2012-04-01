@@ -198,16 +198,16 @@ static ADDRESS_MAP_START( jollyjgr_map, AS_PROGRAM, 8, jollyjgr_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
-	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
+	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE_LEGACY(jollyjgr_misc_w)
+	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE_LEGACY(jollyjgr_coin_lookout_w)
 	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE_MEMBER(jollyjgr_state, m_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE_MEMBER(jollyjgr_state, m_colorram)
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_MEMBER(jollyjgr_state, m_spriteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(jollyjgr_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE_LEGACY(jollyjgr_attrram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE_MEMBER(jollyjgr_state, m_bitmap)
+	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE( m_bitmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fspider_map, AS_PROGRAM, 8, jollyjgr_state )
@@ -215,18 +215,18 @@ static ADDRESS_MAP_START( fspider_map, AS_PROGRAM, 8, jollyjgr_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
-	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
+	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE_LEGACY(jollyjgr_misc_w)
+	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE_LEGACY(jollyjgr_coin_lookout_w)
 	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE_MEMBER(jollyjgr_state, m_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE_MEMBER(jollyjgr_state, m_colorram)
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_MEMBER(jollyjgr_state, m_spriteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(jollyjgr_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE_LEGACY(jollyjgr_attrram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x9880, 0x989f) AM_RAM // ?
-	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_BASE_MEMBER(jollyjgr_state, m_bulletram)
+	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_BASE( m_bulletram)
 	AM_RANGE(0x98b0, 0x9bff) AM_RAM // ?
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE_MEMBER(jollyjgr_state, m_bitmap)
+	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE( m_bitmap)
 ADDRESS_MAP_END
 
 

@@ -245,28 +245,28 @@ logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",
 static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM												/* main RAM */
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(darius_watchdog_w)
-	AM_RANGE(0xc00000, 0xc0007f) AM_READWRITE(darius_ioc_r, darius_ioc_w)			/* inputs, sound */
-	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_word_r, pc080sn_word_w)	/* tilemaps */
-	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE("pc080sn", pc080sn_yscroll_word_w)
-	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE("pc080sn", pc080sn_xscroll_word_w)
-	AM_RANGE(0xd50000, 0xd50003) AM_DEVWRITE("pc080sn", pc080sn_ctrl_word_w)
-	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)/* palette */
-	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE_MEMBER(darius_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE_LEGACY(cpua_ctrl_w)
+	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE_LEGACY(darius_watchdog_w)
+	AM_RANGE(0xc00000, 0xc0007f) AM_READWRITE_LEGACY(darius_ioc_r, darius_ioc_w)			/* inputs, sound */
+	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE_LEGACY("pc080sn", pc080sn_word_r, pc080sn_word_w)	/* tilemaps */
+	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_yscroll_word_w)
+	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_xscroll_word_w)
+	AM_RANGE(0xd50000, 0xd50003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_ctrl_word_w)
+	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)/* palette */
+	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("share3") AM_BASE_MEMBER(darius_state, m_fg_ram)
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE_LEGACY(darius_fg_layer_w) AM_SHARE("share3") AM_BASE( m_fg_ram)
 	AM_RANGE(0xe10000, 0xe10fff) AM_RAM												/* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_cpub_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM				/* local RAM */
-	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w)	/* only writes $c00050 (?) */
-	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
+	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE_LEGACY(darius_ioc_w)	/* only writes $c00050 (?) */
+	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w)
 	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("share3")
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE_LEGACY(darius_fg_layer_w) AM_SHARE("share3")
 ADDRESS_MAP_END
 
 
@@ -493,18 +493,18 @@ static WRITE8_DEVICE_HANDLER( darius_write_portB1 )
 static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8, darius_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(darius_fm1_pan)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(darius_psg0_pan)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(darius_psg1_pan)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(darius_da_pan)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(adpcm_command_w)	/* ADPCM command for second Z80 to read from port 0x00 */
-//  AM_RANGE(0xd800, 0xd800) AM_WRITE(display_value)    /* ??? */
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(sound_bankswitch_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(darius_fm0_pan)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE_LEGACY(darius_fm1_pan)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(darius_psg0_pan)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE_LEGACY(darius_psg1_pan)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(darius_da_pan)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE_LEGACY(adpcm_command_w)	/* ADPCM command for second Z80 to read from port 0x00 */
+//  AM_RANGE(0xd800, 0xd800) AM_WRITE_LEGACY(display_value)    /* ??? */
+	AM_RANGE(0xdc00, 0xdc00) AM_WRITE_LEGACY(sound_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( darius_sound2_map, AS_PROGRAM, 8, darius_state )
@@ -568,10 +568,10 @@ static WRITE8_DEVICE_HANDLER( adpcm_data_w )
 
 static ADDRESS_MAP_START( darius_sound2_io_map, AS_IO, 8, darius_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(adpcm_command_read, adpcm_nmi_disable)
-	AM_RANGE(0x01, 0x01) AM_WRITE(adpcm_nmi_enable)
-	AM_RANGE(0x02, 0x02) AM_READ(readport2) AM_DEVWRITE("msm", adpcm_data_w)	/* readport2 ??? */
-	AM_RANGE(0x03, 0x03) AM_READ(readport3)	/* ??? */
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(adpcm_command_read, adpcm_nmi_disable)
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(adpcm_nmi_enable)
+	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(readport2) AM_DEVWRITE_LEGACY("msm", adpcm_data_w)	/* readport2 ??? */
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(readport3)	/* ??? */
 ADDRESS_MAP_END
 
 

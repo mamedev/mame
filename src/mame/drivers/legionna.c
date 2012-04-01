@@ -82,12 +82,12 @@ Preliminary COP MCU memory map
 static ADDRESS_MAP_START( legionna_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(legionna_mcu_r, legionna_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_background_w) AM_BASE_MEMBER(legionna_state, m_back_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE_MEMBER(legionna_state, m_fore_data)
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(legionna_midground_w) AM_BASE_MEMBER(legionna_state, m_mid_data)
-	AM_RANGE(0x102800, 0x1037ff) AM_RAM_WRITE(legionna_text_w) AM_BASE_MEMBER(legionna_state, m_textram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* palette xRRRRxGGGGxBBBBx ? */
+	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE_LEGACY(legionna_mcu_r, legionna_mcu_w) AM_BASE_LEGACY(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE_LEGACY(legionna_background_w) AM_BASE( m_back_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE_LEGACY(legionna_foreground_w) AM_BASE( m_fore_data)
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE_LEGACY(legionna_midground_w) AM_BASE( m_mid_data)
+	AM_RANGE(0x102800, 0x1037ff) AM_RAM_WRITE_LEGACY(legionna_text_w) AM_BASE( m_textram)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* palette xRRRRxGGGGxBBBBx ? */
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x106000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM /* main ram */
@@ -97,26 +97,26 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( heatbrl_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(heatbrl_mcu_r, heatbrl_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE_MEMBER(legionna_state, m_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE_MEMBER(legionna_state, m_fore_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE_MEMBER(legionna_state, m_mid_data)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE_MEMBER(legionna_state, m_textram)
+	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE_LEGACY(heatbrl_mcu_r, heatbrl_mcu_w) AM_BASE_LEGACY(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE_LEGACY(legionna_background_w) AM_BASE( m_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE_LEGACY(legionna_foreground_w) AM_BASE( m_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE_LEGACY(legionna_midground_w) AM_BASE( m_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE_LEGACY(legionna_text_w) AM_BASE( m_textram)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(godzilla_mcu_r, godzilla_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE_LEGACY(godzilla_mcu_r, godzilla_mcu_w) AM_BASE_LEGACY(&cop_mcu_ram)	/* COP mcu */
 	AM_RANGE(0x100800, 0x100fff) AM_RAM
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(legionna_background_w) AM_BASE_MEMBER(legionna_state, m_back_data)
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(legionna_midground_w) AM_BASE_MEMBER(legionna_state, m_mid_data)
-	AM_RANGE(0x102800, 0x1037ff) AM_RAM_WRITE(legionna_text_w) AM_BASE_MEMBER(legionna_state, m_textram)
-	AM_RANGE(0x103800, 0x103fff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE_MEMBER(legionna_state, m_fore_data)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(legionna_background_w) AM_BASE( m_back_data)
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE_LEGACY(legionna_midground_w) AM_BASE( m_mid_data)
+	AM_RANGE(0x102800, 0x1037ff) AM_RAM_WRITE_LEGACY(legionna_text_w) AM_BASE( m_textram)
+	AM_RANGE(0x103800, 0x103fff) AM_RAM_WRITE_LEGACY(legionna_foreground_w) AM_BASE( m_fore_data)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x106000, 0x1067ff) AM_RAM
 	AM_RANGE(0x106800, 0x106fff) AM_RAM
@@ -135,13 +135,13 @@ static WRITE16_HANDLER( denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w )
 static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(denjinmk_mcu_r, denjinmk_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE_LEGACY(denjinmk_mcu_r, denjinmk_mcu_w) AM_BASE_LEGACY(&cop_mcu_ram)	/* COP mcu */
 	AM_RANGE(0x100800, 0x100fff) AM_RAM
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_background_w) AM_BASE_MEMBER(legionna_state, m_back_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE_MEMBER(legionna_state, m_fore_data)
-	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(legionna_midground_w) AM_BASE_MEMBER(legionna_state, m_mid_data)
-	AM_RANGE(0x102800, 0x103fff) AM_RAM_WRITE(legionna_text_w) AM_BASE_MEMBER(legionna_state, m_textram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE_LEGACY(legionna_background_w) AM_BASE( m_back_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE_LEGACY(legionna_foreground_w) AM_BASE( m_fore_data)
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE_LEGACY(legionna_midground_w) AM_BASE( m_mid_data)
+	AM_RANGE(0x102800, 0x103fff) AM_RAM_WRITE_LEGACY(legionna_text_w) AM_BASE( m_textram)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE_LEGACY(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x106000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x11dfff) AM_RAM
@@ -152,12 +152,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( grainbow_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(grainbow_mcu_r, grainbow_mcu_w) AM_BASE(&cop_mcu_ram)	/* COP mcu */
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE_MEMBER(legionna_state, m_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE_MEMBER(legionna_state, m_fore_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE_MEMBER(legionna_state, m_mid_data)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE_MEMBER(legionna_state, m_textram)
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE_LEGACY(grainbow_mcu_r, grainbow_mcu_w) AM_BASE_LEGACY(&cop_mcu_ram)	/* COP mcu */
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE_LEGACY(legionna_background_w) AM_BASE( m_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE_LEGACY(legionna_foreground_w) AM_BASE( m_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE_LEGACY(legionna_midground_w) AM_BASE( m_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE_LEGACY(legionna_text_w) AM_BASE( m_textram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x104000, 0x104fff) AM_RAM//_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x105000, 0x105fff) AM_RAM
 	AM_RANGE(0x106000, 0x106fff) AM_RAM
@@ -168,12 +168,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cupsoc_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(cupsoc_mcu_r,cupsoc_mcu_w) AM_BASE(&cop_mcu_ram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE_MEMBER(legionna_state, m_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE_MEMBER(legionna_state, m_fore_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE_MEMBER(legionna_state, m_mid_data)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE_MEMBER(legionna_state, m_textram)
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE_LEGACY(cupsoc_mcu_r,cupsoc_mcu_w) AM_BASE_LEGACY(&cop_mcu_ram)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE_LEGACY(legionna_background_w) AM_BASE( m_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE_LEGACY(legionna_foreground_w) AM_BASE( m_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE_LEGACY(legionna_midground_w) AM_BASE( m_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE_LEGACY(legionna_text_w) AM_BASE( m_textram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
@@ -187,12 +187,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cupsocs_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(cupsocs_mcu_r,cupsocs_mcu_w) AM_BASE(&cop_mcu_ram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE_MEMBER(legionna_state, m_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE_MEMBER(legionna_state, m_fore_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE_MEMBER(legionna_state, m_mid_data)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE_MEMBER(legionna_state, m_textram)
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE_LEGACY(cupsocs_mcu_r,cupsocs_mcu_w) AM_BASE_LEGACY(&cop_mcu_ram)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE_LEGACY(legionna_background_w) AM_BASE( m_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE_LEGACY(legionna_foreground_w) AM_BASE( m_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE_LEGACY(legionna_midground_w) AM_BASE( m_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE_LEGACY(legionna_text_w) AM_BASE( m_textram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
@@ -206,12 +206,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cupsocbl_mem, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
-	AM_RANGE(0x100000, 0x1007ff) AM_READWRITE(copdxbl_0_r,copdxbl_0_w) AM_BASE(&cop_mcu_ram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE_MEMBER(legionna_state, m_back_data)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE_MEMBER(legionna_state, m_fore_data)
-	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE_MEMBER(legionna_state, m_mid_data)
-	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE_MEMBER(legionna_state, m_textram)
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100000, 0x1007ff) AM_READWRITE_LEGACY(copdxbl_0_r,copdxbl_0_w) AM_BASE_LEGACY(&cop_mcu_ram)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE_LEGACY(legionna_background_w) AM_BASE( m_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE_LEGACY(legionna_foreground_w) AM_BASE( m_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE_LEGACY(legionna_midground_w) AM_BASE( m_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE_LEGACY(legionna_text_w) AM_BASE( m_textram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_SHARE("spriteram")
@@ -232,9 +232,9 @@ static WRITE8_DEVICE_HANDLER( okim_rombank_w )
 static ADDRESS_MAP_START( cupsocbl_sound_mem, AS_PROGRAM, 8, legionna_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", okim_rombank_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("oki", okim_rombank_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 /*****************************************************************************/

@@ -91,10 +91,10 @@ static READ8_DEVICE_HANDLER( hyprolyb_adpcm_data_r )
 
 static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_data_r)
-	AM_RANGE(0x1001, 0x1001) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_ready_r)
-	AM_RANGE(0x1002, 0x1002) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_msm_data_w)
-	AM_RANGE(0x1003, 0x1003) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_msm_vck_r)
+	AM_RANGE(0x1000, 0x1000) AM_DEVREAD_LEGACY("hyprolyb_adpcm", hyprolyb_adpcm_data_r)
+	AM_RANGE(0x1001, 0x1001) AM_DEVREAD_LEGACY("hyprolyb_adpcm", hyprolyb_adpcm_ready_r)
+	AM_RANGE(0x1002, 0x1002) AM_DEVWRITE_LEGACY("hyprolyb_adpcm", hyprolyb_msm_data_w)
+	AM_RANGE(0x1003, 0x1003) AM_DEVREAD_LEGACY("hyprolyb_adpcm", hyprolyb_msm_vck_r)
 		// on init:
 		//    $1003 = $00
 		//    $1002 = $FF

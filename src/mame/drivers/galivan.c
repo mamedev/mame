@@ -57,9 +57,9 @@ static ADDRESS_MAP_START( galivan_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE_LEGACY(galivan_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
 
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe100, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -67,9 +67,9 @@ static ADDRESS_MAP_START( ninjemak_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE_LEGACY(galivan_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
 
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -80,13 +80,13 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, galivan_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x40, 0x40) AM_WRITE(galivan_gfxbank_w)
-	AM_RANGE(0x41, 0x42) AM_WRITE(galivan_scrollx_w)
-	AM_RANGE(0x43, 0x44) AM_WRITE(galivan_scrolly_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(galivan_sound_command_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(galivan_gfxbank_w)
+	AM_RANGE(0x41, 0x42) AM_WRITE_LEGACY(galivan_scrollx_w)
+	AM_RANGE(0x43, 0x44) AM_WRITE_LEGACY(galivan_scrolly_w)
+	AM_RANGE(0x45, 0x45) AM_WRITE_LEGACY(galivan_sound_command_w)
 /*  AM_RANGE(0x46, 0x46) AM_WRITENOP */
 /*  AM_RANGE(0x47, 0x47) AM_WRITENOP */
-	AM_RANGE(0xc0, 0xc0) AM_READ(IO_port_c0_r) /* dangar needs to return 0x58 */
+	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(IO_port_c0_r) /* dangar needs to return 0x58 */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( blit_trigger_w )
@@ -98,13 +98,13 @@ static WRITE8_HANDLER( blit_trigger_w )
 
 static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8, galivan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1") AM_WRITE(ninjemak_gfxbank_w)
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1") AM_WRITE_LEGACY(ninjemak_gfxbank_w)
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x82, 0x82) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x83, 0x83) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x84, 0x84) AM_READ_PORT("DSW1")
-	AM_RANGE(0x85, 0x85) AM_READ_PORT("DSW2") AM_WRITE(galivan_sound_command_w)
-	AM_RANGE(0x86, 0x86) AM_WRITE(blit_trigger_w)         // ??
+	AM_RANGE(0x85, 0x85) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(galivan_sound_command_w)
+	AM_RANGE(0x86, 0x86) AM_WRITE_LEGACY(blit_trigger_w)         // ??
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP         // ??
 ADDRESS_MAP_END
 
@@ -115,11 +115,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, galivan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac1", dac_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac2", dac_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(soundlatch_clear_r)
+	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

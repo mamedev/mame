@@ -107,35 +107,35 @@ static WRITE8_HANDLER( nmi_mask_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(vastar_bg2videoram_r, vastar_bg2videoram_w) AM_BASE_MEMBER(vastar_state,m_bg2videoram)
-	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(vastar_bg1videoram_r, vastar_bg1videoram_w) AM_BASE_MEMBER(vastar_state,m_bg1videoram)
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE(vastar_bg2videoram_r, vastar_bg2videoram_w)	/* mirror address */
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(vastar_bg1videoram_r, vastar_bg1videoram_w)	/* mirror address */
-	AM_RANGE(0xc000, 0xc000) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,m_sprite_priority)	/* sprite/BG priority */
-	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(vastar_fgvideoram_w) AM_BASE_MEMBER(vastar_state,m_fgvideoram)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
-	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w) AM_BASE_MEMBER(vastar_state,m_sharedram)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(vastar_bg2videoram_r, vastar_bg2videoram_w) AM_BASE(m_bg2videoram)
+	AM_RANGE(0x9000, 0x9fff) AM_READWRITE_LEGACY(vastar_bg1videoram_r, vastar_bg1videoram_w) AM_BASE(m_bg1videoram)
+	AM_RANGE(0xa000, 0xafff) AM_READWRITE_LEGACY(vastar_bg2videoram_r, vastar_bg2videoram_w)	/* mirror address */
+	AM_RANGE(0xb000, 0xbfff) AM_READWRITE_LEGACY(vastar_bg1videoram_r, vastar_bg1videoram_w)	/* mirror address */
+	AM_RANGE(0xc000, 0xc000) AM_WRITEONLY AM_BASE(m_sprite_priority)	/* sprite/BG priority */
+	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE_LEGACY(vastar_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE_LEGACY(watchdog_reset_r, watchdog_reset_w)
+	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE_LEGACY(vastar_sharedram_r, vastar_sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0xf100, 0xf7ff) AM_RAM
 
 	/* in hidden portions of video RAM: (fallthrough) */
-	AM_RANGE(0xc400, 0xc43f) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,m_spriteram1)	/* actually c410-c41f and c430-c43f */
-	AM_RANGE(0xc7c0, 0xc7df) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,m_bg1_scroll)
-	AM_RANGE(0xc7e0, 0xc7ff) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,m_bg2_scroll)
-	AM_RANGE(0xc800, 0xc83f) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,m_spriteram2)	/* actually c810-c81f and c830-c83f */
-	AM_RANGE(0xcc00, 0xcc3f) AM_WRITEONLY AM_BASE_MEMBER(vastar_state,m_spriteram3)	/* actually cc10-cc1f and cc30-cc3f */
+	AM_RANGE(0xc400, 0xc43f) AM_WRITEONLY AM_BASE(m_spriteram1)	/* actually c410-c41f and c430-c43f */
+	AM_RANGE(0xc7c0, 0xc7df) AM_WRITEONLY AM_BASE(m_bg1_scroll)
+	AM_RANGE(0xc7e0, 0xc7ff) AM_WRITEONLY AM_BASE(m_bg2_scroll)
+	AM_RANGE(0xc800, 0xc83f) AM_WRITEONLY AM_BASE(m_spriteram2)	/* actually c810-c81f and c830-c83f */
+	AM_RANGE(0xcc00, 0xcc3f) AM_WRITEONLY AM_BASE(m_spriteram3)	/* actually cc10-cc1f and cc30-cc3f */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_port_map, AS_IO, 8, vastar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(flip_screen_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(vastar_hold_cpu2_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(flip_screen_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(vastar_hold_cpu2_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w)
+	AM_RANGE(0x4000, 0x40ff) AM_READWRITE_LEGACY(vastar_sharedram_r, vastar_sharedram_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
 	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("P1")
 	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")
@@ -143,8 +143,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_port_map, AS_IO, 8, vastar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 

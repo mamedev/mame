@@ -74,54 +74,54 @@ static WRITE8_HANDLER( blktiger_coinlockout_w )
 static ADDRESS_MAP_START( blktiger_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_BASE_MEMBER(blktiger_state, m_txvideoram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE_LEGACY(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(blktiger_txvideoram_w) AM_BASE( m_txvideoram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8, blktiger_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE(blktiger_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE_LEGACY(blktiger_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")	AM_WRITE(blktiger_coinlockout_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	AM_WRITE(blktiger_video_control_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")	AM_WRITE_LEGACY(blktiger_coinlockout_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	AM_WRITE_LEGACY(blktiger_video_control_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x07, 0x07) AM_READWRITE(blktiger_from_mcu_r,blktiger_to_mcu_w)	 /* Software protection (7) */
-	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(blktiger_video_enable_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(blktiger_bgvideoram_bank_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x07, 0x07) AM_READWRITE_LEGACY(blktiger_from_mcu_r,blktiger_to_mcu_w)	 /* Software protection (7) */
+	AM_RANGE(0x08, 0x09) AM_WRITE_LEGACY(blktiger_scrollx_w)
+	AM_RANGE(0x0a, 0x0b) AM_WRITE_LEGACY(blktiger_scrolly_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(blktiger_video_enable_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE_LEGACY(blktiger_bgvideoram_bank_w)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE_LEGACY(blktiger_screen_layout_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8, blktiger_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE(blktiger_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE_LEGACY(blktiger_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")	AM_WRITE(blktiger_coinlockout_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	AM_WRITE(blktiger_video_control_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")	AM_WRITE_LEGACY(blktiger_coinlockout_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	AM_WRITE_LEGACY(blktiger_video_control_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x07, 0x07) AM_NOP	 /* Software protection (7) */
-	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(blktiger_video_enable_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(blktiger_bgvideoram_bank_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
+	AM_RANGE(0x08, 0x09) AM_WRITE_LEGACY(blktiger_scrollx_w)
+	AM_RANGE(0x0a, 0x0b) AM_WRITE_LEGACY(blktiger_scrolly_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(blktiger_video_enable_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE_LEGACY(blktiger_bgvideoram_bank_w)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE_LEGACY(blktiger_screen_layout_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktiger_sound_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0xc800, 0xc800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktiger_mcu_map, AS_PROGRAM, 8, blktiger_state )
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( blktiger_mcu_map, AS_PROGRAM, 8, blktiger_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktiger_mcu_io_map, AS_IO, 8, blktiger_state )
-	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READWRITE(blktiger_from_main_r,blktiger_to_main_w)
+	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READWRITE_LEGACY(blktiger_from_main_r,blktiger_to_main_w)
 	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P3) AM_WRITENOP	/* other ports unknown */
 ADDRESS_MAP_END
 

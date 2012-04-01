@@ -175,20 +175,20 @@ static WRITE8_HANDLER( sound_bank_w )
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bottom9_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bottom9_bankedram1_r, bottom9_bankedram1_w)
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(bankswitch_w)
-	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(bottom9_1f90_w)
-	AM_RANGE(0x1fa0, 0x1fa0) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1fb0, 0x1fb0) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(bottom9_sh_irqtrigger_w)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(bottom9_bankedram1_r, bottom9_bankedram1_w)
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE_LEGACY(bankswitch_w)
+	AM_RANGE(0x1f90, 0x1f90) AM_WRITE_LEGACY(bottom9_1f90_w)
+	AM_RANGE(0x1fa0, 0x1fa0) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x1fb0, 0x1fb0) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE_LEGACY(bottom9_sh_irqtrigger_w)
 	AM_RANGE(0x1fd0, 0x1fd0) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1fd1, 0x1fd1) AM_READ_PORT("P1")
 	AM_RANGE(0x1fd2, 0x1fd2) AM_READ_PORT("P2")
 	AM_RANGE(0x1fd3, 0x1fd3) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1fe0, 0x1fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1ff0, 0x1fff) AM_DEVWRITE("k051316", k051316_ctrl_w)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
+	AM_RANGE(0x1ff0, 0x1fff) AM_DEVWRITE_LEGACY("k051316", k051316_ctrl_w)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE_LEGACY(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -197,11 +197,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, bottom9_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE("k007232_1", k007232_r, k007232_w)
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232_2", k007232_r, k007232_w)
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(nmi_enable_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(sound_bank_w)
+	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE_LEGACY("k007232_1", k007232_r, k007232_w)
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)
+	AM_RANGE(0xd000, 0xd000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(nmi_enable_w)
 ADDRESS_MAP_END
 
 

@@ -178,20 +178,20 @@ static WRITE8_HANDLER( key_matrix_status_w )
 
 static ADDRESS_MAP_START( speedatk_mem, AS_PROGRAM, 8, speedatk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(key_matrix_r,key_matrix_w)
-	AM_RANGE(0x8001, 0x8001) AM_READWRITE(key_matrix_status_r,key_matrix_status_w)
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE_LEGACY(key_matrix_r,key_matrix_w)
+	AM_RANGE(0x8001, 0x8001) AM_READWRITE_LEGACY(key_matrix_status_r,key_matrix_status_w)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(speedatk_videoram_w) AM_BASE_MEMBER(speedatk_state, m_videoram)
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(speedatk_colorram_w) AM_BASE_MEMBER(speedatk_state, m_colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(speedatk_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE_LEGACY(speedatk_colorram_w) AM_BASE( m_colorram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( speedatk_io, AS_IO, 8, speedatk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(speedatk_6845_w) //h46505 address / data routing
-	AM_RANGE(0x24, 0x24) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(speedatk_6845_w) //h46505 address / data routing
+	AM_RANGE(0x24, 0x24) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	//what's 60-6f for? Seems used only in attract mode and read back when a 2p play ends ...
 ADDRESS_MAP_END
 

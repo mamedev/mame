@@ -173,8 +173,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magtouch_io, AS_IO, 32, magtouch_state )
 	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x02e0, 0x02e7) AM_READWRITE8(magtouch_io_r, magtouch_io_w, 0xffffffff)
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
+	AM_RANGE(0x02e0, 0x02e7) AM_READWRITE8_LEGACY(magtouch_io_r, magtouch_io_w, 0xffffffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( magtouch )

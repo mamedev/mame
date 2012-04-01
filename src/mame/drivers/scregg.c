@@ -70,32 +70,32 @@ static WRITE8_HANDLER( scregg_irqack_w )
 
 static ADDRESS_MAP_START( dommy_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
-	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE(scregg_irqack_w)
-	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE(btime_video_control_w)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0x2800, 0x2bff) AM_READWRITE_LEGACY(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(scregg_irqack_w)
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(btime_video_control_w)
 /*  AM_RANGE(0x4004, 0x4004)  */ /* this is read */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("P1")
 	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("P2")
-	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x4006, 0x4007) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x4004, 0x4005) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x4006, 0x4007) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( eggs_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(btime_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(btime_state, m_colorram)
-	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r,btime_mirrorcolorram_w)
-	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1") AM_WRITE(btime_video_control_w)
-	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") AM_WRITE(scregg_irqack_w)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE_LEGACY(btime_mirrorvideoram_r,btime_mirrorvideoram_w)
+	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE_LEGACY(btime_mirrorcolorram_r,btime_mirrorcolorram_w)
+	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(btime_video_control_w)
+	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(scregg_irqack_w)
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P1")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P2")
-	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x2006, 0x2007) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x2004, 0x2005) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x2006, 0x2007) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM    /* reset/interrupt vectors */
 ADDRESS_MAP_END

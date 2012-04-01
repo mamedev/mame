@@ -874,47 +874,47 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(mr2_w) AM_BASE_MEMBER(model1_state, m_mr2)
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(mr_w)  AM_BASE_MEMBER(model1_state, m_mr)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(mr2_w) AM_BASE( m_mr2)
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE_LEGACY(mr_w)  AM_BASE( m_mr)
 
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_BASE_MEMBER(model1_state, m_display_list0)
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE_MEMBER(model1_state, m_display_list1)
-	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE_LEGACY(md0_w) AM_BASE( m_display_list0)
+	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE_LEGACY(md1_w) AM_BASE( m_display_list1)
+	AM_RANGE(0x680000, 0x680003) AM_READWRITE_LEGACY(model1_listctl_r, model1_listctl_w)
 
-	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE_MODERN("tile", segas24_tile, tile_r, tile_w)
+	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
 	AM_RANGE(0x720000, 0x720001) AM_WRITENOP		// Unknown, always 0
 	AM_RANGE(0x740000, 0x740001) AM_WRITENOP		// Horizontal synchronization register
 	AM_RANGE(0x760000, 0x760001) AM_WRITENOP		// Vertical synchronization register
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
-	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE_MODERN("tile", segas24_tile, char_r, char_w)
+	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
 
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE_MEMBER(model1_state, m_color_xlat)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE_LEGACY(p_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE( m_color_xlat)
 
-	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
+	AM_RANGE(0xc00000, 0xc0003f) AM_READ_LEGACY(io_r) AM_WRITENOP
 
-	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
+	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE_LEGACY(network_ctl_r, network_ctl_w)
 
 	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
-	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
+	AM_RANGE(0xc40000, 0xc40001) AM_WRITE_LEGACY(snd_latch_to_68k_w)
+	AM_RANGE(0xc40002, 0xc40003) AM_READ_LEGACY(snd_68k_ready_r)
 
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_copro_adr_r, model1_tgp_copro_adr_w)
-	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_tgp_copro_ram_w )
-	AM_RANGE(0xd80000, 0xd80003) AM_WRITE(model1_tgp_copro_w) AM_MIRROR(0x10)
-	AM_RANGE(0xdc0000, 0xdc0003) AM_READ(fifoin_status_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE_LEGACY(model1_tgp_copro_adr_r, model1_tgp_copro_adr_w)
+	AM_RANGE(0xd20000, 0xd20003) AM_WRITE_LEGACY(model1_tgp_copro_ram_w )
+	AM_RANGE(0xd80000, 0xd80003) AM_WRITE_LEGACY(model1_tgp_copro_w) AM_MIRROR(0x10)
+	AM_RANGE(0xdc0000, 0xdc0003) AM_READ_LEGACY(fifoin_status_r)
 
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP        // Watchdog?  IRQ ack? Always 0x20, usually on irq
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(bank_w)
+	AM_RANGE(0xe00004, 0xe00005) AM_WRITE_LEGACY(bank_w)
 	AM_RANGE(0xe0000c, 0xe0000f) AM_WRITENOP
 
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model1_io, AS_IO, 16, model1_state )
-	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_tgp_copro_ram_r)
-	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_tgp_copro_r)
+	AM_RANGE(0xd20000, 0xd20003) AM_READ_LEGACY(model1_tgp_copro_ram_r)
+	AM_RANGE(0xd80000, 0xd80003) AM_READ_LEGACY(model1_tgp_copro_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
@@ -922,47 +922,47 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(mr2_w) AM_BASE_MEMBER(model1_state, m_mr2)
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(mr_w)  AM_BASE_MEMBER(model1_state, m_mr)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(mr2_w) AM_BASE( m_mr2)
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE_LEGACY(mr_w)  AM_BASE( m_mr)
 
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_BASE_MEMBER(model1_state, m_display_list0)
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE_MEMBER(model1_state, m_display_list1)
-	AM_RANGE(0x680000, 0x680003) AM_READWRITE(model1_listctl_r, model1_listctl_w)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE_LEGACY(md0_w) AM_BASE( m_display_list0)
+	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE_LEGACY(md1_w) AM_BASE( m_display_list1)
+	AM_RANGE(0x680000, 0x680003) AM_READWRITE_LEGACY(model1_listctl_r, model1_listctl_w)
 
-	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE_MODERN("tile", segas24_tile, tile_r, tile_w)
+	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
 	AM_RANGE(0x720000, 0x720001) AM_WRITENOP		// Unknown, always 0
 	AM_RANGE(0x740000, 0x740001) AM_WRITENOP		// Horizontal synchronization register
 	AM_RANGE(0x760000, 0x760001) AM_WRITENOP		// Vertical synchronization register
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
-	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE_MODERN("tile", segas24_tile, char_r, char_w)
+	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
 
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE_MEMBER(model1_state, m_color_xlat)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE_LEGACY(p_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE( m_color_xlat)
 
-	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
+	AM_RANGE(0xc00000, 0xc0003f) AM_READ_LEGACY(io_r) AM_WRITENOP
 
-	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
+	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE_LEGACY(network_ctl_r, network_ctl_w)
 
 	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
-	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
+	AM_RANGE(0xc40000, 0xc40001) AM_WRITE_LEGACY(snd_latch_to_68k_w)
+	AM_RANGE(0xc40002, 0xc40003) AM_READ_LEGACY(snd_68k_ready_r)
 
-	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE(model1_tgp_vr_adr_r, model1_tgp_vr_adr_w)
-	AM_RANGE(0xd20000, 0xd20003) AM_WRITE(model1_vr_tgp_ram_w )
-	AM_RANGE(0xd80000, 0xd80003) AM_WRITE(model1_vr_tgp_w) AM_MIRROR(0x10)
-	AM_RANGE(0xdc0000, 0xdc0003) AM_READ(fifoin_status_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE_LEGACY(model1_tgp_vr_adr_r, model1_tgp_vr_adr_w)
+	AM_RANGE(0xd20000, 0xd20003) AM_WRITE_LEGACY(model1_vr_tgp_ram_w )
+	AM_RANGE(0xd80000, 0xd80003) AM_WRITE_LEGACY(model1_vr_tgp_w) AM_MIRROR(0x10)
+	AM_RANGE(0xdc0000, 0xdc0003) AM_READ_LEGACY(fifoin_status_r)
 
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP        // Watchdog?  IRQ ack? Always 0x20, usually on irq
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(bank_w)
+	AM_RANGE(0xe00004, 0xe00005) AM_WRITE_LEGACY(bank_w)
 	AM_RANGE(0xe0000c, 0xe0000f) AM_WRITENOP
 
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model1_vr_io, AS_IO, 16, model1_state )
-	AM_RANGE(0xd20000, 0xd20003) AM_READ(model1_vr_tgp_ram_r)
-	AM_RANGE(0xd80000, 0xd80003) AM_READ(model1_vr_tgp_r)
+	AM_RANGE(0xd20000, 0xd20003) AM_READ_LEGACY(model1_vr_tgp_ram_r)
+	AM_RANGE(0xd80000, 0xd80003) AM_READ_LEGACY(model1_vr_tgp_r)
 ADDRESS_MAP_END
 
 static READ16_HANDLER( m1_snd_68k_latch_r )
@@ -998,14 +998,14 @@ static WRITE16_HANDLER( m1_snd_68k_latch2_w )
 
 static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE( m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
-	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE( m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
-	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8( "sega1", multipcm_r, multipcm_w, 0x00ff )
+	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE_LEGACY( m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
+	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE_LEGACY( m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
+	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8_LEGACY( "sega1", multipcm_r, multipcm_w, 0x00ff )
 	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
-	AM_RANGE(0xc50000, 0xc50001) AM_DEVWRITE( "sega1", m1_snd_mpcm_bnk_w )
-	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8( "sega2", multipcm_r, multipcm_w, 0x00ff )
-	AM_RANGE(0xc70000, 0xc70001) AM_DEVWRITE( "sega2", m1_snd_mpcm_bnk_w )
-	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8( "ymsnd", ym3438_r, ym3438_w, 0x00ff )
+	AM_RANGE(0xc50000, 0xc50001) AM_DEVWRITE_LEGACY( "sega1", m1_snd_mpcm_bnk_w )
+	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8_LEGACY( "sega2", multipcm_r, multipcm_w, 0x00ff )
+	AM_RANGE(0xc70000, 0xc70001) AM_DEVWRITE_LEGACY( "sega2", m1_snd_mpcm_bnk_w )
+	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8_LEGACY( "ymsnd", ym3438_r, ym3438_w, 0x00ff )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -44,31 +44,31 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM		/* galspnbl work RAM, bitmaps are decompressed here */
 	AM_RANGE(0x800000, 0x803fff) AM_RAM		/* hotpinbl work RAM */
 	AM_RANGE(0x808000, 0x80ffff) AM_RAM		/* hotpinbl work RAM, bitmaps are decompressed here */
-	AM_RANGE(0x880000, 0x880fff) AM_RAM AM_BASE_SIZE_MEMBER(galspnbl_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x880000, 0x880fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8ff400, 0x8fffff) AM_WRITENOP	/* ??? */
-	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE_MEMBER(galspnbl_state, m_colorram)
+	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE( m_colorram)
 	AM_RANGE(0x901000, 0x903fff) AM_WRITENOP	/* ??? */
-	AM_RANGE(0x904000, 0x904fff) AM_RAM AM_BASE_MEMBER(galspnbl_state, m_videoram)
+	AM_RANGE(0x904000, 0x904fff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP	/* ??? */
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE_MEMBER(galspnbl_state, m_bgvideoram)
+	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE( m_bgvideoram)
 	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP	/* more palette ? */
-	AM_RANGE(0xa01000, 0xa017ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa01000, 0xa017ff) AM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP	/* more palette ? */
 	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
-	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)
+	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE_LEGACY(soundcommand_w)
 	AM_RANGE(0xa80020, 0xa80021) AM_READ_PORT("SYSTEM") AM_WRITENOP		/* w - could be watchdog, but causes resets when picture is shown */
 	AM_RANGE(0xa80030, 0xa80031) AM_READ_PORT("DSW1") AM_WRITENOP		/* w - irq ack? */
 	AM_RANGE(0xa80040, 0xa80041) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa80050, 0xa80051) AM_WRITEONLY AM_BASE_MEMBER(galspnbl_state, m_scroll)	/* ??? */
+	AM_RANGE(0xa80050, 0xa80051) AM_WRITEONLY AM_BASE( m_scroll)	/* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, galspnbl_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP	/* irq ack ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

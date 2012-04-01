@@ -1183,22 +1183,22 @@ static WRITE16_HANDLER( jaguar_gpu_ram_w16 ) { if (!(offset&1)) { jaguar_gpu_ram
 
 static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, cojag_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE( jaguar_shared_ram_r16, jaguar_shared_ram_w16 );
-	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE( jaguar_cart_base_r16, jaguar_cart_base_w16 )
-	AM_RANGE(0xe00000, 0xe1ffff) AM_READWRITE( jaguar_rom_base_r16, jaguar_rom_base_w16 )
-	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs_r, jaguar_tom_regs_w) // might be reversed endian of the others..
-	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_READWRITE(jaguar_gpu_clut_r16, jaguar_gpu_clut_w16 )
-	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r16, gpuctrl_w16)
-	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r16, jaguar_blitter_w16)
-	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_READWRITE( jaguar_gpu_ram_r16, jaguar_gpu_ram_w16 )
-	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs_r, jaguar_jerry_regs_w) // might be reversed endian of the others..
-	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r16, joystick_w16)
-	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE(jaguar_eeprom_clk16,jaguar_eeprom_w16)	// GPI00
-	AM_RANGE(0xf15000, 0xf15003) AM_READ(jaguar_eeprom_cs16)				// GPI01
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r16, dspctrl_w16)
-	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r16, jaguar_serial_w16)
-	AM_RANGE(0xf1b000, 0xf1cfff) AM_READWRITE(jaguar_dsp_ram_r16, jaguar_dsp_ram_w16)
-	AM_RANGE(0xf1d000, 0xf1dfff) AM_READWRITE( high_rom_base_r16, high_rom_base_w16 )
+	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE_LEGACY( jaguar_shared_ram_r16, jaguar_shared_ram_w16 );
+	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE_LEGACY( jaguar_cart_base_r16, jaguar_cart_base_w16 )
+	AM_RANGE(0xe00000, 0xe1ffff) AM_READWRITE_LEGACY( jaguar_rom_base_r16, jaguar_rom_base_w16 )
+	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs_r, jaguar_tom_regs_w) // might be reversed endian of the others..
+	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_READWRITE_LEGACY(jaguar_gpu_clut_r16, jaguar_gpu_clut_w16 )
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(gpuctrl_r16, gpuctrl_w16)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(jaguar_blitter_r16, jaguar_blitter_w16)
+	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY( jaguar_gpu_ram_r16, jaguar_gpu_ram_w16 )
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs_r, jaguar_jerry_regs_w) // might be reversed endian of the others..
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE_LEGACY(joystick_r16, joystick_w16)
+	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE_LEGACY(jaguar_eeprom_clk16,jaguar_eeprom_w16)	// GPI00
+	AM_RANGE(0xf15000, 0xf15003) AM_READ_LEGACY(jaguar_eeprom_cs16)				// GPI01
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r16, dspctrl_w16)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r16, jaguar_serial_w16)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_READWRITE_LEGACY(jaguar_dsp_ram_r16, jaguar_dsp_ram_w16)
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_READWRITE_LEGACY( high_rom_base_r16, high_rom_base_w16 )
 ADDRESS_MAP_END
 
 
@@ -1210,57 +1210,57 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, cojag_state )
-	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE("share1")
+	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE_LEGACY(&jaguar_shared_ram) AM_SHARE("share1")
 	AM_RANGE(0x04800000, 0x04bfffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x04c00000, 0x04dfffff) AM_ROMBANK("bank2")
-	AM_RANGE(0x04e00000, 0x04e003ff) AM_DEVREADWRITE("ide", ide_controller32_r, ide_controller32_w)
-	AM_RANGE(0x04f00000, 0x04f003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
-	AM_RANGE(0x04f00400, 0x04f007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE("share2")
-	AM_RANGE(0x04f02100, 0x04f021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
-	AM_RANGE(0x04f02200, 0x04f022ff) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
-	AM_RANGE(0x04f03000, 0x04f03fff) AM_MIRROR(0x00008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE("share3")
-	AM_RANGE(0x04f10000, 0x04f103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
-	AM_RANGE(0x04f16000, 0x04f1600b) AM_READ(cojag_gun_input_r)	// GPI02
+	AM_RANGE(0x04e00000, 0x04e003ff) AM_DEVREADWRITE_LEGACY("ide", ide_controller32_r, ide_controller32_w)
+	AM_RANGE(0x04f00000, 0x04f003ff) AM_READWRITE_LEGACY(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
+	AM_RANGE(0x04f00400, 0x04f007ff) AM_RAM AM_BASE_LEGACY(&jaguar_gpu_clut) AM_SHARE("share2")
+	AM_RANGE(0x04f02100, 0x04f021ff) AM_READWRITE_LEGACY(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0x04f02200, 0x04f022ff) AM_READWRITE_LEGACY(jaguar_blitter_r, jaguar_blitter_w)
+	AM_RANGE(0x04f03000, 0x04f03fff) AM_MIRROR(0x00008000) AM_RAM AM_BASE_LEGACY(&jaguar_gpu_ram) AM_SHARE("share3")
+	AM_RANGE(0x04f10000, 0x04f103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
+	AM_RANGE(0x04f16000, 0x04f1600b) AM_READ_LEGACY(cojag_gun_input_r)	// GPI02
 	AM_RANGE(0x04f17000, 0x04f17003) AM_READ_PORT("SYSTEM")		// GPI03
-	AM_RANGE(0x04f17800, 0x04f17803) AM_WRITE(latch_w)			// GPI04
+	AM_RANGE(0x04f17800, 0x04f17803) AM_WRITE_LEGACY(latch_w)			// GPI04
 	AM_RANGE(0x04f17c00, 0x04f17c03) AM_READ_PORT("P1_P2")		// GPI05
-	AM_RANGE(0x04f1a100, 0x04f1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
-	AM_RANGE(0x04f1a140, 0x04f1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
-	AM_RANGE(0x04f1b000, 0x04f1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE("share4")
+	AM_RANGE(0x04f1a100, 0x04f1a13f) AM_READWRITE_LEGACY(dspctrl_r, dspctrl_w)
+	AM_RANGE(0x04f1a140, 0x04f1a17f) AM_READWRITE_LEGACY(jaguar_serial_r, jaguar_serial_w)
+	AM_RANGE(0x04f1b000, 0x04f1cfff) AM_RAM AM_BASE_LEGACY(&jaguar_dsp_ram) AM_SHARE("share4")
 
-	AM_RANGE(0x06000000, 0x06000003) AM_READWRITE(misc_control_r, misc_control_w)
+	AM_RANGE(0x06000000, 0x06000003) AM_READWRITE_LEGACY(misc_control_r, misc_control_w)
 	AM_RANGE(0x10000000, 0x1007ffff) AM_RAM
 	AM_RANGE(0x12000000, 0x120fffff) AM_RAM		// tested in self-test only?
-	AM_RANGE(0x14000004, 0x14000007) AM_WRITE(watchdog_reset32_w)
-	AM_RANGE(0x16000000, 0x16000003) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(cojag_state, m_rom_base)
+	AM_RANGE(0x14000004, 0x14000007) AM_WRITE_LEGACY(watchdog_reset32_w)
+	AM_RANGE(0x16000000, 0x16000003) AM_WRITE_LEGACY(eeprom_enable_w)
+	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE_LEGACY(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
+	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_BASE( m_rom_base)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, cojag_state )
-	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE("share1")
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(cojag_state, m_rom_base)
+	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE_LEGACY(&jaguar_shared_ram) AM_SHARE("share1")
+	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE( m_rom_base)
 	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM
-	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
-	AM_RANGE(0xa30000, 0xa30003) AM_WRITE(watchdog_reset32_w)
-	AM_RANGE(0xa40000, 0xa40003) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0xb70000, 0xb70003) AM_READWRITE(misc_control_r, misc_control_w)
+	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE_LEGACY(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
+	AM_RANGE(0xa30000, 0xa30003) AM_WRITE_LEGACY(watchdog_reset32_w)
+	AM_RANGE(0xa40000, 0xa40003) AM_WRITE_LEGACY(eeprom_enable_w)
+	AM_RANGE(0xb70000, 0xb70003) AM_READWRITE_LEGACY(misc_control_r, misc_control_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE("ide",  ide_controller32_r, ide_controller32_w)
-	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
-	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_BASE(&jaguar_gpu_clut) AM_SHARE("share2")
-	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
-	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
-	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_BASE(&jaguar_gpu_ram) AM_SHARE("share3")
-	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
-	AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r)	// GPI02
+	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE_LEGACY("ide",  ide_controller32_r, ide_controller32_w)
+	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
+	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_BASE_LEGACY(&jaguar_gpu_clut) AM_SHARE("share2")
+	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE_LEGACY(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE_LEGACY(jaguar_blitter_r, jaguar_blitter_w)
+	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_BASE_LEGACY(&jaguar_gpu_ram) AM_SHARE("share3")
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
+	AM_RANGE(0xf16000, 0xf1600b) AM_READ_LEGACY(cojag_gun_input_r)	// GPI02
 	AM_RANGE(0xf17000, 0xf17003) AM_READ_PORT("SYSTEM")		// GPI03
-//  AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)          // GPI04
+//  AM_RANGE(0xf17800, 0xf17803) AM_WRITE_LEGACY(latch_w)          // GPI04
 	AM_RANGE(0xf17c00, 0xf17c03) AM_READ_PORT("P1_P2")		// GPI05
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
-	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
-	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE(&jaguar_dsp_ram) AM_SHARE("share4")
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r, jaguar_serial_w)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_BASE_LEGACY(&jaguar_dsp_ram) AM_SHARE("share4")
 ADDRESS_MAP_END
 
 
@@ -1275,13 +1275,13 @@ static ADDRESS_MAP_START( gpu_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("bank8")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank9")
-	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE("ide", ide_controller32_r, ide_controller32_w)
-	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
+	AM_RANGE(0xe00000, 0xe003ff) AM_DEVREADWRITE_LEGACY("ide", ide_controller32_r, ide_controller32_w)
+	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf007ff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE(gpuctrl_r, gpuctrl_w)
-	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
+	AM_RANGE(0xf02100, 0xf021ff) AM_READWRITE_LEGACY(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02200, 0xf022ff) AM_READWRITE_LEGACY(jaguar_blitter_r, jaguar_blitter_w)
 	AM_RANGE(0xf03000, 0xf03fff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 ADDRESS_MAP_END
 
 
@@ -1296,31 +1296,31 @@ static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x800000, 0xbfffff) AM_ROMBANK("bank8")
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank9")
-	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
-	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0xf1d000, 0xf1dfff) AM_READ(jaguar_wave_rom_r) AM_BASE(&jaguar_wave_rom)
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_READ_LEGACY(jaguar_wave_rom_r) AM_BASE_LEGACY(&jaguar_wave_rom)
 ADDRESS_MAP_END
 
 /* ToDo, these maps SHOULD be merged with the ones above */
 
 static ADDRESS_MAP_START( jag_gpu_map, AS_PROGRAM, 32, cojag_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_MIRROR(0x200000)  AM_SHARE("share1") AM_REGION("maincpu", 0)
-	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE(&cart_base) AM_SIZE(&cart_size)  AM_SHARE("share15") AM_REGION("maincpu", 0x800000)
-	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE(&rom_base) AM_SIZE(&rom_size)  AM_SHARE("share16") AM_REGION("maincpu", 0xe00000)
-	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
-	AM_RANGE(0xf00400, 0xf005ff) AM_BASE(&jaguar_gpu_clut) AM_MIRROR(0x000200) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
-	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
-	AM_RANGE(0xf03000, 0xf03fff) AM_BASE(&jaguar_gpu_ram) AM_MIRROR(0x008000) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
-	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
-	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
-	AM_RANGE(0xf1b000, 0xf1cfff) AM_BASE(&jaguar_dsp_ram) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_BASE(&high_rom_base) AM_REGION("maincpu", 0xf1d000)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE_LEGACY(&jaguar_shared_ram) AM_MIRROR(0x200000)  AM_SHARE("share1") AM_REGION("maincpu", 0)
+	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_BASE_LEGACY(&cart_base) AM_SIZE_LEGACY(&cart_size)  AM_SHARE("share15") AM_REGION("maincpu", 0x800000)
+	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_BASE_LEGACY(&rom_base) AM_SIZE_LEGACY(&rom_size)  AM_SHARE("share16") AM_REGION("maincpu", 0xe00000)
+	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
+	AM_RANGE(0xf00400, 0xf005ff) AM_BASE_LEGACY(&jaguar_gpu_clut) AM_MIRROR(0x000200) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(jaguar_blitter_r, jaguar_blitter_w)
+	AM_RANGE(0xf03000, 0xf03fff) AM_BASE_LEGACY(&jaguar_gpu_ram) AM_MIRROR(0x008000) AM_RAM AM_SHARE("share3")
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE_LEGACY(joystick_r, joystick_w)
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r, jaguar_serial_w)
+	AM_RANGE(0xf1b000, 0xf1cfff) AM_BASE_LEGACY(&jaguar_dsp_ram) AM_RAM AM_SHARE("share4")
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_BASE_LEGACY(&high_rom_base) AM_REGION("maincpu", 0xf1d000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jag_dsp_map, AS_PROGRAM, 32, cojag_state )
@@ -1328,15 +1328,15 @@ static ADDRESS_MAP_START( jag_dsp_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_RAM AM_SHARE("share1") AM_REGION("maincpu", 0)
 	AM_RANGE(0x800000, 0xdfffff) AM_ROM AM_SHARE("share15") AM_REGION("maincpu", 0x800000)
 	AM_RANGE(0xe00000, 0xe1ffff) AM_ROM AM_SHARE("share16") AM_REGION("maincpu", 0xe00000)
-	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
+	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs32_r, jaguar_tom_regs32_w)
 	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE(gpuctrl_r, gpuctrl_w)
-	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE(jaguar_blitter_r, jaguar_blitter_w)
+	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(gpuctrl_r, gpuctrl_w)
+	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(jaguar_blitter_r, jaguar_blitter_w)
 	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
-	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE(joystick_r, joystick_w)
-	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
-	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)
+	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
+	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE_LEGACY(joystick_r, joystick_w)
+	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r, dspctrl_w)
+	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r, jaguar_serial_w)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_RAM AM_SHARE("share4")
 	AM_RANGE(0xf1d000, 0xf1dfff) AM_ROM AM_REGION("maincpu", 0xf1d000)
 ADDRESS_MAP_END

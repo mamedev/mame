@@ -240,27 +240,27 @@ static READ8_HANDLER( test_r )
 static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8, hitpoker_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM // stack ram
 	AM_RANGE(0x1000, 0x103f) AM_RAM // internal I/O
-	AM_RANGE(0x8000, 0xb5ff) AM_READWRITE(hitpoker_vram_r,hitpoker_vram_w)
+	AM_RANGE(0x8000, 0xb5ff) AM_READWRITE_LEGACY(hitpoker_vram_r,hitpoker_vram_w)
 	AM_RANGE(0xb600, 0xbdff) AM_RAM
 	AM_RANGE(0xbe0a, 0xbe0a) AM_READ_PORT("IN0")
 	AM_RANGE(0xbe0c, 0xbe0c) AM_READ_PORT("IN2") //irq ack?
-	AM_RANGE(0xbe0d, 0xbe0d) AM_READ(rtc_r)
+	AM_RANGE(0xbe0d, 0xbe0d) AM_READ_LEGACY(rtc_r)
 	AM_RANGE(0xbe0e, 0xbe0e) AM_READ_PORT("IN1")
-	AM_RANGE(0xbe50, 0xbe51) AM_WRITE(eeprom_w)
-	AM_RANGE(0xbe53, 0xbe53) AM_READ(eeprom_r)
-	AM_RANGE(0xbe80, 0xbe80) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0xbe81, 0xbe81) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
-	AM_RANGE(0xbe90, 0xbe91) AM_DEVREADWRITE("aysnd", ay8910_r,ay8910_address_data_w)
+	AM_RANGE(0xbe50, 0xbe51) AM_WRITE_LEGACY(eeprom_w)
+	AM_RANGE(0xbe53, 0xbe53) AM_READ_LEGACY(eeprom_r)
+	AM_RANGE(0xbe80, 0xbe80) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xbe81, 0xbe81) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0xbe90, 0xbe91) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r,ay8910_address_data_w)
 	AM_RANGE(0xbea0, 0xbea0) AM_READ_PORT("VBLANK") //probably other bits as well
-//  AM_RANGE(0xbe00, 0xbeff) AM_READ(test_r)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(hitpoker_cram_r,hitpoker_cram_w)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(hitpoker_paletteram_r,hitpoker_paletteram_w)
+//  AM_RANGE(0xbe00, 0xbeff) AM_READ_LEGACY(test_r)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(hitpoker_cram_r,hitpoker_cram_w)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY(hitpoker_paletteram_r,hitpoker_paletteram_w)
 	AM_RANGE(0x0000, 0xbdff) AM_ROM
 	AM_RANGE(0xbf00, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hitpoker_io, AS_IO, 8, hitpoker_state )
-	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE(hitpoker_pic_r,hitpoker_pic_w) AM_BASE_MEMBER(hitpoker_state, m_sys_regs)
+	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE_LEGACY(hitpoker_pic_r,hitpoker_pic_w) AM_BASE( m_sys_regs)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hitpoker )

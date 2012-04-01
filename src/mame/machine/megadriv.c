@@ -2074,26 +2074,26 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
-	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ymsnd", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE_LEGACY(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE_LEGACY(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8_LEGACY("ymsnd", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
 
-	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
+	AM_RANGE(0xa06000, 0xa06001) AM_WRITE_LEGACY(megadriv_68k_z80_bank_write)
 
-	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read,megadriv_68k_io_write)
+	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE_LEGACY(megadriv_68k_io_read,megadriv_68k_io_write)
 
-	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
+	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE_LEGACY(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITE_LEGACY(megadriv_68k_req_z80_reset)
 
 	/* these are fake - remove allocs in VIDEO_START to use these to view ram instead */
-//  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&megadrive_vdp_vram)
-//  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_BASE(&megadrive_vdp_vsram)
-//  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_BASE(&megadrive_vdp_cram)
+//  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_vram)
+//  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_vsram)
+//  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_cram)
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w) // the earth defend
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE_LEGACY(megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE_LEGACY(megadriv_vdp_r,megadriv_vdp_w) // the earth defend
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
 ADDRESS_MAP_END
@@ -2355,16 +2355,16 @@ static READ8_HANDLER( megadriv_z80_unmapped_read )
 
 static ADDRESS_MAP_START( megadriv_z80_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1") AM_MIRROR(0x2000) // RAM can be accessed by the 68k
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2612_r,ym2612_w)
+	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2612_r,ym2612_w)
 
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(megadriv_z80_z80_bank_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(megadriv_z80_z80_bank_w) // wacky races uses this address
+	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(megadriv_z80_z80_bank_w)
+	AM_RANGE(0x6001, 0x6001) AM_WRITE_LEGACY(megadriv_z80_z80_bank_w) // wacky races uses this address
 
-	AM_RANGE(0x6100, 0x7eff) AM_READ(megadriv_z80_unmapped_read)
+	AM_RANGE(0x6100, 0x7eff) AM_READ_LEGACY(megadriv_z80_unmapped_read)
 
-	AM_RANGE(0x7f00, 0x7fff) AM_READWRITE(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
+	AM_RANGE(0x7f00, 0x7fff) AM_READWRITE_LEGACY(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
 
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE_LEGACY(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megadriv_z80_io_map, AS_IO, 8, driver_device )
@@ -2380,19 +2380,19 @@ static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	/* Cartridge Program Rom */
 	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
 
-	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
-	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
+	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE_LEGACY(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE_LEGACY(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8_LEGACY("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa06000, 0xa06001) AM_WRITE_LEGACY(megadriv_68k_z80_bank_write)
 
-	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read, megadriv_68k_io_write)
-	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
+	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE_LEGACY(megadriv_68k_io_read, megadriv_68k_io_write)
+	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE_LEGACY(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITE_LEGACY(megadriv_68k_req_z80_reset)
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w) // the earth defend
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE_LEGACY(megadriv_vdp_r, megadriv_vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE_LEGACY(megadriv_vdp_r, megadriv_vdp_w) // the earth defend
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED( md_bootleg, megadriv )
@@ -3733,23 +3733,23 @@ _32X_MAP_RAM_WRITEHANDLERS(paletteram) // _32x_sh2_paletteram_w
 static ADDRESS_MAP_START( sh2_main_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
-	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( _32x_sh2_master_4000_common_4002_r, _32x_sh2_master_4000_common_4002_w )
-	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
+	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE_LEGACY( _32x_sh2_master_4000_common_4002_r, _32x_sh2_master_4000_common_4002_w )
+	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE_LEGACY( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
 
-	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16( _32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
+	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16_LEGACY( _32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
 
-	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE( _32x_sh2_master_4014_master_4016_w ) // IRQ clear
-	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE( _32x_sh2_master_4018_master_401a_w ) // IRQ clear
-	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE( _32x_sh2_master_401c_master_401e_w ) // IRQ clear
+	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_master_4014_master_4016_w ) // IRQ clear
+	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_master_4018_master_401a_w ) // IRQ clear
+	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_master_401c_master_401e_w ) // IRQ clear
 
-	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
-	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16( _32x_pwm_r, _32x_pwm_w, 0xffffffff )
+	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE_LEGACY( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
+	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16_LEGACY( _32x_pwm_r, _32x_pwm_w, 0xffffffff )
 
-	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
-	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE( _32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
+	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16_LEGACY( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
+	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE_LEGACY( _32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
 
-	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
-	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
+	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
+	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
 
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE("share10")
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0) // program is writeable (wwfraw)
@@ -3762,23 +3762,23 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sh2_slave_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
-	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( _32x_sh2_slave_4000_common_4002_r, _32x_sh2_slave_4000_common_4002_w )
-	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
+	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE_LEGACY( _32x_sh2_slave_4000_common_4002_r, _32x_sh2_slave_4000_common_4002_w )
+	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE_LEGACY( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
 
-	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16( _32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
+	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16_LEGACY( _32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
 
-	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE( _32x_sh2_slave_4014_slave_4016_w ) // IRQ clear
-	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE( _32x_sh2_slave_4018_slave_401a_w ) // IRQ clear
-	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE( _32x_sh2_slave_401c_slave_401e_w ) // IRQ clear
+	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_slave_4014_slave_4016_w ) // IRQ clear
+	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_slave_4018_slave_401a_w ) // IRQ clear
+	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_slave_401c_slave_401e_w ) // IRQ clear
 
-	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
-	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16( _32x_pwm_r, _32x_pwm_w, 0xffffffff )
+	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE_LEGACY( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
+	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16_LEGACY( _32x_pwm_r, _32x_pwm_w, 0xffffffff )
 
-	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
-	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE(_32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
+	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16_LEGACY( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
+	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE_LEGACY(_32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
 
-	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
-	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
+	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
+	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
 
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE("share10")
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0) // program is writeable (wwfraw)
@@ -6768,46 +6768,46 @@ READ16_HANDLER( segacd_font_converted_r )
 }
 
 static ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, driver_device )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE_LEGACY(&segacd_4meg_prgram)
 
-	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
-	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
+	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE_LEGACY(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE_LEGACY(&segacd_dataram)
+	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE_LEGACY(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE_LEGACY(&segacd_dataram2)
 
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") AM_BASE(&segacd_backupram)// backup RAM, odd bytes only!
+	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE_LEGACY(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") AM_BASE_LEGACY(&segacd_backupram)// backup RAM, odd bytes only!
 
-	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
-	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8("rfsnd", rf5c68_r, 0x00ff)
-	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
+	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8_LEGACY("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
+	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8_LEGACY("rfsnd", rf5c68_r, 0x00ff)
+	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8_LEGACY("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
 
 
-	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
-	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
+	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE_LEGACY(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
+	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE_LEGACY(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
 
-	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
-	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
-	AM_RANGE(0xff8008, 0xff8009) AM_READ(cdc_data_sub_r)
-	AM_RANGE(0xff800a, 0xff800b) AM_READWRITE(cdc_dmaaddr_r,cdc_dmaaddr_w) // CDC DMA Address
-	AM_RANGE(0xff800c, 0xff800d) AM_READWRITE(segacd_stopwatch_timer_r, segacd_stopwatch_timer_w)// Stopwatch timer
-	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
-	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
-	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
-	AM_RANGE(0xff8030, 0xff8031) AM_READWRITE(segacd_irq3timer_r, segacd_irq3timer_w) // Timer W/INT3
-	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE(segacd_irq_mask_r,segacd_irq_mask_w)
-	AM_RANGE(0xff8034, 0xff8035) AM_READWRITE(segacd_cdfader_r,segacd_cdfader_w) // CD Fader
-	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
-	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
-	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
-	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE(segacd_font_color_r, segacd_font_color_w)
-	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_BASE(&segacd_font_bits)
-	AM_RANGE(0xff8050, 0xff8057) AM_READ(segacd_font_converted_r)
-	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
-	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
-	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
-	AM_RANGE(0xff805e, 0xff805f) AM_READWRITE(segacd_imagebuffer_start_address_r, segacd_imagebuffer_start_address_w) // Image buffer start address
-	AM_RANGE(0xff8060, 0xff8061) AM_READWRITE(segacd_imagebuffer_offset_r, segacd_imagebuffer_offset_w)
-	AM_RANGE(0xff8062, 0xff8063) AM_READWRITE(segacd_imagebuffer_hdot_size_r, segacd_imagebuffer_hdot_size_w) // Image buffer H dot size
-	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
-	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
+	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE_LEGACY(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
+	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE_LEGACY(segacd_cdc_data_r, segacd_cdc_data_w)
+	AM_RANGE(0xff8008, 0xff8009) AM_READ_LEGACY(cdc_data_sub_r)
+	AM_RANGE(0xff800a, 0xff800b) AM_READWRITE_LEGACY(cdc_dmaaddr_r,cdc_dmaaddr_w) // CDC DMA Address
+	AM_RANGE(0xff800c, 0xff800d) AM_READWRITE_LEGACY(segacd_stopwatch_timer_r, segacd_stopwatch_timer_w)// Stopwatch timer
+	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE_LEGACY(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
+	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE_LEGACY(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
+	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE_LEGACY(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
+	AM_RANGE(0xff8030, 0xff8031) AM_READWRITE_LEGACY(segacd_irq3timer_r, segacd_irq3timer_w) // Timer W/INT3
+	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE_LEGACY(segacd_irq_mask_r,segacd_irq_mask_w)
+	AM_RANGE(0xff8034, 0xff8035) AM_READWRITE_LEGACY(segacd_cdfader_r,segacd_cdfader_w) // CD Fader
+	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE_LEGACY(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
+	AM_RANGE(0xff8038, 0xff8041) AM_READ8_LEGACY(segacd_cdd_rx_r,0xffff)
+	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8_LEGACY(segacd_cdd_tx_w,0xffff)
+	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE_LEGACY(segacd_font_color_r, segacd_font_color_w)
+	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_BASE_LEGACY(&segacd_font_bits)
+	AM_RANGE(0xff8050, 0xff8057) AM_READ_LEGACY(segacd_font_converted_r)
+	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE_LEGACY(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
+	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE_LEGACY(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
+	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE_LEGACY(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
+	AM_RANGE(0xff805e, 0xff805f) AM_READWRITE_LEGACY(segacd_imagebuffer_start_address_r, segacd_imagebuffer_start_address_w) // Image buffer start address
+	AM_RANGE(0xff8060, 0xff8061) AM_READWRITE_LEGACY(segacd_imagebuffer_offset_r, segacd_imagebuffer_offset_w)
+	AM_RANGE(0xff8062, 0xff8063) AM_READWRITE_LEGACY(segacd_imagebuffer_hdot_size_r, segacd_imagebuffer_hdot_size_w) // Image buffer H dot size
+	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE_LEGACY(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
+	AM_RANGE(0xff8066, 0xff8067) AM_WRITE_LEGACY(segacd_trace_vector_base_address_w)// Trace vector base address
 //  AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
 //  AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
@@ -7120,13 +7120,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( svp_ext_map, AS_IO, 16, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xf)
-	AM_RANGE(0*2, 0*2+1) AM_READWRITE(read_PM0, write_PM0)
-	AM_RANGE(1*2, 1*2+1) AM_READWRITE(read_PM1, write_PM1)
-	AM_RANGE(2*2, 2*2+1) AM_READWRITE(read_PM2, write_PM2)
-	AM_RANGE(3*2, 3*2+1) AM_READWRITE(read_XST, write_XST)
-	AM_RANGE(4*2, 4*2+1) AM_READWRITE(read_PM4, write_PM4)
-	AM_RANGE(6*2, 6*2+1) AM_READWRITE(read_PMC, write_PMC)
-	AM_RANGE(7*2, 7*2+1) AM_READWRITE(read_AL, write_AL)
+	AM_RANGE(0*2, 0*2+1) AM_READWRITE_LEGACY(read_PM0, write_PM0)
+	AM_RANGE(1*2, 1*2+1) AM_READWRITE_LEGACY(read_PM1, write_PM1)
+	AM_RANGE(2*2, 2*2+1) AM_READWRITE_LEGACY(read_PM2, write_PM2)
+	AM_RANGE(3*2, 3*2+1) AM_READWRITE_LEGACY(read_XST, write_XST)
+	AM_RANGE(4*2, 4*2+1) AM_READWRITE_LEGACY(read_PM4, write_PM4)
+	AM_RANGE(6*2, 6*2+1) AM_READWRITE_LEGACY(read_PMC, write_PMC)
+	AM_RANGE(7*2, 7*2+1) AM_READWRITE_LEGACY(read_AL, write_AL)
 ADDRESS_MAP_END
 
 

@@ -809,27 +809,27 @@ static INTERRUPT_GEN( nmi_interrupt )
 static ADDRESS_MAP_START( lucky74_map, AS_PROGRAM, 8, lucky74_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")	/* NVRAM */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_BASE_MEMBER(lucky74_state, m_fg_videoram)				/* VRAM1-1 */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(lucky74_fg_colorram_w) AM_BASE_MEMBER(lucky74_state, m_fg_colorram)				/* VRAM1-2 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lucky74_bg_videoram_w) AM_BASE_MEMBER(lucky74_state, m_bg_videoram)				/* VRAM2-1 */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(lucky74_bg_colorram_w) AM_BASE_MEMBER(lucky74_state, m_bg_colorram)				/* VRAM2-2 */
-	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
-	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
-	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */
-	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE("sn1", sn76496_w)							/* SN76489 #1 */
-	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports 2 & 4 */
-	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE("sn2", sn76496_w)							/* SN76489 #2 */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("aysnd", ay8910_address_w)						/* YM2149 control */
-	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE("sn3", sn76496_w)							/* SN76489 #3 */
-	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)			/* YM2149 (Input Port 1) */
-	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)						/* USART 8251 port */
-	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(lucky74_fg_videoram_w) AM_BASE( m_fg_videoram)				/* VRAM1-1 */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(lucky74_fg_colorram_w) AM_BASE( m_fg_colorram)				/* VRAM1-2 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(lucky74_bg_videoram_w) AM_BASE( m_bg_videoram)				/* VRAM2-1 */
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(lucky74_bg_colorram_w) AM_BASE( m_bg_colorram)				/* VRAM2-2 */
+	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
+	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
+	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE_LEGACY("ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */
+	AM_RANGE(0xf100, 0xf100) AM_DEVWRITE_LEGACY("sn1", sn76496_w)							/* SN76489 #1 */
+	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports 2 & 4 */
+	AM_RANGE(0xf300, 0xf300) AM_DEVWRITE_LEGACY("sn2", sn76496_w)							/* SN76489 #2 */
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)						/* YM2149 control */
+	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE_LEGACY("sn3", sn76496_w)							/* SN76489 #3 */
+	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)			/* YM2149 (Input Port 1) */
+	AM_RANGE(0xf700, 0xf701) AM_READWRITE_LEGACY(usart_8251_r, usart_8251_w)						/* USART 8251 port */
+	AM_RANGE(0xf800, 0xf803) AM_READWRITE_LEGACY(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lucky74_portmap, AS_IO, 8, lucky74_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x05) AM_READWRITE(custom_09R81P_port_r, custom_09R81P_port_w)	/* custom 09R81P (samples system) */
-//  AM_RANGE(0xff, 0xff) AM_READWRITE(???)
+	AM_RANGE(0x00, 0x05) AM_READWRITE_LEGACY(custom_09R81P_port_r, custom_09R81P_port_w)	/* custom 09R81P (samples system) */
+//  AM_RANGE(0xff, 0xff) AM_READWRITE_LEGACY(???)
 ADDRESS_MAP_END
 
 /* unknown I/O byte R/W

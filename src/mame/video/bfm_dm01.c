@@ -216,10 +216,10 @@ static WRITE8_HANDLER( unknown_w )
 
 ADDRESS_MAP_START( bfm_dm01_memmap, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM								// 8k RAM
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE(control_r, control_w)	// control reg
-	AM_RANGE(0x2800, 0x2800) AM_READWRITE(mux_r,mux_w)			// mux
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(comm_r,comm_w)		//
-	AM_RANGE(0x3800, 0x3800) AM_READWRITE(unknown_r,unknown_w)	// ???
+	AM_RANGE(0x2000, 0x2000) AM_READWRITE_LEGACY(control_r, control_w)	// control reg
+	AM_RANGE(0x2800, 0x2800) AM_READWRITE_LEGACY(mux_r,mux_w)			// mux
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(comm_r,comm_w)		//
+	AM_RANGE(0x3800, 0x3800) AM_READWRITE_LEGACY(unknown_r,unknown_w)	// ???
 	AM_RANGE(0x4000, 0xFfff) AM_ROM								// 48k  ROM
 ADDRESS_MAP_END
 

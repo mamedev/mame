@@ -132,9 +132,9 @@ static READ8_HANDLER( tms70x0_pf_r );
 static WRITE8_HANDLER( tms70x0_pf_w );
 
 static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, legacy_cpu_device )
-	AM_RANGE(0x0000, 0x007f)	AM_READWRITE(tms7000_internal_r, tms7000_internal_w)	/* tms7000 internal RAM */
+	AM_RANGE(0x0000, 0x007f)	AM_READWRITE_LEGACY(tms7000_internal_r, tms7000_internal_w)	/* tms7000 internal RAM */
 	AM_RANGE(0x0080, 0x00ff)	AM_NOP						/* reserved */
-	AM_RANGE(0x0100, 0x01ff)	AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)				/* tms7000 internal I/O ports */
+	AM_RANGE(0x0100, 0x01ff)	AM_READWRITE_LEGACY(tms70x0_pf_r, tms70x0_pf_w)				/* tms7000 internal I/O ports */
 ADDRESS_MAP_END
 
 

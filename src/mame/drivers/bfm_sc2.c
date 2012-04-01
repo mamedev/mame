@@ -1423,49 +1423,49 @@ static READ8_HANDLER( direct_input_r )
 
 static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k
-	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
-	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
-	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
-	AM_RANGE(0x2200, 0x22FF) AM_WRITE(reel56_w)
+	AM_RANGE(0x2000, 0x2000) AM_READ_LEGACY(vfd_status_r)
+	AM_RANGE(0x2000, 0x20FF) AM_WRITE_LEGACY(reel12_w)
+	AM_RANGE(0x2100, 0x21FF) AM_WRITE_LEGACY(reel34_w)
+	AM_RANGE(0x2200, 0x22FF) AM_WRITE_LEGACY(reel56_w)
 
-	AM_RANGE(0x2300, 0x230B) AM_READ(mux_input_r)
-	AM_RANGE(0x2300, 0x231F) AM_WRITE(mux_output_w)
-	AM_RANGE(0x2320, 0x2323) AM_WRITE(dimas_w)				/* ?unknown dim related */
+	AM_RANGE(0x2300, 0x230B) AM_READ_LEGACY(mux_input_r)
+	AM_RANGE(0x2300, 0x231F) AM_WRITE_LEGACY(mux_output_w)
+	AM_RANGE(0x2320, 0x2323) AM_WRITE_LEGACY(dimas_w)				/* ?unknown dim related */
 
-	AM_RANGE(0x2324, 0x2324) AM_READWRITE(expansion_latch_r, expansion_latch_w)
-	AM_RANGE(0x2325, 0x2327) AM_WRITE(unknown_w)
-	AM_RANGE(0x2328, 0x2328) AM_WRITE(muxena_w)
-	AM_RANGE(0x2329, 0x2329) AM_READWRITE(timerirqclr_r, timerirq_w)
-	AM_RANGE(0x232A, 0x232D) AM_WRITE(unknown_w)
-	AM_RANGE(0x232E, 0x232E) AM_READ(irqstatus_r)
+	AM_RANGE(0x2324, 0x2324) AM_READWRITE_LEGACY(expansion_latch_r, expansion_latch_w)
+	AM_RANGE(0x2325, 0x2327) AM_WRITE_LEGACY(unknown_w)
+	AM_RANGE(0x2328, 0x2328) AM_WRITE_LEGACY(muxena_w)
+	AM_RANGE(0x2329, 0x2329) AM_READWRITE_LEGACY(timerirqclr_r, timerirq_w)
+	AM_RANGE(0x232A, 0x232D) AM_WRITE_LEGACY(unknown_w)
+	AM_RANGE(0x232E, 0x232E) AM_READ_LEGACY(irqstatus_r)
 
-	AM_RANGE(0x232F, 0x232F) AM_WRITE(coininhib_w)
-	AM_RANGE(0x2330, 0x2330) AM_WRITE(payout_latch_w)
-	AM_RANGE(0x2331, 0x2331) AM_WRITE(payout_triac_w)
-	AM_RANGE(0x2332, 0x2332) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x2333, 0x2333) AM_WRITE(mmtr_w)
-	AM_RANGE(0x2334, 0x2335) AM_WRITE(unknown_w)
-	AM_RANGE(0x2336, 0x2336) AM_WRITE(dimcnt_w)
-	AM_RANGE(0x2337, 0x2337) AM_WRITE(volume_override_w)
-	AM_RANGE(0x2338, 0x2338) AM_WRITE(payout_select_w)
-	AM_RANGE(0x2339, 0x2339) AM_WRITE(unknown_w)
-	AM_RANGE(0x2400, 0x2400) AM_READWRITE(uart1stat_r, uart1ctrl_w)	/* mc6850 compatible uart */
-	AM_RANGE(0x2500, 0x2500) AM_READWRITE(uart1data_r, uart1data_w)
-	AM_RANGE(0x2600, 0x2600) AM_READWRITE(uart2stat_r, uart2ctrl_w)	/* mc6850 compatible uart */
-	AM_RANGE(0x2700, 0x2700) AM_READWRITE(uart2data_r, uart2data_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)					/* vfd1 data */
-	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)					/* vfd1+vfd2 reset line */
-	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE("upd", nec_latch_w)
-	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE("upd", nec_reset_w)
-	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)						/* custom chip unlock */
-	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)					/* write bank (rom page select for 0x6000 - 0x7fff ) */
-	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)					/* vfd2 data */
+	AM_RANGE(0x232F, 0x232F) AM_WRITE_LEGACY(coininhib_w)
+	AM_RANGE(0x2330, 0x2330) AM_WRITE_LEGACY(payout_latch_w)
+	AM_RANGE(0x2331, 0x2331) AM_WRITE_LEGACY(payout_triac_w)
+	AM_RANGE(0x2332, 0x2332) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x2333, 0x2333) AM_WRITE_LEGACY(mmtr_w)
+	AM_RANGE(0x2334, 0x2335) AM_WRITE_LEGACY(unknown_w)
+	AM_RANGE(0x2336, 0x2336) AM_WRITE_LEGACY(dimcnt_w)
+	AM_RANGE(0x2337, 0x2337) AM_WRITE_LEGACY(volume_override_w)
+	AM_RANGE(0x2338, 0x2338) AM_WRITE_LEGACY(payout_select_w)
+	AM_RANGE(0x2339, 0x2339) AM_WRITE_LEGACY(unknown_w)
+	AM_RANGE(0x2400, 0x2400) AM_READWRITE_LEGACY(uart1stat_r, uart1ctrl_w)	/* mc6850 compatible uart */
+	AM_RANGE(0x2500, 0x2500) AM_READWRITE_LEGACY(uart1data_r, uart1data_w)
+	AM_RANGE(0x2600, 0x2600) AM_READWRITE_LEGACY(uart2stat_r, uart2ctrl_w)	/* mc6850 compatible uart */
+	AM_RANGE(0x2700, 0x2700) AM_READWRITE_LEGACY(uart2data_r, uart2data_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE_LEGACY(vfd1_data_w)					/* vfd1 data */
+	AM_RANGE(0x2900, 0x2900) AM_WRITE_LEGACY(vfd_reset_w)					/* vfd1+vfd2 reset line */
+	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE_LEGACY("upd", nec_latch_w)
+	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE_LEGACY("upd", nec_reset_w)
+	AM_RANGE(0x2C00, 0x2C00) AM_WRITE_LEGACY(unlock_w)						/* custom chip unlock */
+	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x2E00, 0x2E00) AM_WRITE_LEGACY(bankswitch_w)					/* write bank (rom page select for 0x6000 - 0x7fff ) */
+	AM_RANGE(0x2F00, 0x2F00) AM_WRITE_LEGACY(vfd2_data_w)					/* vfd2 data */
 
-	AM_RANGE(0x3FFE, 0x3FFE) AM_READ( direct_input_r )
-	AM_RANGE(0x3FFF, 0x3FFF) AM_READ( coin_input_r)
+	AM_RANGE(0x3FFE, 0x3FFE) AM_READ_LEGACY( direct_input_r )
+	AM_RANGE(0x3FFF, 0x3FFF) AM_READ_LEGACY( coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM
-	AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)			// contains unknown I/O registers
+	AM_RANGE(0x4000, 0xFFFF) AM_WRITE_LEGACY(unknown_w)			// contains unknown I/O registers
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM
 ADDRESS_MAP_END
@@ -1475,16 +1475,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_IMPORT_FROM( sc2_basemap )
 
-	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_hop_r)		// vfd status register
-	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_vid_w)
+	AM_RANGE(0x2000, 0x2000) AM_READ_LEGACY(vfd_status_hop_r)		// vfd status register
+	AM_RANGE(0x2000, 0x20FF) AM_WRITE_LEGACY(reel12_vid_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITENOP
 	AM_RANGE(0x2200, 0x22FF) AM_WRITENOP
 
-	AM_RANGE(0x3C00, 0x3C07) AM_READ(  key_r   )
-	AM_RANGE(0x3C80, 0x3C80) AM_WRITE( e2ram_w )
+	AM_RANGE(0x3C00, 0x3C07) AM_READ_LEGACY(  key_r   )
+	AM_RANGE(0x3C80, 0x3C80) AM_WRITE_LEGACY( e2ram_w )
 
-	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE(vid_uart_ctrl_r, vid_uart_ctrl_w)		// video uart control reg
-	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE(vid_uart_rx_r, vid_uart_tx_w)			// video uart data  reg
+	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE_LEGACY(vid_uart_ctrl_r, vid_uart_ctrl_w)		// video uart control reg
+	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE_LEGACY(vid_uart_rx_r, vid_uart_tx_w)			// video uart data  reg
 ADDRESS_MAP_END
 
 // input ports for pyramid ////////////////////////////////////////

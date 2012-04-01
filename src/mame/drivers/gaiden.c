@@ -396,57 +396,57 @@ static READ16_HANDLER( raiga_protection_r )
 static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE_MEMBER(gaiden_state, m_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE_MEMBER(gaiden_state, m_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE_MEMBER(gaiden_state, m_videoram3)
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE_MEMBER(gaiden_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE_LEGACY(gaiden_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x072000, 0x073fff) AM_READWRITE_LEGACY(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0x074000, 0x075fff) AM_READWRITE_LEGACY(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE( m_videoram3)
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2") AM_WRITE(gaiden_sproffsety_w)
+	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2") AM_WRITE_LEGACY(gaiden_sproffsety_w)
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
-	AM_RANGE(0x07a108, 0x07a109) AM_WRITE(gaiden_txoffsety_w)
-	AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
-	AM_RANGE(0x07a204, 0x07a205) AM_WRITE(gaiden_fgscrolly_w)
-	AM_RANGE(0x07a208, 0x07a209) AM_WRITE(gaiden_fgoffsety_w)
-	AM_RANGE(0x07a20c, 0x07a20d) AM_WRITE(gaiden_fgscrollx_w)
-	AM_RANGE(0x07a304, 0x07a305) AM_WRITE(gaiden_bgscrolly_w)
-	AM_RANGE(0x07a308, 0x07a309) AM_WRITE(gaiden_bgoffsety_w)
-	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE(gaiden_bgscrollx_w)
-	AM_RANGE(0x07a800, 0x07a801) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x07a802, 0x07a803) AM_WRITE(gaiden_sound_command_w)
+	AM_RANGE(0x07a104, 0x07a105) AM_WRITE_LEGACY(gaiden_txscrolly_w)
+	AM_RANGE(0x07a108, 0x07a109) AM_WRITE_LEGACY(gaiden_txoffsety_w)
+	AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE_LEGACY(gaiden_txscrollx_w)
+	AM_RANGE(0x07a204, 0x07a205) AM_WRITE_LEGACY(gaiden_fgscrolly_w)
+	AM_RANGE(0x07a208, 0x07a209) AM_WRITE_LEGACY(gaiden_fgoffsety_w)
+	AM_RANGE(0x07a20c, 0x07a20d) AM_WRITE_LEGACY(gaiden_fgscrollx_w)
+	AM_RANGE(0x07a304, 0x07a305) AM_WRITE_LEGACY(gaiden_bgscrolly_w)
+	AM_RANGE(0x07a308, 0x07a309) AM_WRITE_LEGACY(gaiden_bgoffsety_w)
+	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE_LEGACY(gaiden_bgscrollx_w)
+	AM_RANGE(0x07a800, 0x07a801) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x07a802, 0x07a803) AM_WRITE_LEGACY(gaiden_sound_command_w)
 	AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
-	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
+	AM_RANGE(0x07a808, 0x07a809) AM_WRITE_LEGACY(gaiden_flip_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE_MEMBER(gaiden_state, m_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_BASE_MEMBER(gaiden_state, m_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_BASE_MEMBER(gaiden_state, m_videoram3)
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE_MEMBER(gaiden_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE_LEGACY(gaiden_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE_LEGACY(gaiden_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE_LEGACY(gaiden_videoram3_w) AM_BASE( m_videoram3)
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x07a00e, 0x07a00f) AM_WRITE(drgnbowl_sound_command_w)
+	AM_RANGE(0x07a00e, 0x07a00f) AM_WRITE_LEGACY(drgnbowl_sound_command_w)
 	AM_RANGE(0x07e000, 0x07e001) AM_WRITENOP
-	AM_RANGE(0x07f000, 0x07f001) AM_WRITE(gaiden_bgscrolly_w)
-	AM_RANGE(0x07f002, 0x07f003) AM_WRITE(gaiden_bgscrollx_w)
-	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
-	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
+	AM_RANGE(0x07f000, 0x07f001) AM_WRITE_LEGACY(gaiden_bgscrolly_w)
+	AM_RANGE(0x07f002, 0x07f003) AM_WRITE_LEGACY(gaiden_bgscrollx_w)
+	AM_RANGE(0x07f004, 0x07f005) AM_WRITE_LEGACY(gaiden_fgscrolly_w)
+	AM_RANGE(0x07f006, 0x07f007) AM_WRITE_LEGACY(gaiden_fgscrollx_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* raiga only */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ym2", ym2203_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnbowl_sound_map, AS_PROGRAM, 8, gaiden_state )
@@ -456,9 +456,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnbowl_sound_port_map, AS_IO, 8, gaiden_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
@@ -909,34 +909,34 @@ Others
 static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2", ym2203_w)
+	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 //  AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-//  AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+//  AM_RANGE(0xfc20, 0xfc20) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE_MEMBER(gaiden_state, m_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE_MEMBER(gaiden_state, m_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE_MEMBER(gaiden_state, m_videoram3)
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE_MEMBER(gaiden_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE_LEGACY(gaiden_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x072000, 0x073fff) AM_READWRITE_LEGACY(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0x074000, 0x075fff) AM_READWRITE_LEGACY(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE( m_videoram3)
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 //  AM_RANGE(0x078800, 0x079fff) AM_RAM
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
-//  AM_RANGE(0x07a104, 0x07a105) AM_WRITE(gaiden_txscrolly_w)
-//  AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE(gaiden_txscrollx_w)
-	AM_RANGE(0x07f000, 0x07f001) AM_WRITE(gaiden_bgscrolly_w)
-	AM_RANGE(0x07f002, 0x07f003) AM_WRITE(gaiden_bgscrollx_w)
-	AM_RANGE(0x07f004, 0x07f005) AM_WRITE(gaiden_fgscrolly_w)
-	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
-	AM_RANGE(0x07a800, 0x07a801) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x07e000, 0x07e001) AM_WRITE(gaiden_sound_command_w)
+//  AM_RANGE(0x07a104, 0x07a105) AM_WRITE_LEGACY(gaiden_txscrolly_w)
+//  AM_RANGE(0x07a10c, 0x07a10d) AM_WRITE_LEGACY(gaiden_txscrollx_w)
+	AM_RANGE(0x07f000, 0x07f001) AM_WRITE_LEGACY(gaiden_bgscrolly_w)
+	AM_RANGE(0x07f002, 0x07f003) AM_WRITE_LEGACY(gaiden_bgscrollx_w)
+	AM_RANGE(0x07f004, 0x07f005) AM_WRITE_LEGACY(gaiden_fgscrolly_w)
+	AM_RANGE(0x07f006, 0x07f007) AM_WRITE_LEGACY(gaiden_fgscrollx_w)
+	AM_RANGE(0x07a800, 0x07a801) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x07e000, 0x07e001) AM_WRITE_LEGACY(gaiden_sound_command_w)
 //  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
-//  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
+//  AM_RANGE(0x07a808, 0x07a809) AM_WRITE_LEGACY(gaiden_flip_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( mastninj, gaiden_state )

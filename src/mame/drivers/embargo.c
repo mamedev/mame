@@ -155,7 +155,7 @@ static WRITE8_HANDLER( input_select_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, embargo_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(embargo_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
@@ -167,11 +167,11 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, embargo_state )
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(port_1_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(dial_r, port_2_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE_LEGACY(port_1_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(dial_r, port_2_w)
 	AM_RANGE(0x03, 0x03) AM_WRITENOP /* always 0xFE */
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ_PORT("IN2")
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(input_port_bit_r, input_select_w)
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE_LEGACY(input_port_bit_r, input_select_w)
 ADDRESS_MAP_END
 
 

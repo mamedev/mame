@@ -55,21 +55,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyhoo_io_map, AS_IO, 8, hyhoo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//  AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_nmi_clock_w)
-	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+//  AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nb1413m3_nmi_clock_w)
+	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x90, 0x97) AM_WRITE(hyhoo_blitter_w)
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r, nb1413m3_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r, nb1413m3_sndrombank1_w)
-	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_BASE_MEMBER(hyhoo_state, m_clut)
-	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE("dac", DAC_WRITE)		// unknown read
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
-	AM_RANGE(0xe0, 0xe1) AM_READ(nb1413m3_gfxrom_r)
-	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r)
+	AM_RANGE(0x90, 0x97) AM_WRITE_LEGACY(hyhoo_blitter_w)
+	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r, nb1413m3_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r, nb1413m3_sndrombank1_w)
+	AM_RANGE(0xc0, 0xcf) AM_WRITEONLY AM_BASE( m_clut)
+	AM_RANGE(0xd0, 0xd0) AM_READNOP AM_DEVWRITE_LEGACY("dac", DAC_WRITE)		// unknown read
+	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(hyhoo_romsel_w)
+	AM_RANGE(0xe0, 0xe1) AM_READ_LEGACY(nb1413m3_gfxrom_r)
+	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 //  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
-	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
+	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hyhoo )

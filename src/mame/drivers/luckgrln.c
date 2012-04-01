@@ -363,30 +363,30 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, luckgrln_state )
 	AM_RANGE(0x10000, 0x1ffff) AM_ROM AM_REGION("rom_data",0x10000)
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("rom_data",0x00000)
 
-	AM_RANGE(0x0c000, 0x0c1ff) AM_RAM_WRITE(luckgrln_reel1_ram_w)  AM_BASE_MEMBER(luckgrln_state, m_reel1_ram) // only written to half way
-	AM_RANGE(0x0c800, 0x0c9ff) AM_RAM_WRITE(luckgrln_reel1_attr_w) AM_BASE_MEMBER(luckgrln_state, m_reel1_attr)
-	AM_RANGE(0x0d000, 0x0d03f) AM_RAM AM_BASE_MEMBER(luckgrln_state, m_reel1_scroll) AM_MIRROR(0x000c0)
+	AM_RANGE(0x0c000, 0x0c1ff) AM_RAM_WRITE_LEGACY(luckgrln_reel1_ram_w)  AM_BASE( m_reel1_ram) // only written to half way
+	AM_RANGE(0x0c800, 0x0c9ff) AM_RAM_WRITE_LEGACY(luckgrln_reel1_attr_w) AM_BASE( m_reel1_attr)
+	AM_RANGE(0x0d000, 0x0d03f) AM_RAM AM_BASE( m_reel1_scroll) AM_MIRROR(0x000c0)
 
-	AM_RANGE(0x0c200, 0x0c3ff) AM_RAM_WRITE(luckgrln_reel2_ram_w)  AM_BASE_MEMBER(luckgrln_state, m_reel2_ram)
-	AM_RANGE(0x0ca00, 0x0cbff) AM_RAM_WRITE(luckgrln_reel2_attr_w) AM_BASE_MEMBER(luckgrln_state, m_reel2_attr)
-	AM_RANGE(0x0d200, 0x0d23f) AM_RAM AM_BASE_MEMBER(luckgrln_state, m_reel2_scroll) AM_MIRROR(0x000c0)
+	AM_RANGE(0x0c200, 0x0c3ff) AM_RAM_WRITE_LEGACY(luckgrln_reel2_ram_w)  AM_BASE( m_reel2_ram)
+	AM_RANGE(0x0ca00, 0x0cbff) AM_RAM_WRITE_LEGACY(luckgrln_reel2_attr_w) AM_BASE( m_reel2_attr)
+	AM_RANGE(0x0d200, 0x0d23f) AM_RAM AM_BASE( m_reel2_scroll) AM_MIRROR(0x000c0)
 
-	AM_RANGE(0x0c400, 0x0c5ff) AM_RAM_WRITE(luckgrln_reel3_ram_w ) AM_BASE_MEMBER(luckgrln_state, m_reel3_ram)
-	AM_RANGE(0x0cc00, 0x0cdff) AM_RAM_WRITE(luckgrln_reel3_attr_w) AM_BASE_MEMBER(luckgrln_state, m_reel3_attr)
-	AM_RANGE(0x0d400, 0x0d43f) AM_RAM AM_BASE_MEMBER(luckgrln_state, m_reel3_scroll) AM_MIRROR(0x000c0)
+	AM_RANGE(0x0c400, 0x0c5ff) AM_RAM_WRITE_LEGACY(luckgrln_reel3_ram_w ) AM_BASE( m_reel3_ram)
+	AM_RANGE(0x0cc00, 0x0cdff) AM_RAM_WRITE_LEGACY(luckgrln_reel3_attr_w) AM_BASE( m_reel3_attr)
+	AM_RANGE(0x0d400, 0x0d43f) AM_RAM AM_BASE( m_reel3_scroll) AM_MIRROR(0x000c0)
 
-	AM_RANGE(0x0c600, 0x0c7ff) AM_RAM_WRITE(luckgrln_reel4_ram_w ) AM_BASE_MEMBER(luckgrln_state, m_reel4_ram)
-	AM_RANGE(0x0ce00, 0x0cfff) AM_RAM_WRITE(luckgrln_reel4_attr_w) AM_BASE_MEMBER(luckgrln_state, m_reel4_attr)
-	AM_RANGE(0x0d600, 0x0d63f) AM_RAM AM_BASE_MEMBER(luckgrln_state, m_reel4_scroll)
+	AM_RANGE(0x0c600, 0x0c7ff) AM_RAM_WRITE_LEGACY(luckgrln_reel4_ram_w ) AM_BASE( m_reel4_ram)
+	AM_RANGE(0x0ce00, 0x0cfff) AM_RAM_WRITE_LEGACY(luckgrln_reel4_attr_w) AM_BASE( m_reel4_attr)
+	AM_RANGE(0x0d600, 0x0d63f) AM_RAM AM_BASE( m_reel4_scroll)
 
 //  AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
 
 
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM // nvram
 
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM AM_BASE_MEMBER(luckgrln_state, m_luck_vram1)
-	AM_RANGE(0x0e800, 0x0efff) AM_RAM AM_BASE_MEMBER(luckgrln_state, m_luck_vram2)
-	AM_RANGE(0x0f000, 0x0f7ff) AM_RAM AM_BASE_MEMBER(luckgrln_state, m_luck_vram3)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM AM_BASE( m_luck_vram1)
+	AM_RANGE(0x0e800, 0x0efff) AM_RAM AM_BASE( m_luck_vram2)
+	AM_RANGE(0x0f000, 0x0f7ff) AM_RAM AM_BASE( m_luck_vram3)
 
 
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM
@@ -546,21 +546,21 @@ static WRITE8_HANDLER(counters_w)
 static ADDRESS_MAP_START( portmap, AS_IO, 8, luckgrln_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
-	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
+	AM_RANGE(0x0060, 0x0060) AM_WRITE_LEGACY(output_w)
 
-	AM_RANGE(0x0090, 0x009f) AM_READ(rtc_r) //AM_WRITENOP
+	AM_RANGE(0x0090, 0x009f) AM_READ_LEGACY(rtc_r) //AM_WRITENOP
 
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(palette_offset_low_w)
-	AM_RANGE(0x00a1, 0x00a1) AM_WRITE(palette_offset_high_w)
-	AM_RANGE(0x00a2, 0x00a2) AM_WRITE(palette_w)
+	AM_RANGE(0x00a0, 0x00a0) AM_WRITE_LEGACY(palette_offset_low_w)
+	AM_RANGE(0x00a1, 0x00a1) AM_WRITE_LEGACY(palette_offset_high_w)
+	AM_RANGE(0x00a2, 0x00a2) AM_WRITE_LEGACY(palette_w)
 
-	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x00b1, 0x00b1) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x00b1, 0x00b1) AM_DEVWRITE("crtc", mc6845_device, register_w)
 
 	AM_RANGE(0x00b8, 0x00b8) AM_READ_PORT("IN0")
-	AM_RANGE(0x00b9, 0x00b9) AM_READ_PORT("IN1") AM_WRITE(counters_w)
-	AM_RANGE(0x00ba, 0x00ba) AM_READ_PORT("IN2") AM_WRITE(lamps_a_w)
-	AM_RANGE(0x00bb, 0x00bb) AM_READ_PORT("IN3") AM_WRITE(lamps_b_w)
+	AM_RANGE(0x00b9, 0x00b9) AM_READ_PORT("IN1") AM_WRITE_LEGACY(counters_w)
+	AM_RANGE(0x00ba, 0x00ba) AM_READ_PORT("IN2") AM_WRITE_LEGACY(lamps_a_w)
+	AM_RANGE(0x00bb, 0x00bb) AM_READ_PORT("IN3") AM_WRITE_LEGACY(lamps_b_w)
 	AM_RANGE(0x00bc, 0x00bc) AM_READ_PORT("DSW1")
 
 	AM_RANGE(0x00c0, 0x00c3) AM_WRITENOP
@@ -604,7 +604,7 @@ static READ8_HANDLER( test_r )
 }
 
 static ADDRESS_MAP_START( _7smash_io, AS_IO, 8, luckgrln_state )
-	AM_RANGE(0x66, 0x66) AM_READ(test_r)
+	AM_RANGE(0x66, 0x66) AM_READ_LEGACY(test_r)
 	AM_IMPORT_FROM( portmap )
 ADDRESS_MAP_END
 

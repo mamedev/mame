@@ -276,17 +276,17 @@ static WRITE16_HANDLER( roulette_out_w )
 
 static ADDRESS_MAP_START( sderby_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_BASE_MEMBER(sderby_state,m_videoram)		/* bg */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_BASE_MEMBER(sderby_state,m_md_videoram)	/* mid */
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_BASE_MEMBER(sderby_state,m_fg_videoram)	/* fg */
-	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(sderby_videoram_w) AM_BASE(m_videoram)		/* bg */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(sderby_md_videoram_w) AM_BASE(m_md_videoram)	/* mid */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(sderby_fg_videoram_w) AM_BASE(m_fg_videoram)	/* fg */
+	AM_RANGE(0x104000, 0x10400b) AM_WRITE_LEGACY(sderby_scroll_w)
 	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP	/* ??? - check code at 0x000456 (executed once at startup) */
 	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP	/* ??? - check code at 0x000524 (executed once at startup) */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_MEMBER(sderby_state,m_spriteram) AM_SIZE_MEMBER(sderby_state,m_spriteram_size)
-	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w)	/* output port */
-	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x308000, 0x30800d) AM_READ_LEGACY(sderby_input_r)
+	AM_RANGE(0x308008, 0x308009) AM_WRITE_LEGACY(sderby_out_w)	/* output port */
+	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x380000, 0x380fff) AM_WRITE_LEGACY(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
 	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
@@ -295,17 +295,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( luckboom_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_BASE_MEMBER(sderby_state,m_videoram)		/* bg */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_BASE_MEMBER(sderby_state,m_md_videoram)	/* mid */
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_BASE_MEMBER(sderby_state,m_fg_videoram)	/* fg */
-	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(sderby_videoram_w) AM_BASE(m_videoram)		/* bg */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(sderby_md_videoram_w) AM_BASE(m_md_videoram)	/* mid */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(sderby_fg_videoram_w) AM_BASE(m_fg_videoram)	/* fg */
+	AM_RANGE(0x104000, 0x10400b) AM_WRITE_LEGACY(sderby_scroll_w)
 	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP	/* ??? - check code at 0x000456 (executed once at startup) */
 	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP	/* ??? - check code at 0x000524 (executed once at startup) */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_MEMBER(sderby_state,m_spriteram) AM_SIZE_MEMBER(sderby_state,m_spriteram_size)
-	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w)	/* output port */
-	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x308000, 0x30800d) AM_READ_LEGACY(sderby_input_r)
+	AM_RANGE(0x308008, 0x308009) AM_WRITE_LEGACY(sderby_out_w)	/* output port */
+	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x380000, 0x380fff) AM_WRITE_LEGACY(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
 	AM_RANGE(0xe00000, 0xe007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
@@ -313,20 +313,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spacewin_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(sderby_videoram_w) AM_BASE_MEMBER(sderby_state,m_videoram)		/* bg */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_BASE_MEMBER(sderby_state,m_md_videoram)	/* mid */
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_BASE_MEMBER(sderby_state,m_fg_videoram)	/* fg */
-	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)	/* tilemaps offset control */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(sderby_videoram_w) AM_BASE(m_videoram)		/* bg */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(sderby_md_videoram_w) AM_BASE(m_md_videoram)	/* mid */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(sderby_fg_videoram_w) AM_BASE(m_fg_videoram)	/* fg */
+	AM_RANGE(0x104000, 0x10400b) AM_WRITE_LEGACY(sderby_scroll_w)	/* tilemaps offset control */
 	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP	/* seems another video register. constantly used */
 	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP	/* seems another video register. constantly used */
 	AM_RANGE(0x104010, 0x105fff) AM_WRITENOP	/* unknown */
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
-	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE(scmatto_out_w)	/* output port */
-	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x308000, 0x30800d) AM_READ_LEGACY(sderby_input_r)
+	AM_RANGE(0x308008, 0x308009) AM_WRITE_LEGACY(scmatto_out_w)	/* output port */
+	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x380000, 0x380fff) AM_WRITE_LEGACY(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd00000, 0xd001ff) AM_RAM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM AM_BASE_MEMBER(sderby_state,m_spriteram) AM_SIZE_MEMBER(sderby_state,m_spriteram_size)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
 	AM_RANGE(0x801000, 0x80100d) AM_WRITENOP	/* unknown */
 	AM_RANGE(0x8f0000, 0x8f07ff) AM_RAM AM_SHARE("nvram")	/* 16K Dallas DS1220Y-200 NVRAM */
 	AM_RANGE(0x8fc000, 0x8fffff) AM_RAM
@@ -334,19 +334,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roulette_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x440000, 0x440fff) AM_WRITEONLY AM_BASE_MEMBER(sderby_state,m_spriteram) AM_SIZE_MEMBER(sderby_state,m_spriteram_size)
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(sderby_videoram_w) AM_BASE_MEMBER(sderby_state,m_videoram)			/* bg */
-	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_BASE_MEMBER(sderby_state,m_md_videoram)	/* mid */
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_BASE_MEMBER(sderby_state,m_fg_videoram)	/* fg */
-	AM_RANGE(0x504000, 0x50400b) AM_RAM_WRITE(sderby_scroll_w)
+	AM_RANGE(0x440000, 0x440fff) AM_WRITEONLY AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(sderby_videoram_w) AM_BASE(m_videoram)			/* bg */
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE_LEGACY(sderby_md_videoram_w) AM_BASE(m_md_videoram)	/* mid */
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE_LEGACY(sderby_fg_videoram_w) AM_BASE(m_fg_videoram)	/* fg */
+	AM_RANGE(0x504000, 0x50400b) AM_RAM_WRITE_LEGACY(sderby_scroll_w)
 	AM_RANGE(0x50400e, 0x50400f) AM_WRITENOP
 
-	AM_RANGE(0x708000, 0x708009) AM_READ(roulette_input_r)
-	AM_RANGE(0x708006, 0x708007) AM_WRITE(roulette_out_w)
-	AM_RANGE(0x70800a, 0x70800b) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x708000, 0x708009) AM_READ_LEGACY(roulette_input_r)
+	AM_RANGE(0x708006, 0x708007) AM_WRITE_LEGACY(roulette_out_w)
+	AM_RANGE(0x70800a, 0x70800b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x70800c, 0x70800d) AM_WRITENOP	/* watchdog?? (0x0003) */
-	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE(rprot_r, rprot_w)	/* MCU communication */
-	AM_RANGE(0x780000, 0x780fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE_LEGACY(rprot_r, rprot_w)	/* MCU communication */
+	AM_RANGE(0x780000, 0x780fff) AM_WRITE_LEGACY(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xff0000, 0xff07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM

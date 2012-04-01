@@ -352,27 +352,27 @@ static WRITE8_HANDLER( airbustr_coin_counter_w )
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(airbustr_state, m_devram) // shared with protection device
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE( m_devram) // shared with protection device
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_io_map, AS_IO, 8, airbustr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(master_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_WRITENOP // ???
-	AM_RANGE(0x02, 0x02) AM_WRITE(master_nmi_trigger_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(master_nmi_trigger_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(airbustr_videoram2_w) AM_BASE_MEMBER(airbustr_state, m_videoram2)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(airbustr_colorram2_w) AM_BASE_MEMBER(airbustr_state, m_colorram2)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_BASE_MEMBER(airbustr_state, m_videoram)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(airbustr_colorram_w) AM_BASE_MEMBER(airbustr_state, m_colorram)
-	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE(airbustr_paletteram_w) AM_BASE_MEMBER(airbustr_state, m_paletteram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(airbustr_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(airbustr_colorram2_w) AM_BASE( m_colorram2)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(airbustr_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(airbustr_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE_LEGACY(airbustr_paletteram_w) AM_BASE( m_paletteram)
 	AM_RANGE(0xd600, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
@@ -380,14 +380,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, airbustr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(soundcommand2_r, soundcommand_w)
-	AM_RANGE(0x04, 0x0c) AM_WRITE(airbustr_scrollregs_w)
-	AM_RANGE(0x0e, 0x0e) AM_READ(soundcommand_status_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(slave_bankswitch_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(soundcommand2_r, soundcommand_w)
+	AM_RANGE(0x04, 0x0c) AM_WRITE_LEGACY(airbustr_scrollregs_w)
+	AM_RANGE(0x0e, 0x0e) AM_READ_LEGACY(soundcommand_status_r)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("P2")
 	AM_RANGE(0x24, 0x24) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x28, 0x28) AM_WRITE(airbustr_coin_counter_w)
+	AM_RANGE(0x28, 0x28) AM_WRITE_LEGACY(airbustr_coin_counter_w)
 	AM_RANGE(0x38, 0x38) AM_WRITENOP // irq ack / irq mask
 ADDRESS_MAP_END
 
@@ -399,10 +399,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, airbustr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(soundcommand_r, soundcommand2_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(sound_bankswitch_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x06, 0x06) AM_READWRITE_LEGACY(soundcommand_r, soundcommand2_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

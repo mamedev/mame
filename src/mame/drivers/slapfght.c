@@ -274,8 +274,8 @@ static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with sound CPU */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(slapfight_videoram_w) AM_BASE( m_slapfight_videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE_LEGACY(slapfight_colorram_w) AM_BASE( m_slapfight_colorram)
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
@@ -284,14 +284,14 @@ static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(slapfight_videoram_w) AM_BASE( m_slapfight_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(slapfight_colorram_w) AM_BASE( m_slapfight_colorram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_lo)
-	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_hi)
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrolly)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixvideoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixcolorram)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE( m_slapfight_scrollx_lo)
+	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE( m_slapfight_scrollx_hi)
+	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE( m_slapfight_scrolly)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(slapfight_fixram_w) AM_BASE( m_slapfight_fixvideoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(slapfight_fixcol_w) AM_BASE( m_slapfight_fixcolorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8, slapfght_state )
@@ -300,15 +300,15 @@ static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(slapfight_videoram_w) AM_BASE( m_slapfight_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(slapfight_colorram_w) AM_BASE( m_slapfight_colorram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_lo)
-	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_hi)
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrolly)
-//  AM_RANGE(0xe803, 0xe803) AM_READWRITE(slapfight_mcu_r, slapfight_mcu_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixvideoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixcolorram)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE( m_slapfight_scrollx_lo)
+	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE( m_slapfight_scrollx_hi)
+	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE( m_slapfight_scrolly)
+//  AM_RANGE(0xe803, 0xe803) AM_READWRITE_LEGACY(slapfight_mcu_r, slapfight_mcu_w)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(slapfight_fixram_w) AM_BASE( m_slapfight_fixvideoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(slapfight_fixcol_w) AM_BASE( m_slapfight_fixcolorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
@@ -317,38 +317,38 @@ static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(slapfight_videoram_w) AM_BASE( m_slapfight_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(slapfight_colorram_w) AM_BASE( m_slapfight_colorram)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_hi)
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrolly)
-	AM_RANGE(0xe803, 0xe803) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_lo)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE( m_slapfight_scrollx_hi)
+	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE( m_slapfight_scrolly)
+	AM_RANGE(0xe803, 0xe803) AM_WRITEONLY AM_BASE( m_slapfight_scrollx_lo)
 	AM_RANGE(0xec00, 0xefff) AM_ROM // it reads a copy of the logo from here!
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixvideoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixcolorram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(slapfight_fixram_w) AM_BASE( m_slapfight_fixvideoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(slapfight_fixcol_w) AM_BASE( m_slapfight_fixcolorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(slapfight_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
-//  AM_RANGE(0x04, 0x04) AM_WRITE(getstar_port_04_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(slapfight_port_08_w)	/* select bank 0 */
-	AM_RANGE(0x09, 0x09) AM_WRITE(slapfight_port_09_w)	/* select bank 1 */
-	AM_RANGE(0x0c, 0x0d) AM_WRITE(slapfight_palette_bank_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(slapfight_port_00_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(slapfight_port_01_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(slapfight_flipscreen_w)
+//  AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(getstar_port_04_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(slapfight_port_06_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(slapfight_port_07_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(slapfight_port_08_w)	/* select bank 0 */
+	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(slapfight_port_09_w)	/* select bank 1 */
+	AM_RANGE(0x0c, 0x0d) AM_WRITE_LEGACY(slapfight_palette_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(slapfight_68705_portA_r, slapfight_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(slapfight_68705_portB_r, slapfight_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(slapfight_68705_portC_r, slapfight_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(slapfight_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(slapfight_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(slapfight_68705_ddrC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(slapfight_68705_portA_r, slapfight_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(slapfight_68705_portB_r, slapfight_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(slapfight_68705_portC_r, slapfight_68705_portC_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(slapfight_68705_ddrA_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(slapfight_68705_ddrB_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(slapfight_68705_ddrC_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -360,30 +360,30 @@ static READ8_HANDLER(tigerh_status_r)
 
 static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(tigerh_status_r, slapfight_port_00_w)	/* status register */
-	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(tigerh_status_r, slapfight_port_00_w)	/* status register */
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(slapfight_port_01_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(slapfight_flipscreen_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(slapfight_port_06_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(slapfight_port_07_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w)	/* status register */
-	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(slapfight_port_00_r, slapfight_port_00_w)	/* status register */
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(slapfight_port_01_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(slapfight_flipscreen_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(slapfight_port_06_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(slapfight_port_07_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(tigerh_68705_portA_r,tigerh_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(tigerh_68705_portB_r,tigerh_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tigerh_68705_portC_r,tigerh_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(tigerh_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(tigerh_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(tigerh_68705_ddrC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(tigerh_68705_portA_r,tigerh_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(tigerh_68705_portB_r,tigerh_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(tigerh_68705_portC_r,tigerh_68705_portC_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(tigerh_68705_ddrA_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(tigerh_68705_ddrB_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(tigerh_68705_ddrC_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -392,25 +392,25 @@ static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with main CPU */
-	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0xa081, 0xa081) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa091, 0xa091) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE_LEGACY(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
 //  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0xa081, 0xa081) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa091, 0xa091) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE_LEGACY(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
 //  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM

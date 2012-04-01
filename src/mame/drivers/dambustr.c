@@ -79,38 +79,38 @@ static WRITE8_DEVICE_HANDLER( dambustr_noise_enable_w )
 static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(dambustr_bg_color_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(dambustr_bg_split_line_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(dambustr_bg_color_w)
+	AM_RANGE(0x8001, 0x8001) AM_WRITE_LEGACY(dambustr_bg_split_line_w)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE_MEMBER(galaxold_state, m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_READ(galaxold_videoram_r)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE_MEMBER(galaxold_state, m_attributesram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_spriteram) AM_SIZE_MEMBER(galaxold_state, m_spriteram_size)
-	AM_RANGE(0xd860, 0xd87f) AM_RAM AM_BASE_MEMBER(galaxold_state, m_bulletsram) AM_SIZE_MEMBER(galaxold_state, m_bulletsram_size)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(galaxold_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_READ_LEGACY(galaxold_videoram_r)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE_LEGACY(galaxold_attributesram_w) AM_BASE(m_attributesram)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
+	AM_RANGE(0xd860, 0xd87f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
 
 	AM_RANGE(0xd880, 0xd8ff) AM_RAM
 
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0")
-	AM_RANGE(0xe002, 0xe003) AM_WRITE(galaxold_coin_counter_w)
-	AM_RANGE(0xe004, 0xe007) AM_DEVWRITE(GAL_AUDIO, galaxian_lfo_freq_w)
+	AM_RANGE(0xe002, 0xe003) AM_WRITE_LEGACY(galaxold_coin_counter_w)
+	AM_RANGE(0xe004, 0xe007) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_lfo_freq_w)
 
 	AM_RANGE(0xe800, 0xefff) AM_READ_PORT("IN1")
-	AM_RANGE(0xe800, 0xe802) AM_DEVWRITE(GAL_AUDIO, galaxian_background_enable_w)
-	AM_RANGE(0xe803, 0xe803) AM_DEVWRITE(GAL_AUDIO, dambustr_noise_enable_w)
-	AM_RANGE(0xe804, 0xe804) AM_DEVWRITE(GAL_AUDIO, galaxian_shoot_enable_w)	// probably louder than normal shot
-	AM_RANGE(0xe805, 0xe805) AM_DEVWRITE(GAL_AUDIO, galaxian_shoot_enable_w)	// normal shot (like Galaxian)
-	AM_RANGE(0xe806, 0xe807) AM_DEVWRITE(GAL_AUDIO, galaxian_vol_w)
+	AM_RANGE(0xe800, 0xe802) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_background_enable_w)
+	AM_RANGE(0xe803, 0xe803) AM_DEVWRITE_LEGACY(GAL_AUDIO, dambustr_noise_enable_w)
+	AM_RANGE(0xe804, 0xe804) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)	// probably louder than normal shot
+	AM_RANGE(0xe805, 0xe805) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_shoot_enable_w)	// normal shot (like Galaxian)
+	AM_RANGE(0xe806, 0xe807) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_vol_w)
 
 	AM_RANGE(0xf000, 0xf7ff) AM_READ_PORT("DSW")
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(galaxold_nmi_enable_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(galaxold_stars_enable_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(galaxold_flip_screen_y_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(galaxold_nmi_enable_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(galaxold_stars_enable_w)
+	AM_RANGE(0xf006, 0xf006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
+	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
 
-	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE(GAL_AUDIO, galaxian_pitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
+	AM_RANGE(0xf800, 0xffff) AM_READ_LEGACY(watchdog_reset_r)
 ADDRESS_MAP_END
 
 

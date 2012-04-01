@@ -436,14 +436,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("bank5")
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank6")
 	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank7")
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(namcos1_bankswitch_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(namcos1_cpu_control_w)
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(namcos1_watchdog_w)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE_LEGACY(namcos1_bankswitch_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(namcos1_cpu_control_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(namcos1_watchdog_w)
 //  AM_RANGE(0xf400, 0xf400) AM_WRITENOP // unknown
-	AM_RANGE(0xf600, 0xf600) AM_WRITE(irq_ack_w)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(firq_ack_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(namcos1_sub_firq_w) // asserts FIRQ on CPU1
-	AM_RANGE(0xfc00, 0xfc01) AM_WRITE(namcos1_subcpu_bank_w)
+	AM_RANGE(0xf600, 0xf600) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(firq_ack_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(namcos1_sub_firq_w) // asserts FIRQ on CPU1
+	AM_RANGE(0xfc00, 0xfc01) AM_WRITE_LEGACY(namcos1_subcpu_bank_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
 
@@ -456,50 +456,50 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("bank13")
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank14")
 	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank15")
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(namcos1_bankswitch_w)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE_LEGACY(namcos1_bankswitch_w)
 //  AM_RANGE(0xf000, 0xf000) AM_WRITENOP // IO Chip
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(namcos1_watchdog_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(namcos1_watchdog_w)
 //  AM_RANGE(0xf400, 0xf400) AM_WRITENOP // ?
-	AM_RANGE(0xf600, 0xf600) AM_WRITE(irq_ack_w)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(firq_ack_w)
+	AM_RANGE(0xf600, 0xf600) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(firq_ack_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank16")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank17")	/* Banked ROMs */
-	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ymsnd", ym2151_status_port_r)
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) /* PSG ( Shared ) */
+	AM_RANGE(0x4000, 0x4001) AM_DEVREAD_LEGACY("ymsnd", ym2151_status_port_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) /* PSG ( Shared ) */
 	AM_RANGE(0x7000, 0x77ff) AM_RAMBANK("bank18")	/* TRIRAM (shared) */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM	/* Sound RAM 3 */
-	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos1_sound_bankswitch_w) /* ROM bank selector */
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(namcos1_watchdog_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(irq_ack_w)
+	AM_RANGE(0xc000, 0xc001) AM_WRITE_LEGACY(namcos1_sound_bankswitch_w) /* ROM bank selector */
+	AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(namcos1_watchdog_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(irq_ack_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM /* built in RAM */
-	AM_RANGE(0x1000, 0x1003) AM_READ(dsw_r)
+	AM_RANGE(0x1000, 0x1003) AM_READ_LEGACY(dsw_r)
 	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("CONTROL0")
 	AM_RANGE(0x1401, 0x1401) AM_READ_PORT("CONTROL1")
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank20") /* banked ROM */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(namcos1_mcu_patch_w)	/* kludge! see notes */
+	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(namcos1_mcu_patch_w)	/* kludge! see notes */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAMBANK("bank19")	/* TRIRAM (shared) */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("nvram") /* EEPROM */
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(namcos1_dac0_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(namcos1_dac1_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(namcos1_mcu_bankswitch_w) /* ROM bank selector */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(irq_ack_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(namcos1_dac0_w)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE_LEGACY(namcos1_dac1_w)
+	AM_RANGE(0xd800, 0xd800) AM_WRITE_LEGACY(namcos1_mcu_bankswitch_w) /* ROM bank selector */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(irq_ack_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos1_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("COIN") AM_WRITE(namcos1_coin_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READNOP AM_WRITE(namcos1_dac_gain_w)
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("COIN") AM_WRITE_LEGACY(namcos1_coin_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READNOP AM_WRITE_LEGACY(namcos1_dac_gain_w)
 ADDRESS_MAP_END
 
 

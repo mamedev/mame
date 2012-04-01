@@ -82,13 +82,13 @@ static WRITE8_DEVICE_HANDLER( audio_dac_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_BASE_MEMBER(trucocl_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_BASE_MEMBER(trucocl_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(trucocl_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE_LEGACY(trucocl_colorram_w) AM_BASE( m_colorram)
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(irq_enable_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
-	AM_RANGE(0x5080, 0x5080) AM_DEVWRITE("dac", audio_dac_w)
-	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x5080, 0x5080) AM_DEVWRITE_LEGACY("dac", audio_dac_w)
+	AM_RANGE(0x50c0, 0x50c0) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

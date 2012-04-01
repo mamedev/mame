@@ -661,15 +661,15 @@ static ADDRESS_MAP_START( wheelfir_main, AS_PROGRAM, 16, wheelfir_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x700000, 0x70001f) AM_WRITE(wheelfir_blit_w)
-	AM_RANGE(0x720000, 0x720001) AM_WRITE(pal_reset_pos_w)
-	AM_RANGE(0x720002, 0x720003) AM_WRITE(pal_data_w)
+	AM_RANGE(0x700000, 0x70001f) AM_WRITE_LEGACY(wheelfir_blit_w)
+	AM_RANGE(0x720000, 0x720001) AM_WRITE_LEGACY(pal_reset_pos_w)
+	AM_RANGE(0x720002, 0x720003) AM_WRITE_LEGACY(pal_data_w)
 	AM_RANGE(0x720004, 0x720005) AM_WRITENOP // always ffff?
-	AM_RANGE(0x740000, 0x740001) AM_WRITE(wheelfir_snd_w)
+	AM_RANGE(0x740000, 0x740001) AM_WRITE_LEGACY(wheelfir_snd_w)
 	AM_RANGE(0x780000, 0x78000f) AM_READNOP /* net comms ? */
-	AM_RANGE(0x760000, 0x760001) AM_WRITE(coin_cnt_w)
-	AM_RANGE(0x7a0000, 0x7a0001) AM_WRITE(wheelfir_scanline_cnt_w)
-	AM_RANGE(0x7c0000, 0x7c0001) AM_READWRITE(wheelfir_status_r, wheelfir_7c0000_w)
+	AM_RANGE(0x760000, 0x760001) AM_WRITE_LEGACY(coin_cnt_w)
+	AM_RANGE(0x7a0000, 0x7a0001) AM_WRITE_LEGACY(wheelfir_scanline_cnt_w)
+	AM_RANGE(0x7c0000, 0x7c0001) AM_READWRITE_LEGACY(wheelfir_status_r, wheelfir_7c0000_w)
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READ_PORT("P1")
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
 
@@ -681,10 +681,10 @@ static ADDRESS_MAP_START( wheelfir_sub, AS_PROGRAM, 16, wheelfir_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x780000, 0x780001) AM_READ(wheelfir_snd_r)
+	AM_RANGE(0x780000, 0x780001) AM_READ_LEGACY(wheelfir_snd_r)
 
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE8("dac1", dac_w, 0xff00) //guess for now
-	AM_RANGE(0x740000, 0x740001) AM_DEVWRITE8("dac2", dac_w, 0xff00)
+	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE8_LEGACY("dac1", dac_w, 0xff00) //guess for now
+	AM_RANGE(0x740000, 0x740001) AM_DEVWRITE8_LEGACY("dac2", dac_w, 0xff00)
 ADDRESS_MAP_END
 
 

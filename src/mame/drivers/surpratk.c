@@ -91,7 +91,7 @@ static WRITE8_HANDLER( surpratk_5fc0_w )
 /********************************************/
 
 static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(surpratk_state, m_ram)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE( m_ram)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")					/* banked ROM */
 	AM_RANGE(0x5f8c, 0x5f8c) AM_READ_PORT("P1")
@@ -99,12 +99,12 @@ static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
 	AM_RANGE(0x5f8e, 0x5f8e) AM_READ_PORT("DSW3")
 	AM_RANGE(0x5f8f, 0x5f8f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f90, 0x5f90) AM_READ_PORT("DSW2")
-	AM_RANGE(0x5fa0, 0x5faf) AM_DEVREADWRITE("k053244", k053244_r, k053244_w)
-	AM_RANGE(0x5fb0, 0x5fbf) AM_DEVWRITE("k053251", k053251_w)
-	AM_RANGE(0x5fc0, 0x5fc0) AM_READWRITE(watchdog_reset_r, surpratk_5fc0_w)
-	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE("ymsnd", ym2151_w)
-	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_r, k052109_w)
+	AM_RANGE(0x5fa0, 0x5faf) AM_DEVREADWRITE_LEGACY("k053244", k053244_r, k053244_w)
+	AM_RANGE(0x5fb0, 0x5fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
+	AM_RANGE(0x5fc0, 0x5fc0) AM_READWRITE_LEGACY(watchdog_reset_r, surpratk_5fc0_w)
+	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE_LEGACY("ymsnd", ym2151_w)
+	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE_LEGACY(surpratk_videobank_w)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM					/* ROM */
 ADDRESS_MAP_END
 

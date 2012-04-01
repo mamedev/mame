@@ -178,29 +178,29 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
 
 //  AM_RANGE(0x180018, 0x18001f) AM_READNOP // ?
 
-	AM_RANGE(0x200000, 0x200005) AM_RAM AM_BASE_MEMBER(mcatadv_state, m_scroll1)
-	AM_RANGE(0x300000, 0x300005) AM_RAM AM_BASE_MEMBER(mcatadv_state, m_scroll2)
+	AM_RANGE(0x200000, 0x200005) AM_RAM AM_BASE( m_scroll1)
+	AM_RANGE(0x300000, 0x300005) AM_RAM AM_BASE( m_scroll2)
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE(mcatadv_videoram1_w) AM_BASE_MEMBER(mcatadv_state, m_videoram1) // Tilemap 0
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(mcatadv_videoram2_w) AM_BASE_MEMBER(mcatadv_state, m_videoram2) // Tilemap 1
+	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE_LEGACY(mcatadv_videoram1_w) AM_BASE( m_videoram1) // Tilemap 0
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(mcatadv_videoram2_w) AM_BASE( m_videoram2) // Tilemap 1
 
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?
 
-	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_SIZE_MEMBER(mcatadv_state, m_spriteram, m_spriteram_size) // Sprites, two halves for double buffering
+	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size) // Sprites, two halves for double buffering
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM // Tests more than is needed?
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("P2")
-//  AM_RANGE(0x900000, 0x900001) AM_WRITE(mcat_coin_w) // Lockout / Counter MCAT Only
+//  AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(mcat_coin_w) // Lockout / Counter MCAT Only
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0xb00000, 0xb0000f) AM_RAM AM_BASE_MEMBER(mcatadv_state, m_vidregs)
+	AM_RANGE(0xb00000, 0xb0000f) AM_RAM AM_BASE( m_vidregs)
 
-	AM_RANGE(0xb00018, 0xb00019) AM_WRITE(watchdog_reset16_w) // NOST Only
-	AM_RANGE(0xb0001e, 0xb0001f) AM_READ(mcat_wd_r) // MCAT Only
-	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(soundlatch2_word_r, mcat_soundlatch_w)
+	AM_RANGE(0xb00018, 0xb00019) AM_WRITE_LEGACY(watchdog_reset16_w) // NOST Only
+	AM_RANGE(0xb0001e, 0xb0001f) AM_READ_LEGACY(mcat_wd_r) // MCAT Only
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE_LEGACY(soundlatch2_word_r, mcat_soundlatch_w)
 ADDRESS_MAP_END
 
 /*** Sound ***/
@@ -215,13 +215,13 @@ static ADDRESS_MAP_START( mcatadv_sound_map, AS_PROGRAM, 8, mcatadv_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM						// ROM
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")				// ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM						// RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r,ym2610_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcatadv_sound_bw_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r,ym2610_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(mcatadv_sound_bw_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcatadv_sound_io_map, AS_IO, 8, mcatadv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_r, soundlatch2_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE_LEGACY(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 
 
@@ -233,10 +233,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nost_sound_io_map, AS_IO, 8, mcatadv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ymsnd", ym2610_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREAD("ymsnd", ym2610_r)
-	AM_RANGE(0x40, 0x40) AM_WRITE(mcatadv_sound_bw_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_r, soundlatch2_w)
+	AM_RANGE(0x00, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2610_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREAD_LEGACY("ymsnd", ym2610_r)
+	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(mcatadv_sound_bw_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE_LEGACY(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 
 /*** Inputs ***/

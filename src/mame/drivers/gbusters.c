@@ -156,21 +156,21 @@ static WRITE8_HANDLER( k052109_051960_w )
 
 
 static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8, gbusters_state )
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_coin_counter_w)						/* coin counters */
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)									/* sound code # */
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(gbusters_sh_irqtrigger_w)						/* cause interrupt on audio CPU */
-	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)								/* watchdog reset */
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE_LEGACY(gbusters_coin_counter_w)						/* coin counters */
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE_LEGACY(soundlatch_w)									/* sound code # */
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE_LEGACY(gbusters_sh_irqtrigger_w)						/* cause interrupt on audio CPU */
+	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE_LEGACY(watchdog_reset_w)								/* watchdog reset */
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
 	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
 	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(gbusters_1f98_w)								/* enable gfx ROM read through VRAM */
-	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE(gbusters_unknown_w)							/* ??? */
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
+	AM_RANGE(0x1f98, 0x1f98) AM_WRITE_LEGACY(gbusters_1f98_w)								/* enable gfx ROM read through VRAM */
+	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE_LEGACY(gbusters_unknown_w)							/* ??? */
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
 	AM_RANGE(0x4000, 0x57ff) AM_RAM													/* RAM I12 */
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(gbusters_state, m_ram)	/* palette + work RAM (RAM D16 & C16) */
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE( m_ram)	/* palette + work RAM (RAM D16 & C16) */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")											/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM													/* ROM 878n02.rom */
 ADDRESS_MAP_END
@@ -178,11 +178,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gbusters_sound_map, AS_PROGRAM, 8, gbusters_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM													/* ROM 878h01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM													/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)									/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_r, k007232_w)		/* 007232 registers */
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ymsnd", ym2151_status_port_r)					/* YM 2151 */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)				/* YM 2151 */
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("k007232", gbusters_snd_bankswitch_w)		/* 007232 bankswitch? */
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)									/* soundlatch_r */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)		/* 007232 registers */
+	AM_RANGE(0xc001, 0xc001) AM_DEVREAD_LEGACY("ymsnd", ym2151_status_port_r)					/* YM 2151 */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)				/* YM 2151 */
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", gbusters_snd_bankswitch_w)		/* 007232 bankswitch? */
 ADDRESS_MAP_END
 
 /***************************************************************************

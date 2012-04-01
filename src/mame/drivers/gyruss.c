@@ -160,25 +160,25 @@ static WRITE8_HANDLER( slave_irq_mask_w )
 
 static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_MEMBER(gyruss_state, m_colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE_MEMBER(gyruss_state, m_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW2") AM_WRITENOP	/* watchdog reset */
-	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("SYSTEM") AM_WRITE(gyruss_sh_irqtrigger_w)
+	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(gyruss_sh_irqtrigger_w)
 	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("P1")
 	AM_RANGE(0xc0c0, 0xc0c0) AM_READ_PORT("P2")
 	AM_RANGE(0xc0e0, 0xc0e0) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc180, 0xc180) AM_WRITE(master_nmi_mask_w)
-	AM_RANGE(0xc185, 0xc185) AM_WRITEONLY AM_BASE_MEMBER(gyruss_state, m_flipscreen)
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc180, 0xc180) AM_WRITE_LEGACY(master_nmi_mask_w)
+	AM_RANGE(0xc185, 0xc185) AM_WRITEONLY AM_BASE( m_flipscreen)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8, gyruss_state )
-	AM_RANGE(0x0000, 0x0000) AM_READ(gyruss_scanline_r)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(slave_irq_mask_w)
+	AM_RANGE(0x0000, 0x0000) AM_READ_LEGACY(gyruss_scanline_r)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(slave_irq_mask_w)
 	AM_RANGE(0x4000, 0x403f) AM_RAM
-	AM_RANGE(0x4040, 0x40ff) AM_RAM_WRITE(gyruss_spriteram_w) AM_BASE_MEMBER(gyruss_state, m_spriteram)
+	AM_RANGE(0x4040, 0x40ff) AM_RAM_WRITE_LEGACY(gyruss_spriteram_w) AM_BASE( m_spriteram)
 	AM_RANGE(0x4100, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -187,28 +187,28 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay3", ay8910_address_w)
-	AM_RANGE(0x09, 0x09) AM_DEVREAD("ay3", ay8910_r)
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay3", ay8910_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("ay4", ay8910_address_w)
-	AM_RANGE(0x0d, 0x0d) AM_DEVREAD("ay4", ay8910_r)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("ay4", ay8910_data_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay5", ay8910_address_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay5", ay8910_r)
-	AM_RANGE(0x12, 0x12) AM_DEVWRITE("ay5", ay8910_data_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(gyruss_i8039_irq_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0x05, 0x05) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("ay3", ay8910_address_w)
+	AM_RANGE(0x09, 0x09) AM_DEVREAD_LEGACY("ay3", ay8910_r)
+	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE_LEGACY("ay3", ay8910_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("ay4", ay8910_address_w)
+	AM_RANGE(0x0d, 0x0d) AM_DEVREAD_LEGACY("ay4", ay8910_r)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE_LEGACY("ay4", ay8910_data_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("ay5", ay8910_address_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD_LEGACY("ay5", ay8910_r)
+	AM_RANGE(0x12, 0x12) AM_DEVWRITE_LEGACY("ay5", ay8910_data_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(gyruss_i8039_irq_w)
+	AM_RANGE(0x18, 0x18) AM_WRITE_LEGACY(soundlatch2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_map, AS_PROGRAM, 8, gyruss_state )
@@ -216,9 +216,9 @@ static ADDRESS_MAP_START( audio_cpu2_map, AS_PROGRAM, 8, gyruss_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_io_map, AS_IO, 8, gyruss_state )
-	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("discrete", gyruss_dac_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(gyruss_irq_clear_w)
+	AM_RANGE(0x00, 0xff) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("discrete", gyruss_dac_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE_LEGACY(gyruss_irq_clear_w)
 ADDRESS_MAP_END
 
 

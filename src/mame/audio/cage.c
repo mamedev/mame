@@ -657,9 +657,9 @@ static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
-	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE(tms32031_io_r, tms32031_io_w)
+	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE_LEGACY(tms32031_io_r, tms32031_io_w)
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
-	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE(cage_from_main_r, cage_to_main_w)
+	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE_LEGACY(cage_from_main_r, cage_to_main_w)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
@@ -668,11 +668,11 @@ static ADDRESS_MAP_START( cage_map_seattle, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
-	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE(tms32031_io_r, tms32031_io_w)
+	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE_LEGACY(tms32031_io_r, tms32031_io_w)
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
-	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE(cage_from_main_r, cage_from_main_ack_w)
-	AM_RANGE(0xa00001, 0xa00001) AM_WRITE(cage_to_main_w)
-	AM_RANGE(0xa00003, 0xa00003) AM_READ(cage_io_status_r)
+	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE_LEGACY(cage_from_main_r, cage_from_main_ack_w)
+	AM_RANGE(0xa00001, 0xa00001) AM_WRITE_LEGACY(cage_to_main_w)
+	AM_RANGE(0xa00003, 0xa00003) AM_READ_LEGACY(cage_io_status_r)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 

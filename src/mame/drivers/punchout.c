@@ -317,13 +317,13 @@ static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_BASE_MEMBER(punchout_state, m_bg_top_videoram)
-	AM_RANGE(0xdff0, 0xdff7) AM_BASE_MEMBER(punchout_state, m_spr1_ctrlram)
-	AM_RANGE(0xdff8, 0xdffc) AM_BASE_MEMBER(punchout_state, m_spr2_ctrlram)
-	AM_RANGE(0xdffd, 0xdffd) AM_BASE_MEMBER(punchout_state, m_palettebank)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_BASE_MEMBER(punchout_state, m_spr1_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_BASE_MEMBER(punchout_state, m_spr2_videoram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_BASE_MEMBER(punchout_state, m_bg_bot_videoram)	// also contains scroll RAM
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(punchout_bg_top_videoram_w) AM_BASE( m_bg_top_videoram)
+	AM_RANGE(0xdff0, 0xdff7) AM_BASE( m_spr1_ctrlram)
+	AM_RANGE(0xdff8, 0xdffc) AM_BASE( m_spr2_ctrlram)
+	AM_RANGE(0xdffd, 0xdffd) AM_BASE( m_palettebank)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(punchout_spr1_videoram_w) AM_BASE( m_spr1_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(punchout_spr2_videoram_w) AM_BASE( m_spr2_videoram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE_LEGACY(punchout_bg_bot_videoram_w) AM_BASE( m_bg_bot_videoram)	// also contains scroll RAM
 ADDRESS_MAP_END
 
 
@@ -331,14 +331,14 @@ static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fg_videoram_w) AM_BASE_MEMBER(punchout_state, m_armwrest_fg_videoram)
-	AM_RANGE(0xdff0, 0xdff7) AM_BASE_MEMBER(punchout_state, m_spr1_ctrlram)
-	AM_RANGE(0xdff8, 0xdffc) AM_BASE_MEMBER(punchout_state, m_spr2_ctrlram)
-	AM_RANGE(0xdffd, 0xdffd) AM_BASE_MEMBER(punchout_state, m_palettebank)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_BASE_MEMBER(punchout_state, m_spr1_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_BASE_MEMBER(punchout_state, m_spr2_videoram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_BASE_MEMBER(punchout_state, m_bg_bot_videoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_BASE_MEMBER(punchout_state, m_bg_top_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(armwrest_fg_videoram_w) AM_BASE( m_armwrest_fg_videoram)
+	AM_RANGE(0xdff0, 0xdff7) AM_BASE( m_spr1_ctrlram)
+	AM_RANGE(0xdff8, 0xdffc) AM_BASE( m_spr2_ctrlram)
+	AM_RANGE(0xdffd, 0xdffd) AM_BASE( m_palettebank)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(punchout_spr1_videoram_w) AM_BASE( m_spr1_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(punchout_spr2_videoram_w) AM_BASE( m_spr2_videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(punchout_bg_bot_videoram_w) AM_BASE( m_bg_bot_videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(punchout_bg_top_videoram_w) AM_BASE( m_bg_top_videoram)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( nmi_mask_w )
@@ -353,29 +353,29 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x00, 0x01) AM_WRITENOP	/* the 2A03 #1 is not present */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE(soundlatch_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_data_w)	/* VLM5030 */
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(soundlatch2_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)	/* VLM5030 */
 //  AM_RANGE(0x05, 0x05) AM_WRITENOP  /* unused */
 //  AM_RANGE(0x06, 0x06) AM_WRITENOP
-	AM_RANGE(0x08, 0x08) AM_WRITE(nmi_mask_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(nmi_mask_w)
 	AM_RANGE(0x09, 0x09) AM_WRITENOP	/* watchdog reset, seldom used because 08 clears the watchdog as well */
 	AM_RANGE(0x0a, 0x0a) AM_WRITENOP	/* ?? */
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(punchout_2a03_reset_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("vlm", punchout_speech_reset_w)	/* VLM5030 */
-	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE("vlm", punchout_speech_st_w)	/* VLM5030 */
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("vlm", punchout_speech_vcu_w)	/* VLM5030 */
+	AM_RANGE(0x0b, 0x0b) AM_WRITE_LEGACY(punchout_2a03_reset_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("vlm", punchout_speech_reset_w)	/* VLM5030 */
+	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE_LEGACY("vlm", punchout_speech_st_w)	/* VLM5030 */
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE_LEGACY("vlm", punchout_speech_vcu_w)	/* VLM5030 */
 	AM_RANGE(0x0f, 0x0f) AM_WRITENOP	/* enable NVRAM ? */
 
 	/* protection ports - Super Punchout only (move to install handler?) */
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE_LEGACY(spunchout_exp_r, spunchout_exp_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)
-	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
-	AM_RANGE(0x4000, 0x4017) AM_DEVREADWRITE("nes", nes_psg_r,nes_psg_w)
+	AM_RANGE(0x4016, 0x4016) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x4017, 0x4017) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0x4000, 0x4017) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r,nes_psg_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

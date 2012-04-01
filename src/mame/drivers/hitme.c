@@ -227,28 +227,28 @@ static WRITE8_DEVICE_HANDLER( output_port_1_w )
 static ADDRESS_MAP_START( hitme_map, AS_PROGRAM, 8, hitme_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_BASE_MEMBER(hitme_state, m_videoram)
+	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE_LEGACY(hitme_vidram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x300) AM_RAM
-	AM_RANGE(0x1400, 0x14ff) AM_READ(hitme_port_0_r)
-	AM_RANGE(0x1500, 0x15ff) AM_READ(hitme_port_1_r)
-	AM_RANGE(0x1600, 0x16ff) AM_READ(hitme_port_2_r)
-	AM_RANGE(0x1700, 0x17ff) AM_READ(hitme_port_3_r)
+	AM_RANGE(0x1400, 0x14ff) AM_READ_LEGACY(hitme_port_0_r)
+	AM_RANGE(0x1500, 0x15ff) AM_READ_LEGACY(hitme_port_1_r)
+	AM_RANGE(0x1600, 0x16ff) AM_READ_LEGACY(hitme_port_2_r)
+	AM_RANGE(0x1700, 0x17ff) AM_READ_LEGACY(hitme_port_3_r)
 	AM_RANGE(0x1800, 0x18ff) AM_READ_PORT("IN4")
 	AM_RANGE(0x1900, 0x19ff) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d00, 0x1dff) AM_DEVWRITE("discrete", output_port_0_w)
-	AM_RANGE(0x1e00, 0x1fff) AM_DEVWRITE("discrete", output_port_1_w)
+	AM_RANGE(0x1d00, 0x1dff) AM_DEVWRITE_LEGACY("discrete", output_port_0_w)
+	AM_RANGE(0x1e00, 0x1fff) AM_DEVWRITE_LEGACY("discrete", output_port_1_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hitme_portmap, AS_IO, 8, hitme_state )
-	AM_RANGE(0x14, 0x14) AM_READ(hitme_port_0_r)
-	AM_RANGE(0x15, 0x15) AM_READ(hitme_port_1_r)
-	AM_RANGE(0x16, 0x16) AM_READ(hitme_port_2_r)
-	AM_RANGE(0x17, 0x17) AM_READ(hitme_port_3_r)
+	AM_RANGE(0x14, 0x14) AM_READ_LEGACY(hitme_port_0_r)
+	AM_RANGE(0x15, 0x15) AM_READ_LEGACY(hitme_port_1_r)
+	AM_RANGE(0x16, 0x16) AM_READ_LEGACY(hitme_port_2_r)
+	AM_RANGE(0x17, 0x17) AM_READ_LEGACY(hitme_port_3_r)
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("IN4")
 	AM_RANGE(0x19, 0x19) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE("discrete", output_port_0_w)
-	AM_RANGE(0x1e, 0x1f) AM_DEVWRITE("discrete", output_port_1_w)
+	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE_LEGACY("discrete", output_port_0_w)
+	AM_RANGE(0x1e, 0x1f) AM_DEVWRITE_LEGACY("discrete", output_port_1_w)
 ADDRESS_MAP_END
 
 

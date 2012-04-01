@@ -150,12 +150,12 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8, poo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM
-	AM_RANGE(0x9800, 0x9801) AM_READ(unk_inp_r) //AM_WRITE( unk_w )
+	AM_RANGE(0x9800, 0x9801) AM_READ_LEGACY(unk_inp_r) //AM_WRITE_LEGACY( unk_w )
 
-	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE_MEMBER(poo_state, m_sprites)
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_BASE_MEMBER(poo_state, m_scrolly)
+	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE( m_sprites)
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_BASE( m_scrolly)
 
-	AM_RANGE(0xb400, 0xb400) AM_WRITE(sound_cmd_w)
+	AM_RANGE(0xb400, 0xb400) AM_WRITE_LEGACY(sound_cmd_w)
 
 	AM_RANGE(0xb500, 0xb500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb501, 0xb501) AM_READ_PORT("DSW2")
@@ -163,9 +163,9 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8, poo_state )
 	AM_RANGE(0xb503, 0xb503) AM_READ_PORT("P2")
 	AM_RANGE(0xb504, 0xb504) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xb700, 0xb700) AM_WRITE(poo_vregs_w)
+	AM_RANGE(0xb700, 0xb700) AM_WRITE_LEGACY(poo_vregs_w)
 
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_MEMBER(poo_state, m_vram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE( m_vram)
 
 ADDRESS_MAP_END
 
@@ -183,8 +183,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( unclepoo_sub_portmap, AS_IO, 8, poo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_LEGACY("ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("ay", ay8910_address_w)
 ADDRESS_MAP_END
 
 

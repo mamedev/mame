@@ -718,16 +718,16 @@ static WRITE8_HANDLER( snd_a02_w )
 
 static ADDRESS_MAP_START( fclown_map, AS_PROGRAM, 8, _5clown_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(fclown_videoram_w) AM_BASE_MEMBER(_5clown_state, m_videoram)	/* Init'ed at $2042 */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(fclown_colorram_w) AM_BASE_MEMBER(_5clown_state, m_colorram)	/* Init'ed at $2054 */
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(fclown_videoram_w) AM_BASE( m_videoram)	/* Init'ed at $2042 */
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE_LEGACY(fclown_colorram_w) AM_BASE( m_colorram)	/* Init'ed at $2054 */
 	AM_RANGE(0x2000, 0x7fff) AM_ROM					/* ROM space */
 
-	AM_RANGE(0xc048, 0xc048) AM_WRITE(cpu_c048_w )
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(cpu_d800_w )
+	AM_RANGE(0xc048, 0xc048) AM_WRITE_LEGACY(cpu_c048_w )
+	AM_RANGE(0xd800, 0xd800) AM_WRITE_LEGACY(cpu_d800_w )
 
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("SW1")	/* DIP Switches bank */
 	AM_RANGE(0xcc00, 0xcc00) AM_READ_PORT("SW2")	/* DIP Switches bank */
@@ -793,11 +793,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fcaudio_map, AS_PROGRAM, 8, _5clown_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(snd_800_w)
-	AM_RANGE(0x0a02, 0x0a02) AM_WRITE(snd_a02_w)
-	AM_RANGE(0x0c04, 0x0c04) AM_DEVWRITE_MODERN("oki6295", okim6295_device, write)
-	AM_RANGE(0x0c06, 0x0c06) AM_DEVREAD_MODERN("oki6295", okim6295_device, read)
-	AM_RANGE(0x0e06, 0x0e06) AM_READ(snd_e06_r)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE_LEGACY(snd_800_w)
+	AM_RANGE(0x0a02, 0x0a02) AM_WRITE_LEGACY(snd_a02_w)
+	AM_RANGE(0x0c04, 0x0c04) AM_DEVWRITE("oki6295", okim6295_device, write)
+	AM_RANGE(0x0c06, 0x0c06) AM_DEVREAD("oki6295", okim6295_device, read)
+	AM_RANGE(0x0e06, 0x0e06) AM_READ_LEGACY(snd_e06_r)
 	AM_RANGE(0xe000, 0xffff) AM_ROM					/* ROM space */
 ADDRESS_MAP_END
 

@@ -354,32 +354,32 @@ static WRITE8_HANDLER( vreg_data_w )
 
 static ADDRESS_MAP_START( readport_master, AS_IO, 8, imolagp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(trigger_slave_nmi_r)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(trigger_slave_nmi_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imolagp_master, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")	/* gas */
-	AM_RANGE(0x2802, 0x2802) AM_READ(steerlatch_r) AM_WRITENOP
+	AM_RANGE(0x2802, 0x2802) AM_READ_LEGACY(steerlatch_r) AM_WRITENOP
 	/*  AM_RANGE(0x2803, 0x2803) ? */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(vreg_control_w)
-	AM_RANGE(0x37f0, 0x37f0) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(vreg_control_w)
+	AM_RANGE(0x37f0, 0x37f0) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	/*  AM_RANGE(0x37f7, 0x37f7) ? */
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(vreg_data_w)
-	AM_RANGE(0x3810, 0x3810) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE_LEGACY(vreg_data_w)
+	AM_RANGE(0x3810, 0x3810) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSWA")	/* DSWA */
-	AM_RANGE(0x5000, 0x50ff) AM_WRITE(imola_ledram_w)
-	AM_RANGE(0x47ff, 0x4800) AM_WRITE(transmit_data_w)
+	AM_RANGE(0x5000, 0x50ff) AM_WRITE_LEGACY(imola_ledram_w)
+	AM_RANGE(0x47ff, 0x4800) AM_WRITE_LEGACY(transmit_data_w)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSWB")	/* DSWB */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_slave, AS_IO, 8, imolagp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x05,0x05) AM_READ(imola_slave_port05r)
-	AM_RANGE(0x06,0x06) AM_READ(imola_slave_port06r)
-	AM_RANGE(0x81,0x81) AM_READ(imola_slave_port81r)
-	AM_RANGE(0x82,0x82) AM_READ(imola_slave_port82r)
+	AM_RANGE(0x05,0x05) AM_READ_LEGACY(imola_slave_port05r)
+	AM_RANGE(0x06,0x06) AM_READ_LEGACY(imola_slave_port06r)
+	AM_RANGE(0x81,0x81) AM_READ_LEGACY(imola_slave_port81r)
+	AM_RANGE(0x82,0x82) AM_READ_LEGACY(imola_slave_port82r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imolagp_slave, AS_PROGRAM, 8, imolagp_state )
@@ -387,9 +387,9 @@ static ADDRESS_MAP_START( imolagp_slave, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x0800, 0x0bff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_ROM
 	AM_RANGE(0x1c00, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(imolagp_state, m_slave_workram)
-	AM_RANGE(0x9fff, 0xa000) AM_READ(receive_data_r)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE(screenram_w)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE( m_slave_workram)
+	AM_RANGE(0x9fff, 0xa000) AM_READ_LEGACY(receive_data_r)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE_LEGACY(screenram_w)
 ADDRESS_MAP_END
 
 

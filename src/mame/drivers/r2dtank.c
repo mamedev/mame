@@ -411,14 +411,14 @@ static WRITE8_DEVICE_HANDLER( pia_comp_w )
 
 
 static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8, r2dtank_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(r2dtank_state, m_videoram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(r2dtank_state, m_colorram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE( m_colorram)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x8003) AM_DEVREAD_MODERN("pia_main", pia6821_device, read) AM_DEVWRITE("pia_main", pia_comp_w)
-	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0x8000, 0x8003) AM_DEVREAD("pia_main", pia6821_device, read) AM_DEVWRITE_LEGACY("pia_main", pia_comp_w)
+	AM_RANGE(0x8004, 0x8004) AM_READWRITE_LEGACY(audio_answer_r, audio_command_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xc000, 0xc007) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -426,8 +426,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( r2dtank_audio_map, AS_PROGRAM, 8, r2dtank_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
-	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE_MODERN("pia_audio", pia6821_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(audio_command_r, audio_answer_w)
+	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE("pia_audio", pia6821_device, read, write)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE_LEGACY(audio_command_r, audio_answer_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

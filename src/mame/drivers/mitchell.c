@@ -305,61 +305,61 @@ static WRITE8_HANDLER( input_w )
 static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(mgakuen_paletteram_r, mgakuen_paletteram_w)	/* palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_BASE_MEMBER(mitchell_state, m_colorram) /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_BASE_SIZE_MEMBER(mitchell_state, m_videoram, m_videoram_size) /* char RAM */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE_LEGACY(mgakuen_paletteram_r, mgakuen_paletteram_w)	/* palette RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(pang_colorram_r, pang_colorram_w) AM_BASE( m_colorram) /* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE_LEGACY(mgakuen_videoram_r, mgakuen_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size) /* char RAM */
 	AM_RANGE(0xe000, 0xefff) AM_RAM	/* Work RAM */
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r, mgakuen_objram_w)	/* OBJ RAM */
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE_LEGACY(mgakuen_objram_r, mgakuen_objram_w)	/* OBJ RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE_MEMBER(mitchell_state, m_colorram) /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_BASE_SIZE_MEMBER(mitchell_state, m_videoram, m_videoram_size)/* Banked char / OBJ RAM */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE_LEGACY(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(pang_colorram_r,pang_colorram_w) AM_BASE( m_colorram) /* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE_LEGACY(pang_videoram_r,pang_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)/* Banked char / OBJ RAM */
 	AM_RANGE(0xe000, 0xffff) AM_RAM	/* Work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x00, 0x02) AM_READ(input_r)			/* The Mahjong games and Block Block need special input treatment */
-	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)	/* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_register_port_w)
-	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(pang_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
+	AM_RANGE(0x00, 0x02) AM_READ_LEGACY(input_r)			/* The Mahjong games and Block Block need special input treatment */
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(input_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(pang_bankswitch_w)	/* Code bank register */
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w)
+	AM_RANGE(0x05, 0x05) AM_READ_LEGACY(pang_port5_r) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP				/* watchdog? irq ack? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)	/* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("eeprom", eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("eeprom", eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("eeprom", eeprom_serial_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(pang_video_bank_w)	/* Video RAM bank register */
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("eeprom", eeprom_cs_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("eeprom", eeprom_clock_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE_LEGACY("eeprom", eeprom_serial_w)
 ADDRESS_MAP_END
 
 /* spangbl */
 static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w)	/* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_BASE_MEMBER(mitchell_state, m_colorram)/* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_BASE_SIZE_MEMBER(mitchell_state, m_videoram, m_videoram_size) /* Banked char / OBJ RAM */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE_LEGACY(pang_paletteram_r, pang_paletteram_w)	/* Banked palette RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(pang_colorram_r, pang_colorram_w)	AM_BASE( m_colorram)/* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE_LEGACY(pang_videoram_r, pang_videoram_w)	AM_BASE_SIZE( m_videoram, m_videoram_size) /* Banked char / OBJ RAM */
 	AM_RANGE(0xe000, 0xffff) AM_RAM		/* Work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x02) AM_READ(input_r)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_register_port_w)
+	AM_RANGE(0x00, 0x02) AM_READ_LEGACY(input_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(pang_bankswitch_w)      /* Code bank register */
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")
 	AM_RANGE(0x06, 0x06) AM_WRITENOP	/* watchdog? irq ack? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("eeprom", eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("eeprom", eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("eeprom", eeprom_serial_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(pang_video_bank_w)      /* Video RAM bank register */
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("eeprom", eeprom_cs_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("eeprom", eeprom_clock_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE_LEGACY("eeprom", eeprom_serial_w)
 ADDRESS_MAP_END
 
 
@@ -373,7 +373,7 @@ static WRITE8_HANDLER( spangbl_msm5205_data_w )
 
 static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-//  AM_RANGE(0xec00, 0xec00) AM_WRITE( spangbl_msm5205_data_w )
+//  AM_RANGE(0xec00, 0xec00) AM_WRITE_LEGACY( spangbl_msm5205_data_w )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -392,9 +392,9 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", oki_banking_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("oki", oki_banking_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER(mstworld_sound_w)
@@ -406,15 +406,15 @@ static WRITE8_HANDLER(mstworld_sound_w)
 
 static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mstworld_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE_LEGACY(mstworld_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(pang_bankswitch_w)	/* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(mstworld_sound_w)	/* write to sound cpu */
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE_LEGACY(pang_bankswitch_w)	/* Code bank register */
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(mstworld_sound_w)	/* write to sound cpu */
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	/* dips? */
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")	/* special? */
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")	/* dips? */
 	AM_RANGE(0x06, 0x06) AM_WRITENOP		/* watchdog? irq ack? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(mstworld_video_bank_w)	/* Video RAM bank register */
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(mstworld_video_bank_w)	/* Video RAM bank register */
 ADDRESS_MAP_END
 
 

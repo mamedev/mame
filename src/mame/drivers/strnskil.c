@@ -85,33 +85,33 @@ static ADDRESS_MAP_START( strnskil_map1, AS_PROGRAM, 8, strnskil_state )
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(strnskil_videoram_w) AM_BASE_MEMBER(strnskil_state, m_videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(strnskil_videoram_w) AM_BASE( m_videoram)
 
-	AM_RANGE(0xd800, 0xd800) AM_READ(strnskil_d800_r)
+	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(strnskil_d800_r)
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
 	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("P2")
 
-	AM_RANGE(0xd808, 0xd808) AM_WRITE(strnskil_scrl_ctrl_w)
+	AM_RANGE(0xd808, 0xd808) AM_WRITE_LEGACY(strnskil_scrl_ctrl_w)
 	AM_RANGE(0xd809, 0xd809) AM_WRITENOP /* coin counter? */
-	AM_RANGE(0xd80a, 0xd80b) AM_WRITEONLY AM_BASE_MEMBER(strnskil_state, m_xscroll)
+	AM_RANGE(0xd80a, 0xd80b) AM_WRITEONLY AM_BASE( m_xscroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( strnskil_map2, AS_PROGRAM, 8, strnskil_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_MEMBER(strnskil_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 
-	AM_RANGE(0xd801, 0xd801) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0xd801, 0xd801) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, strnskil_state )
-//  AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(mcu_portk_r)
-//  AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READWRITE(mcu_portr0_r, mcu_portr0_w)
+//  AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ_LEGACY(mcu_portk_r)
+//  AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READWRITE_LEGACY(mcu_portr0_r, mcu_portr0_w)
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -520,8 +520,8 @@ ROM_END
 static DRIVER_INIT( pettanp )
 {
 //  AM_RANGE(0xd80c, 0xd80c) AM_WRITENOP     /* protection reset? */
-//  AM_RANGE(0xd80d, 0xd80d) AM_WRITE(protection_w) /* protection data write (pettanp) */
-//  AM_RANGE(0xd806, 0xd806) AM_READ(protection_r) /* protection data read (pettanp) */
+//  AM_RANGE(0xd80d, 0xd80d) AM_WRITE_LEGACY(protection_w) /* protection data write (pettanp) */
+//  AM_RANGE(0xd806, 0xd806) AM_READ_LEGACY(protection_r) /* protection data read (pettanp) */
 
 	/* Fujitsu MB8841 4-Bit MCU */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd806, 0xd806, FUNC(pettanp_protection_r));

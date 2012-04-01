@@ -85,25 +85,25 @@ static WRITE8_HANDLER( irq_mask_w )
 
 
 static ADDRESS_MAP_START( megazone_map, AS_PROGRAM, 8, megazone_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(megazone_coin_counter_w) /* coin counter 2, coin counter 1 */
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(megazone_flipscreen_w)
-	AM_RANGE(0x0007, 0x0007) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE_MEMBER(megazone_state, m_scrolly)
-	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY AM_BASE_MEMBER(megazone_state, m_scrollx)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE_MEMBER(megazone_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_SIZE_MEMBER(megazone_state, m_videoram2, m_videoram2_size)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_MEMBER(megazone_state, m_colorram)
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_MEMBER(megazone_state, m_colorram2)
-	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_BASE_SIZE_MEMBER(megazone_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY(megazone_coin_counter_w) /* coin counter 2, coin counter 1 */
+	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(megazone_flipscreen_w)
+	AM_RANGE(0x0007, 0x0007) AM_WRITE_LEGACY(irq_mask_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITEONLY AM_BASE( m_scrolly)
+	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY AM_BASE( m_scrollx)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_SIZE( m_videoram2, m_videoram2_size)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE( m_colorram2)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM		/* 4000->5FFF is a debug rom */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(megazone_i8039_irq_w)	/* START line. Interrupts 8039 */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch_w)			/* CODE  line. Command Interrupts 8039 */
+	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(megazone_i8039_irq_w)	/* START line. Interrupts 8039 */
+	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(soundlatch_w)			/* CODE  line. Command Interrupts 8039 */
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")			/* IO Coin */
 	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("IN1")			/* P1 IO */
 	AM_RANGE(0x6002, 0x6002) AM_READ_PORT("IN2")			/* P2 IO */
@@ -111,15 +111,15 @@ static ADDRESS_MAP_START( megazone_sound_map, AS_PROGRAM, 8, megazone_state )
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP					/* INTMAIN - Interrupts main CPU (unused) */
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP					/* INT (Actually is NMI) enable/disable (unused)*/
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_sound_io_map, AS_IO, 8, megazone_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x00, 0x02) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x00, 0x02) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_i8039_map, AS_PROGRAM, 8, megazone_state )
@@ -127,9 +127,9 @@ static ADDRESS_MAP_START( megazone_i8039_map, AS_PROGRAM, 8, megazone_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megazone_i8039_io_map, AS_IO, 8, megazone_state )
-	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
+	AM_RANGE(0x00, 0xff) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE_LEGACY(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( megazone )

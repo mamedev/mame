@@ -72,54 +72,54 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(flstory_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE(flstory_mcu_r, flstory_mcu_w)
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(flstory_mcu_r, flstory_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP	/* coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_NOP	/* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
-	AM_RANGE(0xd805, 0xd805) AM_READ(flstory_mcu_status_r)
+	AM_RANGE(0xd805, 0xd805) AM_READ_LEGACY(flstory_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, m_scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE_LEGACY(flstory_scrlram_w) AM_BASE( m_scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE_LEGACY(flstory_palette_r, flstory_palette_w)
+	AM_RANGE(0xdf03, 0xdf03) AM_WRITE_LEGACY(flstory_gfxctrl_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM	/* work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(flstory_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE(onna34ro_mcu_r, onna34ro_mcu_w)
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(onna34ro_mcu_r, onna34ro_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP	/* coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_NOP	/* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
-	AM_RANGE(0xd805, 0xd805) AM_READ(onna34ro_mcu_status_r)
+	AM_RANGE(0xd805, 0xd805) AM_READ_LEGACY(onna34ro_mcu_status_r)
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, m_scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE_LEGACY(flstory_scrlram_w) AM_BASE( m_scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(flstory_gfxctrl_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, m_workram) /* work RAM */
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE_LEGACY(flstory_palette_r, flstory_palette_w)
+	AM_RANGE(0xdf03, 0xdf03) AM_WRITE_LEGACY(flstory_gfxctrl_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE( m_workram) /* work RAM */
 ADDRESS_MAP_END
 
 static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
@@ -132,13 +132,13 @@ static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 
 static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(flstory_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(victnine_mcu_r, victnine_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
 	AM_RANGE(0xd002, 0xd002) AM_NOP	/* unknown read & coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
@@ -149,12 +149,12 @@ static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, m_scrlram)
-	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE_LEGACY(flstory_scrlram_w) AM_BASE( m_scrlram)
+	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE_LEGACY(victnine_gfxctrl_r, victnine_gfxctrl_w)
 	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP	/* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, m_workram) /* work RAM */
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE_LEGACY(flstory_palette_r, flstory_palette_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE( m_workram) /* work RAM */
 ADDRESS_MAP_END
 
 
@@ -341,13 +341,13 @@ static WRITE8_HANDLER( rumba_mcu_w )
 
 static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(flstory_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
 //  AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE(rumba_mcu_r, rumba_mcu_w)
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(rumba_mcu_r, rumba_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
 //  AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
 //  AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
@@ -358,12 +358,12 @@ static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
 	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
-	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, m_scrlram)
-	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE_LEGACY(flstory_scrlram_w) AM_BASE( m_scrlram)
+	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE_LEGACY(victnine_gfxctrl_r, victnine_gfxctrl_w)
 //  AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, m_workram) /* work RAM */
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE_LEGACY(flstory_palette_r, flstory_palette_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE( m_workram) /* work RAM */
 ADDRESS_MAP_END
 
 
@@ -448,25 +448,25 @@ static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE("msm", sound_control_0_w)
-	AM_RANGE(0xce00, 0xce00) AM_DEVWRITE("msm", sound_control_1_w)
-	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_r, to_main_w)
-	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w)			/* unknown read*/
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_w)	/* signed 8-bit DAC &  unknown read */
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE_LEGACY("msm", sound_control_0_w)
+	AM_RANGE(0xce00, 0xce00) AM_DEVWRITE_LEGACY("msm", sound_control_1_w)
+	AM_RANGE(0xd800, 0xd800) AM_READWRITE_LEGACY(soundlatch_r, to_main_w)
+	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE_LEGACY(nmi_enable_w)			/* unknown read*/
+	AM_RANGE(0xdc00, 0xdc00) AM_WRITE_LEGACY(nmi_disable_w)
+	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE_LEGACY("dac", dac_w)	/* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM											/* space for diagnostics ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flstory_m68705_map, AS_PROGRAM, 8, flstory_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(flstory_68705_port_a_r, flstory_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(flstory_68705_port_b_r, flstory_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(flstory_68705_port_c_r, flstory_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(flstory_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(flstory_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(flstory_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(flstory_68705_port_a_r, flstory_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(flstory_68705_port_b_r, flstory_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(flstory_68705_port_c_r, flstory_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(flstory_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(flstory_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(flstory_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

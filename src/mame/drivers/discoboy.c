@@ -295,9 +295,9 @@ static WRITE8_HANDLER( discoboy_ram_att_w )
 static ADDRESS_MAP_START( discoboy_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(rambank_r, rambank_w)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(discoboy_ram_att_r, discoboy_ram_att_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(rambank2_r, rambank2_w)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE_LEGACY(rambank_r, rambank_w)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(discoboy_ram_att_r, discoboy_ram_att_w)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE_LEGACY(rambank2_r, rambank2_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -310,13 +310,13 @@ static READ8_HANDLER( discoboy_port_06_r )
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, discoboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA") AM_WRITE(discoboy_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(discoboy_port_01_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA") AM_WRITE_LEGACY(discoboy_port_00_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(discoboy_port_01_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2") AM_WRITE(discoboy_port_03_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2") AM_WRITE_LEGACY(discoboy_port_03_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWB")
-	AM_RANGE(0x06, 0x06) AM_READWRITE(discoboy_port_06_r, discoboy_port_06_w) // ???
-	AM_RANGE(0x07, 0x07) AM_WRITE(rambank_select_w) // 0x20 is palette bank bit.. others?
+	AM_RANGE(0x06, 0x06) AM_READWRITE_LEGACY(discoboy_port_06_r, discoboy_port_06_w) // ???
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(rambank_select_w) // 0x20 is palette bank bit.. others?
 ADDRESS_MAP_END
 
 /* Sound */
@@ -343,11 +343,11 @@ static WRITE8_HANDLER( yunsung8_adpcm_w )
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sndbank")
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm",yunsung8_sound_bankswitch_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
-	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm",yunsung8_sound_bankswitch_w)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE_LEGACY(yunsung8_adpcm_w)
+	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

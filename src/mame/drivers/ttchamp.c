@@ -133,7 +133,7 @@ static READ16_HANDLER( peno_rand2 )
 
 static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
     AM_RANGE(0x00000, 0x0ffff) AM_RAM
-    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE_MEMBER(ttchamp_state, m_peno_vram)
+    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE( m_peno_vram)
     AM_RANGE(0x20000, 0x7ffff) AM_ROMBANK("bank1") // ?
     AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
 ADDRESS_MAP_END
@@ -144,18 +144,18 @@ static ADDRESS_MAP_START( ttchamp_io, AS_IO, 16, ttchamp_state )
     AM_RANGE(0x0002, 0x0003) AM_READ_PORT("SYSTEM")
     AM_RANGE(0x0004, 0x0005) AM_READ_PORT("P1_P2")
 
-//  AM_RANGE(0x0018, 0x0019) AM_READ(peno_rand2)
-//  AM_RANGE(0x001e, 0x001f) AM_READ(peno_rand2)
+//  AM_RANGE(0x0018, 0x0019) AM_READ_LEGACY(peno_rand2)
+//  AM_RANGE(0x001e, 0x001f) AM_READ_LEGACY(peno_rand2)
 
-    AM_RANGE(0x0008, 0x0009) AM_WRITE(paldat_w)
-    AM_RANGE(0x000a, 0x000b) AM_WRITE(paloff_w)
+    AM_RANGE(0x0008, 0x0009) AM_WRITE_LEGACY(paldat_w)
+    AM_RANGE(0x000a, 0x000b) AM_WRITE_LEGACY(paloff_w)
 
-//  AM_RANGE(0x0010, 0x0010) AM_WRITE(pcup_prgbank_w)
+//  AM_RANGE(0x0010, 0x0010) AM_WRITE_LEGACY(pcup_prgbank_w)
     AM_RANGE(0x0010, 0x0011) AM_WRITENOP
 
     AM_RANGE(0x0020, 0x0021) AM_WRITENOP
 
-    AM_RANGE(0x0034, 0x0035) AM_READ(peno_rand) AM_WRITENOP
+    AM_RANGE(0x0034, 0x0035) AM_READ_LEGACY(peno_rand) AM_WRITENOP
 ADDRESS_MAP_END
 
 

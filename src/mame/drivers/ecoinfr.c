@@ -328,8 +328,8 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, ecoinfr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
-	AM_RANGE(0xa000, 0xa000) AM_DEVREADWRITE_MODERN(UPD8251_TAG, i8251_device, data_r, data_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_MODERN(UPD8251_TAG, i8251_device, status_r, control_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, data_r, data_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE(UPD8251_TAG, i8251_device, status_r, control_w)
 
 ADDRESS_MAP_END
 
@@ -337,31 +337,31 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( portmap, AS_IO, 8, ecoinfr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ec_port00_out_w) AM_READ_PORT("IN0") // Reel 1 Write
-	AM_RANGE(0x01, 0x01) AM_WRITE(ec_port01_out_w) AM_READ_PORT("IN1") // Reel 2 Write + Reels Opto Read
-	AM_RANGE(0x02, 0x02) AM_WRITE(ec_port02_out_w) AM_READ_PORT("IN2") // Reel 3 Write
-	AM_RANGE(0x03, 0x03) AM_WRITE(ec_port03_out_w) AM_READ_PORT("IN3")
-	AM_RANGE(0x04, 0x04) AM_WRITE(ec_port04_out_w) AM_READ_PORT("IN4")
-	AM_RANGE(0x05, 0x05) AM_WRITE(ec_port05_out_w) AM_READ_PORT("IN5")
-	AM_RANGE(0x06, 0x06) AM_WRITE(ec_port06_out_w) AM_READ_PORT("IN6")
-	AM_RANGE(0x07, 0x07) AM_WRITE(ec_port07_out_w) AM_READ_PORT("IN7")
-	AM_RANGE(0x08, 0x08) AM_WRITE(ec_port08_out_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ec_port09_out_w) // 09 Reel Enables
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(ec_port0a_out_w) // 10 (Sound 1)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(ec_port0b_out_w) // 11 (Sound 2)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(ec_port0c_out_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(ec_port0d_out_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(ec_port0e_out_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(ec_port0f_out_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(ec_port10_out_w) // 16 (Meter)
-	AM_RANGE(0x11, 0x11) AM_WRITE(ec_port11_out_w) // SEC
-	AM_RANGE(0x12, 0x12) AM_WRITE(ec_port12_out_w) // SEC
-	AM_RANGE(0x13, 0x13) AM_WRITE(ec_port13_out_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(ec_port14_out_w)
-	AM_RANGE(0x15, 0x15) AM_WRITE(ec_port15_out_w) // SEC + VDF (3rd party)
-	AM_RANGE(0x16, 0x16) AM_WRITE(ec_port16_out_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE(ec_port17_out_w) // Hopper + VDF (3rd party)
-	AM_RANGE(0x18, 0x18) AM_WRITE(ec_port18_out_w) // 24 (Watchdog)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(ec_port00_out_w) AM_READ_PORT("IN0") // Reel 1 Write
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(ec_port01_out_w) AM_READ_PORT("IN1") // Reel 2 Write + Reels Opto Read
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(ec_port02_out_w) AM_READ_PORT("IN2") // Reel 3 Write
+	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(ec_port03_out_w) AM_READ_PORT("IN3")
+	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(ec_port04_out_w) AM_READ_PORT("IN4")
+	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(ec_port05_out_w) AM_READ_PORT("IN5")
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(ec_port06_out_w) AM_READ_PORT("IN6")
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(ec_port07_out_w) AM_READ_PORT("IN7")
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(ec_port08_out_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(ec_port09_out_w) // 09 Reel Enables
+	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(ec_port0a_out_w) // 10 (Sound 1)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE_LEGACY(ec_port0b_out_w) // 11 (Sound 2)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(ec_port0c_out_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE_LEGACY(ec_port0d_out_w)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE_LEGACY(ec_port0e_out_w)
+	AM_RANGE(0x0f, 0x0f) AM_WRITE_LEGACY(ec_port0f_out_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(ec_port10_out_w) // 16 (Meter)
+	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(ec_port11_out_w) // SEC
+	AM_RANGE(0x12, 0x12) AM_WRITE_LEGACY(ec_port12_out_w) // SEC
+	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(ec_port13_out_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(ec_port14_out_w)
+	AM_RANGE(0x15, 0x15) AM_WRITE_LEGACY(ec_port15_out_w) // SEC + VDF (3rd party)
+	AM_RANGE(0x16, 0x16) AM_WRITE_LEGACY(ec_port16_out_w)
+	AM_RANGE(0x17, 0x17) AM_WRITE_LEGACY(ec_port17_out_w) // Hopper + VDF (3rd party)
+	AM_RANGE(0x18, 0x18) AM_WRITE_LEGACY(ec_port18_out_w) // 24 (Watchdog)
 ADDRESS_MAP_END
 
 static CUSTOM_INPUT( ecoinfr_reel1_opto_r )

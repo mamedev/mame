@@ -654,34 +654,34 @@ static READ16_HANDLER( coolpool_input_r )
  *************************************/
 
 static ADDRESS_MAP_START( amerdart_map, AS_PROGRAM, 16, coolpool_state )
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE_MEMBER(coolpool_state,m_vram_base)
-	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE(amerdart_misc_w)
-	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE(amerdart_iop_r, amerdart_iop_w)
-	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(m_vram_base)
+	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE_LEGACY(amerdart_misc_w)
+	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE_LEGACY(amerdart_iop_r, amerdart_iop_w)
+	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE_LEGACY(nvram_thrash_data_w) AM_SHARE("nvram")
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffb00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( coolpool_map, AS_PROGRAM, 16, coolpool_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(coolpool_state,m_vram_base)
-	AM_RANGE(0x01000000, 0x010000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)	// IMSG176P-40
-	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
-	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_vram_base)
+	AM_RANGE(0x01000000, 0x010000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)	// IMSG176P-40
+	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE_LEGACY(coolpool_iop_r, coolpool_iop_w)
+	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE_LEGACY(coolpool_misc_w)
 	AM_RANGE(0x03000000, 0x03ffffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE_LEGACY(nvram_thrash_data_w) AM_SHARE("nvram")
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nballsht_map, AS_PROGRAM, 16, coolpool_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(coolpool_state,m_vram_base)
-	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
-	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
-	AM_RANGE(0x04000000, 0x040000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)	// IMSG176P-40
-	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_vram_base)
+	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE_LEGACY(coolpool_iop_r, coolpool_iop_w)
+	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE_LEGACY(coolpool_misc_w)
+	AM_RANGE(0x04000000, 0x040000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)	// IMSG176P-40
+	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_RAM_WRITE_LEGACY(nvram_thrash_data_w) AM_SHARE("nvram")
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff000000, 0xff7fffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -701,14 +701,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( amerdart_dsp_io_map, AS_IO, 16, coolpool_state )
-	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(amerdart_dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dsp_dac_w)
-	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(dsp_romaddr_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(amerdart_dsp_answer_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac", dsp_dac_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
-	AM_RANGE(0x06, 0x06) AM_READ(amerdart_trackball_r)
-	AM_RANGE(0x07, 0x07) AM_READ(amerdart_dsp_cmd_r)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(amerdart_dsp_bio_line_r)
+	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(amerdart_trackball_r)
+	AM_RANGE(0x07, 0x07) AM_READ_LEGACY(amerdart_dsp_cmd_r)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ_LEGACY(amerdart_dsp_bio_line_r)
 ADDRESS_MAP_END
 
 
@@ -719,15 +719,15 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( coolpool_dsp_io_map, AS_IO, 16, coolpool_state )
-	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(dsp_cmd_r, dsp_answer_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac", dsp_dac_w)
-	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(dsp_romaddr_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(dsp_cmd_r, dsp_answer_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac", dsp_dac_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN1")
-	AM_RANGE(TMS32025_BIO, TMS32025_BIO) AM_READ(dsp_bio_line_r)
-	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_hold_line_r)
-//  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
+	AM_RANGE(TMS32025_BIO, TMS32025_BIO) AM_READ_LEGACY(dsp_bio_line_r)
+	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ_LEGACY(dsp_hold_line_r)
+//  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE_LEGACY(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 
 

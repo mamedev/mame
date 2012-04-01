@@ -515,42 +515,42 @@ static WRITE16_HANDLER( dsp56k_ram_bank04_write )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE16("k053936", k053936_ctrl_r, k053936_ctrl_w, 0xffffffff)
-	AM_RANGE(0x440000, 0x440fff) AM_READWRITE(polygonet_roz_ram_r, polygonet_roz_ram_w)
-	AM_RANGE(0x480000, 0x4bffff) AM_DEVREAD("eeprom", polygonet_eeprom_r)
-	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE(polygonet_eeprom_w)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_BASE_MEMBER(polygonet_state, m_shared_ram)
-	AM_RANGE(0x504000, 0x504003) AM_WRITE(dsp_w_lines)
-	AM_RANGE(0x506000, 0x50600f) AM_READWRITE(dsp_host_interface_r, dsp_host_interface_w)
-	AM_RANGE(0x540000, 0x540fff) AM_READWRITE(polygonet_ttl_ram_r, polygonet_ttl_ram_w)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE_LEGACY(plygonet_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE16_LEGACY("k053936", k053936_ctrl_r, k053936_ctrl_w, 0xffffffff)
+	AM_RANGE(0x440000, 0x440fff) AM_READWRITE_LEGACY(polygonet_roz_ram_r, polygonet_roz_ram_w)
+	AM_RANGE(0x480000, 0x4bffff) AM_DEVREAD_LEGACY("eeprom", polygonet_eeprom_r)
+	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE_LEGACY(polygonet_eeprom_w)
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE_LEGACY(shared_ram_write) AM_BASE( m_shared_ram)
+	AM_RANGE(0x504000, 0x504003) AM_WRITE_LEGACY(dsp_w_lines)
+	AM_RANGE(0x506000, 0x50600f) AM_READWRITE_LEGACY(dsp_host_interface_r, dsp_host_interface_w)
+	AM_RANGE(0x540000, 0x540fff) AM_READWRITE_LEGACY(polygonet_ttl_ram_r, polygonet_ttl_ram_w)
 	AM_RANGE(0x541000, 0x54101f) AM_RAM
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
-	AM_RANGE(0x580800, 0x580803) AM_READ(network_r) AM_WRITENOP	/* network RAM | registers? */
-	AM_RANGE(0x600004, 0x600007) AM_WRITE(sound_w)
-	AM_RANGE(0x600008, 0x60000b) AM_READ(sound_r)
-	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x680000, 0x680003) AM_WRITE(watchdog_reset32_w)
-	AM_RANGE(0x700000, 0x73ffff) AM_READ(psac_rom_r)
-	AM_RANGE(0x780000, 0x79ffff) AM_READ(ttl_rom_r)
+	AM_RANGE(0x580800, 0x580803) AM_READ_LEGACY(network_r) AM_WRITENOP	/* network RAM | registers? */
+	AM_RANGE(0x600004, 0x600007) AM_WRITE_LEGACY(sound_w)
+	AM_RANGE(0x600008, 0x60000b) AM_READ_LEGACY(sound_r)
+	AM_RANGE(0x640000, 0x640003) AM_WRITE_LEGACY(sound_irq_w)
+	AM_RANGE(0x680000, 0x680003) AM_WRITE_LEGACY(watchdog_reset32_w)
+	AM_RANGE(0x700000, 0x73ffff) AM_READ_LEGACY(psac_rom_r)
+	AM_RANGE(0x780000, 0x79ffff) AM_READ_LEGACY(ttl_rom_r)
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( dsp_program_map, AS_PROGRAM, 16, polygonet_state )
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE_MEMBER(polygonet_state, m_dsp56k_p_mirror)	/* Unsure of size, but 0x1000 matches bank01 */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(polygonet_state, m_dsp56k_p_8000)
-	AM_RANGE(0xc000, 0xc000) AM_READ(dsp56k_bootload_r)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE( m_dsp56k_p_mirror)	/* Unsure of size, but 0x1000 matches bank01 */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE( m_dsp56k_p_8000)
+	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(dsp56k_bootload_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_data_map, AS_DATA, 16, polygonet_state )
 	AM_RANGE(0x0800, 0x5fff) AM_RAM      /* Appears to not be affected by banking? */
-	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(dsp56k_ram_bank00_read, dsp56k_ram_bank00_write)
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)	/* Mirrored in program space @ 0x7000 */
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(dsp56k_ram_bank02_read, dsp56k_ram_bank02_write)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(dsp56k_shared_ram_read, dsp56k_shared_ram_write)
-	AM_RANGE(0xe000, 0xffbf) AM_READWRITE(dsp56k_ram_bank04_read, dsp56k_ram_bank04_write)
+	AM_RANGE(0x6000, 0x6fff) AM_READWRITE_LEGACY(dsp56k_ram_bank00_read, dsp56k_ram_bank00_write)
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE_LEGACY(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)	/* Mirrored in program space @ 0x7000 */
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_LEGACY(dsp56k_ram_bank02_read, dsp56k_ram_bank02_write)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(dsp56k_shared_ram_read, dsp56k_shared_ram_write)
+	AM_RANGE(0xe000, 0xffbf) AM_READWRITE_LEGACY(dsp56k_ram_bank04_read, dsp56k_ram_bank04_write)
 ADDRESS_MAP_END
 
 /**********************************************************************************/
@@ -578,14 +578,14 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, polygonet_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0x0000, 0xbfff) AM_WRITENOP
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE_MODERN("konami1", k054539_device, read, write)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("konami1", k054539_device, read, write)
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
-	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE_MODERN("konami2", k054539_device, read, write)
+	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("konami2", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(soundlatch3_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(sound_bankswitch_w)
 	AM_RANGE(0xfff1, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END
 

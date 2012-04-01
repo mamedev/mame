@@ -174,25 +174,25 @@ static ADDRESS_MAP_START( mjkjidai_map, AS_PROGRAM, 8, mjkjidai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE_SIZE_MEMBER(mjkjidai_state,m_nvram,m_nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
-	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,m_spriteram1)			// shared with tilemap ram
-	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,m_spriteram2)		// shared with tilemap ram
-	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,m_spriteram3)		// shared with tilemap ram
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_BASE_MEMBER(mjkjidai_state,m_videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE_SIZE(m_nvram,m_nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
+	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE(m_spriteram1)			// shared with tilemap ram
+	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE(m_spriteram2)		// shared with tilemap ram
+	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE(m_spriteram3)		// shared with tilemap ram
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE_LEGACY(mjkjidai_videoram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8, mjkjidai_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(keyboard_r)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(keyboard_r)
 	AM_RANGE(0x01, 0x01) AM_READNOP	// ???
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x01, 0x02) AM_WRITE(keyboard_select_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
+	AM_RANGE(0x01, 0x02) AM_WRITE_LEGACY(keyboard_select_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("adpcm", adpcm_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("adpcm", adpcm_w)
 ADDRESS_MAP_END
 
 

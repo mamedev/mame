@@ -141,12 +141,12 @@ static WRITE8_HANDLER(ldp_write)
 /* PROGRAM MAPS */
 static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, lgp_state )
 	AM_RANGE(0x0000,0x7fff) AM_ROM
-	AM_RANGE(0xe000,0xe3ff) AM_RAM AM_BASE_MEMBER(lgp_state, m_tile_ram)
-	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_BASE_MEMBER(lgp_state, m_tile_control_ram)
+	AM_RANGE(0xe000,0xe3ff) AM_RAM AM_BASE( m_tile_ram)
+	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_BASE( m_tile_control_ram)
 
 //  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
-	AM_RANGE(0xef80,0xef80) AM_READWRITE(ldp_read,ldp_write)
-	AM_RANGE(0xefb8,0xefb8) AM_READ(ldp_read)		/* Likely not right, calms it down though */
+	AM_RANGE(0xef80,0xef80) AM_READWRITE_LEGACY(ldp_read,ldp_write)
+	AM_RANGE(0xefb8,0xefb8) AM_READ_LEGACY(ldp_read)		/* Likely not right, calms it down though */
 	AM_RANGE(0xefc0,0xefc0) AM_READ_PORT("DSWA")	/* Not tested */
 	AM_RANGE(0xefc8,0xefc8) AM_READ_PORT("DSWB")
 	AM_RANGE(0xefd0,0xefd0) AM_READ_PORT("DSWC")

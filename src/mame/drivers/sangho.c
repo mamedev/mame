@@ -235,12 +235,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pzlestar_io_map, AS_IO, 8, sangho_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ymsnd", ym2413_w )
-	AM_RANGE( 0x91, 0x91) AM_WRITE( pzlestar_bank_w )
-	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write )
+	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_w )
+	AM_RANGE( 0x91, 0x91) AM_WRITE_LEGACY( pzlestar_bank_w )
+	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE("v9938", v9938_device, read, write )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
-	AM_RANGE( 0xa8, 0xa8) AM_READWRITE( pzlestar_mem_bank_r, pzlestar_mem_bank_w )
+	AM_RANGE( 0xa8, 0xa8) AM_READWRITE_LEGACY( pzlestar_mem_bank_r, pzlestar_mem_bank_w )
 	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
@@ -248,12 +248,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexyboom_io_map, AS_IO, 8, sangho_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ymsnd", ym2413_w )
+	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_w )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
-	AM_RANGE( 0xf0, 0xf3) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write )
+	AM_RANGE( 0xf0, 0xf3) AM_DEVREADWRITE("v9938", v9938_device, read, write )
 	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
-	AM_RANGE( 0xf8, 0xff) AM_WRITE( sexyboom_bank_w )
+	AM_RANGE( 0xf8, 0xff) AM_WRITE_LEGACY( sexyboom_bank_w )
 ADDRESS_MAP_END
 
 

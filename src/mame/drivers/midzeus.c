@@ -566,33 +566,33 @@ static READ32_HANDLER( invasn_gun_r )
 
 static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32, midzeus_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
+	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE_LEGACY(&ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
-	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_BASE(&zeusbase)
-	AM_RANGE(0x8d0000, 0x8d0004) AM_READWRITE(bitlatches_r, bitlatches_w)
-	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x808000, 0x80807f) AM_READWRITE_LEGACY(tms32031_control_r, tms32031_control_w) AM_BASE_LEGACY(&tms32031_control)
+	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE_LEGACY(zeus_r, zeus_w) AM_BASE_LEGACY(&zeusbase)
+	AM_RANGE(0x8d0000, 0x8d0004) AM_READWRITE_LEGACY(bitlatches_r, bitlatches_w)
+	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
-	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
+	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE_LEGACY(cmos_r, cmos_w) AM_SHARE("nvram")
+	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE_LEGACY(cmos_protect_w)
 	AM_RANGE(0xa00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
+	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE_LEGACY(&ram_base)
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
-	AM_RANGE(0x880000, 0x88007f) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
-	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_BASE(&linkram)
-	AM_RANGE(0x8d0000, 0x8d000a) AM_READWRITE(bitlatches_r, bitlatches_w)
-	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_SHARE("nvram") AM_MIRROR(0x020000)
-	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
-	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE(analog_r, analog_w)
+	AM_RANGE(0x808000, 0x80807f) AM_READWRITE_LEGACY(tms32031_control_r, tms32031_control_w) AM_BASE_LEGACY(&tms32031_control)
+	AM_RANGE(0x880000, 0x88007f) AM_READWRITE_LEGACY(zeus2_r, zeus2_w) AM_BASE_LEGACY(&zeusbase)
+	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE_LEGACY(linkram_r, linkram_w) AM_BASE_LEGACY(&linkram)
+	AM_RANGE(0x8d0000, 0x8d000a) AM_READWRITE_LEGACY(bitlatches_r, bitlatches_w)
+	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE_LEGACY(zpram_r, zpram_w) AM_SHARE("nvram") AM_MIRROR(0x020000)
+	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE_LEGACY(analog_r, analog_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
-	AM_RANGE(0x9f0000, 0x9f7fff) AM_DEVREADWRITE("m48t35", zeus2_timekeeper_r, zeus2_timekeeper_w)
-	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
+	AM_RANGE(0x9f0000, 0x9f7fff) AM_DEVREADWRITE_LEGACY("m48t35", zeus2_timekeeper_r, zeus2_timekeeper_w)
+	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE_LEGACY(cmos_protect_w)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank1") AM_REGION("user2", 0)
 ADDRESS_MAP_END
@@ -1119,7 +1119,7 @@ static READ8_HANDLER( PIC16C5X_T0_clk_r )
 }
 
 static ADDRESS_MAP_START( pic_io_map, AS_IO, 8, midzeus_state )
-	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
+	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ_LEGACY(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 
 

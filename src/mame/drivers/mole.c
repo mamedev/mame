@@ -194,20 +194,20 @@ static READ8_HANDLER( mole_protection_r )
 
 static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_READ(mole_protection_r)
+	AM_RANGE(0x0800, 0x08ff) AM_READ_LEGACY(mole_protection_r)
 	AM_RANGE(0x0800, 0x0800) AM_WRITENOP // ???
 	AM_RANGE(0x0820, 0x0820) AM_WRITENOP // ???
 	AM_RANGE(0x5000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(mole_videoram_w)
-	AM_RANGE(0x8400, 0x8400) AM_WRITE(mole_tilebank_w)
-	AM_RANGE(0x8c00, 0x8c01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(mole_videoram_w)
+	AM_RANGE(0x8400, 0x8400) AM_WRITE_LEGACY(mole_tilebank_w)
+	AM_RANGE(0x8c00, 0x8c01) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x8c40, 0x8c40) AM_WRITENOP // ???
 	AM_RANGE(0x8c80, 0x8c80) AM_WRITENOP // ???
 	AM_RANGE(0x8c81, 0x8c81) AM_WRITENOP // ???
-	AM_RANGE(0x8d00, 0x8d00) AM_READ_PORT("DSW") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x8d00, 0x8d00) AM_READ_PORT("DSW") AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x8d40, 0x8d40) AM_READ_PORT("IN0")
 	AM_RANGE(0x8d80, 0x8d80) AM_READ_PORT("IN1")
-	AM_RANGE(0x8dc0, 0x8dc0) AM_READ_PORT("IN2") AM_WRITE(mole_flipscreen_w)
+	AM_RANGE(0x8dc0, 0x8dc0) AM_READ_PORT("IN2") AM_WRITE_LEGACY(mole_flipscreen_w)
 ADDRESS_MAP_END
 
 

@@ -519,9 +519,9 @@ static ADDRESS_MAP_START( asic65_program_map, AS_PROGRAM, 16, driver_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( asic65_io_map, AS_IO, 16, driver_device )
-	AM_RANGE(0, 0) AM_MIRROR(6) AM_READWRITE(asic65_68k_r, asic65_68k_w)
-	AM_RANGE(1, 1) AM_MIRROR(6) AM_READWRITE(asic65_stat_r, asic65_stat_w)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(asci65_get_bio)
+	AM_RANGE(0, 0) AM_MIRROR(6) AM_READWRITE_LEGACY(asic65_68k_r, asic65_68k_w)
+	AM_RANGE(1, 1) AM_MIRROR(6) AM_READWRITE_LEGACY(asic65_stat_r, asic65_stat_w)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ_LEGACY(asci65_get_bio)
 ADDRESS_MAP_END
 
 

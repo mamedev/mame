@@ -61,15 +61,15 @@ static WRITE8_HANDLER( compgolf_ctrl_w )
 
 static ADDRESS_MAP_START( compgolf_map, AS_PROGRAM, 8, compgolf_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(compgolf_video_w) AM_BASE_MEMBER(compgolf_state, m_videoram)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(compgolf_back_w) AM_BASE_MEMBER(compgolf_state, m_bg_ram)
-	AM_RANGE(0x2000, 0x2060) AM_RAM AM_BASE_MEMBER(compgolf_state, m_spriteram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE_LEGACY(compgolf_video_w) AM_BASE( m_videoram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(compgolf_back_w) AM_BASE( m_bg_ram)
+	AM_RANGE(0x2000, 0x2060) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x2061, 0x2061) AM_WRITENOP
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2") AM_WRITE(compgolf_ctrl_w)
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2") AM_WRITE_LEGACY(compgolf_ctrl_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

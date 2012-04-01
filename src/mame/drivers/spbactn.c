@@ -143,10 +143,10 @@ static WRITE16_HANDLER( soundcommand_w )
 static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x43fff) AM_RAM	// main ram
-	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_BASE_MEMBER(spbactn_state,m_spvideoram)
-	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_BASE_MEMBER(spbactn_state,m_fgvideoram)
-	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_BASE_MEMBER(spbactn_state,m_bgvideoram)
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_BASE(m_spvideoram)
+	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_BASE(m_fgvideoram)
+	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_BASE(m_bgvideoram)
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
 	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")
 	AM_RANGE(0x90020, 0x90021) AM_READ_PORT("SYSTEM")
@@ -155,8 +155,8 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 
 	/* this is an awful lot of unknowns */
 	AM_RANGE(0x90000, 0x90001) AM_WRITENOP
-	AM_RANGE(0x90010, 0x90011) AM_WRITE(soundcommand_w)
-//  AM_RANGE(0x90020, 0x90021) AM_WRITE(soundcommand_w)
+	AM_RANGE(0x90010, 0x90011) AM_WRITE_LEGACY(soundcommand_w)
+//  AM_RANGE(0x90020, 0x90021) AM_WRITE_LEGACY(soundcommand_w)
 	AM_RANGE(0x90030, 0x90031) AM_WRITENOP
 
 	AM_RANGE(0x90080, 0x90081) AM_WRITENOP
@@ -189,11 +189,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spbactn_sound_map, AS_PROGRAM, 8, spbactn_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 
 	AM_RANGE(0xfc00, 0xfc00) AM_READNOP	AM_WRITENOP /* irq ack ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

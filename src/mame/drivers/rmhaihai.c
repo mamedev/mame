@@ -194,8 +194,8 @@ static MACHINE_RESET( themj )
 static ADDRESS_MAP_START( rmhaihai_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_BASE_MEMBER(rmhaihai_state, m_colorram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_BASE_MEMBER(rmhaihai_state, m_videoram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE_LEGACY(rmhaihai_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(rmhaihai_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xb83c, 0xb83c) AM_WRITENOP	// ??
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// ??
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
@@ -203,13 +203,13 @@ static ADDRESS_MAP_START( rmhaihai_map, AS_PROGRAM, 8, rmhaihai_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rmhaihai_io_map, AS_IO, 8, rmhaihai_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP	// ??
-	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)	// ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE("msm", adpcm_w)
-	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
+	AM_RANGE(0x0000, 0x7fff) AM_READ_LEGACY(samples_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(keyboard_r) AM_WRITENOP	// ??
+	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE_LEGACY(keyboard_w)	// ??
+	AM_RANGE(0x8020, 0x8020) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE_LEGACY("msm", adpcm_w)
+	AM_RANGE(0x8060, 0x8060) AM_WRITE_LEGACY(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
 	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP	// ??
 	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP	// ??
@@ -219,22 +219,22 @@ static ADDRESS_MAP_START( themj_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_BASE_MEMBER(rmhaihai_state, m_colorram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_BASE_MEMBER(rmhaihai_state, m_videoram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE_LEGACY(rmhaihai_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(rmhaihai_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( themj_io_map, AS_IO, 8, rmhaihai_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP	// ??
-	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)	// ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE("msm", adpcm_w)
-	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
+	AM_RANGE(0x0000, 0x7fff) AM_READ_LEGACY(samples_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(keyboard_r) AM_WRITENOP	// ??
+	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE_LEGACY(keyboard_w)	// ??
+	AM_RANGE(0x8020, 0x8020) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE_LEGACY("msm", adpcm_w)
+	AM_RANGE(0x8060, 0x8060) AM_WRITE_LEGACY(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
-	AM_RANGE(0x80a0, 0x80a0) AM_WRITE(themj_rombank_w)
+	AM_RANGE(0x80a0, 0x80a0) AM_WRITE_LEGACY(themj_rombank_w)
 	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP	// ??
 	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP	// ??
 ADDRESS_MAP_END

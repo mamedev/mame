@@ -455,35 +455,35 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 
-	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_BASE_MEMBER(mlanding_state, m_g_ram)// 512kB G RAM - enough here for double buffered 512x400x8 frame
-	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_BASE_MEMBER(mlanding_state, m_ml_tileram)
-	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2") AM_BASE_MEMBER(mlanding_state, m_dma_ram)
+	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_BASE( m_g_ram)// 512kB G RAM - enough here for double buffered 512x400x8 frame
+	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE_LEGACY(ml_tileram_r, ml_tileram_w) AM_BASE( m_ml_tileram)
+	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2") AM_BASE( m_dma_ram)
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
 
-	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
-	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(ml_nmi_to_sound_w) //sound reset ??
+	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE_LEGACY(ml_sub_reset_w)
+	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE_LEGACY(ml_nmi_to_sound_w) //sound reset ??
 
-	AM_RANGE(0x2d0000, 0x2d0003) AM_WRITE(ml_to_sound_w)
+	AM_RANGE(0x2d0000, 0x2d0003) AM_WRITE_LEGACY(ml_to_sound_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP
-	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREAD8("tc0140syt", tc0140syt_comm_r, 0x00ff)
+	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREAD8_LEGACY("tc0140syt", tc0140syt_comm_r, 0x00ff)
 
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(ml_mecha_ram_r,ml_mecha_ram_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE_LEGACY(ml_mecha_ram_r,ml_mecha_ram_w)
 
 	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")
 	AM_RANGE(0x290002, 0x290003) AM_READ_PORT("IN0")
 
 	AM_RANGE(0x240004, 0x240005) AM_NOP //watchdog ??
-	AM_RANGE(0x240006, 0x240007) AM_READ(io1_r) // vblank ?
-	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(ml_output_w)
+	AM_RANGE(0x240006, 0x240007) AM_READ_LEGACY(io1_r) // vblank ?
+	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE_LEGACY(ml_output_w)
 
 	/*  */
-	AM_RANGE(0x2b0000, 0x2b0001) AM_READ(ml_analog1_lsb_r)		//-40 .. 40 analog controls ?
-	AM_RANGE(0x2b0004, 0x2b0005) AM_READ(ml_analog2_lsb_r)		//-40 .. 40 analog controls ?
-	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(ml_analog1_msb_r) // tested in service mode, dips?
-	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(ml_analog3_lsb_r)		//-60 .. 60 analog controls ?
-	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(ml_analog2_msb_r)
-	AM_RANGE(0x2b0002, 0x2b0003) AM_READ(ml_analog3_msb_r)		// IN2/IN3 could be switched
+	AM_RANGE(0x2b0000, 0x2b0001) AM_READ_LEGACY(ml_analog1_lsb_r)		//-40 .. 40 analog controls ?
+	AM_RANGE(0x2b0004, 0x2b0005) AM_READ_LEGACY(ml_analog2_lsb_r)		//-40 .. 40 analog controls ?
+	AM_RANGE(0x2b0006, 0x2b0007) AM_READ_LEGACY(ml_analog1_msb_r) // tested in service mode, dips?
+	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_LEGACY(ml_analog3_lsb_r)		//-60 .. 60 analog controls ?
+	AM_RANGE(0x2c0002, 0x2c0003) AM_READ_LEGACY(ml_analog2_msb_r)
+	AM_RANGE(0x2b0002, 0x2b0003) AM_READ_LEGACY(ml_analog3_msb_r)		// IN2/IN3 could be switched
 ADDRESS_MAP_END
 
 
@@ -495,7 +495,7 @@ static ADDRESS_MAP_START( mlanding_sub_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x050000, 0x0503ff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_MEMBER(mlanding_state, m_ml_dotram)
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE( m_ml_dotram)
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( ml_msm_start_lsb_w )
@@ -517,16 +517,16 @@ static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_MIRROR(0x00fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xa000, 0xa001) AM_WRITE(ml_sound_to_main_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("tc0140syt", tc0140syt_slave_comm_r)
+	AM_RANGE(0x9000, 0x9001) AM_MIRROR(0x00fe) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xa000, 0xa001) AM_WRITE_LEGACY(ml_sound_to_main_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD_LEGACY("tc0140syt", tc0140syt_slave_comm_r)
 
-//  AM_RANGE(0xb000, 0xb000) AM_WRITE(ml_msm5205_address_w) //guess
-//  AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("msm", ml_msm5205_start_w)
-//  AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("msm", ml_msm5205_stop_w)
+//  AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(ml_msm5205_address_w) //guess
+//  AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_start_w)
+//  AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_stop_w)
 
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("msm",ml_msm_start_lsb_w)
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(ml_msm_start_msb_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("msm",ml_msm_start_lsb_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(ml_msm_start_msb_w)
 ADDRESS_MAP_END
 
 static READ16_HANDLER( ml_dotram_r )
@@ -556,11 +556,11 @@ static READ8_HANDLER( test_r )
 //mecha driver ?
 static ADDRESS_MAP_START( mlanding_z80_sub_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(mlanding_state, m_mecha_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE( m_mecha_ram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 
-	AM_RANGE(0x9000, 0x9001) AM_READ(test_r)
-	AM_RANGE(0x9800, 0x9803) AM_READ(test_r)
+	AM_RANGE(0x9000, 0x9001) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x9800, 0x9803) AM_READ_LEGACY(test_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16, mlanding_state )
@@ -568,12 +568,12 @@ static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16, mlanding_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16, mlanding_state )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ml_dotram_r,ml_dotram_w)
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_LEGACY(ml_dotram_r,ml_dotram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_io, AS_IO, 16, mlanding_state )
-	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_HOLD_signal_r)
-//  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
+	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ_LEGACY(dsp_HOLD_signal_r)
+//  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE_LEGACY(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mlanding )

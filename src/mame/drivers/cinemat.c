@@ -317,18 +317,18 @@ static ADDRESS_MAP_START( data_map, AS_DATA, 16, cinemat_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( data_map_qb3, AS_DATA, 16, cinemat_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(cinemat_state, m_rambase)
+	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("bank1") AM_BASE( m_rambase)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, cinemat_state )
-	AM_RANGE(0x00, 0x0f) AM_READ(inputs_r)
-	AM_RANGE(0x10, 0x16) AM_READ(switches_r)
-	AM_RANGE(0x17, 0x17) AM_READ(coin_input_r)
+	AM_RANGE(0x00, 0x0f) AM_READ_LEGACY(inputs_r)
+	AM_RANGE(0x10, 0x16) AM_READ_LEGACY(switches_r)
+	AM_RANGE(0x17, 0x17) AM_READ_LEGACY(coin_input_r)
 
-	AM_RANGE(0x05, 0x05) AM_WRITE(coin_reset_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(cinemat_vector_control_w)
-	AM_RANGE(0x00, 0x07) AM_WRITE(cinemat_sound_control_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(coin_reset_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(cinemat_vector_control_w)
+	AM_RANGE(0x00, 0x07) AM_WRITE_LEGACY(cinemat_sound_control_w)
 ADDRESS_MAP_END
 
 

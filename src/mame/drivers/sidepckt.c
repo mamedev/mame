@@ -229,18 +229,18 @@ static WRITE8_HANDLER( sidepctj_i8751_w )
 
 static ADDRESS_MAP_START( sidepckt_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sidepckt_videoram_w) AM_BASE_MEMBER(sidepckt_state,m_videoram) AM_SIZE_MEMBER(sidepckt_state,m_videoram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(sidepckt_videoram_w) AM_BASE(m_videoram) AM_SIZE(m_videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM // ???
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(sidepckt_colorram_w) AM_BASE_MEMBER(sidepckt_state,m_colorram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE_LEGACY(sidepckt_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM // ???
-	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE_MEMBER(sidepckt_state,m_spriteram) AM_SIZE_MEMBER(sidepckt_state,m_spriteram_size)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
 	AM_RANGE(0x2100, 0x24ff) AM_RAM // ???
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3004, 0x3004) AM_WRITE(sound_cpu_command_w)
-	AM_RANGE(0x300c, 0x300c) AM_READNOP AM_WRITE(sidepckt_flipscreen_w)
+	AM_RANGE(0x3004, 0x3004) AM_WRITE_LEGACY(sound_cpu_command_w)
+	AM_RANGE(0x300c, 0x300c) AM_READNOP AM_WRITE_LEGACY(sidepckt_flipscreen_w)
 //  AM_RANGE(0x3014, 0x3014) //i8751 read
 //  AM_RANGE(0x3018, 0x3018) //i8751 write
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -248,9 +248,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sidepckt_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym2", ym3526_w)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

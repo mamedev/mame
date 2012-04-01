@@ -277,12 +277,12 @@ static WRITE16_HANDLER(clk_w)
 
 static ADDRESS_MAP_START( galaxygame_map, AS_PROGRAM, 16, galaxygame_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0xfec0, 0xfecf) AM_READWRITE(ke_r, ke_w)
-	AM_RANGE(0xff52, 0xff53) AM_READWRITE(y_r, y_w) // 177522 Y
+	AM_RANGE(0xfec0, 0xfecf) AM_READWRITE_LEGACY(ke_r, ke_w)
+	AM_RANGE(0xff52, 0xff53) AM_READWRITE_LEGACY(y_r, y_w) // 177522 Y
 	AM_RANGE(0xff54, 0xff55) AM_READ_PORT("COINAC") // 177524 COINAC
-	AM_RANGE(0xff5a, 0xff5b) AM_READWRITE(x_r, x_w)	// 177532 X
+	AM_RANGE(0xff5a, 0xff5b) AM_READWRITE_LEGACY(x_r, x_w)	// 177532 X
 	AM_RANGE(0xff5c, 0xff5d) AM_READ_PORT("SR")		// 177534 SR
-	AM_RANGE(0xff66, 0xff67) AM_WRITE(clk_w)		// 177546 KW11 line frequency clock
+	AM_RANGE(0xff66, 0xff67) AM_WRITE_LEGACY(clk_w)		// 177546 KW11 line frequency clock
 ADDRESS_MAP_END
 
 

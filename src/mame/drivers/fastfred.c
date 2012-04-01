@@ -183,87 +183,87 @@ static WRITE8_HANDLER( sound_nmi_mask_w )
 static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, m_videoram)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, m_attributesram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(fastfred_state, m_spriteram) AM_SIZE_MEMBER(fastfred_state, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd3ff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(fastfred_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE_LEGACY(fastfred_attributes_w) AM_BASE( m_attributesram)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE( m_spriteram) AM_SIZE(m_spriteram_size)
 	AM_RANGE(0xd860, 0xdbff) AM_RAM // Unused, but initialized
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS") AM_WRITEONLY AM_BASE_MEMBER(fastfred_state, m_background_color)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS") AM_WRITEONLY AM_BASE( m_background_color)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(fastfred_charbank1_w)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(fastfred_charbank2_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(fastfred_flip_screen_x_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
-	AM_RANGE(0xf116, 0xf116) AM_WRITE(fastfred_flip_screen_x_w)
-	AM_RANGE(0xf117, 0xf117) AM_WRITE(fastfred_flip_screen_y_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(watchdog_reset_r, soundlatch_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(fastfred_colorbank1_w)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(fastfred_colorbank2_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(fastfred_charbank1_w)
+	AM_RANGE(0xf005, 0xf005) AM_WRITE_LEGACY(fastfred_charbank2_w)
+	AM_RANGE(0xf006, 0xf006) AM_WRITE_LEGACY(fastfred_flip_screen_x_w)
+	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(fastfred_flip_screen_y_w)
+	AM_RANGE(0xf116, 0xf116) AM_WRITE_LEGACY(fastfred_flip_screen_x_w)
+	AM_RANGE(0xf117, 0xf117) AM_WRITE_LEGACY(fastfred_flip_screen_y_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE_LEGACY(watchdog_reset_r, soundlatch_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd03f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, m_attributesram)
-	AM_RANGE(0xd040, 0xd05f) AM_RAM AM_BASE_MEMBER(fastfred_state, m_spriteram) AM_SIZE_MEMBER(fastfred_state, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd03f) AM_RAM_WRITE_LEGACY(fastfred_attributes_w) AM_BASE( m_attributesram)
+	AM_RANGE(0xd040, 0xd05f) AM_RAM AM_BASE( m_spriteram) AM_SIZE(m_spriteram_size)
 	AM_RANGE(0xd060, 0xd3ff) AM_RAM
-	AM_RANGE(0xd800, 0xdbff) AM_MIRROR(0x400) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, m_videoram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITEONLY AM_BASE_MEMBER(fastfred_state, m_background_color)
+	AM_RANGE(0xd800, 0xdbff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(fastfred_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe000, 0xe000) AM_WRITEONLY AM_BASE( m_background_color)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe803, 0xe803) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP // Unused, but initialized
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(fastfred_charbank1_w)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(fastfred_charbank2_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(fastfred_flip_screen_x_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
-	AM_RANGE(0xf116, 0xf116) AM_WRITE(fastfred_flip_screen_x_w)
-	AM_RANGE(0xf117, 0xf117) AM_WRITE(fastfred_flip_screen_y_w)
-	//AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)  // Why doesn't this work???
-	AM_RANGE(0xf800, 0xf801) AM_READNOP AM_DEVWRITE("ay8910.1", ay8910_address_data_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(fastfred_colorbank1_w)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(fastfred_colorbank2_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(fastfred_charbank1_w)
+	AM_RANGE(0xf005, 0xf005) AM_WRITE_LEGACY(fastfred_charbank2_w)
+	AM_RANGE(0xf006, 0xf006) AM_WRITE_LEGACY(fastfred_flip_screen_x_w)
+	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(fastfred_flip_screen_y_w)
+	AM_RANGE(0xf116, 0xf116) AM_WRITE_LEGACY(fastfred_flip_screen_x_w)
+	AM_RANGE(0xf117, 0xf117) AM_WRITE_LEGACY(fastfred_flip_screen_y_w)
+	//AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(watchdog_reset_r)  // Why doesn't this work???
+	AM_RANGE(0xf800, 0xf801) AM_READNOP AM_DEVWRITE_LEGACY("ay8910.1", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x1000, 0x1fff) AM_READ(imago_sprites_offset_r)
+	AM_RANGE(0x1000, 0x1fff) AM_READ_LEGACY(imago_sprites_offset_r)
 	AM_RANGE(0x2000, 0x6fff) AM_ROM
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM // same fg videoram (which one of the 2 is really used?)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(imago_sprites_dma_w)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE_LEGACY(imago_sprites_dma_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(imago_fg_videoram_w) AM_BASE_MEMBER(fastfred_state, m_imago_fg_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE_MEMBER(fastfred_state, m_videoram)
-	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE(fastfred_attributes_w) AM_BASE_MEMBER(fastfred_state, m_attributesram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE_MEMBER(fastfred_state, m_spriteram) AM_SIZE_MEMBER(fastfred_state, m_spriteram_size)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(imago_fg_videoram_w) AM_BASE( m_imago_fg_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(fastfred_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xd800, 0xd83f) AM_RAM_WRITE_LEGACY(fastfred_attributes_w) AM_BASE( m_attributesram)
+	AM_RANGE(0xd840, 0xd85f) AM_RAM AM_BASE( m_spriteram) AM_SIZE(m_spriteram_size)
 	AM_RANGE(0xd860, 0xd8ff) AM_RAM // Unused, but initialized
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("JOYS")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW") AM_WRITENOP // writes 1 when level starts, 0 when game over
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(imago_dma_irq_w)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(imago_charbank_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(fastfred_flip_screen_x_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(fastfred_colorbank1_w)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(fastfred_colorbank2_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(imago_dma_irq_w)
+	AM_RANGE(0xf005, 0xf005) AM_WRITE_LEGACY(imago_charbank_w)
+	AM_RANGE(0xf006, 0xf006) AM_WRITE_LEGACY(fastfred_flip_screen_x_w)
+	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(fastfred_flip_screen_y_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP // writes 0 or 2
-	AM_RANGE(0xf401, 0xf401) AM_WRITE(imago_sprites_bank_w)
-	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf401, 0xf401) AM_WRITE_LEGACY(imago_sprites_bank_w)
+	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_WRITE_LEGACY(soundlatch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r, sound_nmi_mask_w)
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(soundlatch_r, sound_nmi_mask_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY  // Reset PSG's
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay8910.1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay8910.2", ay8910_address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay8910.1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay8910.2", ay8910_address_data_w)
 	AM_RANGE(0x7000, 0x7000) AM_READNOP // only for Imago, read but not used
 ADDRESS_MAP_END
 

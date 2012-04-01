@@ -256,14 +256,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, m_color_select)
-	AM_RANGE(0x8004, 0x8004) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, m_screen_flip)
-	AM_RANGE(0x8005, 0x8005) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, m_screen_select)
-	AM_RANGE(0x8006, 0x8006) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, m_screenb_enable)
-	AM_RANGE(0x8007, 0x8007) AM_WRITEONLY AM_BASE_MEMBER(crgolf_state, m_screena_enable)
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(sound_to_main_r, main_to_sound_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(rom_bank_select_w)
-	AM_RANGE(0xa000, 0xffff) AM_READWRITE(crgolf_videoram_r, crgolf_videoram_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITEONLY AM_BASE( m_color_select)
+	AM_RANGE(0x8004, 0x8004) AM_WRITEONLY AM_BASE( m_screen_flip)
+	AM_RANGE(0x8005, 0x8005) AM_WRITEONLY AM_BASE( m_screen_select)
+	AM_RANGE(0x8006, 0x8006) AM_WRITEONLY AM_BASE( m_screenb_enable)
+	AM_RANGE(0x8007, 0x8007) AM_WRITEONLY AM_BASE( m_screena_enable)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE_LEGACY(sound_to_main_r, main_to_sound_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(rom_bank_select_w)
+	AM_RANGE(0xa000, 0xffff) AM_READWRITE_LEGACY(crgolf_videoram_r, crgolf_videoram_w)
 ADDRESS_MAP_END
 
 
@@ -277,11 +277,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITENOP
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(switch_input_r, switch_input_select_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(analog_input_r, unknown_w)
-	AM_RANGE(0xe003, 0xe003) AM_READWRITE(main_to_sound_r, sound_to_main_w)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE_LEGACY(switch_input_r, switch_input_select_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE_LEGACY(analog_input_r, unknown_w)
+	AM_RANGE(0xe003, 0xe003) AM_READWRITE_LEGACY(main_to_sound_r, sound_to_main_w)
 ADDRESS_MAP_END
 
 

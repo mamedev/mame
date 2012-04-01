@@ -1750,32 +1750,32 @@ static MACHINE_START( firebeat )
 }
 
 static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE_MEMBER(firebeat_state, m_work_ram)
-	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE(midi_uart_r, midi_uart_w)
-	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
-	AM_RANGE(0x70008000, 0x7000800f) AM_READ(keyboard_wheel_r)
-	AM_RANGE(0x7000a000, 0x7000a003) AM_READ(extend_board_irq_r)
-	AM_RANGE(0x74000000, 0x740003ff) AM_READWRITE(ppc_spu_share_r, ppc_spu_share_w) // SPU shared RAM
-	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ(cabinet_r)
-	AM_RANGE(0x7d000340, 0x7d000347) AM_READ(sensor_r)
-	AM_RANGE(0x7d000400, 0x7d000403) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xffff0000)
-	AM_RANGE(0x7d000800, 0x7d000803) AM_READ(input_r)
-	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE(flashram_r, flashram_w)
-	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE(soundflash_r, soundflash_w)
-	AM_RANGE(0x7dc00000, 0x7dc0000f) AM_READWRITE(comm_uart_r, comm_uart_w)
-	AM_RANGE(0x7e000000, 0x7e00003f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, rtc_r, rtc_w, 0xffffffff)
-	AM_RANGE(0x7e000100, 0x7e00013f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, xram_r, xram_w, 0xffffffff)
-	AM_RANGE(0x7e800000, 0x7e8000ff) AM_READWRITE(gcu0_r, gcu0_w)
-	AM_RANGE(0x7e800100, 0x7e8001ff) AM_READWRITE(gcu1_r, gcu1_w)
-	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE(atapi_command_r, atapi_command_w)
-	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE(atapi_control_r, atapi_control_w)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE( m_work_ram)
+	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE_LEGACY(midi_uart_r, midi_uart_w)
+	AM_RANGE(0x70006000, 0x70006003) AM_WRITE_LEGACY(extend_board_irq_w)
+	AM_RANGE(0x70008000, 0x7000800f) AM_READ_LEGACY(keyboard_wheel_r)
+	AM_RANGE(0x7000a000, 0x7000a003) AM_READ_LEGACY(extend_board_irq_r)
+	AM_RANGE(0x74000000, 0x740003ff) AM_READWRITE_LEGACY(ppc_spu_share_r, ppc_spu_share_w) // SPU shared RAM
+	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ_LEGACY(cabinet_r)
+	AM_RANGE(0x7d000340, 0x7d000347) AM_READ_LEGACY(sensor_r)
+	AM_RANGE(0x7d000400, 0x7d000403) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff0000)
+	AM_RANGE(0x7d000800, 0x7d000803) AM_READ_LEGACY(input_r)
+	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE_LEGACY(flashram_r, flashram_w)
+	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE_LEGACY(soundflash_r, soundflash_w)
+	AM_RANGE(0x7dc00000, 0x7dc0000f) AM_READWRITE_LEGACY(comm_uart_r, comm_uart_w)
+	AM_RANGE(0x7e000000, 0x7e00003f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0xffffffff)
+	AM_RANGE(0x7e000100, 0x7e00013f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0xffffffff)
+	AM_RANGE(0x7e800000, 0x7e8000ff) AM_READWRITE_LEGACY(gcu0_r, gcu0_w)
+	AM_RANGE(0x7e800100, 0x7e8001ff) AM_READWRITE_LEGACY(gcu1_r, gcu1_w)
+	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE_LEGACY(atapi_command_r, atapi_command_w)
+	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE_LEGACY(atapi_control_r, atapi_control_w)
 	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION("user1", 0)		/* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16, firebeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
-	AM_RANGE(0x340000, 0x34000f) AM_READ(spu_unk_r)
+	AM_RANGE(0x340000, 0x34000f) AM_READ_LEGACY(spu_unk_r)
 ADDRESS_MAP_END
 
 /*****************************************************************************/

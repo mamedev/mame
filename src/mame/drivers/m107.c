@@ -130,10 +130,10 @@ static WRITE16_HANDLER( m107_sound_reset_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE(m107_vram_w) AM_BASE_MEMBER(m107_state, m_vram_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE_LEGACY(m107_vram_w) AM_BASE( m_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
-	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE_MEMBER(m107_state, m_spriteram)
-	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END
 
@@ -142,15 +142,15 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_READ(m107_sound_status_r)	/* answer from sound CPU */
-	AM_RANGE(0x00, 0x01) AM_WRITE(m107_soundlatch_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(m107_coincounter_w)
+	AM_RANGE(0x08, 0x09) AM_READ_LEGACY(m107_sound_status_r)	/* answer from sound CPU */
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(m107_soundlatch_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(m107_coincounter_w)
 	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
-	AM_RANGE(0x80, 0x9f) AM_WRITE(m107_control_w)
+	AM_RANGE(0x80, 0x9f) AM_WRITE_LEGACY(m107_control_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITENOP /* Written with 0's in interrupt */
-	AM_RANGE(0xb0, 0xb1) AM_WRITE(m107_spritebuffer_w)
+	AM_RANGE(0xb0, 0xb1) AM_WRITE_LEGACY(m107_spritebuffer_w)
 	AM_RANGE(0xc0, 0xc3) AM_READNOP /* Only wpksoc: ticket related? */
-	AM_RANGE(0xc0, 0xc1) AM_WRITE(m107_sound_reset_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE_LEGACY(m107_sound_reset_w)
 ADDRESS_MAP_END
 
 /* same as M107 but with an extra i/o board */
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( wpksoc_map, AS_PROGRAM, 16, m107_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wpksoc_io_map, AS_IO, 16, m107_state )
-	AM_RANGE(0x22, 0x23) AM_WRITE(wpksoc_output_w)
+	AM_RANGE(0x22, 0x23) AM_WRITE_LEGACY(wpksoc_output_w)
 	AM_RANGE(0xc0, 0xc1) AM_READ_PORT("WPK_IN0")
 	AM_RANGE(0xc2, 0xc3) AM_READ_PORT("WPK_IN1")
 	AM_IMPORT_FROM(main_portmap)
@@ -183,10 +183,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8("irem", irem_ga20_r, irem_ga20_w, 0x00ff)
-	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff)
-	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE(m107_soundlatch_r, m107_sound_irq_ack_w)
-	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(m107_sound_status_w)
+	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8_LEGACY("irem", irem_ga20_r, irem_ga20_w, 0x00ff)
+	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff)
+	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE_LEGACY(m107_soundlatch_r, m107_sound_irq_ack_w)
+	AM_RANGE(0xa8046, 0xa8047) AM_WRITE_LEGACY(m107_sound_status_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("soundcpu", 0x1fff0)
 ADDRESS_MAP_END
 

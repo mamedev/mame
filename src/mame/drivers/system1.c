@@ -729,28 +729,28 @@ static WRITE8_HANDLER( nobb_outport24_w )
 static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(system1_state, m_ram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(system1_state, m_spriteram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
-	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(system1_mixer_collision_reset_w)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
-	AM_RANGE(0xfc00, 0xffff) AM_WRITE(system1_sprite_collision_reset_w)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE( m_ram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(system1_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY(system1_videoram_r, system1_videoram_w)
+	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE_LEGACY(system1_mixer_collision_r, system1_mixer_collision_w)
+	AM_RANGE(0xf400, 0xf7ff) AM_WRITE_LEGACY(system1_mixer_collision_reset_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(system1_sprite_collision_r, system1_sprite_collision_w)
+	AM_RANGE(0xfc00, 0xffff) AM_WRITE_LEGACY(system1_sprite_collision_reset_w)
 ADDRESS_MAP_END
 
 /* same as normal System 1 except address map is shuffled (RAM/collision are swapped) */
 static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(system1_mixer_collision_r, system1_mixer_collision_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_WRITE(system1_mixer_collision_reset_w)
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(system1_sprite_collision_r, system1_sprite_collision_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(system1_sprite_collision_reset_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(system1_state, m_spriteram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(system1_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(system1_videoram_r, system1_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(system1_state, m_ram)
+	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE_LEGACY(system1_mixer_collision_r, system1_mixer_collision_w)
+	AM_RANGE(0xc400, 0xc7ff) AM_WRITE_LEGACY(system1_mixer_collision_reset_w)
+	AM_RANGE(0xc800, 0xcbff) AM_READWRITE_LEGACY(system1_sprite_collision_r, system1_sprite_collision_w)
+	AM_RANGE(0xcc00, 0xcfff) AM_WRITE_LEGACY(system1_sprite_collision_reset_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(system1_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY(system1_videoram_r, system1_videoram_w)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE( m_ram)
 ADDRESS_MAP_END
 
 /* I/O map for systems with an 8255 PPI */
@@ -762,7 +762,7 @@ static ADDRESS_MAP_START( system1_ppi_io_map, AS_IO, 8, system1_state )
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x02) AM_READ_PORT("SWA")	/* DIP2 */
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x02) AM_READ_PORT("SWB")	/* DIP1 some games read it from here... */
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_READ_PORT("SWB")	/* DIP1 ... and some others from here but there are games which check BOTH! */
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE("ppi", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE_LEGACY("ppi", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /* I/O map for systems with a Z80 PIO chip */
@@ -774,7 +774,7 @@ static ADDRESS_MAP_START( system1_pio_io_map, AS_IO, 8, system1_state )
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x02) AM_READ_PORT("SWA")	/* DIP2 */
 	AM_RANGE(0x0d, 0x0d) AM_MIRROR(0x02) AM_READ_PORT("SWB")	/* DIP1 some games read it from here... */
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_READ_PORT("SWB")	/* DIP1 ... and some others from here but there are games which check BOTH! */
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY("pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
 ADDRESS_MAP_END
 
 
@@ -788,9 +788,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(sound_data_r)
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1fff) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1fff) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ_LEGACY(sound_data_r)
 ADDRESS_MAP_END
 
 
@@ -803,16 +803,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, system1_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_control_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(mcu_io_r, mcu_io_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE_LEGACY(mcu_control_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( nob_mcu_io_map, AS_IO, 8, system1_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_BASE_MEMBER(system1_state, m_nob_mcu_latch)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_BASE_MEMBER(system1_state, m_nob_mcu_status)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(nob_mcu_control_p2_w)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_BASE( m_nob_mcu_latch)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_BASE( m_nob_mcu_status)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE_LEGACY(nob_mcu_control_p2_w)
 ADDRESS_MAP_END
 
 

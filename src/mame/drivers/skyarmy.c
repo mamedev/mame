@@ -165,24 +165,24 @@ static WRITE8_HANDLER( nmi_enable_w )
 static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8, skyarmy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skyarmy_videoram_w) AM_BASE_MEMBER(skyarmy_state,m_videoram) /* Video RAM */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(skyarmy_colorram_w) AM_BASE_MEMBER(skyarmy_state,m_colorram) /* Color RAM */
-	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE_MEMBER(skyarmy_state,m_spriteram) /* Sprites */
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_MEMBER(skyarmy_state,m_scrollram)  /* Scroll RAM */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(skyarmy_videoram_w) AM_BASE(m_videoram) /* Video RAM */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(skyarmy_colorram_w) AM_BASE(m_colorram) /* Color RAM */
+	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE(m_spriteram) /* Sprites */
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(m_scrollram)  /* Scroll RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("P2")
 	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(nmi_enable_w) // ???
-	AM_RANGE(0xa005, 0xa005) AM_WRITE(skyarmy_flip_screen_x_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(skyarmy_flip_screen_y_w)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(nmi_enable_w) // ???
+	AM_RANGE(0xa005, 0xa005) AM_WRITE_LEGACY(skyarmy_flip_screen_x_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITE_LEGACY(skyarmy_flip_screen_y_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( skyarmy_io_map, AS_IO, 8, skyarmy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 

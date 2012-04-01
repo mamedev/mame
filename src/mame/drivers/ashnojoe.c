@@ -98,22 +98,22 @@ static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 
 static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x041fff) AM_RAM_WRITE(ashnojoe_tileram3_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_3)
-	AM_RANGE(0x042000, 0x043fff) AM_RAM_WRITE(ashnojoe_tileram4_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_4)
-	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(ashnojoe_tileram5_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_5)
-	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(ashnojoe_tileram2_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_2)
-	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(ashnojoe_tileram6_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_6)
-	AM_RANGE(0x047000, 0x047fff) AM_RAM_WRITE(ashnojoe_tileram7_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram_7)
-	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(ashnojoe_tileram_w) AM_BASE_MEMBER(ashnojoe_state, m_tileram)
-	AM_RANGE(0x049000, 0x049fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x040000, 0x041fff) AM_RAM_WRITE_LEGACY(ashnojoe_tileram3_w) AM_BASE( m_tileram_3)
+	AM_RANGE(0x042000, 0x043fff) AM_RAM_WRITE_LEGACY(ashnojoe_tileram4_w) AM_BASE( m_tileram_4)
+	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE_LEGACY(ashnojoe_tileram5_w) AM_BASE( m_tileram_5)
+	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE_LEGACY(ashnojoe_tileram2_w) AM_BASE( m_tileram_2)
+	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE_LEGACY(ashnojoe_tileram6_w) AM_BASE( m_tileram_6)
+	AM_RANGE(0x047000, 0x047fff) AM_RAM_WRITE_LEGACY(ashnojoe_tileram7_w) AM_BASE( m_tileram_7)
+	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE_LEGACY(ashnojoe_tileram_w) AM_BASE( m_tileram)
+	AM_RANGE(0x049000, 0x049fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x04a000, 0x04a001) AM_READ_PORT("P1")
 	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")
 	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
-	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_BASE_MEMBER(ashnojoe_state, m_tilemap_reg)
-	AM_RANGE(0x04a008, 0x04a009) AM_WRITE(ashnojoe_soundlatch_w)
-	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r)	// ??
-	AM_RANGE(0x04a010, 0x04a019) AM_WRITE(joe_tilemaps_xscroll_w)
-	AM_RANGE(0x04a020, 0x04a029) AM_WRITE(joe_tilemaps_yscroll_w)
+	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_BASE( m_tilemap_reg)
+	AM_RANGE(0x04a008, 0x04a009) AM_WRITE_LEGACY(ashnojoe_soundlatch_w)
+	AM_RANGE(0x04a00a, 0x04a00b) AM_READ_LEGACY(fake_4a00a_r)	// ??
+	AM_RANGE(0x04a010, 0x04a019) AM_WRITE_LEGACY(joe_tilemaps_xscroll_w)
+	AM_RANGE(0x04a020, 0x04a029) AM_WRITE_LEGACY(joe_tilemaps_yscroll_w)
 	AM_RANGE(0x04c000, 0x04ffff) AM_RAM
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
@@ -146,10 +146,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, ashnojoe_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
-	AM_RANGE(0x04, 0x04) AM_READ(sound_latch_r)
-	AM_RANGE(0x06, 0x06) AM_READ(sound_latch_status_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(adpcm_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(sound_latch_r)
+	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(sound_latch_status_r)
 ADDRESS_MAP_END
 
 

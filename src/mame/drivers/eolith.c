@@ -148,9 +148,9 @@ static READ32_HANDLER( hidctch3_pen2_r )
 static ADDRESS_MAP_START( eolith_map, AS_PROGRAM, 32, eolith_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // fort2b wants ram here
 	AM_RANGE(0x40000000, 0x401fffff) AM_RAM
-	AM_RANGE(0x90000000, 0x9003ffff) AM_READWRITE(eolith_vram_r, eolith_vram_w)
-	AM_RANGE(0xfc000000, 0xfc000003) AM_READ(eolith_custom_r)
-	AM_RANGE(0xfc400000, 0xfc400003) AM_WRITE(systemcontrol_w)
+	AM_RANGE(0x90000000, 0x9003ffff) AM_READWRITE_LEGACY(eolith_vram_r, eolith_vram_w)
+	AM_RANGE(0xfc000000, 0xfc000003) AM_READ_LEGACY(eolith_custom_r)
+	AM_RANGE(0xfc400000, 0xfc400003) AM_WRITE_LEGACY(systemcontrol_w)
 	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITENOP // sound latch
 	AM_RANGE(0xfca00000, 0xfca00003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfcc00000, 0xfcc0005b) AM_WRITENOP // crt registers ?

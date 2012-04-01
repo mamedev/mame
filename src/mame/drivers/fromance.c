@@ -224,10 +224,10 @@ static WRITE8_HANDLER( fromance_coinctr_w )
 static ADDRESS_MAP_START( nekkyoku_main_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("SERVICE") AM_WRITE(fromance_portselect_w)
-	AM_RANGE(0xf001, 0xf001) AM_READ(fromance_keymatrix_r) AM_WRITENOP
-	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("COIN") AM_WRITE(fromance_coinctr_w)
-	AM_RANGE(0xf003, 0xf003) AM_READWRITE(fromance_busycheck_main_r, fromance_commanddata_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("SERVICE") AM_WRITE_LEGACY(fromance_portselect_w)
+	AM_RANGE(0xf001, 0xf001) AM_READ_LEGACY(fromance_keymatrix_r) AM_WRITENOP
+	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("COIN") AM_WRITE_LEGACY(fromance_coinctr_w)
+	AM_RANGE(0xf003, 0xf003) AM_READWRITE_LEGACY(fromance_busycheck_main_r, fromance_commanddata_w)
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf005, 0xf005) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
@@ -236,10 +236,10 @@ static ADDRESS_MAP_START( fromance_main_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0x9e89, 0x9e89) AM_READNOP			// unknown (idolmj)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("SERVICE") AM_WRITE(fromance_portselect_w)
-	AM_RANGE(0xe001, 0xe001) AM_READ(fromance_keymatrix_r)
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("COIN") AM_WRITE(fromance_coinctr_w)
-	AM_RANGE(0xe003, 0xe003) AM_READWRITE(fromance_busycheck_main_r, fromance_commanddata_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("SERVICE") AM_WRITE_LEGACY(fromance_portselect_w)
+	AM_RANGE(0xe001, 0xe001) AM_READ_LEGACY(fromance_keymatrix_r)
+	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("COIN") AM_WRITE_LEGACY(fromance_coinctr_w)
+	AM_RANGE(0xe003, 0xe003) AM_READWRITE_LEGACY(fromance_busycheck_main_r, fromance_commanddata_w)
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
@@ -255,17 +255,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nekkyoku_sub_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xefff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)
+	AM_RANGE(0xc000, 0xefff) AM_READWRITE_LEGACY(fromance_videoram_r, fromance_videoram_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE_LEGACY(fromance_paletteram_r, fromance_paletteram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
-	AM_RANGE(0xd000, 0xffff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(fromance_paletteram_r, fromance_paletteram_w)
+	AM_RANGE(0xd000, 0xffff) AM_READWRITE_LEGACY(fromance_videoram_r, fromance_videoram_w)
 ADDRESS_MAP_END
 
 
@@ -278,44 +278,44 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(fromance_crtc_data_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(fromance_crtc_register_w)
 	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0xe1, 0xe1) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
-	AM_RANGE(0xe2, 0xe5) AM_WRITE(fromance_scroll_w)
-	AM_RANGE(0xe6, 0xe6) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0xe7, 0xe7) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
-	AM_RANGE(0xe8, 0xe8) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0xe9, 0xea) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(fromance_rombank_w)
+	AM_RANGE(0xe1, 0xe1) AM_READWRITE_LEGACY(fromance_busycheck_sub_r, fromance_gfxreg_w)
+	AM_RANGE(0xe2, 0xe5) AM_WRITE_LEGACY(fromance_scroll_w)
+	AM_RANGE(0xe6, 0xe6) AM_READWRITE_LEGACY(fromance_commanddata_r, fromance_busycheck_sub_w)
+	AM_RANGE(0xe7, 0xe7) AM_DEVWRITE_LEGACY("msm", fromance_adpcm_reset_w)
+	AM_RANGE(0xe8, 0xe8) AM_WRITE_LEGACY(fromance_adpcm_w)
+	AM_RANGE(0xe9, 0xea) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(fromance_crtc_data_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(fromance_crtc_register_w)
 	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
-	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
-	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
-	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0x27, 0x27) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
-	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(fromance_rombank_w)
+	AM_RANGE(0x21, 0x21) AM_READWRITE_LEGACY(fromance_busycheck_sub_r, fromance_gfxreg_w)
+	AM_RANGE(0x22, 0x25) AM_WRITE_LEGACY(fromance_scroll_w)
+	AM_RANGE(0x26, 0x26) AM_READWRITE_LEGACY(fromance_commanddata_r, fromance_busycheck_sub_w)
+	AM_RANGE(0x27, 0x27) AM_DEVWRITE_LEGACY("msm", fromance_adpcm_reset_w)
+	AM_RANGE(0x28, 0x28) AM_WRITE_LEGACY(fromance_adpcm_w)
+	AM_RANGE(0x29, 0x2a) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(fromance_crtc_data_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(fromance_crtc_register_w)
 	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
-	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
-	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
-	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0x27, 0x27) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
-	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(fromance_rombank_w)
+	AM_RANGE(0x21, 0x21) AM_READWRITE_LEGACY(fromance_busycheck_sub_r, fromance_gfxreg_w)
+	AM_RANGE(0x22, 0x25) AM_WRITE_LEGACY(fromance_scroll_w)
+	AM_RANGE(0x26, 0x26) AM_READWRITE_LEGACY(fromance_commanddata_r, fromance_busycheck_sub_w)
+	AM_RANGE(0x27, 0x27) AM_DEVWRITE_LEGACY("msm", fromance_adpcm_reset_w)
+	AM_RANGE(0x28, 0x28) AM_WRITE_LEGACY(fromance_adpcm_w)
+	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 ADDRESS_MAP_END
 
 

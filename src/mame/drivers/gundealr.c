@@ -66,19 +66,19 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, gundealr_state )
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("IN0")
 	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("IN1")
 	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN2")
-	AM_RANGE(0xc010, 0xc013) AM_WRITE(yamyam_fg_scroll_w)		/* Yam Yam only */
-	AM_RANGE(0xc014, 0xc014) AM_WRITE(gundealr_flipscreen_w)
-	AM_RANGE(0xc016, 0xc016) AM_WRITE(yamyam_bankswitch_w)
-	AM_RANGE(0xc020, 0xc023) AM_WRITE(gundealr_fg_scroll_w)	/* Gun Dealer only */
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(gundealr_paletteram_w) AM_BASE_MEMBER(gundealr_state, m_paletteram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gundealr_bg_videoram_w) AM_BASE_MEMBER(gundealr_state, m_bg_videoram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(gundealr_fg_videoram_w) AM_BASE_MEMBER(gundealr_state, m_fg_videoram)
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_MEMBER(gundealr_state, m_rambase)
+	AM_RANGE(0xc010, 0xc013) AM_WRITE_LEGACY(yamyam_fg_scroll_w)		/* Yam Yam only */
+	AM_RANGE(0xc014, 0xc014) AM_WRITE_LEGACY(gundealr_flipscreen_w)
+	AM_RANGE(0xc016, 0xc016) AM_WRITE_LEGACY(yamyam_bankswitch_w)
+	AM_RANGE(0xc020, 0xc023) AM_WRITE_LEGACY(gundealr_fg_scroll_w)	/* Gun Dealer only */
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(gundealr_paletteram_w) AM_BASE( m_paletteram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(gundealr_bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(gundealr_fg_videoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE( m_rambase)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, gundealr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 

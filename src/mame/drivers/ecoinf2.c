@@ -31,7 +31,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oxo_portmap, AS_IO, 8, ecoinf2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x5c, 0x5c) AM_WRITE(ox_port5c_out_w)
+	AM_RANGE(0x5c, 0x5c) AM_WRITE_LEGACY(ox_port5c_out_w)
 ADDRESS_MAP_END
 
 

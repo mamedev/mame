@@ -220,85 +220,85 @@ static READ8_HANDLER( champbja_alt_protection_r )
 static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") /* MCU shared RAM */
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, m_bg_videoram)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(champbas_bg_videoram_w) AM_BASE( m_bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE_MEMBER(champbas_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// !WORK board output (no use?)
 	AM_RANGE(0xa002, 0xa002) AM_WRITENOP
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(champbas_flipscreen_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITENOP
 	AM_RANGE(0xa005, 0xa005) AM_WRITENOP
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITE_LEGACY(champbas_mcu_halt_w)
+	AM_RANGE(0xa007, 0xa007) AM_WRITE_LEGACY(champbas_mcu_switch_w)
 
-	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_BASE_MEMBER(champbas_state, m_spriteram_2)
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
+	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_BASE( m_spriteram_2)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE_LEGACY(champbas_watchdog_reset_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, m_bg_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(champbas_bg_videoram_w) AM_BASE( m_bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
-	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE_MEMBER(champbas_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// !WORK board output (no use?)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(champbas_gfxbank_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE(champbas_palette_bank_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(champbas_gfxbank_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(champbas_flipscreen_w)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(champbas_palette_bank_w)
 	AM_RANGE(0xa005, 0xa005) AM_WRITENOP	// n.c.
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)	// MCU not present/not used in champbas
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)	// MCU not present/not used in champbas
+	AM_RANGE(0xa006, 0xa006) AM_WRITE_LEGACY(champbas_mcu_halt_w)	// MCU not present/not used in champbas
+	AM_RANGE(0xa007, 0xa007) AM_WRITE_LEGACY(champbas_mcu_switch_w)	// MCU not present/not used in champbas
 
-	AM_RANGE(0xa060, 0xa06f) AM_RAM AM_BASE_MEMBER(champbas_state, m_spriteram_2)
-	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xa060, 0xa06f) AM_RAM AM_BASE( m_spriteram_2)
+	AM_RANGE(0xa080, 0xa080) AM_WRITE_LEGACY(soundlatch_w)
 /*  AM_RANGE(0xa0a0, 0xa0a0)    ???? */
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE_LEGACY(champbas_watchdog_reset_w)
 
 	/* champbja only */
-	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_alt_protection_r)
+	AM_RANGE(0x6800, 0x68ff) AM_READ_LEGACY(champbja_alt_protection_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccrb_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 //  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1") // MCU not used (though it's present on the board)
-	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x7000, 0x7001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 //  AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, m_bg_videoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE_MEMBER(champbas_state, m_spriteram_2) /* ??? */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(champbas_bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE( m_spriteram_2) /* ??? */
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	/* ??? */
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(champbas_gfxbank_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(champbas_gfxbank_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(champbas_flipscreen_w)
 	AM_RANGE(0xa006, 0xa006) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* MCU is not used, but some leftover code still writes here */
 
-	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_BASE_MEMBER(champbas_state, m_spriteram) /* Sprite Pos */
-	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_BASE( m_spriteram) /* Sprite Pos */
+	AM_RANGE(0xa080, 0xa080) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 
 
@@ -306,34 +306,34 @@ static ADDRESS_MAP_START( exctsccr_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE_MEMBER(champbas_state, m_bg_videoram)
-	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_BASE_MEMBER(champbas_state, m_spriteram_2) /* ??? */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(champbas_bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM AM_BASE( m_spriteram_2) /* ??? */
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa040, 0xa040) AM_READ_PORT("P2")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_enable_w)
 //  AM_RANGE(0xa001, 0xa001) AM_WRITENOP    /* ??? */
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(champbas_gfxbank_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(champbas_flipscreen_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(champbas_gfxbank_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(champbas_flipscreen_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITE_LEGACY(champbas_mcu_halt_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP /* This is also MCU control, but i dont need it */
 
-	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_BASE_MEMBER(champbas_state, m_spriteram) /* Sprite pos */
-	AM_RANGE(0xa080, 0xa080) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_BASE( m_spriteram) /* Sprite pos */
+	AM_RANGE(0xa080, 0xa080) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 
 
 
 static ADDRESS_MAP_START( champbas_sub_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READ(soundlatch_r)
+	AM_RANGE(0x6000, 0x7fff) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x8000, 0x9fff) AM_WRITENOP	// 4-bit return code to main CPU (not used)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("dac", champbas_dac_w)
+	AM_RANGE(0xa000, 0xbfff) AM_WRITE_LEGACY(soundlatch_clear_w)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE_LEGACY("dac", champbas_dac_w)
 	AM_RANGE(0xe000, 0xe3ff) AM_MIRROR(0x1c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -341,19 +341,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccr_sub_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc008, 0xc008) AM_DEVWRITE("dac1", champbas_dac_w)
-	AM_RANGE(0xc009, 0xc009) AM_DEVWRITE("dac2", champbas_dac_w)
-	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0xc00d, 0xc00d) AM_READ(soundlatch_r)
+	AM_RANGE(0xc008, 0xc008) AM_DEVWRITE_LEGACY("dac1", champbas_dac_w)
+	AM_RANGE(0xc009, 0xc009) AM_DEVWRITE_LEGACY("dac2", champbas_dac_w)
+	AM_RANGE(0xc00c, 0xc00c) AM_WRITE_LEGACY(soundlatch_clear_w)
+	AM_RANGE(0xc00d, 0xc00d) AM_READ_LEGACY(soundlatch_r)
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP /* ??? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccr_sound_io_map, AS_IO, 8, champbas_state )
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay3", ay8910_data_address_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay4", ay8910_data_address_w)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x86, 0x87) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay4", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 

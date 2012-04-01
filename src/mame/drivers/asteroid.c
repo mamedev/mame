@@ -237,19 +237,19 @@ static WRITE8_HANDLER( llander_led_w )
 static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8, asteroid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(asteroid_state, m_ram1)
-	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE_MEMBER(asteroid_state, m_ram2)
-	AM_RANGE(0x2000, 0x2007) AM_READ(asteroid_IN0_r)	/* IN0 */
-	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
-	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(avgdvg_go_w)
-	AM_RANGE(0x3200, 0x3200) AM_WRITE(asteroid_bank_switch_w)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x3600, 0x3600) AM_DEVWRITE("discrete", asteroid_explode_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("discrete", asteroid_thump_w)
-	AM_RANGE(0x3c00, 0x3c05) AM_DEVWRITE("discrete", asteroid_sounds_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE("discrete", asteroid_noise_reset_w)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x4000)
+	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE( m_ram1)
+	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE( m_ram2)
+	AM_RANGE(0x2000, 0x2007) AM_READ_LEGACY(asteroid_IN0_r)	/* IN0 */
+	AM_RANGE(0x2400, 0x2407) AM_READ_LEGACY(asteroid_IN1_r)	/* IN1 */
+	AM_RANGE(0x2800, 0x2803) AM_READ_LEGACY(asteroid_DSW1_r)	/* DSW1 */
+	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(avgdvg_go_w)
+	AM_RANGE(0x3200, 0x3200) AM_WRITE_LEGACY(asteroid_bank_switch_w)
+	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x3600, 0x3600) AM_DEVWRITE_LEGACY("discrete", asteroid_explode_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE_LEGACY("discrete", asteroid_thump_w)
+	AM_RANGE(0x3c00, 0x3c05) AM_DEVWRITE_LEGACY("discrete", asteroid_sounds_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE_LEGACY("discrete", asteroid_noise_reset_w)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x5000, 0x57ff) AM_ROM						/* vector rom */
 	AM_RANGE(0x6800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -258,24 +258,24 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE_MEMBER(asteroid_state, m_ram1)
-	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE_MEMBER(asteroid_state, m_ram2)
-	AM_RANGE(0x2000, 0x2007) AM_READ(asteroid_IN0_r)	/* IN0 */
-	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
-	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
-	AM_RANGE(0x2c00, 0x2c0f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0x2c40, 0x2c7f) AM_DEVREAD_MODERN("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(avgdvg_go_w)
-	AM_RANGE(0x3200, 0x323f) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, write)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x3600, 0x3600) AM_DEVWRITE("discrete", asteroid_explode_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x3c00, 0x3c01) AM_WRITE(astdelux_led_w)
-	AM_RANGE(0x3c03, 0x3c03) AM_DEVWRITE("discrete", astdelux_sounds_w)
-	AM_RANGE(0x3c04, 0x3c04) AM_WRITE(astdelux_bank_switch_w)
-	AM_RANGE(0x3c05, 0x3c07) AM_WRITE(astdelux_coin_counter_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE("discrete", asteroid_noise_reset_w)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x4000)
+	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE( m_ram1)
+	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE( m_ram2)
+	AM_RANGE(0x2000, 0x2007) AM_READ_LEGACY(asteroid_IN0_r)	/* IN0 */
+	AM_RANGE(0x2400, 0x2407) AM_READ_LEGACY(asteroid_IN1_r)	/* IN1 */
+	AM_RANGE(0x2800, 0x2803) AM_READ_LEGACY(asteroid_DSW1_r)	/* DSW1 */
+	AM_RANGE(0x2c00, 0x2c0f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x2c40, 0x2c7f) AM_DEVREAD("earom", atari_vg_earom_device, read)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(avgdvg_go_w)
+	AM_RANGE(0x3200, 0x323f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
+	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x3600, 0x3600) AM_DEVWRITE_LEGACY("discrete", asteroid_explode_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x3c00, 0x3c01) AM_WRITE_LEGACY(astdelux_led_w)
+	AM_RANGE(0x3c03, 0x3c03) AM_DEVWRITE_LEGACY("discrete", astdelux_sounds_w)
+	AM_RANGE(0x3c04, 0x3c04) AM_WRITE_LEGACY(astdelux_bank_switch_w)
+	AM_RANGE(0x3c05, 0x3c07) AM_WRITE_LEGACY(astdelux_coin_counter_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE_LEGACY("discrete", asteroid_noise_reset_w)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x4800, 0x57ff) AM_ROM						/* vector rom */
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -285,15 +285,15 @@ static ADDRESS_MAP_START( llander_map, AS_PROGRAM, 8, asteroid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x1f00)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
-	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
-	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
+	AM_RANGE(0x2400, 0x2407) AM_READ_LEGACY(asteroid_IN1_r)	/* IN1 */
+	AM_RANGE(0x2800, 0x2803) AM_READ_LEGACY(asteroid_DSW1_r)	/* DSW1 */
 	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("THRUST")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(avgdvg_go_w)
-	AM_RANGE(0x3200, 0x3200) AM_WRITE(llander_led_w)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_DEVWRITE("discrete", llander_sounds_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE("discrete", llander_snd_reset_w)
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x4000)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(avgdvg_go_w)
+	AM_RANGE(0x3200, 0x3200) AM_WRITE_LEGACY(llander_led_w)
+	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_DEVWRITE_LEGACY("discrete", llander_sounds_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE_LEGACY("discrete", llander_snd_reset_w)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x4800, 0x5fff) AM_ROM						/* vector rom */
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END

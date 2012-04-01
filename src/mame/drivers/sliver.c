@@ -317,26 +317,26 @@ static WRITE16_HANDLER(sound_w)
 static ADDRESS_MAP_START( sliver_map, AS_PROGRAM, 16, sliver_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, pal_w, 0x00ff)
-	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE8_MODERN("ramdac", ramdac_device, mask_w, 0x00ff)
+	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0x00ff)
+	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0x00ff)
 
 	AM_RANGE(0x300002, 0x300003) AM_NOP // bit 0 tested, writes 0xe0 and 0xc0 - both r and w at the end of interrupt code
 
-	AM_RANGE(0x300004, 0x300005) AM_WRITE(io_offset_w) //unknown i/o device
-	AM_RANGE(0x300006, 0x300007) AM_WRITE(io_data_w)
+	AM_RANGE(0x300004, 0x300005) AM_WRITE_LEGACY(io_offset_w) //unknown i/o device
+	AM_RANGE(0x300006, 0x300007) AM_WRITE_LEGACY(io_data_w)
 
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("DSW")
-	AM_RANGE(0x400006, 0x400007) AM_WRITE(fifo_data_w)
-	AM_RANGE(0x400008, 0x400009) AM_WRITE(fifo_clear_w)
-	AM_RANGE(0x40000a, 0x40000b) AM_WRITE(fifo_flush_w)
-	AM_RANGE(0x40000c, 0x40000d) AM_WRITE(jpeg1_w)
-	AM_RANGE(0x40000e, 0x40000f) AM_WRITE(jpeg2_w)
+	AM_RANGE(0x400006, 0x400007) AM_WRITE_LEGACY(fifo_data_w)
+	AM_RANGE(0x400008, 0x400009) AM_WRITE_LEGACY(fifo_clear_w)
+	AM_RANGE(0x40000a, 0x40000b) AM_WRITE_LEGACY(fifo_flush_w)
+	AM_RANGE(0x40000c, 0x40000d) AM_WRITE_LEGACY(jpeg1_w)
+	AM_RANGE(0x40000e, 0x40000f) AM_WRITE_LEGACY(jpeg2_w)
 
 	AM_RANGE(0x400010, 0x400015) AM_WRITENOP //unknown
-	AM_RANGE(0x400016, 0x400017) AM_WRITE(sound_w)
+	AM_RANGE(0x400016, 0x400017) AM_WRITE_LEGACY(sound_w)
 	AM_RANGE(0x400018, 0x400019) AM_WRITENOP //unknown
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
@@ -356,10 +356,10 @@ static ADDRESS_MAP_START( soundmem_prg, AS_PROGRAM, 8, sliver_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundmem_io, AS_IO, 8, sliver_state )
-	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x0101, 0x0101) AM_READ(soundlatch_r)
+	AM_RANGE(0x0100, 0x0100) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x0101, 0x0101) AM_READ_LEGACY(soundlatch_r)
 	/* ports */
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE( oki_setbank )
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE_LEGACY( oki_setbank )
 ADDRESS_MAP_END
 
 static VIDEO_START(sliver)
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( sliver )
 INPUT_PORTS_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sliver_state )
-	AM_RANGE(0x000, 0x3ff) AM_RAM AM_BASE_MEMBER(sliver_state,m_colorram)
+	AM_RANGE(0x000, 0x3ff) AM_RAM AM_BASE(m_colorram)
 ADDRESS_MAP_END
 
 static RAMDAC_INTERFACE( ramdac_intf )

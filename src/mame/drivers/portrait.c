@@ -120,18 +120,18 @@ static WRITE8_HANDLER( portrait_negative_scroll_w )
 
 static ADDRESS_MAP_START( portrait_map, AS_PROGRAM, 8, portrait_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(portrait_bgvideo_write) AM_BASE_MEMBER(portrait_state, m_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(portrait_fgvideo_write) AM_BASE_MEMBER(portrait_state, m_fgvideoram)
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_SIZE_MEMBER(portrait_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(portrait_bgvideo_write) AM_BASE( m_bgvideoram)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(portrait_fgvideo_write) AM_BASE( m_fgvideoram)
+	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9200, 0x97ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITENOP // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa004, 0xa004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa008, 0xa008) AM_READ_PORT("SYSTEM") AM_WRITE(portrait_ctrl_w)
+	AM_RANGE(0xa008, 0xa008) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(portrait_ctrl_w)
 	AM_RANGE(0xa010, 0xa010) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa018, 0xa018) AM_READNOP AM_WRITE(portrait_positive_scroll_w)
-	AM_RANGE(0xa019, 0xa019) AM_WRITE(portrait_negative_scroll_w)
+	AM_RANGE(0xa018, 0xa018) AM_READNOP AM_WRITE_LEGACY(portrait_positive_scroll_w)
+	AM_RANGE(0xa019, 0xa019) AM_WRITE_LEGACY(portrait_negative_scroll_w)
 	AM_RANGE(0xa800, 0xa83f) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xffff, 0xffff) AM_READNOP
 ADDRESS_MAP_END

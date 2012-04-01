@@ -228,26 +228,26 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 
 static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM		// ROM
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(sandscrp_irq_cause_w)	// IRQ Ack
+	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(sandscrp_irq_cause_w)	// IRQ Ack
 
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM		// RAM
-	AM_RANGE(0x200000, 0x20001f) AM_READWRITE(galpanib_calc_r,galpanib_calc_w)	// Protection
-	AM_RANGE(0x300000, 0x30000f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE_MEMBER(sandscrp_state, m_layers_0_regs)	// Layers 0 Regs
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE_MEMBER(sandscrp_state, m_vram[1])	// Layers 0
-	AM_RANGE(0x401000, 0x401fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE_MEMBER(sandscrp_state, m_vram[0])	//
-	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_BASE_MEMBER(sandscrp_state, m_vscroll[1])									//
-	AM_RANGE(0x403000, 0x403fff) AM_RAM AM_BASE_MEMBER(sandscrp_state, m_vscroll[0])									//
-	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(sandscrp_coin_counter_w)	// Coin Counters (Lockout unused)
+	AM_RANGE(0x200000, 0x20001f) AM_READWRITE_LEGACY(galpanib_calc_r,galpanib_calc_w)	// Protection
+	AM_RANGE(0x300000, 0x30000f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE( m_layers_0_regs)	// Layers 0 Regs
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE( m_vram[1])	// Layers 0
+	AM_RANGE(0x401000, 0x401fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE( m_vram[0])	//
+	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_BASE( m_vscroll[1])									//
+	AM_RANGE(0x403000, 0x403fff) AM_RAM AM_BASE( m_vscroll[0])									//
+	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE_LEGACY(sandscrp_coin_counter_w)	// Coin Counters (Lockout unused)
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
-	AM_RANGE(0xec0000, 0xec0001) AM_READ(watchdog_reset16_r)	//
-	AM_RANGE(0x800000, 0x800001) AM_READ(sandscrp_irq_cause_r)	// IRQ Cause
-	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(sandscrp_soundlatch_word_r, sandscrp_soundlatch_word_w)	// From/To Sound CPU
-	AM_RANGE(0xe40000, 0xe40001) AM_READWRITE(sandscrp_latchstatus_word_r, sandscrp_latchstatus_word_w)	//
+	AM_RANGE(0xec0000, 0xec0001) AM_READ_LEGACY(watchdog_reset16_r)	//
+	AM_RANGE(0x800000, 0x800001) AM_READ_LEGACY(sandscrp_irq_cause_r)	// IRQ Cause
+	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE_LEGACY(sandscrp_soundlatch_word_r, sandscrp_soundlatch_word_w)	// From/To Sound CPU
+	AM_RANGE(0xe40000, 0xe40001) AM_READWRITE_LEGACY(sandscrp_latchstatus_word_r, sandscrp_latchstatus_word_w)	//
 ADDRESS_MAP_END
 
 
@@ -298,12 +298,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sandscrp_soundport, AS_IO, 8, sandscrp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sandscrp_bankswitch_w)	// ROM Bank
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)		// PORTA/B read
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE_MODERN("oki", okim6295_device, write)		// OKIM6295
-	AM_RANGE(0x06, 0x06) AM_WRITE(sandscrp_soundlatch_w)	//
-	AM_RANGE(0x07, 0x07) AM_READ(sandscrp_soundlatch_r)		//
-	AM_RANGE(0x08, 0x08) AM_READ(sandscrp_latchstatus_r)	//
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(sandscrp_bankswitch_w)	// ROM Bank
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)		// PORTA/B read
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("oki", okim6295_device, write)		// OKIM6295
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(sandscrp_soundlatch_w)	//
+	AM_RANGE(0x07, 0x07) AM_READ_LEGACY(sandscrp_soundlatch_r)		//
+	AM_RANGE(0x08, 0x08) AM_READ_LEGACY(sandscrp_latchstatus_r)	//
 ADDRESS_MAP_END
 
 

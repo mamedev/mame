@@ -117,7 +117,7 @@ static READ64_HANDLER( test_r )
 static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM // work ram
-	AM_RANGE(0x13800000, 0x13800007) AM_READ(test_r)
+	AM_RANGE(0x13800000, 0x13800007) AM_READ_LEGACY(test_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aristmk6_port, AS_IO, 64, aristmk6_state )

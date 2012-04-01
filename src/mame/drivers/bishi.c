@@ -148,21 +148,21 @@ static READ16_HANDLER( bishi_K056832_rom_r )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bishi_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM						// Work RAM
-	AM_RANGE(0x800000, 0x800001) AM_READWRITE(control_r, control_w)
+	AM_RANGE(0x800000, 0x800001) AM_READWRITE_LEGACY(control_r, control_w)
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW")
 	AM_RANGE(0x800006, 0x800007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800008, 0x800009) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x810000, 0x810003) AM_WRITE(control2_w)		// bank switch for K056832 character ROM test
+	AM_RANGE(0x810000, 0x810003) AM_WRITE_LEGACY(control2_w)		// bank switch for K056832 character ROM test
 	AM_RANGE(0x820000, 0x820001) AM_WRITENOP			// lamps (see lamp test in service menu)
-	AM_RANGE(0x830000, 0x83003f) AM_DEVWRITE("k056832", k056832_word_w)
-	AM_RANGE(0x840000, 0x840007) AM_DEVWRITE("k056832", k056832_b_word_w)	// VSCCS
-	AM_RANGE(0x850000, 0x85001f) AM_DEVWRITE("k054338", k054338_word_w)	// CLTC
-	AM_RANGE(0x870000, 0x8700ff) AM_DEVWRITE("k055555", k055555_word_w)	// PCU2
-	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xff00)
-	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)	// Graphic planes
-	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb04000, 0xb047ff) AM_READ(bishi_mirror_r)	// bug in the ram/rom test?
-	AM_RANGE(0xc00000, 0xc01fff) AM_READ(bishi_K056832_rom_r)
+	AM_RANGE(0x830000, 0x83003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)
+	AM_RANGE(0x840000, 0x840007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)	// VSCCS
+	AM_RANGE(0x850000, 0x85001f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)	// CLTC
+	AM_RANGE(0x870000, 0x8700ff) AM_DEVWRITE_LEGACY("k055555", k055555_word_w)	// PCU2
+	AM_RANGE(0x880000, 0x880003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xff00)
+	AM_RANGE(0xa00000, 0xa01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	// Graphic planes
+	AM_RANGE(0xb00000, 0xb03fff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xb04000, 0xb047ff) AM_READ_LEGACY(bishi_mirror_r)	// bug in the ram/rom test?
+	AM_RANGE(0xc00000, 0xc01fff) AM_READ_LEGACY(bishi_K056832_rom_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bishi )

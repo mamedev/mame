@@ -211,35 +211,35 @@ static WRITE8_DEVICE_HANDLER( idsoccer_adpcm_w )
 static ADDRESS_MAP_START( docastle_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM
-	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, m_videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, m_colorram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
+	AM_RANGE(0x9800, 0x99ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xa000, 0xa008) AM_READWRITE_LEGACY(docastle_shared0_r, docastle_shared1_w)
+	AM_RANGE(0xa800, 0xa800) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE_LEGACY(docastle_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE_LEGACY(docastle_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( docastle_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
+	AM_RANGE(0xa000, 0xa008) AM_READWRITE_LEGACY(docastle_shared1_r, docastle_shared0_w)
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_READWRITE(docastle_flipscreen_off_r, docastle_flipscreen_off_w)
+	AM_RANGE(0xc004, 0xc004) AM_READWRITE_LEGACY(docastle_flipscreen_off_r, docastle_flipscreen_off_w)
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc084, 0xc084) AM_READWRITE(docastle_flipscreen_on_r, docastle_flipscreen_on_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("sn3", sn76496_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("sn4", sn76496_w)
+	AM_RANGE(0xc084, 0xc084) AM_READWRITE_LEGACY(docastle_flipscreen_on_r, docastle_flipscreen_on_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE_LEGACY("sn4", sn76496_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( docastle_map3, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x0000, 0x00ff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8008) AM_READ(docastle_shared1_r)	// ???
+	AM_RANGE(0x8000, 0x8008) AM_READ_LEGACY(docastle_shared1_r)	// ???
 	AM_RANGE(0xc003, 0xc003) AM_NOP // EP according to schematics
 	AM_RANGE(0xc432, 0xc435) AM_NOP	// ???
 ADDRESS_MAP_END
@@ -254,61 +254,61 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dorunrun_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x4000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, m_videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, m_colorram)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(docastle_nmitrigger_w)
+	AM_RANGE(0xa000, 0xa008) AM_READWRITE_LEGACY(docastle_shared0_r, docastle_shared1_w)
+	AM_RANGE(0xa800, 0xa800) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE_LEGACY(docastle_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_RAM_WRITE_LEGACY(docastle_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xb800, 0xb800) AM_WRITE_LEGACY(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dorunrun_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE("sn3", sn76496_w)
-	AM_RANGE(0xac00, 0xac00) AM_DEVWRITE("sn4", sn76496_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0xa800, 0xa800) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
+	AM_RANGE(0xac00, 0xac00) AM_DEVWRITE_LEGACY("sn4", sn76496_w)
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_READWRITE(docastle_flipscreen_off_r, docastle_flipscreen_off_w)
+	AM_RANGE(0xc004, 0xc004) AM_READWRITE_LEGACY(docastle_flipscreen_off_r, docastle_flipscreen_off_w)
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc084, 0xc084) AM_READWRITE(docastle_flipscreen_on_r, docastle_flipscreen_on_w)
-	AM_RANGE(0xe000, 0xe008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
+	AM_RANGE(0xc084, 0xc084) AM_READWRITE_LEGACY(docastle_flipscreen_on_r, docastle_flipscreen_on_w)
+	AM_RANGE(0xe000, 0xe008) AM_READWRITE_LEGACY(docastle_shared1_r, docastle_shared0_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( idsoccer_map, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_BASE_SIZE_MEMBER(docastle_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x5800, 0x59ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x6000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared0_r, docastle_shared1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_videoram_w) AM_BASE_MEMBER(docastle_state, m_videoram)
-	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE(docastle_colorram_w) AM_BASE_MEMBER(docastle_state, m_colorram)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("msm", idsoccer_adpcm_status_r, idsoccer_adpcm_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(docastle_nmitrigger_w)
+	AM_RANGE(0xa000, 0xa008) AM_READWRITE_LEGACY(docastle_shared0_r, docastle_shared1_w)
+	AM_RANGE(0xa800, 0xa800) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0800) AM_RAM_WRITE_LEGACY(docastle_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xb400, 0xb7ff) AM_MIRROR(0x0800) AM_RAM_WRITE_LEGACY(docastle_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("msm", idsoccer_adpcm_status_r, idsoccer_adpcm_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(docastle_nmitrigger_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( idsoccer_map2, AS_PROGRAM, 8, docastle_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa008) AM_READWRITE(docastle_shared1_r, docastle_shared0_w)
+	AM_RANGE(0xa000, 0xa008) AM_READWRITE_LEGACY(docastle_shared1_r, docastle_shared0_w)
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
-	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(docastle_flipscreen_off_w)
+	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("JOYS_RIGHT") AM_WRITE_LEGACY(docastle_flipscreen_off_w)
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc084, 0xc084) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(docastle_flipscreen_on_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("sn3", sn76496_w)
-	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("sn4", sn76496_w)
+	AM_RANGE(0xc084, 0xc084) AM_READ_PORT("JOYS_RIGHT") AM_WRITE_LEGACY(docastle_flipscreen_on_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE_LEGACY("sn4", sn76496_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

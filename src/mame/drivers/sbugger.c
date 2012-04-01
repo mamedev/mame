@@ -110,8 +110,8 @@ Sound PCB
 
 static ADDRESS_MAP_START( sbugger_map, AS_PROGRAM, 8, sbugger_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(sbugger_videoram_attr_w) AM_BASE_MEMBER(sbugger_state,m_videoram_attr)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(sbugger_videoram_w) AM_BASE_MEMBER(sbugger_state,m_videoram)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(sbugger_videoram_attr_w) AM_BASE(m_videoram_attr)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(sbugger_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM /* sp is set to e0ff */
 	AM_RANGE(0xf400, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -124,8 +124,8 @@ static ADDRESS_MAP_START( sbugger_io_map, AS_IO, 8, sbugger_state )
 	AM_RANGE(0xe4, 0xe4) AM_WRITENOP				// 8156 timer reg1 (write 7f = CNT length)
 	AM_RANGE(0xe5, 0xe5) AM_WRITENOP				// 8156 timer reg2 (write c0 = timer mode - automatic reload, i.e. single pulse every time TC is reached)
 
-	AM_RANGE(0xe8, 0xe8) AM_DEVWRITE("sn76489.1", sn76496_w)
-	AM_RANGE(0xe9, 0xe9) AM_DEVWRITE("sn76489.2", sn76496_w)
+	AM_RANGE(0xe8, 0xe8) AM_DEVWRITE_LEGACY("sn76489.1", sn76496_w)
+	AM_RANGE(0xe9, 0xe9) AM_DEVWRITE_LEGACY("sn76489.2", sn76496_w)
 ADDRESS_MAP_END
 
 /* gfx decode */

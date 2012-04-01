@@ -545,20 +545,20 @@ static ADDRESS_MAP_START( srmp6_map, AS_PROGRAM, 16, srmp6_state )
 	AM_RANGE(0x600000, 0x7fffff) AM_ROMBANK("bank1")		// banked ROM (used by ROM check)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0)
 
-	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)		// inputs
-	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x4d0000, 0x4d0001) AM_READ(srmp6_irq_ack_r)
+	AM_RANGE(0x300000, 0x300005) AM_READWRITE_LEGACY(srmp6_inputs_r, srmp6_input_select_w)		// inputs
+	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE_LEGACY(paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x4d0000, 0x4d0001) AM_READ_LEGACY(srmp6_irq_ack_r)
 
 	// OBJ RAM: checked [$400000-$47dfff]
-	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_BASE_MEMBER(srmp6_state,m_sprram)
+	AM_RANGE(0x400000, 0x47ffff) AM_RAM AM_BASE(m_sprram)
 
 	// CHR RAM: checked [$500000-$5fffff]
-	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(tileram_r,tileram_w) AM_BASE_MEMBER(srmp6_state,m_chrram)
-	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE(dma_w) AM_BASE_MEMBER(srmp6_state,m_dmaram)
+	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE_LEGACY(tileram_r,tileram_w) AM_BASE(m_chrram)
+	//AM_RANGE(0x5fff00, 0x5fffff) AM_WRITE_LEGACY(dma_w) AM_BASE(m_dmaram)
 
-	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE(video_regs_r, video_regs_w) AM_BASE_MEMBER(srmp6_state,m_video_regs)	// ? gfx regs ST-0026 NiLe
-	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE("nile", nile_snd_r, nile_snd_w)
-	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE("nile", nile_sndctrl_r, nile_sndctrl_w)
+	AM_RANGE(0x4c0000, 0x4c006f) AM_READWRITE_LEGACY(video_regs_r, video_regs_w) AM_BASE(m_video_regs)	// ? gfx regs ST-0026 NiLe
+	AM_RANGE(0x4e0000, 0x4e00ff) AM_DEVREADWRITE_LEGACY("nile", nile_snd_r, nile_snd_w)
+	AM_RANGE(0x4e0100, 0x4e0101) AM_DEVREADWRITE_LEGACY("nile", nile_sndctrl_r, nile_sndctrl_w)
 	//AM_RANGE(0x4e0110, 0x4e0111) AM_NOP // ? accessed once ($268dc, written $b.w)
 	//AM_RANGE(0x5fff00, 0x5fff1f) AM_RAM // ? see routine $5ca8, video_regs related ???
 

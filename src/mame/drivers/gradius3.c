@@ -167,43 +167,43 @@ static WRITE8_DEVICE_HANDLER( sound_bank_w )
 static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, irq enable, priority, coin counters, other? */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(cpuA_ctrl_w)	/* halt cpu B, irq enable, priority, coin counters, other? */
 	AM_RANGE(0x0c8000, 0x0c8001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c8002, 0x0c8003) AM_READ_PORT("P1")
 	AM_RANGE(0x0c8004, 0x0c8005) AM_READ_PORT("P2")
 	AM_RANGE(0x0c8006, 0x0c8007) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0d0000, 0x0d0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0d0002, 0x0d0003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0d8000, 0x0d8001) AM_WRITE(cpuB_irqtrigger_w)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE(sound_command_w)
-	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x0d8000, 0x0d8001) AM_WRITE_LEGACY(cpuB_irqtrigger_w)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE_LEGACY(sound_irq_w)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x14c000, 0x153fff) AM_READWRITE(k052109_halfword_r, k052109_halfword_w)
-	AM_RANGE(0x180000, 0x19ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_BASE_MEMBER(gradius3_state, m_gfxram) AM_SHARE("share2")
+	AM_RANGE(0x14c000, 0x153fff) AM_READWRITE_LEGACY(k052109_halfword_r, k052109_halfword_w)
+	AM_RANGE(0x180000, 0x19ffff) AM_RAM_WRITE_LEGACY(gradius3_gfxram_w) AM_BASE( m_gfxram) AM_SHARE("share2")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gradius3_map2, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x140000, 0x140001) AM_WRITE(cpuB_irqenable_w)
+	AM_RANGE(0x140000, 0x140001) AM_WRITE_LEGACY(cpuB_irqenable_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x24c000, 0x253fff) AM_READWRITE(k052109_halfword_r, k052109_halfword_w)
-	AM_RANGE(0x280000, 0x29ffff) AM_RAM_WRITE(gradius3_gfxram_w) AM_SHARE("share2")
-	AM_RANGE(0x2c0000, 0x2c000f) AM_READWRITE(k051937_halfword_r, k051937_halfword_w)
-	AM_RANGE(0x2c0800, 0x2c0fff) AM_READWRITE(k051960_halfword_r, k051960_halfword_w)
-	AM_RANGE(0x400000, 0x5fffff) AM_READ(gradius3_gfxrom_r)		/* gfx ROMs are mapped here, and copied to RAM */
+	AM_RANGE(0x24c000, 0x253fff) AM_READWRITE_LEGACY(k052109_halfword_r, k052109_halfword_w)
+	AM_RANGE(0x280000, 0x29ffff) AM_RAM_WRITE_LEGACY(gradius3_gfxram_w) AM_SHARE("share2")
+	AM_RANGE(0x2c0000, 0x2c000f) AM_READWRITE_LEGACY(k051937_halfword_r, k051937_halfword_w)
+	AM_RANGE(0x2c0800, 0x2c0fff) AM_READWRITE_LEGACY(k051960_halfword_r, k051960_halfword_w)
+	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(gradius3_gfxrom_r)		/* gfx ROMs are mapped here, and copied to RAM */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gradius3_s_map, AS_PROGRAM, 8, gradius3_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("k007232", sound_bank_w)				/* 007232 bankswitch */
-	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_r)
-	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE("k007232", k007232_r, k007232_w)
-	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", sound_bank_w)				/* 007232 bankswitch */
+	AM_RANGE(0xf010, 0xf010) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
+	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

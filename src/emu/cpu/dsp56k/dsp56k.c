@@ -369,13 +369,13 @@ extern CPU_DISASSEMBLE( dsp56k );
  *  Internal Memory Maps
  ****************************************************************************/
 static ADDRESS_MAP_START( dsp56156_program_map, AS_PROGRAM, 16, legacy_cpu_device )
-	AM_RANGE(0x0000,0x07ff) AM_READWRITE(DSP56K::program_r, DSP56K::program_w)	/* 1-5 */
+	AM_RANGE(0x0000,0x07ff) AM_READWRITE_LEGACY(DSP56K::program_r, DSP56K::program_w)	/* 1-5 */
 //  AM_RANGE(0x2f00,0x2fff) AM_ROM                              /* 1-5 PROM reserved memory.  Is this the right spot for it? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp56156_x_data_map, AS_DATA, 16, legacy_cpu_device )
 	AM_RANGE(0x0000,0x07ff) AM_RAM								/* 1-5 */
-	AM_RANGE(0xffc0,0xffff) AM_READWRITE(DSP56K::peripheral_register_r, DSP56K::peripheral_register_w)	/* 1-5 On-chip peripheral registers memory mapped in data space */
+	AM_RANGE(0xffc0,0xffff) AM_READWRITE_LEGACY(DSP56K::peripheral_register_r, DSP56K::peripheral_register_w)	/* 1-5 On-chip peripheral registers memory mapped in data space */
 ADDRESS_MAP_END
 
 

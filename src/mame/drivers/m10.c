@@ -558,44 +558,44 @@ static INTERRUPT_GEN( m15_interrupt )
  *************************************/
 
 static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8, m10_state )
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, m_memory) /* scratch ram */
-	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_BASE_MEMBER(m10_state, m_rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, m_colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(m10_chargen_w) AM_BASE_MEMBER(m10_state, m_chargen) /* background ????? */
+	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE( m_memory) /* scratch ram */
+	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_BASE( m_rom)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE_LEGACY(m10_colorram_w) AM_BASE( m_colorram) /* foreground colour  */
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE_LEGACY(m10_chargen_w) AM_BASE( m_chargen) /* background ????? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
 	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m10_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
-	AM_RANGE(0xa500, 0xa500) AM_WRITE(m10_a500_w)	/* ??? */
-	AM_RANGE(0xa700, 0xa700) AM_READ(m10_a700_r)
+	AM_RANGE(0xa400, 0xa400) AM_WRITE_LEGACY(m10_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
+	AM_RANGE(0xa500, 0xa500) AM_WRITE_LEGACY(m10_a500_w)	/* ??? */
+	AM_RANGE(0xa700, 0xa700) AM_READ_LEGACY(m10_a700_r)
 	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8, m10_state )
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, m_memory) /* scratch ram */
-	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_BASE_MEMBER(m10_state, m_rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, m_colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(m10_state, m_chargen) /* background ????? */
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(m11_a100_w) /* sound writes ???? */
+	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE( m_memory) /* scratch ram */
+	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_BASE( m_rom)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE_LEGACY(m10_colorram_w) AM_BASE( m_colorram) /* foreground colour  */
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE( m_chargen) /* background ????? */
+	AM_RANGE(0xa100, 0xa100) AM_WRITE_LEGACY(m11_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
 	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m11_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
-	AM_RANGE(0xa700, 0xa700) AM_READ(m11_a700_r)
+	AM_RANGE(0xa400, 0xa400) AM_WRITE_LEGACY(m11_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
+	AM_RANGE(0xa700, 0xa700) AM_READ_LEGACY(m11_a700_r)
 	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m15_main, AS_PROGRAM, 8, m10_state )
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, m_memory) /* scratch ram */
-	AM_RANGE(0x1000, 0x33ff) AM_ROM AM_BASE_MEMBER(m10_state, m_rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, m_colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x57ff) AM_RAM_WRITE(m15_chargen_w) AM_BASE_MEMBER(m10_state, m_chargen) /* background ????? */
+	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE( m_memory) /* scratch ram */
+	AM_RANGE(0x1000, 0x33ff) AM_ROM AM_BASE( m_rom)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE_LEGACY(m10_colorram_w) AM_BASE( m_colorram) /* foreground colour  */
+	AM_RANGE(0x5000, 0x57ff) AM_RAM_WRITE_LEGACY(m15_chargen_w) AM_BASE( m_chargen) /* background ????? */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2")
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(m15_a100_w) /* sound writes ???? */
+	AM_RANGE(0xa100, 0xa100) AM_WRITE_LEGACY(m15_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
 	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("P1")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(m15_ctrl_w)	/* sound, flip screen */
+	AM_RANGE(0xa400, 0xa400) AM_WRITE_LEGACY(m15_ctrl_w)	/* sound, flip screen */
 	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 

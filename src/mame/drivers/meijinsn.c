@@ -171,13 +171,13 @@ static READ16_HANDLER( alpha_mcu_r )
 
 static ADDRESS_MAP_START( meijinsn_map, AS_PROGRAM, 16, meijinsn_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080e00, 0x080fff) AM_READ(alpha_mcu_r) AM_WRITENOP
-	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_BASE_MEMBER(meijinsn_state, m_videoram)
+	AM_RANGE(0x080e00, 0x080fff) AM_READ_LEGACY(alpha_mcu_r) AM_WRITENOP
+	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0x180000, 0x180dff) AM_RAM
-	AM_RANGE(0x180e00, 0x180fff) AM_RAM AM_BASE_MEMBER(meijinsn_state, m_shared_ram)
+	AM_RANGE(0x180e00, 0x180fff) AM_RAM AM_BASE( m_shared_ram)
 	AM_RANGE(0x181000, 0x181fff) AM_RAM
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P2")
-	AM_RANGE(0x1a0000, 0x1a0001) AM_READ_PORT("P1") AM_WRITE(sound_w)
+	AM_RANGE(0x1a0000, 0x1a0001) AM_READ_PORT("P1") AM_WRITE_LEGACY(sound_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meijinsn_sound_map, AS_PROGRAM, 8, meijinsn_state )
@@ -187,9 +187,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meijinsn_sound_io_map, AS_IO, 8, meijinsn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_clear_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(soundlatch_clear_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP
 ADDRESS_MAP_END
 

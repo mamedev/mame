@@ -1080,7 +1080,7 @@ static CPU_SET_INFO( m37710 )
 
 // On-board RAM and peripherals
 static ADDRESS_MAP_START( m37710_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
-	AM_RANGE(0x000000, 0x00007f) AM_READWRITE(m37710_internal_word_r, m37710_internal_word_w)
+	AM_RANGE(0x000000, 0x00007f) AM_READWRITE_LEGACY(m37710_internal_word_r, m37710_internal_word_w)
 	AM_RANGE(0x000080, 0x00027f) AM_RAM
 ADDRESS_MAP_END
 

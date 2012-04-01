@@ -1158,85 +1158,85 @@ static ADDRESS_MAP_START( gx_base_memmap, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// BIOS ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM	// main program ROM
 	AM_RANGE(0x400000, 0x7fffff) AM_ROM	// data ROM
-	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_BASE(&gx_workram)	// work RAM
-	AM_RANGE(0xd00000, 0xd01fff) AM_READ(K056832_5bpp_rom_long_r)
-	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE(K053247_long_r, K053247_long_w)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_RAM AM_BASE_LEGACY(&gx_workram)	// work RAM
+	AM_RANGE(0xd00000, 0xd01fff) AM_READ_LEGACY(K056832_5bpp_rom_long_r)
+	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE_LEGACY(K053247_long_r, K053247_long_w)
 	AM_RANGE(0xd21000, 0xd23fff) AM_RAM
-	AM_RANGE(0xd40000, 0xd4003f) AM_WRITE(K056832_long_w)
-	AM_RANGE(0xd44000, 0xd4400f) AM_WRITE(konamigx_tilebank_w)
-	AM_RANGE(0xd48000, 0xd48007) AM_WRITE(K053246_long_w)
-	AM_RANGE(0xd4a010, 0xd4a01f) AM_WRITE(K053247_reg_long_w)
-	AM_RANGE(0xd4c000, 0xd4c01f) AM_READWRITE(ccu_r, ccu_w)
+	AM_RANGE(0xd40000, 0xd4003f) AM_WRITE_LEGACY(K056832_long_w)
+	AM_RANGE(0xd44000, 0xd4400f) AM_WRITE_LEGACY(konamigx_tilebank_w)
+	AM_RANGE(0xd48000, 0xd48007) AM_WRITE_LEGACY(K053246_long_w)
+	AM_RANGE(0xd4a010, 0xd4a01f) AM_WRITE_LEGACY(K053247_reg_long_w)
+	AM_RANGE(0xd4c000, 0xd4c01f) AM_READWRITE_LEGACY(ccu_r, ccu_w)
 	AM_RANGE(0xd4e000, 0xd4e01f) AM_WRITENOP
-	AM_RANGE(0xd50000, 0xd500ff) AM_WRITE(K055555_long_w)
-	AM_RANGE(0xd52000, 0xd5200f) AM_WRITE(sound020_w)
-	AM_RANGE(0xd52010, 0xd5201f) AM_READ(sound020_r)
-	AM_RANGE(0xd56000, 0xd56003) AM_WRITE(eeprom_w)
-	AM_RANGE(0xd58000, 0xd58003) AM_WRITE(control_w)
+	AM_RANGE(0xd50000, 0xd500ff) AM_WRITE_LEGACY(K055555_long_w)
+	AM_RANGE(0xd52000, 0xd5200f) AM_WRITE_LEGACY(sound020_w)
+	AM_RANGE(0xd52010, 0xd5201f) AM_READ_LEGACY(sound020_r)
+	AM_RANGE(0xd56000, 0xd56003) AM_WRITE_LEGACY(eeprom_w)
+	AM_RANGE(0xd58000, 0xd58003) AM_WRITE_LEGACY(control_w)
 	AM_RANGE(0xd5a000, 0xd5a003) AM_READ_PORT("SYSTEM_DSW")
 	AM_RANGE(0xd5c000, 0xd5c003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xd5e000, 0xd5e003) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xd80000, 0xd8001f) AM_WRITE(K054338_long_w)
-	AM_RANGE(0xda0000, 0xda1fff) AM_READWRITE(K056832_ram_long_r, K056832_ram_long_w)
-	AM_RANGE(0xda2000, 0xda3fff) AM_READWRITE(K056832_ram_long_r, K056832_ram_long_w)
+	AM_RANGE(0xd80000, 0xd8001f) AM_WRITE_LEGACY(K054338_long_w)
+	AM_RANGE(0xda0000, 0xda1fff) AM_READWRITE_LEGACY(K056832_ram_long_r, K056832_ram_long_w)
+	AM_RANGE(0xda2000, 0xda3fff) AM_READWRITE_LEGACY(K056832_ram_long_r, K056832_ram_long_w)
 #if GX_DEBUG
-	AM_RANGE(0xd40000, 0xd4003f) AM_READ(K056832_long_r)
-	AM_RANGE(0xd50000, 0xd500ff) AM_READ(K055555_long_r)
-	AM_RANGE(0xd4a010, 0xd4a01f) AM_READ(K053247_reg_long_r)
+	AM_RANGE(0xd40000, 0xd4003f) AM_READ_LEGACY(K056832_long_r)
+	AM_RANGE(0xd50000, 0xd500ff) AM_READ_LEGACY(K055555_long_r)
+	AM_RANGE(0xd4a010, 0xd4a01f) AM_READ_LEGACY(K053247_reg_long_r)
 #endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
-	AM_RANGE(0xd4a000, 0xd4a01f) AM_READ(gx6bppspr_r)	// sprite ROM readback
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd4a000, 0xd4a01f) AM_READ_LEGACY(gx6bppspr_r)	// sprite ROM readback
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM			// LAN RAM? (Racin' Force has, Open Golf doesn't)
 	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP	// LAN board
 	AM_RANGE(0xdda000, 0xddafff) AM_WRITE_PORT("ADC-WRPORT")
 	AM_RANGE(0xddc000, 0xddcfff) AM_READ_PORT("ADC-RDPORT")
-	AM_RANGE(0xdde000, 0xdde003) AM_WRITE(type1_cablamps_w)
-	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
+	AM_RANGE(0xdde000, 0xdde003) AM_WRITE_LEGACY(type1_cablamps_w)
+	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_ctrl)
 	AM_RANGE(0xe20000, 0xe2000f) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
-	AM_RANGE(0xe80000, 0xe81fff) AM_RAM AM_BASE((UINT32**)&K053936_0_linectrl)	// chips 21L+19L / S
-	AM_RANGE(0xec0000, 0xedffff) AM_RAM_WRITE(konamigx_t1_psacmap_w) AM_BASE(&gx_psacram)  // chips 20J+23J+18J / S
-	AM_RANGE(0xf00000, 0xf3ffff) AM_READ(type1_roz_r1)	// ROM readback
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READ(type1_roz_r2)	// ROM readback
+	AM_RANGE(0xe80000, 0xe81fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)	// chips 21L+19L / S
+	AM_RANGE(0xec0000, 0xedffff) AM_RAM_WRITE_LEGACY(konamigx_t1_psacmap_w) AM_BASE_LEGACY(&gx_psacram)  // chips 20J+23J+18J / S
+	AM_RANGE(0xf00000, 0xf3ffff) AM_READ_LEGACY(type1_roz_r1)	// ROM readback
+	AM_RANGE(0xf40000, 0xf7ffff) AM_READ_LEGACY(type1_roz_r2)	// ROM readback
 	AM_RANGE(0xf80000, 0xf80fff) AM_RAM	// chip 21Q / S
 	AM_RANGE(0xfc0000, 0xfc00ff) AM_RAM	// chip 22N / S
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32, konamigx_state )
-	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE_LEGACY(esc_w)
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
-	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
-	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
+	//AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE_LEGACY(type4_prot_w)
+	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_ctrl)
 	//AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
-	AM_RANGE(0xe40000, 0xe40003) AM_WRITE(konamigx_type3_psac2_bank_w) AM_BASE(&konamigx_type3_psac2_bank)
-	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE((UINT32**)&K053936_0_linectrl)
+	AM_RANGE(0xe40000, 0xe40003) AM_WRITE_LEGACY(konamigx_type3_psac2_bank_w) AM_BASE_LEGACY(&konamigx_type3_psac2_bank)
+	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)
 	AM_RANGE(0xe80000, 0xe83fff) AM_RAM AM_BASE_GENERIC(paletteram) 	// main monitor palette
-	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_BASE(&gx_subpaletteram32)
-	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)
+	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_BASE_LEGACY(&gx_subpaletteram32)
+	AM_RANGE(0xec0000, 0xec0003) AM_READ_LEGACY(type3_sync_r)
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
-	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE(type4_prot_w)
+	AM_RANGE(0xcc0000, 0xcc0007) AM_WRITE_LEGACY(type4_prot_w)
 	AM_RANGE(0xd90000, 0xd97fff) AM_RAM
-	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE((UINT32**)&K053936_0_ctrl)
+	AM_RANGE(0xe00000, 0xe0001f) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_ctrl)
 	AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
-	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE((UINT32**)&K053936_0_linectrl)  // 29C & 29G (PSAC2 line control)
+	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)  // 29C & 29G (PSAC2 line control)
 	AM_RANGE(0xe80000, 0xe87fff) AM_RAM AM_BASE_GENERIC(paletteram) // 11G/13G/15G (main screen palette RAM)
-	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_BASE(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
-	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)		// type 4 polls this too
-	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE(konamigx_t4_psacmap_w) AM_BASE(&gx_psacram)	// PSAC2 tilemap
+	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_BASE_LEGACY(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
+	AM_RANGE(0xec0000, 0xec0003) AM_READ_LEGACY(type3_sync_r)		// type 4 polls this too
+	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE_LEGACY(konamigx_t4_psacmap_w) AM_BASE_LEGACY(&gx_psacram)	// PSAC2 tilemap
 //  AM_RANGE(0xf00000, 0xf07fff) AM_RAM
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
@@ -1290,13 +1290,13 @@ static WRITE16_HANDLER(tms57002_control_word_w)
 /* 68000 memory handling */
 static ADDRESS_MAP_START( gxsndmap, AS_PROGRAM, 16, konamigx_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(&gx_sndram)
-	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8_MODERN("konami1", k054539_device, read, write, 0xff00)
-	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8_MODERN("konami2", k054539_device, read, write, 0x00ff)
-	AM_RANGE(0x300000, 0x300001) AM_READWRITE(tms57002_data_word_r, tms57002_data_word_w)
-	AM_RANGE(0x400000, 0x40000f) AM_WRITE(sndcomm68k_w)
-	AM_RANGE(0x400010, 0x40001f) AM_READ(sndcomm68k_r)
-	AM_RANGE(0x500000, 0x500001) AM_READWRITE(tms57002_status_word_r, tms57002_control_word_w)
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_LEGACY(&gx_sndram)
+	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("konami1", k054539_device, read, write, 0xff00)
+	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("konami2", k054539_device, read, write, 0x00ff)
+	AM_RANGE(0x300000, 0x300001) AM_READWRITE_LEGACY(tms57002_data_word_r, tms57002_data_word_w)
+	AM_RANGE(0x400000, 0x40000f) AM_WRITE_LEGACY(sndcomm68k_w)
+	AM_RANGE(0x400010, 0x40001f) AM_READ_LEGACY(sndcomm68k_r)
+	AM_RANGE(0x500000, 0x500001) AM_READWRITE_LEGACY(tms57002_status_word_r, tms57002_control_word_w)
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
 ADDRESS_MAP_END
 

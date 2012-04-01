@@ -212,19 +212,19 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, trvmadns_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_BASE_MEMBER(trvmadns_state, m_gfxram)
+	AM_RANGE(0x6000, 0x7fff) AM_WRITE_LEGACY(trvmadns_gfxram_w) AM_BASE( m_gfxram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(trvmadns_tileram_w) AM_BASE_MEMBER(trvmadns_state, m_tileram)
-	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(trvmadns_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(w2)//NOP
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE_LEGACY(trvmadns_tileram_w) AM_BASE( m_tileram)
+	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE_LEGACY(trvmadns_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(w2)//NOP
+	AM_RANGE(0xe004, 0xe004) AM_WRITE_LEGACY(w3)//NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, trvmadns_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x80, 0x80) AM_WRITE(trvmadns_banking_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(trvmadns_banking_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( trvmadns )

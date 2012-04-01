@@ -669,32 +669,32 @@ static MACHINE_RESET( bfm_sc1 )
 static ADDRESS_MAP_START( sc1_base, AS_PROGRAM, 8, bfm_sc1_state )
 
 	AM_RANGE(0x0000, 0x1FFF) AM_RAM AM_SHARE("nvram") //8k RAM
-	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)				// reel 2+3 latch
-	AM_RANGE(0x2200, 0x23FF) AM_WRITE(reel12_w)				// reel 1+2 latch
-	AM_RANGE(0x2400, 0x25FF) AM_WRITE(vfd_w)				// vfd latch
+	AM_RANGE(0x2000, 0x21FF) AM_WRITE_LEGACY(reel34_w)				// reel 2+3 latch
+	AM_RANGE(0x2200, 0x23FF) AM_WRITE_LEGACY(reel12_w)				// reel 1+2 latch
+	AM_RANGE(0x2400, 0x25FF) AM_WRITE_LEGACY(vfd_w)				// vfd latch
 
-	AM_RANGE(0x2600, 0x27FF) AM_READWRITE(mmtr_r,mmtr_w)	// mechanical meters
-	AM_RANGE(0x2800, 0x2800) AM_READWRITE(triac_r,triac_w)	// payslide triacs
+	AM_RANGE(0x2600, 0x27FF) AM_READWRITE_LEGACY(mmtr_r,mmtr_w)	// mechanical meters
+	AM_RANGE(0x2800, 0x2800) AM_READWRITE_LEGACY(triac_r,triac_w)	// payslide triacs
 
-	AM_RANGE(0x2A00, 0x2A00) AM_READWRITE(mux1latch_r,mux1latch_w) // mux1
-	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE(mux1datlo_r,mux1datlo_w)
-	AM_RANGE(0x2A02, 0x2A02) AM_READWRITE(mux1dathi_r,mux1dathi_w)
+	AM_RANGE(0x2A00, 0x2A00) AM_READWRITE_LEGACY(mux1latch_r,mux1latch_w) // mux1
+	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE_LEGACY(mux1datlo_r,mux1datlo_w)
+	AM_RANGE(0x2A02, 0x2A02) AM_READWRITE_LEGACY(mux1dathi_r,mux1dathi_w)
 
-	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)			// irq latch
+	AM_RANGE(0x2E00, 0x2E00) AM_READ_LEGACY(irqlatch_r)			// irq latch
 
-	AM_RANGE(0x3001, 0x3001) AM_READ(soundlatch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x3001, 0x3001) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x3101, 0x3201) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 
-	AM_RANGE(0x3406, 0x3406) AM_READWRITE(aciastat_r,aciactrl_w)  // MC6850 status register
-	AM_RANGE(0x3407, 0x3407) AM_READWRITE(aciadata_r,aciadata_w)  // MC6850 data register
+	AM_RANGE(0x3406, 0x3406) AM_READWRITE_LEGACY(aciastat_r,aciactrl_w)  // MC6850 status register
+	AM_RANGE(0x3407, 0x3407) AM_READWRITE_LEGACY(aciadata_r,aciadata_w)  // MC6850 data register
 
-	AM_RANGE(0x3408, 0x3408) AM_READWRITE(mux2latch_r,mux2latch_w) // mux2
-	AM_RANGE(0x3409, 0x3409) AM_READWRITE(mux2datlo_r,mux2datlo_w)
-	AM_RANGE(0x340A, 0x340A) AM_READWRITE(mux2dathi_r,mux2dathi_w)
+	AM_RANGE(0x3408, 0x3408) AM_READWRITE_LEGACY(mux2latch_r,mux2latch_w) // mux2
+	AM_RANGE(0x3409, 0x3409) AM_READWRITE_LEGACY(mux2datlo_r,mux2datlo_w)
+	AM_RANGE(0x340A, 0x340A) AM_READWRITE_LEGACY(mux2dathi_r,mux2dathi_w)
 
-	AM_RANGE(0x3600, 0x3600) AM_WRITE(bankswitch_w) 		// write bank
-	AM_RANGE(0x3800, 0x39FF) AM_WRITE(reel56_w)				// reel 5+6 latch
+	AM_RANGE(0x3600, 0x3600) AM_WRITE_LEGACY(bankswitch_w) 		// write bank
+	AM_RANGE(0x3800, 0x39FF) AM_WRITE_LEGACY(reel56_w)				// reel 5+6 latch
 
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM							// 8k  ROM
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")					// 8k  paged ROM (4 pages)
@@ -709,8 +709,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sc1_adder2, AS_PROGRAM, 8, bfm_sc1_state )
 	AM_IMPORT_FROM( sc1_base )
 
-	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE(vid_uart_ctrl_r,vid_uart_ctrl_w)	// video uart control reg read
-	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE(vid_uart_rx_r,vid_uart_tx_w)		// video uart receive  reg
+	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE_LEGACY(vid_uart_ctrl_r,vid_uart_ctrl_w)	// video uart control reg read
+	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE_LEGACY(vid_uart_rx_r,vid_uart_tx_w)		// video uart receive  reg
 ADDRESS_MAP_END
 
 
@@ -721,9 +721,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sc1_viper, AS_PROGRAM, 8, bfm_sc1_state )
 	AM_IMPORT_FROM( sc1_base )
 
-	AM_RANGE(0x3404, 0x3404) AM_READ(dipcoin_r ) // coin input on gamecard
-	AM_RANGE(0x3801, 0x3801) AM_DEVREAD("upd", nec_r)
-	AM_RANGE(0x3800, 0x39FF) AM_DEVWRITE("upd", nec_latch_w)
+	AM_RANGE(0x3404, 0x3404) AM_READ_LEGACY(dipcoin_r ) // coin input on gamecard
+	AM_RANGE(0x3801, 0x3801) AM_DEVREAD_LEGACY("upd", nec_r)
+	AM_RANGE(0x3800, 0x39FF) AM_DEVWRITE_LEGACY("upd", nec_latch_w)
 ADDRESS_MAP_END
 
 // input ports for scorpion1 board //////////////////////////////////////////////////

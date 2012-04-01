@@ -221,20 +221,20 @@ static READ8_HANDLER (controls_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbowling_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_BASE_MEMBER(sbowling_state,m_videoram)
-	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xf801, 0xf801) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE_LEGACY(sbw_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xf801, 0xf801) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, sbowling_state )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(controls_r, pix_data_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(pix_data_r, pix_shift_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1") AM_WRITENOP
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW0") AM_WRITE(system_w)
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW1") AM_WRITE(graph_control_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(system_w)
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(graph_control_w)
 ADDRESS_MAP_END
 
 

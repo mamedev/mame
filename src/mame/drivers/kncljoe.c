@@ -46,20 +46,20 @@ static WRITE8_HANDLER( sound_cmd_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kncljoe_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(kncljoe_videoram_w) AM_BASE_MEMBER(kncljoe_state, m_videoram)
-	AM_RANGE(0xd000, 0xd001) AM_WRITE(kncljoe_scroll_w) AM_BASE_MEMBER(kncljoe_state, m_scrollregs)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE_LEGACY(kncljoe_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xd000, 0xd001) AM_WRITE_LEGACY(kncljoe_scroll_w) AM_BASE( m_scrollregs)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("P1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("P2")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(sound_cmd_w)
-	AM_RANGE(0xd801, 0xd801) AM_WRITE(kncljoe_control_w)
-	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0xd803, 0xd803) AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0xd800, 0xd800) AM_WRITE_LEGACY(sound_cmd_w)
+	AM_RANGE(0xd801, 0xd801) AM_WRITE_LEGACY(kncljoe_control_w)
+	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0xd803, 0xd803) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 	AM_RANGE(0xd807, 0xd807) AM_READNOP		/* unknown read */
 	AM_RANGE(0xd817, 0xd817) AM_READNOP		/* unknown read */
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_SIZE_MEMBER(kncljoe_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -111,13 +111,13 @@ static WRITE8_DEVICE_HANDLER(unused_w)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, kncljoe_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITENOP
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE_LEGACY(sound_irq_ack_w)
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, kncljoe_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVREADWRITE("aysnd", m6803_port1_r, m6803_port1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_DEVREADWRITE("aysnd", m6803_port2_r, m6803_port2_w)
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVREADWRITE_LEGACY("aysnd", m6803_port1_r, m6803_port1_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_DEVREADWRITE_LEGACY("aysnd", m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
 
 

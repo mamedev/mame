@@ -487,32 +487,32 @@ static READ8_HANDLER( protection_r )
 static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(looping_videoram_w) AM_BASE_MEMBER(looping_state, m_videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(looping_videoram_w) AM_BASE( m_videoram)
 
-	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM_WRITE(looping_colorram_w) AM_BASE_MEMBER(looping_state, m_colorram)
-	AM_RANGE(0x9840, 0x987f) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(looping_state, m_spriteram)
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM_WRITE_LEGACY(looping_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x9840, 0x987f) AM_MIRROR(0x0700) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x9880, 0x98ff) AM_MIRROR(0x0700) AM_RAM
 
-	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x07f8) AM_WRITE(level2_irq_set)
-	AM_RANGE(0xb006, 0xb006) AM_MIRROR(0x07f8) AM_WRITE(flip_screen_x_w)
-	AM_RANGE(0xb007, 0xb007) AM_MIRROR(0x07f8) AM_WRITE(flip_screen_y_w)
+	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(level2_irq_set)
+	AM_RANGE(0xb006, 0xb006) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(flip_screen_x_w)
+	AM_RANGE(0xb007, 0xb007) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(flip_screen_y_w)
 
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03fc) AM_READ_PORT("P1") AM_WRITE(out_0_w)					/* /OUT0 */
-	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x03fc) AM_READ_PORT("P2") AM_WRITE(looping_soundlatch_w)	/* /OUT1 */
-	AM_RANGE(0xf802, 0xf802) AM_MIRROR(0x03fc) AM_READ_PORT("DSW") AM_WRITE(out_2_w)				/* /OUT2 */
-	AM_RANGE(0xf803, 0xf803) AM_MIRROR(0x03fc) AM_READWRITE(adc_r, adc_w)
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03fc) AM_READ_PORT("P1") AM_WRITE_LEGACY(out_0_w)					/* /OUT0 */
+	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x03fc) AM_READ_PORT("P2") AM_WRITE_LEGACY(looping_soundlatch_w)	/* /OUT1 */
+	AM_RANGE(0xf802, 0xf802) AM_MIRROR(0x03fc) AM_READ_PORT("DSW") AM_WRITE_LEGACY(out_2_w)				/* /OUT2 */
+	AM_RANGE(0xf803, 0xf803) AM_MIRROR(0x03fc) AM_READWRITE_LEGACY(adc_r, adc_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_io_map, AS_IO, 8, looping_state )
 	/* 400 = A16 */
 	/* 401 = A17 */
 	/* 402 = COLOR 9 */
-	AM_RANGE(0x403, 0x403) AM_WRITE(plr2_w)
+	AM_RANGE(0x403, 0x403) AM_WRITE_LEGACY(plr2_w)
 	/* 404 = C0 */
 	/* 405 = C1 */
-	AM_RANGE(0x406, 0x406) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x407, 0x407) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x406, 0x406) AM_WRITE_LEGACY(main_irq_ack_w)
+	AM_RANGE(0x407, 0x407) AM_WRITE_LEGACY(watchdog_reset_w)
 
 	AM_RANGE(0x10000, 0x10000) AM_NOP		/* external IDLE signal -- we can ignore it */
 ADDRESS_MAP_END
@@ -523,20 +523,20 @@ static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8, looping_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
-	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_address_w)
-	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_w)
+	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x3c03, 0x3c03) AM_MIRROR(0x00f6) AM_NOP
-	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE("tms", tms5220_data_w)
-	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_DEVREAD("tms", tms5220_status_r) AM_WRITENOP
+	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_READNOP AM_DEVWRITE_LEGACY("tms", tms5220_data_w)
+	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_DEVREAD_LEGACY("tms", tms5220_status_r) AM_WRITENOP
 	AM_RANGE(0x3e03, 0x3e03) AM_MIRROR(0x00f6) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_sound_io_map, AS_IO, 8, looping_state )
-	AM_RANGE(0x000, 0x000) AM_WRITE(looping_souint_clr)
-	AM_RANGE(0x001, 0x007) AM_DEVWRITE("dac", looping_sound_sw)
-	AM_RANGE(0x008, 0x008) AM_DEVWRITE("aysnd", ay_enable_w)
-	AM_RANGE(0x009, 0x009) AM_DEVWRITE("tms", speech_enable_w)
-	AM_RANGE(0x00a, 0x00a) AM_WRITE(ballon_enable_w)
+	AM_RANGE(0x000, 0x000) AM_WRITE_LEGACY(looping_souint_clr)
+	AM_RANGE(0x001, 0x007) AM_DEVWRITE_LEGACY("dac", looping_sound_sw)
+	AM_RANGE(0x008, 0x008) AM_DEVWRITE_LEGACY("aysnd", ay_enable_w)
+	AM_RANGE(0x009, 0x009) AM_DEVWRITE_LEGACY("tms", speech_enable_w)
+	AM_RANGE(0x00a, 0x00a) AM_WRITE_LEGACY(ballon_enable_w)
 	AM_RANGE(0x00b, 0x00f) AM_NOP
 ADDRESS_MAP_END
 
@@ -551,7 +551,7 @@ static ADDRESS_MAP_START( looping_cop_data_map, AS_DATA, 8, looping_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_cop_io_map, AS_IO, 8, looping_state )
-	AM_RANGE(0x0100, 0x0107) AM_READWRITE(cop_io_r, cop_io_w)
+	AM_RANGE(0x0100, 0x0107) AM_READWRITE_LEGACY(cop_io_r, cop_io_w)
 ADDRESS_MAP_END
 
 

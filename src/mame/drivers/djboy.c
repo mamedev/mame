@@ -253,7 +253,7 @@ static WRITE8_HANDLER( cpu2_bankswitch_w )
 static ADDRESS_MAP_START( cpu0_am, AS_PROGRAM, 8, djboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_ROMBANK("bank4")
-	AM_RANGE(0xb000, 0xbfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
+	AM_RANGE(0xb000, 0xbfff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
@@ -262,7 +262,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_port_am, AS_IO, 8, djboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(cpu0_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(cpu0_bankswitch_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -270,22 +270,22 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu1_am, AS_PROGRAM, 8, djboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(djboy_videoram_w) AM_BASE_MEMBER(djboy_state, m_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(djboy_paletteram_w) AM_BASE_MEMBER(djboy_state, m_paletteram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE_LEGACY(djboy_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(djboy_paletteram_w) AM_BASE( m_paletteram)
 	AM_RANGE(0xd400, 0xd8ff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_port_am, AS_IO, 8, djboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(cpu1_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(beast_data_r, beast_data_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(djboy_scrolly_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(djboy_scrollx_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(trigger_nmi_on_cpu0)
-	AM_RANGE(0x0c, 0x0c) AM_READ(beast_status_r)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(coin_count_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(cpu1_bankswitch_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(trigger_nmi_on_sound_cpu2)
+	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(beast_data_r, beast_data_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(djboy_scrolly_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(djboy_scrollx_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(trigger_nmi_on_cpu0)
+	AM_RANGE(0x0c, 0x0c) AM_READ_LEGACY(beast_status_r)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE_LEGACY(coin_count_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -298,11 +298,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_port_am, AS_IO, 8, djboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(cpu2_bankswitch_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
-	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
-	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(cpu2_bankswitch_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
+	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -399,10 +399,10 @@ static WRITE8_HANDLER( beast_p3_w )
 /* Program/data maps are defined in the 8051 core */
 
 static ADDRESS_MAP_START( djboy_mcu_io_map, AS_IO, 8, djboy_state )
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(beast_p0_r, beast_p0_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(beast_p1_r, beast_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(beast_p2_r, beast_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(beast_p3_r, beast_p3_w)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE_LEGACY(beast_p0_r, beast_p0_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE_LEGACY(beast_p1_r, beast_p1_w)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE_LEGACY(beast_p2_r, beast_p2_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE_LEGACY(beast_p3_r, beast_p3_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

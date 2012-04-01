@@ -1538,20 +1538,20 @@ static MACHINE_RESET( demon_sound )
 static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x4002, 0x4003) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x5000, 0x5001) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0x5002, 0x5003) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVREAD("ay3", ay8910_r)
-	AM_RANGE(0x6002, 0x6003) AM_DEVWRITE("ay3", ay8910_data_address_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x4002, 0x4003) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x5002, 0x5003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVREAD_LEGACY("ay3", ay8910_r)
+	AM_RANGE(0x6002, 0x6003) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
 	AM_RANGE(0x7000, 0x7000) AM_WRITENOP  /* watchdog? */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ctc", z80ctc_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE("ctc", z80ctc_w)
+	AM_RANGE(0x00, 0x03) AM_DEVWRITE_LEGACY("ctc", z80ctc_w)
+	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE_LEGACY("ctc", z80ctc_w)
 ADDRESS_MAP_END
 
 

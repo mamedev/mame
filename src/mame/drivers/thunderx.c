@@ -407,41 +407,41 @@ static WRITE8_HANDLER( k052109_051960_w )
 /***************************************************************************/
 
 static ADDRESS_MAP_START( scontra_map, AS_PROGRAM, 8, thunderx_state )
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(scontra_bankswitch_w)	/* bankswitch control + coin counters */
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(thunderx_sh_irqtrigger_w)		/* cause interrupt on audio CPU */
-	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE_LEGACY(scontra_bankswitch_w)	/* bankswitch control + coin counters */
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE_LEGACY(thunderx_sh_irqtrigger_w)		/* cause interrupt on audio CPU */
+	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
 	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
 	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(thunderx_1f98_w)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)		/* video RAM + sprite RAM */
+	AM_RANGE(0x1f98, 0x1f98) AM_WRITE_LEGACY(thunderx_1f98_w)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)		/* video RAM + sprite RAM */
 
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(scontra_bankedram_r, scontra_bankedram_w) AM_BASE_MEMBER(thunderx_state, m_ram)			/* palette + work RAM */
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE_LEGACY(scontra_bankedram_r, scontra_bankedram_w) AM_BASE( m_ram)			/* palette + work RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thunderx_map, AS_PROGRAM, 8, thunderx_state )
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(thunderx_videobank_w)
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(thunderx_sh_irqtrigger_w)		/* cause interrupt on audio CPU */
-	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE_LEGACY(thunderx_videobank_w)
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE_LEGACY(thunderx_sh_irqtrigger_w)		/* cause interrupt on audio CPU */
+	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
 	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
 	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE(thunderx_1f98_r, thunderx_1f98_w) /* registers */
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
+	AM_RANGE(0x1f98, 0x1f98) AM_READWRITE_LEGACY(thunderx_1f98_r, thunderx_1f98_w) /* registers */
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)
 
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(thunderx_bankedram_r, thunderx_bankedram_w) AM_BASE_MEMBER(thunderx_state, m_ram)			/* palette + work RAM + unknown RAM */
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE_LEGACY(thunderx_bankedram_r, thunderx_bankedram_w) AM_BASE( m_ram)			/* palette + work RAM + unknown RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -449,17 +449,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( scontra_sound_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM					/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM					/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_r, k007232_w)		/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)		/* YM2151 */
-	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("k007232", scontra_snd_bankswitch_w)	/* 007232 bank select */
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)			/* soundlatch_r */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)		/* 007232 registers */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)		/* YM2151 */
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", scontra_snd_bankswitch_w)	/* 007232 bank select */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thunderx_sound_map, AS_PROGRAM, 8, thunderx_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 ADDRESS_MAP_END
 
 /***************************************************************************

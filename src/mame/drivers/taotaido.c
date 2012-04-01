@@ -91,12 +91,12 @@ static WRITE16_HANDLER( sound_command_w )
 }
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(taotaido_bgvideoram_w) AM_BASE_MEMBER(taotaido_state, m_bgram)	// bg ram?
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_BASE_MEMBER(taotaido_state, m_spriteram)		// sprite ram
-	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE_MEMBER(taotaido_state, m_spriteram2)		// sprite tile lookup ram
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE_LEGACY(taotaido_bgvideoram_w) AM_BASE( m_bgram)	// bg ram?
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_BASE( m_spriteram)		// sprite ram
+	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE( m_spriteram2)		// sprite tile lookup ram
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM										// main ram
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// palette ram
-	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_BASE_MEMBER(taotaido_state, m_scrollram)		// rowscroll / rowselect / scroll ram
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// palette ram
+	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_BASE( m_scrollram)		// rowscroll / rowselect / scroll ram
 	AM_RANGE(0xffff80, 0xffff81) AM_READ_PORT("P1")
 	AM_RANGE(0xffff82, 0xffff83) AM_READ_PORT("P2")
 	AM_RANGE(0xffff84, 0xffff85) AM_READ_PORT("SYSTEM")
@@ -107,12 +107,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0xffff8e, 0xffff8f) AM_READ_PORT("JP")
 	AM_RANGE(0xffffa0, 0xffffa1) AM_READ_PORT("P3")						// used only by taotaida
 	AM_RANGE(0xffffa2, 0xffffa3) AM_READ_PORT("P4")						// used only by taotaida
-	AM_RANGE(0xffff00, 0xffff0f) AM_WRITE(taotaido_tileregs_w)
+	AM_RANGE(0xffff00, 0xffff0f) AM_WRITE_LEGACY(taotaido_tileregs_w)
 	AM_RANGE(0xffff10, 0xffff11) AM_WRITENOP						// unknown
 	AM_RANGE(0xffff20, 0xffff21) AM_WRITENOP						// unknown - flip screen related
-	AM_RANGE(0xffff40, 0xffff47) AM_WRITE(taotaido_sprite_character_bank_select_w)
-	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE(sound_command_w)				// seems right
-	AM_RANGE(0xffffe0, 0xffffe1) AM_READ(pending_command_r)	// guess - seems to be needed for all the sounds to work
+	AM_RANGE(0xffff40, 0xffff47) AM_WRITE_LEGACY(taotaido_sprite_character_bank_select_w)
+	AM_RANGE(0xffffc0, 0xffffc1) AM_WRITE_LEGACY(sound_command_w)				// seems right
+	AM_RANGE(0xffffe0, 0xffffe1) AM_READ_LEGACY(pending_command_r)	// guess - seems to be needed for all the sounds to work
 ADDRESS_MAP_END
 
 /* sound cpu - same as aerofgt */
@@ -139,10 +139,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, taotaido_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(taotaido_sh_bankswitch_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(taotaido_sh_bankswitch_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(pending_command_clear_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

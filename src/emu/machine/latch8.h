@@ -84,16 +84,16 @@ struct _latch8_config
 /* Accessor macros */
 
 #define AM_LATCH8_READ(_tag) \
-	AM_DEVREAD(_tag, latch8_r)
+	AM_DEVREAD_LEGACY(_tag, latch8_r)
 
 #define AM_LATCH8_READBIT(_tag, _bit) \
-	AM_DEVREAD(_tag, latch8_bit ## _bit ## _q_r)
+	AM_DEVREAD_LEGACY(_tag, latch8_bit ## _bit ## _q_r)
 
 #define AM_LATCH8_WRITE(_tag) \
-	AM_DEVWRITE(_tag, latch8_w)
+	AM_DEVWRITE_LEGACY(_tag, latch8_w)
 
 #define AM_LATCH8_READWRITE(_tag) \
-	AM_DEVREADWRITE(_tag, latch8_r, latch8_w)
+	AM_DEVREADWRITE_LEGACY(_tag, latch8_r, latch8_w)
 
 /* write & read full byte */
 

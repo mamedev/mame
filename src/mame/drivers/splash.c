@@ -90,18 +90,18 @@ static WRITE16_HANDLER( splash_coin_w )
 
 static ADDRESS_MAP_START( splash_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM													/* ROM */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, m_pixelram)						/* Pixel Layer */
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE( m_pixelram)						/* Pixel Layer */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
-	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(splash_sh_irqtrigger_w)						/* Sound command */
-	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, m_videoram)	/* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, m_vregs)							/* Scroll registers */
+	AM_RANGE(0x84000e, 0x84000f) AM_WRITE_LEGACY(splash_sh_irqtrigger_w)						/* Sound command */
+	AM_RANGE(0x84000a, 0x84003b) AM_WRITE_LEGACY(splash_coin_w)								/* Coin Counters + Coin Lockout */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE_LEGACY(splash_vram_w) AM_BASE( m_videoram)	/* Video RAM */
+	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE( m_vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE_MEMBER(splash_state, m_spriteram)						/* Sprite RAM */
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
+	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE( m_spriteram)						/* Sprite RAM */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
 
@@ -122,10 +122,10 @@ static void splash_msm5205_int(device_t *device)
 
 static ADDRESS_MAP_START( splash_sound_map, AS_PROGRAM, 8, splash_state )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM										/* ROM */
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)				/* ADPCM data for the MSM5205 chip */
+	AM_RANGE(0xd800, 0xd800) AM_WRITE_LEGACY(splash_adpcm_data_w)				/* ADPCM data for the MSM5205 chip */
 //  AM_RANGE(0xe000, 0xe000) AM_WRITENOP                                /* ??? */
-	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)						/* Sound latch */
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym3812_r,ym3812_w)	/* YM3812 */
+	AM_RANGE(0xe800, 0xe800) AM_READ_LEGACY(soundlatch_r)						/* Sound latch */
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)	/* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_RAM										/* RAM */
 ADDRESS_MAP_END
 
@@ -170,22 +170,22 @@ static void ym_irq(device_t *device, int state)
 
 static ADDRESS_MAP_START( roldfrog_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM													/* ROM */
-	AM_RANGE(0x400000, 0x407fff) AM_ROM AM_BASE_MEMBER(splash_state, m_protdata)						/* Protection Data */
+	AM_RANGE(0x400000, 0x407fff) AM_ROM AM_BASE( m_protdata)						/* Protection Data */
 	AM_RANGE(0x408000, 0x4087ff) AM_RAM 												/* Extra Ram */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, m_pixelram)						/* Pixel Layer */
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE( m_pixelram)						/* Pixel Layer */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
-	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(roldf_sh_irqtrigger_w)						/* Sound command */
-	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, m_videoram)	/* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, m_vregs)							/* Scroll registers */
+	AM_RANGE(0x84000e, 0x84000f) AM_WRITE_LEGACY(roldf_sh_irqtrigger_w)						/* Sound command */
+	AM_RANGE(0x84000a, 0x84003b) AM_WRITE_LEGACY(splash_coin_w)								/* Coin Counters + Coin Lockout */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE_LEGACY(splash_vram_w) AM_BASE( m_videoram)	/* Video RAM */
+	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE( m_vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(roldfrog_bombs_r)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_MEMBER(splash_state, m_spriteram)						/* Sprite RAM */
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITEONLY AM_BASE_MEMBER(splash_state, m_bitmap_mode)			/* Bitmap Mode? */
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
+	AM_RANGE(0xa00000, 0xa00001) AM_READ_LEGACY(roldfrog_bombs_r)
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE( m_spriteram)						/* Sprite RAM */
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITEONLY AM_BASE( m_bitmap_mode)			/* Bitmap Mode? */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
 
@@ -203,13 +203,13 @@ static READ8_HANDLER(roldfrog_unk_r)
 
 static ADDRESS_MAP_START( roldfrog_sound_io_map, AS_IO, 8, splash_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x40, 0x40) AM_NOP
-	AM_RANGE(0x31, 0x31) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x37, 0x37) AM_WRITE(roldfrog_vblank_ack_w )
-	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_r)
+	AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(sound_bank_w)
+	AM_RANGE(0x37, 0x37) AM_WRITE_LEGACY(roldfrog_vblank_ack_w )
+	AM_RANGE(0x70, 0x70) AM_READ_LEGACY(soundlatch_r)
 
-	AM_RANGE(0x0, 0xff) AM_READ(roldfrog_unk_r)
+	AM_RANGE(0x0, 0xff) AM_READ_LEGACY(roldfrog_unk_r)
 ADDRESS_MAP_END
 
 static READ16_HANDLER(spr_read)
@@ -234,19 +234,19 @@ static WRITE16_HANDLER( funystrp_sh_irqtrigger_w )
 static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM													/* ROM */
 	AM_RANGE(0x100000, 0x1fffff) AM_RAM													/* protection? RAM */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, m_pixelram)						/* Pixel Layer */
-	AM_RANGE(0x84000a, 0x84000b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
-	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(funystrp_sh_irqtrigger_w)                       /* Sound command */
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE( m_pixelram)						/* Pixel Layer */
+	AM_RANGE(0x84000a, 0x84000b) AM_WRITE_LEGACY(splash_coin_w)								/* Coin Counters + Coin Lockout */
+	AM_RANGE(0x84000e, 0x84000f) AM_WRITE_LEGACY(funystrp_sh_irqtrigger_w)                       /* Sound command */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x840008, 0x840009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, m_videoram)	/* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, m_vregs)							/* Scroll registers */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE_LEGACY(splash_vram_w) AM_BASE( m_videoram)	/* Video RAM */
+	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE( m_vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_WRITENOP
-	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(spr_read, spr_write) AM_BASE_MEMBER(splash_state, m_spriteram)		/* Sprite RAM */
+	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
+	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE_LEGACY(spr_read, spr_write) AM_BASE( m_spriteram)		/* Sprite RAM */
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM	 AM_MASK(0xffff) /* there's fe0000 <-> ff0000 compare */				/* Work RAM */
 ADDRESS_MAP_END
 
@@ -292,13 +292,13 @@ static WRITE8_HANDLER(msm2_data_w)
 
 static ADDRESS_MAP_START( funystrp_sound_io_map, AS_IO, 8, splash_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(msm1_data_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(msm2_data_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_r)
-	AM_RANGE(0x04, 0x04) AM_READ(int_source_r)
-	AM_RANGE(0x06, 0x06) AM_WRITE(msm1_interrupt_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(msm2_interrupt_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(msm1_data_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(msm2_data_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(sound_bank_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(int_source_r)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(msm1_interrupt_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(msm2_interrupt_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( funystrp )

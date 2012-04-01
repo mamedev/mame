@@ -252,19 +252,19 @@ static WRITE8_HANDLER( cyclemb_flip_w )
 static ADDRESS_MAP_START( cyclemb_map, AS_PROGRAM, 8, cyclemb_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_vram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_cram)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_obj1_ram) //ORAM1 (only a000-a3ff tested)
-	AM_RANGE(0xa800, 0xafff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_obj2_ram) //ORAM2 (only a800-abff tested)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_BASE_MEMBER(cyclemb_state, m_obj3_ram) //ORAM3 (only b000-b3ff tested)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE( m_vram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE( m_cram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE( m_obj1_ram) //ORAM1 (only a000-a3ff tested)
+	AM_RANGE(0xa800, 0xafff) AM_RAM AM_BASE( m_obj2_ram) //ORAM2 (only a800-abff tested)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_BASE( m_obj3_ram) //ORAM3 (only b000-b3ff tested)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM //WRAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclemb_io, AS_IO, 8, cyclemb_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
-	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(cyclemb_8741_0_r, cyclemb_8741_0_w)
-	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
+	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(cyclemb_bankswitch_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE_LEGACY(cyclemb_8741_0_r, cyclemb_8741_0_w)
+	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE_LEGACY(cyclemb_flip_w) //flip screen
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclemb_sound_map, AS_PROGRAM, 8, cyclemb_state )
@@ -275,8 +275,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x40, 0x40) AM_READ_LEGACY(soundlatch_r) AM_WRITE_LEGACY(soundlatch2_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( cyclemb )

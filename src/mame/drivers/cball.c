@@ -127,7 +127,7 @@ static WRITE8_HANDLER( cball_wram_w )
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, cball_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 
-	AM_RANGE(0x0000, 0x03ff) AM_READ(cball_wram_r) AM_MASK(0x7f)
+	AM_RANGE(0x0000, 0x03ff) AM_READ_LEGACY(cball_wram_r) AM_MASK(0x7f)
 	AM_RANGE(0x0400, 0x07ff) AM_READONLY
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("1001")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("1003")
@@ -137,8 +137,8 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, cball_state )
 	AM_RANGE(0x2000, 0x2001) AM_NOP
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")
 
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE(cball_wram_w) AM_MASK(0x7f)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE(cball_vram_w) AM_BASE_MEMBER(cball_state, m_video_ram)
+	AM_RANGE(0x0000, 0x03ff) AM_WRITE_LEGACY(cball_wram_w) AM_MASK(0x7f)
+	AM_RANGE(0x0400, 0x07ff) AM_WRITE_LEGACY(cball_vram_w) AM_BASE( m_video_ram)
 	AM_RANGE(0x1800, 0x1800) AM_NOP /* watchdog? */
 	AM_RANGE(0x1810, 0x1811) AM_NOP
 	AM_RANGE(0x1820, 0x1821) AM_NOP

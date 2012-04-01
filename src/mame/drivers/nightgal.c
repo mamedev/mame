@@ -466,36 +466,36 @@ static READ8_DEVICE_HANDLER( input_2p_r )
 #ifdef UNUSED_CODE
 static ADDRESS_MAP_START( nightgal_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc100, 0xc100) AM_READ(nsc_latch_r)
-	AM_RANGE(0xc200, 0xc200) AM_WRITE(nsc_latch_w)
-	AM_RANGE(0xc300, 0xc30f) AM_WRITE(blit_vregs_w)
+	AM_RANGE(0xc100, 0xc100) AM_READ_LEGACY(nsc_latch_r)
+	AM_RANGE(0xc200, 0xc200) AM_WRITE_LEGACY(nsc_latch_w)
+	AM_RANGE(0xc300, 0xc30f) AM_WRITE_LEGACY(blit_vregs_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nightgal_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
-//  AM_RANGE(0x10,0x10) AM_WRITE(output_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+//  AM_RANGE(0x10,0x10) AM_WRITE_LEGACY(output_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC")
 	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA")
 	AM_RANGE(0x12,0x12) AM_READ_PORT("DSWA")
 	AM_RANGE(0x13,0x13) AM_READ_PORT("DSWB")
-	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x14) AM_WRITE(blitter_w) //data for the nsc to be processed
+	AM_RANGE(0x11,0x11) AM_WRITE_LEGACY(mux_w)
+	AM_RANGE(0x12,0x14) AM_WRITE_LEGACY(blitter_w) //data for the nsc to be processed
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
-	AM_RANGE(0x0081, 0x0083) AM_READ(nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_WRITE(nsc_true_blitter_w)
+	AM_RANGE(0x0080, 0x0080) AM_READ_LEGACY(blitter_status_r)
+	AM_RANGE(0x0081, 0x0083) AM_READ_LEGACY(nsc_blit_r)
+	AM_RANGE(0x0080, 0x0086) AM_WRITE_LEGACY(nsc_true_blitter_w)
 
-	AM_RANGE(0x00a0, 0x00af) AM_WRITE(blit_true_vregs_w)
+	AM_RANGE(0x00a0, 0x00af) AM_WRITE_LEGACY(blit_true_vregs_w)
 
-	AM_RANGE(0x1100, 0x1100) AM_READWRITE(z80_latch_r,z80_latch_w) //irq control?
+	AM_RANGE(0x1100, 0x1100) AM_READWRITE_LEGACY(z80_latch_r,z80_latch_w) //irq control?
 	AM_RANGE(0x1200, 0x1200) AM_READNOP //flip screen set bit
-	AM_RANGE(0x1300, 0x130f) AM_READ(blit_vregs_r)
+	AM_RANGE(0x1300, 0x130f) AM_READ_LEGACY(blit_vregs_r)
 //  AM_RANGE(0x1000, 0xdfff) AM_ROM AM_REGION("gfx1", 0 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
@@ -508,31 +508,31 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sexygal_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM //???
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_BASE_MEMBER(nightgal_state,m_comms_ram)
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY(royalqn_comm_r, royalqn_comm_w) AM_BASE(m_comms_ram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexygal_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-//  AM_RANGE(0x10,0x10) AM_WRITE(output_w)
+	AM_RANGE(0x00,0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+//  AM_RANGE(0x10,0x10) AM_WRITE_LEGACY(output_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("DSWC")
-	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA") AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(royalqn_blitter_0_w)
-	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_1_w)
-	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE(royalqn_blitter_2_w)
+	AM_RANGE(0x11,0x11) AM_READ_PORT("SYSA") AM_WRITE_LEGACY(mux_w)
+	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE_LEGACY(royalqn_blitter_0_w)
+	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE_LEGACY(royalqn_blitter_1_w)
+	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE_LEGACY(royalqn_blitter_2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sexygal_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
-	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_WRITE(sexygal_nsc_true_blitter_w)
+	AM_RANGE(0x0080, 0x0080) AM_READ_LEGACY(blitter_status_r)
+	AM_RANGE(0x0081, 0x0083) AM_READ_LEGACY(royalqn_nsc_blit_r)
+	AM_RANGE(0x0080, 0x0086) AM_WRITE_LEGACY(sexygal_nsc_true_blitter_w)
 
-	AM_RANGE(0x00a0, 0x00af) AM_WRITE(blit_true_vregs_w)
+	AM_RANGE(0x00a0, 0x00af) AM_WRITE_LEGACY(blit_true_vregs_w)
 	AM_RANGE(0x00b0, 0x00b0) AM_WRITENOP // bltflip register
 
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_BASE_MEMBER(nightgal_state,m_comms_ram)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE_LEGACY(royalqn_comm_r, royalqn_comm_w) AM_BASE(m_comms_ram)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -543,19 +543,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( royalqn_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(royalqn_comm_r, royalqn_comm_w) AM_BASE_MEMBER(nightgal_state,m_comms_ram)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(royalqn_comm_r, royalqn_comm_w) AM_BASE(m_comms_ram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalqn_io, AS_IO, 8, nightgal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_MIRROR(0xec) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_MIRROR(0xec) AM_DEVWRITE("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x10,0x10) AM_MIRROR(0xe8) AM_READ_PORT("DSWC") AM_WRITENOP //AM_WRITE(output_w)
-	AM_RANGE(0x11,0x11) AM_MIRROR(0xe8) AM_READ_PORT("SYSA") AM_WRITE(mux_w)
-	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE(royalqn_blitter_0_w)
-	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE(royalqn_blitter_1_w)
-	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE(royalqn_blitter_2_w)
+	AM_RANGE(0x01,0x01) AM_MIRROR(0xec) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_MIRROR(0xec) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x10,0x10) AM_MIRROR(0xe8) AM_READ_PORT("DSWC") AM_WRITENOP //AM_WRITE_LEGACY(output_w)
+	AM_RANGE(0x11,0x11) AM_MIRROR(0xe8) AM_READ_PORT("SYSA") AM_WRITE_LEGACY(mux_w)
+	AM_RANGE(0x12,0x12) AM_MIRROR(0xe8) AM_READ_PORT("DSWA") AM_WRITE_LEGACY(royalqn_blitter_0_w)
+	AM_RANGE(0x13,0x13) AM_MIRROR(0xe8) AM_READ_PORT("DSWB") AM_WRITE_LEGACY(royalqn_blitter_1_w)
+	AM_RANGE(0x14,0x14) AM_MIRROR(0xe8) AM_READNOP AM_WRITE_LEGACY(royalqn_blitter_2_w)
 	AM_RANGE(0x15,0x15) AM_MIRROR(0xe8) AM_NOP
 	AM_RANGE(0x16,0x16) AM_MIRROR(0xe8) AM_NOP
 	AM_RANGE(0x17,0x17) AM_MIRROR(0xe8) AM_NOP
@@ -563,14 +563,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalqn_nsc_map, AS_PROGRAM, 8, nightgal_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0080) AM_READ(blitter_status_r)
-	AM_RANGE(0x0081, 0x0083) AM_READ(royalqn_nsc_blit_r)
-	AM_RANGE(0x0080, 0x0086) AM_WRITE(nsc_true_blitter_w)
+	AM_RANGE(0x0080, 0x0080) AM_READ_LEGACY(blitter_status_r)
+	AM_RANGE(0x0081, 0x0083) AM_READ_LEGACY(royalqn_nsc_blit_r)
+	AM_RANGE(0x0080, 0x0086) AM_WRITE_LEGACY(nsc_true_blitter_w)
 
-	AM_RANGE(0x00a0, 0x00af) AM_WRITE(blit_true_vregs_w)
+	AM_RANGE(0x00a0, 0x00af) AM_WRITE_LEGACY(blit_true_vregs_w)
 	AM_RANGE(0x00b0, 0x00b0) AM_WRITENOP // bltflip register
 
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE(royalqn_comm_r,royalqn_comm_w)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2c00) AM_READWRITE_LEGACY(royalqn_comm_r,royalqn_comm_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP
 	AM_RANGE(0x8000, 0x8000) AM_NOP //open bus or protection check
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_ROM

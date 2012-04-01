@@ -38,14 +38,14 @@ static READ8_HANDLER( n8080_shift_r )
 static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, n8080_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(n8080_state, m_videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE( m_videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( helifire_main_cpu_map, AS_PROGRAM, 8, n8080_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(n8080_state, m_videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(n8080_state, m_colorram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE( m_colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, n8080_state )
@@ -53,14 +53,14 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, n8080_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ(n8080_shift_r)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(n8080_shift_r)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN3")
 
-	AM_RANGE(0x02, 0x02) AM_WRITE(n8080_shift_bits_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(n8080_shift_data_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(n8080_sound_1_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(n8080_sound_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(n8080_video_control_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(n8080_shift_bits_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(n8080_shift_data_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(n8080_sound_1_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(n8080_sound_2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(n8080_video_control_w)
 ADDRESS_MAP_END
 
 

@@ -276,22 +276,22 @@ static READ32_HANDLER( aleck_dips_r )
  */
 
 static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_state )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	/*AM_MIRROR(0xc0000000)*/ AM_BASE(&rdram)				// RDRAM
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	/*AM_MIRROR(0xc0000000)*/ AM_BASE_LEGACY(&rdram)				// RDRAM
 
-	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
+	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("dmem")					// RSP DMEM
 	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("imem")					// RSP IMEM
-	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE("rsp", n64_sp_reg_r, n64_sp_reg_w)	// RSP
-	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE("rsp", n64_dp_reg_r, n64_dp_reg_w)	// RDP
-	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, mi_reg_r, mi_reg_w)	// MIPS Interface
-	AM_RANGE(0x04400000, 0x044fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, vi_reg_r, vi_reg_w)	// Video Interface
-	AM_RANGE(0x04500000, 0x045fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ai_reg_r, ai_reg_w)	// Audio Interface
-	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
-	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
-	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
+	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_sp_reg_r, n64_sp_reg_w)	// RSP
+	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_dp_reg_r, n64_dp_reg_w)	// RDP
+	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE("rcp", n64_periphs, mi_reg_r, mi_reg_w)	// MIPS Interface
+	AM_RANGE(0x04400000, 0x044fffff) AM_DEVREADWRITE("rcp", n64_periphs, vi_reg_r, vi_reg_w)	// Video Interface
+	AM_RANGE(0x04500000, 0x045fffff) AM_DEVREADWRITE("rcp", n64_periphs, ai_reg_r, ai_reg_w)	// Audio Interface
+	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
+	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
+	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
 	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)	// Cartridge
 	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)	// PIF ROM
-	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pif_ram_r, pif_ram_w)
+	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 
 	/*
         Surely this should mirror main ram? srmvs crashes, and
@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_state )
     */
 	AM_RANGE(0xc0000000, 0xc07fffff) AM_RAM
 
-	AM_RANGE(0xc0800000, 0xc0800fff) AM_READWRITE(aleck_dips_r,aleck_dips_w)
+	AM_RANGE(0xc0800000, 0xc0800fff) AM_READWRITE_LEGACY(aleck_dips_r,aleck_dips_w)
 	AM_RANGE(0xd0000000, 0xd00fffff) AM_RAM	// mtetrisc, write only, mirror?
 
 ADDRESS_MAP_END
@@ -307,8 +307,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("dmem")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("imem")
-	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_BASE(&rsp_dmem) AM_SHARE("dmem")
-	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_BASE(&rsp_imem) AM_SHARE("imem")
+	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_BASE_LEGACY(&rsp_dmem) AM_SHARE("dmem")
+	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_BASE_LEGACY(&rsp_imem) AM_SHARE("imem")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( aleck64 )

@@ -305,32 +305,32 @@ static READ8_HANDLER (pturn_custom_r)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pturn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_WRITENOP AM_READ(pturn_custom_r)
+	AM_RANGE(0xc800, 0xcfff) AM_WRITENOP AM_READ_LEGACY(pturn_custom_r)
 
 	AM_RANGE(0xdfe0, 0xdfe0) AM_NOP
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(pturn_videoram_w) AM_BASE_MEMBER(pturn_state, m_videoram)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(fgpalette_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(sound_w)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(pturn_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE_LEGACY(fgpalette_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(sound_w)
 
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE_MEMBER(pturn_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(bg_scrollx_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE_LEGACY(bg_scrollx_w)
 
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1") AM_WRITENOP
-	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(bgcolor_w)
+	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE_LEGACY(bgcolor_w)
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(bg_scrolly_w)
+	AM_RANGE(0xf803, 0xf803) AM_WRITE_LEGACY(bg_scrolly_w)
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf806, 0xf806) AM_READNOP /* Protection related, ((val&3)==2) -> jump to 0 */
 
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE (flip_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_main_enable_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(flip_w)
+	AM_RANGE(0xfc01, 0xfc01) AM_WRITE_LEGACY(nmi_main_enable_w)
 	AM_RANGE(0xfc02, 0xfc02) AM_WRITENOP /* Unknown */
 	AM_RANGE(0xfc03, 0xfc03) AM_WRITENOP /* Unknown */
-	AM_RANGE(0xfc04, 0xfc04) AM_WRITE(bgbank_w)
-	AM_RANGE(0xfc05, 0xfc05) AM_WRITE(fgbank_w)
+	AM_RANGE(0xfc04, 0xfc04) AM_WRITE_LEGACY(bgbank_w)
+	AM_RANGE(0xfc05, 0xfc05) AM_WRITE_LEGACY(fgbank_w)
 	AM_RANGE(0xfc06, 0xfc06) AM_WRITENOP /* Unknown */
 	AM_RANGE(0xfc07, 0xfc07) AM_WRITENOP /* Unknown */
 
@@ -339,10 +339,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, pturn_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r) AM_WRITE(nmi_sub_enable_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r) AM_WRITE_LEGACY(nmi_sub_enable_w)
 	AM_RANGE(0x4000, 0x4000) AM_RAM
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static const gfx_layout charlayout =

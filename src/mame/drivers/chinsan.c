@@ -241,17 +241,17 @@ static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8, chinsan_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE_MEMBER(chinsan_state, m_video)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE( m_video)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinsan_io, AS_IO, 8, chinsan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(chinsan_port00_w)
-	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("adpcm", chin_adpcm_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(chinsan_port00_w)
+	AM_RANGE(0x01, 0x01) AM_READ_LEGACY(chinsan_input_port_0_r)
+	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(chinsan_input_port_1_r)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("adpcm", chin_adpcm_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
 ADDRESS_MAP_END
 
 

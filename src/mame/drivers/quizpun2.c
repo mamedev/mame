@@ -357,23 +357,23 @@ static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank1")
 
-	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE( fg_ram_w ) AM_BASE_MEMBER(quizpun2_state, m_fg_ram )	// 4 * 800
-	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE( bg_ram_w ) AM_BASE_MEMBER(quizpun2_state, m_bg_ram )	// 4 * 400
+	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE_LEGACY( fg_ram_w ) AM_BASE( m_fg_ram )	// 4 * 800
+	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE_LEGACY( bg_ram_w ) AM_BASE( m_bg_ram )	// 4 * 400
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAM										//
 
-	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE( paletteram_xRRRRRGGGGGBBBBB_le_w )  AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE_LEGACY( paletteram_xRRRRRGGGGGBBBBB_le_w )  AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizpun2_io_map, AS_IO, 8, quizpun2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE( quizpun2_irq_ack )
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE( quizpun2_soundlatch_w )
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE( quizpun2_rombank_w )
+	AM_RANGE( 0x40, 0x40 ) AM_WRITE_LEGACY( quizpun2_irq_ack )
+	AM_RANGE( 0x50, 0x50 ) AM_WRITE_LEGACY( quizpun2_soundlatch_w )
+	AM_RANGE( 0x60, 0x60 ) AM_WRITE_LEGACY( quizpun2_rombank_w )
 	AM_RANGE( 0x80, 0x80 ) AM_READ_PORT( "DSW" )
 	AM_RANGE( 0x90, 0x90 ) AM_READ_PORT( "IN0" )
 	AM_RANGE( 0xa0, 0xa0 ) AM_READ_PORT( "IN1" )
-	AM_RANGE( 0xe0, 0xe0 ) AM_READWRITE( quizpun2_protection_r, quizpun2_protection_w )
+	AM_RANGE( 0xe0, 0xe0 ) AM_READWRITE_LEGACY( quizpun2_protection_r, quizpun2_protection_w )
 ADDRESS_MAP_END
 
 
@@ -390,8 +390,8 @@ static ADDRESS_MAP_START( quizpun2_sound_io_map, AS_IO, 8, quizpun2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITENOP	// IRQ end
 	AM_RANGE( 0x20, 0x20 ) AM_WRITENOP	// NMI end
-	AM_RANGE( 0x40, 0x40 ) AM_READ( soundlatch_r )
-	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w )
+	AM_RANGE( 0x40, 0x40 ) AM_READ_LEGACY( soundlatch_r )
+	AM_RANGE( 0x60, 0x61 ) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w )
 ADDRESS_MAP_END
 
 

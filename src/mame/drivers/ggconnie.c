@@ -127,24 +127,24 @@ static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, ggconnie_state )
 	AM_RANGE( 0x000000, 0x0fffff) AM_ROM
 	AM_RANGE( 0x110000, 0x1edfff) AM_NOP
 	AM_RANGE( 0x1ee800, 0x1effff) AM_NOP
-	AM_RANGE( 0x1f0000, 0x1f5fff) AM_RAM AM_BASE(&pce_user_ram)
+	AM_RANGE( 0x1f0000, 0x1f5fff) AM_RAM AM_BASE_LEGACY(&pce_user_ram)
 	AM_RANGE( 0x1f7000, 0x1f7000) AM_READ_PORT("SWA")
 	AM_RANGE( 0x1f7100, 0x1f7100) AM_READ_PORT("SWB")
 	AM_RANGE( 0x1f7200, 0x1f7200) AM_READ_PORT("SWC")
 	AM_RANGE( 0x1f7700, 0x1f7700) AM_READ_PORT("IN1")
-	AM_RANGE( 0x1f7800, 0x1f7800) AM_WRITE(output_w)
-	AM_RANGE( 0x1fe000, 0x1fe007) AM_READWRITE(vdc_0_r, vdc_0_w) AM_MIRROR(0x03e0)
-	AM_RANGE( 0x1fe008, 0x1fe00f) AM_READWRITE(vpc_r, vpc_w) AM_MIRROR(0x03e0)
-	AM_RANGE( 0x1fe010, 0x1fe017) AM_READWRITE(vdc_1_r, vdc_1_w) AM_MIRROR(0x03e0)
-	AM_RANGE( 0x1fe400, 0x1fe7ff) AM_READWRITE(vce_r, vce_w)
-	AM_RANGE( 0x1fe800, 0x1febff) AM_DEVREADWRITE("c6280", c6280_r, c6280_w)
-	AM_RANGE( 0x1fec00, 0x1fefff) AM_READWRITE(h6280_timer_r, h6280_timer_w)
-	AM_RANGE( 0x1ff000, 0x1ff000) AM_READ_PORT("IN0") AM_WRITE(lamp_w)
-	AM_RANGE( 0x1ff400, 0x1ff7ff) AM_READWRITE(h6280_irq_status_r, h6280_irq_status_w )
+	AM_RANGE( 0x1f7800, 0x1f7800) AM_WRITE_LEGACY(output_w)
+	AM_RANGE( 0x1fe000, 0x1fe007) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w) AM_MIRROR(0x03e0)
+	AM_RANGE( 0x1fe008, 0x1fe00f) AM_READWRITE_LEGACY(vpc_r, vpc_w) AM_MIRROR(0x03e0)
+	AM_RANGE( 0x1fe010, 0x1fe017) AM_READWRITE_LEGACY(vdc_1_r, vdc_1_w) AM_MIRROR(0x03e0)
+	AM_RANGE( 0x1fe400, 0x1fe7ff) AM_READWRITE_LEGACY(vce_r, vce_w)
+	AM_RANGE( 0x1fe800, 0x1febff) AM_DEVREADWRITE_LEGACY("c6280", c6280_r, c6280_w)
+	AM_RANGE( 0x1fec00, 0x1fefff) AM_READWRITE_LEGACY(h6280_timer_r, h6280_timer_w)
+	AM_RANGE( 0x1ff000, 0x1ff000) AM_READ_PORT("IN0") AM_WRITE_LEGACY(lamp_w)
+	AM_RANGE( 0x1ff400, 0x1ff7ff) AM_READWRITE_LEGACY(h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sgx_io , AS_IO, 8, ggconnie_state )
-	AM_RANGE( 0x00, 0x03) AM_READWRITE( sgx_vdc_r, sgx_vdc_w )
+	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY( sgx_vdc_r, sgx_vdc_w )
 ADDRESS_MAP_END
 
 static const c6280_interface c6280_config =

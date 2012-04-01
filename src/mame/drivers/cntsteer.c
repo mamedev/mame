@@ -526,49 +526,49 @@ static READ8_HANDLER( cntsteer_adx_r )
 
 static ADDRESS_MAP_START( gekitsui_cpu1_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_MEMBER(cntsteer_state, m_spriteram)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x1200, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE_MEMBER(cntsteer_state, m_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE_MEMBER(cntsteer_state, m_colorram)
-	AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(cntsteer_foreground_vram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(cntsteer_foreground_attr_w) AM_BASE( m_colorram)
+	AM_RANGE(0x3000, 0x3003) AM_WRITE_LEGACY(zerotrgt_ctrl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekitsui_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE_MEMBER(cntsteer_state, m_videoram2)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(cntsteer_background_w) AM_BASE( m_videoram2)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("COINS")
-	AM_RANGE(0x3000, 0x3004) AM_WRITE(zerotrgt_vregs_w)
-	AM_RANGE(0x3005, 0x3005) AM_WRITE(gekitsui_sub_irq_ack)
-	AM_RANGE(0x3007, 0x3007) AM_WRITE(cntsteer_sound_w)
+	AM_RANGE(0x3000, 0x3004) AM_WRITE_LEGACY(zerotrgt_vregs_w)
+	AM_RANGE(0x3005, 0x3005) AM_WRITE_LEGACY(gekitsui_sub_irq_ack)
+	AM_RANGE(0x3007, 0x3007) AM_WRITE_LEGACY(cntsteer_sound_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu1_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_MEMBER(cntsteer_state, m_spriteram)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE_MEMBER(cntsteer_state, m_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE_MEMBER(cntsteer_state, m_colorram)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(cntsteer_sub_nmi_w)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE(cntsteer_sub_irq_w)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(cntsteer_foreground_vram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(cntsteer_foreground_attr_w) AM_BASE( m_colorram)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(cntsteer_sub_nmi_w)
+	AM_RANGE(0x3001, 0x3001) AM_WRITE_LEGACY(cntsteer_sub_irq_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE_MEMBER(cntsteer_state, m_videoram2) AM_SHARE("share3")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("share3")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(cntsteer_background_w) AM_BASE( m_videoram2) AM_SHARE("share3")
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE_LEGACY(cntsteer_background_w) AM_SHARE("share3")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
-	AM_RANGE(0x3001, 0x3001) AM_READ(cntsteer_adx_r)
+	AM_RANGE(0x3001, 0x3001) AM_READ_LEGACY(cntsteer_adx_r)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("COINS")
-	AM_RANGE(0x3000, 0x3004) AM_WRITE(cntsteer_vregs_w)
-	AM_RANGE(0x3005, 0x3005) AM_WRITE(gekitsui_sub_irq_ack)
-	AM_RANGE(0x3006, 0x3006) AM_WRITE(cntsteer_main_irq_w)
-	AM_RANGE(0x3007, 0x3007) AM_WRITE(cntsteer_sound_w)
+	AM_RANGE(0x3000, 0x3004) AM_WRITE_LEGACY(cntsteer_vregs_w)
+	AM_RANGE(0x3005, 0x3005) AM_WRITE_LEGACY(gekitsui_sub_irq_ack)
+	AM_RANGE(0x3006, 0x3006) AM_WRITE_LEGACY(cntsteer_main_irq_w)
+	AM_RANGE(0x3007, 0x3007) AM_WRITE_LEGACY(cntsteer_sound_w)
 	AM_RANGE(0x3007, 0x3007) AM_READNOP //m6809 bug.
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -590,13 +590,13 @@ static INTERRUPT_GEN ( sound_interrupt )
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-//  AM_RANGE(0x1000, 0x1000) AM_WRITE(nmiack_w)
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(nmimask_w)
+//  AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(nmiack_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(nmimask_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

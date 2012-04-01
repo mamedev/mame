@@ -357,44 +357,44 @@ static WRITE16_HANDLER ( musobana_inputport_w )
 }
 
 static ADDRESS_MAP_START( tmp68301_regs, AS_PROGRAM, 16, niyanpai_state )
-	AM_RANGE(0xfffc00, 0xfffc0f) AM_READWRITE(tmp68301_address_decoder_r,tmp68301_address_decoder_w)
-	AM_RANGE(0xfffc80, 0xfffc9f) AM_READWRITE(tmp68301_interrupt_controller_r,tmp68301_interrupt_controller_w)
-	AM_RANGE(0xfffd00, 0xfffd0f) AM_READWRITE(tmp68301_parallel_interface_r,tmp68301_parallel_interface_w)
-	AM_RANGE(0xfffd80, 0xfffdaf) AM_READWRITE(tmp68301_serial_interface_r,tmp68301_serial_interface_w)
-	AM_RANGE(0xfffe00, 0xfffe4f) AM_READWRITE(tmp68301_timer_r,tmp68301_timer_w)
+	AM_RANGE(0xfffc00, 0xfffc0f) AM_READWRITE_LEGACY(tmp68301_address_decoder_r,tmp68301_address_decoder_w)
+	AM_RANGE(0xfffc80, 0xfffc9f) AM_READWRITE_LEGACY(tmp68301_interrupt_controller_r,tmp68301_interrupt_controller_w)
+	AM_RANGE(0xfffd00, 0xfffd0f) AM_READWRITE_LEGACY(tmp68301_parallel_interface_r,tmp68301_parallel_interface_w)
+	AM_RANGE(0xfffd80, 0xfffdaf) AM_READWRITE_LEGACY(tmp68301_serial_interface_r,tmp68301_serial_interface_w)
+	AM_RANGE(0xfffe00, 0xfffe4f) AM_READWRITE_LEGACY(tmp68301_timer_r,tmp68301_timer_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
+	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE_LEGACY(niyanpai_palette_r,niyanpai_palette_w)
 	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM	// palette work ram?
 
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE_LEGACY(niyanpai_sound_w)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITENOP			// unknown
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
-	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
-	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
-	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
-	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
-	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
-	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
-	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
-	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
-	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
-	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
+	AM_RANGE(0x240400, 0x240403) AM_READ_LEGACY(niyanpai_blitter_0_r)
+	AM_RANGE(0x240400, 0x24041f) AM_WRITE_LEGACY(niyanpai_blitter_0_w)
+	AM_RANGE(0x240420, 0x24043f) AM_WRITE_LEGACY(niyanpai_clut_0_w)
+	AM_RANGE(0x240600, 0x240603) AM_READ_LEGACY(niyanpai_blitter_1_r)
+	AM_RANGE(0x240600, 0x24061f) AM_WRITE_LEGACY(niyanpai_blitter_1_w)
+	AM_RANGE(0x240620, 0x24063f) AM_WRITE_LEGACY(niyanpai_clut_1_w)
+	AM_RANGE(0x240800, 0x240803) AM_READ_LEGACY(niyanpai_blitter_2_r)
+	AM_RANGE(0x240800, 0x24081f) AM_WRITE_LEGACY(niyanpai_blitter_2_w)
+	AM_RANGE(0x240820, 0x24083f) AM_WRITE_LEGACY(niyanpai_clut_2_w)
+	AM_RANGE(0x280000, 0x280001) AM_READ_LEGACY(niyanpai_dipsw_r)
 
 	AM_RANGE(0x280200, 0x280201) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x240a00, 0x240a01) AM_WRITE(niyanpai_clutsel_0_w)
-	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
-	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
+	AM_RANGE(0x240a00, 0x240a01) AM_WRITE_LEGACY(niyanpai_clutsel_0_w)
+	AM_RANGE(0x240c00, 0x240c01) AM_WRITE_LEGACY(niyanpai_clutsel_1_w)
+	AM_RANGE(0x240e00, 0x240e01) AM_WRITE_LEGACY(niyanpai_clutsel_2_w)
 
 	AM_IMPORT_FROM( tmp68301_regs )
 ADDRESS_MAP_END
@@ -403,35 +403,35 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
-	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
+	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE_LEGACY(niyanpai_palette_r,niyanpai_palette_w)
 	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM				// palette work ram?
 
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE_LEGACY(niyanpai_sound_w)
 
-	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w)	// inputport select
+	AM_RANGE(0x200200, 0x200201) AM_WRITE_LEGACY(musobana_inputport_w)	// inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
-	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
-	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
-	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
+	AM_RANGE(0x240400, 0x240403) AM_READ_LEGACY(niyanpai_blitter_0_r)
+	AM_RANGE(0x240400, 0x24041f) AM_WRITE_LEGACY(niyanpai_blitter_0_w)
+	AM_RANGE(0x240420, 0x24043f) AM_WRITE_LEGACY(niyanpai_clut_0_w)
 
-	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
-	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
-	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
+	AM_RANGE(0x240600, 0x240603) AM_READ_LEGACY(niyanpai_blitter_1_r)
+	AM_RANGE(0x240600, 0x24061f) AM_WRITE_LEGACY(niyanpai_blitter_1_w)
+	AM_RANGE(0x240620, 0x24063f) AM_WRITE_LEGACY(niyanpai_clut_1_w)
 
-	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
-	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
-	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
-	AM_RANGE(0x240a00, 0x240a01) AM_WRITE(niyanpai_clutsel_0_w)
-	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
-	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
+	AM_RANGE(0x240800, 0x240803) AM_READ_LEGACY(niyanpai_blitter_2_r)
+	AM_RANGE(0x240800, 0x24081f) AM_WRITE_LEGACY(niyanpai_blitter_2_w)
+	AM_RANGE(0x240820, 0x24083f) AM_WRITE_LEGACY(niyanpai_clut_2_w)
+	AM_RANGE(0x240a00, 0x240a01) AM_WRITE_LEGACY(niyanpai_clutsel_0_w)
+	AM_RANGE(0x240c00, 0x240c01) AM_WRITE_LEGACY(niyanpai_clutsel_1_w)
+	AM_RANGE(0x240e00, 0x240e01) AM_WRITE_LEGACY(niyanpai_clutsel_2_w)
 
-	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
-	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
+	AM_RANGE(0x280000, 0x280001) AM_READ_LEGACY(niyanpai_dipsw_r)
+	AM_RANGE(0x280200, 0x280201) AM_READ_LEGACY(musobana_inputport_0_r)
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
 	AM_IMPORT_FROM( tmp68301_regs )
@@ -441,37 +441,37 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040fff) AM_RAM
 
-	AM_RANGE(0x060000, 0x0608ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
+	AM_RANGE(0x060000, 0x0608ff) AM_READWRITE_LEGACY(niyanpai_palette_r,niyanpai_palette_w)
 	AM_RANGE(0x060900, 0x0611ff) AM_RAM				// palette work ram?
 	AM_RANGE(0x07f800, 0x07ffff) AM_RAM
 
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf000, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE_LEGACY(niyanpai_sound_w)
 
-	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w)	// inputport select
+	AM_RANGE(0x200200, 0x200201) AM_WRITE_LEGACY(musobana_inputport_w)	// inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
-	AM_RANGE(0x240400, 0x240403) AM_READ(niyanpai_blitter_0_r)
-	AM_RANGE(0x240400, 0x24041f) AM_WRITE(niyanpai_blitter_0_w)
-	AM_RANGE(0x240420, 0x24043f) AM_WRITE(niyanpai_clut_0_w)
+	AM_RANGE(0x240400, 0x240403) AM_READ_LEGACY(niyanpai_blitter_0_r)
+	AM_RANGE(0x240400, 0x24041f) AM_WRITE_LEGACY(niyanpai_blitter_0_w)
+	AM_RANGE(0x240420, 0x24043f) AM_WRITE_LEGACY(niyanpai_clut_0_w)
 
-	AM_RANGE(0x240600, 0x240603) AM_READ(niyanpai_blitter_1_r)
-	AM_RANGE(0x240600, 0x24061f) AM_WRITE(niyanpai_blitter_1_w)
-	AM_RANGE(0x240620, 0x24063f) AM_WRITE(niyanpai_clut_1_w)
+	AM_RANGE(0x240600, 0x240603) AM_READ_LEGACY(niyanpai_blitter_1_r)
+	AM_RANGE(0x240600, 0x24061f) AM_WRITE_LEGACY(niyanpai_blitter_1_w)
+	AM_RANGE(0x240620, 0x24063f) AM_WRITE_LEGACY(niyanpai_clut_1_w)
 
-	AM_RANGE(0x240800, 0x240803) AM_READ(niyanpai_blitter_2_r)
-	AM_RANGE(0x240800, 0x24081f) AM_WRITE(niyanpai_blitter_2_w)
-	AM_RANGE(0x240820, 0x24083f) AM_WRITE(niyanpai_clut_2_w)
+	AM_RANGE(0x240800, 0x240803) AM_READ_LEGACY(niyanpai_blitter_2_r)
+	AM_RANGE(0x240800, 0x24081f) AM_WRITE_LEGACY(niyanpai_blitter_2_w)
+	AM_RANGE(0x240820, 0x24083f) AM_WRITE_LEGACY(niyanpai_clut_2_w)
 
-	AM_RANGE(0x240a00, 0x240a01) AM_WRITE(niyanpai_clutsel_0_w)
-	AM_RANGE(0x240c00, 0x240c01) AM_WRITE(niyanpai_clutsel_1_w)
-	AM_RANGE(0x240e00, 0x240e01) AM_WRITE(niyanpai_clutsel_2_w)
+	AM_RANGE(0x240a00, 0x240a01) AM_WRITE_LEGACY(niyanpai_clutsel_0_w)
+	AM_RANGE(0x240c00, 0x240c01) AM_WRITE_LEGACY(niyanpai_clutsel_1_w)
+	AM_RANGE(0x240e00, 0x240e01) AM_WRITE_LEGACY(niyanpai_clutsel_2_w)
 
-	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
-	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
+	AM_RANGE(0x280000, 0x280001) AM_READ_LEGACY(niyanpai_dipsw_r)
+	AM_RANGE(0x280200, 0x280201) AM_READ_LEGACY(musobana_inputport_0_r)
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
 	AM_IMPORT_FROM( tmp68301_regs )
@@ -486,18 +486,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( niyanpai_sound_io_map, AS_IO, 8, niyanpai_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
-	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
-	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
-	AM_RANGE(0x30, 0x30) AM_READWRITE(tmpz84c011_0_pd_r, tmpz84c011_0_pd_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE(tmpz84c011_0_pe_r, tmpz84c011_0_pe_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE(tmpz84c011_0_dir_pa_r, tmpz84c011_0_dir_pa_w)
-	AM_RANGE(0x55, 0x55) AM_READWRITE(tmpz84c011_0_dir_pb_r, tmpz84c011_0_dir_pb_w)
-	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
-	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
-	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym3812_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x50, 0x50) AM_READWRITE_LEGACY(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
+	AM_RANGE(0x51, 0x51) AM_READWRITE_LEGACY(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
+	AM_RANGE(0x52, 0x52) AM_READWRITE_LEGACY(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
+	AM_RANGE(0x30, 0x30) AM_READWRITE_LEGACY(tmpz84c011_0_pd_r, tmpz84c011_0_pd_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE_LEGACY(tmpz84c011_0_pe_r, tmpz84c011_0_pe_w)
+	AM_RANGE(0x54, 0x54) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pa_r, tmpz84c011_0_dir_pa_w)
+	AM_RANGE(0x55, 0x55) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pb_r, tmpz84c011_0_dir_pb_w)
+	AM_RANGE(0x56, 0x56) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
+	AM_RANGE(0x34, 0x34) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
+	AM_RANGE(0x44, 0x44) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 ADDRESS_MAP_END
 
 

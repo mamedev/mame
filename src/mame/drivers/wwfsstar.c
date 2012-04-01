@@ -161,28 +161,28 @@ static WRITE16_HANDLER ( wwfsstar_scrollwrite );
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfsstar_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(wwfsstar_fg0_videoram_w) AM_BASE_MEMBER(wwfsstar_state,m_fg0_videoram)	/* FG0 Ram */
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(wwfsstar_bg0_videoram_w) AM_BASE_MEMBER(wwfsstar_state,m_bg0_videoram)	/* BG0 Ram */
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_BASE_MEMBER(wwfsstar_state,m_spriteram)		/* SPR Ram */
-	AM_RANGE(0x140000, 0x140fff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x180000, 0x180003) AM_WRITE(wwfsstar_irqack_w)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(wwfsstar_fg0_videoram_w) AM_BASE(m_fg0_videoram)	/* FG0 Ram */
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE_LEGACY(wwfsstar_bg0_videoram_w) AM_BASE(m_bg0_videoram)	/* BG0 Ram */
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_BASE(m_spriteram)		/* SPR Ram */
+	AM_RANGE(0x140000, 0x140fff) AM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x180000, 0x180003) AM_WRITE_LEGACY(wwfsstar_irqack_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("P1")
-	AM_RANGE(0x180004, 0x180007) AM_WRITE(wwfsstar_scrollwrite)
+	AM_RANGE(0x180004, 0x180007) AM_WRITE_LEGACY(wwfsstar_scrollwrite)
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("P2")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180008, 0x180009) AM_WRITE(wwfsstar_soundwrite)
-	AM_RANGE(0x18000a, 0x18000b) AM_WRITE(wwfsstar_flipscreen_w)
+	AM_RANGE(0x180008, 0x180009) AM_WRITE_LEGACY(wwfsstar_soundwrite)
+	AM_RANGE(0x18000a, 0x18000b) AM_WRITE_LEGACY(wwfsstar_flipscreen_w)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM								/* Work Ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wwfsstar_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

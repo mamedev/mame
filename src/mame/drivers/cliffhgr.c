@@ -234,21 +234,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mainport, AS_IO, 8, cliffhgr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x44, 0x44) AM_DEVWRITE_MODERN("tms9928a", tms9928a_device, vram_write)
-	AM_RANGE(0x45, 0x45) AM_DEVREAD_MODERN("tms9928a", tms9928a_device, vram_read)
-	AM_RANGE(0x46, 0x46) AM_DEVWRITE("discrete", cliff_sound_overlay_w)
-	AM_RANGE(0x50, 0x52) AM_READ(cliff_phillips_code_r)
-	AM_RANGE(0x53, 0x53) AM_READ(cliff_irq_ack_r)
-	AM_RANGE(0x54, 0x54) AM_DEVWRITE_MODERN("tms9928a", tms9928a_device, register_write)
-	AM_RANGE(0x55, 0x55) AM_DEVREAD_MODERN("tms9928a", tms9928a_device, register_read)
-	AM_RANGE(0x57, 0x57) AM_WRITE(cliff_phillips_clear_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(cliff_port_bank_w)
-	AM_RANGE(0x62, 0x62) AM_READ(cliff_port_r)
+	AM_RANGE(0x44, 0x44) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
+	AM_RANGE(0x45, 0x45) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
+	AM_RANGE(0x46, 0x46) AM_DEVWRITE_LEGACY("discrete", cliff_sound_overlay_w)
+	AM_RANGE(0x50, 0x52) AM_READ_LEGACY(cliff_phillips_code_r)
+	AM_RANGE(0x53, 0x53) AM_READ_LEGACY(cliff_irq_ack_r)
+	AM_RANGE(0x54, 0x54) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
+	AM_RANGE(0x55, 0x55) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
+	AM_RANGE(0x57, 0x57) AM_WRITE_LEGACY(cliff_phillips_clear_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(cliff_port_bank_w)
+	AM_RANGE(0x62, 0x62) AM_READ_LEGACY(cliff_port_r)
 	AM_RANGE(0x64, 0x64) AM_WRITENOP /* unused in schematics, may be used as timing delay for IR interface */
-	AM_RANGE(0x66, 0x66) AM_WRITE(cliff_ldwire_w)
-	AM_RANGE(0x68, 0x68) AM_WRITE(cliff_coin_counter_w)
+	AM_RANGE(0x66, 0x66) AM_WRITE_LEGACY(cliff_ldwire_w)
+	AM_RANGE(0x68, 0x68) AM_WRITE_LEGACY(cliff_coin_counter_w)
 	AM_RANGE(0x6a, 0x6a) AM_WRITENOP /* /LAMP0 (Infrared?) */
-	AM_RANGE(0x6e, 0x6f) AM_WRITE(cliff_test_led_w)
+	AM_RANGE(0x6e, 0x6f) AM_WRITE_LEGACY(cliff_test_led_w)
 ADDRESS_MAP_END
 
 

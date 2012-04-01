@@ -184,13 +184,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roul_cpu_io_map, AS_IO, 8, roul_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf4) AM_WRITE(blitter_cmd_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
+	AM_RANGE(0xf0, 0xf4) AM_WRITE_LEGACY(blitter_cmd_w)
+	AM_RANGE(0xf5, 0xf5) AM_READ_LEGACY(blitter_status_r)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW")
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
+	AM_RANGE(0xf9, 0xf9) AM_WRITE_LEGACY(ball_w)
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN0")
 	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE_LEGACY(sound_latch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, roul_state )
@@ -200,8 +200,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_io_map, AS_IO, 8, roul_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static VIDEO_START(roul)

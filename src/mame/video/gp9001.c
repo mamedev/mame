@@ -200,10 +200,10 @@ static WRITE16_DEVICE_HANDLER( gp9001_spram_w )
 }
 
 static ADDRESS_MAP_START( gp9001vdp_map, AS_0, 16, gp9001vdp_device )
-	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_bg_tmap_r, gp9001_bg_tmap_w)
-	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_fg_tmap_r, gp9001_fg_tmap_w)
-	AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_top_tmap_r, gp9001_top_tmap_w)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_spram_r, gp9001_spram_w)
+	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE_LEGACY(DEVICE_SELF, gp9001_bg_tmap_r, gp9001_bg_tmap_w)
+	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE_LEGACY(DEVICE_SELF, gp9001_fg_tmap_r, gp9001_fg_tmap_w)
+	AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE_LEGACY(DEVICE_SELF, gp9001_top_tmap_r, gp9001_top_tmap_w)
+	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE_LEGACY(DEVICE_SELF, gp9001_spram_r, gp9001_spram_w)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
 ADDRESS_MAP_END
 

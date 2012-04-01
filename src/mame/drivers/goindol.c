@@ -90,34 +90,34 @@ static WRITE8_HANDLER( prot_fcb0_w )
 static ADDRESS_MAP_START( goindol_map, AS_PROGRAM, 8, goindol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(goindol_state, m_ram)
-	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE(soundlatch_w) // watchdog?
-	AM_RANGE(0xc810, 0xc810) AM_WRITE(goindol_bankswitch_w)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE( m_ram)
+	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE_LEGACY(soundlatch_w) // watchdog?
+	AM_RANGE(0xc810, 0xc810) AM_WRITE_LEGACY(goindol_bankswitch_w)
 	AM_RANGE(0xc820, 0xc820) AM_READ_PORT("DIAL")
-	AM_RANGE(0xc820, 0xd820) AM_WRITEONLY AM_BASE_MEMBER(goindol_state, m_fg_scrolly)
+	AM_RANGE(0xc820, 0xd820) AM_WRITEONLY AM_BASE( m_fg_scrolly)
 	AM_RANGE(0xc830, 0xc830) AM_READ_PORT("P1")
-	AM_RANGE(0xc830, 0xd830) AM_WRITEONLY AM_BASE_MEMBER(goindol_state, m_fg_scrollx)
+	AM_RANGE(0xc830, 0xd830) AM_WRITEONLY AM_BASE( m_fg_scrollx)
 	AM_RANGE(0xc834, 0xc834) AM_READ_PORT("P2")
-	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_SIZE_MEMBER(goindol_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd03f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd040, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(goindol_bg_videoram_w) AM_BASE_SIZE_MEMBER(goindol_state, m_bg_videoram, m_bg_videoram_size)
-	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_BASE_MEMBER(goindol_state, m_spriteram2)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(goindol_bg_videoram_w) AM_BASE_SIZE( m_bg_videoram, m_bg_videoram_size)
+	AM_RANGE(0xe000, 0xe03f) AM_RAM AM_BASE( m_spriteram2)
 	AM_RANGE(0xe040, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(goindol_fg_videoram_w) AM_BASE_SIZE_MEMBER(goindol_state, m_fg_videoram, m_fg_videoram_size)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(goindol_fg_videoram_w) AM_BASE_SIZE( m_fg_videoram, m_fg_videoram_size)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf422, 0xf422) AM_READ(prot_f422_r)
+	AM_RANGE(0xf422, 0xf422) AM_READ_LEGACY(prot_f422_r)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc44, 0xfc44) AM_WRITE(prot_fc44_w)
-	AM_RANGE(0xfc66, 0xfc66) AM_WRITE(prot_fc66_w)
-	AM_RANGE(0xfcb0, 0xfcb0) AM_WRITE(prot_fcb0_w)
-	AM_RANGE(0xfd99, 0xfd99) AM_WRITE(prot_fd99_w)
+	AM_RANGE(0xfc44, 0xfc44) AM_WRITE_LEGACY(prot_fc44_w)
+	AM_RANGE(0xfc66, 0xfc66) AM_WRITE_LEGACY(prot_fc66_w)
+	AM_RANGE(0xfcb0, 0xfcb0) AM_WRITE_LEGACY(prot_fcb0_w)
+	AM_RANGE(0xfd99, 0xfd99) AM_WRITE_LEGACY(prot_fd99_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, goindol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ymsnd", ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r)
+	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

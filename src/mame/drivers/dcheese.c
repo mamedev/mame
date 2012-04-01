@@ -218,14 +218,14 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16, dcheese_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("200000") AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("220000") AM_WRITE(madmax_blitter_color_w)
-	AM_RANGE(0x240000, 0x240001) AM_READ_PORT("240000") AM_WRITE(eeprom_control_w)
-	AM_RANGE(0x260000, 0x26001f) AM_WRITE(madmax_blitter_xparam_w)
-	AM_RANGE(0x280000, 0x28001f) AM_WRITE(madmax_blitter_yparam_w)
-	AM_RANGE(0x2a0000, 0x2a003f) AM_READWRITE(madmax_blitter_vidparam_r, madmax_blitter_vidparam_w)
-	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(sound_command_w)
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(madmax_blitter_unknown_w)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("200000") AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("220000") AM_WRITE_LEGACY(madmax_blitter_color_w)
+	AM_RANGE(0x240000, 0x240001) AM_READ_PORT("240000") AM_WRITE_LEGACY(eeprom_control_w)
+	AM_RANGE(0x260000, 0x26001f) AM_WRITE_LEGACY(madmax_blitter_xparam_w)
+	AM_RANGE(0x280000, 0x28001f) AM_WRITE_LEGACY(madmax_blitter_yparam_w)
+	AM_RANGE(0x2a0000, 0x2a003f) AM_READWRITE_LEGACY(madmax_blitter_vidparam_r, madmax_blitter_vidparam_w)
+	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(madmax_blitter_unknown_w)
 ADDRESS_MAP_END
 
 
@@ -238,9 +238,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, dcheese_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sound_status_r, sound_control_w)
-	AM_RANGE(0x0800, 0x0fff) AM_READ(sound_command_r)
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0700) AM_WRITE(bsmt_data_w)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(sound_status_r, sound_control_w)
+	AM_RANGE(0x0800, 0x0fff) AM_READ_LEGACY(sound_command_r)
+	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0700) AM_WRITE_LEGACY(bsmt_data_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END

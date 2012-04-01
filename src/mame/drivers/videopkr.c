@@ -943,11 +943,11 @@ static ADDRESS_MAP_START( i8039_map, AS_PROGRAM, 8, videopkr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_io_port, AS_IO, 8, videopkr_state )
-	AM_RANGE(0x00,            0xff           ) AM_READWRITE(videopkr_io_r, videopkr_io_w)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1  ) AM_READWRITE(videopkr_p1_data_r, videopkr_p1_data_w)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2  ) AM_READWRITE(videopkr_p2_data_r, videopkr_p2_data_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_WRITE(prog_w)
-	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0  ) AM_READ(videopkr_t0_latch)
+	AM_RANGE(0x00,            0xff           ) AM_READWRITE_LEGACY(videopkr_io_r, videopkr_io_w)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1  ) AM_READWRITE_LEGACY(videopkr_p1_data_r, videopkr_p1_data_w)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2  ) AM_READWRITE_LEGACY(videopkr_p2_data_r, videopkr_p2_data_w)
+	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_WRITE_LEGACY(prog_w)
+	AM_RANGE(MCS48_PORT_T0,   MCS48_PORT_T0  ) AM_READ_LEGACY(videopkr_t0_latch)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_mem, AS_PROGRAM, 8, videopkr_state )
@@ -955,9 +955,9 @@ static ADDRESS_MAP_START( i8039_sound_mem, AS_PROGRAM, 8, videopkr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_port, AS_IO, 8, videopkr_state )
-	AM_RANGE(0x00         , 0xff         ) AM_READWRITE(sound_io_r, sound_io_w)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(sound_p2_r, sound_p2_w)
+	AM_RANGE(0x00         , 0xff         ) AM_READWRITE_LEGACY(sound_io_r, sound_io_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE_LEGACY(sound_p2_r, sound_p2_w)
 ADDRESS_MAP_END
 
 
@@ -968,10 +968,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( i8051_sound_port, AS_IO, 8, videopkr_state )
 	AM_RANGE(0x0000, 0x1ff) AM_RAM
 	/* ports */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(baby_sound_p0_r, baby_sound_p0_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(baby_sound_p1_r, baby_sound_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READ(baby_sound_p2_r) AM_DEVWRITE("dac", baby_sound_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_DEVREADWRITE("aysnd", baby_sound_p3_r, baby_sound_p3_w)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE_LEGACY(baby_sound_p0_r, baby_sound_p0_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE_LEGACY(baby_sound_p1_r, baby_sound_p1_w)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READ_LEGACY(baby_sound_p2_r) AM_DEVWRITE_LEGACY("dac", baby_sound_p2_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_DEVREADWRITE_LEGACY("aysnd", baby_sound_p3_r, baby_sound_p3_w)
 ADDRESS_MAP_END
 
 

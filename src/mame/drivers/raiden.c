@@ -49,21 +49,21 @@
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE( m_shared_ram)
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, m_videoram)
-	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0d060, 0x0d067) AM_WRITEONLY AM_BASE_MEMBER(raiden_state, m_scroll_ram)
+	AM_RANGE(0x0b000, 0x0b007) AM_WRITE_LEGACY(raiden_control_w)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE_LEGACY(raiden_text_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0d060, 0x0d067) AM_WRITEONLY AM_BASE( m_scroll_ram)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
-	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE(raiden_background_w) AM_BASE_MEMBER(raiden_state, m_back_data)
-	AM_RANGE(0x02800, 0x02fff) AM_RAM_WRITE(raiden_foreground_w) AM_BASE_MEMBER(raiden_state, m_fore_data)
-	AM_RANGE(0x03000, 0x03fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE_LEGACY(raiden_background_w) AM_BASE( m_back_data)
+	AM_RANGE(0x02800, 0x02fff) AM_RAM_WRITE_LEGACY(raiden_foreground_w) AM_BASE( m_fore_data)
+	AM_RANGE(0x03000, 0x03fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x07ffe, 0x0afff) AM_WRITENOP
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
@@ -74,13 +74,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( alt_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
-	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, m_videoram)
+	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1") AM_BASE( m_shared_ram)
+	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE_LEGACY(raiden_text_w) AM_BASE( m_videoram)
 	AM_RANGE(0x0e000, 0x0e001) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x0e000, 0x0e007) AM_WRITE(raidena_control_w)
+	AM_RANGE(0x0e000, 0x0e007) AM_WRITE_LEGACY(raidena_control_w)
 	AM_RANGE(0x0e002, 0x0e003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0f000, 0x0f035) AM_WRITEONLY AM_BASE_MEMBER(raiden_state, m_scroll_ram)
+	AM_RANGE(0x0f000, 0x0f035) AM_WRITEONLY AM_BASE( m_scroll_ram)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -89,22 +89,22 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raidenu_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08000, 0x08035) AM_WRITEONLY AM_BASE_MEMBER(raiden_state, m_scroll_ram)
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
+	AM_RANGE(0x08000, 0x08035) AM_WRITEONLY AM_BASE( m_scroll_ram)
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE( m_shared_ram)
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raidena_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, m_videoram)
-	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0b000, 0x0b007) AM_WRITE_LEGACY(raidena_control_w)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE_LEGACY(raiden_text_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( raidenu_sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
-	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(raiden_background_w) AM_BASE_MEMBER(raiden_state, m_back_data)
-	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(raiden_foreground_w) AM_BASE_MEMBER(raiden_state, m_fore_data)
-	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE_LEGACY(raiden_background_w) AM_BASE( m_back_data)
+	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE_LEGACY(raiden_foreground_w) AM_BASE( m_fore_data)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1")
 	//AM_RANGE(0x07ffe, 0x0afff) AM_WRITENOP
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM

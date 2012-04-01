@@ -684,15 +684,15 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_SHARE("share1") AM_WRITENOP
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
-	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_BASE_MEMBER(coolridr_state, m_h1_vram)//bg vram
-	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE(sysh1_char_w) AM_BASE_MEMBER(coolridr_state, m_h1_charram) //FIXME: half size
-	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE_MEMBER(coolridr_state, m_framebuffer_vram) //FIXME: not all of it
+	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_BASE( m_h1_vram)//bg vram
+	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE_LEGACY(sysh1_pal_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE_LEGACY(sysh1_char_w) AM_BASE( m_h1_charram) //FIXME: half size
+	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE_LEGACY(sysh1_dma_w) AM_BASE( m_framebuffer_vram) //FIXME: not all of it
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
-	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_BASE_MEMBER(coolridr_state, m_txt_vram)//text tilemap + "lineram"
-	AM_RANGE(0x04000000, 0x0400003f) AM_RAM_WRITE(sysh1_txt_blit_w) AM_BASE_MEMBER(coolridr_state, m_sysh1_txt_blit)
-	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE_MEMBER(coolridr_state, m_sysh1_workram_h)
+	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_BASE( m_txt_vram)//text tilemap + "lineram"
+	AM_RANGE(0x04000000, 0x0400003f) AM_RAM_WRITE_LEGACY(sysh1_txt_blit_w) AM_BASE( m_sysh1_txt_blit)
+	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE( m_sysh1_workram_h)
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share1")
 
 	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
@@ -710,7 +710,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x03208900, 0x03208903) AM_RAM /*???*/
 	AM_RANGE(0x03300400, 0x03300403) AM_RAM /*irq enable?*/
 
-	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_BASE_MEMBER(coolridr_state, m_h1_unk)
+	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE_LEGACY(sysh1_unk_r,sysh1_unk_w) AM_BASE( m_h1_unk)
 	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /*???*/
 
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
@@ -737,9 +737,9 @@ ADDRESS_MAP_END
 // (see also Model 3):
 static ADDRESS_MAP_START( system_h1_sound_map, AS_PROGRAM, 16, coolridr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-//  AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE("scsp1", scsp_r, scsp_w)
+//  AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp1", scsp_r, scsp_w)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM
-//  AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE("scsp2", scsp_r, scsp_w)
+//  AM_RANGE(0x300000, 0x300fff) AM_DEVREADWRITE_LEGACY("scsp2", scsp_r, scsp_w)
 ADDRESS_MAP_END
 
 

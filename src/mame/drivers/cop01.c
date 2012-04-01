@@ -127,9 +127,9 @@ static READ8_HANDLER( cop01_sound_irq_ack_w )
 static ADDRESS_MAP_START( cop01_map, AS_PROGRAM, 8, cop01_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM /* c000-c7ff in cop01 */
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE_MEMBER(cop01_state, m_bgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cop01_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE_MEMBER(cop01_state, m_fgvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(cop01_background_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE_LEGACY(cop01_foreground_w) AM_BASE( m_fgvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, cop01_state )
@@ -139,9 +139,9 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cop01_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x40, 0x43) AM_WRITE(cop01_vreg_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(cop01_sound_command_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
+	AM_RANGE(0x40, 0x43) AM_WRITE_LEGACY(cop01_vreg_w)
+	AM_RANGE(0x44, 0x44) AM_WRITE_LEGACY(cop01_sound_command_w)
+	AM_RANGE(0x45, 0x45) AM_WRITE_LEGACY(cop01_irq_ack_w) /* ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8, cop01_state )
@@ -151,23 +151,23 @@ static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8, cop01_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x40, 0x43) AM_WRITE(cop01_vreg_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(cop01_sound_command_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
+	AM_RANGE(0x40, 0x43) AM_WRITE_LEGACY(cop01_vreg_w)
+	AM_RANGE(0x44, 0x44) AM_WRITE_LEGACY(cop01_sound_command_w)
+	AM_RANGE(0x45, 0x45) AM_WRITE_LEGACY(cop01_irq_ack_w) /* ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cop01_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READ(cop01_sound_irq_ack_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(cop01_sound_irq_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay3", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
+	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(cop01_sound_command_r)
 ADDRESS_MAP_END
 
 
@@ -180,11 +180,11 @@ static READ8_HANDLER( kludge )
 
 static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP	/* 1412M2? */
 	AM_RANGE(0x03, 0x03) AM_WRITENOP	/* 1412M2? */
-	AM_RANGE(0x03, 0x03) AM_READ(kludge)	/* 1412M2? */
-	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(kludge)	/* 1412M2? */
+	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(cop01_sound_command_r)
 ADDRESS_MAP_END
 
 

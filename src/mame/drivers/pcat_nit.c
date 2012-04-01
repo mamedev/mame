@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, pcat_nit_state )
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM AM_REGION("video_bios", 0) AM_WRITENOP
 	AM_RANGE(0x000d0000, 0x000d3fff) AM_RAM AM_REGION("disk_bios", 0)
-	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8(pcat_nit_rombank_w, 0xff)
+	AM_RANGE(0x000d7000, 0x000d7003) AM_WRITE8_LEGACY(pcat_nit_rombank_w, 0xff)
 	AM_RANGE(0x000d8000, 0x000dffff) AM_ROMBANK("rombank")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_RAM AM_REGION("bios", 0 )
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("bios", 0 )
@@ -204,9 +204,9 @@ static READ8_HANDLER(pcat_nit_io_r)
 
 static ADDRESS_MAP_START( pcat_nit_io, AS_IO, 32, pcat_nit_state )
 	AM_IMPORT_FROM(pcat32_io_common)
-	AM_RANGE(0x0278, 0x027f) AM_READ8(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
+	AM_RANGE(0x0278, 0x027f) AM_READ8_LEGACY(pcat_nit_io_r, 0xffffffff) AM_WRITENOP
 	AM_RANGE(0x0280, 0x0283) AM_READNOP
-	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8_MODERN("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ns16450_0", ns16450_device, ins8250_r, ins8250_w, 0xffffffff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pcat_nit )

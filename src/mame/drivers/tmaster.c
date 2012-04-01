@@ -509,26 +509,26 @@ static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x27ffff ) AM_RAM
 	AM_RANGE( 0x280000, 0x28ffef ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x28fff0, 0x28ffff ) AM_READWRITE( rtc_r, rtc_w )
+	AM_RANGE( 0x28fff0, 0x28ffff ) AM_READWRITE_LEGACY( rtc_r, rtc_w )
 
-	AM_RANGE( 0x300010, 0x300011 ) AM_READ( tmaster_coins_r )
+	AM_RANGE( 0x300010, 0x300011 ) AM_READ_LEGACY( tmaster_coins_r )
 
-	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8_LEGACY( "duart68681", duart68681_r, duart68681_w, 0xff )
 
-	AM_RANGE( 0x300040, 0x300041 ) AM_DEVWRITE( "oki", tmaster_oki_bank_w )
+	AM_RANGE( 0x300040, 0x300041 ) AM_DEVWRITE_LEGACY( "oki", tmaster_oki_bank_w )
 
-	AM_RANGE( 0x300070, 0x300071 ) AM_WRITE( tmaster_addr_w )
+	AM_RANGE( 0x300070, 0x300071 ) AM_WRITE_LEGACY( tmaster_addr_w )
 
-	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE_MEMBER(tmaster_state, m_regs )
-	AM_RANGE( 0x500010, 0x500011 ) AM_READ ( tmaster_blitter_r )
+	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE_LEGACY( tmaster_blitter_w ) AM_BASE( m_regs )
+	AM_RANGE( 0x500010, 0x500011 ) AM_READ_LEGACY( tmaster_blitter_r )
 
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITENOP // often
 
-	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_WRITE( paletteram16_xBBBBBGGGGGRRRRR_word_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_WRITE_LEGACY( paletteram16_xBBBBBGGGGGRRRRR_word_w ) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
+	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 
-	AM_RANGE( 0x800010, 0x800011 ) AM_WRITE( tmaster_color_w )
+	AM_RANGE( 0x800010, 0x800011 ) AM_WRITE_LEGACY( tmaster_color_w )
 ADDRESS_MAP_END
 
 
@@ -731,26 +731,26 @@ static READ16_HANDLER( dummy_read_01 )
 
 static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
 
-	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_BASE_MEMBER(tmaster_state, m_galgames_ram )
+	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_BASE( m_galgames_ram )
 	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( "maincpu", 0x40000 )
 	AM_RANGE( 0x200000, 0x23ffff ) AM_READ_BANK(GALGAMES_BANK_200000_R) AM_WRITE_BANK(GALGAMES_BANK_200000_W)
 	AM_RANGE( 0x240000, 0x3fffff ) AM_READ_BANK(GALGAMES_BANK_240000_R)
 
-	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE_MEMBER(tmaster_state, m_regs )
-	AM_RANGE( 0x400012, 0x400013 ) AM_WRITE( tmaster_addr_w )
-	AM_RANGE( 0x400014, 0x400015 ) AM_WRITE( tmaster_color_w )
-	AM_RANGE( 0x400020, 0x400021 ) AM_READ ( tmaster_blitter_r )
+	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE_LEGACY( tmaster_blitter_w ) AM_BASE( m_regs )
+	AM_RANGE( 0x400012, 0x400013 ) AM_WRITE_LEGACY( tmaster_addr_w )
+	AM_RANGE( 0x400014, 0x400015 ) AM_WRITE_LEGACY( tmaster_color_w )
+	AM_RANGE( 0x400020, 0x400021 ) AM_READ_LEGACY( tmaster_blitter_r )
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READ( dummy_read_01 ) AM_WRITENOP
-	AM_RANGE( 0x700000, 0x700001 ) AM_READ( dummy_read_01 ) AM_WRITENOP
+	AM_RANGE( 0x600000, 0x600001 ) AM_READ_LEGACY( dummy_read_01 ) AM_WRITENOP
+	AM_RANGE( 0x700000, 0x700001 ) AM_READ_LEGACY( dummy_read_01 ) AM_WRITENOP
 	AM_RANGE( 0x800020, 0x80003f ) AM_NOP	// ?
-	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE( watchdog_reset16_w )
+	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE_LEGACY( watchdog_reset16_w )
 
-	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE( galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
+	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
+	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE_LEGACY( galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_WRITE( galgames_palette_offset_w )
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_WRITE( galgames_palette_data_w )
+	AM_RANGE( 0xc00000, 0xc00001 ) AM_WRITE_LEGACY( galgames_palette_offset_w )
+	AM_RANGE( 0xc00002, 0xc00003 ) AM_WRITE_LEGACY( galgames_palette_data_w )
 
 	AM_RANGE( 0xd00000, 0xd00001 ) AM_READ_PORT("TRACKBALL_1_X")
 	AM_RANGE( 0xd00000, 0xd00001 ) AM_WRITENOP
@@ -761,10 +761,10 @@ static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
 	AM_RANGE( 0xd0000a, 0xd0000b ) AM_READ_PORT("P2")
 	AM_RANGE( 0xd0000c, 0xd0000d ) AM_READ_PORT("SYSTEM") AM_WRITENOP
 
-	AM_RANGE( 0xd0000e, 0xd0000f ) AM_WRITE( galgames_cart_sel_w )
-	AM_RANGE( 0xd00010, 0xd00011 ) AM_READWRITE( galgames_eeprom_r, galgames_eeprom_w )
-	AM_RANGE( 0xd00012, 0xd00013 ) AM_READWRITE( galgames_cart_data_r, galgames_cart_data_w )
-	AM_RANGE( 0xd00014, 0xd00015 ) AM_READWRITE( galgames_cart_clock_r, galgames_cart_clock_w )
+	AM_RANGE( 0xd0000e, 0xd0000f ) AM_WRITE_LEGACY( galgames_cart_sel_w )
+	AM_RANGE( 0xd00010, 0xd00011 ) AM_READWRITE_LEGACY( galgames_eeprom_r, galgames_eeprom_w )
+	AM_RANGE( 0xd00012, 0xd00013 ) AM_READWRITE_LEGACY( galgames_cart_data_r, galgames_cart_data_w )
+	AM_RANGE( 0xd00014, 0xd00015 ) AM_READWRITE_LEGACY( galgames_cart_clock_r, galgames_cart_clock_w )
 
 ADDRESS_MAP_END
 

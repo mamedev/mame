@@ -77,12 +77,12 @@ static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8, murogmbl_state )
 	AM_RANGE(0x0000, 0x1fFf) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM
-	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE_MEMBER(murogmbl_state, m_video)
+	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE( m_video)
 	AM_RANGE(0x5c00, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("DSW")
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN1")
-	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE("dac1", dac_w) /* read is always discarded */
+	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE_LEGACY("dac1", dac_w) /* read is always discarded */
 ADDRESS_MAP_END
 
 static VIDEO_START(murogmbl)

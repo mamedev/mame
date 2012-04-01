@@ -23,7 +23,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pyramid_portmap, AS_IO, 8, ecoinf3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x58, 0x58) AM_WRITE(py_port58_out_w)
+	AM_RANGE(0x58, 0x58) AM_WRITE_LEGACY(py_port58_out_w)
 ADDRESS_MAP_END
 
 /*

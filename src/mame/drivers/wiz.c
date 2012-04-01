@@ -226,31 +226,31 @@ static WRITE8_HANDLER( wiz_main_nmi_mask_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_WRITE(wiz_coin_counter_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_BASE_MEMBER(wiz_state, m_videoram2)					/* Fallthrough */
-	AM_RANGE(0xd400, 0xd7ff) AM_BASE_MEMBER(wiz_state, m_colorram2)
-	AM_RANGE(0xd800, 0xd83f) AM_BASE_MEMBER(wiz_state, m_attributesram2)
-	AM_RANGE(0xd840, 0xd85f) AM_BASE_MEMBER(wiz_state, m_spriteram2) AM_SIZE_MEMBER(wiz_state, m_spriteram_size)
+	AM_RANGE(0xc800, 0xc801) AM_WRITE_LEGACY(wiz_coin_counter_w)
+	AM_RANGE(0xd000, 0xd3ff) AM_BASE( m_videoram2)					/* Fallthrough */
+	AM_RANGE(0xd400, 0xd7ff) AM_BASE( m_colorram2)
+	AM_RANGE(0xd800, 0xd83f) AM_BASE( m_attributesram2)
+	AM_RANGE(0xd840, 0xd85f) AM_BASE( m_spriteram2) AM_SIZE(m_spriteram_size)
 	AM_RANGE(0xd000, 0xd85f) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_BASE_MEMBER(wiz_state, m_videoram)	/* Fallthrough */
+	AM_RANGE(0xe000, 0xe3ff) AM_BASE( m_videoram)	/* Fallthrough */
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xe83f) AM_BASE_MEMBER(wiz_state, m_attributesram)
-	AM_RANGE(0xe840, 0xe85f) AM_BASE_MEMBER(wiz_state, m_spriteram)
+	AM_RANGE(0xe800, 0xe83f) AM_BASE( m_attributesram)
+	AM_RANGE(0xe840, 0xe85f) AM_BASE( m_spriteram)
 	AM_RANGE(0xe000, 0xe85f) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW0")
-	AM_RANGE(0xf000, 0xf000) AM_RAM AM_BASE_MEMBER(wiz_state, m_sprite_bank)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(wiz_main_nmi_mask_w)
-	AM_RANGE(0xf002, 0xf003) AM_WRITE(wiz_palettebank_w)
-	AM_RANGE(0xf004, 0xf005) AM_WRITE(wiz_char_bank_select_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(wiz_flipx_w)
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(wiz_flipy_w)
+	AM_RANGE(0xf000, 0xf000) AM_RAM AM_BASE( m_sprite_bank)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(wiz_main_nmi_mask_w)
+	AM_RANGE(0xf002, 0xf003) AM_WRITE_LEGACY(wiz_palettebank_w)
+	AM_RANGE(0xf004, 0xf005) AM_WRITE_LEGACY(wiz_char_bank_select_w)
+	AM_RANGE(0xf006, 0xf006) AM_WRITE_LEGACY(wiz_flipx_w)
+	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(wiz_flipy_w)
 	AM_RANGE(0xf008, 0xf008) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf008, 0xf00f) AM_WRITENOP			/* initialized by Stinger/Scion */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
 	AM_RANGE(0xf018, 0xf018) AM_READ_PORT("IN1")
-	AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xf800, 0xf80f) AM_WRITE(sound_command_w)	/* sound registers */
-	AM_RANGE(0xf818, 0xf818) AM_WRITE(wiz_bgcolor_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xf800, 0xf80f) AM_WRITE_LEGACY(sound_command_w)	/* sound registers */
+	AM_RANGE(0xf818, 0xf818) AM_WRITE_LEGACY(wiz_bgcolor_w)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( wiz_sound_nmi_mask_w )
@@ -265,20 +265,20 @@ static WRITE8_HANDLER( wiz_sound_nmi_mask_w )
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,wiz_sound_nmi_mask_w)	/* Stinger/Scion */
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("8910.3", ay8910_address_data_w)
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_address_data_w)		/* Wiz only */
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,wiz_sound_nmi_mask_w)	/* Wiz */
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(soundlatch_r,wiz_sound_nmi_mask_w)	/* Stinger/Scion */
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("8910.3", ay8910_address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_data_w)		/* Wiz only */
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE_LEGACY(soundlatch_r,wiz_sound_nmi_mask_w)	/* Wiz */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,wiz_sound_nmi_mask_w)	/* Stinger/Scion */
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_address_data_w)		/* Wiz only */
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,wiz_sound_nmi_mask_w)	/* Wiz */
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(soundlatch_r,wiz_sound_nmi_mask_w)	/* Stinger/Scion */
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_data_w)		/* Wiz only */
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE_LEGACY(soundlatch_r,wiz_sound_nmi_mask_w)	/* Wiz */
 ADDRESS_MAP_END
 
 

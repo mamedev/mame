@@ -203,37 +203,37 @@ static WRITE8_HANDLER( nvram_enable_w )
 /* full address map derived from schematics */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_MEMBER(atetris_state, m_videoram)
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x2810, 0x281f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITE(nvram_enable_w)
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(coincount_w)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(atetris_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE_LEGACY(nvram_w) AM_SHARE("nvram")
+	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x2810, 0x281f) AM_MIRROR(0x03e0) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITE_LEGACY(nvram_enable_w)
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE_LEGACY(coincount_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READ(atetris_slapstic_r)
+	AM_RANGE(0x6000, 0x7fff) AM_READ_LEGACY(atetris_slapstic_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_MEMBER(atetris_state, m_videoram)
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
-	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x2804, 0x2804) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x2806, 0x2806) AM_DEVWRITE("sn3", sn76496_w)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(atetris_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE_LEGACY(nvram_w) AM_SHARE("nvram")
+	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x2804, 0x2804) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x2806, 0x2806) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
 	AM_RANGE(0x2808, 0x2808) AM_READ_PORT("IN0")
 	AM_RANGE(0x2818, 0x2818) AM_READ_PORT("IN1")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE(nvram_enable_w)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(coincount_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(nvram_enable_w)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITE_LEGACY(coincount_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READ(atetris_slapstic_r)
+	AM_RANGE(0x6000, 0x7fff) AM_READ_LEGACY(atetris_slapstic_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

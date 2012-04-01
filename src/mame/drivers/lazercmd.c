@@ -412,9 +412,9 @@ static READ8_HANDLER( lazercmd_hardware_r )
 static ADDRESS_MAP_START( lazercmd_map, AS_PROGRAM, 8, lazercmd_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
-	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE_SIZE_MEMBER(lazercmd_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x1f00, 0x1f03) AM_WRITE(lazercmd_hardware_w)
-	AM_RANGE(0x1f00, 0x1f07) AM_READ(lazercmd_hardware_r)
+	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x1f00, 0x1f03) AM_WRITE_LEGACY(lazercmd_hardware_w)
+	AM_RANGE(0x1f00, 0x1f07) AM_READ_LEGACY(lazercmd_hardware_r)
 ADDRESS_MAP_END
 
 
@@ -422,24 +422,24 @@ static ADDRESS_MAP_START( medlanes_map, AS_PROGRAM, 8, lazercmd_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1000, 0x17ff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
-	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE_SIZE_MEMBER(lazercmd_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x1f00, 0x1f03) AM_WRITE(medlanes_hardware_w)
-	AM_RANGE(0x1f00, 0x1f07) AM_READ(lazercmd_hardware_r)
+	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x1f00, 0x1f03) AM_WRITE_LEGACY(medlanes_hardware_w)
+	AM_RANGE(0x1f00, 0x1f07) AM_READ_LEGACY(lazercmd_hardware_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( bbonk_map, AS_PROGRAM, 8, lazercmd_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1c1f) AM_RAM
-	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE_SIZE_MEMBER(lazercmd_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x1f00, 0x1f03) AM_WRITE(bbonk_hardware_w)
-	AM_RANGE(0x1f00, 0x1f07) AM_READ(lazercmd_hardware_r)
+	AM_RANGE(0x1c20, 0x1eff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x1f00, 0x1f03) AM_WRITE_LEGACY(bbonk_hardware_w)
+	AM_RANGE(0x1f00, 0x1f07) AM_READ_LEGACY(lazercmd_hardware_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( lazercmd_portmap, AS_IO, 8, lazercmd_state )
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE(lazercmd_ctrl_port_r, lazercmd_ctrl_port_w)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(lazercmd_data_port_r, lazercmd_data_port_w)
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE_LEGACY(lazercmd_ctrl_port_r, lazercmd_ctrl_port_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE_LEGACY(lazercmd_data_port_r, lazercmd_data_port_w)
 ADDRESS_MAP_END
 
 

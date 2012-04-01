@@ -338,24 +338,24 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, omegrace_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4bff) AM_RAM
 	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_SHARE("nvram") /* NVRAM */
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x8000) /* vector ram */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x8000) /* vector ram */
 	AM_RANGE(0x9000, 0x9fff) AM_ROM /* vector rom */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
-	AM_RANGE(0x09, 0x09) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(avgdvg_reset_w)
+	AM_RANGE(0x08, 0x08) AM_READ_LEGACY(omegrace_vg_go_r)
+	AM_RANGE(0x09, 0x09) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(avgdvg_reset_w)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("AVGDVG")				/* vg_halt */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")				/* DIP SW C4 */
 	AM_RANGE(0x17, 0x17) AM_READ_PORT("DSW2")				/* DIP SW C6 */
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")				/* Player 1 input */
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")				/* Player 2 input */
-	AM_RANGE(0x13, 0x13) AM_WRITE(omegrace_leds_w)			/* coin counters, leds, flip screen */
-	AM_RANGE(0x14, 0x14) AM_WRITE(omegrace_soundlatch_w)	/* Sound command */
-	AM_RANGE(0x15, 0x15) AM_READ(omegrace_spinner1_r)		/* 1st controller */
+	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(omegrace_leds_w)			/* coin counters, leds, flip screen */
+	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(omegrace_soundlatch_w)	/* Sound command */
+	AM_RANGE(0x15, 0x15) AM_READ_LEGACY(omegrace_spinner1_r)		/* 1st controller */
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("SPIN1")				/* 2nd controller (cocktail) */
 ADDRESS_MAP_END
 
@@ -374,9 +374,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)	/* likely ay8910 input port, not direct */
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch_r)	/* likely ay8910 input port, not direct */
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

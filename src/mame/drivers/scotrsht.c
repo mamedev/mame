@@ -62,18 +62,18 @@ static WRITE8_HANDLER( scotrsht_soundlatch_w )
 }
 
 static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(scotrsht_colorram_w) AM_BASE_MEMBER(scotrsht_state, m_colorram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(scotrsht_videoram_w) AM_BASE_MEMBER(scotrsht_state, m_videoram)
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(scotrsht_state, m_spriteram, m_spriteram_size) /* sprites */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE_LEGACY(scotrsht_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE_LEGACY(scotrsht_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* sprites */
 	AM_RANGE(0x10c0, 0x1fff) AM_RAM /* work ram */
-	AM_RANGE(0x2000, 0x201f) AM_RAM AM_BASE_MEMBER(scotrsht_state, m_scroll) /* scroll registers */
+	AM_RANGE(0x2000, 0x201f) AM_RAM AM_BASE( m_scroll) /* scroll registers */
 	AM_RANGE(0x2040, 0x2040) AM_WRITENOP
 	AM_RANGE(0x2041, 0x2041) AM_WRITENOP
 	AM_RANGE(0x2042, 0x2042) AM_WRITENOP  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */
-	AM_RANGE(0x2043, 0x2043) AM_WRITE(scotrsht_charbank_w)
-	AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(scotrsht_palettebank_w)
-	AM_RANGE(0x3100, 0x3100) AM_WRITE(scotrsht_soundlatch_w)
+	AM_RANGE(0x2043, 0x2043) AM_WRITE_LEGACY(scotrsht_charbank_w)
+	AM_RANGE(0x2044, 0x2044) AM_WRITE_LEGACY(ctrl_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(scotrsht_palettebank_w)
+	AM_RANGE(0x3100, 0x3100) AM_WRITE_LEGACY(scotrsht_soundlatch_w)
 	AM_RANGE(0x3200, 0x3200) AM_WRITENOP /* it writes 0, 1 */
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("DSW3")
@@ -81,19 +81,19 @@ static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )
 	AM_RANGE(0x3301, 0x3301) AM_READ_PORT("P1")
 	AM_RANGE(0x3302, 0x3302) AM_READ_PORT("P2")
 	AM_RANGE(0x3303, 0x3303) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3300, 0x3300) AM_WRITE(watchdog_reset_w) /* watchdog */
+	AM_RANGE(0x3300, 0x3300) AM_WRITE_LEGACY(watchdog_reset_w) /* watchdog */
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scotrsht_sound_map, AS_PROGRAM, 8, scotrsht_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scotrsht_sound_port, AS_IO, 8, scotrsht_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 

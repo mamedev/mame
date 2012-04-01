@@ -334,42 +334,42 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM , 8, gsword_state )
 	AM_RANGE(0x0000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa37f) AM_RAM
-	AM_RANGE(0xa380, 0xa3ff) AM_RAM AM_BASE_MEMBER(gsword_state, m_spritetile_ram)
+	AM_RANGE(0xa380, 0xa3ff) AM_RAM AM_BASE( m_spritetile_ram)
 	AM_RANGE(0xa400, 0xa77f) AM_RAM
-	AM_RANGE(0xa780, 0xa7ff) AM_RAM AM_BASE_MEMBER(gsword_state, m_spritexy_ram) AM_SIZE_MEMBER(gsword_state, m_spritexy_size)
-	AM_RANGE(0xa980, 0xa980) AM_WRITE(gsword_charbank_w)
-	AM_RANGE(0xaa80, 0xaa80) AM_WRITE(gsword_videoctrl_w)	/* flip screen, char palette bank */
-	AM_RANGE(0xab00, 0xab00) AM_WRITE(gsword_scroll_w)
-	AM_RANGE(0xab80, 0xabff) AM_WRITEONLY AM_BASE_MEMBER(gsword_state, m_spriteattrib_ram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(gsword_videoram_w) AM_BASE_MEMBER(gsword_state, m_videoram)
+	AM_RANGE(0xa780, 0xa7ff) AM_RAM AM_BASE( m_spritexy_ram) AM_SIZE(m_spritexy_size)
+	AM_RANGE(0xa980, 0xa980) AM_WRITE_LEGACY(gsword_charbank_w)
+	AM_RANGE(0xaa80, 0xaa80) AM_WRITE_LEGACY(gsword_videoctrl_w)	/* flip screen, char palette bank */
+	AM_RANGE(0xab00, 0xab00) AM_WRITE_LEGACY(gsword_scroll_w)
+	AM_RANGE(0xab80, 0xabff) AM_WRITEONLY AM_BASE( m_spriteattrib_ram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(gsword_videoram_w) AM_BASE( m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7e, 0x7f) AM_WRITE(TAITO8741_0_w)  AM_READ(TAITO8741_0_r)
+	AM_RANGE(0x7e, 0x7f) AM_WRITE_LEGACY(TAITO8741_0_w)  AM_READ_LEGACY(TAITO8741_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( josvolly_cpu1_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7e, 0x7f) AM_WRITE(josvolly_8741_0_w)  AM_READ(josvolly_8741_0_r)
+	AM_RANGE(0x7e, 0x7f) AM_WRITE_LEGACY(josvolly_8741_0_w)  AM_READ_LEGACY(josvolly_8741_0_r)
 ADDRESS_MAP_END
 
 //
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(gsword_state, m_cpu2_ram)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE( m_cpu2_ram)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(adpcm_soundcommand_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_READWRITE(TAITO8741_2_r,TAITO8741_2_w)
-	AM_RANGE(0x20, 0x21) AM_READWRITE(TAITO8741_3_r,TAITO8741_3_w)
-	AM_RANGE(0x40, 0x41) AM_READWRITE(TAITO8741_1_r,TAITO8741_1_w)
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
-	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE("ay1", ay8910_r,        ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE("ay2", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x00, 0x01) AM_READWRITE_LEGACY(TAITO8741_2_r,TAITO8741_2_w)
+	AM_RANGE(0x20, 0x21) AM_READWRITE_LEGACY(TAITO8741_3_r,TAITO8741_3_w)
+	AM_RANGE(0x40, 0x41) AM_READWRITE_LEGACY(TAITO8741_1_r,TAITO8741_1_w)
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE_LEGACY("ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
+	AM_RANGE(0x61, 0x61) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r,        ay8910_data_w)
 //
 	AM_RANGE(0xe0, 0xe0) AM_READNOP /* ?? */
 	AM_RANGE(0xa0, 0xa0) AM_WRITENOP /* ?? */
@@ -380,32 +380,32 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("msm", gsword_adpcm_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("msm", gsword_adpcm_data_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(gsword_state, m_cpu2_ram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE( m_cpu2_ram)
 
 	/* 8000 to 8003 looks MCU */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN1")	// 1PL
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN2")	// 2PL / ACK
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN0")	// START
 
-//  AM_RANGE(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
-	AM_RANGE(0xA000, 0xA001) AM_WRITE(josvolly_8741_1_w) AM_READ(josvolly_8741_1_r)
+//  AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(adpcm_soundcommand_w)
+	AM_RANGE(0xA000, 0xA001) AM_WRITE_LEGACY(josvolly_8741_1_w) AM_READ_LEGACY(josvolly_8741_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( josvolly_cpu2_io_map, AS_IO, 8, gsword_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("ay1", ay8910_r,        ay8910_data_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
-	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE("ay2", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ay1", gsword_fake_0_r, gsword_AY8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r,        ay8910_data_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_LEGACY("ay2", gsword_fake_1_r, gsword_AY8910_control_port_1_w)
+	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r,        ay8910_data_w)
 
-	AM_RANGE(0x81, 0x81) AM_WRITE(josvolly_nmi_enable_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(josvolly_nmi_enable_w)
 	AM_RANGE(0xC1, 0xC1) AM_NOP // irq clear
 
 ADDRESS_MAP_END

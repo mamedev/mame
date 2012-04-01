@@ -688,25 +688,25 @@ static READ8_DEVICE_HANDLER( caterplr_AY8910_r )
 
 static ADDRESS_MAP_START( centiped_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(centiped_state, m_rambase)
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
-	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE( m_rambase)
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE_LEGACY(centiped_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("DSW2")		/* DSW2 */
-	AM_RANGE(0x0c00, 0x0c00) AM_READ(centiped_IN0_r)	/* IN0 */
+	AM_RANGE(0x0c00, 0x0c00) AM_READ_LEGACY(centiped_IN0_r)	/* IN0 */
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("IN1")		/* IN1 */
-	AM_RANGE(0x0c02, 0x0c02) AM_READ(centiped_IN2_r)	/* IN2 */
+	AM_RANGE(0x0c02, 0x0c02) AM_READ_LEGACY(centiped_IN2_r)	/* IN2 */
 	AM_RANGE(0x0c03, 0x0c03) AM_READ_PORT("IN3")		/* IN3 */
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0x1400, 0x140f) AM_WRITE(centiped_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1600, 0x163f) AM_DEVWRITE_MODERN("earom",atari_vg_earom_device, write)
-	AM_RANGE(0x1680, 0x1680) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x1700, 0x173f) AM_DEVREAD_MODERN("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x1c00, 0x1c02) AM_WRITE(coin_count_w)
-	AM_RANGE(0x1c03, 0x1c04) AM_WRITE(led_w)
-	AM_RANGE(0x1c07, 0x1c07) AM_WRITE(centiped_flip_screen_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x1400, 0x140f) AM_WRITE_LEGACY(centiped_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1600, 0x163f) AM_DEVWRITE("earom",atari_vg_earom_device, write)
+	AM_RANGE(0x1680, 0x1680) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x1700, 0x173f) AM_DEVREAD("earom", atari_vg_earom_device, read)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x1c00, 0x1c02) AM_WRITE_LEGACY(coin_count_w)
+	AM_RANGE(0x1c03, 0x1c04) AM_WRITE_LEGACY(led_w)
+	AM_RANGE(0x1c07, 0x1c07) AM_WRITE_LEGACY(centiped_flip_screen_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -714,24 +714,24 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( centipdb_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x4000) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_MIRROR(0x4000) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
-	AM_RANGE(0x07c0, 0x07ff) AM_MIRROR(0x4000) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
+	AM_RANGE(0x0400, 0x07bf) AM_MIRROR(0x4000) AM_RAM_WRITE_LEGACY(centiped_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x07c0, 0x07ff) AM_MIRROR(0x4000) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x4000) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_MIRROR(0x4000) AM_READ_PORT("DSW2")		/* DSW2 */
-	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x4000) AM_READ(centiped_IN0_r)	/* IN0 */
+	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x4000) AM_READ_LEGACY(centiped_IN0_r)	/* IN0 */
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x4000) AM_READ_PORT("IN1")		/* IN1 */
-	AM_RANGE(0x0c02, 0x0c02) AM_MIRROR(0x4000) AM_READ(centiped_IN2_r)	/* IN2 */
+	AM_RANGE(0x0c02, 0x0c02) AM_MIRROR(0x4000) AM_READ_LEGACY(centiped_IN2_r)	/* IN2 */
 	AM_RANGE(0x0c03, 0x0c03) AM_MIRROR(0x4000) AM_READ_PORT("IN3")		/* IN3 */
-	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x4000) AM_DEVWRITE("pokey", ay8910_data_address_w)
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x4000) AM_DEVREAD("pokey", ay8910_r)
-	AM_RANGE(0x1400, 0x140f) AM_MIRROR(0x4000) AM_WRITE(centiped_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1600, 0x163f) AM_MIRROR(0x4000) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, write)
-	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x4000) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0x4000) AM_DEVREAD_MODERN("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x4000) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x1c00, 0x1c02) AM_MIRROR(0x4000) AM_WRITE(coin_count_w)
-	AM_RANGE(0x1c03, 0x1c04) AM_MIRROR(0x4000) AM_WRITE(led_w)
-	AM_RANGE(0x1c07, 0x1c07) AM_MIRROR(0x4000) AM_WRITE(centiped_flip_screen_w)
+	AM_RANGE(0x1000, 0x1001) AM_MIRROR(0x4000) AM_DEVWRITE_LEGACY("pokey", ay8910_data_address_w)
+	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x4000) AM_DEVREAD_LEGACY("pokey", ay8910_r)
+	AM_RANGE(0x1400, 0x140f) AM_MIRROR(0x4000) AM_WRITE_LEGACY(centiped_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1600, 0x163f) AM_MIRROR(0x4000) AM_DEVWRITE("earom", atari_vg_earom_device, write)
+	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x4000) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0x4000) AM_DEVREAD("earom", atari_vg_earom_device, read)
+	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x4000) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x1c00, 0x1c02) AM_MIRROR(0x4000) AM_WRITE_LEGACY(coin_count_w)
+	AM_RANGE(0x1c03, 0x1c04) AM_MIRROR(0x4000) AM_WRITE_LEGACY(led_w)
+	AM_RANGE(0x1c07, 0x1c07) AM_MIRROR(0x4000) AM_WRITE_LEGACY(centiped_flip_screen_w)
 	AM_RANGE(0x2000, 0x27ff) AM_ROM
 	AM_RANGE(0x2800, 0x3fff) AM_MIRROR(0x4000) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_ROM
@@ -748,25 +748,25 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( milliped_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
-	AM_RANGE(0x2000, 0x2000) AM_READ(centiped_IN0_r)
-	AM_RANGE(0x2001, 0x2001) AM_READ(milliped_IN1_r)
-	AM_RANGE(0x2010, 0x2010) AM_READ(milliped_IN2_r)
+	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE_LEGACY(centiped_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x2000, 0x2000) AM_READ_LEGACY(centiped_IN0_r)
+	AM_RANGE(0x2001, 0x2001) AM_READ_LEGACY(milliped_IN1_r)
+	AM_RANGE(0x2010, 0x2010) AM_READ_LEGACY(milliped_IN2_r)
 	AM_RANGE(0x2011, 0x2011) AM_READ_PORT("IN3")
-	AM_RANGE(0x2030, 0x2030) AM_DEVREAD_MODERN("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x2480, 0x249f) AM_WRITE(milliped_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2500, 0x2502) AM_WRITE(coin_count_w)
-	AM_RANGE(0x2503, 0x2504) AM_WRITE(led_w)
-	AM_RANGE(0x2505, 0x2505) AM_WRITE(input_select_w) /* TBEN */
-	AM_RANGE(0x2506, 0x2506) AM_WRITE(centiped_flip_screen_w)
-	AM_RANGE(0x2507, 0x2507) AM_WRITE(control_select_w) /* CNTRLSEL */
-	AM_RANGE(0x2600, 0x2600) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x2680, 0x2680) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x2700, 0x2700) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x2780, 0x27bf) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, write)
+	AM_RANGE(0x2030, 0x2030) AM_DEVREAD("earom", atari_vg_earom_device, read)
+	AM_RANGE(0x2480, 0x249f) AM_WRITE_LEGACY(milliped_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x2500, 0x2502) AM_WRITE_LEGACY(coin_count_w)
+	AM_RANGE(0x2503, 0x2504) AM_WRITE_LEGACY(led_w)
+	AM_RANGE(0x2505, 0x2505) AM_WRITE_LEGACY(input_select_w) /* TBEN */
+	AM_RANGE(0x2506, 0x2506) AM_WRITE_LEGACY(centiped_flip_screen_w)
+	AM_RANGE(0x2507, 0x2507) AM_WRITE_LEGACY(control_select_w) /* CNTRLSEL */
+	AM_RANGE(0x2600, 0x2600) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x2680, 0x2680) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x2700, 0x2700) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x2780, 0x27bf) AM_DEVWRITE("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -781,17 +781,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( warlords_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
-	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE_LEGACY(centiped_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW1")	/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("DSW2")	/* DSW2 */
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("IN1")	/* IN1 */
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x1c00, 0x1c02) AM_WRITE(coin_count_w)
-	AM_RANGE(0x1c03, 0x1c06) AM_WRITE(led_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x1c00, 0x1c02) AM_WRITE_LEGACY(coin_count_w)
+	AM_RANGE(0x1c03, 0x1c06) AM_WRITE_LEGACY(led_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -806,26 +806,26 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mazeinv_map, AS_PROGRAM, 8, centiped_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
-	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
+	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE_LEGACY(centiped_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("IN1")
 	AM_RANGE(0x2010, 0x2010) AM_READ_PORT("IN2")
 	AM_RANGE(0x2011, 0x2011) AM_READ_PORT("IN3")
-	AM_RANGE(0x2020, 0x2020) AM_READ(mazeinv_input_r)
-	AM_RANGE(0x2030, 0x2030) AM_DEVREAD_MODERN("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x2480, 0x249f) AM_WRITE(mazeinv_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2500, 0x2502) AM_WRITE(coin_count_w)
-	AM_RANGE(0x2503, 0x2504) AM_WRITE(led_w)
-	AM_RANGE(0x2505, 0x2505) AM_WRITE(input_select_w)
-	AM_RANGE(0x2506, 0x2506) AM_WRITE(centiped_flip_screen_w)
-	AM_RANGE(0x2580, 0x2583) AM_WRITE(mazeinv_input_select_w)
-	AM_RANGE(0x2600, 0x2600) AM_WRITE(irq_ack_w)
-	AM_RANGE(0x2680, 0x2680) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x2700, 0x2700) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x2780, 0x27bf) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, write)
+	AM_RANGE(0x2020, 0x2020) AM_READ_LEGACY(mazeinv_input_r)
+	AM_RANGE(0x2030, 0x2030) AM_DEVREAD("earom", atari_vg_earom_device, read)
+	AM_RANGE(0x2480, 0x249f) AM_WRITE_LEGACY(mazeinv_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x2500, 0x2502) AM_WRITE_LEGACY(coin_count_w)
+	AM_RANGE(0x2503, 0x2504) AM_WRITE_LEGACY(led_w)
+	AM_RANGE(0x2505, 0x2505) AM_WRITE_LEGACY(input_select_w)
+	AM_RANGE(0x2506, 0x2506) AM_WRITE_LEGACY(centiped_flip_screen_w)
+	AM_RANGE(0x2580, 0x2583) AM_WRITE_LEGACY(mazeinv_input_select_w)
+	AM_RANGE(0x2600, 0x2600) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x2680, 0x2680) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x2700, 0x2700) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x2780, 0x27bf) AM_DEVWRITE("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -840,20 +840,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bullsdrt_map, AS_PROGRAM, 8, centiped_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x6000) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x6000) AM_READ(centiped_IN0_r)
+	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x6000) AM_READ_LEGACY(centiped_IN0_r)
 	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x6000) AM_READ_PORT("IN1")
-	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x6000) AM_READ(centiped_IN2_r)
-	AM_RANGE(0x1200, 0x123f) AM_MIRROR(0x6000) AM_DEVREADWRITE_MODERN("earom",atari_vg_earom_device, read, write)
-	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x6000) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x6000) AM_READ_LEGACY(centiped_IN2_r)
+	AM_RANGE(0x1200, 0x123f) AM_MIRROR(0x6000) AM_DEVREADWRITE("earom",atari_vg_earom_device, read, write)
+	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x6000) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x6000) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1400, 0x140f) AM_MIRROR(0x6000) AM_WRITE(centiped_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1481, 0x1481) AM_MIRROR(0x6000) AM_WRITE(bullsdrt_coin_count_w)
-	AM_RANGE(0x1483, 0x1484) AM_MIRROR(0x6000) AM_WRITE(led_w)
-	AM_RANGE(0x1487, 0x1487) AM_MIRROR(0x6000) AM_WRITE(centiped_flip_screen_w)
-	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x1400, 0x140f) AM_MIRROR(0x6000) AM_WRITE_LEGACY(centiped_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1481, 0x1481) AM_MIRROR(0x6000) AM_WRITE_LEGACY(bullsdrt_coin_count_w)
+	AM_RANGE(0x1483, 0x1484) AM_MIRROR(0x6000) AM_WRITE_LEGACY(led_w)
+	AM_RANGE(0x1487, 0x1487) AM_MIRROR(0x6000) AM_WRITE_LEGACY(centiped_flip_screen_w)
+	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_NOP
-	AM_RANGE(0x1800, 0x1bbf) AM_MIRROR(0x6000) AM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, m_videoram)
-	AM_RANGE(0x1bc0, 0x1bff) AM_MIRROR(0x6000) AM_RAM AM_BASE_MEMBER(centiped_state, m_spriteram)
+	AM_RANGE(0x1800, 0x1bbf) AM_MIRROR(0x6000) AM_WRITE_LEGACY(centiped_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x1bc0, 0x1bff) AM_MIRROR(0x6000) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
@@ -861,9 +861,9 @@ static ADDRESS_MAP_START( bullsdrt_map, AS_PROGRAM, 8, centiped_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bullsdrt_port_map, AS_IO, 8, centiped_state )
-	AM_RANGE(0x00, 0x00) AM_WRITE(bullsdrt_sprites_bank_w)
-	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_BASE_MEMBER(centiped_state, m_bullsdrt_tiles_bankram)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(bullsdrt_data_port_r) AM_DEVWRITE("snsnd", sn76496_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(bullsdrt_sprites_bank_w)
+	AM_RANGE(0x20, 0x3f) AM_WRITE_LEGACY(bullsdrt_tilesbank_w) AM_BASE( m_bullsdrt_tiles_bankram)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ_LEGACY(bullsdrt_data_port_r) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
 ADDRESS_MAP_END
 
 

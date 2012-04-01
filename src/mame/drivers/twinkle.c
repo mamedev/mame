@@ -611,22 +611,22 @@ static READ32_HANDLER(shared_psx_r)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, twinkle_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE(shared_psx_r, shared_psx_w)
-	AM_RANGE(0x1f200000, 0x1f20001f) AM_READWRITE(am53cf96_r, am53cf96_w)
+	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE_LEGACY(shared_psx_r, shared_psx_w)
+	AM_RANGE(0x1f200000, 0x1f20001f) AM_READWRITE_LEGACY(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
 	AM_RANGE(0x1f210400, 0x1f2107ff) AM_READNOP
-	AM_RANGE(0x1f218000, 0x1f218003) AM_WRITE(watchdog_reset32_w) /* LTC1232 */
-	AM_RANGE(0x1f220000, 0x1f220003) AM_WRITE(twinkle_io_w)
-	AM_RANGE(0x1f220004, 0x1f220007) AM_READ(twinkle_io_r)
+	AM_RANGE(0x1f218000, 0x1f218003) AM_WRITE_LEGACY(watchdog_reset32_w) /* LTC1232 */
+	AM_RANGE(0x1f220000, 0x1f220003) AM_WRITE_LEGACY(twinkle_io_w)
+	AM_RANGE(0x1f220004, 0x1f220007) AM_READ_LEGACY(twinkle_io_r)
 	AM_RANGE(0x1f230000, 0x1f230003) AM_WRITENOP
 	AM_RANGE(0x1f240000, 0x1f240003) AM_READ_PORT("IN6")
 	AM_RANGE(0x1f250000, 0x1f250003) AM_WRITENOP
-	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE(serial_w)
+	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE_LEGACY(serial_w)
 	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE_PORT("OUTSEC")
 	AM_RANGE(0x1f280000, 0x1f280003) AM_READ_PORT("INSEC")
-	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, rtc_r, rtc_w, 0x00ff00ff)
-	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, xram_r, xram_w, 0x00ff00ff)
-	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE(twinkle_output_w)
+	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0x00ff00ff)
+	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0x00ff00ff)
+	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE_LEGACY(twinkle_output_w)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
@@ -735,15 +735,15 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	// 220000 = LEDs?
-	AM_RANGE(0x230000, 0x230003) AM_WRITE(twinkle_spu_ctrl_w)
+	AM_RANGE(0x230000, 0x230003) AM_WRITE_LEGACY(twinkle_spu_ctrl_w)
 	// 240000 = top 16 bits of DMA address?
 	// 250000 = write to initiate DMA?
 	// 260000 = ???
-	AM_RANGE(0x280000, 0x280fff) AM_READWRITE( shared_68k_r, shared_68k_w )
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ide", twinkle_ide_r, twinkle_ide_w)
+	AM_RANGE(0x280000, 0x280fff) AM_READWRITE_LEGACY( shared_68k_r, shared_68k_w )
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("ide", twinkle_ide_r, twinkle_ide_w)
 	// 34000E = ???
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_r, rf5c400_w)
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE( twinkle_waveram_r, twinkle_waveram_w )	// 8 MB window wave RAM
+	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c400_r, rf5c400_w)
+	AM_RANGE(0x800000, 0xffffff) AM_READWRITE_LEGACY( twinkle_waveram_r, twinkle_waveram_w )	// 8 MB window wave RAM
 ADDRESS_MAP_END
 
 /* SCSI */

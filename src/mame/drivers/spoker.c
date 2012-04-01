@@ -226,41 +226,41 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 
-	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE( bg_tile_w ) AM_BASE_MEMBER( spoker_state,m_bg_tile_ram )
+	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE_LEGACY( bg_tile_w ) AM_BASE(m_bg_tile_ram )
 
-	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER( spoker_state,m_fg_tile_ram )
+	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE_LEGACY( fg_tile_w )  AM_BASE(m_fg_tile_ram )
 
 	/* TODO: ppi #1 */
-	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE( spoker_nmi_and_coins_w )
+	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE_LEGACY( spoker_nmi_and_coins_w )
 	AM_RANGE( 0x6481, 0x6481 ) AM_READ_PORT( "SERVICE" )
 	AM_RANGE( 0x6482, 0x6482 ) AM_READ_PORT( "COINS" )
 
 	/* TODO: ppi #2 */
 	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "BUTTONS1" )
-	AM_RANGE( 0x6491, 0x6491 ) AM_WRITE( spoker_video_and_leds_w )
-	AM_RANGE( 0x6492, 0x6492 ) AM_WRITE( spoker_leds_w )
+	AM_RANGE( 0x6491, 0x6491 ) AM_WRITE_LEGACY( spoker_video_and_leds_w )
+	AM_RANGE( 0x6492, 0x6492 ) AM_WRITE_LEGACY( spoker_leds_w )
 
 	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "BUTTONS2" )
 
-	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE( "ymsnd", ym2413_w )
+	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_w )
 
-	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE( spoker_magic_r, spoker_magic_w )	// DSW1-5
+	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE_LEGACY( spoker_magic_r, spoker_magic_w )	// DSW1-5
 
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER( spoker_state,m_fg_color_ram )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE_LEGACY( fg_color_w ) AM_BASE(m_fg_color_ram )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
 //  AM_RANGE( 0x1000, 0x1fff ) AM_WRITENOP
 
-	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
+	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 
-	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE( bg_tile_w ) AM_BASE_MEMBER( spoker_state,m_bg_tile_ram )
+	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE_LEGACY( bg_tile_w ) AM_BASE(m_bg_tile_ram )
 
 	AM_RANGE( 0x4000, 0x4000 ) AM_READ_PORT( "DSW1" )
 	AM_RANGE( 0x4001, 0x4001 ) AM_READ_PORT( "DSW2" )
@@ -270,18 +270,18 @@ static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
 
 //  AM_RANGE( 0x4000, 0x40ff ) AM_WRITENOP
 
-	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER( spoker_state,m_fg_tile_ram )
+	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE_LEGACY( fg_tile_w )  AM_BASE(m_fg_tile_ram )
 
 	AM_RANGE( 0x6480, 0x6480 ) AM_READ_PORT( "IN0" )
 	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "IN1" )
-	AM_RANGE( 0x6491, 0x6491 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE( 0x6491, 0x6491 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "IN2" )
-	AM_RANGE( 0x64b0, 0x64b0 ) AM_WRITE( spoker_leds_w )
+	AM_RANGE( 0x64b0, 0x64b0 ) AM_WRITE_LEGACY( spoker_leds_w )
 	AM_RANGE( 0x64c0, 0x64c0 ) AM_READNOP //irq ack?
 
-	AM_RANGE( 0x64f0, 0x64f0 ) AM_WRITE(spoker_nmi_and_coins_w )
+	AM_RANGE( 0x64f0, 0x64f0 ) AM_WRITE_LEGACY(spoker_nmi_and_coins_w )
 
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER( spoker_state,m_fg_color_ram )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE_LEGACY( fg_color_w ) AM_BASE( m_fg_color_ram )
 ADDRESS_MAP_END
 
 

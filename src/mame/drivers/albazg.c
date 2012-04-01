@@ -230,24 +230,24 @@ static I8255A_INTERFACE( ppi8255_intf )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
+	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE_LEGACY(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_BASE_MEMBER(albazg_state, m_cus_ram)
-	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_BASE_MEMBER(albazg_state, m_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_BASE_MEMBER(albazg_state, m_colorram)
+	AM_RANGE(0xaf80, 0xafff) AM_READWRITE_LEGACY(custom_ram_r, custom_ram_w) AM_BASE( m_cus_ram)
+	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(yumefuda_vram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(yumefuda_cram_w) AM_BASE( m_colorram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, albazg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/

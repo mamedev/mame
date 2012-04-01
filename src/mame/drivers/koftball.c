@@ -156,30 +156,30 @@ static WRITE16_HANDLER(bmc_2_videoram_w)
 
 static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_BASE_MEMBER(koftball_state, m_main_ram)
+	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_BASE( m_main_ram)
 
-	AM_RANGE(0x260000, 0x260fff) AM_WRITE(bmc_1_videoram_w) AM_BASE_MEMBER(koftball_state, m_bmc_1_videoram)
-	AM_RANGE(0x261000, 0x261fff) AM_WRITE(bmc_2_videoram_w) AM_BASE_MEMBER(koftball_state, m_bmc_2_videoram)
+	AM_RANGE(0x260000, 0x260fff) AM_WRITE_LEGACY(bmc_1_videoram_w) AM_BASE( m_bmc_1_videoram)
+	AM_RANGE(0x261000, 0x261fff) AM_WRITE_LEGACY(bmc_2_videoram_w) AM_BASE( m_bmc_2_videoram)
 	AM_RANGE(0x262000, 0x26ffff) AM_RAM
 
 	AM_RANGE(0x280000, 0x28ffff) AM_RAM /* unused ? */
 	AM_RANGE(0x2a0000, 0x2a001f) AM_WRITENOP
-	AM_RANGE(0x2a0000, 0x2a001f) AM_READ(random_number_r)
-	AM_RANGE(0x2b0000, 0x2b0003) AM_READ(random_number_r)
-	AM_RANGE(0x2d8000, 0x2d8001) AM_READ(random_number_r)
+	AM_RANGE(0x2a0000, 0x2a001f) AM_READ_LEGACY(random_number_r)
+	AM_RANGE(0x2b0000, 0x2b0003) AM_READ_LEGACY(random_number_r)
+	AM_RANGE(0x2d8000, 0x2d8001) AM_READ_LEGACY(random_number_r)
 	/*sound chip or mcu comm ? maybe just i/o (offset 0xe=lamps?)*/
 	AM_RANGE(0x2da000, 0x2da001) AM_WRITENOP /* offset ? */
 	AM_RANGE(0x2da002, 0x2da003) AM_WRITENOP /* data ? */
 
-	AM_RANGE(0x2db000, 0x2db001) AM_WRITE(bmc_RAMDAC_offset_w)
-	AM_RANGE(0x2db002, 0x2db003) AM_READWRITE(bmc_RAMDAC_color_r, bmc_RAMDAC_color_w)
+	AM_RANGE(0x2db000, 0x2db001) AM_WRITE_LEGACY(bmc_RAMDAC_offset_w)
+	AM_RANGE(0x2db002, 0x2db003) AM_READWRITE_LEGACY(bmc_RAMDAC_color_r, bmc_RAMDAC_color_w)
 	AM_RANGE(0x2db004, 0x2db005) AM_WRITENOP
-	AM_RANGE(0x2dc000, 0x2dc001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff00)
+	AM_RANGE(0x2dc000, 0x2dc001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x2f0000, 0x2f0003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP
-	AM_RANGE(0x340000, 0x340001) AM_READ(prot_r)
-	AM_RANGE(0x360000, 0x360001) AM_WRITE(prot_w)
+	AM_RANGE(0x340000, 0x340001) AM_READ_LEGACY(prot_r)
+	AM_RANGE(0x360000, 0x360001) AM_WRITE_LEGACY(prot_w)
 ADDRESS_MAP_END
 
 

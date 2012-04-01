@@ -210,9 +210,9 @@ static WRITE8_HANDLER( main_irq_ack_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dacholer_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE(background_w) AM_BASE_MEMBER(dacholer_state, m_bgvideoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_BASE_MEMBER(dacholer_state, m_fgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(dacholer_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(background_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(foreground_w) AM_BASE( m_fgvideoram)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itaten_main_map, AS_PROGRAM, 8, dacholer_state )
@@ -229,12 +229,12 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, dacholer_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWA")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWB")
 	AM_RANGE(0x05, 0x05) AM_READNOP // watchdog in itaten
-	AM_RANGE(0x20, 0x20) AM_WRITE(coins_w)
-	AM_RANGE(0x21, 0x21) AM_WRITE(bg_bank_w)
-	AM_RANGE(0x22, 0x22) AM_WRITE(bg_scroll_x_w)
-	AM_RANGE(0x23, 0x23) AM_WRITE(bg_scroll_y_w)
-	AM_RANGE(0x24, 0x24) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x27, 0x27) AM_WRITE(snd_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(coins_w)
+	AM_RANGE(0x21, 0x21) AM_WRITE_LEGACY(bg_bank_w)
+	AM_RANGE(0x22, 0x22) AM_WRITE_LEGACY(bg_scroll_x_w)
+	AM_RANGE(0x23, 0x23) AM_WRITE_LEGACY(bg_scroll_y_w)
+	AM_RANGE(0x24, 0x24) AM_WRITE_LEGACY(main_irq_ack_w)
+	AM_RANGE(0x27, 0x27) AM_WRITE_LEGACY(snd_w)
 ADDRESS_MAP_END
 
 
@@ -283,22 +283,22 @@ static WRITE8_HANDLER( music_irq_w )
 
 static ADDRESS_MAP_START( snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch_clear_w )
-	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(snd_irq_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(snd_ack_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(adpcm_w)
-	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay3", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(soundlatch_r, soundlatch_clear_w )
+	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(music_irq_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(snd_irq_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(snd_ack_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(adpcm_w)
+	AM_RANGE(0x86, 0x87) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itaten_snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch_clear_w )
-	AM_RANGE(0x86, 0x87) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay3", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(soundlatch_r, soundlatch_clear_w )
+	AM_RANGE(0x86, 0x87) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 

@@ -66,25 +66,25 @@ static WRITE8_HANDLER( flip_screen_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ambush_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(watchdog_reset_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc080, 0xc09f) AM_BASE_MEMBER(ambush_state, m_scrollram)
-	AM_RANGE(0xc100, 0xc1ff) AM_BASE_MEMBER(ambush_state, m_colorram)
-	AM_RANGE(0xc200, 0xc3ff) AM_BASE_SIZE_MEMBER(ambush_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc400, 0xc7ff) AM_BASE_SIZE_MEMBER(ambush_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xc080, 0xc09f) AM_BASE( m_scrollram)
+	AM_RANGE(0xc100, 0xc1ff) AM_BASE( m_colorram)
+	AM_RANGE(0xc200, 0xc3ff) AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc400, 0xc7ff) AM_BASE_SIZE( m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xcc00, 0xcc03) AM_WRITENOP
-	AM_RANGE(0xcc04, 0xcc04) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xcc05, 0xcc05) AM_WRITEONLY AM_BASE_MEMBER(ambush_state, m_colorbank)
-	AM_RANGE(0xcc07, 0xcc07) AM_WRITE(ambush_coin_counter_w)
+	AM_RANGE(0xcc04, 0xcc04) AM_WRITE_LEGACY(flip_screen_w)
+	AM_RANGE(0xcc05, 0xcc05) AM_WRITEONLY AM_BASE( m_colorbank)
+	AM_RANGE(0xcc07, 0xcc07) AM_WRITE_LEGACY(ambush_coin_counter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, ambush_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_address_w)
-	AM_RANGE(0x81, 0x81) AM_DEVWRITE("ay2", ay8910_data_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_address_w)
+	AM_RANGE(0x81, 0x81) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 ADDRESS_MAP_END
 
 

@@ -605,15 +605,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner81_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x70, 0x70) AM_WRITE(blitter_x_w)
-	AM_RANGE(0x71, 0x71) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0x72, 0x72) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0x74, 0x74) AM_WRITE(blitter_y_w)
-	AM_RANGE(0x75, 0x75) AM_READ(blitter_status_r)
-	AM_RANGE(0x76, 0x76) AM_WRITE(blitter_aux_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(blitter_x_w)
+	AM_RANGE(0x71, 0x71) AM_WRITE_LEGACY(blitter_unk_w)
+	AM_RANGE(0x72, 0x72) AM_WRITE_LEGACY(blitter_trig_wdht_w)
+	AM_RANGE(0x74, 0x74) AM_WRITE_LEGACY(blitter_y_w)
+	AM_RANGE(0x75, 0x75) AM_READ_LEGACY(blitter_status_r)
+	AM_RANGE(0x76, 0x76) AM_WRITE_LEGACY(blitter_aux_w)
 
 	AM_RANGE(0xd8, 0xd8) AM_WRITENOP			/* dunno, but is writing 0's very often */
-	AM_RANGE(0xdf, 0xdf) AM_WRITE(sound_latch_w)
+	AM_RANGE(0xdf, 0xdf) AM_WRITE_LEGACY(sound_latch_w)
 
 	AM_RANGE(0xe8, 0xe8) AM_READ_PORT("IN0")	/* credits for players A, B, C, D */
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("IN3")
@@ -622,7 +622,7 @@ static ADDRESS_MAP_START( winner81_cpu_io_map, AS_IO, 8, corona_state )
 	AM_RANGE(0xec, 0xec) AM_READ_PORT("IN4")
 	AM_RANGE(0xed, 0xed) AM_READ_PORT("DSW1")	/* DIP switches bank 1 */
 	AM_RANGE(0xee, 0xee) AM_READ_PORT("DSW2")
-	AM_RANGE(0xef, 0xef) AM_WRITE(wc_meters_w)	/* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
+	AM_RANGE(0xef, 0xef) AM_WRITE_LEGACY(wc_meters_w)	/* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(  winner81_sound_map, AS_PROGRAM, 8, corona_state )
@@ -632,8 +632,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(  winner81_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(sound_latch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 /*  Winners Circle 1982
@@ -662,20 +662,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE_LEGACY(blitter_x_w)
+	AM_RANGE(0xf1, 0xf1) AM_WRITE_LEGACY(blitter_y_w)
+	AM_RANGE(0xf2, 0xf2) AM_WRITE_LEGACY(blitter_trig_wdht_w)
+	AM_RANGE(0xf3, 0xf3) AM_WRITE_LEGACY(blitter_aux_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE_LEGACY(blitter_unk_w)
+	AM_RANGE(0xf5, 0xf5) AM_READ_LEGACY(blitter_status_r)
 
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW1")	/* coinage DIP SW */
 	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("IN0")	/* controls for players A & B */
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN1")	/* credits for players A, B, C, D */
 	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("IN3")	/* single credits for players A, B, C, D, + fix bits 3, 4, 5, 6 in meters */
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(wc_meters_w)
+	AM_RANGE(0xfc, 0xfc) AM_WRITE_LEGACY(wc_meters_w)
 	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN2")	/* controls for players C & D */
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE_LEGACY(sound_latch_w)
 	AM_RANGE(0xff, 0xff) AM_READ_PORT("DSW2")	/* no idea */
 ADDRESS_MAP_END
 
@@ -686,8 +686,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winner82_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(sound_latch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_WRITENOP	/* socket for another ay, inited but never played */
 ADDRESS_MAP_END
 
@@ -726,18 +726,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( re800_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE_LEGACY(blitter_x_w)
+	AM_RANGE(0xf1, 0xf1) AM_WRITE_LEGACY(blitter_y_w)
+	AM_RANGE(0xf2, 0xf2) AM_WRITE_LEGACY(blitter_trig_wdht_w)
+	AM_RANGE(0xf3, 0xf3) AM_WRITE_LEGACY(blitter_aux_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE_LEGACY(blitter_unk_w)
+	AM_RANGE(0xf5, 0xf5) AM_READ_LEGACY(blitter_status_r)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("IN1")
 	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(mux_port_w)
-	AM_RANGE(0xfd, 0xfd) AM_READ(mux_port_r)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(ball_w)
+	AM_RANGE(0xfc, 0xfc) AM_WRITE_LEGACY(mux_port_w)
+	AM_RANGE(0xfd, 0xfd) AM_READ_LEGACY(mux_port_r)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE_LEGACY(sound_latch_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE_LEGACY(ball_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( re800_sound_map, AS_PROGRAM, 8, corona_state )
@@ -747,8 +747,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( re800_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(sound_latch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
@@ -785,19 +785,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( luckyrlt_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
-	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITE(blitter_trig_wdht_w)
-	AM_RANGE(0xf3, 0xf3) AM_WRITE(blitter_aux_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE(blitter_unk_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE_LEGACY(blitter_x_w)
+	AM_RANGE(0xf1, 0xf1) AM_WRITE_LEGACY(blitter_y_w)
+	AM_RANGE(0xf2, 0xf2) AM_WRITE_LEGACY(blitter_trig_wdht_w)
+	AM_RANGE(0xf3, 0xf3) AM_WRITE_LEGACY(blitter_aux_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE_LEGACY(blitter_unk_w)
+	AM_RANGE(0xf5, 0xf5) AM_READ_LEGACY(blitter_status_r)
 
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
+	AM_RANGE(0xf9, 0xf9) AM_WRITE_LEGACY(ball_w)
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("DSW1")
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(mux_port_w)
-	AM_RANGE(0xfd, 0xfd) AM_READ(mux_port_r)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
+	AM_RANGE(0xfc, 0xfc) AM_WRITE_LEGACY(mux_port_w)
+	AM_RANGE(0xfd, 0xfd) AM_READ_LEGACY(mux_port_r)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE_LEGACY(sound_latch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( luckyrlt_sound_map, AS_PROGRAM, 8, corona_state )
@@ -807,8 +807,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( luckyrlt_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(sound_latch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

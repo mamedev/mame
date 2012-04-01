@@ -137,24 +137,24 @@ static WRITE8_HANDLER( protram_w )
 static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8, laserbas_state )
 	//ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0xbfff) AM_READWRITE(vram_r, vram_w)
+	AM_RANGE(0x4000, 0xbfff) AM_READWRITE_LEGACY(vram_r, vram_w)
 	AM_RANGE(0xc000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(protram_r, protram_w) AM_BASE_MEMBER(laserbas_state,m_protram) /* protection device */
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(protram_r, protram_w) AM_BASE(m_protram) /* protection device */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( laserbas_io, AS_IO, 8, laserbas_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(vrambank_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(vrambank_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN1") // DSW + something else?
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("IN2")
-//  AM_RANGE(0x23, 0x23) AM_WRITE(test_w) bit 2 presumably is a mux for 0x20?
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("pit0", pit8253_r, pit8253_w)
-	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE("pit1", pit8253_r, pit8253_w)
-	AM_RANGE(0x80, 0x9f) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+//  AM_RANGE(0x23, 0x23) AM_WRITE_LEGACY(test_w) bit 2 presumably is a mux for 0x20?
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_LEGACY("pit0", pit8253_r, pit8253_w)
+	AM_RANGE(0x44, 0x47) AM_DEVREADWRITE_LEGACY("pit1", pit8253_r, pit8253_w)
+	AM_RANGE(0x80, 0x9f) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( laserbas )

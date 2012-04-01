@@ -127,26 +127,26 @@ static WRITE8_DEVICE_HANDLER( hc11_okibank_w )
 
 static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8, namco_30test_state )
 	AM_RANGE(0x0000, 0x003f) AM_RAM // internal I/O
-	AM_RANGE(0x007c, 0x007c) AM_READWRITE(hc11_mux_r,hc11_mux_w)
-	AM_RANGE(0x007e, 0x007e) AM_DEVREADWRITE("oki",hc11_okibank_r,hc11_okibank_w)
+	AM_RANGE(0x007c, 0x007c) AM_READWRITE_LEGACY(hc11_mux_r,hc11_mux_w)
+	AM_RANGE(0x007e, 0x007e) AM_DEVREADWRITE_LEGACY("oki",hc11_okibank_r,hc11_okibank_w)
 	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
 	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
 	AM_RANGE(0x0d80, 0x0dbf) AM_RAM	// EEPROM read-back data goes there
-	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	/* 0x401e-0x401f: time */
-	AM_RANGE(0x4000, 0x401f) AM_WRITE(namco_30test_led_w) // 7-seg leds
+	AM_RANGE(0x4000, 0x401f) AM_WRITE_LEGACY(namco_30test_led_w) // 7-seg leds
 	/* 0x6000: 1st place 7-seg led */
 	/* 0x6001: 2nd place 7-seg led */
 	/* 0x6002: 3rd place 7-seg led */
 	/* 0x6003: current / last play score */
 	/* 0x6004: lamps */
-	AM_RANGE(0x6000, 0x6003) AM_WRITE(namco_30test_led_rank_w)
-	AM_RANGE(0x6004, 0x6004) AM_WRITE(namco_30test_lamps_w)
+	AM_RANGE(0x6000, 0x6003) AM_WRITE_LEGACY(namco_30test_led_rank_w)
+	AM_RANGE(0x6004, 0x6004) AM_WRITE_LEGACY(namco_30test_lamps_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8, namco_30test_state )
-	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ(namco_30test_mux_r)
+	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ_LEGACY(namco_30test_mux_r)
 //  AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
 	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END

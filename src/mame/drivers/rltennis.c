@@ -92,15 +92,15 @@ static ADDRESS_MAP_START( rltennis_main, AS_PROGRAM, 16, rltennis_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x700000, 0x70000f) AM_WRITE(rlt_blitter_w)
-	AM_RANGE(0x720000, 0x720001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device,index_w,0x00ff)
-	AM_RANGE(0x720002, 0x720003) AM_DEVREADWRITE8_MODERN("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
-	AM_RANGE(0x720006, 0x720007) AM_DEVWRITE8_MODERN("ramdac",ramdac_device,index_r_w,0x00ff)
-	AM_RANGE(0x740000, 0x740001) AM_WRITE(rlt_snd1_w)
-	AM_RANGE(0x760000, 0x760001) AM_WRITE(rlt_snd2_w)
+	AM_RANGE(0x700000, 0x70000f) AM_WRITE_LEGACY(rlt_blitter_w)
+	AM_RANGE(0x720000, 0x720001) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
+	AM_RANGE(0x720002, 0x720003) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
+	AM_RANGE(0x720006, 0x720007) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)
+	AM_RANGE(0x740000, 0x740001) AM_WRITE_LEGACY(rlt_snd1_w)
+	AM_RANGE(0x760000, 0x760001) AM_WRITE_LEGACY(rlt_snd2_w)
 	AM_RANGE(0x780000, 0x780001) AM_WRITENOP	/* sound control, unknown, usually = 0x0044 */
 	AM_RANGE(0x7a0000, 0x7a0003) AM_READNOP 	/* unknown, read only at boot time*/
-	AM_RANGE(0x7e0000, 0x7e0001) AM_READ(rlt_io_r)
+	AM_RANGE(0x7e0000, 0x7e0001) AM_READ_LEGACY(rlt_io_r)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
@@ -178,7 +178,7 @@ static MACHINE_RESET( rltennis )
 }
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, rltennis_state )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
 static RAMDAC_INTERFACE( ramdac_intf )

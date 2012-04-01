@@ -160,24 +160,24 @@ static WRITE8_HANDLER( tankbatt_coin_lockout_w )
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
-	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE_MEMBER(tankbatt_state, m_bulletsram) AM_SIZE_MEMBER(tankbatt_state, m_bulletsram_size)
+	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE( m_bulletsram) AM_SIZE(m_bulletsram_size)
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_BASE_MEMBER(tankbatt_state, m_videoram)
-	AM_RANGE(0x0c00, 0x0c07) AM_READ(tankbatt_in0_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(tankbatt_led_w)
-	AM_RANGE(0x0c02, 0x0c02) AM_WRITE(tankbatt_coin_counter_w)
-	AM_RANGE(0x0c03, 0x0c03) AM_WRITE(tankbatt_coin_lockout_w)
-	AM_RANGE(0x0c08, 0x0c0f) AM_READ(tankbatt_in1_r)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(tankbatt_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0c00, 0x0c07) AM_READ_LEGACY(tankbatt_in0_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_WRITE_LEGACY(tankbatt_led_w)
+	AM_RANGE(0x0c02, 0x0c02) AM_WRITE_LEGACY(tankbatt_coin_counter_w)
+	AM_RANGE(0x0c03, 0x0c03) AM_WRITE_LEGACY(tankbatt_coin_lockout_w)
+	AM_RANGE(0x0c08, 0x0c0f) AM_READ_LEGACY(tankbatt_in1_r)
 	AM_RANGE(0x0c08, 0x0c08) AM_WRITENOP //coin counter mirror?
-	AM_RANGE(0x0c0a, 0x0c0a) AM_WRITE(tankbatt_interrupt_enable_w)
-	AM_RANGE(0x0c0b, 0x0c0b) AM_WRITE(tankbatt_sh_engine_w)
-	AM_RANGE(0x0c0c, 0x0c0c) AM_WRITE(tankbatt_sh_fire_w)
-	AM_RANGE(0x0c0d, 0x0c0d) AM_WRITE(tankbatt_sh_expl_w) // bit 7 == led for the start 2 button
+	AM_RANGE(0x0c0a, 0x0c0a) AM_WRITE_LEGACY(tankbatt_interrupt_enable_w)
+	AM_RANGE(0x0c0b, 0x0c0b) AM_WRITE_LEGACY(tankbatt_sh_engine_w)
+	AM_RANGE(0x0c0c, 0x0c0c) AM_WRITE_LEGACY(tankbatt_sh_fire_w)
+	AM_RANGE(0x0c0d, 0x0c0d) AM_WRITE_LEGACY(tankbatt_sh_expl_w) // bit 7 == led for the start 2 button
 	AM_RANGE(0x0c0e, 0x0c0e) AM_WRITENOP //bit 7 == led for the start 1 button
-	AM_RANGE(0x0c0f, 0x0c0f) AM_WRITE(tankbatt_demo_interrupt_enable_w)
-	AM_RANGE(0x0c10, 0x0c10) AM_WRITE(tankbatt_irq_ack_w)
-	AM_RANGE(0x0c18, 0x0c1f) AM_READ(tankbatt_dsw_r)
+	AM_RANGE(0x0c0f, 0x0c0f) AM_WRITE_LEGACY(tankbatt_demo_interrupt_enable_w)
+	AM_RANGE(0x0c10, 0x0c10) AM_WRITE_LEGACY(tankbatt_irq_ack_w)
+	AM_RANGE(0x0c18, 0x0c1f) AM_READ_LEGACY(tankbatt_dsw_r)
 	AM_RANGE(0x0c18, 0x0c18) AM_WRITENOP	/* watchdog ?? */
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("maincpu",0)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu",0) //mirror for the reset/irq vectors

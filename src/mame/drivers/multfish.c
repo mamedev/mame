@@ -669,10 +669,10 @@ DRIVER_INIT( lhauntent )
 }
 
 static ADDRESS_MAP_START( multfish_map, AS_PROGRAM, 8, multfish_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITE(multfish_vid_w)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITE_LEGACY(multfish_vid_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE("m48t35", multfish_timekeeper_r, multfish_timekeeper_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bankedram_r, bankedram_w)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE_LEGACY("m48t35", multfish_timekeeper_r, multfish_timekeeper_w)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w)
 ADDRESS_MAP_END
 
 // According to control panel the user buttons are arranged as
@@ -914,52 +914,52 @@ static ADDRESS_MAP_START( multfish_portmap, AS_IO, 8, multfish_state )
 	AM_RANGE(0x17, 0x17) AM_READ_PORT("IN7")
 
 	/* Write ports not hooked up yet */
-	AM_RANGE(0x30, 0x30) AM_WRITE(multfish_lamps1_w)
-        AM_RANGE(0x31, 0x31) AM_WRITE(multfish_counters_w)
-//  AM_RANGE(0x32, 0x32) AM_WRITE(multfish_port32_w)
-	AM_RANGE(0x33, 0x33) AM_WRITE(multfish_hopper_w)
-	AM_RANGE(0x34, 0x34) AM_WRITE(multfish_lamps2_w)
-	AM_RANGE(0x35, 0x35) AM_WRITE(multfish_lamps3_w)
-//  AM_RANGE(0x36, 0x36) AM_WRITE(multfish_port36_w)
-	AM_RANGE(0x37, 0x37) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x38, 0x38) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x39, 0x39) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x3a, 0x3a) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(multfish_lamps1_w)
+        AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(multfish_counters_w)
+//  AM_RANGE(0x32, 0x32) AM_WRITE_LEGACY(multfish_port32_w)
+	AM_RANGE(0x33, 0x33) AM_WRITE_LEGACY(multfish_hopper_w)
+	AM_RANGE(0x34, 0x34) AM_WRITE_LEGACY(multfish_lamps2_w)
+	AM_RANGE(0x35, 0x35) AM_WRITE_LEGACY(multfish_lamps3_w)
+//  AM_RANGE(0x36, 0x36) AM_WRITE_LEGACY(multfish_port36_w)
+	AM_RANGE(0x37, 0x37) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x38, 0x38) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x39, 0x39) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x3a, 0x3a) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 
-	AM_RANGE(0x60, 0x60) AM_WRITE(multfish_dispenable_w) // display enable mirror for lottery sets
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(multfish_dispenable_w) // display enable mirror for lottery sets
 
-	AM_RANGE(0x90, 0x90) AM_READ(ray_r)
+	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(ray_r)
 
-	AM_RANGE(0xa0, 0xa0)  AM_WRITE(multfish_bank_w) // Crazy Monkey 2 banking
-	AM_RANGE(0xb0, 0xb0)  AM_WRITE(multfish_bank_w) // Fruit Cocktail 2 lottery banking
-	AM_RANGE(0xb1, 0xb1)  AM_WRITE(multfish_bank_w) // Crazy Monkey Ent banking
-	AM_RANGE(0xb2, 0xb2)  AM_WRITE(multfish_bank_w) // Lacky Haunter Ent banking
-	AM_RANGE(0xb6, 0xb6)  AM_WRITE(multfish_bank_w) // Resident Ent banking
-	AM_RANGE(0xbf, 0xbf)  AM_WRITE(multfish_bank_w) // Gnome Ent banking
-	AM_RANGE(0xc7, 0xc7)  AM_WRITE(multfish_bank_w) // Resident lottery banking
-	AM_RANGE(0xca, 0xca)  AM_WRITE(multfish_bank_w) // Gnome lottery banking
-	AM_RANGE(0xcb, 0xcb)  AM_WRITE(multfish_bank_w) // Keks lottery banking
-	AM_RANGE(0xcc, 0xcc)  AM_WRITE(multfish_bank_w) // Sweet Life 2 lottery banking
-	AM_RANGE(0xcd, 0xcd)  AM_WRITE(multfish_bank_w) // Island 2 lottery banking
-	AM_RANGE(0xce, 0xce)  AM_WRITE(multfish_bank_w) // Pirate 2 lottery banking
-	AM_RANGE(0xd0, 0xd0)  AM_WRITE(multfish_bank_w) // rollfr_4 banking
-	AM_RANGE(0xe1, 0xe1)  AM_WRITE(multfish_bank_w) // Island 2 banking
-	AM_RANGE(0xe5, 0xe5)  AM_WRITE(multfish_bank_w) // Gnome banking
-	AM_RANGE(0xe8, 0xe8)  AM_WRITE(multfish_bank_w) // Sweet Life 2 banking
-	AM_RANGE(0xea, 0xea)  AM_WRITE(multfish_bank_w) // Fruit Cocktail 2 banking
-	AM_RANGE(0xec, 0xec)  AM_WRITE(multfish_bank_w) // Crazy Monkey lottery banking
+	AM_RANGE(0xa0, 0xa0)  AM_WRITE_LEGACY(multfish_bank_w) // Crazy Monkey 2 banking
+	AM_RANGE(0xb0, 0xb0)  AM_WRITE_LEGACY(multfish_bank_w) // Fruit Cocktail 2 lottery banking
+	AM_RANGE(0xb1, 0xb1)  AM_WRITE_LEGACY(multfish_bank_w) // Crazy Monkey Ent banking
+	AM_RANGE(0xb2, 0xb2)  AM_WRITE_LEGACY(multfish_bank_w) // Lacky Haunter Ent banking
+	AM_RANGE(0xb6, 0xb6)  AM_WRITE_LEGACY(multfish_bank_w) // Resident Ent banking
+	AM_RANGE(0xbf, 0xbf)  AM_WRITE_LEGACY(multfish_bank_w) // Gnome Ent banking
+	AM_RANGE(0xc7, 0xc7)  AM_WRITE_LEGACY(multfish_bank_w) // Resident lottery banking
+	AM_RANGE(0xca, 0xca)  AM_WRITE_LEGACY(multfish_bank_w) // Gnome lottery banking
+	AM_RANGE(0xcb, 0xcb)  AM_WRITE_LEGACY(multfish_bank_w) // Keks lottery banking
+	AM_RANGE(0xcc, 0xcc)  AM_WRITE_LEGACY(multfish_bank_w) // Sweet Life 2 lottery banking
+	AM_RANGE(0xcd, 0xcd)  AM_WRITE_LEGACY(multfish_bank_w) // Island 2 lottery banking
+	AM_RANGE(0xce, 0xce)  AM_WRITE_LEGACY(multfish_bank_w) // Pirate 2 lottery banking
+	AM_RANGE(0xd0, 0xd0)  AM_WRITE_LEGACY(multfish_bank_w) // rollfr_4 banking
+	AM_RANGE(0xe1, 0xe1)  AM_WRITE_LEGACY(multfish_bank_w) // Island 2 banking
+	AM_RANGE(0xe5, 0xe5)  AM_WRITE_LEGACY(multfish_bank_w) // Gnome banking
+	AM_RANGE(0xe8, 0xe8)  AM_WRITE_LEGACY(multfish_bank_w) // Sweet Life 2 banking
+	AM_RANGE(0xea, 0xea)  AM_WRITE_LEGACY(multfish_bank_w) // Fruit Cocktail 2 banking
+	AM_RANGE(0xec, 0xec)  AM_WRITE_LEGACY(multfish_bank_w) // Crazy Monkey lottery banking
 
-	AM_RANGE(0xf0, 0xf0)  AM_WRITE(multfish_bank_w) // Gold Fish banking
-	AM_RANGE(0xf1, 0xf1)  AM_WRITE(multfish_rambank_w)
-	AM_RANGE(0xf3, 0xf3)  AM_WRITE(multfish_f3_w) // from 00->01 at startup, irq enable maybe?
-	AM_RANGE(0xf4, 0xf4)  AM_WRITE(multfish_dispenable_w) // display enable
+	AM_RANGE(0xf0, 0xf0)  AM_WRITE_LEGACY(multfish_bank_w) // Gold Fish banking
+	AM_RANGE(0xf1, 0xf1)  AM_WRITE_LEGACY(multfish_rambank_w)
+	AM_RANGE(0xf3, 0xf3)  AM_WRITE_LEGACY(multfish_f3_w) // from 00->01 at startup, irq enable maybe?
+	AM_RANGE(0xf4, 0xf4)  AM_WRITE_LEGACY(multfish_dispenable_w) // display enable
 
 	/* mirrors of the rom banking */
-	AM_RANGE(0xf8, 0xfd)  AM_WRITE(multfish_bank_w)
+	AM_RANGE(0xf8, 0xfd)  AM_WRITE_LEGACY(multfish_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rollfr_portmap, AS_IO, 8, multfish_state )
-	AM_RANGE(0x33, 0x33) AM_WRITE(rollfr_hopper_w)
+	AM_RANGE(0x33, 0x33) AM_WRITE_LEGACY(rollfr_hopper_w)
 	AM_IMPORT_FROM(multfish_portmap)
 ADDRESS_MAP_END
 

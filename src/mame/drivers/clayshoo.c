@@ -220,9 +220,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, clayshoo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_ROM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_SIZE_MEMBER(clayshoo_state, m_videoram, m_videoram_size)	/* 6k of video ram according to readme */
+	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)	/* 6k of video ram according to readme */
 	AM_RANGE(0x9800, 0xa800) AM_WRITENOP	  /* not really mapped, but cleared */
-	AM_RANGE(0xc800, 0xc800) AM_READWRITE(analog_r, analog_reset_w)
+	AM_RANGE(0xc800, 0xc800) AM_READWRITE_LEGACY(analog_r, analog_reset_w)
 ADDRESS_MAP_END
 
 
@@ -235,9 +235,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, clayshoo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 

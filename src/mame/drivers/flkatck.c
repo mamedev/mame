@@ -96,12 +96,12 @@ static WRITE8_HANDLER( multiply_w )
 
 
 static ADDRESS_MAP_START( flkatck_map, AS_PROGRAM, 8, flkatck_state )
-	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE(flkatck_k007121_regs_w)									/* 007121 registers */
+	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE_LEGACY(flkatck_k007121_regs_w)									/* 007121 registers */
 	AM_RANGE(0x0008, 0x03ff) AM_RAM																	/* RAM */
-	AM_RANGE(0x0400, 0x041f) AM_READWRITE(flkatck_ls138_r, flkatck_ls138_w)							/* inputs, DIPS, bankswitch, counters, sound command */
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)	/* palette */
+	AM_RANGE(0x0400, 0x041f) AM_READWRITE_LEGACY(flkatck_ls138_r, flkatck_ls138_w)							/* inputs, DIPS, bankswitch, counters, sound command */
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)	/* palette */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM																	/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_BASE_MEMBER(flkatck_state, m_k007121_ram)					/* Video RAM (007121) */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE_LEGACY(flkatck_k007121_w) AM_BASE( m_k007121_ram)					/* Video RAM (007121) */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")															/* banked ROM */
 	AM_RANGE(0x6000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END
@@ -109,13 +109,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( flkatck_sound_map, AS_PROGRAM, 8, flkatck_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(multiply_r, multiply_w)				/* ??? */
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE_LEGACY(multiply_r, multiply_w)				/* ??? */
 //  AM_RANGE(0x9001, 0x9001) AM_RAM                                             /* ??? */
 	AM_RANGE(0x9004, 0x9004) AM_READNOP											/* ??? */
 	AM_RANGE(0x9006, 0x9006) AM_WRITENOP										/* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)								/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)	/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)			/* YM2151 */
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)								/* soundlatch_r */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w)	/* 007232 registers */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)			/* YM2151 */
 ADDRESS_MAP_END
 
 

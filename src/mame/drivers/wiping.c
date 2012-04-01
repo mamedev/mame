@@ -73,26 +73,26 @@ static WRITE8_HANDLER( sound_irq_mask_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiping_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_BASE_MEMBER(wiping_state, m_videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_BASE_MEMBER(wiping_state, m_colorram)
-	AM_RANGE(0x8800, 0x88ff) AM_BASE_SIZE_MEMBER(wiping_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8000, 0x83ff) AM_BASE( m_videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_BASE( m_colorram)
+	AM_RANGE(0x8800, 0x88ff) AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8000, 0x8bff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(main_irq_mask_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(wiping_flipscreen_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(subcpu_reset_w)
-	AM_RANGE(0xa800, 0xa807) AM_READ(ports_r)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(main_irq_mask_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(wiping_flipscreen_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(subcpu_reset_w)
+	AM_RANGE(0xa800, 0xa807) AM_READ_LEGACY(ports_r)
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xb800, 0xb800) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wiping_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("wiping", wiping_sound_w)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE_LEGACY("wiping", wiping_sound_w)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(sound_irq_mask_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE_LEGACY(sound_irq_mask_w)
 ADDRESS_MAP_END
 
 

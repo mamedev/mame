@@ -190,25 +190,25 @@ static WRITE16_HANDLER( drill_irq_w )
 	COMBINE_DATA(&state->irq_reg);
 }
 
-static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, taito_f3_state )
+static ADDRESS_MAP_START( drill_map, AS_PROGRAM, 16, _2mindril_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x3000ff) AM_RAM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(f3_spriteram_r,f3_spriteram_w)
-	AM_RANGE(0x410000, 0x41bfff) AM_READWRITE(f3_pf_data_r,f3_pf_data_w)
-	AM_RANGE(0x41c000, 0x41dfff) AM_READWRITE(f3_videoram_r,f3_videoram_w)
-	AM_RANGE(0x41e000, 0x41ffff) AM_READWRITE(f3_vram_r,f3_vram_w)
-	AM_RANGE(0x420000, 0x42ffff) AM_READWRITE(f3_lineram_r,f3_lineram_w)
-	AM_RANGE(0x430000, 0x43ffff) AM_READWRITE(f3_pivot_r,f3_pivot_w)
-	AM_RANGE(0x460000, 0x46000f) AM_WRITE(f3_control_0_w)
-	AM_RANGE(0x460010, 0x46001f) AM_WRITE(f3_control_1_w)
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(f3_spriteram_r,f3_spriteram_w)
+	AM_RANGE(0x410000, 0x41bfff) AM_READWRITE_LEGACY(f3_pf_data_r,f3_pf_data_w)
+	AM_RANGE(0x41c000, 0x41dfff) AM_READWRITE_LEGACY(f3_videoram_r,f3_videoram_w)
+	AM_RANGE(0x41e000, 0x41ffff) AM_READWRITE_LEGACY(f3_vram_r,f3_vram_w)
+	AM_RANGE(0x420000, 0x42ffff) AM_READWRITE_LEGACY(f3_lineram_r,f3_lineram_w)
+	AM_RANGE(0x430000, 0x43ffff) AM_READWRITE_LEGACY(f3_pivot_r,f3_pivot_w)
+	AM_RANGE(0x460000, 0x46000f) AM_WRITE_LEGACY(f3_control_0_w)
+	AM_RANGE(0x460010, 0x46001f) AM_WRITE_LEGACY(f3_control_1_w)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x502022, 0x502023) AM_WRITENOP //countinously switches between 0 and 2
-	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8("ymsnd", ym2610_r, ym2610_w, 0x00ff)
-	AM_RANGE(0x60000c, 0x60000d) AM_READWRITE(drill_irq_r,drill_irq_w)
+	AM_RANGE(0x600000, 0x600007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2610_r, ym2610_w, 0x00ff)
+	AM_RANGE(0x60000c, 0x60000d) AM_READWRITE_LEGACY(drill_irq_r,drill_irq_w)
 	AM_RANGE(0x60000e, 0x60000f) AM_RAM // unknown purpose, zeroed at start-up and nothing else
-	AM_RANGE(0x700000, 0x70000f) AM_READWRITE(drill_io_r,drill_io_w) AM_BASE_MEMBER(_2mindril_state, m_iodata) // i/o
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(sensors_w)
+	AM_RANGE(0x700000, 0x70000f) AM_READWRITE_LEGACY(drill_io_r,drill_io_w) AM_BASE(m_iodata) // i/o
+	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(sensors_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( drill )

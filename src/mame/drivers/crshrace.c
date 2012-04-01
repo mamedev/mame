@@ -187,24 +187,24 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x300000, 0x3fffff) AM_READ(extrarom1_r)
-	AM_RANGE(0x400000, 0x4fffff) AM_READ(extrarom2_r)
-	AM_RANGE(0x500000, 0x5fffff) AM_READ(extrarom2_r)	/* mirror */
+	AM_RANGE(0x300000, 0x3fffff) AM_READ_LEGACY(extrarom1_r)
+	AM_RANGE(0x400000, 0x4fffff) AM_READ_LEGACY(extrarom2_r)
+	AM_RANGE(0x500000, 0x5fffff) AM_READ_LEGACY(extrarom2_r)	/* mirror */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE(crshrace_videoram1_w) AM_BASE_MEMBER(crshrace_state, m_videoram1)
+	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE_LEGACY(crshrace_videoram1_w) AM_BASE( m_videoram1)
 	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
-	AM_RANGE(0xffc000, 0xffc001) AM_WRITE(crshrace_roz_bank_w)
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_BASE_MEMBER(crshrace_state, m_videoram2)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1") AM_WRITE(crshrace_gfxctrl_w)
+	AM_RANGE(0xffc000, 0xffc001) AM_WRITE_LEGACY(crshrace_roz_bank_w)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(crshrace_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1") AM_WRITE_LEGACY(crshrace_gfxctrl_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE_LEGACY(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
-	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_ctrl_w)
+	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
 	AM_RANGE(0xfff044, 0xfff047) AM_WRITEONLY	// ??? moves during race
 ADDRESS_MAP_END
 
@@ -216,9 +216,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, crshrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(crshrace_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, pending_command_clear_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(crshrace_sh_bankswitch_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(soundlatch_r, pending_command_clear_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 
 

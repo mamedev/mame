@@ -76,18 +76,18 @@ static WRITE8_HANDLER( amspdwy_sound_w )
 
 static ADDRESS_MAP_START( amspdwy_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												// ROM
-	AM_RANGE(0x8000, 0x801f) AM_WRITE(amspdwy_paletteram_w) AM_BASE_GENERIC(paletteram)// Palette
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(amspdwy_videoram_w) AM_BASE_MEMBER(amspdwy_state, m_videoram)	// Layer, mirrored?
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(amspdwy_colorram_w) AM_BASE_MEMBER(amspdwy_state, m_colorram)	// Layer
+	AM_RANGE(0x8000, 0x801f) AM_WRITE_LEGACY(amspdwy_paletteram_w) AM_BASE_GENERIC(paletteram)// Palette
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE_LEGACY(amspdwy_videoram_w) AM_BASE( m_videoram)	// Layer, mirrored?
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE_LEGACY(amspdwy_colorram_w) AM_BASE( m_colorram)	// Layer
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM												// Unused?
 //  AM_RANGE(0xa000, 0xa000) AM_WRITENOP                                        // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW2") AM_WRITE(amspdwy_flipscreen_w)	// DSW 2 + Toggle Flip Screen?
-	AM_RANGE(0xa800, 0xa800) AM_READ(amspdwy_wheel_0_r)							// Player 1
-	AM_RANGE(0xac00, 0xac00) AM_READ(amspdwy_wheel_1_r)							// Player 2
+	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(amspdwy_flipscreen_w)	// DSW 2 + Toggle Flip Screen?
+	AM_RANGE(0xa800, 0xa800) AM_READ_LEGACY(amspdwy_wheel_0_r)							// Player 1
+	AM_RANGE(0xac00, 0xac00) AM_READ_LEGACY(amspdwy_wheel_1_r)							// Player 2
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP										// ? Exiting IRQ
-	AM_RANGE(0xb400, 0xb400) AM_DEVREAD("ymsnd", amspdwy_sound_r) AM_WRITE(amspdwy_sound_w)		// YM2151 status, To Sound CPU
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE_MEMBER(amspdwy_state, m_spriteram, m_spriteram_size)// Sprites
+	AM_RANGE(0xb400, 0xb400) AM_DEVREAD_LEGACY("ymsnd", amspdwy_sound_r) AM_WRITE_LEGACY(amspdwy_sound_w)		// YM2151 status, To Sound CPU
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)// Sprites
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM												// Work RAM
 ADDRESS_MAP_END
 
@@ -99,7 +99,7 @@ static READ8_HANDLER( amspdwy_port_r )
 }
 
 static ADDRESS_MAP_START( amspdwy_portmap, AS_IO, 8, amspdwy_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(amspdwy_port_r)
+	AM_RANGE(0x0000, 0x7fff) AM_READ_LEGACY(amspdwy_port_r)
 ADDRESS_MAP_END
 
 
@@ -115,8 +115,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( amspdwy_sound_map, AS_PROGRAM, 8, amspdwy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
 //  AM_RANGE(0x8000, 0x8000) AM_WRITENOP                            // ? Written with 0 at the start
-	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_r)					// From Main CPU
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)			//
+	AM_RANGE(0x9000, 0x9000) AM_READ_LEGACY(soundlatch_r)					// From Main CPU
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)			//
 	AM_RANGE(0xc000, 0xdfff) AM_RAM									// Work RAM
 	AM_RANGE(0xffff, 0xffff) AM_READNOP								// ??? IY = FFFF at the start ?
 ADDRESS_MAP_END

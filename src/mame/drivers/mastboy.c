@@ -700,28 +700,28 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // Internal ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM // External ROM
 
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE_MEMBER(mastboy_state, m_workram)// work ram
-	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_BASE_MEMBER(mastboy_state, m_tileram)// tilemap ram
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE_MEMBER(mastboy_state, m_colram) AM_MIRROR(0x0e00)  // colour ram
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE( m_workram)// work ram
+	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_BASE( m_tileram)// tilemap ram
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE( m_colram) AM_MIRROR(0x0e00)  // colour ram
 
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE(banked_ram_r,banked_ram_w) // mastboy bank area read / write
+	AM_RANGE(0xc000, 0xffff) AM_READWRITE_LEGACY(banked_ram_r,banked_ram_w) // mastboy bank area read / write
 
-	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(mastboy_backupram_r,mastboy_backupram_w) AM_SHARE("nvram")
+	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE_LEGACY(mastboy_backupram_r,mastboy_backupram_w) AM_SHARE("nvram")
 
 	AM_RANGE(0xff800, 0xff807) AM_READ_PORT("P1")
 	AM_RANGE(0xff808, 0xff80f) AM_READ_PORT("P2")
 	AM_RANGE(0xff810, 0xff817) AM_READ_PORT("DSW1")
 	AM_RANGE(0xff818, 0xff81f) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0xff820, 0xff827) AM_WRITE(mastboy_bank_w)
-	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE("saa", saa1099_data_w)
-	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE("saa", saa1099_control_w)
-	AM_RANGE(0xff830, 0xff830) AM_WRITE(mastboy_msm5205_data_w)
-	AM_RANGE(0xff838, 0xff838) AM_WRITE(mastboy_irq0_ack_w)
-	AM_RANGE(0xff839, 0xff839) AM_WRITE(msm5205_mastboy_m5205_sambit0_w)
-	AM_RANGE(0xff83a, 0xff83a) AM_WRITE(msm5205_mastboy_m5205_sambit1_w)
-	AM_RANGE(0xff83b, 0xff83b) AM_DEVWRITE("msm", mastboy_msm5205_reset_w)
-	AM_RANGE(0xff83c, 0xff83c) AM_WRITE(backupram_enable_w)
+	AM_RANGE(0xff820, 0xff827) AM_WRITE_LEGACY(mastboy_bank_w)
+	AM_RANGE(0xff828, 0xff828) AM_DEVWRITE_LEGACY("saa", saa1099_data_w)
+	AM_RANGE(0xff829, 0xff829) AM_DEVWRITE_LEGACY("saa", saa1099_control_w)
+	AM_RANGE(0xff830, 0xff830) AM_WRITE_LEGACY(mastboy_msm5205_data_w)
+	AM_RANGE(0xff838, 0xff838) AM_WRITE_LEGACY(mastboy_irq0_ack_w)
+	AM_RANGE(0xff839, 0xff839) AM_WRITE_LEGACY(msm5205_mastboy_m5205_sambit0_w)
+	AM_RANGE(0xff83a, 0xff83a) AM_WRITE_LEGACY(msm5205_mastboy_m5205_sambit1_w)
+	AM_RANGE(0xff83b, 0xff83b) AM_DEVWRITE_LEGACY("msm", mastboy_msm5205_reset_w)
+	AM_RANGE(0xff83c, 0xff83c) AM_WRITE_LEGACY(backupram_enable_w)
 
 	AM_RANGE(0xffc00, 0xfffff) AM_RAM // Internal RAM
 ADDRESS_MAP_END
@@ -740,8 +740,8 @@ static READ8_HANDLER( mastboy_nmi_read )
 }
 
 static ADDRESS_MAP_START( mastboy_io_map, AS_IO, 8, mastboy_state )
-	AM_RANGE(0x38, 0x38) AM_READ(mastboy_port_38_read)
-	AM_RANGE(0x39, 0x39) AM_READ(mastboy_nmi_read)
+	AM_RANGE(0x38, 0x38) AM_READ_LEGACY(mastboy_port_38_read)
+	AM_RANGE(0x39, 0x39) AM_READ_LEGACY(mastboy_nmi_read)
 ADDRESS_MAP_END
 
 /* Input Ports */

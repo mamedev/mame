@@ -207,19 +207,19 @@ static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 }
 
 static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,m_main)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE(m_main)
 	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
-	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
-	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE("eeprom", eeprom_resetline_w )
-	AM_RANGE(0xafee, 0xafee) AM_DEVWRITE("eeprom", eeprom_clockline_w )
-	AM_RANGE(0xafef, 0xafef) AM_DEVWRITE("eeprom", eeprom_dataline_w )
-	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+	AM_RANGE(0xaf00, 0xafff) AM_READ_LEGACY(spool99_io_r)
+	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE_LEGACY("eeprom", eeprom_resetline_w )
+	AM_RANGE(0xafee, 0xafee) AM_DEVWRITE_LEGACY("eeprom", eeprom_clockline_w )
+	AM_RANGE(0xafef, 0xafef) AM_DEVWRITE_LEGACY("eeprom", eeprom_dataline_w )
+	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,m_vram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,m_cram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(spool99_vram_w) AM_BASE(m_vram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE_LEGACY(spool99_cram_w) AM_BASE(m_cram)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( vcarn_io_r )
@@ -253,20 +253,20 @@ static READ8_HANDLER( vcarn_io_r )
 }
 
 static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,m_main)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE(m_main)
 	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
-	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)
-	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE("eeprom", eeprom_resetline_w )
-	AM_RANGE(0xa746, 0xa746) AM_DEVWRITE("eeprom", eeprom_clockline_w )
-	AM_RANGE(0xa747, 0xa747) AM_DEVWRITE("eeprom", eeprom_dataline_w )
-	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+	AM_RANGE(0xa700, 0xa7ff) AM_READ_LEGACY(vcarn_io_r)
+	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE_LEGACY("eeprom", eeprom_resetline_w )
+	AM_RANGE(0xa746, 0xa746) AM_DEVWRITE_LEGACY("eeprom", eeprom_clockline_w )
+	AM_RANGE(0xa747, 0xa747) AM_DEVWRITE_LEGACY("eeprom", eeprom_dataline_w )
+	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xb000, 0xdfff) AM_RAM
-//  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_BASE(&vcarn_io)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,m_vram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,m_cram)
+//  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE_LEGACY(vcarn_io_r,vcarn_io_w) AM_BASE_LEGACY(&vcarn_io)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(spool99_vram_w) AM_BASE(m_vram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE_LEGACY(spool99_cram_w) AM_BASE(m_cram)
 ADDRESS_MAP_END
 
 

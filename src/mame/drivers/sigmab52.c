@@ -309,14 +309,14 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 
 	AM_RANGE(0x8000, 0xf6ff) AM_RAMBANK("bank3")
 
-	AM_RANGE(0xf700, 0xf700) AM_READ(unk_f700_r)
-	AM_RANGE(0xf710, 0xf710) AM_WRITE(unk_f710_w)
-	AM_RANGE(0xf721, 0xf721) AM_READ(unk_f721_r)
+	AM_RANGE(0xf700, 0xf700) AM_READ_LEGACY(unk_f700_r)
+	AM_RANGE(0xf710, 0xf710) AM_WRITE_LEGACY(unk_f710_w)
+	AM_RANGE(0xf721, 0xf721) AM_READ_LEGACY(unk_f721_r)
 
-	//AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
-	//AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
+	//AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_status_r, hd63484_address_w)
+	//AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
 
-	AM_RANGE(0xf730, 0xf731) AM_READWRITE(acrtc_r, acrtc_w)
+	AM_RANGE(0xf730, 0xf731) AM_READWRITE_LEGACY(acrtc_r, acrtc_w)
 	AM_RANGE(0xf740, 0xf740) AM_READ_PORT("IN0")
 	AM_RANGE(0xf741, 0xf741) AM_READ_PORT("IN1")	// random checks to active high to go further with the test.
 	AM_RANGE(0xf742, 0xf742) AM_READ_PORT("IN2")

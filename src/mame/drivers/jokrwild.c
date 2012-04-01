@@ -192,17 +192,17 @@ static READ8_HANDLER( rng_r )
 *************************/
 
 static ADDRESS_MAP_START( jokrwild_map, AS_PROGRAM, 8, jokrwild_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_BASE_MEMBER(jokrwild_state, m_videoram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE_LEGACY(jokrwild_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM //FIXME: backup RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_BASE_MEMBER(jokrwild_state, m_colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(jokrwild_colorram_w) AM_BASE( m_colorram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM //stack RAM
-	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write) //optical sensor is here
+	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //optical sensor is here
 //  AM_RANGE(0x4010, 0x4010) AM_READNOP /* R ???? */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x6100, 0x6100) AM_READ_PORT("SW1")
-	AM_RANGE(0x6200, 0x6203) AM_READ(rng_r)//another PIA?
+	AM_RANGE(0x6200, 0x6203) AM_READ_LEGACY(rng_r)//another PIA?
 	AM_RANGE(0x6300, 0x6300) AM_READ_PORT("SW2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

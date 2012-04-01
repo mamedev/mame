@@ -55,12 +55,12 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, travrusa_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_BASE_MEMBER(travrusa_state, m_videoram)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(travrusa_scroll_x_high_w)
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(travrusa_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)	/* + coin counters - not written by shtrider */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(travrusa_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(travrusa_scroll_x_low_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(travrusa_scroll_x_high_w)
+	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(irem_sound_cmd_w)
+	AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(travrusa_flipscreen_w)	/* + coin counters - not written by shtrider */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("SYSTEM")		/* IN0 */
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P1")			/* IN1 */
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("P2")			/* IN2 */

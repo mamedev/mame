@@ -296,37 +296,37 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16, umipoker_state )
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(umipoker_vram_0_w) AM_BASE_MEMBER(umipoker_state, m_vram_0)
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(umipoker_vram_1_w) AM_BASE_MEMBER(umipoker_state, m_vram_1)
-	AM_RANGE(0x804000, 0x805fff) AM_RAM_WRITE(umipoker_vram_2_w) AM_BASE_MEMBER(umipoker_state, m_vram_2)
-	AM_RANGE(0x806000, 0x807fff) AM_RAM_WRITE(umipoker_vram_3_w) AM_BASE_MEMBER(umipoker_state, m_vram_3)
-	AM_RANGE(0xc00000, 0xc0ffff) AM_READ8(z80_rom_readback_r,0x00ff)
-	AM_RANGE(0xc1f000, 0xc1ffff) AM_READWRITE8(z80_shared_ram_r,z80_shared_ram_w,0x00ff)
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(umipoker_vram_0_w) AM_BASE( m_vram_0)
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(umipoker_vram_1_w) AM_BASE( m_vram_1)
+	AM_RANGE(0x804000, 0x805fff) AM_RAM_WRITE_LEGACY(umipoker_vram_2_w) AM_BASE( m_vram_2)
+	AM_RANGE(0x806000, 0x807fff) AM_RAM_WRITE_LEGACY(umipoker_vram_3_w) AM_BASE( m_vram_3)
+	AM_RANGE(0xc00000, 0xc0ffff) AM_READ8_LEGACY(z80_rom_readback_r,0x00ff)
+	AM_RANGE(0xc1f000, 0xc1ffff) AM_READWRITE8_LEGACY(z80_shared_ram_r,z80_shared_ram_w,0x00ff)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("IN1") // unused?
 	AM_RANGE(0xe00008, 0xe00009) AM_READ_PORT("IN2")
-//  AM_RANGE(0xe0000c, 0xe0000d) AM_WRITE(lamps_w) -----> lamps only for saiyukip.
-//  AM_RANGE(0xe00010, 0xe00011) AM_WRITE(counters_w) --> coin counters for both games.
+//  AM_RANGE(0xe0000c, 0xe0000d) AM_WRITE_LEGACY(lamps_w) -----> lamps only for saiyukip.
+//  AM_RANGE(0xe00010, 0xe00011) AM_WRITE_LEGACY(counters_w) --> coin counters for both games.
 	AM_RANGE(0xe00014, 0xe00015) AM_READ_PORT("DSW1-2")
 	AM_RANGE(0xe00018, 0xe00019) AM_READ_PORT("DSW3-4")
-	AM_RANGE(0xe00020, 0xe00021) AM_WRITE(umipoker_scrolly_0_w)
-	AM_RANGE(0xe00022, 0xe00023) AM_WRITE(umipoker_irq_ack_w)
-	AM_RANGE(0xe00026, 0xe00027) AM_WRITE(umipoker_scrolly_2_w)
-	AM_RANGE(0xe0002a, 0xe0002b) AM_WRITE(umipoker_scrolly_1_w)
+	AM_RANGE(0xe00020, 0xe00021) AM_WRITE_LEGACY(umipoker_scrolly_0_w)
+	AM_RANGE(0xe00022, 0xe00023) AM_WRITE_LEGACY(umipoker_irq_ack_w)
+	AM_RANGE(0xe00026, 0xe00027) AM_WRITE_LEGACY(umipoker_scrolly_2_w)
+	AM_RANGE(0xe0002a, 0xe0002b) AM_WRITE_LEGACY(umipoker_scrolly_1_w)
 	AM_RANGE(0xe0002c, 0xe0002d) AM_WRITENOP // unknown meaning, bit 0 goes from 0 -> 1 on IRQ service routine
-	AM_RANGE(0xe0002e, 0xe0002f) AM_WRITE(umipoker_scrolly_3_w)
+	AM_RANGE(0xe0002e, 0xe0002f) AM_WRITE_LEGACY(umipoker_scrolly_3_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( umipoker_audio_map, AS_PROGRAM, 8, umipoker_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(z80_shared_ram_r,z80_shared_ram_w) AM_BASE_MEMBER(umipoker_state, m_z80_wram)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE_LEGACY(z80_shared_ram_r,z80_shared_ram_w) AM_BASE( m_z80_wram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( umipoker_audio_io_map, AS_IO, 8, umipoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ym", ym3812_r, ym3812_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ym", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
 
 

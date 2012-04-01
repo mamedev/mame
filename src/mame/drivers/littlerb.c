@@ -116,16 +116,16 @@ static ADDRESS_MAP_START( littlerb_vdp_map8, AS_0, 16, littlerb_state )
 	AM_RANGE(0x00080000, 0x003fffff) AM_RAM // temp so it doesn't fill the log
 
 	/* these are definitely written by a non-incrementing access to the VDP */
-	AM_RANGE(0x00800000, 0x00800001) AM_DEVWRITE8_MODERN("^ramdac", ramdac_device, index_w, 0x00ff)
-	AM_RANGE(0x00800002 ,0x00800003) AM_DEVWRITE8_MODERN("^ramdac", ramdac_device, pal_w,   0x00ff)
-	AM_RANGE(0x00800004 ,0x00800005) AM_DEVWRITE8_MODERN("^ramdac", ramdac_device, mask_w,  0x00ff)
+	AM_RANGE(0x00800000, 0x00800001) AM_DEVWRITE8("^ramdac", ramdac_device, index_w, 0x00ff)
+	AM_RANGE(0x00800002 ,0x00800003) AM_DEVWRITE8("^ramdac", ramdac_device, pal_w,   0x00ff)
+	AM_RANGE(0x00800004 ,0x00800005) AM_DEVWRITE8("^ramdac", ramdac_device, mask_w,  0x00ff)
 
 	// most gfx end up here including the sprite list
-	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM_WRITE(region4_w)  AM_BASE_MEMBER(littlerb_state, m_region4)
+	AM_RANGE(0x1ff80000, 0x1fffffff) AM_RAM_WRITE_LEGACY(region4_w)  AM_BASE( m_region4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, littlerb_state )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
 static RAMDAC_INTERFACE( ramdac_intf )
@@ -331,9 +331,9 @@ static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16, littlerb_state )
 	AM_RANGE(0x060004, 0x060007) AM_WRITENOP
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM // main ram?
-	AM_RANGE(0x700000, 0x700007) AM_READ(littlerb_vdp_r) AM_WRITE(littlerb_vdp_w)
-	AM_RANGE(0x740000, 0x740001) AM_WRITE(littlerb_l_sound_w)
-	AM_RANGE(0x760000, 0x760001) AM_WRITE(littlerb_r_sound_w)
+	AM_RANGE(0x700000, 0x700007) AM_READ_LEGACY(littlerb_vdp_r) AM_WRITE_LEGACY(littlerb_vdp_w)
+	AM_RANGE(0x740000, 0x740001) AM_WRITE_LEGACY(littlerb_l_sound_w)
+	AM_RANGE(0x760000, 0x760001) AM_WRITE_LEGACY(littlerb_r_sound_w)
 	AM_RANGE(0x780000, 0x780001) AM_WRITENOP // generic outputs
 	AM_RANGE(0x7c0000, 0x7c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READ_PORT("P1")

@@ -356,42 +356,42 @@ static WRITE32_HANDLER( pip_w )
 
 static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
-	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8 (ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)	// nvram is 8-bit wide, 0x2000 in size */
+	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8_LEGACY(ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)	// nvram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
-	AM_RANGE(0xc1180000, 0xc1187fff) AM_READWRITE8 (ms32_priram_r8,  ms32_priram_w8,  0x000000ff) AM_MIRROR(0x3c038000) /* priram is 8-bit wide, 0x2000 in size */
+	AM_RANGE(0xc1180000, 0xc1187fff) AM_READWRITE8_LEGACY(ms32_priram_r8,  ms32_priram_w8,  0x000000ff) AM_MIRROR(0x3c038000) /* priram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
-	AM_RANGE(0xc1400000, 0xc143ffff) AM_READWRITE16(ms32_palram_r16, ms32_palram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* palram is 16-bit wide, 0x20000 in size */
+	AM_RANGE(0xc1400000, 0xc143ffff) AM_READWRITE16_LEGACY(ms32_palram_r16, ms32_palram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* palram is 16-bit wide, 0x20000 in size */
 /*  AM_RANGE(0xc1440000, 0xc145ffff) // mirrors of palram, handled above */
-	AM_RANGE(0xc2000000, 0xc201ffff) AM_READWRITE16(ms32_rozram_r16, ms32_rozram_w16, 0x0000ffff) AM_MIRROR(0x3c1e0000) /* rozram is 16-bit wide, 0x10000 in size */
+	AM_RANGE(0xc2000000, 0xc201ffff) AM_READWRITE16_LEGACY(ms32_rozram_r16, ms32_rozram_w16, 0x0000ffff) AM_MIRROR(0x3c1e0000) /* rozram is 16-bit wide, 0x10000 in size */
 /*  AM_RANGE(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above */
-	AM_RANGE(0xc2200000, 0xc2201fff) AM_READWRITE16(ms32_lineram_r16,ms32_lineram_w16,0x0000ffff) AM_MIRROR(0x3c1fe000) /* lineram is 16-bit wide, 0x1000 in size */
+	AM_RANGE(0xc2200000, 0xc2201fff) AM_READWRITE16_LEGACY(ms32_lineram_r16,ms32_lineram_w16,0x0000ffff) AM_MIRROR(0x3c1fe000) /* lineram is 16-bit wide, 0x1000 in size */
 /*  AM_RANGE(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above */
-	AM_RANGE(0xc2800000, 0xc283ffff) AM_READWRITE16(ms32_sprram_r16, ms32_sprram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* spriteram is 16-bit wide, 0x20000 in size */
+	AM_RANGE(0xc2800000, 0xc283ffff) AM_READWRITE16_LEGACY(ms32_sprram_r16, ms32_sprram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* spriteram is 16-bit wide, 0x20000 in size */
 /*  AM_RANGE(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above */
-	AM_RANGE(0xc2c00000, 0xc2c07fff) AM_READWRITE16(ms32_txram_r16,  ms32_txram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* txram is 16-bit wide, 0x4000 in size */
-	AM_RANGE(0xc2c08000, 0xc2c0ffff) AM_READWRITE16(ms32_bgram_r16,  ms32_bgram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* bgram is 16-bit wide, 0x4000 in size */
+	AM_RANGE(0xc2c00000, 0xc2c07fff) AM_READWRITE16_LEGACY(ms32_txram_r16,  ms32_txram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* txram is 16-bit wide, 0x4000 in size */
+	AM_RANGE(0xc2c08000, 0xc2c0ffff) AM_READWRITE16_LEGACY(ms32_bgram_r16,  ms32_bgram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* bgram is 16-bit wide, 0x4000 in size */
 /*  AM_RANGE(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
-	AM_RANGE(0xc2e00000, 0xc2e1ffff) AM_RAM AM_BASE_MEMBER(ms32_state, m_mainram)                                AM_MIRROR(0x3c0e0000) /* mainram is 32-bit wide, 0x20000 in size */
+	AM_RANGE(0xc2e00000, 0xc2e1ffff) AM_RAM AM_BASE( m_mainram)                                AM_MIRROR(0x3c0e0000) /* mainram is 32-bit wide, 0x20000 in size */
 	AM_RANGE(0xc3e00000, 0xc3ffffff) AM_ROMBANK("bank1")                                                AM_MIRROR(0x3c000000) // ROM is 32-bit wide, 0x200000 in size */
 
 	/* todo: clean up the mapping of these */
 	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP	/* sound? */
-	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w) /* sound? */
+	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE_LEGACY(ms32_sound_w) /* sound? */
 	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("DSW")
 	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP // irq ack?
-	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
+	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE_LEGACY(reset_sub_w)
 	AM_RANGE(0xfce00050, 0xfce0005f) AM_WRITENOP	// watchdog? I haven't investigated
-//  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITEONLY AM_BASE(&ms32_fce00000) /* registers not ram? */
-	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE(ms32_gfxctrl_w)	/* flip screen + other unknown bits */
-	AM_RANGE(0xfce00280, 0xfce0028f) AM_WRITE(ms32_brightness_w)	// global brightness control
-/**/AM_RANGE(0xfce00600, 0xfce0065f) AM_RAM AM_BASE_MEMBER(ms32_state, m_roz_ctrl)		/* roz control registers */
-/**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_BASE_MEMBER(ms32_state, m_tx_scroll)	/* tx layer scroll */
-/**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_BASE_MEMBER(ms32_state, m_bg_scroll)	/* bg layer scroll */
-	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE(pip_w)	// ??? layer related? seems to be always 0
+//  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITEONLY AM_BASE_LEGACY(&ms32_fce00000) /* registers not ram? */
+	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE_LEGACY(ms32_gfxctrl_w)	/* flip screen + other unknown bits */
+	AM_RANGE(0xfce00280, 0xfce0028f) AM_WRITE_LEGACY(ms32_brightness_w)	// global brightness control
+/**/AM_RANGE(0xfce00600, 0xfce0065f) AM_RAM AM_BASE( m_roz_ctrl)		/* roz control registers */
+/**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_BASE( m_tx_scroll)	/* tx layer scroll */
+/**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_BASE( m_bg_scroll)	/* bg layer scroll */
+	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE_LEGACY(pip_w)	// ??? layer related? seems to be always 0
 //  AM_RANGE(0xfce00e00, 0xfce00e03)    coin counters + something else
-	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
-	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_BASE_MEMBER(ms32_state, m_mahjong_input_select)
+	AM_RANGE(0xfd000000, 0xfd000003) AM_READ_LEGACY(ms32_sound_r)
+	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_BASE( m_mahjong_input_select)
 ADDRESS_MAP_END
 
 
@@ -423,7 +423,7 @@ static WRITE32_HANDLER( ms32_irq5_guess_w )
 }
 
 static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
-	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3)
+	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ_LEGACY(ms32_read_inputs3)
 
 	AM_RANGE(0xfce00004, 0xfce00023) AM_RAM // regs?
 	AM_RANGE(0xfce00200, 0xfce0021f) AM_RAM // regs?
@@ -431,8 +431,8 @@ static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
 
 	/* these two are almost certainly wrong, they just let you see what
        happens if you generate the FPU ints without breaking other games */
-	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(ms32_irq5_guess_w)
-	AM_RANGE(0xfd0f0000, 0xfd0f0003) AM_WRITE(ms32_irq2_guess_w)
+	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE_LEGACY(ms32_irq5_guess_w)
+	AM_RANGE(0xfd0f0000, 0xfd0f0003) AM_WRITE_LEGACY(ms32_irq2_guess_w)
 
 	AM_RANGE(0xfd100000, 0xfd103fff) AM_RAM // used when you start enabling fpu ints
 	AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM // uploads data here
@@ -440,7 +440,7 @@ static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
 	AM_RANGE(0xfd140000, 0xfd143fff) AM_RAM // used when you start enabling fpu ints
 	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM // same data here
 
-	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) // definitely line ram
+	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_READWRITE16_LEGACY(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) // definitely line ram
 	AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM // scroll info for lineram?
 
 	AM_IMPORT_FROM(ms32_map)
@@ -553,7 +553,7 @@ what the operations might be, my maths isn't up to much though...
 ///**/AM_RANGE(0xfdc00000, 0xfdc006ff) AM_RAM /* f1superb */
 ///**/AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM /* f1superb lineram #2? */
 ///**/AM_RANGE(0xfe202000, 0xfe2fffff) AM_RAM /* f1superb vram */
-//  AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3) /* analog controls in f1superb? */
+//  AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ_LEGACY(ms32_read_inputs3) /* analog controls in f1superb? */
 
 /*************************************
  *
@@ -1386,13 +1386,13 @@ static WRITE8_HANDLER( to_main_w )
 
 static ADDRESS_MAP_START( ms32_sound_map, AS_PROGRAM, 8, ms32_state )
 	AM_RANGE(0x0000, 0x3eff) AM_ROM
-	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE("ymf", ymf271_r,ymf271_w)
-	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)
+	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE_LEGACY("ymf", ymf271_r,ymf271_w)
+	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE_LEGACY(latch_r,to_main_w)
 	AM_RANGE(0x3f20, 0x3f20) AM_READNOP /* 2nd latch ? */
 	AM_RANGE(0x3f20, 0x3f20) AM_WRITENOP /* to_main2_w  ? */
 	AM_RANGE(0x3f40, 0x3f40) AM_WRITENOP   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
 	AM_RANGE(0x3f70, 0x3f70) AM_WRITENOP   // watchdog? banking? very noisy
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(ms32_snd_bank_w)
+	AM_RANGE(0x3f80, 0x3f80) AM_WRITE_LEGACY(ms32_snd_bank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank5")

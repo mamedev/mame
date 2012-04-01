@@ -351,50 +351,50 @@ static WRITE16_HANDLER( mcu_table2_w )
 static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
-	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
-	AM_RANGE(0x00420, 0x00429) AM_WRITE(mcu_table2_w)
+	AM_RANGE(0x00400, 0x00407) AM_WRITE_LEGACY(mcu_table_w)
+	AM_RANGE(0x00420, 0x00429) AM_WRITE_LEGACY(mcu_table2_w)
 
 	/* results from cop? */
-	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00430, 0x00431) AM_READ_LEGACY(rdx_v33_unknown_r)
+	AM_RANGE(0x00432, 0x00433) AM_READ_LEGACY(rdx_v33_unknown_r)
+	AM_RANGE(0x00434, 0x00435) AM_READ_LEGACY(rdx_v33_unknown_r)
+	AM_RANGE(0x00436, 0x00437) AM_READ_LEGACY(rdx_v33_unknown_r)
 
-	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE(&seibu_crtc_regs)
+	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE_LEGACY(&seibu_crtc_regs)
 	AM_RANGE(0x00650, 0x0068f) AM_RAM //???
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
-	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
-	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
+	AM_RANGE(0x006b0, 0x006b1) AM_WRITE_LEGACY(mcu_prog_w)
+	AM_RANGE(0x006b2, 0x006b3) AM_WRITE_LEGACY(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
-	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
+	AM_RANGE(0x006bc, 0x006bd) AM_WRITE_LEGACY(mcu_prog_offs_w)
 	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
-	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(mcu_xval_w)
-	AM_RANGE(0x006da, 0x006db) AM_WRITE(mcu_yval_w)
-//  AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
-//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
+	AM_RANGE(0x006d8, 0x006d9) AM_WRITE_LEGACY(mcu_xval_w)
+	AM_RANGE(0x006da, 0x006db) AM_WRITE_LEGACY(mcu_yval_w)
+//  AM_RANGE(0x006dc, 0x006dd) AM_READ_LEGACY(rdx_v33_unknown2_r)
+//  AM_RANGE(0x006de, 0x006df) AM_WRITE_LEGACY(mcu_unkaa_w) // mcu command related?
 
-	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
-//  AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
+	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE_LEGACY("eeprom", rdx_v33_eeprom_w)
+//  AM_RANGE(0x00740, 0x00741) AM_READ_LEGACY(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x00762, 0x00763) AM_READNOP
 
-	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
+	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
 
 	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_MEMBER(r2dx_v33_state, m_spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE(&bg_vram)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE(&md_vram)
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE(&fg_vram)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE(&tx_vram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE_LEGACY(rdx_bg_vram_w) AM_BASE_LEGACY(&bg_vram)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE_LEGACY(rdx_md_vram_w) AM_BASE_LEGACY(&md_vram)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE_LEGACY(rdx_fg_vram_w) AM_BASE_LEGACY(&fg_vram)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE_LEGACY(rdx_tx_vram_w) AM_BASE_LEGACY(&tx_vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
@@ -429,45 +429,45 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
 
 	/* results from cop? */
-	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
-	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00430, 0x00431) AM_READ_LEGACY(rdx_v33_unknown_r)
+	AM_RANGE(0x00432, 0x00433) AM_READ_LEGACY(rdx_v33_unknown_r)
+	AM_RANGE(0x00434, 0x00435) AM_READ_LEGACY(rdx_v33_unknown_r)
+	AM_RANGE(0x00436, 0x00437) AM_READ_LEGACY(rdx_v33_unknown_r)
 
-	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
-	AM_RANGE(0x00420, 0x00427) AM_WRITE(mcu_table2_w)
+	AM_RANGE(0x00400, 0x00407) AM_WRITE_LEGACY(mcu_table_w)
+	AM_RANGE(0x00420, 0x00427) AM_WRITE_LEGACY(mcu_table2_w)
 
-	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE(&seibu_crtc_regs)
+	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE_LEGACY(&seibu_crtc_regs)
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
-	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
-	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
+	AM_RANGE(0x006b0, 0x006b1) AM_WRITE_LEGACY(mcu_prog_w)
+	AM_RANGE(0x006b2, 0x006b3) AM_WRITE_LEGACY(mcu_prog_w2)
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
-	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
-//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
-//  AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
-//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
-	//AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
+	AM_RANGE(0x006bc, 0x006bd) AM_WRITE_LEGACY(mcu_prog_offs_w)
+//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE_LEGACY(bbbbll_w) // scroll?
+//  AM_RANGE(0x006dc, 0x006dd) AM_READ_LEGACY(nzerotea_unknown_r)
+//  AM_RANGE(0x006de, 0x006df) AM_WRITE_LEGACY(mcu_unkaa_w) // mcu command related?
+	//AM_RANGE(0x00700, 0x00701) AM_DEVWRITE_LEGACY("eeprom", rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
+//  AM_RANGE(0x00762, 0x00763) AM_READ_LEGACY(nzerotea_unknown_r)
 
-	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(nzerotea_sound_comms_r,nzerotea_sound_comms_w)
+	AM_RANGE(0x00780, 0x0079f) AM_READWRITE_LEGACY(nzerotea_sound_comms_r,nzerotea_sound_comms_w)
 
 	AM_RANGE(0x00800, 0x00fff) AM_RAM
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_MEMBER(r2dx_v33_state, m_spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE( m_spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE(&bg_vram)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE(&md_vram)
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE(&fg_vram)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE(&tx_vram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE_LEGACY(rdx_bg_vram_w) AM_BASE_LEGACY(&bg_vram)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE_LEGACY(rdx_md_vram_w) AM_BASE_LEGACY(&md_vram)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE_LEGACY(rdx_fg_vram_w) AM_BASE_LEGACY(&fg_vram)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE_LEGACY(rdx_tx_vram_w) AM_BASE_LEGACY(&tx_vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )

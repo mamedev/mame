@@ -350,26 +350,26 @@ static ADDRESS_MAP_START( srmp5_mem, AS_PROGRAM, 32, srmp5_state )
 	AM_RANGE(0x01800000, 0x01800003) AM_RAM //?1
 	AM_RANGE(0x01800004, 0x01800007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01800008, 0x0180000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0180000c, 0x0180000f) AM_WRITE(bank_w)
-	AM_RANGE(0x01800010, 0x01800013) AM_READ(srmp5_inputs_r) //multiplexed controls (selected by writes to 1c)
+	AM_RANGE(0x0180000c, 0x0180000f) AM_WRITE_LEGACY(bank_w)
+	AM_RANGE(0x01800010, 0x01800013) AM_READ_LEGACY(srmp5_inputs_r) //multiplexed controls (selected by writes to 1c)
 	AM_RANGE(0x01800014, 0x01800017) AM_READ_PORT("TEST")
-	AM_RANGE(0x0180001c, 0x0180001f) AM_WRITE(input_select_w)//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
+	AM_RANGE(0x0180001c, 0x0180001f) AM_WRITE_LEGACY(input_select_w)//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
 	AM_RANGE(0x01800200, 0x01800203) AM_RAM  //sound related ? only few writes after boot
-	AM_RANGE(0x01802000, 0x01802003) AM_WRITE(cmd1_w)
-	AM_RANGE(0x01802004, 0x01802007) AM_WRITE(cmd2_w)
-	AM_RANGE(0x01802008, 0x0180200b) AM_READ(cmd_stat32_r)
-	AM_RANGE(0x01a00000, 0x01bfffff) AM_READ(data_r)
+	AM_RANGE(0x01802000, 0x01802003) AM_WRITE_LEGACY(cmd1_w)
+	AM_RANGE(0x01802004, 0x01802007) AM_WRITE_LEGACY(cmd2_w)
+	AM_RANGE(0x01802008, 0x0180200b) AM_READ_LEGACY(cmd_stat32_r)
+	AM_RANGE(0x01a00000, 0x01bfffff) AM_READ_LEGACY(data_r)
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READNOP // debug? 'Toru'
 
-	AM_RANGE(0x0a000000, 0x0a0fffff) AM_READWRITE(spr_r, spr_w)
-	AM_RANGE(0x0a100000, 0x0a17ffff) AM_READWRITE(srmp5_palette_r, srmp5_palette_w)
+	AM_RANGE(0x0a000000, 0x0a0fffff) AM_READWRITE_LEGACY(spr_r, spr_w)
+	AM_RANGE(0x0a100000, 0x0a17ffff) AM_READWRITE_LEGACY(srmp5_palette_r, srmp5_palette_w)
 	//0?N???A?????????i??????????
 	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
-	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE(srmp5_vidregs_r, srmp5_vidregs_w)
-	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE(tileram_r, tileram_w)
+	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE_LEGACY(srmp5_vidregs_r, srmp5_vidregs_w)
+	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE_LEGACY(tileram_r, tileram_w)
 
 	AM_RANGE(0x1eff0000, 0x1eff001f) AM_WRITEONLY
-	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
+	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ_LEGACY(irq_ack_clear)
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -377,8 +377,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, srmp5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_snd_r, st0016_snd_w)
-	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE_LEGACY("stsnd", st0016_snd_r, st0016_snd_w)
+	AM_RANGE(0xec00, 0xec1f) AM_READ_LEGACY(st0016_character_ram_r) AM_WRITE_LEGACY(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -406,13 +406,13 @@ static READ8_HANDLER(cmd_stat8_r)
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, srmp5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(cmd1_r)
-	AM_RANGE(0xc1, 0xc1) AM_READ(cmd2_r)
-	AM_RANGE(0xc2, 0xc2) AM_READ(cmd_stat8_r)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
-	AM_RANGE(0xe7, 0xe7) AM_WRITE(st0016_rom_bank_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	AM_RANGE(0x00, 0xbf) AM_READ_LEGACY(st0016_vregs_r) AM_WRITE_LEGACY(st0016_vregs_w)
+	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(cmd1_r)
+	AM_RANGE(0xc1, 0xc1) AM_READ_LEGACY(cmd2_r)
+	AM_RANGE(0xc2, 0xc2) AM_READ_LEGACY(cmd_stat8_r)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
+	AM_RANGE(0xe7, 0xe7) AM_WRITE_LEGACY(st0016_rom_bank_w)
+	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(st0016_dma_r)
 ADDRESS_MAP_END
 
 

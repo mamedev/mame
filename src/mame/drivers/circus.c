@@ -60,13 +60,13 @@ static READ8_HANDLER( circus_paddle_r )
 static ADDRESS_MAP_START( circus_map, AS_PROGRAM, 8, circus_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(circus_clown_x_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(circus_clown_y_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(circus_videoram_w) AM_BASE_MEMBER(circus_state, m_videoram)
-	AM_RANGE(0x8000, 0x8000) AM_RAM_WRITE(circus_clown_z_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(circus_clown_x_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(circus_clown_y_w)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(circus_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x8000, 0x8000) AM_RAM_WRITE_LEGACY(circus_clown_z_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
-	AM_RANGE(0xd000, 0xd000) AM_READ(circus_paddle_r)
+	AM_RANGE(0xd000, 0xd000) AM_READ_LEGACY(circus_paddle_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

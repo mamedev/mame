@@ -180,9 +180,9 @@ static WRITE8_HANDLER( ppmast93_port4_w )
 static ADDRESS_MAP_START( ppmast93_cpu1_map, AS_PROGRAM, 8, ppmast93_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ppmast93_bgram_w) AM_BASE_MEMBER(ppmast93_state, m_bgram) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(ppmast93_bgram_w) AM_BASE( m_bgram) AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xdfff) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(ppmast93_fgram_w) AM_BASE_MEMBER(ppmast93_state, m_fgram) AM_SHARE("share2")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(ppmast93_fgram_w) AM_BASE( m_fgram) AM_SHARE("share2")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -194,13 +194,13 @@ static ADDRESS_MAP_START( ppmast93_cpu1_io, AS_IO, 8, ppmast93_state )
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW1")
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ppmast93_port4_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(ppmast93_port4_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppmast93_cpu2_map, AS_PROGRAM, 8, ppmast93_state )
 	AM_RANGE(0x0000, 0xfbff) AM_ROM AM_REGION("sub", 0x10000)
-	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xfd00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -217,7 +217,7 @@ static WRITE8_HANDLER(ppmast_sound_w)
 }
 
 static ADDRESS_MAP_START( ppmast93_cpu2_io, AS_IO, 8, ppmast93_state )
-	  AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITE(ppmast_sound_w) AM_REGION("sub", 0x20000)
+	  AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITE_LEGACY(ppmast_sound_w) AM_REGION("sub", 0x20000)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ppmast93 )

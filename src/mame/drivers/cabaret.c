@@ -165,23 +165,23 @@ static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 	AM_RANGE( 0x0081, 0x0081 ) AM_READ_PORT( "SERVICE" )
 	AM_RANGE( 0x0082, 0x0082 ) AM_READ_PORT( "COINS" )
 	AM_RANGE( 0x0090, 0x0090 ) AM_READ_PORT( "BUTTONS1" )
-	AM_RANGE( 0x00a0, 0x00a0 ) AM_WRITE( cabaret_nmi_and_coins_w )
+	AM_RANGE( 0x00a0, 0x00a0 ) AM_WRITE_LEGACY( cabaret_nmi_and_coins_w )
 
 	AM_RANGE( 0x00a1, 0x00a1 ) AM_READ_PORT("DSW1")			/* DSW1 */
 	AM_RANGE( 0x00a2, 0x00a2 ) AM_READ_PORT("DSW2")			/* DSW2 */
 	AM_RANGE( 0x00b0, 0x00b0 ) AM_READ_PORT("DSW3")			/* DSW3 */
 
-	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE( "ymsnd", ym2413_w )
+	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_w )
 
-	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER(cabaret_state, m_fg_tile_ram )
-	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER(cabaret_state, m_fg_color_ram )
+	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE_LEGACY( fg_tile_w )  AM_BASE( m_fg_tile_ram )
+	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE_LEGACY( fg_color_w ) AM_BASE( m_fg_color_ram )
 
-	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
+	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 
-	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE( bg_scroll_w ) AM_BASE_MEMBER(cabaret_state, m_bg_scroll )
+	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE_LEGACY( bg_scroll_w ) AM_BASE( m_bg_scroll )
 
-	AM_RANGE( 0x1800, 0x19ff ) AM_RAM_WRITE( bg_tile_w )  AM_BASE_MEMBER(cabaret_state, m_bg_tile_ram )
+	AM_RANGE( 0x1800, 0x19ff ) AM_RAM_WRITE_LEGACY( bg_tile_w )  AM_BASE( m_bg_tile_ram )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM AM_REGION("gfx3", 0)
 ADDRESS_MAP_END
 

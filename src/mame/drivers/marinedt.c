@@ -304,25 +304,25 @@ static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8, marinedt_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4400, 0x47ff) AM_RAM				//unused, vram mirror?
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(tx_tileram_w) AM_BASE_MEMBER(marinedt_state, m_tx_tileram)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE_LEGACY(tx_tileram_w) AM_BASE( m_tx_tileram)
 	AM_RANGE(0x4c00, 0x4c00) AM_WRITENOP	//?? maybe off by one error
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( marinedt_io_map, AS_IO, 8, marinedt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW0")		//dips coinage
-	AM_RANGE(0x01, 0x01) AM_READ(marinedt_port1_r)	//trackball xy muxed
-	AM_RANGE(0x02, 0x02) AM_READWRITE(marinedt_obj1_x_r, marinedt_obj1_a_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN0") AM_WRITE(marinedt_obj1_x_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1") AM_WRITE(marinedt_obj1_y_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(marinedt_music_w)
-	AM_RANGE(0x06, 0x06) AM_READWRITE(marinedt_obj1_yr_r, marinedt_sound_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(marinedt_obj2_a_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(marinedt_obj2_x_w)
-	AM_RANGE(0x0a, 0x0a) AM_READWRITE(marinedt_obj1_yq_r, marinedt_obj2_y_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(marinedt_pd_w)
-	AM_RANGE(0x0e, 0x0e) AM_READWRITE(marinedt_coll_r, watchdog_reset_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE(marinedt_pf_w)
+	AM_RANGE(0x01, 0x01) AM_READ_LEGACY(marinedt_port1_r)	//trackball xy muxed
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(marinedt_obj1_x_r, marinedt_obj1_a_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN0") AM_WRITE_LEGACY(marinedt_obj1_x_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(marinedt_obj1_y_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(marinedt_music_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE_LEGACY(marinedt_obj1_yr_r, marinedt_sound_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(marinedt_obj2_a_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(marinedt_obj2_x_w)
+	AM_RANGE(0x0a, 0x0a) AM_READWRITE_LEGACY(marinedt_obj1_yq_r, marinedt_obj2_y_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE_LEGACY(marinedt_pd_w)
+	AM_RANGE(0x0e, 0x0e) AM_READWRITE_LEGACY(marinedt_coll_r, watchdog_reset_w)
+	AM_RANGE(0x0f, 0x0f) AM_WRITE_LEGACY(marinedt_pf_w)
 ADDRESS_MAP_END
 
 

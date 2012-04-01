@@ -975,19 +975,19 @@ static WRITE8_HANDLER( sound_nmi_clear_w )
 static ADDRESS_MAP_START( mazerbla_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(mazerbla_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(cfb_zpu_int_req_clr)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
 	AM_RANGE(0xe800, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x4c, 0x4f) AM_READWRITE(ls670_1_r, ls670_0_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
-	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
-	AM_RANGE(0x68, 0x68) AM_WRITE(zpu_coin_counter_w)
-	AM_RANGE(0x6a, 0x6a) AM_WRITE(zpu_lamps_w)
-	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
+	AM_RANGE(0x4c, 0x4f) AM_READWRITE_LEGACY(ls670_1_r, ls670_0_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(zpu_bcd_decoder_w)
+	AM_RANGE(0x62, 0x62) AM_READ_LEGACY(zpu_inputs_r)
+	AM_RANGE(0x68, 0x68) AM_WRITE_LEGACY(zpu_coin_counter_w)
+	AM_RANGE(0x6a, 0x6a) AM_WRITE_LEGACY(zpu_lamps_w)
+	AM_RANGE(0x6e, 0x6f) AM_WRITE_LEGACY(zpu_led_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu2_map, AS_PROGRAM, 8, mazerbla_state )
@@ -998,28 +998,28 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu2_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(vsb_ls273_audio_control_w)
-	AM_RANGE(0x80, 0x83) AM_READWRITE(ls670_0_r, ls670_1_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(vsb_ls273_audio_control_w)
+	AM_RANGE(0x80, 0x83) AM_READWRITE_LEGACY(ls670_0_r, ls670_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu3_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* GFX roms */
-	AM_RANGE(0x4000, 0x4003) AM_WRITE(vcu_video_reg_w)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(mazerbla_state, m_cfb_ram)		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
-	AM_RANGE(0xa000, 0xa7ff) AM_READ(vcu_set_cmd_param_r)	/* VCU command and parameters LOAD */
-	AM_RANGE(0xc000, 0xdfff) AM_READ(vcu_set_gfx_addr_r)	/* gfx LOAD (blit) */
-	AM_RANGE(0xe000, 0xffff) AM_READ(vcu_set_clr_addr_r)	/* palette? LOAD */
+	AM_RANGE(0x4000, 0x4003) AM_WRITE_LEGACY(vcu_video_reg_w)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE( m_cfb_ram)		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
+	AM_RANGE(0xa000, 0xa7ff) AM_READ_LEGACY(vcu_set_cmd_param_r)	/* VCU command and parameters LOAD */
+	AM_RANGE(0xc000, 0xdfff) AM_READ_LEGACY(vcu_set_gfx_addr_r)	/* gfx LOAD (blit) */
+	AM_RANGE(0xe000, 0xffff) AM_READ_LEGACY(vcu_set_clr_addr_r)	/* palette? LOAD */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu3_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
-	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(cfb_backgnd_color_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
+	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(cfb_zpu_int_req_set_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(cfb_rom_bank_sel_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(cfb_vbank_w)	//visible/writable videopage select?
 ADDRESS_MAP_END
 
 
@@ -1031,33 +1031,33 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( greatgun_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x4c, 0x4c) AM_WRITE(main_sound_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
-	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
+	AM_RANGE(0x4c, 0x4c) AM_WRITE_LEGACY(main_sound_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(zpu_bcd_decoder_w)
+	AM_RANGE(0x62, 0x62) AM_READ_LEGACY(zpu_inputs_r)
 	AM_RANGE(0x66, 0x66) AM_WRITENOP
 	AM_RANGE(0x68, 0x68) AM_WRITENOP
-	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
+	AM_RANGE(0x6e, 0x6f) AM_WRITE_LEGACY(zpu_led_w)
 ADDRESS_MAP_END
 
 /* Great Guns has a little different banking layout */
 static ADDRESS_MAP_START( greatgun_cpu3_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP
-	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
-	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w_gg)
-	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(cfb_backgnd_color_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
+	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(cfb_zpu_int_req_set_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(cfb_rom_bank_sel_w_gg)
+	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(cfb_vbank_w)	//visible/writable videopage select?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(sound_int_clear_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_clear_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(sound_int_clear_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(sound_nmi_clear_w)
 ADDRESS_MAP_END
 
 

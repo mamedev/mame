@@ -400,16 +400,16 @@ static ADDRESS_MAP_START( ninjakd2_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("PAD2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DIPSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc201, 0xc201) AM_WRITE(ninjakd2_soundreset_w)	// sound reset + flip screen
-	AM_RANGE(0xc202, 0xc202) AM_WRITE(ninjakd2_bankselect_w)
-	AM_RANGE(0xc203, 0xc203) AM_WRITE(ninjakd2_sprite_overdraw_w)
-	AM_RANGE(0xc208, 0xc20c) AM_WRITE(ninjakd2_bg_ctrl_w)	// scroll + enable
-	AM_RANGE(0xc800, 0xcdff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_fg_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_bg_videoram)
+	AM_RANGE(0xc200, 0xc200) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc201, 0xc201) AM_WRITE_LEGACY(ninjakd2_soundreset_w)	// sound reset + flip screen
+	AM_RANGE(0xc202, 0xc202) AM_WRITE_LEGACY(ninjakd2_bankselect_w)
+	AM_RANGE(0xc203, 0xc203) AM_WRITE_LEGACY(ninjakd2_sprite_overdraw_w)
+	AM_RANGE(0xc208, 0xc20c) AM_WRITE_LEGACY(ninjakd2_bg_ctrl_w)	// scroll + enable
+	AM_RANGE(0xc800, 0xcdff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(ninjakd2_fgvideoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(ninjakd2_bgvideoram_w) AM_BASE( m_bg_videoram)
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, m_spriteram)
+	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE( m_spriteram)
 ADDRESS_MAP_END
 
 
@@ -417,48 +417,48 @@ static ADDRESS_MAP_START( mnight_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xd9ff) AM_RAM
-	AM_RANGE(0xda00, 0xdfff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, m_spriteram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ninjakd2_bgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_bg_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_fg_videoram)
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xda00, 0xdfff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(ninjakd2_bgvideoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(ninjakd2_fgvideoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("KEYCOIN")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("PAD1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("PAD2")
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("DIPSW1")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xfa01, 0xfa01) AM_WRITE(ninjakd2_soundreset_w)
-	AM_RANGE(0xfa02, 0xfa02) AM_WRITE(ninjakd2_bankselect_w)
-	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(ninjakd2_sprite_overdraw_w)
-	AM_RANGE(0xfa08, 0xfa0c) AM_WRITE(ninjakd2_bg_ctrl_w)	// scroll + enable
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xfa01, 0xfa01) AM_WRITE_LEGACY(ninjakd2_soundreset_w)
+	AM_RANGE(0xfa02, 0xfa02) AM_WRITE_LEGACY(ninjakd2_bankselect_w)
+	AM_RANGE(0xfa03, 0xfa03) AM_WRITE_LEGACY(ninjakd2_sprite_overdraw_w)
+	AM_RANGE(0xfa08, 0xfa0c) AM_WRITE_LEGACY(ninjakd2_bg_ctrl_w)	// scroll + enable
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( robokid_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_fg_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
-	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)	// banked
-	AM_RANGE(0xd800, 0xdbff) AM_READWRITE(robokid_bg0_videoram_r, robokid_bg0_videoram_w)	// banked
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(ninjakd2_fgvideoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_READWRITE_LEGACY(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
+	AM_RANGE(0xd400, 0xd7ff) AM_READWRITE_LEGACY(robokid_bg1_videoram_r, robokid_bg1_videoram_w)	// banked
+	AM_RANGE(0xd800, 0xdbff) AM_READWRITE_LEGACY(robokid_bg0_videoram_r, robokid_bg0_videoram_w)	// banked
 	AM_RANGE(0xdc00, 0xdc00) AM_READ_PORT("KEYCOIN")
 	AM_RANGE(0xdc01, 0xdc01) AM_READ_PORT("PAD1")
 	AM_RANGE(0xdc02, 0xdc02) AM_READ_PORT("PAD2")
 	AM_RANGE(0xdc03, 0xdc03) AM_READ_PORT("DIPSW1")
 	AM_RANGE(0xdc04, 0xdc04) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xdc01, 0xdc01) AM_WRITE(ninjakd2_soundreset_w)	// sound reset + flip screen
-	AM_RANGE(0xdc02, 0xdc02) AM_WRITE(robokid_bankselect_w)
-	AM_RANGE(0xdc03, 0xdc03) AM_WRITE(ninjakd2_sprite_overdraw_w)
-	AM_RANGE(0xdd00, 0xdd04) AM_WRITE(robokid_bg0_ctrl_w)	// scroll + enable
-	AM_RANGE(0xdd05, 0xdd05) AM_WRITE(robokid_bg0_bank_w)
-	AM_RANGE(0xde00, 0xde04) AM_WRITE(robokid_bg1_ctrl_w)	// scroll + enable
-	AM_RANGE(0xde05, 0xde05) AM_WRITE(robokid_bg1_bank_w)
-	AM_RANGE(0xdf00, 0xdf04) AM_WRITE(robokid_bg2_ctrl_w)	// scroll + enable
-	AM_RANGE(0xdf05, 0xdf05) AM_WRITE(robokid_bg2_bank_w)
+	AM_RANGE(0xdc00, 0xdc00) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xdc01, 0xdc01) AM_WRITE_LEGACY(ninjakd2_soundreset_w)	// sound reset + flip screen
+	AM_RANGE(0xdc02, 0xdc02) AM_WRITE_LEGACY(robokid_bankselect_w)
+	AM_RANGE(0xdc03, 0xdc03) AM_WRITE_LEGACY(ninjakd2_sprite_overdraw_w)
+	AM_RANGE(0xdd00, 0xdd04) AM_WRITE_LEGACY(robokid_bg0_ctrl_w)	// scroll + enable
+	AM_RANGE(0xdd05, 0xdd05) AM_WRITE_LEGACY(robokid_bg0_bank_w)
+	AM_RANGE(0xde00, 0xde04) AM_WRITE_LEGACY(robokid_bg1_ctrl_w)	// scroll + enable
+	AM_RANGE(0xde05, 0xde05) AM_WRITE_LEGACY(robokid_bg1_bank_w)
+	AM_RANGE(0xdf00, 0xdf04) AM_WRITE_LEGACY(robokid_bg2_ctrl_w)	// scroll + enable
+	AM_RANGE(0xdf05, 0xdf05) AM_WRITE_LEGACY(robokid_bg2_bank_w)
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, m_spriteram)
+	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE( m_spriteram)
 ADDRESS_MAP_END
 
 
@@ -466,26 +466,26 @@ static ADDRESS_MAP_START( omegaf_main_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("KEYCOIN")
-	AM_RANGE(0xc001, 0xc003) AM_READ(omegaf_io_protection_r)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(ninjakd2_soundreset_w)	// sound reset + flip screen
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(robokid_bankselect_w)
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(ninjakd2_sprite_overdraw_w)
-	AM_RANGE(0xc004, 0xc006) AM_WRITE(omegaf_io_protection_w)
-	AM_RANGE(0xc100, 0xc104) AM_WRITE(robokid_bg0_ctrl_w)	// scroll + enable
-	AM_RANGE(0xc105, 0xc105) AM_WRITE(robokid_bg0_bank_w)
+	AM_RANGE(0xc001, 0xc003) AM_READ_LEGACY(omegaf_io_protection_r)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE_LEGACY(ninjakd2_soundreset_w)	// sound reset + flip screen
+	AM_RANGE(0xc002, 0xc002) AM_WRITE_LEGACY(robokid_bankselect_w)
+	AM_RANGE(0xc003, 0xc003) AM_WRITE_LEGACY(ninjakd2_sprite_overdraw_w)
+	AM_RANGE(0xc004, 0xc006) AM_WRITE_LEGACY(omegaf_io_protection_w)
+	AM_RANGE(0xc100, 0xc104) AM_WRITE_LEGACY(robokid_bg0_ctrl_w)	// scroll + enable
+	AM_RANGE(0xc105, 0xc105) AM_WRITE_LEGACY(robokid_bg0_bank_w)
 	AM_RANGE(0xc1e7, 0xc1e7) AM_READNOP						// see notes
-	AM_RANGE(0xc200, 0xc204) AM_WRITE(robokid_bg1_ctrl_w)	// scroll + enable
-	AM_RANGE(0xc205, 0xc205) AM_WRITE(robokid_bg1_bank_w)
-	AM_RANGE(0xc300, 0xc304) AM_WRITE(robokid_bg2_ctrl_w)	// scroll + enable
-	AM_RANGE(0xc305, 0xc305) AM_WRITE(robokid_bg2_bank_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(robokid_bg0_videoram_r, robokid_bg0_videoram_w)	// banked
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(robokid_bg1_videoram_r, robokid_bg1_videoram_w)	// banked
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ninjakd2_fgvideoram_w) AM_BASE_MEMBER(ninjakd2_state, m_fg_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc200, 0xc204) AM_WRITE_LEGACY(robokid_bg1_ctrl_w)	// scroll + enable
+	AM_RANGE(0xc205, 0xc205) AM_WRITE_LEGACY(robokid_bg1_bank_w)
+	AM_RANGE(0xc300, 0xc304) AM_WRITE_LEGACY(robokid_bg2_ctrl_w)	// scroll + enable
+	AM_RANGE(0xc305, 0xc305) AM_WRITE_LEGACY(robokid_bg2_bank_w)
+	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE_LEGACY(robokid_bg0_videoram_r, robokid_bg0_videoram_w)	// banked
+	AM_RANGE(0xc800, 0xcbff) AM_READWRITE_LEGACY(robokid_bg1_videoram_r, robokid_bg1_videoram_w)	// banked
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE_LEGACY(robokid_bg2_videoram_r, robokid_bg2_videoram_w)	// banked
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(ninjakd2_fgvideoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe000, 0xf9ff) AM_RAM
-	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE_MEMBER(ninjakd2_state, m_spriteram)
+	AM_RANGE(0xfa00, 0xffff) AM_RAM AM_BASE( m_spriteram)
 ADDRESS_MAP_END
 
 
@@ -493,14 +493,14 @@ static ADDRESS_MAP_START( ninjakd2_sound_cpu, AS_PROGRAM, 8, ninjakd2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(ninjakd2_pcm_play_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(ninjakd2_pcm_play_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ninjakd2_sound_io, AS_IO, 8, ninjakd2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("2203.1", ym2203_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("2203.2", ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("2203.1", ym2203_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("2203.2", ym2203_w)
 ADDRESS_MAP_END
 
 

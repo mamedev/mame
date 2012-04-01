@@ -91,20 +91,20 @@ static MACHINE_START( xxmissio )
 static ADDRESS_MAP_START( map1, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0x8002, 0x8003) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x8002, 0x8003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("STATUS")
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_m_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(xxmissio_status_m_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(xxmissio_flipscreen_w)
 
-	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM AM_BASE_MEMBER(xxmissio_state, m_fgram)
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE_MEMBER(xxmissio_state, m_bgram)
-	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM AM_BASE_MEMBER(xxmissio_state, m_spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM AM_BASE( m_fgram)
+	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE_LEGACY(xxmissio_bgram_r, xxmissio_bgram_w) AM_BASE( m_bgram)
+	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM AM_BASE( m_spriteram)
 
-	AM_RANGE(0xd800, 0xdaff) AM_SHARE("share4") AM_RAM_WRITE(xxmissio_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd800, 0xdaff) AM_SHARE("share4") AM_RAM_WRITE_LEGACY(xxmissio_paletteram_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xe000, 0xefff) AM_SHARE("share5") AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_SHARE("share6") AM_RAM
@@ -115,21 +115,21 @@ static ADDRESS_MAP_START( map2, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0x8002, 0x8003) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE(xxmissio_bank_sel_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x8002, 0x8003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x8006, 0x8006) AM_WRITE_LEGACY(xxmissio_bank_sel_w)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("STATUS")
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_s_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(xxmissio_status_s_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(xxmissio_flipscreen_w)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM
-	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE(xxmissio_bgram_r, xxmissio_bgram_w)
+	AM_RANGE(0xc800, 0xcfff) AM_SHARE("share2") AM_READWRITE_LEGACY(xxmissio_bgram_r, xxmissio_bgram_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_SHARE("share3") AM_RAM
 
-	AM_RANGE(0xd800, 0xdaff) AM_SHARE("share4") AM_RAM_WRITE(xxmissio_paletteram_w)
+	AM_RANGE(0xd800, 0xdaff) AM_SHARE("share4") AM_RAM_WRITE_LEGACY(xxmissio_paletteram_w)
 
 	AM_RANGE(0xe000, 0xefff) AM_SHARE("share6") AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_SHARE("share5") AM_RAM

@@ -1057,8 +1057,8 @@ static SCREEN_UPDATE_IND16(sfbonus)
 
 
 static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8, sfbonus_state )
-	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(sfbonus_state, m_nvram) AM_SIZE_MEMBER(sfbonus_state, m_nvram_size)
+	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(sfbonus_videoram_w)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE( m_nvram) AM_SIZE(m_nvram_size)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sfbonus_bank_w )
@@ -1142,27 +1142,27 @@ static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8, sfbonus_state )
 	AM_RANGE(0x0430, 0x0430) AM_READ_PORT("SWITCH4")
 	AM_RANGE(0x0438, 0x0438) AM_READ_PORT("SWITCH5")
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVWRITE_MODERN("ramdac", ramdac_device, index_w)
-	AM_RANGE(0x0c01, 0x0c01) AM_DEVWRITE_MODERN("ramdac", ramdac_device, pal_w)
-	AM_RANGE(0x0c02, 0x0c02) AM_DEVWRITE_MODERN("ramdac", ramdac_device, mask_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE(0x0c01, 0x0c01) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE(0x0c02, 0x0c02) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
-	AM_RANGE(0x1800, 0x1807) AM_WRITE(sfbonus_1800_w) AM_BASE_MEMBER(sfbonus_state, m_1800_regs) // lamps and coin counters
+	AM_RANGE(0x1800, 0x1807) AM_WRITE_LEGACY(sfbonus_1800_w) AM_BASE( m_1800_regs) // lamps and coin counters
 
-	AM_RANGE(0x2400, 0x241f) AM_RAM AM_BASE_MEMBER(sfbonus_state, m_vregs)
+	AM_RANGE(0x2400, 0x241f) AM_RAM AM_BASE( m_vregs)
 
-	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_2800_r)
-	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(sfbonus_2801_w) AM_BASE_MEMBER(sfbonus_state, m_2801_regs)
+	AM_RANGE(0x2800, 0x2800) AM_READ_LEGACY(sfbonus_2800_r)
+	AM_RANGE(0x2801, 0x2801) AM_READ_LEGACY(sfbonus_2801_r) AM_WRITE_LEGACY(sfbonus_2801_w) AM_BASE( m_2801_regs)
 
-	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_2c00_r)
-	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(sfbonus_2c01_w) AM_BASE_MEMBER(sfbonus_state, m_2c01_regs)
+	AM_RANGE(0x2c00, 0x2c00) AM_READ_LEGACY(sfbonus_2c00_r)
+	AM_RANGE(0x2c01, 0x2c01) AM_READ_LEGACY(sfbonus_2c01_r) AM_WRITE_LEGACY(sfbonus_2c01_w) AM_BASE( m_2c01_regs)
 
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(sfbonus_3000_w) AM_BASE_MEMBER(sfbonus_state, m_3000_regs)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
-	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_3800_r)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(sfbonus_3000_w) AM_BASE( m_3000_regs)
+	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(sfbonus_bank_w)
+	AM_RANGE(0x3800, 0x3800) AM_READ_LEGACY(sfbonus_3800_r)
 
-	AM_RANGE(0x3800, 0x3807) AM_WRITE(sfbonus_3800_w) AM_BASE_MEMBER(sfbonus_state, m_3800_regs)
+	AM_RANGE(0x3800, 0x3807) AM_WRITE_LEGACY(sfbonus_3800_w) AM_BASE( m_3800_regs)
 ADDRESS_MAP_END
 
 
@@ -1232,7 +1232,7 @@ static NVRAM_HANDLER( sfbonus )
 }
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sfbonus_state )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 static RAMDAC_INTERFACE( ramdac_intf )

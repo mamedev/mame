@@ -383,8 +383,8 @@ static WRITE8_HANDLER( unknown_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80v_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
 	AM_RANGE(0x0800, 0xbfff) AM_ROM		/* PROM board ROM area */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE_MEMBER(segag80v_state, m_mainram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vectorram_w) AM_BASE_MEMBER(segag80v_state, m_vectorram) AM_SIZE_MEMBER(segag80v_state, m_vectorram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(mainram_w) AM_BASE( m_mainram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(vectorram_w) AM_BASE( m_vectorram) AM_SIZE(m_vectorram_size)
 ADDRESS_MAP_END
 
 
@@ -392,12 +392,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segag80v_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xbc, 0xbc) /* AM_READ ??? */
-	AM_RANGE(0xbd, 0xbe) AM_WRITE(multiply_w)
-	AM_RANGE(0xbe, 0xbe) AM_READ(multiply_r)
-	AM_RANGE(0xbf, 0xbf) AM_WRITE(unknown_w)
+	AM_RANGE(0xbd, 0xbe) AM_WRITE_LEGACY(multiply_w)
+	AM_RANGE(0xbe, 0xbe) AM_READ_LEGACY(multiply_r)
+	AM_RANGE(0xbf, 0xbf) AM_WRITE_LEGACY(unknown_w)
 
-	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE(coin_count_w)
-	AM_RANGE(0xf8, 0xfb) AM_READ(mangled_ports_r)
+	AM_RANGE(0xf9, 0xf9) AM_MIRROR(0x04) AM_WRITE_LEGACY(coin_count_w)
+	AM_RANGE(0xf8, 0xfb) AM_READ_LEGACY(mangled_ports_r)
 	AM_RANGE(0xfc, 0xfc) AM_READ_PORT("FC")
 ADDRESS_MAP_END
 

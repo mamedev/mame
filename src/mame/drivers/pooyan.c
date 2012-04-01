@@ -51,22 +51,22 @@ static WRITE8_HANDLER( irq_enable_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pooyan_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pooyan_colorram_w) AM_BASE_MEMBER(pooyan_state, m_colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pooyan_videoram_w) AM_BASE_MEMBER(pooyan_state, m_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(pooyan_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(pooyan_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_MEMBER(pooyan_state, m_spriteram)
-	AM_RANGE(0x9400, 0x94ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE_MEMBER(pooyan_state, m_spriteram2)
+	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x9400, 0x94ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE( m_spriteram2)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa080, 0xa080) AM_MIRROR(0x5e1f) AM_READ_PORT("IN0")
 	AM_RANGE(0xa0a0, 0xa0a0) AM_MIRROR(0x5e1f) AM_READ_PORT("IN1")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_MIRROR(0x5e1f) AM_READ_PORT("IN2")
 	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x5e1f) AM_READ_PORT("DSW0")
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x5e7f) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xa180, 0xa180) AM_MIRROR(0x5e78) AM_WRITE(irq_enable_w)
-	AM_RANGE(0xa181, 0xa181) AM_MIRROR(0x5e78) AM_WRITE(timeplt_sh_irqtrigger_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x5e7f) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xa180, 0xa180) AM_MIRROR(0x5e78) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xa181, 0xa181) AM_MIRROR(0x5e78) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)
 	AM_RANGE(0xa183, 0xa183) AM_MIRROR(0x5e78) AM_WRITENOP // ???
-	AM_RANGE(0xa187, 0xa187) AM_MIRROR(0x5e78) AM_WRITE(pooyan_flipscreen_w)
+	AM_RANGE(0xa187, 0xa187) AM_MIRROR(0x5e78) AM_WRITE_LEGACY(pooyan_flipscreen_w)
 ADDRESS_MAP_END
 
 

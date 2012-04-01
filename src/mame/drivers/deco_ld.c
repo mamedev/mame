@@ -184,18 +184,18 @@ static READ8_HANDLER( test_r )
 static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 //  AM_RANGE(0x1000, 0x1007) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_READ(test_r)
-	AM_RANGE(0x1001, 0x1001) AM_READ(test_r)
-	AM_RANGE(0x1002, 0x1002) AM_READ(test_r)
-	AM_RANGE(0x1003, 0x1003) AM_READ(test_r)
+	AM_RANGE(0x1000, 0x1000) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x1001, 0x1001) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x1002, 0x1002) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x1003, 0x1003) AM_READ_LEGACY(test_r)
 	AM_RANGE(0x1001, 0x1001) AM_WRITENOP //???
 //  AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN0")
-	AM_RANGE(0x1003, 0x1003) AM_WRITE(rblaster_vram_bank_w) //might be 1001
+	AM_RANGE(0x1003, 0x1003) AM_WRITE_LEGACY(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
-	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1007, 0x1007) AM_READWRITE_LEGACY(laserdisc_r,laserdisc_w) // ld data
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(deco_ld_state, m_videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -203,18 +203,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN1")
-	AM_RANGE(0x1001, 0x1001) AM_READ(test_r)//_PORT("IN2")
-	AM_RANGE(0x1002, 0x1002) AM_READ(test_r)//_PORT("IN3")
-	AM_RANGE(0x1003, 0x1003) AM_READ(test_r)//AM_READ_PORT("IN0")
-//  AM_RANGE(0x1004, 0x1004) AM_READ(test_r)//_PORT("IN4")
-//  AM_RANGE(0x1005, 0x1005) AM_READ(test_r)//_PORT("IN5")
-	AM_RANGE(0x1004, 0x1004) AM_WRITE(rblaster_vram_bank_w) //might be 1001
+	AM_RANGE(0x1001, 0x1001) AM_READ_LEGACY(test_r)//_PORT("IN2")
+	AM_RANGE(0x1002, 0x1002) AM_READ_LEGACY(test_r)//_PORT("IN3")
+	AM_RANGE(0x1003, 0x1003) AM_READ_LEGACY(test_r)//AM_READ_PORT("IN0")
+//  AM_RANGE(0x1004, 0x1004) AM_READ_LEGACY(test_r)//_PORT("IN4")
+//  AM_RANGE(0x1005, 0x1005) AM_READ_LEGACY(test_r)//_PORT("IN5")
+	AM_RANGE(0x1004, 0x1004) AM_WRITE_LEGACY(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
-	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1007, 0x1007) AM_READWRITE_LEGACY(laserdisc_r,laserdisc_w) // ld data
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM //vram attr?
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE_MEMBER(deco_ld_state, m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -224,11 +224,11 @@ static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
 //  AM_RANGE(0x1000, 0x1007) AM_NOP
 	AM_RANGE(0x1001, 0x1001) AM_WRITENOP //???
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("IN0")
-	AM_RANGE(0x1003, 0x1003) AM_WRITE(rblaster_vram_bank_w) //might be 1001
+	AM_RANGE(0x1003, 0x1003) AM_WRITE_LEGACY(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
-	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(deco_ld_state, m_videoram)
+	AM_RANGE(0x1007, 0x1007) AM_READWRITE_LEGACY(laserdisc_r,laserdisc_w) // ld data
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE( m_videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -252,11 +252,11 @@ static INTERRUPT_GEN ( sound_interrupt )
 
 static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

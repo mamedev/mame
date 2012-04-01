@@ -223,36 +223,36 @@ static WRITE8_HANDLER( coin_lockout_w )
 static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xd7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(mirax_state, m_videoram)
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_MEMBER(mirax_state, m_spriteram)
-	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE_MEMBER(mirax_state, m_colorram) //per-column color + bank bits for the videoram
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE( m_colorram) //per-column color + bank bits for the videoram
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("P2")
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf300, 0xf300) AM_READ(unk_r) //watchdog? value is always read then discarded
+	AM_RANGE(0xf300, 0xf300) AM_READ_LEGACY(unk_r) //watchdog? value is always read then discarded
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf500, 0xf500) AM_WRITE(coin_lockout_w)
-	AM_RANGE(0xf501, 0xf501) AM_WRITE(nmi_mask_w)
+	AM_RANGE(0xf500, 0xf500) AM_WRITE_LEGACY(coin_lockout_w)
+	AM_RANGE(0xf501, 0xf501) AM_WRITE_LEGACY(nmi_mask_w)
 //  AM_RANGE(0xf506, 0xf506)
 //  AM_RANGE(0xf507, 0xf507)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(mirax_sound_cmd_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(mirax_sound_cmd_w)
 //  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mirax_sound_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 
 	AM_RANGE(0xe000, 0xe000) AM_WRITENOP
 	AM_RANGE(0xe001, 0xe001) AM_WRITENOP
-	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE("ay1", ay_sel) //1st ay ?
+	AM_RANGE(0xe003, 0xe003) AM_DEVWRITE_LEGACY("ay1", ay_sel) //1st ay ?
 
 	AM_RANGE(0xe400, 0xe400) AM_WRITENOP
 	AM_RANGE(0xe401, 0xe401) AM_WRITENOP
-	AM_RANGE(0xe403, 0xe403) AM_DEVWRITE("ay2", ay_sel) //2nd ay ?
+	AM_RANGE(0xe403, 0xe403) AM_DEVWRITE_LEGACY("ay2", ay_sel) //2nd ay ?
 
-	AM_RANGE(0xf900, 0xf9ff) AM_WRITE(audio_w)
+	AM_RANGE(0xf900, 0xf9ff) AM_WRITE_LEGACY(audio_w)
 ADDRESS_MAP_END
 
 static const gfx_layout layout16 =

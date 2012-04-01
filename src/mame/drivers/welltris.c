@@ -357,20 +357,20 @@ static WRITE8_HANDLER( pending_command_clear_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE_MEMBER(welltris_state,m_pixelram)	/* Graph_1 & 2*/
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE(m_pixelram)	/* Graph_1 & 2*/
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work */
-	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(welltris_spriteram_w) AM_BASE_MEMBER(welltris_state,m_spriteram)			/* Sprite */
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_BASE_MEMBER(welltris_state,m_charvideoram)		/* Char */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE_LEGACY(welltris_spriteram_w) AM_BASE(m_spriteram)			/* Sprite */
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(welltris_charvideoram_w) AM_BASE(m_charvideoram)		/* Char */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")					/* Bottom Controls */
-	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(welltris_palette_bank_w)
+	AM_RANGE(0xfff000, 0xfff001) AM_WRITE_LEGACY(welltris_palette_bank_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")					/* Top Controls */
-	AM_RANGE(0xfff002, 0xfff003) AM_WRITE(welltris_gfxbank_w)
+	AM_RANGE(0xfff002, 0xfff003) AM_WRITE_LEGACY(welltris_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("P3")					/* Left Side Ctrls */
-	AM_RANGE(0xfff004, 0xfff007) AM_WRITE(welltris_scrollreg_w)
+	AM_RANGE(0xfff004, 0xfff007) AM_WRITE_LEGACY(welltris_scrollreg_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("P4")					/* Right Side Ctrls */
 	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("SYSTEM")				/* Bit 5 Tested at start of irq 1 */
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE_LEGACY(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("EXTRA")				/* P3+P4 Coin + Start Buttons */
 	AM_RANGE(0xfff00c, 0xfff00d) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITENOP					/* ?? */
@@ -386,10 +386,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, welltris_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(welltris_sh_bankswitch_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0x10, 0x10) AM_READ(soundlatch_r)
-	AM_RANGE(0x18, 0x18) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(welltris_sh_bankswitch_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x10, 0x10) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x18, 0x18) AM_WRITE_LEGACY(pending_command_clear_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( welltris )

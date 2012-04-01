@@ -61,19 +61,19 @@ static SCREEN_UPDATE_IND16(royalgum)
 static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8, rgum_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //not all of it?
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x2002, 0x2002) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_address_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x2002, 0x2002) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_w)
 
 	AM_RANGE(0x2801, 0x2801) AM_READNOP //read but value discarded?
 	AM_RANGE(0x2803, 0x2803) AM_READNOP
 
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_MEMBER(rgum_state, m_vram)
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_MEMBER(rgum_state, m_cram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE( m_vram)
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE( m_cram)
 
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

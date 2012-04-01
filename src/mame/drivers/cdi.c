@@ -56,23 +56,23 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 *************************/
 
 static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
-    AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(cdi_state,m_planea)
-    AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE_MEMBER(cdi_state,m_planeb)
+    AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(m_planea)
+    AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE(m_planeb)
 #if ENABLE_UART_PRINTING
-    AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_loopback_enable)
+    AM_RANGE(0x00301400, 0x00301403) AM_READ_LEGACY(uart_loopback_enable)
 #endif
-	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdic_ram_r, cdic_ram_w)
-    //AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_BASE_MEMBER(cdi_state,m_cdic_regs.ram)
-	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdic_r, cdic_w)
-	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave", slave_r, slave_w)
+	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE_LEGACY("cdic", cdic_ram_r, cdic_ram_w)
+    //AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_BASE(m_cdic_regs.ram)
+	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE_LEGACY("cdic", cdic_r, cdic_w)
+	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE_LEGACY("slave", slave_r, slave_w)
     //AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-    AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)    /* nvram (only low bytes used) */
+    AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8_LEGACY("mk48t08", timekeeper_r, timekeeper_w, 0xff00)    /* nvram (only low bytes used) */
     AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
-    AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
+    AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE_LEGACY(mcd212_r, mcd212_w)
     //AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
     AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
     //AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
-    AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE(scc68070_periphs_r, scc68070_periphs_w)
+    AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE_LEGACY(scc68070_periphs_r, scc68070_periphs_w)
 ADDRESS_MAP_END
 
 /*************************

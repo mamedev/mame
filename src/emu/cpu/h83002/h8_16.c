@@ -687,35 +687,35 @@ READ16_HANDLER( h8s2323_per_regs_r )
 static ADDRESS_MAP_START( h8_3002_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
 	// 512B RAM
 	AM_RANGE(0xfffd10, 0xffff0f) AM_RAM
-	AM_RANGE(0xffff10, 0xffffff) AM_READWRITE( h8_itu_r, h8_itu_w )
+	AM_RANGE(0xffff10, 0xffffff) AM_READWRITE_LEGACY( h8_itu_r, h8_itu_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8_3044_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
 	// 32k ROM, 2k RAM
 	AM_RANGE(0xfff710, 0xffff0f) AM_RAM
-	AM_RANGE(0xffff1c, 0xffffff) AM_READWRITE( h8_itu_r, h8_itu_w )
+	AM_RANGE(0xffff1c, 0xffffff) AM_READWRITE_LEGACY( h8_itu_r, h8_itu_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8_3007_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
 	// ROM-less, 4k RAM
-	AM_RANGE(0xfee000, 0xfee0ff) AM_READWRITE( h8_3007_itu1_r, h8_3007_itu1_w )
+	AM_RANGE(0xfee000, 0xfee0ff) AM_READWRITE_LEGACY( h8_3007_itu1_r, h8_3007_itu1_w )
 	AM_RANGE(0xffef20, 0xffff1f) AM_RAM
-	AM_RANGE(0xffff20, 0xffffe9) AM_READWRITE( h8_3007_itu_r, h8_3007_itu_w )
+	AM_RANGE(0xffff20, 0xffffe9) AM_READWRITE_LEGACY( h8_3007_itu_r, h8_3007_itu_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8s_2241_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE( 0xFFEC00, 0xFFFBFF ) AM_RAM // on-chip ram
-	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2241_per_regs_r, h8s2241_per_regs_w ) // internal i/o registers
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE_LEGACY( h8s2241_per_regs_r, h8s2241_per_regs_w ) // internal i/o registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8s_2246_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
-	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2246_per_regs_r, h8s2246_per_regs_w ) // internal i/o registers
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE_LEGACY( h8s2246_per_regs_r, h8s2246_per_regs_w ) // internal i/o registers
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h8s_2323_internal_map, AS_PROGRAM, 16, legacy_cpu_device )
 	AM_RANGE( 0xFFDC00, 0xFFFBFF ) AM_RAM // on-chip ram
-	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE( h8s2323_per_regs_r, h8s2323_per_regs_w ) // internal i/o registers
+	AM_RANGE( 0xFFFE40, 0xFFFFFF ) AM_READWRITE_LEGACY( h8s2323_per_regs_r, h8s2323_per_regs_w ) // internal i/o registers
 ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3002 )

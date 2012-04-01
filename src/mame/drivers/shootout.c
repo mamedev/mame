@@ -66,14 +66,14 @@ static WRITE8_HANDLER( shootout_coin_counter_w )
 
 static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE(shootout_bankswitch_w)
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE(shootout_flipscreen_w)
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2") AM_WRITE(shootout_coin_counter_w)
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2") AM_WRITE(sound_cpu_command_w)
+	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(shootout_bankswitch_w)
+	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE_LEGACY(shootout_flipscreen_w)
+	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2") AM_WRITE_LEGACY(shootout_coin_counter_w)
+	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(sound_cpu_command_w)
 	AM_RANGE(0x1004, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_BASE_MEMBER(shootout_state,m_spriteram)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE_MEMBER(shootout_state,m_textram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE_MEMBER(shootout_state,m_videoram)
+	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(shootout_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY(shootout_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -84,11 +84,11 @@ static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1")
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE(shootout_coin_counter_w)
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_MEMBER(shootout_state,m_spriteram)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE_MEMBER(shootout_state,m_textram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE_MEMBER(shootout_state,m_videoram)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(shootout_coin_counter_w)
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(shootout_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE_LEGACY(shootout_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -98,8 +98,8 @@ ADDRESS_MAP_END
 /* same as Tryout */
 static ADDRESS_MAP_START( shootout_sound_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // unknown, NOT irq/nmi mask
 ADDRESS_MAP_END

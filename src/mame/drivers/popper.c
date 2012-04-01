@@ -162,21 +162,21 @@ static WRITE8_HANDLER( nmi_mask_w )
 static ADDRESS_MAP_START( popper_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0xc000, 0xc1bf) AM_RAM
-	AM_RANGE(0xc1c0, 0xc1ff) AM_RAM_WRITE(popper_ol_videoram_w) AM_BASE_MEMBER(popper_state, m_ol_videoram)
-	AM_RANGE(0xc200, 0xc61f) AM_RAM_WRITE(popper_videoram_w) AM_BASE_MEMBER(popper_state, m_videoram)
+	AM_RANGE(0xc1c0, 0xc1ff) AM_RAM_WRITE_LEGACY(popper_ol_videoram_w) AM_BASE( m_ol_videoram)
+	AM_RANGE(0xc200, 0xc61f) AM_RAM_WRITE_LEGACY(popper_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xc620, 0xc9bf) AM_RAM
-	AM_RANGE(0xc9c0, 0xc9ff) AM_RAM_WRITE(popper_ol_attribram_w) AM_BASE_MEMBER(popper_state, m_ol_attribram)
-	AM_RANGE(0xca00, 0xce1f) AM_RAM_WRITE(popper_attribram_w) AM_BASE_MEMBER(popper_state, m_attribram)
+	AM_RANGE(0xc9c0, 0xc9ff) AM_RAM_WRITE_LEGACY(popper_ol_attribram_w) AM_BASE( m_ol_attribram)
+	AM_RANGE(0xca00, 0xce1f) AM_RAM_WRITE_LEGACY(popper_attribram_w) AM_BASE( m_attribram)
 	AM_RANGE(0xce20, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(popper_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xe007) AM_READ(popper_input_ports_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(popper_flipscreen_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(popper_e002_w)				//?? seems to be graphic related
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(popper_gfx_bank_w)
+	AM_RANGE(0xe000, 0xe007) AM_READ_LEGACY(popper_input_ports_r)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE_LEGACY(popper_flipscreen_w)
+	AM_RANGE(0xe002, 0xe002) AM_WRITE_LEGACY(popper_e002_w)				//?? seems to be graphic related
+	AM_RANGE(0xe003, 0xe003) AM_WRITE_LEGACY(popper_gfx_bank_w)
 	AM_RANGE(0xe004, 0xe007) AM_WRITENOP					//?? range cleared once when the SP is set
-	AM_RANGE(0xe400, 0xe400) AM_READ(popper_soundcpu_nmi_r)
+	AM_RANGE(0xe400, 0xe400) AM_READ_LEGACY(popper_soundcpu_nmi_r)
 	AM_RANGE(0xf800, 0xf800) AM_READNOP					//?? read once at startup
 	AM_RANGE(0xfc00, 0xfc00) AM_READNOP					//?? possibly watchdog
 	AM_RANGE(0xffff, 0xffff) AM_READNOP
@@ -184,11 +184,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popper_sound_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_READNOP					//?? all read once at startup and the
 	AM_RANGE(0x8002, 0x8002) AM_WRITENOP				//?? same writes as 0x8000 (mostly)
 	AM_RANGE(0x8003, 0x8003) AM_READNOP					//?? result ignored, looks like part
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0xa002, 0xa002) AM_READNOP					//?? of AY8910 initialisation
 	AM_RANGE(0xa002, 0xa002) AM_WRITENOP				//?? same writes as 0xa000
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")

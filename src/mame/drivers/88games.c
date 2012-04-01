@@ -135,32 +135,32 @@ static WRITE8_HANDLER( k052109_051960_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _88games_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(_88games_state, m_banked_rom) /* banked ROM + palette RAM */
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_MEMBER(_88games_state, m_paletteram_1000)	/* banked ROM + palette RAM */
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE( m_banked_rom) /* banked ROM + palette RAM */
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE( m_paletteram_1000)	/* banked ROM + palette RAM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(_88games_state, m_ram)
-	AM_RANGE(0x5f84, 0x5f84) AM_WRITE(k88games_5f84_w)
-	AM_RANGE(0x5f88, 0x5f88) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(soundlatch_w)
-	AM_RANGE(0x5f90, 0x5f90) AM_WRITE(k88games_sh_irqtrigger_w)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE( m_ram)
+	AM_RANGE(0x5f84, 0x5f84) AM_WRITE_LEGACY(k88games_5f84_w)
+	AM_RANGE(0x5f88, 0x5f88) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x5f90, 0x5f90) AM_WRITE_LEGACY(k88games_sh_irqtrigger_w)
 	AM_RANGE(0x5f94, 0x5f94) AM_READ_PORT("IN0")
 	AM_RANGE(0x5f95, 0x5f95) AM_READ_PORT("IN1")
 	AM_RANGE(0x5f96, 0x5f96) AM_READ_PORT("IN2")
 	AM_RANGE(0x5f97, 0x5f97) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f9b, 0x5f9b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x5fc0, 0x5fcf) AM_DEVWRITE("k051316", k051316_ctrl_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
+	AM_RANGE(0x5fc0, 0x5fcf) AM_DEVWRITE_LEGACY("k051316", k051316_ctrl_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _88games_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(speech_msg_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(speech_control_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(speech_msg_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(speech_control_w)
 ADDRESS_MAP_END
 
 

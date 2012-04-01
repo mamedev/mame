@@ -140,18 +140,18 @@ static ADDRESS_MAP_START( pachifev_map, AS_PROGRAM, 8, pachifev_state )
     AM_RANGE(0xff04, 0xff04) AM_READ_PORT("DSW1")
     AM_RANGE(0xff06, 0xff06) AM_READ_PORT("DSW2")
     AM_RANGE(0xff08, 0xff08) AM_READ_PORT("DSW3")
-    AM_RANGE(0xff10, 0xff10) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)
-    AM_RANGE(0xff12, 0xff12) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)
-    AM_RANGE(0xff20, 0xff20) AM_DEVWRITE("sn76_1", sn76496_w)
-    AM_RANGE(0xff30, 0xff30) AM_DEVWRITE("sn76_2", sn76496_w)
-    AM_RANGE(0xff40, 0xff40) AM_WRITE(controls_w)
+    AM_RANGE(0xff10, 0xff10) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+    AM_RANGE(0xff12, 0xff12) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
+    AM_RANGE(0xff20, 0xff20) AM_DEVWRITE_LEGACY("sn76_1", sn76496_w)
+    AM_RANGE(0xff30, 0xff30) AM_DEVWRITE_LEGACY("sn76_2", sn76496_w)
+    AM_RANGE(0xff40, 0xff40) AM_WRITE_LEGACY(controls_w)
     AM_RANGE(0xff50, 0xff50) AM_WRITENOP /* unknown */
     AM_RANGE(0xfffa, 0xfffb) AM_NOP /* decrementer */
     AM_RANGE(0xfffc, 0xffff) AM_NOP /* nmi */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pachifev_cru, AS_IO, 8, pachifev_state )
-    AM_RANGE(0x000, 0x000) AM_READ(controls_r)
+    AM_RANGE(0x000, 0x000) AM_READ_LEGACY(controls_r)
 ADDRESS_MAP_END
 
 

@@ -51,16 +51,16 @@ static WRITE16_HANDLER ( crospang_soundlatch_w )
 static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
 	AM_RANGE(0x100000, 0x100001) AM_WRITENOP
-	AM_RANGE(0x100002, 0x100003) AM_WRITE(crospang_fg_scrolly_w)
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(crospang_bg_scrollx_w)
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(crospang_bg_scrolly_w)
-	AM_RANGE(0x100008, 0x100009) AM_WRITE(crospang_fg_scrollx_w)
+	AM_RANGE(0x100002, 0x100003) AM_WRITE_LEGACY(crospang_fg_scrolly_w)
+	AM_RANGE(0x100004, 0x100005) AM_WRITE_LEGACY(crospang_bg_scrollx_w)
+	AM_RANGE(0x100006, 0x100007) AM_WRITE_LEGACY(crospang_bg_scrolly_w)
+	AM_RANGE(0x100008, 0x100009) AM_WRITE_LEGACY(crospang_fg_scrollx_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITENOP
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_BASE_MEMBER(crospang_state, m_fg_videoram)
-	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_BASE_MEMBER(crospang_state, m_bg_videoram)
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE_MEMBER(crospang_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE_LEGACY(crospang_fg_videoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE_LEGACY(crospang_bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x270000, 0x270001) AM_WRITE_LEGACY(crospang_soundlatch_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
 	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
@@ -70,17 +70,17 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_WRITENOP // writes to rom quite often
 
-	AM_RANGE(0x100004, 0x100005) AM_WRITE(bestri_fg_scrollx_w)
-	AM_RANGE(0x100006, 0x100007) AM_WRITE(bestri_fg_scrolly_w)
-	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(bestri_bg_scrolly_w)
-	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(bestri_bg_scrollx_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(bestri_tilebank_w)
+	AM_RANGE(0x100004, 0x100005) AM_WRITE_LEGACY(bestri_fg_scrollx_w)
+	AM_RANGE(0x100006, 0x100007) AM_WRITE_LEGACY(bestri_fg_scrolly_w)
+	AM_RANGE(0x10000a, 0x10000b) AM_WRITE_LEGACY(bestri_bg_scrolly_w)
+	AM_RANGE(0x10000c, 0x10000d) AM_WRITE_LEGACY(bestri_bg_scrollx_w)
+	AM_RANGE(0x10000e, 0x10000f) AM_WRITE_LEGACY(bestri_tilebank_w)
 
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(crospang_fg_videoram_w) AM_BASE_MEMBER(crospang_state, m_fg_videoram)
-	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_BASE_MEMBER(crospang_state, m_bg_videoram)
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE_MEMBER(crospang_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE_LEGACY(crospang_fg_videoram_w) AM_BASE( m_fg_videoram)
+	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE_LEGACY(crospang_bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x270000, 0x270001) AM_WRITE_LEGACY(crospang_soundlatch_w)
 	AM_RANGE(0x270004, 0x270005) AM_WRITENOP
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
@@ -98,9 +98,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crospang_sound_io_map, AS_IO, 8, crospang_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 

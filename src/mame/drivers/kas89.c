@@ -516,13 +516,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kas89_io, AS_IO, 8, kas89_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_WRITE(mux_w)
-	AM_RANGE(0x81, 0x81) AM_READ(mux_r)
-	AM_RANGE(0x82, 0x82) AM_WRITE(control_w)	/* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
-	AM_RANGE(0x83, 0x83) AM_WRITE(led_mux_data_w)
-	AM_RANGE(0x84, 0x84) AM_WRITE(led_mux_select_w)
-	AM_RANGE(0x85, 0x85) AM_WRITE(sound_comm_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("v9938", v9938_device, read, write)
+	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(mux_w)
+	AM_RANGE(0x81, 0x81) AM_READ_LEGACY(mux_r)
+	AM_RANGE(0x82, 0x82) AM_WRITE_LEGACY(control_w)	/* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
+	AM_RANGE(0x83, 0x83) AM_WRITE_LEGACY(led_mux_data_w)
+	AM_RANGE(0x84, 0x84) AM_WRITE_LEGACY(led_mux_select_w)
+	AM_RANGE(0x85, 0x85) AM_WRITE_LEGACY(sound_comm_w)
 ADDRESS_MAP_END
 
 /*
@@ -570,10 +570,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io, AS_IO, 8, kas89_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(int_ack_w)	// comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(int_ack_w)	// comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
+	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 

@@ -151,20 +151,20 @@ static WRITE8_HANDLER( albazc_vregs_w )
 
 static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8, albazc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(albazc_state, m_spriteram1)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE_MEMBER(albazc_state, m_spriteram2)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE_MEMBER(albazc_state, m_spriteram3)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE( m_spriteram1)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE( m_spriteram2)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE( m_spriteram3)
 	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP	// ??? written once during P.O.S.T.
-	AM_RANGE(0xa300, 0xa304) AM_WRITE(albazc_vregs_w)	// ???
+	AM_RANGE(0xa300, 0xa304) AM_WRITE_LEGACY(albazc_vregs_w)	// ???
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM			// main ram
 	AM_RANGE(0xc400, 0xc4ff) AM_RAM			// ???
-	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(hanaroku_out_0_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE_LEGACY(hanaroku_out_0_w)
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("IN1")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN2") AM_WRITE(hanaroku_out_1_w)
-	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW3") AM_WRITE(hanaroku_out_2_w)
+	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN2") AM_WRITE_LEGACY(hanaroku_out_1_w)
+	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW3") AM_WRITE_LEGACY(hanaroku_out_2_w)
 ADDRESS_MAP_END
 
 

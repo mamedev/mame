@@ -136,21 +136,21 @@ static READ8_HANDLER( snd_flag_r )
 static ADDRESS_MAP_START( ladyfrog_map, AS_PROGRAM, 8, ladyfrog_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc07f) AM_RAM
-	AM_RANGE(0xc080, 0xc87f) AM_READWRITE(ladyfrog_videoram_r, ladyfrog_videoram_w) AM_BASE_SIZE_MEMBER(ladyfrog_state, m_videoram, m_videoram_size)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(ladyfrog_gfxctrl2_w)
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
+	AM_RANGE(0xc080, 0xc87f) AM_READWRITE_LEGACY(ladyfrog_videoram_r, ladyfrog_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(ladyfrog_gfxctrl2_w)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
+	AM_RANGE(0xd403, 0xd403) AM_WRITE_LEGACY(sound_cpu_reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xdc00, 0xdc9f) AM_READWRITE(ladyfrog_spriteram_r,ladyfrog_spriteram_w)
-	AM_RANGE(0xdca0, 0xdcbf) AM_READWRITE(ladyfrog_scrlram_r, ladyfrog_scrlram_w) AM_BASE_MEMBER(ladyfrog_state, m_scrlram)
+	AM_RANGE(0xdc00, 0xdc9f) AM_READWRITE_LEGACY(ladyfrog_spriteram_r,ladyfrog_spriteram_w)
+	AM_RANGE(0xdca0, 0xdcbf) AM_READWRITE_LEGACY(ladyfrog_scrlram_r, ladyfrog_scrlram_w) AM_BASE( m_scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM
-	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(ladyfrog_palette_r, ladyfrog_palette_w)
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE_LEGACY(ladyfrog_palette_r, ladyfrog_palette_w)
 	AM_RANGE(0xd0d0, 0xd0d0) AM_READNOP /* code jumps to ASCII text "Alfa tecnology"  @ $b7 */
-	AM_RANGE(0xdf03, 0xdf03) AM_WRITE(ladyfrog_gfxctrl_w)
+	AM_RANGE(0xdf03, 0xdf03) AM_WRITE_LEGACY(ladyfrog_gfxctrl_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -158,14 +158,14 @@ static ADDRESS_MAP_START( ladyfrog_sound_map, AS_PROGRAM, 8, ladyfrog_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_WRITENOP
-	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE("msm", msm5232_w)
+	AM_RANGE(0xc802, 0xc803) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xc900, 0xc90d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITENOP
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE(soundlatch_r,to_main_w)
-	AM_RANGE(0xd200, 0xd200) AM_READNOP AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(soundlatch_r,to_main_w)
+	AM_RANGE(0xd200, 0xd200) AM_READNOP AM_WRITE_LEGACY(nmi_enable_w)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE_LEGACY(nmi_disable_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_NOP
 ADDRESS_MAP_END

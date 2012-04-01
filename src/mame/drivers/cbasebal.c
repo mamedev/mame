@@ -114,26 +114,26 @@ static const eeprom_interface cbasebal_eeprom_intf =
 static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8, cbasebal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_GENERIC(paletteram)	/* palette + vram + scrollram */
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE_GENERIC(paletteram)	/* palette + vram + scrollram */
 	AM_RANGE(0xe000, 0xfdff) AM_RAM		/* work RAM */
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(cbasebal_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbasebal_portmap, AS_IO, 8, cbasebal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(cbasebal_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(cbasebal_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE_PORT("IO_01")
 	AM_RANGE(0x02, 0x02) AM_WRITE_PORT("IO_02")
 	AM_RANGE(0x03, 0x03) AM_WRITE_PORT("IO_03")
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x08, 0x09) AM_WRITE(cbasebal_scrollx_w)
-	AM_RANGE(0x0a, 0x0b) AM_WRITE(cbasebal_scrolly_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("oki", okim6295_device, write)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x08, 0x09) AM_WRITE_LEGACY(cbasebal_scrollx_w)
+	AM_RANGE(0x0a, 0x0b) AM_WRITE_LEGACY(cbasebal_scrolly_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("P1")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("P2")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x13, 0x13) AM_WRITE(cbasebal_gfxctrl_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE(cbasebal_coinctrl_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(cbasebal_gfxctrl_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(cbasebal_coinctrl_w)
 ADDRESS_MAP_END
 
 

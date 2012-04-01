@@ -314,27 +314,27 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
-	AM_RANGE(0x490040, 0x490043) AM_DEVWRITE("eeprom", darkhors_eeprom_w)
-	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("4e0080") AM_WRITE(darkhors_unk1_w)
+	AM_RANGE(0x490040, 0x490043) AM_DEVWRITE_LEGACY("eeprom", darkhors_eeprom_w)
+	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("4e0080") AM_WRITE_LEGACY(darkhors_unk1_w)
 
 	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")
 	AM_RANGE(0x580004, 0x580007) AM_READ_PORT("580004")
-	AM_RANGE(0x580008, 0x58000b) AM_READ(darkhors_input_sel_r)
-	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(darkhors_input_sel_w)
-	AM_RANGE(0x580084, 0x580087) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff000000)
+	AM_RANGE(0x580008, 0x58000b) AM_READ_LEGACY(darkhors_input_sel_r)
+	AM_RANGE(0x58000c, 0x58000f) AM_WRITE_LEGACY(darkhors_input_sel_w)
+	AM_RANGE(0x580084, 0x580087) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff000000)
 	AM_RANGE(0x580200, 0x580203) AM_READNOP
 	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
 
 	AM_RANGE(0x800000, 0x86bfff) AM_RAM
-	AM_RANGE(0x86c000, 0x86ffff) AM_RAM_WRITE(darkhors_tmapram_w) AM_BASE_MEMBER(darkhors_state, m_tmapram)
-	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(darkhors_tmapram2_w) AM_BASE_MEMBER(darkhors_state, m_tmapram2)
+	AM_RANGE(0x86c000, 0x86ffff) AM_RAM_WRITE_LEGACY(darkhors_tmapram_w) AM_BASE( m_tmapram)
+	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE_LEGACY(darkhors_tmapram2_w) AM_BASE( m_tmapram2)
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
-	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE_MEMBER(darkhors_state, m_spriteram)
-	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x880000, 0x89ffff) AM_WRITE_LEGACY(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
-	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_BASE_MEMBER(darkhors_state, m_tmapscroll)
-	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_BASE_MEMBER(darkhors_state, m_tmapscroll2)
+	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_BASE( m_tmapscroll)
+	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_BASE( m_tmapscroll2)
 ADDRESS_MAP_END
 
 
@@ -350,26 +350,26 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
-	AM_RANGE(0x490040, 0x490043) AM_DEVWRITE("eeprom", darkhors_eeprom_w)
-	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("4e0080") AM_WRITE(darkhors_unk1_w)
+	AM_RANGE(0x490040, 0x490043) AM_DEVWRITE_LEGACY("eeprom", darkhors_eeprom_w)
+	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("4e0080") AM_WRITE_LEGACY(darkhors_unk1_w)
 
 	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")
 	AM_RANGE(0x580004, 0x580007) AM_READ_PORT("580004")
-	AM_RANGE(0x580008, 0x58000b) AM_READ(darkhors_input_sel_r)
-	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(darkhors_input_sel_w)
+	AM_RANGE(0x580008, 0x58000b) AM_READ_LEGACY(darkhors_input_sel_r)
+	AM_RANGE(0x58000c, 0x58000f) AM_WRITE_LEGACY(darkhors_input_sel_w)
 	AM_RANGE(0x580200, 0x580203) AM_READNOP
 	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
 
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE_MEMBER(darkhors_state, m_spriteram)
+	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE( m_spriteram)
 
-	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x880000, 0x89ffff) AM_WRITE_LEGACY(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
 
 	AM_RANGE(0x8C0000, 0x8C01ff) AM_RAM
 	AM_RANGE(0x8E0000, 0x8E01ff) AM_RAM
 
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM_WRITE(jclub2_tileram_w) AM_BASE_MEMBER(darkhors_state, m_jclub2_tileram) // tile data gets decompressed here by main cpu?
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM_WRITE_LEGACY(jclub2_tileram_w) AM_BASE( m_jclub2_tileram) // tile data gets decompressed here by main cpu?
 ADDRESS_MAP_END
 
 
@@ -728,20 +728,20 @@ MACHINE_CONFIG_END
 static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, darkhors_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_snd_r, st0016_snd_w)
-	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
+	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE_LEGACY("stsnd", st0016_snd_r, st0016_snd_w)
+	AM_RANGE(0xec00, 0xec1f) AM_READ_LEGACY(st0016_character_ram_r) AM_WRITE_LEGACY(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, darkhors_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
-	//AM_RANGE(0xc0, 0xc0) AM_READ(cmd1_r)
-	//AM_RANGE(0xc1, 0xc1) AM_READ(cmd2_r)
-	//AM_RANGE(0xc2, 0xc2) AM_READ(cmd_stat8_r)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(st0016_rom_bank_w)
-	AM_RANGE(0xe7, 0xe7) AM_WRITE(st0016_rom_bank_w)
-	//AM_RANGE(0xf0, 0xf0) AM_READ(st0016_dma_r)
+	AM_RANGE(0x00, 0xbf) AM_READ_LEGACY(st0016_vregs_r) AM_WRITE_LEGACY(st0016_vregs_w)
+	//AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(cmd1_r)
+	//AM_RANGE(0xc1, 0xc1) AM_READ_LEGACY(cmd2_r)
+	//AM_RANGE(0xc2, 0xc2) AM_READ_LEGACY(cmd_stat8_r)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
+	AM_RANGE(0xe7, 0xe7) AM_WRITE_LEGACY(st0016_rom_bank_w)
+	//AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(st0016_dma_r)
 ADDRESS_MAP_END
 
 static const st0016_interface st0016_config =

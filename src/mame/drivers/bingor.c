@@ -509,16 +509,16 @@ static READ16_HANDLER( test_r )
 static ADDRESS_MAP_START( bingor_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBIIII_word_w) AM_BASE_GENERIC(paletteram) //wrong
-	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_BASE_MEMBER(bingor_state, m_blit_ram)
+	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBIIII_word_w) AM_BASE_GENERIC(paletteram) //wrong
+	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_BASE( m_blit_ram)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bingor_io, AS_IO, 16, bingor_state )
-//  AM_RANGE(0x0000, 0x00ff) AM_READ( test_r )
-	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
-	AM_RANGE(0x0102, 0x0103) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
-//  AM_RANGE(0x0200, 0x0201) AM_READ( test_r )
+//  AM_RANGE(0x0000, 0x00ff) AM_READ_LEGACY( test_r )
+	AM_RANGE(0x0100, 0x0101) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x0102, 0x0103) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
+//  AM_RANGE(0x0200, 0x0201) AM_READ_LEGACY( test_r )
 ADDRESS_MAP_END
 
 static READ8_HANDLER( test8_r )
@@ -527,7 +527,7 @@ static READ8_HANDLER( test8_r )
 }
 
 static ADDRESS_MAP_START( pic_io_map, AS_IO, 8, bingor_state )
-	AM_RANGE(0x02, 0x02) AM_READ(test8_r)
+	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(test8_r)
 	AM_RANGE(0x10, 0x10) AM_READNOP
 ADDRESS_MAP_END
 

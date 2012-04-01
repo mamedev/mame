@@ -108,19 +108,19 @@ static WRITE8_HANDLER( aquarium_oki_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aquarium_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(aquarium_mid_videoram_w) AM_BASE_MEMBER(aquarium_state, m_mid_videoram)
-	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(aquarium_bak_videoram_w) AM_BASE_MEMBER(aquarium_state, m_bak_videoram)
-	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE(aquarium_txt_videoram_w) AM_BASE_MEMBER(aquarium_state, m_txt_videoram)
-	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE_SIZE_MEMBER(aquarium_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_BASE_MEMBER(aquarium_state, m_scroll)
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE_LEGACY(aquarium_mid_videoram_w) AM_BASE( m_mid_videoram)
+	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE_LEGACY(aquarium_bak_videoram_w) AM_BASE( m_bak_videoram)
+	AM_RANGE(0xc02000, 0xc03fff) AM_RAM_WRITE_LEGACY(aquarium_txt_videoram_w) AM_BASE( m_txt_videoram)
+	AM_RANGE(0xc80000, 0xc81fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd80014, 0xd8001f) AM_WRITEONLY AM_BASE( m_scroll)
 	AM_RANGE(0xd80068, 0xd80069) AM_WRITENOP		/* probably not used */
 	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
 	AM_RANGE(0xd80082, 0xd80083) AM_READNOP	/* stored but not read back ? check code at 0x01f440 */
 	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xd80086, 0xd80087) AM_READ(aquarium_coins_r)
+	AM_RANGE(0xd80086, 0xd80087) AM_READ_LEGACY(aquarium_coins_r)
 	AM_RANGE(0xd80088, 0xd80089) AM_WRITENOP		/* ?? video related */
-	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE(aquarium_sound_w)
+	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE_LEGACY(aquarium_sound_w)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -132,11 +132,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_portmap, AS_IO, 8, aquarium_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(aquarium_oki_r, aquarium_oki_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
-	AM_RANGE(0x06, 0x06) AM_WRITE(aquarium_snd_ack_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(aquarium_z80_bank_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(aquarium_oki_r, aquarium_oki_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(aquarium_snd_ack_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(aquarium_z80_bank_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( aquarium )

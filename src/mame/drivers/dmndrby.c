@@ -118,26 +118,26 @@ static WRITE8_HANDLER( output_w )
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dmndrby_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc000, 0xc007) AM_READ(input_r)
-	AM_RANGE(0xc000, 0xc007) AM_WRITE(output_w)
+	AM_RANGE(0xc000, 0xc007) AM_READ_LEGACY(input_r)
+	AM_RANGE(0xc000, 0xc007) AM_WRITE_LEGACY(output_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("DSW2")
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP//(vblank_irq_w) //???
 	AM_RANGE(0xca01, 0xca01) AM_WRITENOP //watchdog
-	AM_RANGE(0xca02, 0xca02) AM_RAM_WRITE(dderby_sound_w)
+	AM_RANGE(0xca02, 0xca02) AM_RAM_WRITE_LEGACY(dderby_sound_w)
 	AM_RANGE(0xca03, 0xca03) AM_WRITENOP//(timer_irq_w) //???
-	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_BASE_MEMBER(dmndrby_state, m_scroll_ram)
-	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_BASE_MEMBER(dmndrby_state, m_sprite_ram) // horse sprites
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(dmndrby_state, m_dderby_vidchars) // char ram
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(dmndrby_state, m_dderby_vidattribs) // colours/ attrib ram
+	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_BASE( m_scroll_ram)
+	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_BASE( m_sprite_ram) // horse sprites
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE( m_dderby_vidchars) // char ram
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE( m_dderby_vidattribs) // colours/ attrib ram
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dderby_sound_map, AS_PROGRAM, 8, dmndrby_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1000) AM_RAM //???
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
-	AM_RANGE(0x4001, 0x4001) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x4001, 0x4001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 ADDRESS_MAP_END
 

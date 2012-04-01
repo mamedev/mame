@@ -695,19 +695,19 @@ static READ8_HANDLER( horshoes_trackx_hi_r )
 #define COMMON_BANKS_MAP \
 	AM_RANGE(0x0000, 0x5fff) AM_ROM			\
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")			\
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE(bank0_w) \
-	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE(bank1_w) \
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE(bank2_w) \
-	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE(bank3_w) \
-	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)		\
-	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)	\
-	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)			\
-	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)		\
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w)	\
-	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rombankswitch_r, rombankswitch_w)
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE_LEGACY(bank0_w) \
+	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE_LEGACY(bank1_w) \
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE_LEGACY(bank2_w) \
+	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE_LEGACY(bank3_w) \
+	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE_LEGACY(taitol_bankc_r, taitol_bankc_w)		\
+	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE_LEGACY(taitol_control_r, taitol_control_w)	\
+	AM_RANGE(0xff00, 0xff02) AM_READWRITE_LEGACY(irq_adr_r, irq_adr_w)			\
+	AM_RANGE(0xff03, 0xff03) AM_READWRITE_LEGACY(irq_enable_r, irq_enable_w)		\
+	AM_RANGE(0xff04, 0xff07) AM_READWRITE_LEGACY(rambankswitch_r, rambankswitch_w)	\
+	AM_RANGE(0xff08, 0xff08) AM_READWRITE_LEGACY(rombankswitch_r, rombankswitch_w)
 
 #define COMMON_SINGLE_MAP \
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ymsnd", extport_select_and_ym2203_r, ym2203_w)	\
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ymsnd", extport_select_and_ym2203_r, ym2203_w)	\
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 
 
@@ -721,14 +721,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
-	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_port_w)
-	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(rombank2switch_w)
+	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_port_w)
+	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA") AM_WRITENOP	// Direct copy of input port 0
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
 	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")
-	AM_RANGE(0xd004, 0xd004) AM_WRITE(control2_w)
+	AM_RANGE(0xd004, 0xd004) AM_WRITE_LEGACY(control2_w)
 	AM_RANGE(0xd005, 0xd006) AM_WRITENOP	// Always 0
 	AM_RANGE(0xd007, 0xd007) AM_READ_PORT("IN2")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
@@ -738,19 +738,19 @@ static ADDRESS_MAP_START( fhawk_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xe000, 0xe000) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
-	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_port_w)
-	AM_RANGE(0x8c01, 0x8c01) AM_DEVREADWRITE("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE_LEGACY(mux_r, mux_w)
+	AM_RANGE(0x8801, 0x8801) AM_WRITE_LEGACY(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_port_w)
+	AM_RANGE(0x8c01, 0x8c01) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -773,14 +773,14 @@ static ADDRESS_MAP_START( raimais_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xe400, 0xe403) AM_WRITENOP /* pan */
 	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(sound_bankswitch_w)
 ADDRESS_MAP_END
 
 
@@ -798,25 +798,25 @@ static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN0")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("IN1")
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(control2_w)
+	AM_RANGE(0xe004, 0xe004) AM_WRITE_LEGACY(control2_w)
 	AM_RANGE(0xe007, 0xe007) AM_READ_PORT("IN2")
 	AM_RANGE(0xe008, 0xe00f) AM_READNOP
-	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_port_w)
-	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(rombank2switch_r, rombank2switch_w)
+	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_port_w)
+	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE_LEGACY(rombank2switch_r, rombank2switch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( champwr_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank7")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(champwr_msm5205_hi_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(champwr_msm5205_lo_w)
-	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("msm", champwr_msm5205_start_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", champwr_msm5205_stop_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(champwr_msm5205_hi_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(champwr_msm5205_lo_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", champwr_msm5205_start_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", champwr_msm5205_stop_w)
 ADDRESS_MAP_END
 
 
@@ -825,17 +825,17 @@ static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
-	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0xa800, 0xa800) AM_READWRITE_LEGACY(mux_r, mux_w)
+	AM_RANGE(0xa801, 0xa801) AM_WRITE_LEGACY(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 #if 0
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(rombank2switch_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
@@ -851,8 +851,8 @@ static ADDRESS_MAP_START( puzznic_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READNOP	// Watchdog
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM		// Wrong, used to overcome protection
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
-	AM_RANGE(0xb801, 0xb801) AM_READWRITE(mcu_control_r, mcu_control_w)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE_LEGACY(mcu_data_r, mcu_data_w)
+	AM_RANGE(0xb801, 0xb801) AM_READWRITE_LEGACY(mcu_control_r, mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// Control register, function unknown
 ADDRESS_MAP_END
 
@@ -862,9 +862,9 @@ static ADDRESS_MAP_START( puzznici_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READNOP	// Watchdog
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM		// Wrong, used to overcome protection
-//  AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
-	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
-//  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
+//  AM_RANGE(0xb800, 0xb800) AM_READWRITE_LEGACY(mcu_data_r, mcu_data_w)
+	AM_RANGE(0xb801, 0xb801) AM_READ_LEGACY(mcu_control_r)
+//  AM_RANGE(0xb801, 0xb801) AM_WRITE_LEGACY(mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// Control register, function unknown
 ADDRESS_MAP_END
 
@@ -898,21 +898,21 @@ static ADDRESS_MAP_START( cachat_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xa803, 0xa803) AM_WRITENOP	// Control register, function unknown
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// Control register, function unknown
 	AM_RANGE(0xb001, 0xb001) AM_READNOP	// Watchdog or interrupt ack (value ignored)
-	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE(rombankswitch_r, rombankswitch_w)
+	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE_LEGACY(rombankswitch_r, rombankswitch_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READ(horshoes_tracky_lo_r)
-	AM_RANGE(0xa802, 0xa802) AM_READ(horshoes_tracky_reset_r)
-	AM_RANGE(0xa803, 0xa803) AM_READ(horshoes_trackx_reset_r)
-	AM_RANGE(0xa804, 0xa804) AM_READ(horshoes_tracky_hi_r)
-	AM_RANGE(0xa808, 0xa808) AM_READ(horshoes_trackx_lo_r)
-	AM_RANGE(0xa80c, 0xa80c) AM_READ(horshoes_trackx_hi_r)
+	AM_RANGE(0xa800, 0xa800) AM_READ_LEGACY(horshoes_tracky_lo_r)
+	AM_RANGE(0xa802, 0xa802) AM_READ_LEGACY(horshoes_tracky_reset_r)
+	AM_RANGE(0xa803, 0xa803) AM_READ_LEGACY(horshoes_trackx_reset_r)
+	AM_RANGE(0xa804, 0xa804) AM_READ_LEGACY(horshoes_tracky_hi_r)
+	AM_RANGE(0xa808, 0xa808) AM_READ_LEGACY(horshoes_trackx_lo_r)
+	AM_RANGE(0xa80c, 0xa80c) AM_READ_LEGACY(horshoes_trackx_hi_r)
 	AM_RANGE(0xb801, 0xb801) AM_READNOP	// Watchdog or interrupt ack
-	AM_RANGE(0xb802, 0xb802) AM_WRITE(horshoes_bankg_w)
+	AM_RANGE(0xb802, 0xb802) AM_WRITE_LEGACY(horshoes_bankg_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -932,7 +932,7 @@ static ADDRESS_MAP_START( evilston_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank7")
 ADDRESS_MAP_END
 

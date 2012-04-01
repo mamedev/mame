@@ -2248,6 +2248,6 @@ const mb86233_cpu_core model1_vr_tgp_config =
 /* TGP memory map */
 ADDRESS_MAP_START( model1_vr_tgp_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x00000000, 0x000007ff) AM_RAM AM_REGION("tgp", 0)
-	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE(copro_ram_r, copro_ram_w)
+	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE_LEGACY(copro_ram_r, copro_ram_w)
 	AM_RANGE(0xff800000, 0xff87ffff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END

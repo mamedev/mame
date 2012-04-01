@@ -151,22 +151,22 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mainsnk_state )
 	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3")
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc600, 0xc600) AM_WRITE(mainsnk_c600_w)
-	AM_RANGE(0xc700, 0xc700) AM_WRITE(sound_command_w)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(mainsnk_bgram_w) AM_BASE_MEMBER(mainsnk_state, m_bgram)
+	AM_RANGE(0xc600, 0xc600) AM_WRITE_LEGACY(mainsnk_c600_w)
+	AM_RANGE(0xc700, 0xc700) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(mainsnk_bgram_w) AM_BASE( m_bgram)
 	AM_RANGE(0xdc00, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(mainsnk_state, m_spriteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mainsnk_fgram_w) AM_BASE_MEMBER(mainsnk_state, m_fgram)	// + work RAM
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(mainsnk_fgram_w) AM_BASE( m_fgram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mainsnk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(sound_command_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ(sound_ack_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ay1", ay8910_address_data_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(sound_command_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(sound_ack_r)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITENOP	// ? always FFFF, snkwave leftover?
-	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, mainsnk_state )

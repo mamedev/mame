@@ -126,15 +126,15 @@ static WRITE8_HANDLER( lamp_control_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, victory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_READ(victory_video_control_r)
-	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(victory_video_control_w)
-	AM_RANGE(0xc200, 0xc3ff) AM_WRITE(victory_paletteram_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(victory_state, m_videoram)
-	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_BASE_MEMBER(victory_state, m_charram)
+	AM_RANGE(0xc000, 0xc0ff) AM_READ_LEGACY(victory_video_control_r)
+	AM_RANGE(0xc100, 0xc1ff) AM_WRITE_LEGACY(victory_video_control_w)
+	AM_RANGE(0xc200, 0xc3ff) AM_WRITE_LEGACY(victory_paletteram_w)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_BASE( m_charram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fc) AM_DEVREADWRITE("custom", victory_sound_response_r, victory_sound_command_w)
-	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fc) AM_DEVREAD("custom", victory_sound_status_r)
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("custom", victory_sound_response_r, victory_sound_command_w)
+	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fc) AM_DEVREAD_LEGACY("custom", victory_sound_status_r)
 ADDRESS_MAP_END
 
 
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, victory_state )
 	AM_RANGE(0x0a, 0x0a) AM_READ_PORT("COIN")
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("UNUSED")
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_WRITE(lamp_control_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_WRITE_LEGACY(lamp_control_w)
 	AM_RANGE(0x14, 0xff) AM_NOP
 ADDRESS_MAP_END
 

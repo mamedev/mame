@@ -67,11 +67,11 @@ static WRITE8_HANDLER( speedbal_coincounter_w )
 static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0x0000, 0xdbff) AM_ROM
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with SOUND
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE(speedbal_background_videoram_w) AM_BASE_MEMBER(speedbal_state, m_background_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(speedbal_foreground_videoram_w) AM_BASE_MEMBER(speedbal_state, m_foreground_videoram)
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE_LEGACY(speedbal_background_videoram_w) AM_BASE( m_background_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(speedbal_foreground_videoram_w) AM_BASE( m_foreground_videoram)
+	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf600, 0xfeff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xff00, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(speedbal_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xff00, 0xffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( main_cpu_io_map, AS_IO, 8, speedbal_state )
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("P1")
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("P2")
-	AM_RANGE(0x40, 0x40) AM_WRITE(speedbal_coincounter_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(speedbal_coincounter_w)
 	AM_RANGE(0x50, 0x50) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_io_map, AS_IO, 8, speedbal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP
 	AM_RANGE(0x80, 0x80) AM_WRITENOP
 	AM_RANGE(0x82, 0x82) AM_WRITENOP

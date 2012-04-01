@@ -80,13 +80,13 @@ static WRITE16_HANDLER( deniam_irq_ack_w )
 
 static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, m_videoram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, m_textram)
-	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(deniam_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, m_paletteram)
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_w)
-	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
-	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(deniam_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(deniam_textram_w) AM_BASE( m_textram)
+	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x840000, 0x840fff) AM_WRITE_LEGACY(deniam_palette_w) AM_BASE( m_paletteram)
+	AM_RANGE(0xc40000, 0xc40001) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE_LEGACY(deniam_coinctrl_r, deniam_coinctrl_w)
+	AM_RANGE(0xc40004, 0xc40005) AM_WRITE_LEGACY(deniam_irq_ack_w)
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
 	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP
@@ -102,27 +102,27 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, deniam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ymsnd", ym3812_w)
-	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x07, 0x07) AM_DEVWRITE("oki", deniam16b_oki_rom_bank_w)
+	AM_RANGE(0x01, 0x01) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0x05, 0x05) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE_LEGACY("oki", deniam16b_oki_rom_bank_w)
 ADDRESS_MAP_END
 
 /* identical to 16b, but handles sound directly */
 static ADDRESS_MAP_START( deniam16c_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(deniam_videoram_w) AM_BASE_MEMBER(deniam_state, m_videoram)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(deniam_textram_w) AM_BASE_MEMBER(deniam_state, m_textram)
-	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(deniam_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x840000, 0x840fff) AM_WRITE(deniam_palette_w) AM_BASE_MEMBER(deniam_state, m_paletteram)
-	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE(deniam_coinctrl_r, deniam_coinctrl_w)
-	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(deniam_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(deniam_textram_w) AM_BASE( m_textram)
+	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x840000, 0x840fff) AM_WRITE_LEGACY(deniam_palette_w) AM_BASE( m_paletteram)
+	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE_LEGACY(deniam_coinctrl_r, deniam_coinctrl_w)
+	AM_RANGE(0xc40004, 0xc40005) AM_WRITE_LEGACY(deniam_irq_ack_w)
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
 	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP
-	AM_RANGE(0xc44006, 0xc44007) AM_READNOP	AM_DEVWRITE("oki", deniam16c_oki_rom_bank_w) /* read unused? */
-	AM_RANGE(0xc40008, 0xc4000b) AM_DEVWRITE8("ymsnd", ym3812_w, 0xff00)
+	AM_RANGE(0xc44006, 0xc44007) AM_READNOP	AM_DEVWRITE_LEGACY("oki", deniam16c_oki_rom_bank_w) /* read unused? */
+	AM_RANGE(0xc40008, 0xc4000b) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_w, 0xff00)
 	AM_RANGE(0xc4400a, 0xc4400b) AM_READ_PORT("DSW") /* probably YM3812 input port */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

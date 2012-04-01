@@ -198,17 +198,17 @@ static READ32_HANDLER( vblank_r )
 
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, dgpix_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4003ffff) AM_READWRITE(vram_r, vram_w)
-	AM_RANGE(0xe0000000, 0xe1ffffff) AM_READWRITE(flash_r, flash_w)
-	AM_RANGE(0xe2000000, 0xe3ffffff) AM_READWRITE(flash_r, flash_w)
+	AM_RANGE(0x40000000, 0x4003ffff) AM_READWRITE_LEGACY(vram_r, vram_w)
+	AM_RANGE(0xe0000000, 0xe1ffffff) AM_READWRITE_LEGACY(flash_r, flash_w)
+	AM_RANGE(0xe2000000, 0xe3ffffff) AM_READWRITE_LEGACY(flash_r, flash_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1", 0x1c00000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 32, dgpix_state )
 	AM_RANGE(0x0200, 0x0203) AM_READNOP // used to sync with the protecion PIC? tested bits 0 and 1
-	AM_RANGE(0x0400, 0x0403) AM_READWRITE(vblank_r, vbuffer_w)
+	AM_RANGE(0x0400, 0x0403) AM_READWRITE_LEGACY(vblank_r, vbuffer_w)
 	AM_RANGE(0x0a10, 0x0a13) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x0200, 0x0203) AM_WRITE(coin_w)
+	AM_RANGE(0x0200, 0x0203) AM_WRITE_LEGACY(coin_w)
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITENOP // writes only: 1, 0, 1 at startup
 	AM_RANGE(0x0c80, 0x0c83) AM_WRITENOP // sound commands / latches
 	AM_RANGE(0x0c80, 0x0c83) AM_READNOP //read at startup -> cmp 0xFE

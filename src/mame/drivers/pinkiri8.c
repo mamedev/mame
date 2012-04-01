@@ -59,19 +59,19 @@ public:
 
 static ADDRESS_MAP_START( janshi_vdp_map8, AS_0, 8, pinkiri8_state )
 
-	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_BASE_MEMBER(pinkiri8_state, m_janshi_back_vram) // bg tilemap?
-	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_BASE_MEMBER(pinkiri8_state, m_janshi_vram1) // xpos, colour, tile number etc.
+	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_BASE( m_janshi_back_vram) // bg tilemap?
+	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_BASE( m_janshi_vram1) // xpos, colour, tile number etc.
 
-	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_BASE_MEMBER(pinkiri8_state, m_janshi_unk1) // ?? height related?
-	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_BASE_MEMBER(pinkiri8_state, m_janshi_widthflags)
-	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_BASE_MEMBER(pinkiri8_state, m_janshi_unk2) // 2x increasing tables 00 10 20 30 etc.
+	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_BASE( m_janshi_unk1) // ?? height related?
+	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_BASE( m_janshi_widthflags)
+	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_BASE( m_janshi_unk2) // 2x increasing tables 00 10 20 30 etc.
 
-	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_BASE_MEMBER(pinkiri8_state, m_janshi_vram2) // y pos + unknown
+	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_BASE( m_janshi_vram2) // y pos + unknown
 
-	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xff2000, 0xff27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xff2000, 0xff27ff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 
-	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_BASE_MEMBER(pinkiri8_state, m_janshi_crtc_regs)
+	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_BASE( m_janshi_crtc_regs)
 ADDRESS_MAP_END
 
 
@@ -465,13 +465,13 @@ static READ8_HANDLER( mux_p1_r )
 static ADDRESS_MAP_START( pinkiri8_io, AS_IO, 8, pinkiri8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_RAM //Z180 internal I/O
-	AM_RANGE(0x60, 0x60) AM_WRITE(output_regs_w)
-	AM_RANGE(0x80, 0x83) AM_WRITE(pinkiri8_vram_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(output_regs_w)
+	AM_RANGE(0x80, 0x83) AM_WRITE_LEGACY(pinkiri8_vram_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write) //correct?
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(mux_w) //mux
-	AM_RANGE(0xb0, 0xb0) AM_READ(mux_p2_r) // mux inputs
-	AM_RANGE(0xb1, 0xb1) AM_READ(mux_p1_r) // mux inputs
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("oki", okim6295_device, read, write) //correct?
+	AM_RANGE(0xb0, 0xb0) AM_WRITE_LEGACY(mux_w) //mux
+	AM_RANGE(0xb0, 0xb0) AM_READ_LEGACY(mux_p2_r) // mux inputs
+	AM_RANGE(0xb1, 0xb1) AM_READ_LEGACY(mux_p1_r) // mux inputs
 	AM_RANGE(0xb2, 0xb2) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("DSW2")

@@ -95,27 +95,27 @@ static WRITE8_HANDLER(pitnrun_vflip_w)
 static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(pitnrun_videoram_w) AM_BASE_MEMBER(pitnrun_state, m_videoram)
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(pitnrun_videoram2_w) AM_BASE_MEMBER(pitnrun_state, m_videoram2)
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE_MEMBER(pitnrun_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(pitnrun_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE_LEGACY(pitnrun_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa800, 0xa807) AM_WRITENOP /* Analog Sound */
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(pitnrun_color_select_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(nmi_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(pitnrun_color_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_WRITENOP/* COLOR SEL 2 - not used ?*/
-	AM_RANGE(0xb005, 0xb005) AM_WRITE(pitnrun_char_bank_select)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE(pitnrun_hflip_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE(pitnrun_vflip_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc800, 0xc801) AM_WRITE(pitnrun_scroll_w)
+	AM_RANGE(0xb005, 0xb005) AM_WRITE_LEGACY(pitnrun_char_bank_select)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(pitnrun_hflip_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(pitnrun_vflip_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc800, 0xc801) AM_WRITE_LEGACY(pitnrun_scroll_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITENOP/* VP(VF?)MCV - not used ?*/
-	AM_RANGE(0xc804, 0xc804) AM_WRITE(pitnrun_mcu_data_w)
-	AM_RANGE(0xc805, 0xc805) AM_WRITE(pitnrun_h_heed_w)
-	AM_RANGE(0xc806, 0xc806) AM_WRITE(pitnrun_v_heed_w)
-	AM_RANGE(0xc807, 0xc807) AM_WRITE(pitnrun_ha_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ(pitnrun_mcu_status_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ(pitnrun_mcu_data_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(pitnrun_mcu_data_w)
+	AM_RANGE(0xc805, 0xc805) AM_WRITE_LEGACY(pitnrun_h_heed_w)
+	AM_RANGE(0xc806, 0xc806) AM_WRITE_LEGACY(pitnrun_v_heed_w)
+	AM_RANGE(0xc807, 0xc807) AM_WRITE_LEGACY(pitnrun_ha_w)
+	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(pitnrun_mcu_status_r)
+	AM_RANGE(0xd000, 0xd000) AM_READ_LEGACY(pitnrun_mcu_data_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ_LEGACY(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pitnrun_sound_map, AS_PROGRAM, 8, pitnrun_state )
@@ -125,10 +125,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pitnrun_sound_io_map, AS_IO, 8, pitnrun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8f, 0x8f) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(soundlatch_clear_w)
+	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x8f, 0x8f) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x90, 0x96) AM_WRITENOP
 	AM_RANGE(0x97, 0x97) AM_WRITENOP
 	AM_RANGE(0x98, 0x98) AM_WRITENOP
@@ -136,9 +136,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pitnrun_mcu_map, AS_PROGRAM, 8, pitnrun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(pitnrun_68705_portA_r,pitnrun_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(pitnrun_68705_portB_r,pitnrun_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ(pitnrun_68705_portC_r)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(pitnrun_68705_portA_r,pitnrun_68705_portA_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(pitnrun_68705_portB_r,pitnrun_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READ_LEGACY(pitnrun_68705_portC_r)
 	AM_RANGE(0x0003, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

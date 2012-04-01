@@ -1725,35 +1725,35 @@ static WRITE16_HANDLER( quiz365_protection_w )
 static ADDRESS_MAP_START( quiz365_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM													// ROM
 
-	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)							// Palette
+	AM_RANGE(0x200000, 0x2003ff) AM_WRITE_LEGACY(ddenlovr_palette_w)							// Palette
 
-	AM_RANGE(0x200c02, 0x200c03) AM_READ(quiz365_protection_r)							// Protection
-	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITE(quiz365_protection_w)							// Protection
+	AM_RANGE(0x200c02, 0x200c03) AM_READ_LEGACY(quiz365_protection_r)							// Protection
+	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITE_LEGACY(quiz365_protection_w)							// Protection
 //  AM_RANGE(0x201000, 0x2017ff) AM_WRITEONLY                                      // ?
 
-	AM_RANGE(0x300200, 0x300201) AM_WRITE(ddenlovr_select2_16_w)
-	AM_RANGE(0x300202, 0x300203) AM_WRITE(quiz365_coincounter_w)						// Coin Counters + more stuff written on startup
-	AM_RANGE(0x300204, 0x300207) AM_READ(quiz365_input2_r)								//
+	AM_RANGE(0x300200, 0x300201) AM_WRITE_LEGACY(ddenlovr_select2_16_w)
+	AM_RANGE(0x300202, 0x300203) AM_WRITE_LEGACY(quiz365_coincounter_w)						// Coin Counters + more stuff written on startup
+	AM_RANGE(0x300204, 0x300207) AM_READ_LEGACY(quiz365_input2_r)								//
 
-	AM_RANGE(0x300240, 0x300247) AM_WRITE(ddenlovr16_palette_base_w)
-	AM_RANGE(0x300248, 0x30024f) AM_WRITE(ddenlovr16_palette_mask_w)
-	AM_RANGE(0x300250, 0x300257) AM_WRITE(ddenlovr16_transparency_pen_w)
-	AM_RANGE(0x300258, 0x30025f) AM_WRITE(ddenlovr16_transparency_mask_w)
-	AM_RANGE(0x300268, 0x300269) AM_WRITE(ddenlovr16_bgcolor_w)
-	AM_RANGE(0x30026a, 0x30026b) AM_WRITE(ddenlovr16_priority_w)
-	AM_RANGE(0x30026c, 0x30026d) AM_WRITE(ddenlovr16_layer_enable_w)
-	AM_RANGE(0x300270, 0x300271) AM_READ(unk16_r)										// ? must be 78 on startup (not necessary in ddlover)
-	AM_RANGE(0x300280, 0x300283) AM_WRITE(ddenlovr_blitter_w)
-	AM_RANGE(0x300286, 0x300287) AM_READ(ddenlovr_gfxrom_r)								// Video Chip
+	AM_RANGE(0x300240, 0x300247) AM_WRITE_LEGACY(ddenlovr16_palette_base_w)
+	AM_RANGE(0x300248, 0x30024f) AM_WRITE_LEGACY(ddenlovr16_palette_mask_w)
+	AM_RANGE(0x300250, 0x300257) AM_WRITE_LEGACY(ddenlovr16_transparency_pen_w)
+	AM_RANGE(0x300258, 0x30025f) AM_WRITE_LEGACY(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0x300268, 0x300269) AM_WRITE_LEGACY(ddenlovr16_bgcolor_w)
+	AM_RANGE(0x30026a, 0x30026b) AM_WRITE_LEGACY(ddenlovr16_priority_w)
+	AM_RANGE(0x30026c, 0x30026d) AM_WRITE_LEGACY(ddenlovr16_layer_enable_w)
+	AM_RANGE(0x300270, 0x300271) AM_READ_LEGACY(unk16_r)										// ? must be 78 on startup (not necessary in ddlover)
+	AM_RANGE(0x300280, 0x300283) AM_WRITE_LEGACY(ddenlovr_blitter_w)
+	AM_RANGE(0x300286, 0x300287) AM_READ_LEGACY(ddenlovr_gfxrom_r)								// Video Chip
 
-	AM_RANGE(0x3002c0, 0x3002c1) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)// Sound
-	AM_RANGE(0x300300, 0x300303) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0x300340, 0x30035f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0x300380, 0x300383) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x300384, 0x300385) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
-	AM_RANGE(0x3003c2, 0x3003c3) AM_DEVWRITE("oki", quiz365_oki_bank1_w)
-	AM_RANGE(0x3003ca, 0x3003cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)					// Blitter irq acknowledge
-	AM_RANGE(0x3003cc, 0x3003cd) AM_DEVWRITE("oki", quiz365_oki_bank2_w)
+	AM_RANGE(0x3002c0, 0x3002c1) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)// Sound
+	AM_RANGE(0x300300, 0x300303) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
+	AM_RANGE(0x300340, 0x30035f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
+	AM_RANGE(0x300380, 0x300383) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x300384, 0x300385) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0x3003c2, 0x3003c3) AM_DEVWRITE_LEGACY("oki", quiz365_oki_bank1_w)
+	AM_RANGE(0x3003ca, 0x3003cb) AM_WRITE_LEGACY(ddenlovr_blitter_irq_ack_w)					// Blitter irq acknowledge
+	AM_RANGE(0x3003cc, 0x3003cd) AM_DEVWRITE_LEGACY("oki", quiz365_oki_bank2_w)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM													// RAM
 ADDRESS_MAP_END
@@ -1788,31 +1788,31 @@ static CUSTOM_INPUT( ddenlovj_blitter_r )
 static ADDRESS_MAP_START( ddenlovj_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM // ROM
 
-	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)							// Palette
+	AM_RANGE(0x200000, 0x2003ff) AM_WRITE_LEGACY(ddenlovr_palette_w)							// Palette
 //  AM_RANGE(0x201000, 0x2017ff) AM_WRITEONLY                                      // ? B0 on startup, then 00
 
-	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr16_palette_base_w)
-	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr16_palette_mask_w)
-	AM_RANGE(0x300050, 0x300057) AM_WRITE(ddenlovr16_transparency_pen_w)
-	AM_RANGE(0x300058, 0x30005f) AM_WRITE(ddenlovr16_transparency_mask_w)
-	AM_RANGE(0x300068, 0x300069) AM_WRITE(ddenlovr16_bgcolor_w)
-	AM_RANGE(0x30006a, 0x30006b) AM_WRITE(ddenlovr16_priority_w)
-	AM_RANGE(0x30006c, 0x30006d) AM_WRITE(ddenlovr16_layer_enable_w)
-	AM_RANGE(0x300070, 0x300071) AM_READ(unk16_r)										// ? must be 78 on startup (not necessary in ddlover)
-	AM_RANGE(0x300080, 0x300083) AM_WRITE(ddenlovr_blitter_w)
-	AM_RANGE(0x300086, 0x300087) AM_READ(ddenlovr_gfxrom_r)								// Video Chip
-	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0x300100, 0x30011f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x300040, 0x300047) AM_WRITE_LEGACY(ddenlovr16_palette_base_w)
+	AM_RANGE(0x300048, 0x30004f) AM_WRITE_LEGACY(ddenlovr16_palette_mask_w)
+	AM_RANGE(0x300050, 0x300057) AM_WRITE_LEGACY(ddenlovr16_transparency_pen_w)
+	AM_RANGE(0x300058, 0x30005f) AM_WRITE_LEGACY(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0x300068, 0x300069) AM_WRITE_LEGACY(ddenlovr16_bgcolor_w)
+	AM_RANGE(0x30006a, 0x30006b) AM_WRITE_LEGACY(ddenlovr16_priority_w)
+	AM_RANGE(0x30006c, 0x30006d) AM_WRITE_LEGACY(ddenlovr16_layer_enable_w)
+	AM_RANGE(0x300070, 0x300071) AM_READ_LEGACY(unk16_r)										// ? must be 78 on startup (not necessary in ddlover)
+	AM_RANGE(0x300080, 0x300083) AM_WRITE_LEGACY(ddenlovr_blitter_w)
+	AM_RANGE(0x300086, 0x300087) AM_READ_LEGACY(ddenlovr_gfxrom_r)								// Video Chip
+	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
+	AM_RANGE(0x300100, 0x30011f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
+	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x300180, 0x300181) AM_READ_PORT("P1")
 	AM_RANGE(0x300182, 0x300183) AM_READ_PORT("P2")
 	AM_RANGE(0x300184, 0x300185) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x300186, 0x300187) AM_READ(ddenlovj_dsw_r)								// DSW
-	AM_RANGE(0x300188, 0x300189) AM_WRITE(ddenlovj_coincounter_w)						// Coin Counters
-	AM_RANGE(0x30018a, 0x30018b) AM_WRITEONLY AM_BASE_MEMBER(dynax_state, m_dsw_sel16)			// DSW select
-	AM_RANGE(0x30018c, 0x30018d) AM_DEVWRITE("oki", ddenlovr_oki_bank_w)
-	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)					// Blitter irq acknowledge
-	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)// Sound
+	AM_RANGE(0x300186, 0x300187) AM_READ_LEGACY(ddenlovj_dsw_r)								// DSW
+	AM_RANGE(0x300188, 0x300189) AM_WRITE_LEGACY(ddenlovj_coincounter_w)						// Coin Counters
+	AM_RANGE(0x30018a, 0x30018b) AM_WRITEONLY AM_BASE( m_dsw_sel16)			// DSW select
+	AM_RANGE(0x30018c, 0x30018d) AM_DEVWRITE_LEGACY("oki", ddenlovr_oki_bank_w)
+	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE_LEGACY(ddenlovr_blitter_irq_ack_w)					// Blitter irq acknowledge
+	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)// Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM													// RAM
 ADDRESS_MAP_END
 
@@ -1847,36 +1847,36 @@ static WRITE16_HANDLER( ddenlovrk_protection2_w )
 static ADDRESS_MAP_START( ddenlovrk_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM														// ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_RAM_READ(ddenlovrk_protection1_r) AM_BASE_MEMBER(dynax_state, m_protection1)
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE(ddenlovrk_protection2_r, ddenlovrk_protection2_w) AM_BASE_MEMBER(dynax_state, m_protection2)
+	AM_RANGE(0x100000, 0x100001) AM_RAM_READ_LEGACY(ddenlovrk_protection1_r) AM_BASE( m_protection1)
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE_LEGACY(ddenlovrk_protection2_r, ddenlovrk_protection2_w) AM_BASE( m_protection2)
 
-	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
+	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE_LEGACY(ddenlovr_palette_w)								// Palette
 //  AM_RANGE(0xd01000, 0xd017ff) AM_RAM                                                    // ? B0 on startup, then 00
 
-	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
-	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
-	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr16_transparency_pen_w)
-	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE(ddenlovr16_transparency_mask_w)
-	AM_RANGE(0xe00068, 0xe00069) AM_WRITE(ddenlovr16_bgcolor_w)
-	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE(ddenlovr16_priority_w)
-	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE(ddenlovr16_layer_enable_w)
+	AM_RANGE(0xe00040, 0xe00047) AM_WRITE_LEGACY(ddenlovr16_palette_base_w)
+	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE_LEGACY(ddenlovr16_palette_mask_w)
+	AM_RANGE(0xe00050, 0xe00057) AM_WRITE_LEGACY(ddenlovr16_transparency_pen_w)
+	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE_LEGACY(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0xe00068, 0xe00069) AM_WRITE_LEGACY(ddenlovr16_bgcolor_w)
+	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE_LEGACY(ddenlovr16_priority_w)
+	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE_LEGACY(ddenlovr16_layer_enable_w)
 	AM_RANGE(0xe00070, 0xe00071) AM_READNOP
-	AM_RANGE(0xe00080, 0xe00083) AM_WRITE(ddenlovr_blitter_w)
-	AM_RANGE(0xe00086, 0xe00087) AM_READ(ddenlovr_gfxrom_r)									// Video Chip
+	AM_RANGE(0xe00080, 0xe00083) AM_WRITE_LEGACY(ddenlovr_blitter_w)
+	AM_RANGE(0xe00086, 0xe00087) AM_READ_LEGACY(ddenlovr_gfxrom_r)									// Video Chip
 
 	AM_RANGE(0xe00100, 0xe00101) AM_READ_PORT("P1")
 	AM_RANGE(0xe00102, 0xe00103) AM_READ_PORT("P2")
 	AM_RANGE(0xe00104, 0xe00105) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe00200, 0xe00201) AM_READ_PORT("DSW")
-	AM_RANGE(0xe00302, 0xe00303) AM_WRITE(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
-	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)							// Coin Counters
-	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)							//
+	AM_RANGE(0xe00302, 0xe00303) AM_WRITE_LEGACY(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
+	AM_RANGE(0xe00308, 0xe00309) AM_WRITE_LEGACY(ddenlovr_coincounter_0_w)							// Coin Counters
+	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE_LEGACY(ddenlovr_coincounter_1_w)							//
 
-	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
-	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)	// Sound
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
+	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	// Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
@@ -1886,35 +1886,35 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ddenlovr_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM														// ROM
 
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE("oki", ddenlovr_oki_bank_w)
+	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE_LEGACY("oki", ddenlovr_oki_bank_w)
 
-	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
+	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE_LEGACY(ddenlovr_palette_w)								// Palette
 //  AM_RANGE(0xd01000, 0xd017ff) AM_RAM                                                   // ? B0 on startup, then 00
 
-	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
-	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
-	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr16_transparency_pen_w)
-	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE(ddenlovr16_transparency_mask_w)
-	AM_RANGE(0xe00068, 0xe00069) AM_WRITE(ddenlovr16_bgcolor_w)
-	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE(ddenlovr16_priority_w)
-	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE(ddenlovr16_layer_enable_w)
-	AM_RANGE(0xe00070, 0xe00071) AM_READ(unk16_r)											// ? must be 78 on startup (not necessary in ddlover)
-	AM_RANGE(0xe00080, 0xe00083) AM_WRITE(ddenlovr_blitter_w)
-	AM_RANGE(0xe00086, 0xe00087) AM_READ(ddenlovr_gfxrom_r)									// Video Chip
+	AM_RANGE(0xe00040, 0xe00047) AM_WRITE_LEGACY(ddenlovr16_palette_base_w)
+	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE_LEGACY(ddenlovr16_palette_mask_w)
+	AM_RANGE(0xe00050, 0xe00057) AM_WRITE_LEGACY(ddenlovr16_transparency_pen_w)
+	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE_LEGACY(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0xe00068, 0xe00069) AM_WRITE_LEGACY(ddenlovr16_bgcolor_w)
+	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE_LEGACY(ddenlovr16_priority_w)
+	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE_LEGACY(ddenlovr16_layer_enable_w)
+	AM_RANGE(0xe00070, 0xe00071) AM_READ_LEGACY(unk16_r)											// ? must be 78 on startup (not necessary in ddlover)
+	AM_RANGE(0xe00080, 0xe00083) AM_WRITE_LEGACY(ddenlovr_blitter_w)
+	AM_RANGE(0xe00086, 0xe00087) AM_READ_LEGACY(ddenlovr_gfxrom_r)									// Video Chip
 
 	AM_RANGE(0xe00100, 0xe00101) AM_READ_PORT("P1")
 	AM_RANGE(0xe00102, 0xe00103) AM_READ_PORT("P2")
 	AM_RANGE(0xe00104, 0xe00105) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe00200, 0xe00201) AM_READ_PORT("DSW")
-	AM_RANGE(0xe00302, 0xe00303) AM_WRITE(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
-	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)							// Coin Counters
-	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)							//
+	AM_RANGE(0xe00302, 0xe00303) AM_WRITE_LEGACY(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
+	AM_RANGE(0xe00308, 0xe00309) AM_WRITE_LEGACY(ddenlovr_coincounter_0_w)							// Coin Counters
+	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE_LEGACY(ddenlovr_coincounter_1_w)							//
 
-	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
-	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)	// Sound
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
+	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	// Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
@@ -1975,33 +1975,33 @@ static WRITE16_DEVICE_HANDLER( nettoqc_oki_bank_w )
 static ADDRESS_MAP_START( nettoqc_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM														// ROM
 
-	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
-	AM_RANGE(0x200c02, 0x200c03) AM_READ(nettoqc_protection_r)								//
-	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITEONLY AM_BASE_MEMBER(dynax_state, m_protection1)			//
+	AM_RANGE(0x200000, 0x2003ff) AM_WRITE_LEGACY(ddenlovr_palette_w)								// Palette
+	AM_RANGE(0x200c02, 0x200c03) AM_READ_LEGACY(nettoqc_protection_r)								//
+	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITEONLY AM_BASE( m_protection1)			//
 	AM_RANGE(0x201000, 0x2017ff) AM_WRITEONLY											// ?
 
-	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr16_palette_base_w)
-	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr16_palette_mask_w)
-	AM_RANGE(0x300050, 0x300057) AM_WRITE(ddenlovr16_transparency_pen_w)
-	AM_RANGE(0x300058, 0x30005f) AM_WRITE(ddenlovr16_transparency_mask_w)
-	AM_RANGE(0x300068, 0x300069) AM_WRITE(ddenlovr16_bgcolor_w)
-	AM_RANGE(0x30006a, 0x30006b) AM_WRITE(ddenlovr16_priority_w)
-	AM_RANGE(0x30006c, 0x30006d) AM_WRITE(ddenlovr16_layer_enable_w)
-	AM_RANGE(0x300070, 0x300071) AM_READ(unk16_r)											// ? must be 78 on startup (not necessary in ddlover)
-	AM_RANGE(0x300080, 0x300083) AM_WRITE(ddenlovr_blitter_w)
-	AM_RANGE(0x300086, 0x300087) AM_READ(ddenlovr_gfxrom_r)									// Video Chip
-	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0x300100, 0x30011f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write,0x00ff)
-	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x300040, 0x300047) AM_WRITE_LEGACY(ddenlovr16_palette_base_w)
+	AM_RANGE(0x300048, 0x30004f) AM_WRITE_LEGACY(ddenlovr16_palette_mask_w)
+	AM_RANGE(0x300050, 0x300057) AM_WRITE_LEGACY(ddenlovr16_transparency_pen_w)
+	AM_RANGE(0x300058, 0x30005f) AM_WRITE_LEGACY(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0x300068, 0x300069) AM_WRITE_LEGACY(ddenlovr16_bgcolor_w)
+	AM_RANGE(0x30006a, 0x30006b) AM_WRITE_LEGACY(ddenlovr16_priority_w)
+	AM_RANGE(0x30006c, 0x30006d) AM_WRITE_LEGACY(ddenlovr16_layer_enable_w)
+	AM_RANGE(0x300070, 0x300071) AM_READ_LEGACY(unk16_r)											// ? must be 78 on startup (not necessary in ddlover)
+	AM_RANGE(0x300080, 0x300083) AM_WRITE_LEGACY(ddenlovr_blitter_w)
+	AM_RANGE(0x300086, 0x300087) AM_READ_LEGACY(ddenlovr_gfxrom_r)									// Video Chip
+	AM_RANGE(0x3000c0, 0x3000c3) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
+	AM_RANGE(0x300100, 0x30011f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write,0x00ff)
+	AM_RANGE(0x300140, 0x300143) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x300180, 0x300181) AM_READ_PORT("P1")
 	AM_RANGE(0x300182, 0x300183) AM_READ_PORT("P2")
 	AM_RANGE(0x300184, 0x300185) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x300186, 0x300187) AM_READ(nettoqc_input_r)									// DSW's
-	AM_RANGE(0x300188, 0x300189) AM_WRITE(nettoqc_coincounter_w)							// Coin Counters
-	AM_RANGE(0x30018a, 0x30018b) AM_WRITE(ddenlovr_select_16_w)								//
-	AM_RANGE(0x30018c, 0x30018d) AM_DEVWRITE("oki", nettoqc_oki_bank_w)
-	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
-	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)	// Sound
+	AM_RANGE(0x300186, 0x300187) AM_READ_LEGACY(nettoqc_input_r)									// DSW's
+	AM_RANGE(0x300188, 0x300189) AM_WRITE_LEGACY(nettoqc_coincounter_w)							// Coin Counters
+	AM_RANGE(0x30018a, 0x30018b) AM_WRITE_LEGACY(ddenlovr_select_16_w)								//
+	AM_RANGE(0x30018c, 0x30018d) AM_DEVWRITE_LEGACY("oki", nettoqc_oki_bank_w)
+	AM_RANGE(0x3001ca, 0x3001cb) AM_WRITE_LEGACY(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
+	AM_RANGE(0x300240, 0x300241) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	// Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
@@ -2041,34 +2041,34 @@ static ADDRESS_MAP_START( quizchq_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM											// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM											// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")									// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(rongrong_palette_w)		// ROM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(rongrong_palette_w)		// ROM (Banked)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizchq_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(rongrong_blitter_w)
-	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x1b, 0x1b) AM_READWRITE(rongrong_blitter_busy_r, rongrong_blitter_busy_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(rongrong_blitter_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(rongrong_gfxrom_r)
+	AM_RANGE(0x1b, 0x1b) AM_READWRITE_LEGACY(rongrong_blitter_busy_r, rongrong_blitter_busy_w)
 
-	AM_RANGE(0x1c, 0x1c) AM_READ(rongrong_input_r)
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(rongrong_select_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(ddenlovr_select2_w)
-	AM_RANGE(0x22, 0x23) AM_READ(rongrong_input2_r)
+	AM_RANGE(0x1c, 0x1c) AM_READ_LEGACY(rongrong_input_r)
+	AM_RANGE(0x1e, 0x1e) AM_WRITE_LEGACY(rongrong_select_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(ddenlovr_select2_w)
+	AM_RANGE(0x22, 0x23) AM_READ_LEGACY(rongrong_input2_r)
 
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x60, 0x61) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 
-	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0x88, 0x8b) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0x8c, 0x8f) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0x95, 0x95) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0x96, 0x96) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE(0x98, 0x98) AM_READ(unk_r)							// ? must be 78 on startup
+	AM_RANGE(0x80, 0x83) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0x84, 0x87) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0x88, 0x8b) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0x94, 0x94) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0x95, 0x95) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0x96, 0x96) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE(0x98, 0x98) AM_READ_LEGACY(unk_r)							// ? must be 78 on startup
 
-	AM_RANGE(0xa0, 0xaf) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("oki", quizchq_oki_bank_w)
+	AM_RANGE(0xa0, 0xaf) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE_LEGACY("oki", quizchq_oki_bank_w)
 	AM_RANGE(0xc2, 0xc2) AM_WRITENOP						// enables palette RAM at 8000
 ADDRESS_MAP_END
 
@@ -2078,33 +2078,33 @@ static ADDRESS_MAP_START( rongrong_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM											// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM											// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")									// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(rongrong_palette_w)		// ROM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(rongrong_palette_w)		// ROM (Banked)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rongrong_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(rongrong_blitter_w)
-	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x1b, 0x1b) AM_READWRITE(rongrong_blitter_busy_r, rongrong_blitter_busy_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(rongrong_blitter_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(rongrong_gfxrom_r)
+	AM_RANGE(0x1b, 0x1b) AM_READWRITE_LEGACY(rongrong_blitter_busy_r, rongrong_blitter_busy_w)
 
-	AM_RANGE(0x1c, 0x1c) AM_READ(rongrong_input_r)
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(rongrong_select_w)
+	AM_RANGE(0x1c, 0x1c) AM_READ_LEGACY(rongrong_input_r)
+	AM_RANGE(0x1e, 0x1e) AM_WRITE_LEGACY(rongrong_select_w)
 
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x60, 0x61) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 
-	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0x88, 0x8b) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0x8c, 0x8f) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0x95, 0x95) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0x96, 0x96) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE(0x98, 0x98) AM_READ(unk_r)									// ? must be 78 on startup
+	AM_RANGE(0x80, 0x83) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0x84, 0x87) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0x88, 0x8b) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0x94, 0x94) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0x95, 0x95) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0x96, 0x96) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE(0x98, 0x98) AM_READ_LEGACY(unk_r)									// ? must be 78 on startup
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(ddenlovr_select2_w)
-	AM_RANGE(0xa2, 0xa3) AM_READ(rongrong_input2_r)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE_LEGACY(ddenlovr_select2_w)
+	AM_RANGE(0xa2, 0xa3) AM_READ_LEGACY(rongrong_input2_r)
 	AM_RANGE(0xc2, 0xc2) AM_WRITENOP									// enables palette RAM at f000, and protection device at f705/f706/f601
 ADDRESS_MAP_END
 /*
@@ -2187,55 +2187,55 @@ static READ8_HANDLER( mmpanic_link_r )	{ return 0xff; }
 /* Main CPU */
 
 static ADDRESS_MAP_START( mmpanic_map, AS_PROGRAM, 8, dynax_state )
-	AM_RANGE(0x0051, 0x0051) AM_READ(magic_r)								// ?
+	AM_RANGE(0x0051, 0x0051) AM_READ_LEGACY(magic_r)								// ?
 	AM_RANGE(0x0000, 0x5fff) AM_ROM											// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM											// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")									// RAM (Banked)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(rongrong_palette_w)		// ROM (Banked)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(rongrong_palette_w)		// ROM (Banked)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmpanic_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
+	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 
 	// Layers 0-3:
-	AM_RANGE(0x20, 0x23) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0x24, 0x27) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0x28, 0x2b) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0x2c, 0x2f) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0x34, 0x34) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0x35, 0x35) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0x36, 0x36) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE(0x38, 0x38) AM_READ(unk_r)				// ? must be 78 on startup
+	AM_RANGE(0x20, 0x23) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0x24, 0x27) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0x28, 0x2b) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0x2c, 0x2f) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0x34, 0x34) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0x35, 0x35) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0x36, 0x36) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE(0x38, 0x38) AM_READ_LEGACY(unk_r)				// ? must be 78 on startup
 
 	// Layers 4-7:
-	AM_RANGE(0x40, 0x43) AM_WRITE(ddenlovr_palette_base2_w)
-	AM_RANGE(0x44, 0x47) AM_WRITE(ddenlovr_palette_mask2_w)
-	AM_RANGE(0x48, 0x4b) AM_WRITE(ddenlovr_transparency_pen2_w)
-	AM_RANGE(0x4c, 0x4f) AM_WRITE(ddenlovr_transparency_mask2_w)
-	AM_RANGE(0x54, 0x54) AM_WRITE(ddenlovr_bgcolor2_w)
-	AM_RANGE(0x55, 0x55) AM_WRITE(ddenlovr_priority2_w)
-	AM_RANGE(0x56, 0x56) AM_WRITE(ddenlovr_layer_enable2_w)
-	AM_RANGE(0x58, 0x58) AM_READ(unk_r)				// ? must be 78 on startup
+	AM_RANGE(0x40, 0x43) AM_WRITE_LEGACY(ddenlovr_palette_base2_w)
+	AM_RANGE(0x44, 0x47) AM_WRITE_LEGACY(ddenlovr_palette_mask2_w)
+	AM_RANGE(0x48, 0x4b) AM_WRITE_LEGACY(ddenlovr_transparency_pen2_w)
+	AM_RANGE(0x4c, 0x4f) AM_WRITE_LEGACY(ddenlovr_transparency_mask2_w)
+	AM_RANGE(0x54, 0x54) AM_WRITE_LEGACY(ddenlovr_bgcolor2_w)
+	AM_RANGE(0x55, 0x55) AM_WRITE_LEGACY(ddenlovr_priority2_w)
+	AM_RANGE(0x56, 0x56) AM_WRITE_LEGACY(ddenlovr_layer_enable2_w)
+	AM_RANGE(0x58, 0x58) AM_READ_LEGACY(unk_r)				// ? must be 78 on startup
 
-	AM_RANGE(0x60, 0x61) AM_WRITE(mmpanic_blitter_w)
-	AM_RANGE(0x63, 0x63) AM_READ(rongrong_gfxrom_r)	// Video Chip
-	AM_RANGE(0x64, 0x65) AM_WRITE(mmpanic_blitter2_w)
-	AM_RANGE(0x68, 0x68) AM_DEVWRITE("aysnd", ddenlovr_select_w)
-	AM_RANGE(0x69, 0x69) AM_WRITE(mmpanic_lockout_w)
+	AM_RANGE(0x60, 0x61) AM_WRITE_LEGACY(mmpanic_blitter_w)
+	AM_RANGE(0x63, 0x63) AM_READ_LEGACY(rongrong_gfxrom_r)	// Video Chip
+	AM_RANGE(0x64, 0x65) AM_WRITE_LEGACY(mmpanic_blitter2_w)
+	AM_RANGE(0x68, 0x68) AM_DEVWRITE_LEGACY("aysnd", ddenlovr_select_w)
+	AM_RANGE(0x69, 0x69) AM_WRITE_LEGACY(mmpanic_lockout_w)
 	AM_RANGE(0x6a, 0x6a) AM_READ_PORT("IN0")
 	AM_RANGE(0x6b, 0x6b) AM_READ_PORT("IN1")
-	AM_RANGE(0x6c, 0x6d) AM_READ(mmpanic_link_r)	// Other cabinets?
-	AM_RANGE(0x74, 0x74) AM_WRITE(mmpanic_rombank_w)
+	AM_RANGE(0x6c, 0x6d) AM_READ_LEGACY(mmpanic_link_r)	// Other cabinets?
+	AM_RANGE(0x74, 0x74) AM_WRITE_LEGACY(mmpanic_rombank_w)
 	AM_RANGE(0x78, 0x78) AM_WRITENOP				// 0, during RST 08 (irq acknowledge?)
-	AM_RANGE(0x7c, 0x7c) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)	// Sound
-	AM_RANGE(0x8c, 0x8c) AM_WRITE(mmpanic_soundlatch_w)	//
-	AM_RANGE(0x88, 0x88) AM_WRITE(mmpanic_leds_w)		// Leds
+	AM_RANGE(0x7c, 0x7c) AM_DEVREADWRITE("oki", okim6295_device, read, write)	// Sound
+	AM_RANGE(0x8c, 0x8c) AM_WRITE_LEGACY(mmpanic_soundlatch_w)	//
+	AM_RANGE(0x88, 0x88) AM_WRITE_LEGACY(mmpanic_leds_w)		// Leds
 	AM_RANGE(0x90, 0x90) AM_WRITENOP				// written just before port 8c
 	AM_RANGE(0x94, 0x94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x98, 0x98) AM_READ_PORT("DSW2")
 	AM_RANGE(0x9c, 0x9c) AM_READ_PORT("DSW3")		// DSW 1&2 high bits
-	AM_RANGE(0xa6, 0xa6) AM_WRITE(mmpanic_leds2_w)		//
+	AM_RANGE(0xa6, 0xa6) AM_WRITE_LEGACY(mmpanic_leds2_w)		//
 ADDRESS_MAP_END
 
 /* Sound CPU */
@@ -2248,13 +2248,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmpanic_sound_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x02, 0x02) AM_READNOP		// read just before port 00
 	AM_RANGE(0x04, 0x04) AM_NOP					// read only once at the start
 	AM_RANGE(0x06, 0x06) AM_WRITENOP	// almost always 1, sometimes 0
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 ADDRESS_MAP_END
 
 
@@ -2271,7 +2271,7 @@ static ADDRESS_MAP_START( funkyfig_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")			// RAM (Banked)
 
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x81ff) AM_WRITE(rongrong_palette_w)
+	AM_RANGE(0x8000, 0x81ff) AM_WRITE_LEGACY(rongrong_palette_w)
 	AM_RANGE(0x8400, 0x87ff) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -2358,32 +2358,32 @@ static WRITE8_HANDLER( funkyfig_lockout_w )
 
 static ADDRESS_MAP_START( funkyfig_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)	// Sound
-	AM_RANGE(0x01, 0x01) AM_WRITE(mmpanic_leds_w)		// Leds
-	AM_RANGE(0x02, 0x02) AM_WRITE(mmpanic_soundlatch_w)	//
-	AM_RANGE(0x04, 0x04) AM_READ(funkyfig_busy_r)
-	AM_RANGE(0x1c, 0x1c) AM_READ(funkyfig_dsw_r)
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(funkyfig_rombank_w)
-	AM_RANGE(0x20, 0x21) AM_WRITE(funkyfig_blitter_w)
-	AM_RANGE(0x23, 0x23) AM_READ(rongrong_gfxrom_r)		// Video Chip
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki", okim6295_device, read, write)	// Sound
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(mmpanic_leds_w)		// Leds
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(mmpanic_soundlatch_w)	//
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(funkyfig_busy_r)
+	AM_RANGE(0x1c, 0x1c) AM_READ_LEGACY(funkyfig_dsw_r)
+	AM_RANGE(0x1e, 0x1e) AM_WRITE_LEGACY(funkyfig_rombank_w)
+	AM_RANGE(0x20, 0x21) AM_WRITE_LEGACY(funkyfig_blitter_w)
+	AM_RANGE(0x23, 0x23) AM_READ_LEGACY(rongrong_gfxrom_r)		// Video Chip
+	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 
 	// Layers 0-3:
-	AM_RANGE(0x60, 0x63) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0x64, 0x67) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0x68, 0x6b) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0x6c, 0x6f) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0x74, 0x74) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0x75, 0x75) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0x76, 0x76) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE(0x78, 0x78) AM_READ(unk_r)					// ? must be 78 on startup
+	AM_RANGE(0x60, 0x63) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0x64, 0x67) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0x68, 0x6b) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0x6c, 0x6f) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0x74, 0x74) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0x75, 0x75) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0x76, 0x76) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE(0x78, 0x78) AM_READ_LEGACY(unk_r)					// ? must be 78 on startup
 
-	AM_RANGE(0x80, 0x80) AM_WRITE(ddenlovr_select2_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(funkyfig_lockout_w)
-	AM_RANGE(0x82, 0x82) AM_READ(funkyfig_coin_r)
-	AM_RANGE(0x83, 0x83) AM_READ(funkyfig_key_r)
+	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(ddenlovr_select2_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(funkyfig_lockout_w)
+	AM_RANGE(0x82, 0x82) AM_READ_LEGACY(funkyfig_coin_r)
+	AM_RANGE(0x83, 0x83) AM_READ_LEGACY(funkyfig_key_r)
 
-	AM_RANGE(0xa2, 0xa2) AM_WRITE(mmpanic_leds2_w)
+	AM_RANGE(0xa2, 0xa2) AM_WRITE_LEGACY(mmpanic_leds2_w)
 ADDRESS_MAP_END
 
 
@@ -2391,7 +2391,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( funkyfig_sound_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
+	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x04, 0x04) AM_READNOP	// read only once at the start
 ADDRESS_MAP_END
 
@@ -2541,43 +2541,43 @@ static READ8_HANDLER( hanakanz_rand_r )
 
 static ADDRESS_MAP_START( hanakanz_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(hanakanz_busy_r) AM_DEVWRITE("oki", hanakanz_oki_bank_w)
-	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(hanakanz_dsw_w)
-	AM_RANGE(0x32, 0x32) AM_READ(hanakanz_dsw_r)
-	AM_RANGE(0x80, 0x80) AM_WRITE(hanakanz_blitter_data_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(hanakanz_palette_w)
-	AM_RANGE(0x83, 0x84) AM_READ(hanakanz_gfxrom_r)
+	AM_RANGE(0x2c, 0x2c) AM_READ_LEGACY(hanakanz_busy_r) AM_DEVWRITE_LEGACY("oki", hanakanz_oki_bank_w)
+	AM_RANGE(0x2e, 0x2e) AM_WRITE_LEGACY(hanakanz_blitter_reg_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(hanakanz_rombank_w)
+	AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(hanakanz_dsw_w)
+	AM_RANGE(0x32, 0x32) AM_READ_LEGACY(hanakanz_dsw_r)
+	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(hanakanz_blitter_data_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(hanakanz_palette_w)
+	AM_RANGE(0x83, 0x84) AM_READ_LEGACY(hanakanz_gfxrom_r)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x91, 0x92) AM_READ(hanakanz_keyb_r)
-	AM_RANGE(0x93, 0x93) AM_WRITE(hanakanz_coincounter_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE(hanakanz_keyb_w)
-	AM_RANGE(0x96, 0x96) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
+	AM_RANGE(0x91, 0x92) AM_READ_LEGACY(hanakanz_keyb_r)
+	AM_RANGE(0x93, 0x93) AM_WRITE_LEGACY(hanakanz_coincounter_w)
+	AM_RANGE(0x94, 0x94) AM_WRITE_LEGACY(hanakanz_keyb_w)
+	AM_RANGE(0x96, 0x96) AM_READ_LEGACY(hanakanz_rand_r)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hkagerou_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(hanakanz_busy_r) AM_DEVWRITE("oki", hanakanz_oki_bank_w)
-	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(hanakanz_dsw_w)
-	AM_RANGE(0x32, 0x32) AM_READ(hanakanz_dsw_r)
-	AM_RANGE(0x80, 0x80) AM_WRITE(hanakanz_blitter_data_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(hanakanz_palette_w)
-	AM_RANGE(0x83, 0x84) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x2c, 0x2c) AM_READ_LEGACY(hanakanz_busy_r) AM_DEVWRITE_LEGACY("oki", hanakanz_oki_bank_w)
+	AM_RANGE(0x2e, 0x2e) AM_WRITE_LEGACY(hanakanz_blitter_reg_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(hanakanz_rombank_w)
+	AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(hanakanz_dsw_w)
+	AM_RANGE(0x32, 0x32) AM_READ_LEGACY(hanakanz_dsw_r)
+	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(hanakanz_blitter_data_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(hanakanz_palette_w)
+	AM_RANGE(0x83, 0x84) AM_READ_LEGACY(hanakanz_gfxrom_r)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb1, 0xb2) AM_READ(hanakanz_keyb_r)
-	AM_RANGE(0xb3, 0xb3) AM_WRITE(hanakanz_coincounter_w)
-	AM_RANGE(0xb4, 0xb4) AM_WRITE(hanakanz_keyb_w)
-	AM_RANGE(0xb6, 0xb6) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
+	AM_RANGE(0xb1, 0xb2) AM_READ_LEGACY(hanakanz_keyb_r)
+	AM_RANGE(0xb3, 0xb3) AM_WRITE_LEGACY(hanakanz_coincounter_w)
+	AM_RANGE(0xb4, 0xb4) AM_WRITE_LEGACY(hanakanz_keyb_w)
+	AM_RANGE(0xb6, 0xb6) AM_READ_LEGACY(hanakanz_rand_r)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -2595,23 +2595,23 @@ static READ8_HANDLER( mjreach1_protection_r )
 
 static ADDRESS_MAP_START( mjreach1_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(hanakanz_busy_r) AM_DEVWRITE("oki", hanakanz_oki_bank_w)
-	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(hanakanz_dsw_w)
-	AM_RANGE(0x32, 0x32) AM_READ(hanakanz_dsw_r)
-	AM_RANGE(0x80, 0x80) AM_WRITE(hanakanz_blitter_data_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(hanakanz_palette_w)
-	AM_RANGE(0x83, 0x84) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0x90, 0x90) AM_WRITE(hanakanz_keyb_w)
-	AM_RANGE(0x92, 0x92) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0x93, 0x93) AM_READWRITE(mjreach1_protection_r, mjreach1_protection_w)
+	AM_RANGE(0x2c, 0x2c) AM_READ_LEGACY(hanakanz_busy_r) AM_DEVWRITE_LEGACY("oki", hanakanz_oki_bank_w)
+	AM_RANGE(0x2e, 0x2e) AM_WRITE_LEGACY(hanakanz_blitter_reg_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(hanakanz_rombank_w)
+	AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(hanakanz_dsw_w)
+	AM_RANGE(0x32, 0x32) AM_READ_LEGACY(hanakanz_dsw_r)
+	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(hanakanz_blitter_data_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(hanakanz_palette_w)
+	AM_RANGE(0x83, 0x84) AM_READ_LEGACY(hanakanz_gfxrom_r)
+	AM_RANGE(0x90, 0x90) AM_WRITE_LEGACY(hanakanz_keyb_w)
+	AM_RANGE(0x92, 0x92) AM_READ_LEGACY(hanakanz_rand_r)
+	AM_RANGE(0x93, 0x93) AM_READWRITE_LEGACY(mjreach1_protection_r, mjreach1_protection_w)
 	AM_RANGE(0x94, 0x94) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x95, 0x96) AM_READ(hanakanz_keyb_r)
-	AM_RANGE(0x97, 0x97) AM_WRITE(hanakanz_coincounter_w)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
+	AM_RANGE(0x95, 0x96) AM_READ_LEGACY(hanakanz_keyb_r)
+	AM_RANGE(0x97, 0x97) AM_WRITE_LEGACY(hanakanz_coincounter_w)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xe0, 0xef) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -2726,26 +2726,26 @@ static WRITE8_DEVICE_HANDLER( mjchuuka_oki_bank_w )
 }
 
 static ADDRESS_MAP_START( mjchuuka_portmap, AS_IO, 8, dynax_state ) 	// 16 bit I/O
-	AM_RANGE(0x13, 0x13) AM_MIRROR(0xff00) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff00) AM_WRITE(hanakanz_rombank_w)
-	AM_RANGE(0x1e, 0x1e) AM_MIRROR(0xff00) AM_DEVWRITE("oki", mjchuuka_oki_bank_w	)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(mjchuuka_blitter_w)
-	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(mjchuuka_palette_w)
-	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_READ(mjchuuka_gfxrom_0_r)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_WRITE(mjchuuka_coincounter_w)
-	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff00) AM_WRITE(hanakanz_keyb_w)
+	AM_RANGE(0x13, 0x13) AM_MIRROR(0xff00) AM_READ_LEGACY(hanakanz_rand_r)
+	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0xff00) AM_WRITE_LEGACY(hanakanz_rombank_w)
+	AM_RANGE(0x1e, 0x1e) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY("oki", mjchuuka_oki_bank_w	)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE_LEGACY(mjchuuka_blitter_w)
+	AM_RANGE(0x21, 0x21) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE_LEGACY(mjchuuka_palette_w)
+	AM_RANGE(0x23, 0x23) AM_MIRROR(0xff00) AM_READ_LEGACY(mjchuuka_gfxrom_0_r)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0xff00) AM_WRITE_LEGACY(mjchuuka_coincounter_w)
+	AM_RANGE(0x41, 0x41) AM_MIRROR(0xff00) AM_WRITE_LEGACY(hanakanz_keyb_w)
 	AM_RANGE(0x42, 0x42) AM_MIRROR(0xff00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x43, 0x44) AM_MIRROR(0xff00) AM_READ(mjchuuka_keyb_r)
-	AM_RANGE(0x45, 0x45) AM_MIRROR(0xff00) AM_READ(mjchuuka_gfxrom_1_r)
+	AM_RANGE(0x43, 0x44) AM_MIRROR(0xff00) AM_READ_LEGACY(mjchuuka_keyb_r)
+	AM_RANGE(0x45, 0x45) AM_MIRROR(0xff00) AM_READ_LEGACY(mjchuuka_gfxrom_1_r)
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0xff00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x61, 0x61) AM_MIRROR(0xff00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x62, 0x62) AM_MIRROR(0xff00) AM_READ_PORT("DSW3")
 	AM_RANGE(0x63, 0x63) AM_MIRROR(0xff00) AM_READ_PORT("DSW4")
 	AM_RANGE(0x64, 0x64) AM_MIRROR(0xff00) AM_READ_PORT("DSW5")		// DSW 1-4 high bits
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
-	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
@@ -2758,7 +2758,7 @@ static ADDRESS_MAP_START( mjmyster_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM				// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")		// RAM (Banked)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")		// ROM/RAM (Banked)
-	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(rongrong_palette_w)	// RAM enabled by bit 4 of rombank
+	AM_RANGE(0xf000, 0xf1ff) AM_WRITE_LEGACY(rongrong_palette_w)	// RAM enabled by bit 4 of rombank
 	AM_RANGE(0xf200, 0xffff) AM_WRITENOP		// ""
 ADDRESS_MAP_END
 
@@ -2851,30 +2851,30 @@ static WRITE8_HANDLER( mjmyster_blitter_w )
 
 static ADDRESS_MAP_START( mjmyster_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(mjmyster_blitter_w)
-	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x1c, 0x1c) AM_WRITE(mjmyster_rambank_w)
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(mmpanic_rombank_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(mjmyster_select2_w)
-	AM_RANGE(0x21, 0x21) AM_WRITE(mjmyster_coincounter_w)
-	AM_RANGE(0x22, 0x22) AM_READ(mjmyster_coins_r)
-	AM_RANGE(0x23, 0x23) AM_READ(mjmyster_keyb_r)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x46, 0x46) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x48, 0x48) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0x88, 0x8b) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0x8c, 0x8f) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0x95, 0x95) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0x96, 0x96) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE(0x98, 0x98) AM_READ(unk_r)							// ? must be 78 on startup
-	AM_RANGE(0xc2, 0xc2) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0xc3, 0xc3) AM_READ(mjmyster_dsw_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(mjmyster_blitter_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(rongrong_gfxrom_r)
+	AM_RANGE(0x1c, 0x1c) AM_WRITE_LEGACY(mjmyster_rambank_w)
+	AM_RANGE(0x1e, 0x1e) AM_WRITE_LEGACY(mmpanic_rombank_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(mjmyster_select2_w)
+	AM_RANGE(0x21, 0x21) AM_WRITE_LEGACY(mjmyster_coincounter_w)
+	AM_RANGE(0x22, 0x22) AM_READ_LEGACY(mjmyster_coins_r)
+	AM_RANGE(0x23, 0x23) AM_READ_LEGACY(mjmyster_keyb_r)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x42, 0x43) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x46, 0x46) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x48, 0x48) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0x80, 0x83) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0x84, 0x87) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0x88, 0x8b) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0x94, 0x94) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0x95, 0x95) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0x96, 0x96) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE(0x98, 0x98) AM_READ_LEGACY(unk_r)							// ? must be 78 on startup
+	AM_RANGE(0xc2, 0xc2) AM_READ_LEGACY(hanakanz_rand_r)
+	AM_RANGE(0xc3, 0xc3) AM_READ_LEGACY(mjmyster_dsw_r)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -2903,9 +2903,9 @@ static ADDRESS_MAP_START( hginga_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")						// RAM (Banked)
-	AM_RANGE(0xf601, 0xf601) AM_READ(hginga_protection_r)
+	AM_RANGE(0xf601, 0xf601) AM_READ_LEGACY(hginga_protection_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM/RAM (Banked)
-	AM_RANGE(0xf000, 0xf1ff) AM_WRITE(rongrong_palette_w)	// RAM enabled by bit 4 of rombank
+	AM_RANGE(0xf000, 0xf1ff) AM_WRITE_LEGACY(rongrong_palette_w)	// RAM enabled by bit 4 of rombank
 	AM_RANGE(0xf700, 0xf706) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -3031,28 +3031,28 @@ static WRITE8_HANDLER( hginga_blitter_w )
 
 static ADDRESS_MAP_START( hginga_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(hginga_blitter_w)
-	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(mjmyster_rambank_w)
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x24, 0x24) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x26, 0x26) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x28, 0x28) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(hginga_input_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(hginga_coins_w)
-	AM_RANGE(0x42, 0x42) AM_READ(hginga_coins_r)
-	AM_RANGE(0x43, 0x43) AM_READ(hginga_input_r)
-	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_WRITE(hginga_80_w)
-	AM_RANGE(0xa0, 0xa3) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0xa4, 0xa7) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0xa8, 0xab) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0xac, 0xaf) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0xb4, 0xb4) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0xb5, 0xb5) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0xb6, 0xb6) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE(0xb8, 0xb8) AM_READ(unk_r)	// ? must be 78 on startup
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(hginga_blitter_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(rongrong_gfxrom_r)
+	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE_LEGACY(mjmyster_rambank_w)
+	AM_RANGE(0x1e, 0x1e) AM_WRITE_LEGACY(hginga_rombank_w)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x24, 0x24) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x26, 0x26) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x28, 0x28) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(hginga_input_w)
+	AM_RANGE(0x41, 0x41) AM_WRITE_LEGACY(hginga_coins_w)
+	AM_RANGE(0x42, 0x42) AM_READ_LEGACY(hginga_coins_r)
+	AM_RANGE(0x43, 0x43) AM_READ_LEGACY(hginga_input_r)
+	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(hginga_80_w)
+	AM_RANGE(0xa0, 0xa3) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0xa4, 0xa7) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0xa8, 0xab) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0xac, 0xaf) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0xb4, 0xb4) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0xb5, 0xb5) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0xb6, 0xb6) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE(0xb8, 0xb8) AM_READ_LEGACY(unk_r)	// ? must be 78 on startup
 ADDRESS_MAP_END
 
 
@@ -3138,37 +3138,37 @@ static ADDRESS_MAP_START( hgokou_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM								// ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")						// RAM (Banked)
-	AM_RANGE(0xe601, 0xe601) AM_READ(hgokou_protection_r)
+	AM_RANGE(0xe601, 0xe601) AM_READ_LEGACY(hgokou_protection_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM (Banked)
-	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(rongrong_palette_w)
+	AM_RANGE(0xe000, 0xe1ff) AM_WRITE_LEGACY(rongrong_palette_w)
 	AM_RANGE(0xe700, 0xe706) AM_WRITENOP
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hgokou_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(hginga_blitter_w)
-	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(mjmyster_rambank_w)		// ? ack on RTC int
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w)
-	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
-	AM_RANGE(0x40, 0x43) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0x44, 0x47) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0x48, 0x4b) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0x4c, 0x4f) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0x54, 0x54) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0x55, 0x55) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0x56, 0x56) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE(0x58, 0x58) AM_READ(unk_r)									// ? must be 78 on startup
-	AM_RANGE(0x60, 0x60) AM_WRITE(hgokou_dsw_sel_w)
-	AM_RANGE(0x61, 0x61) AM_WRITE(hgokou_input_w)
-	AM_RANGE(0x62, 0x62) AM_READ(hgokou_input_r)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x86, 0x86) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x88, 0x88) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0xb0, 0xb0) AM_READ(hanakanz_rand_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(hginga_blitter_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(rongrong_gfxrom_r)
+	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE_LEGACY(mjmyster_rambank_w)		// ? ack on RTC int
+	AM_RANGE(0x1e, 0x1e) AM_WRITE_LEGACY(hginga_rombank_w)
+	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0x40, 0x43) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0x44, 0x47) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0x48, 0x4b) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0x4c, 0x4f) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0x54, 0x54) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0x55, 0x55) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0x56, 0x56) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE(0x58, 0x58) AM_READ_LEGACY(unk_r)									// ? must be 78 on startup
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(hgokou_dsw_sel_w)
+	AM_RANGE(0x61, 0x61) AM_WRITE_LEGACY(hgokou_input_w)
+	AM_RANGE(0x62, 0x62) AM_READ_LEGACY(hgokou_input_r)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x86, 0x86) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x88, 0x88) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0xb0, 0xb0) AM_READ_LEGACY(hanakanz_rand_r)
 ADDRESS_MAP_END
 
 
@@ -3204,29 +3204,29 @@ static READ8_HANDLER( hgokbang_input_r )
 
 static ADDRESS_MAP_START( hgokbang_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(hginga_blitter_w)
-	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(mjmyster_rambank_w)		// ? ack on RTC int
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x24, 0x24) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x26, 0x26) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x28, 0x28) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(hgokou_dsw_sel_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(hgokou_input_w)
-	AM_RANGE(0x42, 0x42) AM_READ(hgokou_input_r)
-	AM_RANGE(0x43, 0x43) AM_READ(hgokbang_input_r)
-	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
-	AM_RANGE(0xa0, 0xa3) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0xa4, 0xa7) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0xa8, 0xab) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0xac, 0xaf) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0xb4, 0xb4) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0xb5, 0xb5) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0xb6, 0xb6) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE(0xb8, 0xb8) AM_READ(unk_r)									// ? must be 78 on startup
-	AM_RANGE(0xe0, 0xe0) AM_READ(hanakanz_rand_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(hginga_blitter_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(rongrong_gfxrom_r)
+	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE_LEGACY(mjmyster_rambank_w)		// ? ack on RTC int
+	AM_RANGE(0x1e, 0x1e) AM_WRITE_LEGACY(hginga_rombank_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x24, 0x24) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x26, 0x26) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x28, 0x28) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(hgokou_dsw_sel_w)
+	AM_RANGE(0x41, 0x41) AM_WRITE_LEGACY(hgokou_input_w)
+	AM_RANGE(0x42, 0x42) AM_READ_LEGACY(hgokou_input_r)
+	AM_RANGE(0x43, 0x43) AM_READ_LEGACY(hgokbang_input_r)
+	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0xa0, 0xa3) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0xa4, 0xa7) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0xa8, 0xab) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0xac, 0xaf) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0xb4, 0xb4) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0xb5, 0xb5) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0xb6, 0xb6) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE(0xb8, 0xb8) AM_READ_LEGACY(unk_r)									// ? must be 78 on startup
+	AM_RANGE(0xe0, 0xe0) AM_READ_LEGACY(hanakanz_rand_r)
 ADDRESS_MAP_END
 
 
@@ -3295,30 +3295,30 @@ static ADDRESS_MAP_START( hparadis_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")						// RAM (Banked)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM (Banked)
-	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(rongrong_palette_w)
+	AM_RANGE(0xc000, 0xc1ff) AM_WRITE_LEGACY(rongrong_palette_w)
 ADDRESS_MAP_END
 
 // the RTC seems unused
 static ADDRESS_MAP_START( hparadis_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(rongrong_blitter_w)
-	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x1b, 0x1b) AM_READWRITE(rongrong_blitter_busy_r, rongrong_blitter_busy_w)
-	AM_RANGE(0x1c, 0x1c) AM_READ(hparadis_dsw_r)
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(hparadis_select_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x60, 0x61) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0x88, 0x8b) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0x8c, 0x8f) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0x95, 0x95) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0x96, 0x96) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE(0x98, 0x98) AM_READ(unk_r)	// ? must be 78 on startup
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(hginga_input_w)
-	AM_RANGE(0xa1, 0xa1) AM_WRITE(hparadis_coin_w)
-	AM_RANGE(0xa2, 0xa3) AM_READ(hparadis_input_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(rongrong_blitter_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(rongrong_gfxrom_r)
+	AM_RANGE(0x1b, 0x1b) AM_READWRITE_LEGACY(rongrong_blitter_busy_r, rongrong_blitter_busy_w)
+	AM_RANGE(0x1c, 0x1c) AM_READ_LEGACY(hparadis_dsw_r)
+	AM_RANGE(0x1e, 0x1e) AM_WRITE_LEGACY(hparadis_select_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x60, 0x61) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x80, 0x83) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0x84, 0x87) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0x88, 0x8b) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0x94, 0x94) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0x95, 0x95) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0x96, 0x96) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE(0x98, 0x98) AM_READ_LEGACY(unk_r)	// ? must be 78 on startup
+	AM_RANGE(0xa0, 0xa0) AM_WRITE_LEGACY(hginga_input_w)
+	AM_RANGE(0xa1, 0xa1) AM_WRITE_LEGACY(hparadis_coin_w)
+	AM_RANGE(0xa2, 0xa3) AM_READ_LEGACY(hparadis_input_r)
 	AM_RANGE(0xc2, 0xc2) AM_WRITENOP	// enables palette RAM at c000
 ADDRESS_MAP_END
 
@@ -3346,30 +3346,30 @@ static READ8_HANDLER( mjmywrld_coins_r )
 
 static ADDRESS_MAP_START( mjmywrld_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(mjmyster_blitter_w)
-	AM_RANGE(0x03, 0x03) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x1c, 0x1c) AM_WRITE(mjmyster_rambank_w)
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(hginga_rombank_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(mjmyster_select2_w)
-	AM_RANGE(0x21, 0x21) AM_WRITE(mjmyster_coincounter_w)
-	AM_RANGE(0x22, 0x22) AM_READ(mjmywrld_coins_r)
-	AM_RANGE(0x23, 0x23) AM_READ(mjmyster_keyb_r)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x42, 0x43) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x46, 0x46) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x48, 0x48) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
-	AM_RANGE(0x80, 0x83) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0x84, 0x87) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0x88, 0x8b) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0x8c, 0x8f) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0x94, 0x94) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0x95, 0x95) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0x96, 0x96) AM_WRITE(ddenlovr_layer_enable_w)
-	AM_RANGE(0x98, 0x98) AM_READ(unk_r)	// ? must be 78 on startup
-	AM_RANGE(0xc0, 0xc0) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0xe0, 0xe0) AM_READ(mjmyster_dsw_r)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(mjmyster_blitter_w)
+	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(rongrong_gfxrom_r)
+	AM_RANGE(0x1c, 0x1c) AM_WRITE_LEGACY(mjmyster_rambank_w)
+	AM_RANGE(0x1e, 0x1e) AM_WRITE_LEGACY(hginga_rombank_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(mjmyster_select2_w)
+	AM_RANGE(0x21, 0x21) AM_WRITE_LEGACY(mjmyster_coincounter_w)
+	AM_RANGE(0x22, 0x22) AM_READ_LEGACY(mjmywrld_coins_r)
+	AM_RANGE(0x23, 0x23) AM_READ_LEGACY(mjmyster_keyb_r)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x42, 0x43) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x46, 0x46) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x48, 0x48) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x60, 0x6f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0x80, 0x83) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0x84, 0x87) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0x88, 0x8b) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0x8c, 0x8f) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0x94, 0x94) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0x95, 0x95) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0x96, 0x96) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
+	AM_RANGE(0x98, 0x98) AM_READ_LEGACY(unk_r)	// ? must be 78 on startup
+	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(hanakanz_rand_r)
+	AM_RANGE(0xe0, 0xe0) AM_READ_LEGACY(mjmyster_dsw_r)
 ADDRESS_MAP_END
 
 
@@ -3425,45 +3425,45 @@ static READ16_HANDLER( akamaru_e0010d_r )
 static ADDRESS_MAP_START( akamaru_map, AS_PROGRAM, 16, dynax_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM														// ROM
 
-	AM_RANGE(0x213570, 0x213571) AM_WRITE(akamaru_protection1_w)							// OKI bank
-	AM_RANGE(0x624680, 0x624681) AM_READ(akamaru_protection1_r)
+	AM_RANGE(0x213570, 0x213571) AM_WRITE_LEGACY(akamaru_protection1_w)							// OKI bank
+	AM_RANGE(0x624680, 0x624681) AM_READ_LEGACY(akamaru_protection1_r)
 
-	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)								// Palette
+	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE_LEGACY(ddenlovr_palette_w)								// Palette
 //  AM_RANGE(0xd01000, 0xd017ff) AM_WRITEONLY                                          // 0
 
-	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
-	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
-	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr16_transparency_pen_w)
-	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE(ddenlovr16_transparency_mask_w)
-	AM_RANGE(0xe00068, 0xe00069) AM_WRITE(ddenlovr16_bgcolor_w)
-	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE(ddenlovr16_priority_w)
-	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE(ddenlovr16_layer_enable_w)
-	AM_RANGE(0xe00070, 0xe00071) AM_READ(unk16_r)											// ? must be 78 on startup (not necessary in ddlover)
-	AM_RANGE(0xe00080, 0xe00083) AM_WRITE(ddenlovr_blitter_w)
-	AM_RANGE(0xe00086, 0xe00087) AM_READ(ddenlovr_gfxrom_r)									// Video Chip
+	AM_RANGE(0xe00040, 0xe00047) AM_WRITE_LEGACY(ddenlovr16_palette_base_w)
+	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE_LEGACY(ddenlovr16_palette_mask_w)
+	AM_RANGE(0xe00050, 0xe00057) AM_WRITE_LEGACY(ddenlovr16_transparency_pen_w)
+	AM_RANGE(0xe00058, 0xe0005f) AM_WRITE_LEGACY(ddenlovr16_transparency_mask_w)
+	AM_RANGE(0xe00068, 0xe00069) AM_WRITE_LEGACY(ddenlovr16_bgcolor_w)
+	AM_RANGE(0xe0006a, 0xe0006b) AM_WRITE_LEGACY(ddenlovr16_priority_w)
+	AM_RANGE(0xe0006c, 0xe0006d) AM_WRITE_LEGACY(ddenlovr16_layer_enable_w)
+	AM_RANGE(0xe00070, 0xe00071) AM_READ_LEGACY(unk16_r)											// ? must be 78 on startup (not necessary in ddlover)
+	AM_RANGE(0xe00080, 0xe00083) AM_WRITE_LEGACY(ddenlovr_blitter_w)
+	AM_RANGE(0xe00086, 0xe00087) AM_READ_LEGACY(ddenlovr_gfxrom_r)									// Video Chip
 
 	AM_RANGE(0xe00100, 0xe00101) AM_READ_PORT("P1")
 	AM_RANGE(0xe00102, 0xe00103) AM_READ_PORT("P2")
 	AM_RANGE(0xe00104, 0xe00105) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xe00106, 0xe00107) AM_READ(akamaru_protection2_r)
-	AM_RANGE(0xe00108, 0xe0010b) AM_WRITEONLY AM_BASE_MEMBER(dynax_state, m_protection2)
+	AM_RANGE(0xe00106, 0xe00107) AM_READ_LEGACY(akamaru_protection2_r)
+	AM_RANGE(0xe00108, 0xe0010b) AM_WRITEONLY AM_BASE( m_protection2)
 
-	AM_RANGE(0xe0010c, 0xe0010d) AM_READ(akamaru_e0010d_r)
-	AM_RANGE(0xe00200, 0xe00201) AM_READ(akamaru_dsw_r)										// DSW
+	AM_RANGE(0xe0010c, 0xe0010d) AM_READ_LEGACY(akamaru_e0010d_r)
+	AM_RANGE(0xe00200, 0xe00201) AM_READ_LEGACY(akamaru_dsw_r)										// DSW
 
-	AM_RANGE(0xe00204, 0xe00205) AM_READ(akamaru_blitter_r)									// Blitter Busy & IRQ
-	AM_RANGE(0xe00302, 0xe00303) AM_WRITE(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
+	AM_RANGE(0xe00204, 0xe00205) AM_READ_LEGACY(akamaru_blitter_r)									// Blitter Busy & IRQ
+	AM_RANGE(0xe00302, 0xe00303) AM_WRITE_LEGACY(ddenlovr_blitter_irq_ack_w)						// Blitter irq acknowledge
 
-	AM_RANGE(0xe00304, 0xe00307) AM_WRITEONLY AM_BASE_MEMBER(dynax_state, m_dsw_sel16)				// DSW select
-	AM_RANGE(0xe00308, 0xe00309) AM_WRITE(ddenlovr_coincounter_0_w)							// Coin Counters
-	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE(ddenlovr_coincounter_1_w)							//
+	AM_RANGE(0xe00304, 0xe00307) AM_WRITEONLY AM_BASE( m_dsw_sel16)				// DSW select
+	AM_RANGE(0xe00308, 0xe00309) AM_WRITE_LEGACY(ddenlovr_coincounter_0_w)							// Coin Counters
+	AM_RANGE(0xe0030c, 0xe0030d) AM_WRITE_LEGACY(ddenlovr_coincounter_1_w)							//
 
-	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8("ymsnd", ym2413_w, 0x00ff)
-	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8_MODERN("rtc", msm6242_device, read, write, 0x00ff)
-	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
-	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)	// Sound
+	AM_RANGE(0xe00400, 0xe00403) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)
+	AM_RANGE(0xe00500, 0xe0051f) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0x00ff)
+	AM_RANGE(0xe00600, 0xe00603) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0xe00604, 0xe00605) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0xe00700, 0xe00701) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	// Sound
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
@@ -3531,32 +3531,32 @@ static WRITE8_HANDLER( mjflove_coincounter_w )
 }
 
 static ADDRESS_MAP_START( mjflove_portmap, AS_IO, 8, dynax_state ) 	// 16 bit I/O
-	AM_RANGE(0x0010, 0x0010) AM_READ(hanakanz_rand_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x0010, 0x0010) AM_READ_LEGACY(hanakanz_rand_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x001c, 0x001c) AM_READ_PORT("DSW2") AM_MIRROR(0xff00)
-	AM_RANGE(0x001e, 0x001e) AM_WRITE(hanakanz_keyb_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x0020, 0x0023) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0x0024, 0x0027) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0x0028, 0x002b) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0x002c, 0x002f) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0x0034, 0x0034) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0x0035, 0x0035) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0x0036, 0x0036) AM_WRITE(ddenlovr_layer_enable_w)
+	AM_RANGE(0x001e, 0x001e) AM_WRITE_LEGACY(hanakanz_keyb_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x0020, 0x0023) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0x0024, 0x0027) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0x0028, 0x002b) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0x002c, 0x002f) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0x0034, 0x0034) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0x0035, 0x0035) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0x0036, 0x0036) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
 	AM_RANGE(0x0038, 0x0038) AM_READNOP			// ? ack or watchdog
-	AM_RANGE(0x0040, 0x0041) AM_WRITE(mjflove_blitter_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x0043, 0x0043) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x0080, 0x0081) AM_READ(mjflove_keyb_r)
+	AM_RANGE(0x0040, 0x0041) AM_WRITE_LEGACY(mjflove_blitter_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x0043, 0x0043) AM_READ_LEGACY(rongrong_gfxrom_r)
+	AM_RANGE(0x0080, 0x0081) AM_READ_LEGACY(mjflove_keyb_r)
 	AM_RANGE(0x0082, 0x0082) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x00da, 0x00da) AM_READ(mjflove_protection_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(mjmyster_rambank_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00f8, 0x00f8) AM_WRITE(mjflove_rombank_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fa, 0x00fa) AM_DEVWRITE("oki", mjflove_okibank_w)
+	AM_RANGE(0x00da, 0x00da) AM_READ_LEGACY(mjflove_protection_r) AM_MIRROR(0xff00)
+	AM_RANGE(0x00f2, 0x00f2) AM_WRITE_LEGACY(mjmyster_rambank_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x00f8, 0x00f8) AM_WRITE_LEGACY(mjflove_rombank_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x00fa, 0x00fa) AM_DEVWRITE_LEGACY("oki", mjflove_okibank_w)
 	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0181, 0x0181) AM_WRITENOP						// ? int. enable
-	AM_RANGE(0x0184, 0x0184) AM_WRITE(mjflove_coincounter_w)
-	AM_RANGE(0x0200, 0x0201) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x0280, 0x028f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
-	AM_RANGE(0x0300, 0x0301) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x0380, 0x0380) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x0184, 0x0184) AM_WRITE_LEGACY(mjflove_coincounter_w)
+	AM_RANGE(0x0200, 0x0201) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x0280, 0x028f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0x0300, 0x0301) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x0380, 0x0380) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -3584,21 +3584,21 @@ static READ8_HANDLER( jongtei_busy_r )
 
 static ADDRESS_MAP_START( jongtei_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(jongtei_busy_r) AM_DEVWRITE("oki", jongtei_okibank_w)
-	AM_RANGE(0x2e, 0x2e) AM_WRITE(hanakanz_blitter_reg_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_rombank_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(jongtei_dsw_keyb_w)
-	AM_RANGE(0x32, 0x32) AM_READ(hanakanz_dsw_r)
+	AM_RANGE(0x2c, 0x2c) AM_READ_LEGACY(jongtei_busy_r) AM_DEVWRITE_LEGACY("oki", jongtei_okibank_w)
+	AM_RANGE(0x2e, 0x2e) AM_WRITE_LEGACY(hanakanz_blitter_reg_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(hanakanz_rombank_w)
+	AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(jongtei_dsw_keyb_w)
+	AM_RANGE(0x32, 0x32) AM_READ_LEGACY(hanakanz_dsw_r)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x41, 0x42) AM_READ(hanakanz_keyb_r)
-	AM_RANGE(0x43, 0x43) AM_WRITE(hanakanz_coincounter_w)
-	AM_RANGE(0x46, 0x46) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0x60, 0x60) AM_WRITE(hanakanz_blitter_data_w)
-	AM_RANGE(0x61, 0x61) AM_WRITE(hanakanz_palette_w)
-	AM_RANGE(0x63, 0x64) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
+	AM_RANGE(0x41, 0x42) AM_READ_LEGACY(hanakanz_keyb_r)
+	AM_RANGE(0x43, 0x43) AM_WRITE_LEGACY(hanakanz_coincounter_w)
+	AM_RANGE(0x46, 0x46) AM_READ_LEGACY(hanakanz_rand_r)
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(hanakanz_blitter_data_w)
+	AM_RANGE(0x61, 0x61) AM_WRITE_LEGACY(hanakanz_palette_w)
+	AM_RANGE(0x63, 0x64) AM_READ_LEGACY(hanakanz_gfxrom_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -3611,7 +3611,7 @@ static ADDRESS_MAP_START( sryudens_map, AS_PROGRAM, 8, dynax_state )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM								// RAM
 	AM_RANGE(0x7000, 0x7fff) AM_RAMBANK("bank2")						// RAM (Banked)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")						// ROM (Banked)
-	AM_RANGE(0xe000, 0xe1ff) AM_WRITE(rongrong_palette_w)
+	AM_RANGE(0xe000, 0xe1ff) AM_WRITE_LEGACY(rongrong_palette_w)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( sryudens_keyb_r )
@@ -3657,33 +3657,33 @@ static WRITE8_HANDLER( sryudens_rambank_w )
 
 static ADDRESS_MAP_START( sryudens_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE(sryudens_rambank_w)	// ? ack on RTC int
-	AM_RANGE(0x1e, 0x1e) AM_WRITE(mjflove_rombank_w)
-	AM_RANGE(0x20, 0x23) AM_WRITE(ddenlovr_palette_base_w)
-	AM_RANGE(0x24, 0x27) AM_WRITE(ddenlovr_palette_mask_w)
-	AM_RANGE(0x28, 0x2b) AM_WRITE(ddenlovr_transparency_pen_w)
-	AM_RANGE(0x2c, 0x2f) AM_WRITE(ddenlovr_transparency_mask_w)
-	AM_RANGE(0x34, 0x34) AM_WRITE(ddenlovr_bgcolor_w)
-	AM_RANGE(0x35, 0x35) AM_WRITE(ddenlovr_priority_w)
-	AM_RANGE(0x36, 0x36) AM_WRITE(ddenlovr_layer_enable_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x1c, 0x1c) AM_READNOP AM_WRITE_LEGACY(sryudens_rambank_w)	// ? ack on RTC int
+	AM_RANGE(0x1e, 0x1e) AM_WRITE_LEGACY(mjflove_rombank_w)
+	AM_RANGE(0x20, 0x23) AM_WRITE_LEGACY(ddenlovr_palette_base_w)
+	AM_RANGE(0x24, 0x27) AM_WRITE_LEGACY(ddenlovr_palette_mask_w)
+	AM_RANGE(0x28, 0x2b) AM_WRITE_LEGACY(ddenlovr_transparency_pen_w)
+	AM_RANGE(0x2c, 0x2f) AM_WRITE_LEGACY(ddenlovr_transparency_mask_w)
+	AM_RANGE(0x34, 0x34) AM_WRITE_LEGACY(ddenlovr_bgcolor_w)
+	AM_RANGE(0x35, 0x35) AM_WRITE_LEGACY(ddenlovr_priority_w)
+	AM_RANGE(0x36, 0x36) AM_WRITE_LEGACY(ddenlovr_layer_enable_w)
 	AM_RANGE(0x38, 0x38) AM_READNOP			// ? ack or watchdog
-	AM_RANGE(0x40, 0x41) AM_WRITE(mjflove_blitter_w)
-	AM_RANGE(0x43, 0x43) AM_READ(rongrong_gfxrom_r)
-	AM_RANGE(0x50, 0x50) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE("oki", quizchq_oki_bank_w)
-	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
+	AM_RANGE(0x40, 0x41) AM_WRITE_LEGACY(mjflove_blitter_w)
+	AM_RANGE(0x43, 0x43) AM_READ_LEGACY(rongrong_gfxrom_r)
+	AM_RANGE(0x50, 0x50) AM_READ_LEGACY(hanakanz_rand_r)
+	AM_RANGE(0x70, 0x70) AM_DEVWRITE_LEGACY("oki", quizchq_oki_bank_w)
+	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("DSW1")
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("DSW2")
 	AM_RANGE(0x92, 0x92) AM_READ_PORT("DSW4")
 	AM_RANGE(0x93, 0x93) AM_READ_PORT("DSW3")
 	AM_RANGE(0x94, 0x94) AM_READ_PORT("DSWTOP")
-	AM_RANGE(0x98, 0x98) AM_WRITE(sryudens_coincounter_w)
-	AM_RANGE(0x99, 0x99) AM_WRITE(hanakanz_keyb_w)
+	AM_RANGE(0x98, 0x98) AM_WRITE_LEGACY(sryudens_coincounter_w)
+	AM_RANGE(0x99, 0x99) AM_WRITE_LEGACY(hanakanz_keyb_w)
 	AM_RANGE(0x9a, 0x9a) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x9b, 0x9c) AM_READ(sryudens_keyb_r)
+	AM_RANGE(0x9b, 0x9c) AM_READ_LEGACY(sryudens_keyb_r)
 ADDRESS_MAP_END
 
 
@@ -3793,25 +3793,25 @@ static READ8_HANDLER( daimyojn_year_hack_r )
 
 static ADDRESS_MAP_START( daimyojn_portmap, AS_IO, 8, dynax_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x2c, 0x2c) AM_READ(jongtei_busy_r) AM_DEVWRITE("oki", daimyojn_okibank_w)
-	AM_RANGE(0x2e, 0x2e) AM_WRITE(daimyojn_palette_sel_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(hanakanz_blitter_reg_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(jongtei_dsw_keyb_w)
-	AM_RANGE(0x32, 0x32) AM_READ(hanakanz_dsw_r)
-	AM_RANGE(0x40, 0x40) AM_WRITE(daimyojn_blitter_data_palette_w)
-	AM_RANGE(0x42, 0x44) AM_READ(hanakanz_gfxrom_r)
-	AM_RANGE(0x8a, 0x8b) AM_READ(daimyojn_year_hack_r)	// ?
-	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE_MODERN("rtc", msm6242_device, read, write)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("ymsnd", ym2413_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x2c, 0x2c) AM_READ_LEGACY(jongtei_busy_r) AM_DEVWRITE_LEGACY("oki", daimyojn_okibank_w)
+	AM_RANGE(0x2e, 0x2e) AM_WRITE_LEGACY(daimyojn_palette_sel_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(hanakanz_blitter_reg_w)
+	AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(jongtei_dsw_keyb_w)
+	AM_RANGE(0x32, 0x32) AM_READ_LEGACY(hanakanz_dsw_r)
+	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(daimyojn_blitter_data_palette_w)
+	AM_RANGE(0x42, 0x44) AM_READ_LEGACY(hanakanz_gfxrom_r)
+	AM_RANGE(0x8a, 0x8b) AM_READ_LEGACY(daimyojn_year_hack_r)	// ?
+	AM_RANGE(0x80, 0x8f) AM_DEVREADWRITE("rtc", msm6242_device, read, write)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xaa, 0xaa) AM_READ(daimyojn_keyb1_r)
-	AM_RANGE(0xac, 0xac) AM_READ(daimyojn_keyb2_r)
-	AM_RANGE(0xae, 0xae) AM_WRITE(hanakanz_coincounter_w)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(mjmyster_rambank_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(mjflove_rombank_w)
-	AM_RANGE(0xd0, 0xd0) AM_READ(hanakanz_rand_r)
-	AM_RANGE(0xe0, 0xe0) AM_READWRITE(daimyojn_protection_r, daimyojn_protection_w)
+	AM_RANGE(0xaa, 0xaa) AM_READ_LEGACY(daimyojn_keyb1_r)
+	AM_RANGE(0xac, 0xac) AM_READ_LEGACY(daimyojn_keyb2_r)
+	AM_RANGE(0xae, 0xae) AM_WRITE_LEGACY(hanakanz_coincounter_w)
+	AM_RANGE(0xb0, 0xb0) AM_WRITE_LEGACY(mjmyster_rambank_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(mjflove_rombank_w)
+	AM_RANGE(0xd0, 0xd0) AM_READ_LEGACY(hanakanz_rand_r)
+	AM_RANGE(0xe0, 0xe0) AM_READWRITE_LEGACY(daimyojn_protection_r, daimyojn_protection_w)
 ADDRESS_MAP_END
 
 

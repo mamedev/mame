@@ -323,18 +323,18 @@ static ADDRESS_MAP_START( sfkick_map, AS_PROGRAM, 8, sfkick_state )
 	AM_RANGE( 0xa000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE( 0xc000, 0xdfff) AM_ROMBANK("bank7")
 	AM_RANGE( 0xe000, 0xffff) AM_ROMBANK("bank8")
-	AM_RANGE( 0x0000, 0x3fff) AM_WRITE( page0_w )
-	AM_RANGE( 0x4000, 0x7fff) AM_WRITE( page1_w )
-	AM_RANGE( 0x8000, 0xbfff) AM_WRITE( page2_w )
-	AM_RANGE( 0xc000, 0xffff) AM_WRITE( page3_w )
+	AM_RANGE( 0x0000, 0x3fff) AM_WRITE_LEGACY( page0_w )
+	AM_RANGE( 0x4000, 0x7fff) AM_WRITE_LEGACY( page1_w )
+	AM_RANGE( 0x8000, 0xbfff) AM_WRITE_LEGACY( page2_w )
+	AM_RANGE( 0xc000, 0xffff) AM_WRITE_LEGACY( page3_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfkick_io_map, AS_IO, 8, sfkick_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0xa0, 0xa7) AM_WRITE( soundlatch_w )
-	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE_MODERN( "v9938", v9938_device, read, write)
-	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE( 0xa0, 0xa7) AM_WRITE_LEGACY( soundlatch_w )
+	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE( "v9938", v9938_device, read, write)
+	AM_RANGE( 0xa8, 0xab) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE( 0xb4, 0xb5) AM_RAM /* loopback ? req by sfkicka (MSX Bios leftover)*/
 ADDRESS_MAP_END
 
@@ -345,8 +345,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfkick_sound_io_map, AS_IO, 8, sfkick_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x04, 0x05) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER ( ppi_port_c_w )

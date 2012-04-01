@@ -311,9 +311,9 @@ static WRITE64_HANDLER(dsp_w)
 
 static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64, taitopjc_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM // Work RAM
-	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE(video_r, video_w)
-	AM_RANGE(0x80000000, 0x80003fff) AM_READWRITE(dsp_r, dsp_w)
-	AM_RANGE(0xc0000000, 0xc000ffff) AM_READ(ppc_common_r)
+	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE_LEGACY(video_r, video_w)
+	AM_RANGE(0x80000000, 0x80003fff) AM_READWRITE_LEGACY(dsp_r, dsp_w)
+	AM_RANGE(0xc0000000, 0xc000ffff) AM_READ_LEGACY(ppc_common_r)
 	AM_RANGE(0xff000000, 0xff01ffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -367,8 +367,8 @@ static WRITE8_HANDLER(tlcs_sound_w)
 
 static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8, taitopjc_state )
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM		// Work RAM
-	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE(tlcs_sound_r, tlcs_sound_w)
-	AM_RANGE(0x060000, 0x061fff) AM_READWRITE(tlcs_common_r, tlcs_common_w)
+	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE_LEGACY(tlcs_sound_r, tlcs_sound_w)
+	AM_RANGE(0x060000, 0x061fff) AM_READWRITE_LEGACY(tlcs_common_r, tlcs_common_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 

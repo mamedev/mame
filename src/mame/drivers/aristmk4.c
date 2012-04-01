@@ -871,32 +871,32 @@ ADDRESS MAP - SLOT GAMES
 ******************************************************************************/
 
 static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8, aristmk4_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, m_mkiv_vram) // video ram -  chips U49 / U50
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE( m_mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
-	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x1c00, 0x1cff) AM_WRITE_LEGACY(mk4_printer_w)
+	AM_RANGE(0x1900, 0x19ff) AM_READ_LEGACY(mk4_printer_r)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM  // graphics rom map
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_SHARE("nvram")
 
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
-	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
-	AM_RANGE(0x5003, 0x5003) AM_READ(u3_p3)
-	AM_RANGE(0x5005, 0x5005) AM_READ(ldsw)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(u3_p0)
+	AM_RANGE(0x5002, 0x5002) AM_READ_LEGACY(u3_p2)
+	AM_RANGE(0x5003, 0x5003) AM_READ_LEGACY(u3_p3)
+	AM_RANGE(0x5005, 0x5005) AM_READ_LEGACY(ldsw)
 	AM_RANGE(0x500d, 0x500d) AM_READ_PORT("500d")
 	AM_RANGE(0x500e, 0x500e) AM_READ_PORT("500e")
 	AM_RANGE(0x500f, 0x500f) AM_READ_PORT("500f")
-	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE_MODERN("via6522_0",via6522_device,read,write)
-	AM_RANGE(0x5200, 0x5200) AM_READ(cashcade_r)
+	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE("via6522_0",via6522_device,read,write)
+	AM_RANGE(0x5200, 0x5200) AM_READ_LEGACY(cashcade_r)
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
-	AM_RANGE(0x52c0, 0x52c0) AM_READ(bv_p0)
-	AM_RANGE(0x52c1, 0x52c1) AM_READ(bv_p1)
-	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x52c0, 0x52c0) AM_READ_LEGACY(bv_p0)
+	AM_RANGE(0x52c1, 0x52c1) AM_READ_LEGACY(bv_p1)
+	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
-	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE_MODERN("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
-	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
-	AM_RANGE(0x5468, 0x5468) AM_READWRITE(cgdrr,cgdrw) // 4020 ripple counter outputs
+	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
+	AM_RANGE(0x5440, 0x5440) AM_WRITE_LEGACY(mlamps) // take win and gamble lamps
+	AM_RANGE(0x5468, 0x5468) AM_READWRITE_LEGACY(cgdrr,cgdrw) // 4020 ripple counter outputs
 	AM_RANGE(0x6000, 0xffff) AM_ROM  // game roms
 ADDRESS_MAP_END
 
@@ -915,31 +915,31 @@ The U87 personality rom is not required, therefore game rom code mapping is from
 */
 
 static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8, aristmk4_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(aristmk4_state, m_mkiv_vram) // video ram -  chips U49 / U50
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE( m_mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
-	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x1c00, 0x1cff) AM_WRITE_LEGACY(mk4_printer_w)
+	AM_RANGE(0x1900, 0x19ff) AM_READ_LEGACY(mk4_printer_r)
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_SHARE("nvram")
 
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
-	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(u3_p0)
+	AM_RANGE(0x5002, 0x5002) AM_READ_LEGACY(u3_p2)
 	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("5003")
-	AM_RANGE(0x5005, 0x5005) AM_READ(ldsw)
+	AM_RANGE(0x5005, 0x5005) AM_READ_LEGACY(ldsw)
 	AM_RANGE(0x500d, 0x500d) AM_READ_PORT("500d")
 	AM_RANGE(0x500e, 0x500e) AM_READ_PORT("500e")
 	AM_RANGE(0x500f, 0x500f) AM_READ_PORT("500f")
-	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE_MODERN("via6522_0",via6522_device,read,write)
-	AM_RANGE(0x5200, 0x5200) AM_READ(cashcade_r)
+	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE("via6522_0",via6522_device,read,write)
+	AM_RANGE(0x5200, 0x5200) AM_READ_LEGACY(cashcade_r)
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
-	AM_RANGE(0x52c0, 0x52c0) AM_READ(bv_p0)
-	AM_RANGE(0x52c1, 0x52c1) AM_READ(bv_p1)
-	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x52c0, 0x52c0) AM_READ_LEGACY(bv_p0)
+	AM_RANGE(0x52c1, 0x52c1) AM_READ_LEGACY(bv_p1)
+	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
-	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE_MODERN("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
-	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
-	AM_RANGE(0x5468, 0x5468) AM_READWRITE(cgdrr,cgdrw) // 4020 ripple counter outputs
+	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
+	AM_RANGE(0x5440, 0x5440) AM_WRITE_LEGACY(mlamps) // take win and gamble lamps
+	AM_RANGE(0x5468, 0x5468) AM_READWRITE_LEGACY(cgdrr,cgdrw) // 4020 ripple counter outputs
 	AM_RANGE(0x6000, 0x7fff) AM_ROM  // graphics rom map
 	AM_RANGE(0x8000, 0xffff) AM_ROM  // game roms
 ADDRESS_MAP_END

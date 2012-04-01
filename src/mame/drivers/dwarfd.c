@@ -599,32 +599,32 @@ static READ8_HANDLER(qc_b8_r)
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, dwarfd_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
+	AM_RANGE(0x4000, 0x4fff) AM_READWRITE_LEGACY(dwarfd_ram_r, dwarfd_ram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, dwarfd_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 
-	AM_RANGE(0x20, 0x20) AM_READWRITE(i8275_preg_r, i8275_preg_w)
-	AM_RANGE(0x21, 0x21) AM_READWRITE(i8275_sreg_r, i8275_creg_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE_LEGACY(i8275_preg_r, i8275_preg_w)
+	AM_RANGE(0x21, 0x21) AM_READWRITE_LEGACY(i8275_sreg_r, i8275_creg_w)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP // unknown
-	AM_RANGE(0x60, 0x60) AM_WRITE(output1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(output2_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(output1_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(output2_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc1, 0xc1) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qc_map, AS_PROGRAM, 8, dwarfd_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(dwarfd_ram_r, dwarfd_ram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qc_io_map, AS_IO, 8, dwarfd_state )
 	AM_IMPORT_FROM( io_map )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xb8, 0xb8) AM_READ(qc_b8_r)
+	AM_RANGE(0xb8, 0xb8) AM_READ_LEGACY(qc_b8_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dwarfd )

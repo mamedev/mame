@@ -139,17 +139,17 @@ static ADDRESS_MAP_START( mayumi_map, AS_PROGRAM, 8, mayumi_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_BASE_MEMBER(mayumi_state, m_videoram)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE_LEGACY(mayumi_videoram_w) AM_BASE( m_videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mayumi_io_map, AS_IO, 8, mayumi_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0") AM_WRITE(bank_sel_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(input_sel_w)
-	AM_RANGE(0xc1, 0xc2) AM_READ(key_matrix_r)	// 0xc0-c3 8255ppi
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0") AM_WRITE_LEGACY(bank_sel_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(input_sel_w)
+	AM_RANGE(0xc1, 0xc2) AM_READ_LEGACY(key_matrix_r)	// 0xc0-c3 8255ppi
 	AM_RANGE(0xc3, 0xc3) AM_WRITENOP		// 0xc0-c3 8255ppi
-	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 /*************************************

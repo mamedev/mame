@@ -914,39 +914,39 @@ void itech32_state::nvram_init(nvram_device &nvram, void *base, size_t length)
 
 /*------ Time Killers memory layout ------*/
 static ADDRESS_MAP_START( timekill_map, AS_PROGRAM, 16, itech32_state )
-	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_BASE_MEMBER(itech32_state, m_main_ram) AM_SHARE("nvram")
+	AM_RANGE(0x000000, 0x003fff) AM_RAM AM_BASE( m_main_ram) AM_SHARE("nvram")
 	AM_RANGE(0x040000, 0x040001) AM_READ_PORT("P1")
 	AM_RANGE(0x048000, 0x048001) AM_READ_PORT("P2")
-	AM_RANGE(0x050000, 0x050001) AM_READ_PORT("SYSTEM") AM_WRITE(timekill_intensity_w)
-	AM_RANGE(0x058000, 0x058001) AM_READ_PORT("DIPS") AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x060000, 0x060001) AM_WRITE(timekill_colora_w)
-	AM_RANGE(0x068000, 0x068001) AM_WRITE(timekill_colorbc_w)
+	AM_RANGE(0x050000, 0x050001) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(timekill_intensity_w)
+	AM_RANGE(0x058000, 0x058001) AM_READ_PORT("DIPS") AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x060000, 0x060001) AM_WRITE_LEGACY(timekill_colora_w)
+	AM_RANGE(0x068000, 0x068001) AM_WRITE_LEGACY(timekill_colorbc_w)
 	AM_RANGE(0x070000, 0x070001) AM_WRITENOP	/* noisy */
-	AM_RANGE(0x078000, 0x078001) AM_WRITE(sound_data_w)
-	AM_RANGE(0x080000, 0x08007f) AM_READWRITE(itech32_video_r, itech32_video_w) AM_BASE_MEMBER(itech32_state, m_video)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(int1_ack_w)
-	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM_WRITE(timekill_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(itech32_state, m_main_rom)
+	AM_RANGE(0x078000, 0x078001) AM_WRITE_LEGACY(sound_data_w)
+	AM_RANGE(0x080000, 0x08007f) AM_READWRITE_LEGACY(itech32_video_r, itech32_video_w) AM_BASE( m_video)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE_LEGACY(int1_ack_w)
+	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM_WRITE_LEGACY(timekill_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1", 0) AM_BASE( m_main_rom)
 ADDRESS_MAP_END
 
 
 /*------ BloodStorm and later games memory layout ------*/
 static ADDRESS_MAP_START( bloodstm_map, AS_PROGRAM, 16, itech32_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE_MEMBER(itech32_state, m_main_ram) AM_SHARE("nvram")
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1") AM_WRITE(int1_ack_w)
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE( m_main_ram) AM_SHARE("nvram")
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1") AM_WRITE_LEGACY(int1_ack_w)
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P2")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P3")
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P4") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P4") AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("DIPS")
-	AM_RANGE(0x300000, 0x300001) AM_WRITE(bloodstm_color1_w)
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(bloodstm_color2_w)
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x480000, 0x480001) AM_WRITE(sound_data_w)
-	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(bloodstm_video_r, bloodstm_video_w) AM_BASE_MEMBER(itech32_state, m_video)
-	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(bloodstm_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(bloodstm_plane_w)
+	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(bloodstm_color1_w)
+	AM_RANGE(0x380000, 0x380001) AM_WRITE_LEGACY(bloodstm_color2_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x480000, 0x480001) AM_WRITE_LEGACY(sound_data_w)
+	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE_LEGACY(bloodstm_video_r, bloodstm_video_w) AM_BASE( m_video)
+	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE_LEGACY(bloodstm_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE_LEGACY(bloodstm_plane_w)
 	AM_RANGE(0x780000, 0x780001) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x800000, 0x87ffff) AM_MIRROR(0x780000) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(itech32_state, m_main_rom)
+	AM_RANGE(0x800000, 0x87ffff) AM_MIRROR(0x780000) AM_ROM AM_REGION("user1", 0) AM_BASE( m_main_rom)
 ADDRESS_MAP_END
 
 
@@ -997,65 +997,65 @@ static WRITE32_HANDLER( test2_w )
 
 static ADDRESS_MAP_START( drivedge_map, AS_PROGRAM, 32, itech32_state )
 #if LOG_DRIVEDGE_UNINIT_RAM
-AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE(test1_r, test1_w)
-AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
+AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE_LEGACY(test1_r, test1_w)
+AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE_LEGACY(test2_r, test2_w)
 #endif
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_BASE_MEMBER(itech32_state, m_main_ram) AM_SHARE("nvram")
+	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_BASE( m_main_ram) AM_SHARE("nvram")
 	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("80000")
 	AM_RANGE(0x082000, 0x082003) AM_READ_PORT("82000")
-	AM_RANGE(0x084000, 0x084003) AM_READWRITE(sound_data32_r, sound_data32_w)
+	AM_RANGE(0x084000, 0x084003) AM_READWRITE_LEGACY(sound_data32_r, sound_data32_w)
 //  AM_RANGE(0x086000, 0x08623f) AM_RAM -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
-	AM_RANGE(0x088000, 0x088003) AM_READ(drivedge_steering_r)
-	AM_RANGE(0x08a000, 0x08a003) AM_READ(drivedge_gas_r) AM_WRITENOP
+	AM_RANGE(0x088000, 0x088003) AM_READ_LEGACY(drivedge_steering_r)
+	AM_RANGE(0x08a000, 0x08a003) AM_READ_LEGACY(drivedge_gas_r) AM_WRITENOP
 	AM_RANGE(0x08c000, 0x08c003) AM_READ_PORT("8c000")
 	AM_RANGE(0x08e000, 0x08e003) AM_READ_PORT("8e000") AM_WRITENOP
-	AM_RANGE(0x100000, 0x10000f) AM_WRITE(drivedge_zbuf_control_w) AM_BASE_MEMBER(itech32_state, m_drivedge_zbuf_control)
-	AM_RANGE(0x180000, 0x180003) AM_WRITE(drivedge_color0_w)
-	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_WRITE(drivedge_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100000, 0x10000f) AM_WRITE_LEGACY(drivedge_zbuf_control_w) AM_BASE( m_drivedge_zbuf_control)
+	AM_RANGE(0x180000, 0x180003) AM_WRITE_LEGACY(drivedge_color0_w)
+	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_WRITE_LEGACY(drivedge_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1c0000, 0x1c0003) AM_WRITENOP
-	AM_RANGE(0x1e0000, 0x1e0113) AM_READWRITE(itech020_video_r, itech020_video_w) AM_BASE_MEMBER(itech32_state, m_video)
-	AM_RANGE(0x1e4000, 0x1e4003) AM_WRITE(tms_reset_assert_w)
-	AM_RANGE(0x1ec000, 0x1ec003) AM_WRITE(tms_reset_clear_w)
+	AM_RANGE(0x1e0000, 0x1e0113) AM_READWRITE_LEGACY(itech020_video_r, itech020_video_w) AM_BASE( m_video)
+	AM_RANGE(0x1e4000, 0x1e4003) AM_WRITE_LEGACY(tms_reset_assert_w)
+	AM_RANGE(0x1ec000, 0x1ec003) AM_WRITE_LEGACY(tms_reset_clear_w)
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("200000")
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(tms1_68k_ram_w) AM_SHARE("share1")
-	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(tms2_68k_ram_w) AM_SHARE("share2")
-	AM_RANGE(0x380000, 0x380003) AM_WRITENOP // AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x600000, 0x607fff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(itech32_state, m_main_rom)
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE_LEGACY(tms1_68k_ram_w) AM_SHARE("share1")
+	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE_LEGACY(tms2_68k_ram_w) AM_SHARE("share2")
+	AM_RANGE(0x380000, 0x380003) AM_WRITENOP // AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x600000, 0x607fff) AM_ROM AM_REGION("user1", 0) AM_BASE( m_main_rom)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivedge_tms1_map, AS_PROGRAM, 32, itech32_state )
-	AM_RANGE(0x000000, 0x001fff) AM_RAM AM_BASE_MEMBER(itech32_state, m_tms1_boot)
-	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x400) AM_RAM_WRITE(tms1_trigger_w) AM_SHARE("share1") AM_BASE_MEMBER(itech32_state, m_tms1_ram)
+	AM_RANGE(0x000000, 0x001fff) AM_RAM AM_BASE( m_tms1_boot)
+	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(tms1_trigger_w) AM_SHARE("share1") AM_BASE( m_tms1_ram)
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivedge_tms2_map, AS_PROGRAM, 32, itech32_state )
-	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x8400) AM_RAM_WRITE(tms2_trigger_w) AM_SHARE("share2") AM_BASE_MEMBER(itech32_state, m_tms2_ram)
+	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x8400) AM_RAM_WRITE_LEGACY(tms2_trigger_w) AM_SHARE("share2") AM_BASE( m_tms2_ram)
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 ADDRESS_MAP_END
 
 
 /*------ 68EC020-based memory layout ------*/
 static ADDRESS_MAP_START( itech020_map, AS_PROGRAM, 32, itech32_state )
-	AM_RANGE(0x000000, 0x007fff) AM_RAM AM_BASE_MEMBER(itech32_state, m_main_ram)
-	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("P1") AM_WRITE(int1_ack32_w)
+	AM_RANGE(0x000000, 0x007fff) AM_RAM AM_BASE( m_main_ram)
+	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("P1") AM_WRITE_LEGACY(int1_ack32_w)
 	AM_RANGE(0x100000, 0x100003) AM_READ_PORT("P2")
 	AM_RANGE(0x180000, 0x180003) AM_READ_PORT("P3")
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("P4")
 	AM_RANGE(0x280000, 0x280003) AM_READ_PORT("DIPS")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(itech020_color1_w)
-	AM_RANGE(0x380000, 0x380003) AM_WRITE(itech020_color2_w)
-	AM_RANGE(0x400000, 0x400003) AM_WRITE(watchdog_reset32_w)
-	AM_RANGE(0x480000, 0x480003) AM_WRITE(sound_data32_w)
-	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE(itech020_video_r, itech020_video_w) AM_BASE_MEMBER(itech32_state, m_video)
+	AM_RANGE(0x300000, 0x300003) AM_WRITE_LEGACY(itech020_color1_w)
+	AM_RANGE(0x380000, 0x380003) AM_WRITE_LEGACY(itech020_color2_w)
+	AM_RANGE(0x400000, 0x400003) AM_WRITE_LEGACY(watchdog_reset32_w)
+	AM_RANGE(0x480000, 0x480003) AM_WRITE_LEGACY(sound_data32_w)
+	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE_LEGACY(itech020_video_r, itech020_video_w) AM_BASE( m_video)
 	AM_RANGE(0x578000, 0x57ffff) AM_READNOP				/* touched by protection */
-	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE(itech020_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE_LEGACY(itech020_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x603fff) AM_RAM AM_SHARE("nvram")
 /* ? */	AM_RANGE(0x61ff00, 0x61ffff) AM_WRITENOP			/* Unknown Writes */
-	AM_RANGE(0x680000, 0x680003) AM_READ(itech020_prot_result_r) AM_WRITENOP
+	AM_RANGE(0x680000, 0x680003) AM_READ_LEGACY(itech020_prot_result_r) AM_WRITENOP
 /* ! */	AM_RANGE(0x680800, 0x68083f) AM_READONLY AM_WRITENOP /* Serial DUART Channel A/B & Top LED sign - To Do! */
-	AM_RANGE(0x700000, 0x700003) AM_WRITE(itech020_plane_w)
-	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(itech32_state, m_main_rom)
+	AM_RANGE(0x700000, 0x700003) AM_WRITE_LEGACY(itech020_plane_w)
+	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("user1", 0) AM_BASE( m_main_rom)
 ADDRESS_MAP_END
 
 
@@ -1068,12 +1068,12 @@ ADDRESS_MAP_END
 
 /*------ Rev 1 sound board memory layout ------*/
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, itech32_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE(sound_return_w)
-	AM_RANGE(0x0400, 0x0400) AM_READ(sound_data_r)
-	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE("ensoniq", es5506_r, es5506_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
+	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY(sound_return_w)
+	AM_RANGE(0x0400, 0x0400) AM_READ_LEGACY(sound_data_r)
+	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE_LEGACY("ensoniq", es5506_r, es5506_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_WRITE_LEGACY(sound_bank_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP	/* noisy */
-	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
+	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1082,11 +1082,11 @@ ADDRESS_MAP_END
 
 /*------ Rev 2 sound board memory layout ------*/
 static ADDRESS_MAP_START( sound_020_map, AS_PROGRAM, 8, itech32_state )
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x400) AM_READ(sound_data_r)
-	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE("ensoniq", es5506_r, es5506_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x1400, 0x1400) AM_WRITE(firq_clear_w)
-	AM_RANGE(0x1800, 0x1800) AM_READ(sound_data_buffer_r) AM_WRITENOP
+	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x400) AM_READ_LEGACY(sound_data_r)
+	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE_LEGACY("ensoniq", es5506_r, es5506_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_WRITE_LEGACY(sound_bank_w)
+	AM_RANGE(0x1400, 0x1400) AM_WRITE_LEGACY(firq_clear_w)
+	AM_RANGE(0x1800, 0x1800) AM_READ_LEGACY(sound_data_buffer_r) AM_WRITENOP
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM

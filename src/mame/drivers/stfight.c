@@ -242,26 +242,26 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("P1")			/* IN1 */
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("P2")			/* IN2 */
 	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("START")		/* IN3 */
-	AM_RANGE(0xc203, 0xc204) AM_READ(stfight_dsw_r)		/* DS0,1 */
-	AM_RANGE(0xc205, 0xc205) AM_READ(stfight_coin_r)	/* coin mech */
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(stfight_fm_w)               /* play fm sound */
-	AM_RANGE(0xc600, 0xc600) AM_DEVWRITE("msm", stfight_adpcm_control_w)    /* voice control */
-	AM_RANGE(0xc700, 0xc700) AM_WRITE(stfight_coin_w)             /* coin mech */
+	AM_RANGE(0xc203, 0xc204) AM_READ_LEGACY(stfight_dsw_r)		/* DS0,1 */
+	AM_RANGE(0xc205, 0xc205) AM_READ_LEGACY(stfight_coin_r)	/* coin mech */
+	AM_RANGE(0xc500, 0xc500) AM_WRITE_LEGACY(stfight_fm_w)               /* play fm sound */
+	AM_RANGE(0xc600, 0xc600) AM_DEVWRITE_LEGACY("msm", stfight_adpcm_control_w)    /* voice control */
+	AM_RANGE(0xc700, 0xc700) AM_WRITE_LEGACY(stfight_coin_w)             /* coin mech */
 	AM_RANGE(0xc804, 0xc806) AM_WRITENOP                    /* TBD */
-	AM_RANGE(0xc807, 0xc807) AM_WRITE(stfight_sprite_bank_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(stfight_text_char_w) AM_BASE_MEMBER(stfight_state, m_text_char_ram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(stfight_text_attr_w) AM_BASE_MEMBER(stfight_state, m_text_attr_ram)
-	AM_RANGE(0xd800, 0xd808) AM_WRITE(stfight_vh_latch_w) AM_BASE_MEMBER(stfight_state, m_vh_latch_ram)
+	AM_RANGE(0xc807, 0xc807) AM_WRITE_LEGACY(stfight_sprite_bank_w)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(stfight_text_char_w) AM_BASE( m_text_char_ram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(stfight_text_attr_w) AM_BASE( m_text_attr_ram)
+	AM_RANGE(0xd800, 0xd808) AM_WRITE_LEGACY(stfight_vh_latch_w) AM_BASE( m_vh_latch_ram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(stfight_state, m_sprite_ram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE( m_sprite_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, stfight_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(stfight_e800_w)
-	AM_RANGE(0xf000, 0xf000) AM_READ(stfight_fm_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(stfight_e800_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ_LEGACY(stfight_fm_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

@@ -203,26 +203,26 @@ static WRITE8_HANDLER( fax_bank_select_w )
 
 static ADDRESS_MAP_START( exidy_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(exidy_state, m_videoram)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x003f) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite1_xpos)
-	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0x003f) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite1_ypos)
-	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0x003f) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite2_xpos)
-	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0x003f) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite2_ypos)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x003f) AM_WRITEONLY AM_BASE( m_sprite1_xpos)
+	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0x003f) AM_WRITEONLY AM_BASE( m_sprite1_ypos)
+	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0x003f) AM_WRITEONLY AM_BASE( m_sprite2_xpos)
+	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0x003f) AM_WRITEONLY AM_BASE( m_sprite2_ypos)
 	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_READ_PORT("DSW")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_spriteno)
+	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITEONLY AM_BASE( m_spriteno)
 	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_READ_PORT("IN0")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite_enable)
-	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ(exidy_interrupt_r)
-	AM_RANGE(0x5210, 0x5212) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_color_latch)
+	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITEONLY AM_BASE( m_sprite_enable)
+	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ_LEGACY(exidy_interrupt_r)
+	AM_RANGE(0x5210, 0x5212) AM_WRITEONLY AM_BASE( m_color_latch)
 	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sidetrac_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_BASE_MEMBER(exidy_state, m_characterram)
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
+	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_BASE( m_characterram)
+	AM_RANGE(0x5200, 0x5200) AM_WRITE_LEGACY(targ_audio_1_w)
+	AM_RANGE(0x5201, 0x5201) AM_WRITE_LEGACY(spectar_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
 	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
@@ -230,9 +230,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( targ_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE_MEMBER(exidy_state, m_characterram)
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(targ_audio_2_w)
+	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE( m_characterram)
+	AM_RANGE(0x5200, 0x5200) AM_WRITE_LEGACY(targ_audio_1_w)
+	AM_RANGE(0x5201, 0x5201) AM_WRITE_LEGACY(targ_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
 	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
@@ -240,9 +240,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spectar_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE_MEMBER(exidy_state, m_characterram)
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
+	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE( m_characterram)
+	AM_RANGE(0x5200, 0x5200) AM_WRITE_LEGACY(targ_audio_1_w)
+	AM_RANGE(0x5201, 0x5201) AM_WRITE_LEGACY(spectar_audio_2_w)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
 	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
@@ -251,28 +251,28 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rallys_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(exidy_state, m_videoram)
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE_MEMBER(exidy_state, m_characterram)
-	AM_RANGE(0x5000, 0x5000) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite1_xpos)
-	AM_RANGE(0x5001, 0x5001) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite1_ypos)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE( m_characterram)
+	AM_RANGE(0x5000, 0x5000) AM_WRITEONLY AM_BASE( m_sprite1_xpos)
+	AM_RANGE(0x5001, 0x5001) AM_WRITEONLY AM_BASE( m_sprite1_ypos)
 	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_READ_PORT("DSW")
-	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_spriteno)
+	AM_RANGE(0x5100, 0x5100) AM_MIRROR(0x00fc) AM_WRITEONLY AM_BASE( m_spriteno)
 	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_READ_PORT("IN0")
-	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite_enable)
-	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ(exidy_interrupt_r)
-	AM_RANGE(0x5200, 0x5200) AM_WRITE(targ_audio_1_w)
-	AM_RANGE(0x5201, 0x5201) AM_WRITE(spectar_audio_2_w)
-	AM_RANGE(0x5210, 0x5212) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_color_latch)
+	AM_RANGE(0x5101, 0x5101) AM_MIRROR(0x00fc) AM_WRITEONLY AM_BASE( m_sprite_enable)
+	AM_RANGE(0x5103, 0x5103) AM_MIRROR(0x00fc) AM_READ_LEGACY(exidy_interrupt_r)
+	AM_RANGE(0x5200, 0x5200) AM_WRITE_LEGACY(targ_audio_1_w)
+	AM_RANGE(0x5201, 0x5201) AM_WRITE_LEGACY(spectar_audio_2_w)
+	AM_RANGE(0x5210, 0x5212) AM_WRITEONLY AM_BASE( m_color_latch)
 	AM_RANGE(0x5213, 0x5213) AM_READ_PORT("IN2")
-	AM_RANGE(0x5300, 0x5300) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite2_xpos)
-	AM_RANGE(0x5301, 0x5301) AM_WRITEONLY AM_BASE_MEMBER(exidy_state, m_sprite2_ypos)
+	AM_RANGE(0x5300, 0x5300) AM_WRITEONLY AM_BASE( m_sprite2_xpos)
+	AM_RANGE(0x5301, 0x5301) AM_WRITEONLY AM_BASE( m_sprite2_ypos)
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("maincpu", 0x3f00)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( venture_map, AS_PROGRAM, 8, exidy_state )
-	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE_MEMBER(exidy_state, m_characterram)
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
+	AM_RANGE(0x4800, 0x4fff) AM_RAM AM_BASE( m_characterram)
+	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
@@ -280,8 +280,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pepper2_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x4800, 0x4fff) AM_NOP
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE_MEMBER(exidy_state, m_characterram)
+	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE( m_characterram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END
@@ -291,11 +291,11 @@ static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(fax_bank_select_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(fax_bank_select_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
+	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x5213, 0x5217) AM_WRITENOP		/* empty control lines on color/sound board */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE_MEMBER(exidy_state, m_characterram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_BASE( m_characterram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_IMPORT_FROM(exidy_map)
 ADDRESS_MAP_END

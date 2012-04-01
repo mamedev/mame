@@ -87,35 +87,35 @@ static WRITE8_HANDLER( nmi_mask_w )
 static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_MEMBER(pbaction_state, m_work_ram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(pbaction_videoram2_w) AM_BASE_MEMBER(pbaction_state, m_videoram2)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(pbaction_colorram2_w) AM_BASE_MEMBER(pbaction_state, m_colorram2)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(pbaction_videoram_w) AM_BASE_MEMBER(pbaction_state, m_videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(pbaction_colorram_w) AM_BASE_MEMBER(pbaction_state, m_colorram)
-	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE_MEMBER(pbaction_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE( m_work_ram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(pbaction_videoram2_w) AM_BASE( m_videoram2)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(pbaction_colorram2_w) AM_BASE( m_colorram2)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(pbaction_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE_LEGACY(pbaction_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE_LEGACY(nmi_mask_w)
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
 	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe604, 0xe604) AM_READ_PORT("DSW1") AM_WRITE(pbaction_flipscreen_w)
+	AM_RANGE(0xe604, 0xe604) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(pbaction_flipscreen_w)
 	AM_RANGE(0xe605, 0xe605) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe606, 0xe606) AM_READNOP	/* ??? */ AM_WRITE(pbaction_scroll_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(pbaction_sh_command_w)
+	AM_RANGE(0xe606, 0xe606) AM_READNOP	/* ??? */ AM_WRITE_LEGACY(pbaction_scroll_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(pbaction_sh_command_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xffff, 0xffff) AM_WRITENOP	/* watchdog? */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( pbaction_sound_io_map, AS_IO, 8, pbaction_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x20, 0x21) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x30, 0x31) AM_DEVWRITE("ay3", ay8910_address_data_w)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x20, 0x21) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x30, 0x31) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

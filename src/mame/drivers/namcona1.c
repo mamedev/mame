@@ -746,41 +746,41 @@ static WRITE16_HANDLER( mcu_mailbox_w_mcu )
 }
 
 static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16, namcona1_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE_MEMBER(namcona1_state, m_workram)
-	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE( m_workram)
+	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE_LEGACY(mcu_mailbox_r, mcu_mailbox_w_68k)
 	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)	/* code */
-	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE(namcona1_nvram_r, namcona1_nvram_w)
-	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE_MEMBER(namcona1_state, m_vreg)
-	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_MEMBER(namcona1_state, m_videoram)
+	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE_LEGACY(namcona1_nvram_r, namcona1_nvram_w)
+	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE_LEGACY(custom_key_r, custom_key_w)
+	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE_LEGACY(namcona1_vreg_r, namcona1_vreg_w) AM_BASE( m_vreg)
+	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE_LEGACY(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE_LEGACY(namcona1_gfxram_r, namcona1_gfxram_w)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE_LEGACY(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE_MEMBER(namcona1_state, m_scroll)		/* scroll registers */
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE_MEMBER(namcona1_state, m_spriteram)			/* spriteram */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE( m_scroll)		/* scroll registers */
+	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE( m_spriteram)			/* spriteram */
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16, namcona1_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE_MEMBER(namcona1_state, m_workram)
-	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE( m_workram)
+	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE_LEGACY(mcu_mailbox_r, mcu_mailbox_w_68k)
 	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP /* xday: serial out? */
 	AM_RANGE(0xd40000, 0xd40001) AM_WRITENOP /* xday: serial out? */
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP /* xday: serial out? */
 	AM_RANGE(0xdc0000, 0xdc001f) AM_WRITENOP /* xday: serial config? */
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)	/* code */
-	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE(namcona1_nvram_r, namcona1_nvram_w)
+	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE_LEGACY(namcona1_nvram_r, namcona1_nvram_w)
 	/* xday: additional battery-backed ram at 00E024FA? */
-	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE_MEMBER(namcona1_state, m_vreg)
-	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_MEMBER(namcona1_state, m_videoram)
+	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE_LEGACY(custom_key_r, custom_key_w)
+	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE_LEGACY(namcona1_vreg_r, namcona1_vreg_w) AM_BASE( m_vreg)
+	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE_LEGACY(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE_LEGACY(namcona1_gfxram_r, namcona1_gfxram_w)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE_LEGACY(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE( m_videoram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE_MEMBER(namcona1_state, m_scroll)		/* scroll registers */
-	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE_MEMBER(namcona1_state, m_spriteram)			/* spriteram */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE( m_scroll)		/* scroll registers */
+	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE( m_spriteram)			/* spriteram */
 ADDRESS_MAP_END
 
 
@@ -833,12 +833,12 @@ static WRITE16_DEVICE_HANDLER(snd_w)
 }
 
 static ADDRESS_MAP_START( namcona1_mcu_map, AS_PROGRAM, 16, namcona1_state )
-	AM_RANGE(0x000800, 0x000fff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_mcu)	// "Mailslot" communications ports
-	AM_RANGE(0x001000, 0x001fff) AM_DEVREADWRITE("c140", snd_r, snd_w)	// C140-alike sound chip
-	AM_RANGE(0x002000, 0x002fff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w)	// mirror of first page of shared work RAM
+	AM_RANGE(0x000800, 0x000fff) AM_READWRITE_LEGACY(mcu_mailbox_r, mcu_mailbox_w_mcu)	// "Mailslot" communications ports
+	AM_RANGE(0x001000, 0x001fff) AM_DEVREADWRITE_LEGACY("c140", snd_r, snd_w)	// C140-alike sound chip
+	AM_RANGE(0x002000, 0x002fff) AM_READWRITE_LEGACY(na1mcu_shared_r, na1mcu_shared_w)	// mirror of first page of shared work RAM
 	AM_RANGE(0x003000, 0x00afff) AM_RAM						// there is a 32k RAM chip according to CGFM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0)			// internal ROM BIOS
-	AM_RANGE(0x200000, 0x27ffff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w)	// shared work RAM
+	AM_RANGE(0x200000, 0x27ffff) AM_READWRITE_LEGACY(na1mcu_shared_r, na1mcu_shared_w)	// shared work RAM
 ADDRESS_MAP_END
 
 
@@ -964,12 +964,12 @@ static READ8_HANDLER( portana_r )
 }
 
 static ADDRESS_MAP_START( namcona1_mcu_io_map, AS_IO, 8, namcona1_state )
-	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READWRITE( port4_r, port4_w )
-	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READWRITE( port5_r, port5_w )
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE( port6_r, port6_w )
-	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READWRITE( port7_r, port7_w )
-	AM_RANGE(M37710_PORT8, M37710_PORT8) AM_READWRITE( port8_r, port8_w )
-	AM_RANGE(0x10, 0x1f) AM_READ( portana_r )
+	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READWRITE_LEGACY( port4_r, port4_w )
+	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READWRITE_LEGACY( port5_r, port5_w )
+	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE_LEGACY( port6_r, port6_w )
+	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READWRITE_LEGACY( port7_r, port7_w )
+	AM_RANGE(M37710_PORT8, M37710_PORT8) AM_READWRITE_LEGACY( port8_r, port8_w )
+	AM_RANGE(0x10, 0x1f) AM_READ_LEGACY( portana_r )
 ADDRESS_MAP_END
 
 

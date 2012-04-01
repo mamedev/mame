@@ -293,15 +293,15 @@ static WRITE8_HANDLER( palette_write )
 /* PROGRAM MAP */
 static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, gpworld_state )
 	AM_RANGE(0x0000,0xbfff) AM_ROM
-	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE_MEMBER(gpworld_state, m_sprite_RAM)
-	AM_RANGE(0xc800,0xcfff) AM_WRITE(palette_write) AM_BASE_MEMBER(gpworld_state, m_palette_RAM)	/* The memory test reads at 0xc800 */
-	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_BASE_MEMBER(gpworld_state, m_tile_RAM)
-	AM_RANGE(0xd800,0xd800) AM_READWRITE(ldp_read,ldp_write)
-/*  AM_RANGE(0xd801,0xd801) AM_READ(???) */
+	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE( m_sprite_RAM)
+	AM_RANGE(0xc800,0xcfff) AM_WRITE_LEGACY(palette_write) AM_BASE( m_palette_RAM)	/* The memory test reads at 0xc800 */
+	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_BASE( m_tile_RAM)
+	AM_RANGE(0xd800,0xd800) AM_READWRITE_LEGACY(ldp_read,ldp_write)
+/*  AM_RANGE(0xd801,0xd801) AM_READ_LEGACY(???) */
 	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL")	//8255 here....
-/*  AM_RANGE(0xda01,0xda01) AM_WRITE(???) */					/* These inputs are interesting - there are writes and reads all over these addr's */
-	AM_RANGE(0xda02,0xda02) AM_WRITE(brake_gas_write)				/*bit 0 select gas/brake input */
-	AM_RANGE(0xda20,0xda20) AM_READ(pedal_in)
+/*  AM_RANGE(0xda01,0xda01) AM_WRITE_LEGACY(???) */					/* These inputs are interesting - there are writes and reads all over these addr's */
+	AM_RANGE(0xda02,0xda02) AM_WRITE_LEGACY(brake_gas_write)				/*bit 0 select gas/brake input */
+	AM_RANGE(0xda20,0xda20) AM_READ_LEGACY(pedal_in)
 
 	AM_RANGE(0xe000,0xffff) AM_RAM								/* Potentially not all work RAM? */
 ADDRESS_MAP_END
@@ -310,7 +310,7 @@ ADDRESS_MAP_END
 /* I/O MAP */
 static ADDRESS_MAP_START( mainport, AS_IO, 8, gpworld_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_WRITE(misc_io_write)
+	AM_RANGE(0x01,0x01) AM_WRITE_LEGACY(misc_io_write)
 	AM_RANGE(0x80,0x80) AM_READ_PORT("IN0")
 	AM_RANGE(0x81,0x81) AM_READ_PORT("IN1")
 	AM_RANGE(0x82,0x82) AM_READ_PORT("DSW1")

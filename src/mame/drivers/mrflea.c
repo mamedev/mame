@@ -169,19 +169,19 @@ static WRITE8_HANDLER( mrflea_data1_w )
 static ADDRESS_MAP_START( mrflea_master_map, AS_PROGRAM, 8, mrflea_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(mrflea_videoram_w) AM_BASE_MEMBER(mrflea_state, m_videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xec00, 0xecff) AM_RAM_WRITE(mrflea_spriteram_w) AM_BASE_MEMBER(mrflea_state, m_spriteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(mrflea_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xec00, 0xecff) AM_RAM_WRITE_LEGACY(mrflea_spriteram_w) AM_BASE( m_spriteram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mrflea_master_io_map, AS_IO, 8, mrflea_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog? */
-	AM_RANGE(0x40, 0x40) AM_WRITE(mrflea_io_w)
-	AM_RANGE(0x41, 0x41) AM_READ(mrflea_main_r)
-	AM_RANGE(0x42, 0x42) AM_READ(mrflea_main_status_r)
+	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(mrflea_io_w)
+	AM_RANGE(0x41, 0x41) AM_READ_LEGACY(mrflea_main_r)
+	AM_RANGE(0x42, 0x42) AM_READ_LEGACY(mrflea_main_status_r)
 	AM_RANGE(0x43, 0x43) AM_WRITENOP /* 0xa6,0x0d,0x05 */
-	AM_RANGE(0x60, 0x60) AM_WRITE(mrflea_gfx_bank_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(mrflea_gfx_bank_w)
 ADDRESS_MAP_END
 
 
@@ -195,20 +195,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mrflea_slave_io_map, AS_IO, 8, mrflea_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x10, 0x10) AM_READ(mrflea_interrupt_type_r) AM_WRITENOP /* ? / irq ACK */
+	AM_RANGE(0x10, 0x10) AM_READ_LEGACY(mrflea_interrupt_type_r) AM_WRITENOP /* ? / irq ACK */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP /* 0x83,0x00,0xfc */
-	AM_RANGE(0x20, 0x20) AM_READ(mrflea_io_r)
-	AM_RANGE(0x21, 0x21) AM_WRITE(mrflea_main_w)
-	AM_RANGE(0x22, 0x22) AM_READ(mrflea_io_status_r)
+	AM_RANGE(0x20, 0x20) AM_READ_LEGACY(mrflea_io_r)
+	AM_RANGE(0x21, 0x21) AM_WRITE_LEGACY(mrflea_main_w)
+	AM_RANGE(0x22, 0x22) AM_READ_LEGACY(mrflea_io_status_r)
 	AM_RANGE(0x23, 0x23) AM_WRITENOP /* 0xb4,0x09,0x05 */
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x42, 0x42) AM_READWRITE(mrflea_input1_r, mrflea_data1_w)
-	AM_RANGE(0x43, 0x43) AM_WRITE(mrflea_select1_w)
-	AM_RANGE(0x44, 0x44) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0x44, 0x45) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0x46, 0x46) AM_DEVREAD("ay3", ay8910_r)
-	AM_RANGE(0x46, 0x47) AM_DEVWRITE("ay3", ay8910_data_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x42, 0x42) AM_READWRITE_LEGACY(mrflea_input1_r, mrflea_data1_w)
+	AM_RANGE(0x43, 0x43) AM_WRITE_LEGACY(mrflea_select1_w)
+	AM_RANGE(0x44, 0x44) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x44, 0x45) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x46, 0x46) AM_DEVREAD_LEGACY("ay3", ay8910_r)
+	AM_RANGE(0x46, 0x47) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 /*************************************

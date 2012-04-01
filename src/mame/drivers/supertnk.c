@@ -306,10 +306,10 @@ static ADDRESS_MAP_START( supertnk_map, AS_PROGRAM, 8, supertnk_state )
 	AM_RANGE(0x1800, 0x1bff) AM_RAM
 	AM_RANGE(0x1efc, 0x1efc) AM_READ_PORT("JOYS")
 	AM_RANGE(0x1efd, 0x1efd) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x1efe, 0x1eff) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x1efe, 0x1eff) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x1efe, 0x1efe) AM_READ_PORT("DSW")
 	AM_RANGE(0x1eff, 0x1eff) AM_READ_PORT("UNK")
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(supertnk_videoram_r, supertnk_videoram_w)
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(supertnk_videoram_r, supertnk_videoram_w)
 ADDRESS_MAP_END
 
 
@@ -322,12 +322,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( supertnk_io_map, AS_IO, 8, supertnk_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
-	AM_RANGE(0x0400, 0x0400) AM_WRITE(supertnk_bitplane_select_0_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE(supertnk_bitplane_select_1_w)
-	AM_RANGE(0x0402, 0x0402) AM_WRITE(supertnk_bankswitch_0_w)
-	AM_RANGE(0x0404, 0x0404) AM_WRITE(supertnk_bankswitch_1_w)
-	AM_RANGE(0x0406, 0x0406) AM_WRITE(supertnk_interrupt_ack_w)
-	AM_RANGE(0x0407, 0x0407) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0400, 0x0400) AM_WRITE_LEGACY(supertnk_bitplane_select_0_w)
+	AM_RANGE(0x0401, 0x0401) AM_WRITE_LEGACY(supertnk_bitplane_select_1_w)
+	AM_RANGE(0x0402, 0x0402) AM_WRITE_LEGACY(supertnk_bankswitch_0_w)
+	AM_RANGE(0x0404, 0x0404) AM_WRITE_LEGACY(supertnk_bankswitch_1_w)
+	AM_RANGE(0x0406, 0x0406) AM_WRITE_LEGACY(supertnk_interrupt_ack_w)
+	AM_RANGE(0x0407, 0x0407) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 
 

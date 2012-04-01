@@ -2214,21 +2214,21 @@ ADDRESS_MAP_END
 
 
 ADDRESS_MAP_START( ataxx_80186_map_io, AS_IO, 16, driver_device )
-	AM_RANGE(0xff00, 0xffff) AM_DEVREADWRITE("custom", i80186_internal_port_r, i80186_internal_port_w)
+	AM_RANGE(0xff00, 0xffff) AM_DEVREADWRITE_LEGACY("custom", i80186_internal_port_r, i80186_internal_port_w)
 ADDRESS_MAP_END
 
 
 ADDRESS_MAP_START( redline_80186_map_io, AS_IO, 16, driver_device )
-	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("custom", redline_dac_w)
-	AM_RANGE(0xff00, 0xffff) AM_DEVREADWRITE("custom", i80186_internal_port_r, i80186_internal_port_w)
+	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE_LEGACY("custom", redline_dac_w)
+	AM_RANGE(0xff00, 0xffff) AM_DEVREADWRITE_LEGACY("custom", i80186_internal_port_r, i80186_internal_port_w)
 ADDRESS_MAP_END
 
 
 ADDRESS_MAP_START( leland_80186_map_io, AS_IO, 16, driver_device )
-	AM_RANGE(0x0000, 0x000b) AM_DEVWRITE("custom", dac_w)
-	AM_RANGE(0x0080, 0x008b) AM_DEVWRITE("custom", dac_w)
-	AM_RANGE(0x00c0, 0x00cb) AM_DEVWRITE("custom", dac_w)
-	AM_RANGE(0xff00, 0xffff) AM_DEVREADWRITE("custom", i80186_internal_port_r, i80186_internal_port_w)
+	AM_RANGE(0x0000, 0x000b) AM_DEVWRITE_LEGACY("custom", dac_w)
+	AM_RANGE(0x0080, 0x008b) AM_DEVWRITE_LEGACY("custom", dac_w)
+	AM_RANGE(0x00c0, 0x00cb) AM_DEVWRITE_LEGACY("custom", dac_w)
+	AM_RANGE(0xff00, 0xffff) AM_DEVREADWRITE_LEGACY("custom", i80186_internal_port_r, i80186_internal_port_w)
 ADDRESS_MAP_END
 
 

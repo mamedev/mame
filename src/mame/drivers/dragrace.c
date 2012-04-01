@@ -168,14 +168,14 @@ static READ8_HANDLER( dragrace_scanline_r )
 
 static ADDRESS_MAP_START( dragrace_map, AS_PROGRAM, 8, dragrace_state )
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0800, 0x083f) AM_READ(dragrace_input_r)
-	AM_RANGE(0x0900, 0x091f) AM_WRITE(dragrace_misc_w)
-	AM_RANGE(0x0920, 0x093f) AM_WRITE(dragrace_misc_clear_w)
-	AM_RANGE(0x0a00, 0x0aff) AM_WRITEONLY AM_BASE_MEMBER(dragrace_state, m_playfield_ram)
-	AM_RANGE(0x0b00, 0x0bff) AM_WRITEONLY AM_BASE_MEMBER(dragrace_state, m_position_ram)
-	AM_RANGE(0x0c00, 0x0c00) AM_READ(dragrace_steering_r)
-	AM_RANGE(0x0d00, 0x0d00) AM_READ(dragrace_scanline_r)
-	AM_RANGE(0x0e00, 0x0eff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0800, 0x083f) AM_READ_LEGACY(dragrace_input_r)
+	AM_RANGE(0x0900, 0x091f) AM_WRITE_LEGACY(dragrace_misc_w)
+	AM_RANGE(0x0920, 0x093f) AM_WRITE_LEGACY(dragrace_misc_clear_w)
+	AM_RANGE(0x0a00, 0x0aff) AM_WRITEONLY AM_BASE( m_playfield_ram)
+	AM_RANGE(0x0b00, 0x0bff) AM_WRITEONLY AM_BASE( m_position_ram)
+	AM_RANGE(0x0c00, 0x0c00) AM_READ_LEGACY(dragrace_steering_r)
+	AM_RANGE(0x0d00, 0x0d00) AM_READ_LEGACY(dragrace_scanline_r)
+	AM_RANGE(0x0e00, 0x0eff) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM /* program */
 	AM_RANGE(0xf800, 0xffff) AM_ROM /* program mirror */
 ADDRESS_MAP_END

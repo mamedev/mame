@@ -769,8 +769,8 @@ static ADDRESS_MAP_START( map, AS_PROGRAM, 8, majorpkr_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_ROM AM_ROMBANK("rom_bank")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(paletteram_r, paletteram_w)	/* 4*4 palettes - 4 banks? */
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(vram_r, vram_w)				/* two tilemaps - 2 banks? */
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE_LEGACY(paletteram_r, paletteram_w)	/* 4*4 palettes - 4 banks? */
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE_LEGACY(vram_r, vram_w)				/* two tilemaps - 2 banks? */
 ADDRESS_MAP_END
 
 /*
@@ -796,25 +796,25 @@ ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START( portmap, AS_IO, 8, majorpkr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(rom_bank_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(palette_bank_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(vram_bank_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(rom_bank_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(palette_bank_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(vram_bank_w)
 
-	AM_RANGE(0x10, 0x10) AM_READ(mux_port2_r)	/* muxed set of controls */
-	AM_RANGE(0x10, 0x10) AM_WRITE(pulses_w)		/* kind of watchdog on bit4... mech counters on bits 0-1-2-3 */
+	AM_RANGE(0x10, 0x10) AM_READ_LEGACY(mux_port2_r)	/* muxed set of controls */
+	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(pulses_w)		/* kind of watchdog on bit4... mech counters on bits 0-1-2-3 */
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x11, 0x11) AM_WRITE(mux_sel_w)	/* multiplexer selector */
+	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(mux_sel_w)	/* multiplexer selector */
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN2")
-	AM_RANGE(0x12, 0x12) AM_WRITE(vidreg_w)		/* video registers: normal or up down screen */
-	AM_RANGE(0x13, 0x13) AM_READ(mux_port_r)	/* all 4 DIP switches banks multiplexed */
-	AM_RANGE(0x13, 0x13) AM_WRITE(lamps_a_w)	/* lamps a out */
+	AM_RANGE(0x12, 0x12) AM_WRITE_LEGACY(vidreg_w)		/* video registers: normal or up down screen */
+	AM_RANGE(0x13, 0x13) AM_READ_LEGACY(mux_port_r)	/* all 4 DIP switches banks multiplexed */
+	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(lamps_a_w)	/* lamps a out */
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("TEST")	/* "freeze" switch */
-	AM_RANGE(0x14, 0x14) AM_WRITE(lamps_b_w)	/* lamps b out */
+	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(lamps_b_w)	/* lamps b out */
 
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 
-	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_WRITENOP	/* leftover from a PSG SN76489/96? */
 ADDRESS_MAP_END
 

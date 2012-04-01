@@ -137,17 +137,17 @@ static WRITE8_HANDLER ( xyonix_io_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xyonix_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(xyonix_vidram_w) AM_BASE_MEMBER(xyonix_state,m_vidram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE_LEGACY(xyonix_vidram_w) AM_BASE(m_vidram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, xyonix_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_READNOP AM_DEVWRITE("sn1", sn76496_w)	/* SN76496 ready signal */
-	AM_RANGE(0x21, 0x21) AM_READNOP AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0x20, 0x20) AM_READNOP AM_DEVWRITE_LEGACY("sn1", sn76496_w)	/* SN76496 ready signal */
+	AM_RANGE(0x21, 0x21) AM_READNOP AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP		/* NMI ack? */
-	AM_RANGE(0x50, 0x50) AM_WRITE(xyonix_irqack_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE_LEGACY(xyonix_irqack_w)
 	AM_RANGE(0x60, 0x61) AM_WRITENOP		/* mc6845 */
-	AM_RANGE(0xe0, 0xe0) AM_READWRITE(xyonix_io_r, xyonix_io_w)
+	AM_RANGE(0xe0, 0xe0) AM_READWRITE_LEGACY(xyonix_io_r, xyonix_io_w)
 ADDRESS_MAP_END
 
 /* Inputs Ports **************************************************************/

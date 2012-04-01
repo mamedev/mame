@@ -90,35 +90,35 @@ static WRITE8_HANDLER( tbowl_sound_command_w )
 static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(tbowl_bg2videoram_w) AM_BASE_MEMBER(tbowl_state, m_bg2videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(tbowl_bgvideoram_w) AM_BASE_MEMBER(tbowl_state, m_bgvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(tbowl_txvideoram_w) AM_BASE_MEMBER(tbowl_state, m_txvideoram)
-//  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(tbowl_bg2videoram_w) AM_BASE( m_bg2videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE_LEGACY(tbowl_bgvideoram_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(tbowl_txvideoram_w) AM_BASE( m_txvideoram)
+//  AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(unknown_write) * written during start-up, not again */
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w) AM_BASE_MEMBER(tbowl_state, m_shared_ram) /* check */
-	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1") AM_WRITE(tbowlb_bankswitch_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(shared_r, shared_w) AM_BASE( m_shared_ram) /* check */
+	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1") AM_WRITE_LEGACY(tbowlb_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("P2")
-//  AM_RANGE(0xfc01, 0xfc01) AM_WRITE(unknown_write) /* written during start-up, not again */
+//  AM_RANGE(0xfc01, 0xfc01) AM_WRITE_LEGACY(unknown_write) /* written during start-up, not again */
 	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("P3")
-//  AM_RANGE(0xfc02, 0xfc02) AM_WRITE(unknown_write) /* written during start-up, not again */
-	AM_RANGE(0xfc03, 0xfc03) AM_READ_PORT("P4") AM_WRITE(tbowl_coin_counter_w)
-//  AM_RANGE(0xfc05, 0xfc05) AM_WRITE(unknown_write) /* no idea */
-//  AM_RANGE(0xfc06, 0xfc06) AM_READ(dummy_r)        /* Read During NMI */
+//  AM_RANGE(0xfc02, 0xfc02) AM_WRITE_LEGACY(unknown_write) /* written during start-up, not again */
+	AM_RANGE(0xfc03, 0xfc03) AM_READ_PORT("P4") AM_WRITE_LEGACY(tbowl_coin_counter_w)
+//  AM_RANGE(0xfc05, 0xfc05) AM_WRITE_LEGACY(unknown_write) /* no idea */
+//  AM_RANGE(0xfc06, 0xfc06) AM_READ_LEGACY(dummy_r)        /* Read During NMI */
 	AM_RANGE(0xfc07, 0xfc07) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfc08, 0xfc08) AM_READ_PORT("DSW1")
-//  AM_RANGE(0xfc08, 0xfc08) AM_WRITE(unknown_write) /* hardly used .. */
+//  AM_RANGE(0xfc08, 0xfc08) AM_WRITE_LEGACY(unknown_write) /* hardly used .. */
 	AM_RANGE(0xfc09, 0xfc09) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc0a, 0xfc0a) AM_READ_PORT("DSW3")
-//  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE(unknown_write) /* hardly used .. */
-	AM_RANGE(0xfc0d, 0xfc0d) AM_WRITE(tbowl_sound_command_w) /* not sure, used quite a bit */
-	AM_RANGE(0xfc10, 0xfc10) AM_WRITE(tbowl_bg2xscroll_lo)
-	AM_RANGE(0xfc11, 0xfc11) AM_WRITE(tbowl_bg2xscroll_hi)
-	AM_RANGE(0xfc12, 0xfc12) AM_WRITE(tbowl_bg2yscroll_lo)
-	AM_RANGE(0xfc13, 0xfc13) AM_WRITE(tbowl_bg2yscroll_hi)
-	AM_RANGE(0xfc14, 0xfc14) AM_WRITE(tbowl_bgxscroll_lo)
-	AM_RANGE(0xfc15, 0xfc15) AM_WRITE(tbowl_bgxscroll_hi)
-	AM_RANGE(0xfc16, 0xfc16) AM_WRITE(tbowl_bgyscroll_lo)
-	AM_RANGE(0xfc17, 0xfc17) AM_WRITE(tbowl_bgyscroll_hi)
+//  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE_LEGACY(unknown_write) /* hardly used .. */
+	AM_RANGE(0xfc0d, 0xfc0d) AM_WRITE_LEGACY(tbowl_sound_command_w) /* not sure, used quite a bit */
+	AM_RANGE(0xfc10, 0xfc10) AM_WRITE_LEGACY(tbowl_bg2xscroll_lo)
+	AM_RANGE(0xfc11, 0xfc11) AM_WRITE_LEGACY(tbowl_bg2xscroll_hi)
+	AM_RANGE(0xfc12, 0xfc12) AM_WRITE_LEGACY(tbowl_bg2yscroll_lo)
+	AM_RANGE(0xfc13, 0xfc13) AM_WRITE_LEGACY(tbowl_bg2yscroll_hi)
+	AM_RANGE(0xfc14, 0xfc14) AM_WRITE_LEGACY(tbowl_bgxscroll_lo)
+	AM_RANGE(0xfc15, 0xfc15) AM_WRITE_LEGACY(tbowl_bgxscroll_hi)
+	AM_RANGE(0xfc16, 0xfc16) AM_WRITE_LEGACY(tbowl_bgyscroll_lo)
+	AM_RANGE(0xfc17, 0xfc17) AM_WRITE_LEGACY(tbowl_bgyscroll_hi)
 ADDRESS_MAP_END
 
 /* Board C */
@@ -132,13 +132,13 @@ static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READONLY
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
-	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_BASE_MEMBER(tbowl_state, m_spriteram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram) // 2x palettes, one for each monitor?
+	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_BASE( m_spriteram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram) // 2x palettes, one for each monitor?
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(tbowlc_bankswitch_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(shared_r, shared_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(tbowlc_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITENOP /* ? */
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(tbowl_trigger_nmi) /* ? */
+	AM_RANGE(0xfc02, 0xfc02) AM_WRITE_LEGACY(tbowl_trigger_nmi) /* ? */
 	AM_RANGE(0xfc03, 0xfc03) AM_WRITENOP /* ? */
 	AM_RANGE(0xfc06, 0xfc06) AM_WRITENOP /* ? */
 ADDRESS_MAP_END
@@ -189,14 +189,14 @@ static void tbowl_adpcm_int(device_t *device)
 static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ym1", ym3812_w)
-	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE("ym2", ym3812_w)
-	AM_RANGE(0xe000, 0xe001) AM_WRITE(tbowl_adpcm_end_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITE(tbowl_adpcm_start_w)
-	AM_RANGE(0xe004, 0xe005) AM_WRITE(tbowl_adpcm_vol_w)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("ym1", ym3812_w)
+	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0xe000, 0xe001) AM_WRITE_LEGACY(tbowl_adpcm_end_w)
+	AM_RANGE(0xe002, 0xe003) AM_WRITE_LEGACY(tbowl_adpcm_start_w)
+	AM_RANGE(0xe004, 0xe005) AM_WRITE_LEGACY(tbowl_adpcm_vol_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITENOP
 	AM_RANGE(0xe007, 0xe007) AM_WRITENOP	/* NMI acknowledge */
-	AM_RANGE(0xe010, 0xe010) AM_READ(soundlatch_r)
+	AM_RANGE(0xe010, 0xe010) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
 /*** Input Ports

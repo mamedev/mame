@@ -201,16 +201,16 @@ static WRITE8_HANDLER( hopper_w )
 static ADDRESS_MAP_START( m14_map, AS_PROGRAM, 8, m14_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_BASE_MEMBER(m14_state, m_video_ram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_BASE_MEMBER(m14_state, m_color_ram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(m14_vram_w) AM_BASE( m_video_ram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(m14_cram_w) AM_BASE( m_color_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m14_io_map, AS_IO, 8, m14_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE") AM_WRITENOP
-	AM_RANGE(0xf9, 0xf9) AM_READ(input_buttons_r) AM_WRITENOP
-	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r) AM_WRITENOP
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE(hopper_w)
+	AM_RANGE(0xf9, 0xf9) AM_READ_LEGACY(input_buttons_r) AM_WRITENOP
+	AM_RANGE(0xfa, 0xfa) AM_READ_LEGACY(m14_rng_r) AM_WRITENOP
+	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE_LEGACY(hopper_w)
 	AM_RANGE(0xf8, 0xfc) AM_WRITENOP
 ADDRESS_MAP_END
 

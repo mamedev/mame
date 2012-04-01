@@ -328,9 +328,9 @@ static WRITE64_HANDLER(ppc_common_w)
 static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64, taitotz_state )
 	//AM_RANGE(0x00000000, 0x00000007) AM_RAM   // Register/RAM access port? - Written 128k+256k times on boot
 	//AM_RANGE(0x00000008, 0x0000000f) AM_RAM   // Register/RAM address port?
-	AM_RANGE(0x00000000, 0x0000000f) AM_WRITE(video_chip_w)
+	AM_RANGE(0x00000000, 0x0000000f) AM_WRITE_LEGACY(video_chip_w)
 	AM_RANGE(0x40000000, 0x400fffff) AM_RAM   // Work RAM
-	AM_RANGE(0xa8000000, 0xa8003fff) AM_READWRITE(ppc_common_r, ppc_common_w)   // Common RAM (with TLCS-900)
+	AM_RANGE(0xa8000000, 0xa8003fff) AM_READWRITE_LEGACY(ppc_common_r, ppc_common_w)   // Common RAM (with TLCS-900)
 	//AM_RANGE(0xa8003ff8, 0xa8003fff) AM_RAM   // TLCS-900 related?
 	AM_RANGE(0xac000000, 0xac0fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)

@@ -145,21 +145,21 @@ static WRITE8_HANDLER( sound_arm_nmi_w )
 /********************************************/
 
 static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(parodius_state, m_ram)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE( m_ram)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x3f8c, 0x3f8c) AM_READ_PORT("P1")
 	AM_RANGE(0x3f8d, 0x3f8d) AM_READ_PORT("P2")
 	AM_RANGE(0x3f8e, 0x3f8e) AM_READ_PORT("DSW3")
 	AM_RANGE(0x3f8f, 0x3f8f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3f90, 0x3f90) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3fa0, 0x3faf) AM_DEVREADWRITE("k053245", k053244_r, k053244_w)
-	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE("k053251", k053251_w)
-	AM_RANGE(0x3fc0, 0x3fc0) AM_READWRITE(watchdog_reset_r,parodius_3fc0_w)
-	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE(parodius_videobank_w)
-	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE(parodius_sh_irqtrigger_w)
-	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVREADWRITE("k053260", parodius_sound_r, k053260_w)	/* K053260 */
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(parodius_052109_053245_r, parodius_052109_053245_w)
-	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE("k052109", k052109_r, k052109_w)
+	AM_RANGE(0x3fa0, 0x3faf) AM_DEVREADWRITE_LEGACY("k053245", k053244_r, k053244_w)
+	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
+	AM_RANGE(0x3fc0, 0x3fc0) AM_READWRITE_LEGACY(watchdog_reset_r,parodius_3fc0_w)
+	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE_LEGACY(parodius_videobank_w)
+	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE_LEGACY(parodius_sh_irqtrigger_w)
+	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVREADWRITE_LEGACY("k053260", parodius_sound_r, k053260_w)	/* K053260 */
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE_LEGACY(parodius_052109_053245_r, parodius_052109_053245_w)
+	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")			/* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM					/* ROM */
 ADDRESS_MAP_END
@@ -167,9 +167,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( parodius_sound_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_r,k053260_w)
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(sound_arm_nmi_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r,k053260_w)
 ADDRESS_MAP_END
 
 

@@ -228,23 +228,23 @@ static WRITE32_HANDLER( superchs_stick_w )
 
 static ADDRESS_MAP_START( superchs_map, AS_PROGRAM, 32, superchs_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE_MEMBER(superchs_state, m_ram)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_SIZE_MEMBER(superchs_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x180000, 0x18ffff) AM_DEVREADWRITE("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)
-	AM_RANGE(0x1b0000, 0x1b002f) AM_DEVREADWRITE("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE_MEMBER(superchs_state, m_shared_ram)
-	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(superchs_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM AM_BASE( m_ram)
+	AM_RANGE(0x140000, 0x141fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x180000, 0x18ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)
+	AM_RANGE(0x1b0000, 0x1b002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE( m_shared_ram)
+	AM_RANGE(0x240000, 0x240003) AM_WRITE_LEGACY(cpua_ctrl_w)
+	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE_LEGACY(superchs_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM AM_SHARE("f3_shared")
-	AM_RANGE(0x300000, 0x300007) AM_READWRITE(superchs_input_r, superchs_input_w)	/* eerom etc. */
-	AM_RANGE(0x340000, 0x340003) AM_READWRITE(superchs_stick_r, superchs_stick_w)	/* stick int request */
+	AM_RANGE(0x300000, 0x300007) AM_READWRITE_LEGACY(superchs_input_r, superchs_input_w)	/* eerom etc. */
+	AM_RANGE(0x340000, 0x340003) AM_READWRITE_LEGACY(superchs_stick_r, superchs_stick_w)	/* stick int request */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superchs_cpub_map, AS_PROGRAM, 16, superchs_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE("tc0480scp", tc0480scp_word_w) /* Only written upon errors */
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
+	AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE_LEGACY("tc0480scp", tc0480scp_word_w) /* Only written upon errors */
+	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w)
 	AM_RANGE(0xa00000, 0xa001ff) AM_RAM	/* Extra road control?? */
 ADDRESS_MAP_END
 

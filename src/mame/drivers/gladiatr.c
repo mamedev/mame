@@ -376,12 +376,12 @@ static MACHINE_RESET( ppking )
 
 static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_MEMBER(gladiatr_state, m_spriteram)
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(ppking_video_registers_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE_MEMBER(gladiatr_state, m_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE_MEMBER(gladiatr_state, m_colorram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE_MEMBER(gladiatr_state, m_textram)
+	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xcc00, 0xcfff) AM_WRITE_LEGACY(ppking_video_registers_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(gladiatr_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(gladiatr_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(gladiatr_textram_w) AM_BASE( m_textram)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
@@ -393,19 +393,19 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, gladiatr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(gladiatr_spritebuffer_w)
 	AM_RANGE(0xc004, 0xc004) AM_NOP	// WRITE(ppking_irq_patch_w)
-	AM_RANGE(0xc09e, 0xc09f) AM_READ(qx0_r) AM_WRITE(qx0_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_READ_LEGACY(qx0_r) AM_WRITE_LEGACY(qx0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x20, 0x21) AM_READ(qx1_r) AM_WRITE(qx1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x20, 0x21) AM_READ_LEGACY(qx1_r) AM_WRITE_LEGACY(qx1_w)
 	AM_RANGE(0x40, 0x40) AM_READNOP
-	AM_RANGE(0x60, 0x61) AM_READ(qx2_r) AM_WRITE(qx2_w)
-	AM_RANGE(0x80, 0x81) AM_READ(qx3_r) AM_WRITE(qx3_w)
+	AM_RANGE(0x60, 0x61) AM_READ_LEGACY(qx2_r) AM_WRITE_LEGACY(qx2_w)
+	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(qx3_r) AM_WRITE_LEGACY(qx3_w)
 ADDRESS_MAP_END
 
 
@@ -414,12 +414,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_MEMBER(gladiatr_state, m_spriteram)
-	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(gladiatr_video_registers_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE_MEMBER(gladiatr_state, m_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE_MEMBER(gladiatr_state, m_colorram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE_MEMBER(gladiatr_state, m_textram)
+	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xcc00, 0xcfff) AM_WRITE_LEGACY(gladiatr_video_registers_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(gladiatr_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(gladiatr_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(gladiatr_textram_w) AM_BASE( m_textram)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
@@ -429,32 +429,32 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gladiatr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
-	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("msm", glad_adpcm_w)
-	AM_RANGE(0x2000, 0x2fff) AM_READ(glad_cpu_sound_command_r)
+	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE_LEGACY("msm", glad_adpcm_w)
+	AM_RANGE(0x2000, 0x2fff) AM_READ_LEGACY(glad_cpu_sound_command_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(gladiatr_spritebank_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(gladiatr_bankswitch_w)
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
-	AM_RANGE(0xc007, 0xc007) AM_WRITE(gladiatr_flipscreen_w)
-	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(TAITO8741_0_r, TAITO8741_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(gladiatr_spritebuffer_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE_LEGACY(gladiatr_spritebank_w)
+	AM_RANGE(0xc002, 0xc002) AM_WRITE_LEGACY(gladiatr_bankswitch_w)
+	AM_RANGE(0xc004, 0xc004) AM_WRITE_LEGACY(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
+	AM_RANGE(0xc007, 0xc007) AM_WRITE_LEGACY(gladiatr_flipscreen_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE_LEGACY(TAITO8741_0_r, TAITO8741_0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP	// watchdog_reset_w doesn't work
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x20, 0x21) AM_READWRITE(TAITO8741_1_r, TAITO8741_1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x20, 0x21) AM_READWRITE_LEGACY(TAITO8741_1_r, TAITO8741_1_w)
 	AM_RANGE(0x40, 0x40) AM_NOP	// WRITE(sub_irq_ack_w)
-	AM_RANGE(0x60, 0x61) AM_READWRITE(TAITO8741_2_r, TAITO8741_2_w)
-	AM_RANGE(0x80, 0x81) AM_READWRITE(TAITO8741_3_r, TAITO8741_3_w)
+	AM_RANGE(0x60, 0x61) AM_READWRITE_LEGACY(TAITO8741_2_r, TAITO8741_2_w)
+	AM_RANGE(0x80, 0x81) AM_READWRITE_LEGACY(TAITO8741_3_r, TAITO8741_3_w)
 	AM_RANGE(0xa0, 0xa7) AM_NOP	// filters on sound output
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(glad_cpu_sound_command_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(glad_cpu_sound_command_w)
 ADDRESS_MAP_END
 
 

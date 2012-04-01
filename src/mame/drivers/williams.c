@@ -510,12 +510,12 @@
  *************************************/
 
 static ADDRESS_MAP_START( defender_map, AS_PROGRAM, 8, williams_state )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(williams_state, m_videoram)
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE( m_videoram)
 	/* range from 0xc000-0xcfff is mapped programmatically below */
 	AM_RANGE(0xc000, 0xc00f) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc400, 0xc4ff) AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(defender_bank_select_w)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE_LEGACY(defender_bank_select_w)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -547,31 +547,31 @@ void defender_install_io_space(address_space *space)
  *************************************/
 
 static ADDRESS_MAP_START( williams_map, AS_PROGRAM, 8, williams_state )
-	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, m_videoram)
+	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE( m_videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
-	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
-	AM_RANGE(0xc900, 0xc9ff) AM_WRITE(williams_vram_select_w)
-	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
-	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
-	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
+	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
+	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
+	AM_RANGE(0xc900, 0xc9ff) AM_WRITE_LEGACY(williams_vram_select_w)
+	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE_LEGACY(williams_blitter_w)
+	AM_RANGE(0xcb00, 0xcbff) AM_READ_LEGACY(williams_video_counter_r)
+	AM_RANGE(0xcbff, 0xcbff) AM_WRITE_LEGACY(williams_watchdog_reset_w)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(williams_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( williams_extra_ram_map, AS_PROGRAM, 8, williams_state )
-	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, m_videoram)
+	AM_RANGE(0x0000, 0x8fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE( m_videoram)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
-	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
-	AM_RANGE(0xc900, 0xc9ff) AM_WRITE(sinistar_vram_select_w)
-	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
-	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
-	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
+	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
+	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
+	AM_RANGE(0xc900, 0xc9ff) AM_WRITE_LEGACY(sinistar_vram_select_w)
+	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE_LEGACY(williams_blitter_w)
+	AM_RANGE(0xcb00, 0xcbff) AM_READ_LEGACY(williams_video_counter_r)
+	AM_RANGE(0xcbff, 0xcbff) AM_WRITE_LEGACY(williams_watchdog_reset_w)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(williams_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -585,22 +585,22 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( blaster_map, AS_PROGRAM, 8, williams_state )
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, m_videoram)
+	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE( m_videoram)
 	AM_RANGE(0x4000, 0x8fff) AM_READ_BANK("bank2") AM_WRITEONLY
-	AM_RANGE(0xbb00, 0xbbff) AM_WRITEONLY AM_BASE_MEMBER(williams_state, m_blaster_palette_0)
-	AM_RANGE(0xbc00, 0xbcff) AM_WRITEONLY AM_BASE_MEMBER(williams_state, m_blaster_scanline_control)
+	AM_RANGE(0xbb00, 0xbbff) AM_WRITEONLY AM_BASE( m_blaster_palette_0)
+	AM_RANGE(0xbc00, 0xbcff) AM_WRITEONLY AM_BASE( m_blaster_scanline_control)
 	AM_RANGE(0x9000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x03f0) AM_WRITEONLY AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
-	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
-	AM_RANGE(0xc900, 0xc93f) AM_WRITE(blaster_vram_select_w)
-	AM_RANGE(0xc940, 0xc97f) AM_WRITE(blaster_remap_select_w)
-	AM_RANGE(0xc980, 0xc9bf) AM_WRITE(blaster_bank_select_w)
-	AM_RANGE(0xc9c0, 0xc9ff) AM_WRITE(blaster_video_control_w)
-	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
-	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
-	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
+	AM_RANGE(0xc804, 0xc807) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
+	AM_RANGE(0xc80c, 0xc80f) AM_MIRROR(0x00f0) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
+	AM_RANGE(0xc900, 0xc93f) AM_WRITE_LEGACY(blaster_vram_select_w)
+	AM_RANGE(0xc940, 0xc97f) AM_WRITE_LEGACY(blaster_remap_select_w)
+	AM_RANGE(0xc980, 0xc9bf) AM_WRITE_LEGACY(blaster_bank_select_w)
+	AM_RANGE(0xc9c0, 0xc9ff) AM_WRITE_LEGACY(blaster_video_control_w)
+	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE_LEGACY(williams_blitter_w)
+	AM_RANGE(0xcb00, 0xcbff) AM_READ_LEGACY(williams_video_counter_r)
+	AM_RANGE(0xcbff, 0xcbff) AM_WRITE_LEGACY(williams_watchdog_reset_w)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(williams_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -613,45 +613,45 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( williams2_map, AS_PROGRAM, 8, williams_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, m_videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE( m_videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_BASE_MEMBER(williams_state, m_williams2_tileram)
-	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
-	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE(williams_blitter_w)
-	AM_RANGE(0xc900, 0xc97f) AM_WRITE(williams2_watchdog_reset_w)
-	AM_RANGE(0xc980, 0xc983) AM_MIRROR(0x0070) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
-	AM_RANGE(0xc984, 0xc987) AM_MIRROR(0x0070) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
-	AM_RANGE(0xc98c, 0xc98f) AM_MIRROR(0x0070) AM_WRITE(williams2_7segment_w)
-	AM_RANGE(0xcb00, 0xcb1f) AM_WRITE(williams2_fg_select_w)
-	AM_RANGE(0xcb20, 0xcb3f) AM_WRITE(williams2_bg_select_w)
-	AM_RANGE(0xcb40, 0xcb5f) AM_WRITE(williams2_xscroll_low_w)
-	AM_RANGE(0xcb60, 0xcb7f) AM_WRITE(williams2_xscroll_high_w)
-	AM_RANGE(0xcb80, 0xcb9f) AM_WRITE(defender_video_control_w)
-	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE(williams2_blit_window_enable_w)
-	AM_RANGE(0xcbe0, 0xcbef) AM_READ(williams2_video_counter_r)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(williams2_tileram_w) AM_BASE( m_williams2_tileram)
+	AM_RANGE(0xc800, 0xc87f) AM_WRITE_LEGACY(williams2_bank_select_w)
+	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE_LEGACY(williams_blitter_w)
+	AM_RANGE(0xc900, 0xc97f) AM_WRITE_LEGACY(williams2_watchdog_reset_w)
+	AM_RANGE(0xc980, 0xc983) AM_MIRROR(0x0070) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
+	AM_RANGE(0xc984, 0xc987) AM_MIRROR(0x0070) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
+	AM_RANGE(0xc98c, 0xc98f) AM_MIRROR(0x0070) AM_WRITE_LEGACY(williams2_7segment_w)
+	AM_RANGE(0xcb00, 0xcb1f) AM_WRITE_LEGACY(williams2_fg_select_w)
+	AM_RANGE(0xcb20, 0xcb3f) AM_WRITE_LEGACY(williams2_bg_select_w)
+	AM_RANGE(0xcb40, 0xcb5f) AM_WRITE_LEGACY(williams2_xscroll_low_w)
+	AM_RANGE(0xcb60, 0xcb7f) AM_WRITE_LEGACY(williams2_xscroll_high_w)
+	AM_RANGE(0xcb80, 0xcb9f) AM_WRITE_LEGACY(defender_video_control_w)
+	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE_LEGACY(williams2_blit_window_enable_w)
+	AM_RANGE(0xcbe0, 0xcbef) AM_READ_LEGACY(williams2_video_counter_r)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(williams_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( williams2_extra_ram_map, AS_PROGRAM, 8, williams_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE_MEMBER(williams_state, m_videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_READ_BANK("bank1") AM_WRITEONLY AM_BASE( m_videoram)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(williams2_tileram_w) AM_BASE_MEMBER(williams_state, m_williams2_tileram)
-	AM_RANGE(0xc800, 0xc87f) AM_WRITE(williams2_bank_select_w)
-	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE(williams_blitter_w)
-	AM_RANGE(0xc900, 0xc97f) AM_WRITE(williams2_watchdog_reset_w)
-	AM_RANGE(0xc980, 0xc983) AM_MIRROR(0x0070) AM_DEVREADWRITE_MODERN("pia_1", pia6821_device, read, write)
-	AM_RANGE(0xc984, 0xc987) AM_MIRROR(0x0070) AM_DEVREADWRITE_MODERN("pia_0", pia6821_device, read, write)
-	AM_RANGE(0xc98c, 0xc98f) AM_MIRROR(0x0070) AM_WRITE(williams2_7segment_w)
-	AM_RANGE(0xcb00, 0xcb1f) AM_WRITE(williams2_fg_select_w)
-	AM_RANGE(0xcb20, 0xcb3f) AM_WRITE(williams2_bg_select_w)
-	AM_RANGE(0xcb40, 0xcb5f) AM_WRITE(williams2_xscroll_low_w)
-	AM_RANGE(0xcb60, 0xcb7f) AM_WRITE(williams2_xscroll_high_w)
-	AM_RANGE(0xcb80, 0xcb9f) AM_WRITE(defender_video_control_w)
-	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE(williams2_blit_window_enable_w)
-	AM_RANGE(0xcbe0, 0xcbef) AM_READ(williams2_video_counter_r)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(williams2_tileram_w) AM_BASE( m_williams2_tileram)
+	AM_RANGE(0xc800, 0xc87f) AM_WRITE_LEGACY(williams2_bank_select_w)
+	AM_RANGE(0xc880, 0xc887) AM_MIRROR(0x0078) AM_WRITE_LEGACY(williams_blitter_w)
+	AM_RANGE(0xc900, 0xc97f) AM_WRITE_LEGACY(williams2_watchdog_reset_w)
+	AM_RANGE(0xc980, 0xc983) AM_MIRROR(0x0070) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
+	AM_RANGE(0xc984, 0xc987) AM_MIRROR(0x0070) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
+	AM_RANGE(0xc98c, 0xc98f) AM_MIRROR(0x0070) AM_WRITE_LEGACY(williams2_7segment_w)
+	AM_RANGE(0xcb00, 0xcb1f) AM_WRITE_LEGACY(williams2_fg_select_w)
+	AM_RANGE(0xcb20, 0xcb3f) AM_WRITE_LEGACY(williams2_bg_select_w)
+	AM_RANGE(0xcb40, 0xcb5f) AM_WRITE_LEGACY(williams2_xscroll_low_w)
+	AM_RANGE(0xcb60, 0xcb7f) AM_WRITE_LEGACY(williams2_xscroll_high_w)
+	AM_RANGE(0xcb80, 0xcb9f) AM_WRITE_LEGACY(defender_video_control_w)
+	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE_LEGACY(williams2_blit_window_enable_w)
+	AM_RANGE(0xcbe0, 0xcbef) AM_READ_LEGACY(williams2_video_counter_r)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(williams_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -666,7 +666,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( defender_sound_map, AS_PROGRAM, 8, williams_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE_MODERN("pia_2", pia6821_device, read, write)
+	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -674,7 +674,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, williams_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM		/* MC6810 RAM */
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE_MODERN("pia_2", pia6821_device, read, write)
+	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -682,7 +682,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map_b, AS_PROGRAM, 8, williams_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM		/* MC6810 RAM */
-	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE_MODERN("pia_2b", pia6821_device, read, write)
+	AM_RANGE(0x0400, 0x0403) AM_MIRROR(0x8000) AM_DEVREADWRITE("pia_2b", pia6821_device, read, write)
 	AM_RANGE(0xb000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -697,7 +697,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( williams2_sound_map, AS_PROGRAM, 8, williams_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM		/* MC6810 RAM */
-	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE_MODERN("pia_2", pia6821_device, read, write)
+	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("pia_2", pia6821_device, read, write)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

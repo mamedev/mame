@@ -287,15 +287,15 @@ TODO:
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_videoram, m_videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_objectram, m_objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE( m_objectram, m_objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE(bublbobl_sound_status_r, bublbobl_sound_command_w)
-	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(bublbobl_soundcpu_reset_w)
-	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xfb40, 0xfb40) AM_WRITE(bublbobl_bankswitch_w)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_BASE_MEMBER(bublbobl_state, m_mcu_sharedram)
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE_LEGACY(bublbobl_sound_status_r, bublbobl_sound_command_w)
+	AM_RANGE(0xfa03, 0xfa03) AM_WRITE_LEGACY(bublbobl_soundcpu_reset_w)
+	AM_RANGE(0xfa80, 0xfa80) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xfb40, 0xfb40) AM_WRITE_LEGACY(bublbobl_bankswitch_w)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_BASE( m_mcu_sharedram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, bublbobl_state )
@@ -306,23 +306,23 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym3526_r, ym3526_w)
-	AM_RANGE(0xb000, 0xb000) AM_READWRITE(soundlatch_r, bublbobl_sound_status_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(bublbobl_sh_nmi_enable_w) AM_READNOP
-	AM_RANGE(0xb002, 0xb002) AM_WRITE(bublbobl_sh_nmi_disable_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym3526_r, ym3526_w)
+	AM_RANGE(0xb000, 0xb000) AM_READWRITE_LEGACY(soundlatch_r, bublbobl_sound_status_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(bublbobl_sh_nmi_enable_w) AM_READNOP
+	AM_RANGE(0xb002, 0xb002) AM_WRITE_LEGACY(bublbobl_sh_nmi_disable_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM	// space for diagnostic ROM?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, bublbobl_state )
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(bublbobl_mcu_ddr1_r, bublbobl_mcu_ddr1_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(bublbobl_mcu_ddr2_r, bublbobl_mcu_ddr2_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bublbobl_mcu_port1_r, bublbobl_mcu_port1_w)
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(bublbobl_mcu_port2_r, bublbobl_mcu_port2_w)
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE(bublbobl_mcu_ddr3_r, bublbobl_mcu_ddr3_w)
-	AM_RANGE(0x0005, 0x0005) AM_READWRITE(bublbobl_mcu_ddr4_r, bublbobl_mcu_ddr4_w)
-	AM_RANGE(0x0006, 0x0006) AM_READWRITE(bublbobl_mcu_port3_r, bublbobl_mcu_port3_w)
-	AM_RANGE(0x0007, 0x0007) AM_READWRITE(bublbobl_mcu_port4_r, bublbobl_mcu_port4_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(bublbobl_mcu_ddr1_r, bublbobl_mcu_ddr1_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(bublbobl_mcu_ddr2_r, bublbobl_mcu_ddr2_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(bublbobl_mcu_port1_r, bublbobl_mcu_port1_w)
+	AM_RANGE(0x0003, 0x0003) AM_READWRITE_LEGACY(bublbobl_mcu_port2_r, bublbobl_mcu_port2_w)
+	AM_RANGE(0x0004, 0x0004) AM_READWRITE_LEGACY(bublbobl_mcu_ddr3_r, bublbobl_mcu_ddr3_w)
+	AM_RANGE(0x0005, 0x0005) AM_READWRITE_LEGACY(bublbobl_mcu_ddr4_r, bublbobl_mcu_ddr4_w)
+	AM_RANGE(0x0006, 0x0006) AM_READWRITE_LEGACY(bublbobl_mcu_port3_r, bublbobl_mcu_port3_w)
+	AM_RANGE(0x0007, 0x0007) AM_READWRITE_LEGACY(bublbobl_mcu_port4_r, bublbobl_mcu_port4_w)
 	AM_RANGE(0x0040, 0x00ff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -330,11 +330,11 @@ ADDRESS_MAP_END
 // The 68705 is from a bootleg, the original MCU is a 6801U4
 static ADDRESS_MAP_START( bootlegmcu_map, AS_PROGRAM, 8, bublbobl_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x000, 0x000) AM_READWRITE(bublbobl_68705_port_a_r, bublbobl_68705_port_a_w)
-	AM_RANGE(0x001, 0x001) AM_READWRITE(bublbobl_68705_port_b_r, bublbobl_68705_port_b_w)
+	AM_RANGE(0x000, 0x000) AM_READWRITE_LEGACY(bublbobl_68705_port_a_r, bublbobl_68705_port_a_w)
+	AM_RANGE(0x001, 0x001) AM_READWRITE_LEGACY(bublbobl_68705_port_b_r, bublbobl_68705_port_b_w)
 	AM_RANGE(0x002, 0x002) AM_READ_PORT("IN0")	// COIN
-	AM_RANGE(0x004, 0x004) AM_WRITE(bublbobl_68705_ddr_a_w)
-	AM_RANGE(0x005, 0x005) AM_WRITE(bublbobl_68705_ddr_b_w)
+	AM_RANGE(0x004, 0x004) AM_WRITE_LEGACY(bublbobl_68705_ddr_a_w)
+	AM_RANGE(0x005, 0x005) AM_WRITE_LEGACY(bublbobl_68705_ddr_b_w)
 	AM_RANGE(0x006, 0x006) AM_WRITENOP // ???
 	AM_RANGE(0x010, 0x07f) AM_RAM
 	AM_RANGE(0x080, 0x7ff) AM_ROM
@@ -343,18 +343,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_videoram, m_videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_objectram, m_objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE( m_objectram, m_objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE(bublbobl_sound_status_r, bublbobl_sound_command_w)
-	AM_RANGE(0xfa03, 0xfa03) AM_WRITE(bublbobl_soundcpu_reset_w)
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE_LEGACY(bublbobl_sound_status_r, bublbobl_sound_command_w)
+	AM_RANGE(0xfa03, 0xfa03) AM_WRITE_LEGACY(bublbobl_soundcpu_reset_w)
 	AM_RANGE(0xfa80, 0xfa80) AM_WRITENOP // ???
-	AM_RANGE(0xfb40, 0xfb40) AM_WRITE(bublbobl_bankswitch_w)
+	AM_RANGE(0xfb40, 0xfb40) AM_WRITE_LEGACY(bublbobl_bankswitch_w)
 	AM_RANGE(0xfc00, 0xfcff) AM_RAM
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM
-	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(boblbobl_ic43_a_r, boblbobl_ic43_a_w)
-	AM_RANGE(0xfe80, 0xfe83) AM_READWRITE(boblbobl_ic43_b_r, boblbobl_ic43_b_w)
+	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE_LEGACY(boblbobl_ic43_a_r, boblbobl_ic43_a_w)
+	AM_RANGE(0xfe80, 0xfe83) AM_READWRITE_LEGACY(boblbobl_ic43_b_r, boblbobl_ic43_b_w)
 	AM_RANGE(0xff00, 0xff00) AM_READ_PORT("DSW0")
 	AM_RANGE(0xff01, 0xff01) AM_READ_PORT("DSW1")
 	AM_RANGE(0xff02, 0xff02) AM_READ_PORT("IN0")
@@ -367,21 +367,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_videoram, m_videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(bublbobl_state, m_objectram, m_objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE( m_objectram, m_objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfa04, 0xfa04) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfa05, 0xfa05) AM_READ_PORT("IN0")
 	AM_RANGE(0xfa06, 0xfa06) AM_READ_PORT("IN1")
 	AM_RANGE(0xfa07, 0xfa07) AM_READ_PORT("IN2")
-	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(tokio_bankswitch_w)
-	AM_RANGE(0xfb00, 0xfb00) AM_WRITE(tokio_videoctrl_w)
-	AM_RANGE(0xfb80, 0xfb80) AM_WRITE(bublbobl_nmitrigger_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(bublbobl_sound_status_r, bublbobl_sound_command_w)
-	AM_RANGE(0xfe00, 0xfe00) AM_READ(tokio_mcu_r) AM_WRITENOP // ???
+	AM_RANGE(0xfa80, 0xfa80) AM_WRITE_LEGACY(tokio_bankswitch_w)
+	AM_RANGE(0xfb00, 0xfb00) AM_WRITE_LEGACY(tokio_videoctrl_w)
+	AM_RANGE(0xfb80, 0xfb80) AM_WRITE_LEGACY(bublbobl_nmitrigger_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE_LEGACY(bublbobl_sound_status_r, bublbobl_sound_command_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_READ_LEGACY(tokio_mcu_r) AM_WRITENOP // ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokio_slave_map, AS_PROGRAM, 8, bublbobl_state )
@@ -392,11 +392,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokio_sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE(soundlatch_r, bublbobl_sound_status_w)
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE_LEGACY(soundlatch_r, bublbobl_sound_status_w)
 	AM_RANGE(0x9800, 0x9800) AM_READNOP	// ???
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(bublbobl_sh_nmi_disable_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(bublbobl_sh_nmi_enable_w)
-	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(bublbobl_sh_nmi_disable_w)
+	AM_RANGE(0xa800, 0xa800) AM_WRITE_LEGACY(bublbobl_sh_nmi_enable_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM	// space for diagnostic ROM?
 ADDRESS_MAP_END
 

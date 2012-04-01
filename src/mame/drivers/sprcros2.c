@@ -104,9 +104,9 @@ static WRITE8_HANDLER( sprcros2_s_port3_w )
 static ADDRESS_MAP_START( sprcros2_master_map, AS_PROGRAM, 8, sprcros2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_BASE_MEMBER(sprcros2_state, m_fgvideoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(sprcros2_fgvideoram_w) AM_BASE( m_fgvideoram)
 	AM_RANGE(0xe800, 0xe817) AM_RAM						//always zero
-	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_BASE_SIZE_MEMBER(sprcros2_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")			//shared with slave cpu
@@ -114,18 +114,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_master_io_map, AS_IO, 8, sprcros2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("EXTRA") AM_DEVWRITE("sn3", sn76496_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("EXTRA") AM_DEVWRITE_LEGACY("sn3", sn76496_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07, 0x07) AM_WRITE(sprcros2_m_port7_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(sprcros2_m_port7_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_slave_map, AS_PROGRAM, 8, sprcros2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_BASE_MEMBER(sprcros2_state, m_bgvideoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(sprcros2_bgvideoram_w) AM_BASE( m_bgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
@@ -133,9 +133,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_slave_io_map, AS_IO, 8, sprcros2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sprcros2_bgscrollx_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(sprcros2_bgscrolly_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(sprcros2_s_port3_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(sprcros2_bgscrollx_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(sprcros2_bgscrolly_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(sprcros2_s_port3_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sprcros2 )

@@ -1334,15 +1334,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io_map, AS_IO, 8, bfcobra_state )
 ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x23) AM_READWRITE(chipset_r, chipset_w)
-	AM_RANGE(0x24, 0x24) AM_DEVWRITE_MODERN("acia6850_0", acia6850_device, control_write)
-	AM_RANGE(0x25, 0x25) AM_DEVWRITE_MODERN("acia6850_0", acia6850_device, data_write)
-	AM_RANGE(0x26, 0x26) AM_DEVREAD_MODERN("acia6850_0", acia6850_device, status_read)
-	AM_RANGE(0x27, 0x27) AM_DEVREAD_MODERN("acia6850_0", acia6850_device, data_read)
-	AM_RANGE(0x30, 0x30) AM_READ(fdctrl_r)
-	AM_RANGE(0x31, 0x31) AM_READWRITE(fddata_r, fdctrl_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(rombank_w)
-	AM_RANGE(0x50, 0x53) AM_READWRITE(ramdac_r, ramdac_w)
+	AM_RANGE(0x00, 0x23) AM_READWRITE_LEGACY(chipset_r, chipset_w)
+	AM_RANGE(0x24, 0x24) AM_DEVWRITE("acia6850_0", acia6850_device, control_write)
+	AM_RANGE(0x25, 0x25) AM_DEVWRITE("acia6850_0", acia6850_device, data_write)
+	AM_RANGE(0x26, 0x26) AM_DEVREAD("acia6850_0", acia6850_device, status_read)
+	AM_RANGE(0x27, 0x27) AM_DEVREAD("acia6850_0", acia6850_device, data_read)
+	AM_RANGE(0x30, 0x30) AM_READ_LEGACY(fdctrl_r)
+	AM_RANGE(0x31, 0x31) AM_READWRITE_LEGACY(fddata_r, fdctrl_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(rombank_w)
+	AM_RANGE(0x50, 0x53) AM_READWRITE_LEGACY(ramdac_r, ramdac_w)
 ADDRESS_MAP_END
 
 
@@ -1463,20 +1463,20 @@ static ADDRESS_MAP_START( m6809_prog_map, AS_PROGRAM, 8, bfcobra_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM	AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_RAM		// W 'B', 6F
 	AM_RANGE(0x2200, 0x2200) AM_RAM		// W 'F'
-	AM_RANGE(0x2600, 0x2600) AM_READWRITE(meter_r, meter_w)
+	AM_RANGE(0x2600, 0x2600) AM_READWRITE_LEGACY(meter_r, meter_w)
 	AM_RANGE(0x2800, 0x2800) AM_RAM		// W
-	AM_RANGE(0x2A00, 0x2A02) AM_READWRITE(latch_r, latch_w)
-	AM_RANGE(0x2E00, 0x2E00) AM_READ(int_latch_r)
-	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x3201, 0x3201) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x3404, 0x3404) AM_DEVREADWRITE_MODERN("acia6850_1", acia6850_device, status_read, control_write)
-	AM_RANGE(0x3405, 0x3405) AM_DEVREADWRITE_MODERN("acia6850_1", acia6850_device, data_read, data_write)
-	AM_RANGE(0x3406, 0x3406) AM_DEVREADWRITE_MODERN("acia6850_2", acia6850_device, status_read, control_write)
-	AM_RANGE(0x3407, 0x3407) AM_DEVREADWRITE_MODERN("acia6850_2", acia6850_device, data_read, data_write)
+	AM_RANGE(0x2A00, 0x2A02) AM_READWRITE_LEGACY(latch_r, latch_w)
+	AM_RANGE(0x2E00, 0x2E00) AM_READ_LEGACY(int_latch_r)
+	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x3201, 0x3201) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x3404, 0x3404) AM_DEVREADWRITE("acia6850_1", acia6850_device, status_read, control_write)
+	AM_RANGE(0x3405, 0x3405) AM_DEVREADWRITE("acia6850_1", acia6850_device, data_read, data_write)
+	AM_RANGE(0x3406, 0x3406) AM_DEVREADWRITE("acia6850_2", acia6850_device, status_read, control_write)
+	AM_RANGE(0x3407, 0x3407) AM_DEVREADWRITE("acia6850_2", acia6850_device, data_read, data_write)
 //  AM_RANGE(0x3408, 0x3408) AM_NOP
 //  AM_RANGE(0x340A, 0x340A) AM_NOP
 //  AM_RANGE(0x3600, 0x3600) AM_NOP
-	AM_RANGE(0x3801, 0x3801) AM_DEVREADWRITE("upd", upd_r, upd_w)
+	AM_RANGE(0x3801, 0x3801) AM_DEVREADWRITE_LEGACY("upd", upd_r, upd_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* Watchdog */
 ADDRESS_MAP_END

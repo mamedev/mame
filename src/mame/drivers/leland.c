@@ -65,19 +65,19 @@
 static ADDRESS_MAP_START( master_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(leland_battery_ram_w) AM_SHARE("battery")
+	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE_LEGACY(leland_battery_ram_w) AM_SHARE("battery")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(leland_gated_paletteram_r, leland_gated_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_master_video_addr_w)
+	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE_LEGACY(leland_gated_paletteram_r, leland_gated_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xf801) AM_WRITE_LEGACY(leland_master_video_addr_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( master_map_io, AS_IO, 8, leland_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(leland_master_alt_bankswitch_w)
-	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE("custom", leland_80186_response_r, leland_80186_command_lo_w)
-	AM_RANGE(0xf4, 0xf4) AM_DEVWRITE("custom", leland_80186_command_hi_w)
-	AM_RANGE(0xfd, 0xff) AM_READWRITE(leland_master_analog_key_r, leland_master_analog_key_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE_LEGACY(leland_master_alt_bankswitch_w)
+	AM_RANGE(0xf2, 0xf2) AM_DEVREADWRITE_LEGACY("custom", leland_80186_response_r, leland_80186_command_lo_w)
+	AM_RANGE(0xf4, 0xf4) AM_DEVWRITE_LEGACY("custom", leland_80186_command_hi_w)
+	AM_RANGE(0xfd, 0xff) AM_READWRITE_LEGACY(leland_master_analog_key_r, leland_master_analog_key_w)
 ADDRESS_MAP_END
 
 
@@ -92,26 +92,26 @@ static ADDRESS_MAP_START( slave_small_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xdfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_slave_video_addr_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ(leland_raster_r)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(leland_slave_small_banksw_w)
+	AM_RANGE(0xf800, 0xf801) AM_WRITE_LEGACY(leland_slave_video_addr_w)
+	AM_RANGE(0xf802, 0xf802) AM_READ_LEGACY(leland_raster_r)
+	AM_RANGE(0xf803, 0xf803) AM_WRITE_LEGACY(leland_slave_small_banksw_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( slave_large_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(leland_slave_large_banksw_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(leland_slave_large_banksw_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_slave_video_addr_w)
-	AM_RANGE(0xf802, 0xf802) AM_READ(leland_raster_r)
+	AM_RANGE(0xf800, 0xf801) AM_WRITE_LEGACY(leland_slave_video_addr_w)
+	AM_RANGE(0xf802, 0xf802) AM_READ_LEGACY(leland_raster_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( slave_map_io, AS_IO, 8, leland_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
-	AM_RANGE(0x40, 0x5f) AM_READWRITE(leland_svram_port_r, leland_svram_port_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE_LEGACY(leland_svram_port_r, leland_svram_port_w)
+	AM_RANGE(0x40, 0x5f) AM_READWRITE_LEGACY(leland_svram_port_r, leland_svram_port_w)
 ADDRESS_MAP_END
 
 

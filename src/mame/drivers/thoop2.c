@@ -86,20 +86,20 @@ static READ16_HANDLER( DS5002FP_R )
 
 static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM													/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop2_vram_w) AM_BASE_MEMBER(thoop2_state, m_videoram)	/* Video RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE_MEMBER(thoop2_state, m_vregs)					/* Video Registers */
-	AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset16_w)							/* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(thoop2_state, m_spriteram)						/* Sprite RAM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(thoop2_vram_w) AM_BASE( m_videoram)	/* Video RAM */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE( m_vregs)					/* Video Registers */
+	AM_RANGE(0x10800c, 0x10800d) AM_WRITE_LEGACY(watchdog_reset16_w)							/* INT 6 ACK/Watchdog timer */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)/* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE( m_spriteram)						/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)						/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)					/* OKI6295 data register */
-	AM_RANGE(0x70000a, 0x70005b) AM_WRITE(thoop2_coin_w)								/* Coin Counters + Coin Lockout */
-	AM_RANGE(0xfeff00, 0xfeff01) AM_READ(DS5002FP_R)
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE_LEGACY(OKIM6295_bankswitch_w)						/* OKI6295 bankswitch */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)					/* OKI6295 data register */
+	AM_RANGE(0x70000a, 0x70005b) AM_WRITE_LEGACY(thoop2_coin_w)								/* Coin Counters + Coin Lockout */
+	AM_RANGE(0xfeff00, 0xfeff01) AM_READ_LEGACY(DS5002FP_R)
 	AM_RANGE(0xfeff02, 0xfeff03) AM_WRITENOP  /* pf: 0xfeff02 and 0xfeff03 need to remain zero always */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM													/* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END

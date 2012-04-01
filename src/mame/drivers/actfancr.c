@@ -78,52 +78,52 @@ static WRITE8_HANDLER( actfancr_buffer_spriteram_w)
 
 static ADDRESS_MAP_START( actfan_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control0_8bit_w)
-	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE("tilegen1", deco_bac06_pf_control1_8bit_swap_w)
-	AM_RANGE(0x062000, 0x063fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
-	AM_RANGE(0x070000, 0x070007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control0_8bit_w)
-	AM_RANGE(0x070010, 0x07001f) AM_DEVWRITE("tilegen2", deco_bac06_pf_control1_8bit_swap_w)
-	AM_RANGE(0x072000, 0x0727ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
+	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_swap_w)
+	AM_RANGE(0x062000, 0x063fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
+	AM_RANGE(0x070000, 0x070007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x070010, 0x07001f) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control1_8bit_swap_w)
+	AM_RANGE(0x072000, 0x0727ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
 	AM_RANGE(0x100000, 0x1007ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
-	AM_RANGE(0x120000, 0x1205ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x110000, 0x110001) AM_WRITE_LEGACY(actfancr_buffer_spriteram_w)
+	AM_RANGE(0x120000, 0x1205ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x130000, 0x130000) AM_READ_PORT("P1")
 	AM_RANGE(0x130001, 0x130001) AM_READ_PORT("P2")
 	AM_RANGE(0x130002, 0x130002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x130003, 0x130003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x140000, 0x140001) AM_READ_PORT("SYSTEM")	/* VBL */
-	AM_RANGE(0x150000, 0x150001) AM_WRITE(actfancr_sound_w)
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(actfancr_state, m_main_ram) /* Main ram */
+	AM_RANGE(0x150000, 0x150001) AM_WRITE_LEGACY(actfancr_sound_w)
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE( m_main_ram) /* Main ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triothep_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control0_8bit_w)
-	AM_RANGE(0x040010, 0x04001f) AM_DEVWRITE("tilegen2", deco_bac06_pf_control1_8bit_swap_w)
-	AM_RANGE(0x044000, 0x045fff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
-	AM_RANGE(0x046400, 0x0467ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_rowscroll_8bit_swap_r, deco_bac06_pf_rowscroll_8bit_swap_w)
-	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control0_8bit_w)
-	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE("tilegen1", deco_bac06_pf_control1_8bit_swap_w)
-	AM_RANGE(0x064000, 0x0647ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
-	AM_RANGE(0x066400, 0x0667ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_8bit_swap_r, deco_bac06_pf_rowscroll_8bit_swap_w)
-	AM_RANGE(0x100000, 0x100001) AM_WRITE(actfancr_sound_w)
-	AM_RANGE(0x110000, 0x110001) AM_WRITE(actfancr_buffer_spriteram_w)
+	AM_RANGE(0x040000, 0x040007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x040010, 0x04001f) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control1_8bit_swap_w)
+	AM_RANGE(0x044000, 0x045fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
+	AM_RANGE(0x046400, 0x0467ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_rowscroll_8bit_swap_r, deco_bac06_pf_rowscroll_8bit_swap_w)
+	AM_RANGE(0x060000, 0x060007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
+	AM_RANGE(0x060010, 0x06001f) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_swap_w)
+	AM_RANGE(0x064000, 0x0647ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
+	AM_RANGE(0x066400, 0x0667ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_8bit_swap_r, deco_bac06_pf_rowscroll_8bit_swap_w)
+	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(actfancr_sound_w)
+	AM_RANGE(0x110000, 0x110001) AM_WRITE_LEGACY(actfancr_buffer_spriteram_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x130000, 0x1305ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x130000, 0x1305ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x140001) AM_READNOP /* Value doesn't matter */
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(actfancr_state, m_main_ram) /* Main ram */
-	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(triothep_control_r, triothep_control_select_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM AM_BASE( m_main_ram) /* Main ram */
+	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE_LEGACY(triothep_control_r, triothep_control_select_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 static ADDRESS_MAP_START( dec0_s_map, AS_PROGRAM, 8, actfancr_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

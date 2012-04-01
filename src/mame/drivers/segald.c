@@ -246,15 +246,15 @@ static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, segald_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(astron_OBJ_read, astron_OBJ_write) AM_BASE_MEMBER(segald_state, m_obj_RAM)	/* OBJ according to the schematics (sprite) */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(astron_DISC_read, astron_DISC_write)					/* DISC interface according to schematics */
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE_LEGACY(astron_OBJ_read, astron_OBJ_write) AM_BASE( m_obj_RAM)	/* OBJ according to the schematics (sprite) */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(astron_DISC_read, astron_DISC_write)					/* DISC interface according to schematics */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")								/* SW bank 2 (DIPs) */
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")								/* SW bank 3 (DIPs) */
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")								/* SW bank 0 (IO) */
 	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")								/* SW bank 1 (IO) */
-	AM_RANGE(0xd800, 0xd803) AM_READWRITE(astron_OUT_read, astron_OUT_write) AM_BASE_MEMBER(segald_state, m_out_RAM)	/* OUT according to schematics (output port) */
-	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE(astron_COLOR_read, astron_COLOR_write) AM_BASE_MEMBER(segald_state, m_color_RAM) /* COLOR according to the schematics */
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(astron_FIX_write) AM_BASE_MEMBER(segald_state, m_fix_RAM)						/* FIX according to schematics (characters) */
+	AM_RANGE(0xd800, 0xd803) AM_READWRITE_LEGACY(astron_OUT_read, astron_OUT_write) AM_BASE( m_out_RAM)	/* OUT according to schematics (output port) */
+	AM_RANGE(0xe000, 0xe1ff) AM_READWRITE_LEGACY(astron_COLOR_read, astron_COLOR_write) AM_BASE( m_color_RAM) /* COLOR according to the schematics */
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE_LEGACY(astron_FIX_write) AM_BASE( m_fix_RAM)						/* FIX according to schematics (characters) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM																/* RAM according to schematics */
 ADDRESS_MAP_END
 
@@ -262,7 +262,7 @@ ADDRESS_MAP_END
 /* I/O MAP */
 static ADDRESS_MAP_START( mainport, AS_IO, 8, segald_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_WRITE(astron_io_bankswitch_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(astron_io_bankswitch_w)
 ADDRESS_MAP_END
 
 

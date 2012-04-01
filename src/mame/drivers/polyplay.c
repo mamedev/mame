@@ -147,17 +147,17 @@ static ADDRESS_MAP_START( polyplay_map, AS_PROGRAM, 8, polyplay_state )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x8fff) AM_ROM
 	AM_RANGE(0xe800, 0xebff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0xec00, 0xf7ff) AM_RAM_WRITE(polyplay_characterram_w) AM_BASE_MEMBER(polyplay_state, m_characterram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(polyplay_state, m_videoram)
+	AM_RANGE(0xec00, 0xf7ff) AM_RAM_WRITE_LEGACY(polyplay_characterram_w) AM_BASE( m_characterram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE( m_videoram)
 ADDRESS_MAP_END
 
 
 /* port mapping */
 static ADDRESS_MAP_START( polyplay_io_map, AS_IO, 8, polyplay_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x81) AM_WRITE(polyplay_sound_channel)
-	AM_RANGE(0x82, 0x82) AM_WRITE(polyplay_start_timer2)
-	AM_RANGE(0x83, 0x83) AM_READ(polyplay_random_read)
+	AM_RANGE(0x80, 0x81) AM_WRITE_LEGACY(polyplay_sound_channel)
+	AM_RANGE(0x82, 0x82) AM_WRITE_LEGACY(polyplay_start_timer2)
+	AM_RANGE(0x83, 0x83) AM_READ_LEGACY(polyplay_random_read)
 	AM_RANGE(0x84, 0x84) AM_READ_PORT("INPUT")
 ADDRESS_MAP_END
 
