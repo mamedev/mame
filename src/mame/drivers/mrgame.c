@@ -2,7 +2,6 @@
     Mr. Game 1B11188/0
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"

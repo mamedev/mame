@@ -3,7 +3,6 @@
 #ifndef __CIDELSA__
 #define __CIDELSA__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"

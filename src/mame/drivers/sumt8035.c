@@ -9,7 +9,6 @@ This hardware could be enhanced with a 6845 to run video AWPs, and is the origin
 hardware. We don't have the ROMs for that though.
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"

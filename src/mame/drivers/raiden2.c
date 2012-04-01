@@ -136,7 +136,6 @@ Current Problem(s) - in order of priority
 
 */
 
-#define ADDRESS_MAP_MODERN
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"

@@ -41,7 +41,6 @@
     Trivia: BSMT stands for "Brian Schmidt's Mouse Trap"
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "bsmt2000.h"

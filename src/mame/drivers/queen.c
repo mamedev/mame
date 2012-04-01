@@ -31,7 +31,6 @@ processor speed is 533MHz <- likely to be a Celeron or a Pentium III class CPU -
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i386/i386.h"

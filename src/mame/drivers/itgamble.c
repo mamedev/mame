@@ -53,7 +53,6 @@
 
 #define EJOLLYX5_MAIN_CLOCK	XTAL_16MHz
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/h83002/h8.h"

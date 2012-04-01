@@ -33,7 +33,6 @@
     15/07/11 - rom loading for most games added, still some missing tho and clones still need sorting out properly.
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"

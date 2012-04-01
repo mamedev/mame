@@ -11,7 +11,6 @@ lots of reads from 0xe000 at the start
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

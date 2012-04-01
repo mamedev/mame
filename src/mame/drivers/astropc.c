@@ -9,7 +9,6 @@ We need to figure this out and convert them to CHDs (I think.. unless they're fl
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i386/i386.h"

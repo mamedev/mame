@@ -4,7 +4,6 @@
 /* I don't think this is Pluto, or other known platforms */
 
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"

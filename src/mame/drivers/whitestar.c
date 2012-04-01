@@ -2,7 +2,6 @@
     Sega/Stern Whitestar
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "video/mc6845.h"

@@ -19,7 +19,6 @@ I/O Board with Altera Flex EPF15K50EQC240-3
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i386/i386.h"

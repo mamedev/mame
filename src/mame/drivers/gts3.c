@@ -2,7 +2,6 @@
     Gottlieb System 3
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m65ce02.h"

@@ -2,7 +2,6 @@
     Playmatic MPU 1
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"

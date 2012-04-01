@@ -2,7 +2,6 @@
     Technoplay "2-2C 8008 LS" (68000 CPU)
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"

@@ -2,7 +2,6 @@
     Gottlieb System 1
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/pps4/pps4.h"

@@ -37,7 +37,6 @@ MX29F1610MC 16M FlashROM (x7)
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i386/i386.h"

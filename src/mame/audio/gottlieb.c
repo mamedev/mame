@@ -38,7 +38,6 @@
     POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/gottlieb.h"

@@ -57,7 +57,6 @@ Windows showed a 5.94 gig partion empty and a 12.74 unallocated partition
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/mips/r3000.h"

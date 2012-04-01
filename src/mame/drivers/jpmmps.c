@@ -21,7 +21,6 @@
    what appear to be i8255 issues?
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"

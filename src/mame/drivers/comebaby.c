@@ -59,7 +59,6 @@ can't be emulated without proper mb bios
   Easy enough to fix a broken game if you have the controls to plug into it.
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i386/i386.h"

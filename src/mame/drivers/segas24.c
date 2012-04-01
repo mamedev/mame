@@ -333,7 +333,6 @@ Notes:
    just made a copy & renamed them for now to avoid any conflicts
 */
 
-#define ADDRESS_MAP_MODERN
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
