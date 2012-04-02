@@ -1861,6 +1861,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/tugboat.o \
 	$(DRIVERS)/umipoker.o \
 	$(DRIVERS)/unkfr.o \
+	$(DRIVERS)/unkhorse.o \
 	$(DRIVERS)/unkpcp.o \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
