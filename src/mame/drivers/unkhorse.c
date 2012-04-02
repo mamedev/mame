@@ -9,7 +9,10 @@
 
 TODO:
 - identify game!
-- improve I/O
+- improve I/O:
+  * more buttons/sensors?
+  * horse_output_w bits
+  * 6-pos dipswitch on the pcb, only 4 are known at the moment
 - confirm colors and sound pitch
 
 ***************************************************************************/
@@ -40,7 +43,7 @@ public:
 
 PALETTE_INIT( horse )
 {
-	// palette is simply 1bpp
+	// palette is simply 3bpp
 	for (int i = 0; i < 8; i++)
 		palette_set_color_rgb(machine, i, pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0));
 }
@@ -87,15 +90,16 @@ ADDRESS_MAP_END
 static READ8_DEVICE_HANDLER(horse_input_r)
 {
 	horse_state *state = device->machine().driver_data<horse_state>();
-	UINT8 ret = 0xff;
 
-	if (state->m_output & 0x80)
-		ret &= input_port_read(device->machine(), "IN0");
+	switch (state->m_output >> 6 & 3)
+	{
+		case 0: return input_port_read(device->machine(), "IN0");
+		case 1: return input_port_read(device->machine(), "IN1");
+		case 2: return input_port_read(device->machine(), "IN2");
+		default: break;
+	}
 
-	if (state->m_output & 0x40)
-		ret &= input_port_read(device->machine(), "IN1");
-
-	return ret;
+	return 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER(horse_output_w)
@@ -104,7 +108,7 @@ static WRITE8_DEVICE_HANDLER(horse_output_w)
 	state->m_output = data;
 	
 	// d4: payout related
-	// d6-d7: input select
+	// d6-d7: input mux
 	// other bits: ?
 }
 
@@ -134,7 +138,7 @@ static I8155_INTERFACE(i8155_intf)
 
 static INPUT_PORTS_START( horse )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW:1,2,3")
 	PORT_DIPSETTING( 0x01, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING( 0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING( 0x03, DEF_STR( 1C_3C ) )
@@ -143,27 +147,37 @@ static INPUT_PORTS_START( horse )
 	PORT_DIPSETTING( 0x06, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING( 0x07, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING( 0x00, "1 Coin/10 Credits" )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPNAME( 0x08, 0x08, "UNK04" )				PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "UNK05" )				PORT_DIPLOCATION("SW:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "Maximum Bet" )		PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING(    0x20, "20" )
+	PORT_DIPSETTING(    0x00, "50" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, "UNK1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "UNK2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "UNK3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 INPUT_PORTS_END
 
 
