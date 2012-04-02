@@ -99,11 +99,9 @@ Sound PCB
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/i8155.h"
 #include "sound/sn76496.h"
 #include "includes/sbugger.h"
-
-//arbitrary
-#define NUM_INTS_FRAME 24
 
 
 /* memory maps */
@@ -112,21 +110,16 @@ static ADDRESS_MAP_START( sbugger_map, AS_PROGRAM, 8, sbugger_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(sbugger_videoram_attr_w) AM_BASE(m_videoram_attr)
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(sbugger_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM /* sp is set to e0ff */
+	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("i8156", i8155_device, memory_r, memory_w) /* sp is set to e0ff */
 	AM_RANGE(0xf400, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sbugger_io_map, AS_IO, 8, sbugger_state )
-	AM_RANGE(0xe0, 0xe0) AM_WRITENOP				// 8156 command/status reg (write c0 = command START = (start of timer)
-	AM_RANGE(0xe1, 0xe1) AM_READ_PORT("INPUTS")		// 8156 PA
-	AM_RANGE(0xe2, 0xe2) AM_READ_PORT("DSW1")		// 8156 PB
-	AM_RANGE(0xe3, 0xe3) AM_READ_PORT("DSW2")		// 8156 PC = 6 bit ! //2 bits tested af f4c6
-	AM_RANGE(0xe4, 0xe4) AM_WRITENOP				// 8156 timer reg1 (write 7f = CNT length)
-	AM_RANGE(0xe5, 0xe5) AM_WRITENOP				// 8156 timer reg2 (write c0 = timer mode - automatic reload, i.e. single pulse every time TC is reached)
-
+	AM_RANGE(0xe0, 0xe7) AM_DEVREADWRITE("i8156", i8155_device, io_r, io_w)
 	AM_RANGE(0xe8, 0xe8) AM_DEVWRITE_LEGACY("sn76489.1", sn76496_w)
 	AM_RANGE(0xe9, 0xe9) AM_DEVWRITE_LEGACY("sn76489.2", sn76496_w)
 ADDRESS_MAP_END
+
 
 /* gfx decode */
 
@@ -146,6 +139,7 @@ static const gfx_layout char16layout =
 static GFXDECODE_START( sbugger )
 	GFXDECODE_ENTRY( "gfx1", 0, char16layout,   0, 1  )
 GFXDECODE_END
+
 
 /* input ports */
 
@@ -209,17 +203,34 @@ static INPUT_PORTS_START( sbugger )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
 /* machine driver */
+
+static WRITE_LINE_DEVICE_HANDLER(sbugger_interrupt)
+{
+	cputag_set_input_line(device->machine(), "maincpu", I8085_RST75_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+}
+
+static I8156_INTERFACE(i8156_intf)
+{
+	// all ports set to input
+	DEVCB_INPUT_PORT("INPUTS"),
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("DSW1"),
+	DEVCB_NULL,
+	DEVCB_INPUT_PORT("DSW2"),
+	DEVCB_NULL,
+	DEVCB_LINE(sbugger_interrupt)
+};
 
 static MACHINE_CONFIG_START( sbugger, sbugger_state )
 
 	MCFG_CPU_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
 	MCFG_CPU_PROGRAM_MAP(sbugger_map)
 	MCFG_CPU_IO_MAP(sbugger_io_map)
-	MCFG_CPU_PERIODIC_INT(irq3_line_hold,NUM_INTS_FRAME*60)
+	MCFG_I8156_ADD("i8156", 200000, i8156_intf)		/* freq is an approximation */
 
 	MCFG_GFXDECODE(sbugger)
-
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -243,6 +254,7 @@ static MACHINE_CONFIG_START( sbugger, sbugger_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
+
 
 /* rom loading */
 
@@ -275,5 +287,5 @@ ROM_START( sbuggera )
 	ROM_LOAD( "spbugger.gfx", 0x0000, 0x1000, CRC(d3f345b5) SHA1(a5082ffc3043352e9b731af95770bdd62fb928bf) )
 ROM_END
 
-GAME( 1981, sbugger,  0,        sbugger,  sbugger,  0, ROT270, "Game-A-Tron", "Space Bugger (set 1)", GAME_NOT_WORKING )
+GAME( 1981, sbugger,  0,        sbugger,  sbugger,  0, ROT270, "Game-A-Tron", "Space Bugger (set 1)", GAME_NOT_WORKING | GAME_IMPERFECT_COLORS )
 GAME( 1981, sbuggera, sbugger,  sbugger,  sbugger,  0, ROT270, "Game-A-Tron", "Space Bugger (set 2)", GAME_IMPERFECT_COLORS )
