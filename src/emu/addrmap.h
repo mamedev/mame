@@ -598,48 +598,6 @@ void _class :: _name(address_map &map, const device_t &device) \
 	curentry->set_handler(device, _tag, _rhandler, #_rhandler, _whandler, #_whandler, _unitmask); \
 
 
-// driver data base reads
-#define AM_READ_BASE(_class, _handler) \
-	curentry->set_handler(device, DEVICE_SELF, read_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0)); \
-
-#define AM_READ8_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, DEVICE_SELF, read8_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
-
-#define AM_READ16_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, DEVICE_SELF, read16_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
-
-#define AM_READ32_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, DEVICE_SELF, read32_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
-
-
-// driver data base writes
-#define AM_WRITE_BASE(_class, _handler) \
-	curentry->set_handler(device, DEVICE_SELF, write_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0)); \
-
-#define AM_WRITE8_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, DEVICE_SELF, write8_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
-
-#define AM_WRITE16_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, DEVICE_SELF, write16_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
-
-#define AM_WRITE32_BASE(_class, _handler, _unitmask) \
-	curentry->set_handler(device, DEVICE_SELF, write32_delegate(&_class::_handler, "driver_data::" #_handler, (_class *)0), _unitmask); \
-
-
-// driver data base reads/writes
-#define AM_READWRITE_BASE(_class, _rhandler, _whandler) \
-	curentry->set_handler(device, DEVICE_SELF, read_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0)); \
-
-#define AM_READWRITE8_BASE(_class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, DEVICE_SELF, read8_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write8_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0), _unitmask); \
-
-#define AM_READWRITE16_BASE(_class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, DEVICE_SELF, read16_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write16_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0), _unitmask); \
-
-#define AM_READWRITE32_BASE(_class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(device, DEVICE_SELF, read32_delegate(&_class::_rhandler, "driver_data::" #_rhandler, (_class *)0), write32_delegate(&_class::_whandler, "driver_data::" #_whandler, (_class *)0), _unitmask); \
-
-
 // driver data reads
 #define AM_READ(_handler) \
 	curentry->set_handler(device, DEVICE_SELF, read_delegate(&drivdata_class::_handler, "driver_data::" #_handler, (drivdata_class *)0)); \

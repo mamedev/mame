@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( draco_io_map, AS_IO, 8, draco_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ic29", cdp1852_device, read) AM_DEVWRITE("ic32", cdp1852_device, write)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("ic30", cdp1852_device, read)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("ic31", cdp1852_device, read)
-	AM_RANGE(0x03, 0x07) AM_WRITE_BASE(cidelsa_state, cdp1869_w)
+	AM_RANGE(0x03, 0x07) AM_WRITE(cdp1869_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( draco_sound_map, AS_PROGRAM, 8, draco_state )
