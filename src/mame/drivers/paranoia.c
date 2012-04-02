@@ -36,6 +36,7 @@ HuC6280A (Hudson)
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/i8155.h"
 #include "machine/pcecommn.h"
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
@@ -83,23 +84,10 @@ static WRITE8_HANDLER( paranoia_8085_d000_w )
 	//logerror( "D000 (8085) write %02x\n", data );
 }
 
-static WRITE8_HANDLER( paranoia_8085_8155_w )
-{
-	switch( offset )
-	{
-	case 0: logerror( "8155 Command register write %x, timer command = %x, interrupt enable = %x, ports = %x\n", data, (data >> 6) & 3, (data >> 4) & 3, data & 0xf ); break;
-	case 1: logerror( "8155 I/O Port A write %x\n", data ); break;
-	case 2: logerror( "8155 I/O Port B write %x\n", data ); break;
-	case 3: logerror( "8155 I/O Port C (or control) write %x\n", data ); break;
-	case 4: logerror( "8155 Timer low 8 bits write %x\n", data ); break;
-	case 5: logerror( "8155 Timer high 6 bits write %x, timer mode %x\n", data & 0x3f, (data >> 6) & 3); break;
-	}
-}
-
 static ADDRESS_MAP_START(paranoia_8085_map, AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x0000, 0x7fff) AM_ROM
-	AM_RANGE( 0x8000, 0x80ff) AM_RAM
-	AM_RANGE( 0x8100, 0x8105) AM_WRITE_LEGACY(paranoia_8085_8155_w )
+	AM_RANGE( 0x8000, 0x80ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
+	AM_RANGE( 0x8100, 0x8107) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
 	AM_RANGE( 0xd000, 0xd000) AM_WRITE_LEGACY(paranoia_8085_d000_w )
 	AM_RANGE( 0xe000, 0xe1ff) AM_RAM
 ADDRESS_MAP_END
@@ -139,6 +127,39 @@ static ADDRESS_MAP_START(paranoia_z80_io_map, AS_IO, 8, paranoia_state )
 	AM_RANGE( 0x37, 0x37 ) AM_WRITE_LEGACY(paranoia_z80_io_37_w )
 ADDRESS_MAP_END
 
+static WRITE8_DEVICE_HANDLER(paranoia_i8155_a_w)
+{
+	//logerror("i8155 Port A: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER(paranoia_i8155_b_w)
+{
+	//logerror("i8155 Port B: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER(paranoia_i8155_c_w)
+{
+	//logerror("i8155 Port C: %02X\n", data);
+}
+
+static WRITE_LINE_DEVICE_HANDLER(paranoia_i8155_timer_out)
+{
+	//cputag_set_input_line(device->machine(), "sub", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	//logerror("Timer out %d\n", state);
+}
+
+static I8155_INTERFACE(i8155_intf)
+{
+	// all ports set to output
+	DEVCB_NULL,
+	DEVCB_HANDLER(paranoia_i8155_a_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(paranoia_i8155_b_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(paranoia_i8155_c_w),
+	DEVCB_LINE(paranoia_i8155_timer_out)
+};
+
 static const c6280_interface c6280_config =
 {
 	"maincpu"
@@ -160,6 +181,8 @@ static MACHINE_CONFIG_START( paranoia, paranoia_state )
 	MCFG_CPU_ADD("sub2", Z80, 18000000/6)
 	MCFG_CPU_PROGRAM_MAP(paranoia_z80_map)
 	MCFG_CPU_IO_MAP(paranoia_z80_io_map)
+
+	MCFG_I8155_ADD("i8155", 1000000 /*?*/, i8155_intf)
 
     /* video hardware */
 
