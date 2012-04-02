@@ -6544,10 +6544,11 @@
  . NGM-2410
  NEO-MVS PROGBK1 / NEO-MVS CHA512Y
  . NGH-2410
+ NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
 ***************************************-->
 
   <software name="mslug2">
-    <description>Metal Slug 2 - Super Vehicle-001/II</description>
+    <description>Metal Slug 2 - Super Vehicle-001/II (NGM-2410)(NGH-2410)</description>
     <year>1998</year>
     <publisher>SNK</publisher>
     <sharedfeat name="mvsrelease" value="yes" />
@@ -7072,8 +7073,6 @@
     </part>
   </software>
 
-
-
   <!--***************************************
  ID-0251
  . NGM-2510
@@ -7086,7 +7085,7 @@
 ***************************************-->
 
   <software name="kof99">
-    <description>The King of Fighters '99 - Millennium Battle (set 1)</description>
+    <description>The King of Fighters '99 - Millennium Battle (NGM-2510)</description>
     <year>1999</year>
     <publisher>SNK</publisher>
     <sharedfeat name="mvsrelease" value="yes" />
@@ -7130,7 +7129,7 @@
   </software>
 
   <software name="kof99h" cloneof="kof99">
-    <description>The King of Fighters '99 - Millennium Battle (set 2)</description>
+    <description>The King of Fighters '99 - Millennium Battle (NGH-2510)</description>
     <year>1999</year>
     <publisher>SNK</publisher>
     <sharedfeat name="mvsrelease" value="no" />
@@ -7349,10 +7348,11 @@
  . NGM-2530
  NEO-MVS PROGLBA (NEO-SMA) (LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
  . NGH-2530
+ NEO-AES PROGLBA (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
 ***************************************-->
 
   <software name="garou">
-    <description>Garou - Mark of the Wolves (set 1)</description>
+    <description>Garou - Mark of the Wolves (NGM-2530)</description>
     <year>1999</year>
     <publisher>SNK</publisher>
     <sharedfeat name="mvsrelease" value="yes" />
@@ -7397,8 +7397,8 @@
     </part>
   </software>
 
-  <software name="garouo" cloneof="garou">
-    <description>Garou - Mark of the Wolves (set 2)</description>
+  <software name="garouh" cloneof="garou">
+    <description>Garou - Mark of the Wolves (NGM-2530)(NGH-2530)</description>
     <year>1999</year>
     <publisher>SNK</publisher>
     <sharedfeat name="mvsrelease" value="yes" />
@@ -7408,7 +7408,7 @@
     <part name="cart" interface="neo_cart">
       <!-- Original Version - Encrypted GFX -->
       <!-- earlier revision -->
-      <feature name="crypt" value="garouo_prot" />
+      <feature name="crypt" value="garouh_prot" />
       <dataarea name="maincpu" size="0x900000">
         <rom loadflag="load16_word_swap" name="ke.neo-sma" offset="0x0c0000" size="0x040000" crc="96c72233" sha1="29e19effd40fdf7e5144332396857f4ad0eff13e" />        <!-- stored in the custom chip -->
         <rom loadflag="load16_word_swap" name="253-p1.p1" offset="0x100000" size="0x400000" crc="18ae5d7e" sha1="bdb58ec9137d8653979b47132f2d10e1cc6aaa24" />        <!-- mask rom TC5332205 -->

@@ -28,7 +28,7 @@
 
       kof98
         - unique early encryption
-      kof99, garou, garouo, mslug3, kof2000
+      kof99, garou, garouh, mslug3, kof2000
         - complex SMA chip which appears to contain part of the game rom
           internally and decrypts the 68k code on the board.  Also has a
           random number generator and  custom bankswitching
@@ -1000,7 +1000,7 @@ void kof98_decrypt_68k(running_machine &machine)
 }
 
 
-/* kof99, garou, garouo, mslug3 and kof2000 have and SMA chip which contains program code and decrypts the 68k roms */
+/* kof99, garou, garouh, mslug3 and kof2000 have and SMA chip which contains program code and decrypts the 68k roms */
 void kof99_decrypt_68k(running_machine &machine)
 {
 	UINT16 *rom;
@@ -1067,7 +1067,7 @@ void garou_decrypt_68k(running_machine &machine)
 }
 
 
-void garouo_decrypt_68k(running_machine &machine)
+void garouh_decrypt_68k(running_machine &machine)
 {
 	UINT16 *rom;
 	int i,j;
