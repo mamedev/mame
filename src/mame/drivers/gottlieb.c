@@ -1750,12 +1750,6 @@ static MACHINE_CONFIG_DERIVED( gottlieb1, gottlieb_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gottlieb1_votrax, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX("r1sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_DERIVED( gottlieb2, gottlieb_core )
 	MCFG_GOTTLIEB_SOUND_R2_ADD("r2sound")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1802,7 +1796,20 @@ static MACHINE_CONFIG_DERIVED( qbert, gottlieb1 )
 	MCFG_FRAGMENT_ADD(qbert_samples)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_DERIVED( tylz, gottlieb1 )
+	MCFG_FRAGMENT_ADD(qbert_samples)
+MACHINE_CONFIG_END
+
+
 #else
+
+
+static MACHINE_CONFIG_DERIVED( gottlieb1_votrax, gottlieb_core )
+	MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX("r1sound")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( reactor, gottlieb1_votrax )
 
@@ -1816,6 +1823,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( qbert, gottlieb1_votrax )
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( tylz, gottlieb1_votrax )
+MACHINE_CONFIG_END
+
 
 #endif
 
@@ -2492,7 +2504,7 @@ GAME( 1982, myqbert,   qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb
 GAME( 1982, qberttst,  qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", GAME_IMPERFECT_SOUND )
 GAME( 1982, qbtrktst,  qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", GAME_IMPERFECT_SOUND )
 GAME( 1982, insector,  0,        gottlieb1, 		insector, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
-GAME( 1982, tylz,      0,        gottlieb1_votrax,	tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1982, tylz,      0,        tylz,	tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
 GAME( 1984, argusg,    0,        gottlieb1, 		argusg,   ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
 GAME( 1983, mplanets,  0,        gottlieb1, 		mplanets, romtiles, ROT270, "Gottlieb", "Mad Planets", 0 )
 GAME( 1983, mplanetsuk,mplanets, gottlieb1, 		mplanets, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )

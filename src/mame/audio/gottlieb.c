@@ -161,11 +161,9 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 			}
 
 			mame_printf_debug("Votrax played '%s'\n", phonemes);
+
 			if (strcmp(phonemes, "[0] HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert & Tylz - Hello, I am turned on */
-      {
-        if (strcmp(machine().system().name, "tylz") != 0) /* Playing this in tylz will crash the game */			
-          m_samples->start(0, 42);
-      }
+                                m_samples->start(0, 42);
 			else if (strcmp(phonemes, "[0]BAH1EH1Y") == 0)							  /* Q-Bert - Bye, bye */
 				m_samples->start(0, 43);
 			else if (strcmp(phonemes, "[0]A2YHT LEH2FTTH") == 0)					  /* Reactor - Eight left */
