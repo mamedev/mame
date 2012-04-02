@@ -1,6 +1,7 @@
 /**********************************************************************
 
-    Intel 8155 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
+    Intel 8155/8156 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
+    8156 is the same as 8155, except that chip enable is active high instead of low
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -54,8 +55,18 @@
 	MCFG_DEVICE_ADD((_tag), I8155, _clock)	\
 	MCFG_DEVICE_CONFIG(_config)
 
+
+#define MCFG_I8156_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD((_tag), I8156, _clock)	\
+	MCFG_DEVICE_CONFIG(_config)
+
+
 #define I8155_INTERFACE(name) \
 	const i8155_interface (name) =
+
+
+#define I8156_INTERFACE(name) \
+	const i8156_interface (name) =
 
 
 
@@ -148,6 +159,7 @@ private:
 
 // device type definition
 extern const device_type I8155;
+extern const device_type I8156;
 
 
 

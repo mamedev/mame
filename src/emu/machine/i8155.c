@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Intel 8155 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
+    Intel 8155/8156 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -19,8 +19,9 @@
 #include "i8155.h"
 
 
-// device type definition
+// device type definitions
 const device_type I8155 = &device_creator<i8155_device>;
+const device_type I8156 = &device_creator<i8155_device>;
 
 
 //**************************************************************************
