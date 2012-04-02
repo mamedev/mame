@@ -973,6 +973,7 @@ static const struct game_keys keys_table[] =
 	{ "mpangj",   { 0x95f741c6,0xe547a21b }, 0x100000 },	// 0C84 347D 89A3  cmpi.l  #$347D89A3,D4
 	{ "pzloop2",  { 0xa054f812,0xc40d36b4 }, 0x400000 },	// 0C82 9A73 15F1  cmpi.l  #$9A7315F1,D2
 	{ "pzloop2j", { 0xa054f812,0xc40d36b4 }, 0x400000 },	// 0C82 9A73 15F1  cmpi.l  #$9A7315F1,D2
+	{ "pzloop2jr1",{ 0xa054f812,0xc40d36b4 }, 0x400000 },	// 0C82 9A73 15F1  cmpi.l  #$9A7315F1,D2
 	{ "choko",    { 0xd3fb12c6,0x7f8e17b5 }, 0x400000 },	// 0C86 4D17 5B3C  cmpi.l  #$4D175B3C,D6
 	{ "dimahoo",  { 0x0ddb8e40,0x2817fd2b }, 0x080000 },	// BE4C B244 B6C5  cmp.w   A4,D7   cmp.w   D4,D1   cmpa.w  D5,A3
 	{ "dimahoou", { 0x6575af59,0xb0fea691 }, 0x080000 },	// BE4C B244 B6C5  cmp.w   A4,D7   cmp.w   D4,D1   cmpa.w  D5,A3
