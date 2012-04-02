@@ -1480,7 +1480,7 @@ static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x2100, 0x21FF) AM_WRITENOP
 	AM_RANGE(0x2200, 0x22FF) AM_WRITENOP
 
-	AM_RANGE(0x3C00, 0x3C07) AM_READ_LEGACY( key_r   )
+	AM_RANGE(0x3C00, 0x3C07) AM_READ_LEGACY(key_r   )
 	AM_RANGE(0x3C80, 0x3C80) AM_WRITE_LEGACY(e2ram_w )
 
 	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE_LEGACY(vid_uart_ctrl_r, vid_uart_ctrl_w)		// video uart control reg

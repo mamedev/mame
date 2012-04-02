@@ -234,9 +234,9 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, uapce_state )
 	AM_RANGE( 0x0000, 0x07FF) AM_ROM
 	AM_RANGE( 0x0800, 0x0FFF) AM_RAM
 	AM_RANGE( 0x1000, 0x17FF) AM_WRITE_LEGACY(jamma_if_control_latch_w )
-	AM_RANGE( 0x1800, 0x1FFF) AM_READ_LEGACY( jamma_if_read_dsw )
+	AM_RANGE( 0x1800, 0x1FFF) AM_READ_LEGACY(jamma_if_read_dsw )
 	AM_RANGE( 0x2000, 0x27FF) AM_READ_PORT( "COIN" )
-	AM_RANGE( 0x2800, 0x2FFF) AM_READ_LEGACY( jamma_if_control_latch_r )
+	AM_RANGE( 0x2800, 0x2FFF) AM_READ_LEGACY(jamma_if_control_latch_r )
 ADDRESS_MAP_END
 
 
