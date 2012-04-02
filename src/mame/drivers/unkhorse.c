@@ -4,20 +4,20 @@
   probably early 80s, manufacturer unknown
   
   from a broken PCB, labeled EFI TG-007
-  8085A CPU + 8155 (for I/O, and maybe sound)
+  8085A CPU + 8155 (for I/O and sound)
   8KB RAM mainly for bitmap video, and 512x4 RAM for color map
 
 TODO:
 - identify game!
-- sound
-- improve inputs
-- confirm colors
+- improve I/O
+- confirm colors and sound pitch
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/i8155.h"
+#include "sound/dac.h"
 
 
 class horse_state : public driver_device
@@ -110,8 +110,7 @@ static WRITE8_DEVICE_HANDLER(horse_output_w)
 
 static WRITE_LINE_DEVICE_HANDLER(horse_timer_out)
 {
-	// sound?
-	// TODO
+	dac_signed_w(device->machine().device("dac"), 0, state ? 0x7f : 0);
 }
 
 static I8155_INTERFACE(i8155_intf)
@@ -187,7 +186,7 @@ static MACHINE_CONFIG_START( horse, horse_state )
 	MCFG_CPU_IO_MAP(horse_io_map)
 	MCFG_CPU_VBLANK_INT("screen", horse_interrupt)
 
-	MCFG_I8155_ADD("i8155", XTAL_12MHz / 2, i8155_intf) // divider guessed
+	MCFG_I8155_ADD("i8155", XTAL_12MHz / 2, i8155_intf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -202,7 +201,10 @@ static MACHINE_CONFIG_START( horse, horse_state )
 	MCFG_PALETTE_INIT(horse)
 
 	/* sound hardware */
-	// ..
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -224,4 +226,4 @@ ROM_START( unkhorse )
 ROM_END
 
 
-GAME( 19??, unkhorse, 0, horse, horse, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 19??, unkhorse, 0, horse, horse, 0, ROT270, "<unknown>", "unknown Japanese horse gambling game", 0 )
