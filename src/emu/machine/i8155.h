@@ -66,7 +66,7 @@
 
 
 #define I8156_INTERFACE(name) \
-	const i8156_interface (name) =
+	const i8155_interface (name) =
 
 
 
