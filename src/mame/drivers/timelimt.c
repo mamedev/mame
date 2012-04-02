@@ -47,9 +47,9 @@ static WRITE8_HANDLER( sound_reset_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM		/* rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM		/* ram */
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(timelimt_videoram_w) AM_BASE( m_videoram)	/* video ram */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(timelimt_bg_videoram_w) AM_BASE( m_bg_videoram) AM_SIZE(m_bg_videoram_size)/* background ram */
-	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	/* sprite ram */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(timelimt_videoram_w) AM_BASE(m_videoram)	/* video ram */
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(timelimt_bg_videoram_w) AM_BASE(m_bg_videoram) AM_SIZE(m_bg_videoram_size)/* background ram */
+	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	/* sprite ram */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")

@@ -2163,14 +2163,14 @@ static WRITE32_HANDLER( cps3_colourram_w )
 /* there are more unknown writes, but you get the idea */
 static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("user1", 0) // Bios ROM
-	AM_RANGE(0x02000000, 0x0207ffff) AM_RAM AM_BASE( m_mainram) // Main RAM
+	AM_RANGE(0x02000000, 0x0207ffff) AM_RAM AM_BASE(m_mainram) // Main RAM
 
 	AM_RANGE(0x03000000, 0x030003ff) AM_RAM // 'FRAM' (SFIII memory test mode ONLY)
 
-//  AM_RANGE(0x04000000, 0x0407dfff) AM_RAM AM_BASE( m_spriteram)//AM_WRITEONLY // Sprite RAM (jojoba tests this size)
-	AM_RANGE(0x04000000, 0x0407ffff) AM_RAM AM_BASE( m_spriteram)//AM_WRITEONLY // Sprite RAM
+//  AM_RANGE(0x04000000, 0x0407dfff) AM_RAM AM_BASE(m_spriteram)//AM_WRITEONLY // Sprite RAM (jojoba tests this size)
+	AM_RANGE(0x04000000, 0x0407ffff) AM_RAM AM_BASE(m_spriteram)//AM_WRITEONLY // Sprite RAM
 
-	AM_RANGE(0x04080000, 0x040bffff) AM_READWRITE_LEGACY(cps3_colourram_r, cps3_colourram_w) AM_BASE( m_colourram)  // Colour RAM (jojoba tests this size) 0x20000 colours?!
+	AM_RANGE(0x04080000, 0x040bffff) AM_READWRITE_LEGACY(cps3_colourram_r, cps3_colourram_w) AM_BASE(m_colourram)  // Colour RAM (jojoba tests this size) 0x20000 colours?!
 
 	// video registers of some kind probably
 	AM_RANGE(0x040C0000, 0x040C0003) AM_READ_LEGACY(cps3_40C0000_r)//?? every frame
@@ -2179,12 +2179,12 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
     AM_RANGE(0x040C000c, 0x040C000f) AM_READ_LEGACY(cps3_vbl_r)// AM_WRITENOP/
 
 	AM_RANGE(0x040C0000, 0x040C001f) AM_WRITE_LEGACY(cps3_unk_vidregs_w)
-	AM_RANGE(0x040C0020, 0x040C002b) AM_WRITEONLY AM_BASE( m_tilemap20_regs_base)
-	AM_RANGE(0x040C0030, 0x040C003b) AM_WRITEONLY AM_BASE( m_tilemap30_regs_base)
-	AM_RANGE(0x040C0040, 0x040C004b) AM_WRITEONLY AM_BASE( m_tilemap40_regs_base)
-	AM_RANGE(0x040C0050, 0x040C005b) AM_WRITEONLY AM_BASE( m_tilemap50_regs_base)
+	AM_RANGE(0x040C0020, 0x040C002b) AM_WRITEONLY AM_BASE(m_tilemap20_regs_base)
+	AM_RANGE(0x040C0030, 0x040C003b) AM_WRITEONLY AM_BASE(m_tilemap30_regs_base)
+	AM_RANGE(0x040C0040, 0x040C004b) AM_WRITEONLY AM_BASE(m_tilemap40_regs_base)
+	AM_RANGE(0x040C0050, 0x040C005b) AM_WRITEONLY AM_BASE(m_tilemap50_regs_base)
 
-	AM_RANGE(0x040C0060, 0x040C007f) AM_RAM AM_BASE( m_fullscreenzoom)
+	AM_RANGE(0x040C0060, 0x040C007f) AM_RAM AM_BASE(m_fullscreenzoom)
 
 
 	AM_RANGE(0x040C0094, 0x040C009b) AM_WRITE_LEGACY(cps3_characterdma_w)
@@ -2206,24 +2206,24 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
 
 	AM_RANGE(0x05000008, 0x0500000b) AM_WRITENOP // ?? every frame
 
-	AM_RANGE(0x05000a00, 0x05000a1f) AM_READ_LEGACY( cps3_unk_io_r ) // ?? every frame
+	AM_RANGE(0x05000a00, 0x05000a1f) AM_READ_LEGACY(cps3_unk_io_r ) // ?? every frame
 
-	AM_RANGE(0x05001000, 0x05001203) AM_READWRITE_LEGACY( cps3_eeprom_r, cps3_eeprom_w )
+	AM_RANGE(0x05001000, 0x05001203) AM_READWRITE_LEGACY(cps3_eeprom_r, cps3_eeprom_w )
 
 	AM_RANGE(0x05040000, 0x0504ffff) AM_READWRITE_LEGACY(cps3_ssram_r,cps3_ssram_w) // 'SS' RAM (Score Screen) (text tilemap + toles)
 	//0x25050020
-	AM_RANGE(0x05050020, 0x05050023) AM_WRITE_LEGACY( cps3_ss_bank_base_w )
-	AM_RANGE(0x05050024, 0x05050027) AM_WRITE_LEGACY( cps3_ss_pal_base_w )
+	AM_RANGE(0x05050020, 0x05050023) AM_WRITE_LEGACY(cps3_ss_bank_base_w )
+	AM_RANGE(0x05050024, 0x05050027) AM_WRITE_LEGACY(cps3_ss_pal_base_w )
 
-	AM_RANGE(0x05100000, 0x05100003) AM_WRITE_LEGACY( cps3_irq12_ack_w )
-	AM_RANGE(0x05110000, 0x05110003) AM_WRITE_LEGACY( cps3_irq10_ack_w )
+	AM_RANGE(0x05100000, 0x05100003) AM_WRITE_LEGACY(cps3_irq12_ack_w )
+	AM_RANGE(0x05110000, 0x05110003) AM_WRITE_LEGACY(cps3_irq10_ack_w )
 
-	AM_RANGE(0x05140000, 0x05140003) AM_READWRITE_LEGACY( cps3_cdrom_r, cps3_cdrom_w )
+	AM_RANGE(0x05140000, 0x05140003) AM_READWRITE_LEGACY(cps3_cdrom_r, cps3_cdrom_w )
 
-	AM_RANGE(0x06000000, 0x067fffff) AM_READWRITE_LEGACY( cps3_flash1_r, cps3_flash1_w ) /* Flash ROMs simm 1 */
-	AM_RANGE(0x06800000, 0x06ffffff) AM_READWRITE_LEGACY( cps3_flash2_r, cps3_flash2_w ) /* Flash ROMs simm 2 */
+	AM_RANGE(0x06000000, 0x067fffff) AM_READWRITE_LEGACY(cps3_flash1_r, cps3_flash1_w ) /* Flash ROMs simm 1 */
+	AM_RANGE(0x06800000, 0x06ffffff) AM_READWRITE_LEGACY(cps3_flash2_r, cps3_flash2_w ) /* Flash ROMs simm 2 */
 
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM_WRITE_LEGACY( cps3_0xc0000000_ram_w ) AM_BASE( m_0xc0000000_ram) /* Executes code from here */
+	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM_WRITE_LEGACY(cps3_0xc0000000_ram_w ) AM_BASE(m_0xc0000000_ram) /* Executes code from here */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cps3 )

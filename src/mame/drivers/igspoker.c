@@ -348,8 +348,8 @@ static ADDRESS_MAP_START( igspoker_prg_map, AS_PROGRAM, 8, igspoker_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
@@ -359,14 +359,14 @@ static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")			/* Services */
 	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")			/* Coing & Kbd */
 	AM_RANGE(0x5090, 0x5090) AM_WRITE_LEGACY(custom_io_w)
-	AM_RANGE(0x5091, 0x5091) AM_READ_LEGACY(custom_io_r) AM_WRITE_LEGACY( igs_lamps_w )			/* Keyboard */
+	AM_RANGE(0x5091, 0x5091) AM_READ_LEGACY(custom_io_r) AM_WRITE_LEGACY(igs_lamps_w )			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")			/* Not connected */
 	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ_LEGACY(igs_irqack_r) AM_WRITE_LEGACY(igs_irqack_w)
-	AM_RANGE(0x6800, 0x6fff) AM_RAM_WRITE_LEGACY( bg_tile_w )  AM_BASE( m_bg_tile_ram )
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE_LEGACY( fg_tile_w )  AM_BASE( m_fg_tile_ram )
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE_LEGACY( fg_color_w ) AM_BASE( m_fg_color_ram )
-	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY( exp_rom_r )
+	AM_RANGE(0x6800, 0x6fff) AM_RAM_WRITE_LEGACY(bg_tile_w )  AM_BASE(m_bg_tile_ram )
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE_LEGACY(fg_tile_w )  AM_BASE(m_fg_tile_ram )
+	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE_LEGACY(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(exp_rom_r )
 ADDRESS_MAP_END
 
 
@@ -1102,8 +1102,8 @@ INPUT_PORTS_END
 
 
 static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
@@ -1114,19 +1114,19 @@ static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x50f0, 0x50f0) AM_WRITE_LEGACY(igs_nmi_and_coins_w)
 	AM_RANGE(0x5080, 0x5080) AM_READ_PORT("SERVICE")			/* Services */
 	AM_RANGE(0x5090, 0x5090) AM_WRITE_LEGACY(custom_io_w)
-	AM_RANGE(0x5091, 0x5091) AM_READ_LEGACY(custom_io_r) AM_WRITE_LEGACY( igs_lamps_w )			/* Keyboard */
+	AM_RANGE(0x5091, 0x5091) AM_READ_LEGACY(custom_io_r) AM_WRITE_LEGACY(igs_lamps_w )			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
 	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ_LEGACY(igs_irqack_r) AM_WRITE_LEGACY(igs_irqack_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE_LEGACY( fg_tile_w )  AM_BASE( m_fg_tile_ram )
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE_LEGACY( fg_color_w ) AM_BASE( m_fg_color_ram )
-	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY( exp_rom_r )
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE_LEGACY(fg_tile_w )  AM_BASE(m_fg_tile_ram )
+	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE_LEGACY(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(exp_rom_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW1")			/* DSW1 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("DSW2")			/* DSW2 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
@@ -1136,14 +1136,14 @@ static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")			/* Services */
 	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")			/* Coing & Kbd */
 	AM_RANGE(0x5090, 0x5090) AM_WRITE_LEGACY(custom_io_w)
-	AM_RANGE(0x5091, 0x5091) AM_READ_LEGACY(custom_io_r) AM_WRITE_LEGACY( igs_lamps_w )			/* Keyboard */
+	AM_RANGE(0x5091, 0x5091) AM_READ_LEGACY(custom_io_r) AM_WRITE_LEGACY(igs_lamps_w )			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
 	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x50c0, 0x50c0) AM_READ_LEGACY(igs_irqack_r) AM_WRITE_LEGACY(igs_irqack_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE_LEGACY( fg_tile_w )  AM_BASE( m_fg_tile_ram )
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE_LEGACY( fg_color_w ) AM_BASE( m_fg_color_ram )
-	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY( exp_rom_r )
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE_LEGACY(fg_tile_w )  AM_BASE(m_fg_tile_ram )
+	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE_LEGACY(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(exp_rom_r )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( number10 )

@@ -871,7 +871,7 @@ ADDRESS MAP - SLOT GAMES
 ******************************************************************************/
 
 static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8, aristmk4_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE( m_mkiv_vram) // video ram -  chips U49 / U50
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(m_mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
@@ -915,7 +915,7 @@ The U87 personality rom is not required, therefore game rom code mapping is from
 */
 
 static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8, aristmk4_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE( m_mkiv_vram) // video ram -  chips U49 / U50
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(m_mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)

@@ -69,9 +69,9 @@ static ADDRESS_MAP_START( mouser_map, AS_PROGRAM, 8, mouser_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6bff) AM_RAM
 	AM_RANGE(0x8800, 0x88ff) AM_WRITENOP /* unknown */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE( m_videoram)
-	AM_RANGE(0x9800, 0x9cff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x9800, 0x9cff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE(m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE_LEGACY(mouser_nmi_enable_w) /* bit 0 = NMI Enable */
 	AM_RANGE(0xa001, 0xa001) AM_WRITE_LEGACY(mouser_flip_screen_x_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(mouser_flip_screen_y_w)

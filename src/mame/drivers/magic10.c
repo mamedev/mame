@@ -284,9 +284,9 @@ static WRITE16_HANDLER( magic10_out_w )
 
 static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(layer1_videoram_w) AM_BASE( m_layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(layer0_videoram_w) AM_BASE( m_layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(layer2_videoram_w) AM_BASE( m_layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(layer1_videoram_w) AM_BASE(m_layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(layer0_videoram_w) AM_BASE(m_layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(layer2_videoram_w) AM_BASE(m_layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE_LEGACY(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
@@ -294,15 +294,15 @@ static ADDRESS_MAP_START( magic10_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x400008, 0x400009) AM_WRITE_LEGACY(magic10_out_w)
 	AM_RANGE(0x40000a, 0x40000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x40000e, 0x40000f) AM_WRITENOP
-	AM_RANGE(0x400080, 0x400087) AM_RAM AM_BASE( m_vregs)
+	AM_RANGE(0x400080, 0x400087) AM_RAM AM_BASE(m_vregs)
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(layer1_videoram_w) AM_BASE( m_layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(layer0_videoram_w) AM_BASE( m_layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(layer2_videoram_w) AM_BASE( m_layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(layer1_videoram_w) AM_BASE(m_layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(layer0_videoram_w) AM_BASE(m_layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(layer2_videoram_w) AM_BASE(m_layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE_LEGACY(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("INPUTS")
@@ -310,15 +310,15 @@ static ADDRESS_MAP_START( magic10a_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x500008, 0x500009) AM_WRITE_LEGACY(magic10_out_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x50000e, 0x50000f) AM_WRITENOP
-	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE( m_vregs)	// video registers?
+	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE(m_vregs)	// video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(layer1_videoram_w) AM_BASE( m_layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(layer0_videoram_w) AM_BASE( m_layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(layer2_videoram_w) AM_BASE( m_layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(layer1_videoram_w) AM_BASE(m_layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(layer0_videoram_w) AM_BASE(m_layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(layer2_videoram_w) AM_BASE(m_layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE_LEGACY(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500001) AM_READ_LEGACY(magic102_r)
@@ -330,14 +330,14 @@ static ADDRESS_MAP_START( magic102_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE( m_vregs)	// video registers?
+	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE(m_vregs)	// video registers?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(layer1_videoram_w) AM_BASE( m_layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(layer0_videoram_w) AM_BASE( m_layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(layer2_videoram_w) AM_BASE( m_layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(layer1_videoram_w) AM_BASE(m_layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(layer0_videoram_w) AM_BASE(m_layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(layer2_videoram_w) AM_BASE(m_layer2_videoram)
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE_LEGACY(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE_LEGACY(hotslot_copro_r, hotslot_copro_w)	// copro comm
@@ -349,21 +349,21 @@ static ADDRESS_MAP_START( hotslot_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x50001a, 0x50001d) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x70000a, 0x70000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE( m_vregs)
+	AM_RANGE(0x700080, 0x700087) AM_RAM AM_BASE(m_vregs)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sgsafari_map, AS_PROGRAM, 16, magic10_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(layer1_videoram_w) AM_BASE( m_layer1_videoram)
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(layer0_videoram_w) AM_BASE( m_layer0_videoram)
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(layer2_videoram_w) AM_BASE( m_layer2_videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(layer1_videoram_w) AM_BASE(m_layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(layer0_videoram_w) AM_BASE(m_layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(layer2_videoram_w) AM_BASE(m_layer2_videoram)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x300000, 0x3001ff) AM_RAM_WRITE_LEGACY(paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500008, 0x500009) AM_WRITE_LEGACY(magic10_out_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x50000e, 0x50000f) AM_READ_PORT("IN0")
-	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE( m_vregs)	// video registers?
+	AM_RANGE(0x500080, 0x500087) AM_RAM AM_BASE(m_vregs)	// video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 /*

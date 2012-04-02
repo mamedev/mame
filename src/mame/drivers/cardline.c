@@ -128,8 +128,8 @@ static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
 	AM_RANGE(0x2840, 0x2840) AM_NOP
 	AM_RANGE(0x2880, 0x2880) AM_NOP
 	AM_RANGE(0x3003, 0x3003) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE_LEGACY(vram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE_LEGACY(attr_w) AM_BASE( m_colorram)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE_LEGACY(vram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe000, 0xffff) AM_WRITE_LEGACY(attr_w) AM_BASE(m_colorram)
 	/* Ports */
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE_LEGACY(unk_r, video_w)
 ADDRESS_MAP_END

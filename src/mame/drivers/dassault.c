@@ -224,18 +224,18 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_BASE( m_pf2_rowscroll)
+	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_BASE(m_pf2_rowscroll)
 	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 
 	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_BASE( m_pf4_rowscroll)
+	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_BASE(m_pf4_rowscroll)
 	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE( m_ram) /* Main ram */
+	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE(m_ram) /* Main ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram2") /* Spriteram (2nd) */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE_LEGACY(dassault_irq_r, dassault_irq_w)
-	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w) AM_BASE( m_shared_ram) /* Shared ram */
+	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w) AM_BASE(m_shared_ram) /* Shared ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x100002, 0x100007) AM_WRITENOP /* ? */
 	AM_RANGE(0x100004, 0x100005) AM_READ_LEGACY(dassault_sub_control_r)
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE( m_ram2) /* Sub cpu ram */
+	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE(m_ram2) /* Sub cpu ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram") /* Sprite ram */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE_LEGACY(dassault_irq_r, dassault_irq_w)
 	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w)

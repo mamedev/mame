@@ -74,33 +74,33 @@ static WRITE8_HANDLER( torus_coin_counter_w )
 #define STANDARD_MAP	\
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	/* ROM */	\
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	/* ROM (banked) */ \
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(paradise_vram_2_w) AM_BASE( m_vram_2)	/* Background */ \
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(paradise_vram_1_w) AM_BASE( m_vram_1)	/* Midground */ \
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(paradise_vram_0_w) AM_BASE( m_vram_0)	/* Foreground */ \
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(paradise_vram_2_w) AM_BASE(m_vram_2)	/* Background */ \
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(paradise_vram_1_w) AM_BASE(m_vram_1)	/* Midground */ \
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(paradise_vram_0_w) AM_BASE(m_vram_0)	/* Foreground */ \
 
 
 static ADDRESS_MAP_START( paradise_map, AS_PROGRAM, 8, paradise_state )
 	STANDARD_MAP
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM	// RAM
-	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0xd900, 0xe0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE(0xe100, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tgtball_map, AS_PROGRAM, 8, paradise_state )
 	STANDARD_MAP
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM	// RAM
-	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0xd900, 0xd9ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE(0xda00, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( torus_map, AS_PROGRAM, 8, paradise_state )
 	STANDARD_MAP
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE(0xe000, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8, paradise_state )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE_LEGACY(paradise_palette_w) AM_BASE( m_paletteram)	// Palette
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE_LEGACY(paradise_palette_w) AM_BASE(m_paletteram)	// Palette
 	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(paradise_priority_w)	// Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(paradise_flipscreen_w)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE_LEGACY(paradise_palbank_w)	// Layers palette bank
@@ -113,11 +113,11 @@ static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8, paradise_state )
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("oki2", okim6295_device, read, write)	// OKI 1
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE_LEGACY(paradise_pixmap_w) AM_BASE( m_videoram)	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE_LEGACY(paradise_pixmap_w) AM_BASE(m_videoram)	// Pixmap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( torus_io_map, AS_IO, 8, paradise_state )
-	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE_LEGACY(paradise_palette_w) AM_BASE( m_paletteram)	// Palette
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE_LEGACY(paradise_palette_w) AM_BASE(m_paletteram)	// Palette
 	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(paradise_priority_w)	// Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(paradise_flipscreen_w)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE_LEGACY(paradise_palbank_w)	// Layers palette bank
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START( torus_io_map, AS_IO, 8, paradise_state )
 	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1")
 	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
 	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE_LEGACY(paradise_pixmap_w) AM_BASE( m_videoram)	// Pixmap
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE_LEGACY(paradise_pixmap_w) AM_BASE(m_videoram)	// Pixmap
 ADDRESS_MAP_END
 
 

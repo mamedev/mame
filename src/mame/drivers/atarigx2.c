@@ -1153,14 +1153,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, atarigx2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM
-	AM_RANGE(0xca0000, 0xca0fff) AM_READWRITE_LEGACY(atarigx2_protection_r, atarigx2_protection_w) AM_BASE( m_protection_base)
+	AM_RANGE(0xca0000, 0xca0fff) AM_READWRITE_LEGACY(atarigx2_protection_r, atarigx2_protection_w) AM_BASE(m_protection_base)
 	AM_RANGE(0xd00000, 0xd1ffff) AM_READ_LEGACY(a2d_data_r)
 	AM_RANGE(0xd20000, 0xd20fff) AM_READWRITE_LEGACY(atarigen_eeprom_upper32_r, atarigen_eeprom32_w) AM_SHARE("eeprom")
 	AM_RANGE(0xd40000, 0xd40fff) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram32_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE_LEGACY(atarigen_playfield32_w) AM_BASE( m_playfield32)
-	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE_LEGACY(atarigen_alpha32_w) AM_BASE( m_alpha32)
+	AM_RANGE(0xd72000, 0xd75fff) AM_WRITE_LEGACY(atarigen_playfield32_w) AM_BASE(m_playfield32)
+	AM_RANGE(0xd76000, 0xd76fff) AM_WRITE_LEGACY(atarigen_alpha32_w) AM_BASE(m_alpha32)
 	AM_RANGE(0xd78000, 0xd78fff) AM_DEVREADWRITE_LEGACY("rle", atarirle_spriteram32_r, atarirle_spriteram32_w)
-	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE_LEGACY(mo_command_w) AM_BASE( m_mo_command)
+	AM_RANGE(0xd7a200, 0xd7a203) AM_WRITE_LEGACY(mo_command_w) AM_BASE(m_mo_command)
 	AM_RANGE(0xd70000, 0xd7ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd9ffff) AM_WRITE_LEGACY(atarigen_eeprom_enable32_w)
 	AM_RANGE(0xe06000, 0xe06003) AM_WRITE_LEGACY(atarigen_sound_upper32_w)

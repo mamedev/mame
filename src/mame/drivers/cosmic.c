@@ -356,8 +356,8 @@ static WRITE8_HANDLER( flip_screen_w )
 
 static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
-	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
@@ -371,8 +371,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
-	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x6000, 0x601f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
@@ -385,7 +385,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8, cosmic_state )
@@ -399,7 +399,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3807) AM_READ_LEGACY(magspot_coinage_dip_r)
-	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE_LEGACY(cosmic_color_register_w)
 	AM_RANGE(0x480f, 0x480f) AM_WRITE_LEGACY(flip_screen_w)
@@ -407,7 +407,7 @@ static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
 	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN2")
 	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("IN3")
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 

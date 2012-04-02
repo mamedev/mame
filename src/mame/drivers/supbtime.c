@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 	AM_RANGE(0x104000, 0x11ffff) AM_WRITENOP /* Nothing there */
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x120800, 0x13ffff) AM_WRITENOP /* Nothing there */
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(supbtime_controls_r)
@@ -72,14 +72,14 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_r, deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE( m_pf1_rowscroll)
-	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE( m_pf2_rowscroll)
+	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE(m_pf1_rowscroll)
+	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE(m_pf2_rowscroll)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(sound_w)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
@@ -87,8 +87,8 @@ static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_r, deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE( m_pf1_rowscroll) // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE( m_pf2_rowscroll) // unused
+	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_BASE(m_pf1_rowscroll) // unused
+	AM_RANGE(0x342000, 0x3427ff) AM_RAM AM_BASE(m_pf2_rowscroll) // unused
 ADDRESS_MAP_END
 
 /******************************************************************************/

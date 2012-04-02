@@ -203,7 +203,7 @@ static WRITE8_HANDLER( nvram_enable_w )
 /* full address map derived from schematics */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(atetris_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(atetris_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE_LEGACY(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
@@ -220,7 +220,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(atetris_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(atetris_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE_LEGACY(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE_LEGACY("sn1", sn76496_w)

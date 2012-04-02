@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( marinedt_map, AS_PROGRAM, 8, marinedt_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4400, 0x47ff) AM_RAM				//unused, vram mirror?
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE_LEGACY(tx_tileram_w) AM_BASE( m_tx_tileram)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE_LEGACY(tx_tileram_w) AM_BASE(m_tx_tileram)
 	AM_RANGE(0x4c00, 0x4c00) AM_WRITENOP	//?? maybe off by one error
 ADDRESS_MAP_END
 

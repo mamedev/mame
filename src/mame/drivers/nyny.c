@@ -529,10 +529,10 @@ static WRITE8_HANDLER( nyny_pia_1_2_w )
 
 
 static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8, nyny_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE( m_videoram1)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE( m_colorram1)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE( m_videoram2)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE( m_colorram2)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_videoram1)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(m_colorram1)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_videoram2)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_colorram2)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("nvram") /* SRAM (coin counter, shown when holding F2) */
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, address_w)

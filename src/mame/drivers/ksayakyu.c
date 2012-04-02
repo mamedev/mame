@@ -118,8 +118,8 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0xa806, 0xa806) AM_READ_LEGACY(sound_status_r)
 	AM_RANGE(0xa807, 0xa807) AM_READNOP /* watchdog ? */
 	AM_RANGE(0xa808, 0xa808) AM_WRITE_LEGACY(bank_select_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(ksayakyu_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(ksayakyu_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundcpu_map, AS_PROGRAM, 8, ksayakyu_state )

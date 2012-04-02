@@ -67,12 +67,12 @@ static WRITE8_HANDLER( protection_w )
 static ADDRESS_MAP_START( skyskipr_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE( m_background_pos)
-	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE( m_palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE(m_background_pos)
+	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE(m_palettebank)
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE_LEGACY(popeye_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE_LEGACY(popeye_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_WRITE_LEGACY(popeye_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_WRITE_LEGACY(popeye_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE_LEGACY(skyskipr_bitmap_w)
 	AM_RANGE(0xe000, 0xe001) AM_READWRITE_LEGACY(protection_r,protection_w)
 ADDRESS_MAP_END
@@ -81,12 +81,12 @@ static ADDRESS_MAP_START( popeye_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
-	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE( m_background_pos)
-	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE( m_palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE(m_background_pos)
+	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE(m_palettebank)
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE_LEGACY(popeye_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE_LEGACY(popeye_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_WRITE_LEGACY(popeye_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_WRITE_LEGACY(popeye_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE_LEGACY(popeye_bitmap_w)
 	AM_RANGE(0xe000, 0xe001) AM_READWRITE_LEGACY(protection_r,protection_w)
 ADDRESS_MAP_END
@@ -94,12 +94,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( popeyebl_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE( m_background_pos)
-	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE( m_palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE(m_background_pos)
+	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE(m_palettebank)
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE_LEGACY(popeye_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE_LEGACY(popeye_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_WRITE_LEGACY(popeye_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xa400, 0xa7ff) AM_WRITE_LEGACY(popeye_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE_LEGACY(skyskipr_bitmap_w)
 	AM_RANGE(0xe000, 0xe01f) AM_ROM
 ADDRESS_MAP_END

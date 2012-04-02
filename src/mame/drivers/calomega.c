@@ -845,8 +845,8 @@ static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE("acia6850_0", acia6850_device, status_read, control_write)
 	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE("acia6850_0", acia6850_device, data_read, data_write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(calomega_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(calomega_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(calomega_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(calomega_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x1800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -858,8 +858,8 @@ static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(calomega_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(calomega_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(calomega_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(calomega_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x1800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -871,8 +871,8 @@ static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x10c4, 0x10c7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x10c8, 0x10cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(calomega_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(calomega_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(calomega_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(calomega_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x2800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -883,8 +883,8 @@ static ADDRESS_MAP_START( sys906_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x2c04, 0x2c04) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2c05, 0x2c05) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x2c08, 0x2c09) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(calomega_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(calomega_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(calomega_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(calomega_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

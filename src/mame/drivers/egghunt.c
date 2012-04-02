@@ -220,7 +220,7 @@ static WRITE8_DEVICE_HANDLER( egghunt_okibanking_w )
 static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(egghunt_atram_w) AM_BASE( m_atram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(egghunt_atram_w) AM_BASE(m_atram)
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE_LEGACY(egghunt_bgram_r, egghunt_bgram_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END

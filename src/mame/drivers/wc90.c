@@ -111,11 +111,11 @@ static WRITE8_HANDLER( wc90_sound_command_w )
 static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM		/* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE_LEGACY(wc90_fgvideoram_w) AM_BASE( m_fgvideoram)	/* fg video ram */
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE_LEGACY(wc90_fgvideoram_w) AM_BASE(m_fgvideoram)	/* fg video ram */
 	AM_RANGE(0xb000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE_LEGACY(wc90_bgvideoram_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE_LEGACY(wc90_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(wc90_txvideoram_w) AM_BASE( m_txvideoram)	/* tx video ram */
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(wc90_txvideoram_w) AM_BASE(m_txvideoram)	/* tx video ram */
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1")
@@ -123,18 +123,18 @@ static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xfc05, 0xfc05) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfc06, 0xfc06) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc07, 0xfc07) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc02, 0xfc02) AM_WRITEONLY AM_BASE( m_scroll0ylo)
-	AM_RANGE(0xfc03, 0xfc03) AM_WRITEONLY AM_BASE( m_scroll0yhi)
-	AM_RANGE(0xfc06, 0xfc06) AM_WRITEONLY AM_BASE( m_scroll0xlo)
-	AM_RANGE(0xfc07, 0xfc07) AM_WRITEONLY AM_BASE( m_scroll0xhi)
-	AM_RANGE(0xfc22, 0xfc22) AM_WRITEONLY AM_BASE( m_scroll1ylo)
-	AM_RANGE(0xfc23, 0xfc23) AM_WRITEONLY AM_BASE( m_scroll1yhi)
-	AM_RANGE(0xfc26, 0xfc26) AM_WRITEONLY AM_BASE( m_scroll1xlo)
-	AM_RANGE(0xfc27, 0xfc27) AM_WRITEONLY AM_BASE( m_scroll1xhi)
-	AM_RANGE(0xfc42, 0xfc42) AM_WRITEONLY AM_BASE( m_scroll2ylo)
-	AM_RANGE(0xfc43, 0xfc43) AM_WRITEONLY AM_BASE( m_scroll2yhi)
-	AM_RANGE(0xfc46, 0xfc46) AM_WRITEONLY AM_BASE( m_scroll2xlo)
-	AM_RANGE(0xfc47, 0xfc47) AM_WRITEONLY AM_BASE( m_scroll2xhi)
+	AM_RANGE(0xfc02, 0xfc02) AM_WRITEONLY AM_BASE(m_scroll0ylo)
+	AM_RANGE(0xfc03, 0xfc03) AM_WRITEONLY AM_BASE(m_scroll0yhi)
+	AM_RANGE(0xfc06, 0xfc06) AM_WRITEONLY AM_BASE(m_scroll0xlo)
+	AM_RANGE(0xfc07, 0xfc07) AM_WRITEONLY AM_BASE(m_scroll0xhi)
+	AM_RANGE(0xfc22, 0xfc22) AM_WRITEONLY AM_BASE(m_scroll1ylo)
+	AM_RANGE(0xfc23, 0xfc23) AM_WRITEONLY AM_BASE(m_scroll1yhi)
+	AM_RANGE(0xfc26, 0xfc26) AM_WRITEONLY AM_BASE(m_scroll1xlo)
+	AM_RANGE(0xfc27, 0xfc27) AM_WRITEONLY AM_BASE(m_scroll1xhi)
+	AM_RANGE(0xfc42, 0xfc42) AM_WRITEONLY AM_BASE(m_scroll2ylo)
+	AM_RANGE(0xfc43, 0xfc43) AM_WRITEONLY AM_BASE(m_scroll2yhi)
+	AM_RANGE(0xfc46, 0xfc46) AM_WRITEONLY AM_BASE(m_scroll2xlo)
+	AM_RANGE(0xfc47, 0xfc47) AM_WRITEONLY AM_BASE(m_scroll2xhi)
 	AM_RANGE(0xfcc0, 0xfcc0) AM_WRITE_LEGACY(wc90_sound_command_w)
 	AM_RANGE(0xfcd0, 0xfcd0) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xfce0, 0xfce0) AM_WRITE_LEGACY(wc90_bankswitch_w)
@@ -143,7 +143,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")

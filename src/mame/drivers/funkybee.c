@@ -91,8 +91,8 @@ static WRITE8_HANDLER( funkybee_coin_counter_w )
 static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8, funkybee_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(funkybee_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE_LEGACY(funkybee_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(funkybee_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE_LEGACY(funkybee_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(funkybee_scroll_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(funkybee_flipscreen_w)
 	AM_RANGE(0xe802, 0xe803) AM_WRITE_LEGACY(funkybee_coin_counter_w)

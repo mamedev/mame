@@ -520,9 +520,9 @@ GFXDECODE_END
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, grchamp_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_BASE( m_radarram)
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM AM_BASE( m_videoram)
-	AM_RANGE(0x5800, 0x58ff) AM_MIRROR(0x0700) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_radarram)
+	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x5800, 0x58ff) AM_MIRROR(0x0700) AM_RAM AM_BASE(m_spriteram)
 ADDRESS_MAP_END
 
 
@@ -547,9 +547,9 @@ ADDRESS_MAP_END
 /* complete memory map derived from schematics */
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, grchamp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(grchamp_left_w) AM_BASE( m_leftram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY(grchamp_right_w) AM_BASE( m_rightram)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(grchamp_center_w) AM_BASE( m_centerram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(grchamp_left_w) AM_BASE(m_leftram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY(grchamp_right_w) AM_BASE(m_rightram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(grchamp_center_w) AM_BASE(m_centerram)
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
 	AM_RANGE(0x5000, 0x6fff) AM_ROM
 ADDRESS_MAP_END

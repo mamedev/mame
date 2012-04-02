@@ -460,7 +460,7 @@ static ADDRESS_MAP_START( memory_map, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x5d6000, 0x5d6003) AM_WRITE_LEGACY(sndram_bank_w)					// SOUND RAM bank
 	AM_RANGE(0x5e0000, 0x5e0003) AM_READWRITE_LEGACY(turntable_r, turntable_select_w)		// input port control (turn tables)
 	AM_RANGE(0x600000, 0x601fff) AM_READ_LEGACY(v_rom_r)						// VIDEO ROM readthrough (for POST)
-	AM_RANGE(0x801000, 0x8017ff) AM_RAM AM_BASE( m_obj_ram)				// OBJECT RAM
+	AM_RANGE(0x801000, 0x8017ff) AM_RAM AM_BASE(m_obj_ram)				// OBJECT RAM
 	AM_RANGE(0x802000, 0x802fff) AM_WRITE_LEGACY(unknown802000_w)					// ??
 	AM_RANGE(0x803000, 0x80309f) AM_READWRITE_LEGACY(obj_ctrl_r, obj_ctrl_w)			// OBJECT REGS
 	AM_RANGE(0x803800, 0x803fff) AM_READ_LEGACY(obj_rom_r)						// OBJECT ROM readthrough (for POST)

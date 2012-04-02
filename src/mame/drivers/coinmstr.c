@@ -201,10 +201,10 @@ static READ8_HANDLER( ff_r )
 static ADDRESS_MAP_START( coinmstr_map, AS_PROGRAM, 8, coinmstr_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(quizmstr_bg_w) AM_BASE( m_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(quizmstr_attr1_w) AM_BASE( m_attr_ram1)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(quizmstr_attr2_w) AM_BASE( m_attr_ram2)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(quizmstr_attr3_w) AM_BASE( m_attr_ram3)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(quizmstr_bg_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(quizmstr_attr1_w) AM_BASE(m_attr_ram1)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(quizmstr_attr2_w) AM_BASE(m_attr_ram2)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(quizmstr_attr3_w) AM_BASE(m_attr_ram3)
 ADDRESS_MAP_END
 
 // Different I/O mappping for every game

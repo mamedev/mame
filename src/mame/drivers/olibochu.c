@@ -246,8 +246,8 @@ static WRITE8_HANDLER( sound_command_w )
 
 static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(olibochu_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(olibochu_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(olibochu_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(olibochu_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x9000, 0x903f) AM_RAM //???
 	AM_RANGE(0x9800, 0x983f) AM_RAM //???
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
@@ -258,8 +258,8 @@ static ADDRESS_MAP_START( olibochu_map, AS_PROGRAM, 8, olibochu_state )
 	AM_RANGE(0xa005, 0xa005) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa800, 0xa801) AM_WRITE_LEGACY(sound_command_w)
 	AM_RANGE(0xa802, 0xa802) AM_WRITE_LEGACY(olibochu_flipscreen_w)	/* bit 6 = enable sound? */
-	AM_RANGE(0xf400, 0xf41f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf440, 0xf47f) AM_RAM AM_BASE_SIZE( m_spriteram2, m_spriteram2_size)
+	AM_RANGE(0xf400, 0xf41f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf440, 0xf47f) AM_RAM AM_BASE_SIZE(m_spriteram2, m_spriteram2_size)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

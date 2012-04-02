@@ -253,8 +253,8 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 /* Mystic Warriors */
 static ADDRESS_MAP_START( mystwarr_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// main program
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE( m_gx_workram)
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE( m_spriteram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_gx_workram)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x480000, 0x4800ff) AM_WRITE_LEGACY(K055555_word_w)
 	AM_RANGE(0x482000, 0x48200f) AM_READ_LEGACY(K055673_rom_word_r)
 	AM_RANGE(0x482010, 0x48201f) AM_WRITE_LEGACY(K053247_reg_word_w)
@@ -290,7 +290,7 @@ ADDRESS_MAP_END
 /* Metamorphic Force */
 static ADDRESS_MAP_START( metamrph_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM	// main program
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE( m_gx_workram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_gx_workram)
 	AM_RANGE(0x210000, 0x210fff) AM_READWRITE_LEGACY(K053247_word_r,K053247_word_w)
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
 	AM_RANGE(0x240000, 0x240007) AM_WRITE_LEGACY(K053246_word_w)
@@ -332,7 +332,7 @@ ADDRESS_MAP_END
 /* Violent Storm */
 static ADDRESS_MAP_START( viostorm_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM		// main program
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE( m_gx_workram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_gx_workram)
 	AM_RANGE(0x210000, 0x210fff) AM_READWRITE_LEGACY(K053247_word_r,K053247_word_w)
 	AM_RANGE(0x211000, 0x21ffff) AM_RAM
 	AM_RANGE(0x240000, 0x240007) AM_WRITE_LEGACY(K053246_word_w)
@@ -429,7 +429,7 @@ static WRITE16_HANDLER( mccontrol_w )
 /* Martial Champion */
 static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM									// main program
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE( m_gx_workram)			// work RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(m_gx_workram)			// work RAM
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM									// data ROM
 	AM_RANGE(0x400000, 0x4000ff) AM_WRITE_LEGACY(K055555_word_w)				// PCU2
 	AM_RANGE(0x402000, 0x40200f) AM_READ_LEGACY(K055673_rom_word_r)			// sprite ROM readback
@@ -451,7 +451,7 @@ static ADDRESS_MAP_START( martchmp_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x41a000, 0x41a001) AM_WRITE_LEGACY(sound_irq_w)
 	AM_RANGE(0x41c000, 0x41c01f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)				// CCU
 	AM_RANGE(0x41e000, 0x41e007) AM_WRITE_LEGACY(K056832_b_word_w)				// VSCCS
-	AM_RANGE(0x480000, 0x483fff) AM_READWRITE_LEGACY(K053247_martchmp_word_r,K053247_martchmp_word_w) AM_BASE( m_spriteram)	// sprite RAM
+	AM_RANGE(0x480000, 0x483fff) AM_READWRITE_LEGACY(K053247_martchmp_word_r,K053247_martchmp_word_w) AM_BASE(m_spriteram)	// sprite RAM
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE_LEGACY(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)						// palette RAM
 	AM_RANGE(0x680000, 0x681fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM
 	AM_RANGE(0x682000, 0x683fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
@@ -470,7 +470,7 @@ ADDRESS_MAP_END
 /* Ultimate Battler Dadandarn */
 static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM							// main program and data ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE( m_spriteram)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM
 	AM_RANGE(0x412000, 0x413fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)	// tilemap RAM mirror read/write (essential)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE_LEGACY(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
@@ -492,7 +492,7 @@ static ADDRESS_MAP_START( dadandrn_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x48c000, 0x48c01f) AM_WRITE_LEGACY(K054338_word_w)
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")	// bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ_LEGACY(dddeeprom_r)
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE( m_gx_workram)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(m_gx_workram)
 	AM_RANGE(0x680000, 0x68003f) AM_READWRITE_LEGACY(K055550_word_r,K055550_word_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE_LEGACY(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE_LEGACY(ddd_053936_enable_w)
@@ -517,7 +517,7 @@ ADDRESS_MAP_END
 // c00000 = 936 tiles (7fffff window)
 static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM								// main program
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE( m_spriteram)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(K053247_scattered_word_r,K053247_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x410000, 0x411fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)		// tilemap RAM
 	AM_RANGE(0x412000, 0x413fff) AM_READWRITE_LEGACY(K056832_ram_word_r,K056832_ram_word_w)		// tilemap RAM mirror read / write (essential)
 	AM_RANGE(0x420000, 0x421fff) AM_RAM_WRITE_LEGACY(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
@@ -539,7 +539,7 @@ static ADDRESS_MAP_START( gaiapols_map, AS_PROGRAM, 16, mystwarr_state )
 	AM_RANGE(0x48c000, 0x48c01f) AM_WRITE_LEGACY(K054338_word_w)
 	AM_RANGE(0x48e000, 0x48e001) AM_READ_PORT("IN0_P1")				// bit 3 (0x8) is test switch
 	AM_RANGE(0x48e020, 0x48e021) AM_READ_LEGACY(dddeeprom_r)
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE( m_gx_workram)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE(m_gx_workram)
 	AM_RANGE(0x660000, 0x6600ff) AM_READWRITE_LEGACY(K054000_lsb_r,K054000_lsb_w)
 	AM_RANGE(0x6a0000, 0x6a0001) AM_WRITE_LEGACY(mmeeprom_w)
 	AM_RANGE(0x6c0000, 0x6c0001) AM_WRITE_LEGACY(ddd_053936_enable_w)

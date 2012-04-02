@@ -939,43 +939,43 @@ static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_SHARE("nvram")	// battery
 
 	// read lo (L1)   (only half tilemap?)
-	AM_RANGE( 0x412000, 0x412fff ) AM_READ8_LEGACY( ss9601_videoram_1_lo_r, 0xffff )
-	AM_RANGE( 0x413000, 0x4131ff ) AM_READWRITE8_LEGACY( ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w, 0xffff )
+	AM_RANGE( 0x412000, 0x412fff ) AM_READ8_LEGACY(ss9601_videoram_1_lo_r, 0xffff )
+	AM_RANGE( 0x413000, 0x4131ff ) AM_READWRITE8_LEGACY(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w, 0xffff )
 	// read lo (REEL)
-	AM_RANGE( 0x416000, 0x416fff ) AM_READ8_LEGACY( ss9601_reelram_lo_r, 0xffff )
-	AM_RANGE( 0x417000, 0x4171ff ) AM_READWRITE8_LEGACY( ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w, 0xffff )
+	AM_RANGE( 0x416000, 0x416fff ) AM_READ8_LEGACY(ss9601_reelram_lo_r, 0xffff )
+	AM_RANGE( 0x417000, 0x4171ff ) AM_READWRITE8_LEGACY(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w, 0xffff )
 
 	// read hi (L1)
-	AM_RANGE( 0x422000, 0x422fff ) AM_READ8_LEGACY( ss9601_videoram_1_hi_r, 0xffff )
-	AM_RANGE( 0x423000, 0x4231ff ) AM_READWRITE8_LEGACY( ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w, 0xffff )
+	AM_RANGE( 0x422000, 0x422fff ) AM_READ8_LEGACY(ss9601_videoram_1_hi_r, 0xffff )
+	AM_RANGE( 0x423000, 0x4231ff ) AM_READWRITE8_LEGACY(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w, 0xffff )
 	// read hi (REEL)
-	AM_RANGE( 0x426000, 0x426fff ) AM_READ8_LEGACY( ss9601_reelram_hi_r, 0xffff )
-	AM_RANGE( 0x427000, 0x4271ff ) AM_READWRITE8_LEGACY( ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w, 0xffff )
+	AM_RANGE( 0x426000, 0x426fff ) AM_READ8_LEGACY(ss9601_reelram_hi_r, 0xffff )
+	AM_RANGE( 0x427000, 0x4271ff ) AM_READWRITE8_LEGACY(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w, 0xffff )
 
 	// write both (L1)
-	AM_RANGE( 0x430000, 0x431fff ) AM_WRITE8_LEGACY( ss9601_videoram_1_hi_lo_w, 0xffff )
-	AM_RANGE( 0x432000, 0x432fff ) AM_WRITE8_LEGACY( ss9601_videoram_1_hi_lo_w, 0xffff )
-	AM_RANGE( 0x433000, 0x4331ff ) AM_WRITE8_LEGACY( ss9601_scrollram_1_hi_lo_w, 0xffff )
+	AM_RANGE( 0x430000, 0x431fff ) AM_WRITE8_LEGACY(ss9601_videoram_1_hi_lo_w, 0xffff )
+	AM_RANGE( 0x432000, 0x432fff ) AM_WRITE8_LEGACY(ss9601_videoram_1_hi_lo_w, 0xffff )
+	AM_RANGE( 0x433000, 0x4331ff ) AM_WRITE8_LEGACY(ss9601_scrollram_1_hi_lo_w, 0xffff )
 	// write both (L0 & REEL)
-	AM_RANGE( 0x434000, 0x435fff ) AM_WRITE8_LEGACY( ss9601_videoram_0_hi_lo_w, 0xffff )
-	AM_RANGE( 0x436000, 0x436fff ) AM_WRITE8_LEGACY( ss9601_reelram_hi_lo_w, 0xffff )
-	AM_RANGE( 0x437000, 0x4371ff ) AM_WRITE8_LEGACY( ss9601_scrollram_0_hi_lo_w, 0xffff )
+	AM_RANGE( 0x434000, 0x435fff ) AM_WRITE8_LEGACY(ss9601_videoram_0_hi_lo_w, 0xffff )
+	AM_RANGE( 0x436000, 0x436fff ) AM_WRITE8_LEGACY(ss9601_reelram_hi_lo_w, 0xffff )
+	AM_RANGE( 0x437000, 0x4371ff ) AM_WRITE8_LEGACY(ss9601_scrollram_0_hi_lo_w, 0xffff )
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE_LEGACY( bishjan_sel_w )
-	AM_RANGE( 0x600040, 0x600041 ) AM_WRITE8_LEGACY( ss9601_scrollctrl_w, 0xff00 )
-	AM_RANGE( 0x600060, 0x600063 ) AM_WRITE8_LEGACY( hm86171_colorram_w, 0xffff )
-	AM_RANGE( 0x600080, 0x600081 ) AM_WRITE8_LEGACY( ss9601_tilesize_w, 0xff00 )
-	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE8_LEGACY( ss9601_byte_lo_w, 0xff00 )
+	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE_LEGACY(bishjan_sel_w )
+	AM_RANGE( 0x600040, 0x600041 ) AM_WRITE8_LEGACY(ss9601_scrollctrl_w, 0xff00 )
+	AM_RANGE( 0x600060, 0x600063 ) AM_WRITE8_LEGACY(hm86171_colorram_w, 0xffff )
+	AM_RANGE( 0x600080, 0x600081 ) AM_WRITE8_LEGACY(ss9601_tilesize_w, 0xff00 )
+	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE8_LEGACY(ss9601_byte_lo_w, 0xff00 )
 
-	AM_RANGE( 0xa0001e, 0xa0001f ) AM_WRITE8_LEGACY( ss9601_disable_w, 0x00ff )
+	AM_RANGE( 0xa0001e, 0xa0001f ) AM_WRITE8_LEGACY(ss9601_disable_w, 0x00ff )
 
-	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE8_LEGACY( ss9601_scroll_w, 0xffff )
+	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE8_LEGACY(ss9601_scroll_w, 0xffff )
 
 	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ_PORT("DSW")								// SW1
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_PORT("JOY") AM_WRITE_LEGACY( bishjan_input_w )	// IN C
-	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ_LEGACY( bishjan_input_r )						// IN A & B
-	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ_LEGACY( bishjan_serial_r )						// IN D
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE_LEGACY( bishjan_outputs_w ) AM_BASE( m_outputs16 )
+	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_PORT("JOY") AM_WRITE_LEGACY(bishjan_input_w )	// IN C
+	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ_LEGACY(bishjan_input_r )						// IN A & B
+	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ_LEGACY(bishjan_serial_r )						// IN D
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE_LEGACY(bishjan_outputs_w ) AM_BASE(m_outputs16 )
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1116,28 +1116,28 @@ static ADDRESS_MAP_START( mtrain_map, AS_PROGRAM, 8, subsino2_state )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM AM_SHARE("nvram")	// battery
 
-	AM_RANGE( 0x08000, 0x08fff ) AM_WRITE_LEGACY( mtrain_videoram_w )
+	AM_RANGE( 0x08000, 0x08fff ) AM_WRITE_LEGACY(mtrain_videoram_w )
 
-	AM_RANGE( 0x0911f, 0x0911f ) AM_WRITE_LEGACY( ss9601_disable_w )
-	AM_RANGE( 0x09120, 0x09125 ) AM_WRITE_LEGACY( ss9601_scroll_w )
+	AM_RANGE( 0x0911f, 0x0911f ) AM_WRITE_LEGACY(ss9601_disable_w )
+	AM_RANGE( 0x09120, 0x09125 ) AM_WRITE_LEGACY(ss9601_scroll_w )
 
-	AM_RANGE( 0x0912f, 0x0912f ) AM_WRITE_LEGACY( ss9601_byte_lo_w )
+	AM_RANGE( 0x0912f, 0x0912f ) AM_WRITE_LEGACY(ss9601_byte_lo_w )
 
-	AM_RANGE( 0x09140, 0x09142 ) AM_WRITE_LEGACY( mtrain_outputs_w ) AM_BASE( m_outputs )
+	AM_RANGE( 0x09140, 0x09142 ) AM_WRITE_LEGACY(mtrain_outputs_w ) AM_BASE(m_outputs )
 	AM_RANGE( 0x09143, 0x09143 ) AM_READ_PORT( "IN D" )	// (not shown in system test) 0x40 serial out, 0x80 serial in
 	AM_RANGE( 0x09144, 0x09144 ) AM_READ_PORT( "IN A" )	// A
 	AM_RANGE( 0x09145, 0x09145 ) AM_READ_PORT( "IN B" )	// B
 	AM_RANGE( 0x09146, 0x09146 ) AM_READ_PORT( "IN C" )	// C
-	AM_RANGE( 0x09147, 0x09147 ) AM_READ_LEGACY( dsw_r )
-	AM_RANGE( 0x09148, 0x09148 ) AM_WRITE_LEGACY( dsw_mask_w )
+	AM_RANGE( 0x09147, 0x09147 ) AM_READ_LEGACY(dsw_r )
+	AM_RANGE( 0x09148, 0x09148 ) AM_WRITE_LEGACY(dsw_mask_w )
 
-	AM_RANGE( 0x09152, 0x09152 ) AM_WRITE_LEGACY( vblank_bit2_r ) AM_DEVWRITE_LEGACY( "oki", oki_bank_bit0_w )
+	AM_RANGE( 0x09152, 0x09152 ) AM_WRITE_LEGACY(vblank_bit2_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit0_w )
 
-	AM_RANGE( 0x09158, 0x0915e ) AM_READ_LEGACY( mtrain_prot_r )
+	AM_RANGE( 0x09158, 0x0915e ) AM_READ_LEGACY(mtrain_prot_r )
 
-	AM_RANGE( 0x09160, 0x09163 ) AM_WRITE_LEGACY( hm86171_colorram_w )
+	AM_RANGE( 0x09160, 0x09163 ) AM_WRITE_LEGACY(hm86171_colorram_w )
 	AM_RANGE( 0x09164, 0x09164 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE( 0x09168, 0x09168 ) AM_WRITE_LEGACY( mtrain_tilesize_w )
+	AM_RANGE( 0x09168, 0x09168 ) AM_WRITE_LEGACY(mtrain_tilesize_w )
 
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
@@ -1182,53 +1182,53 @@ static ADDRESS_MAP_START( saklove_map, AS_PROGRAM, 8, subsino2_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram")	// battery
 
 	// read lo (L1)   (only half tilemap?)
-	AM_RANGE(0x12000, 0x12fff) AM_READWRITE_LEGACY( ss9601_videoram_1_lo_r,  ss9601_videoram_1_lo_w )
-	AM_RANGE(0x13000, 0x131ff) AM_READWRITE_LEGACY( ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w )
+	AM_RANGE(0x12000, 0x12fff) AM_READWRITE_LEGACY(ss9601_videoram_1_lo_r,  ss9601_videoram_1_lo_w )
+	AM_RANGE(0x13000, 0x131ff) AM_READWRITE_LEGACY(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w )
 	// read lo (L0)
-	AM_RANGE(0x16000, 0x16fff) AM_READWRITE_LEGACY( ss9601_videoram_0_lo_r,  ss9601_videoram_0_lo_w )
-	AM_RANGE(0x17000, 0x171ff) AM_READWRITE_LEGACY( ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w )
+	AM_RANGE(0x16000, 0x16fff) AM_READWRITE_LEGACY(ss9601_videoram_0_lo_r,  ss9601_videoram_0_lo_w )
+	AM_RANGE(0x17000, 0x171ff) AM_READWRITE_LEGACY(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w )
 
 	// read hi (L1)
-	AM_RANGE(0x22000, 0x22fff) AM_READWRITE_LEGACY( ss9601_videoram_1_hi_r,  ss9601_videoram_1_hi_w )
-	AM_RANGE(0x23000, 0x231ff) AM_READWRITE_LEGACY( ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w )
+	AM_RANGE(0x22000, 0x22fff) AM_READWRITE_LEGACY(ss9601_videoram_1_hi_r,  ss9601_videoram_1_hi_w )
+	AM_RANGE(0x23000, 0x231ff) AM_READWRITE_LEGACY(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w )
 	// read hi (L0)
-	AM_RANGE(0x26000, 0x26fff) AM_READWRITE_LEGACY( ss9601_videoram_0_hi_r,  ss9601_videoram_0_hi_w )
-	AM_RANGE(0x27000, 0x271ff) AM_READWRITE_LEGACY( ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w )
+	AM_RANGE(0x26000, 0x26fff) AM_READWRITE_LEGACY(ss9601_videoram_0_hi_r,  ss9601_videoram_0_hi_w )
+	AM_RANGE(0x27000, 0x271ff) AM_READWRITE_LEGACY(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w )
 
 	// write both (L1)
-	AM_RANGE(0x30000, 0x31fff) AM_READWRITE_LEGACY( ss9601_videoram_1_hi_r, ss9601_videoram_1_hi_lo_w )
+	AM_RANGE(0x30000, 0x31fff) AM_READWRITE_LEGACY(ss9601_videoram_1_hi_r, ss9601_videoram_1_hi_lo_w )
 	// write both (L0)
-	AM_RANGE(0x34000, 0x35fff) AM_READWRITE_LEGACY( ss9601_videoram_0_hi_r, ss9601_videoram_0_hi_lo_w )
+	AM_RANGE(0x34000, 0x35fff) AM_READWRITE_LEGACY(ss9601_videoram_0_hi_r, ss9601_videoram_0_hi_lo_w )
 
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saklove_io, AS_IO, 8, subsino2_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY( ss9601_scrollctrl_w )
+	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY(ss9601_scrollctrl_w )
 
 	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE_LEGACY( "ymsnd", ym3812_w )
+	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
 
-	AM_RANGE(0x0060, 0x0063) AM_WRITE_LEGACY( hm86171_colorram_w )
+	AM_RANGE(0x0060, 0x0063) AM_WRITE_LEGACY(hm86171_colorram_w )
 
-	AM_RANGE(0x0080, 0x0080) AM_WRITE_LEGACY( ss9601_tilesize_w )
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE_LEGACY( ss9601_byte_lo_w )
-	AM_RANGE(0x021f, 0x021f) AM_WRITE_LEGACY( ss9601_disable_w )
-	AM_RANGE(0x0220, 0x0225) AM_WRITE_LEGACY( ss9601_scroll_w )
+	AM_RANGE(0x0080, 0x0080) AM_WRITE_LEGACY(ss9601_tilesize_w )
+	AM_RANGE(0x00a0, 0x00a0) AM_WRITE_LEGACY(ss9601_byte_lo_w )
+	AM_RANGE(0x021f, 0x021f) AM_WRITE_LEGACY(ss9601_disable_w )
+	AM_RANGE(0x0220, 0x0225) AM_WRITE_LEGACY(ss9601_scroll_w )
 
-	AM_RANGE(0x0300, 0x0303) AM_WRITE_LEGACY( saklove_outputs_w ) AM_BASE( m_outputs )
+	AM_RANGE(0x0300, 0x0303) AM_WRITE_LEGACY(saklove_outputs_w ) AM_BASE(m_outputs )
 	AM_RANGE(0x0303, 0x0303) AM_READ_PORT( "IN D" )	// 0x40 serial out, 0x80 serial in
 	AM_RANGE(0x0304, 0x0304) AM_READ_PORT( "IN A" )
 	AM_RANGE(0x0305, 0x0305) AM_READ_PORT( "IN B" )
 	AM_RANGE(0x0306, 0x0306) AM_READ_PORT( "IN C" )
 
-	AM_RANGE(0x0307, 0x0307) AM_READ_LEGACY( dsw_r )
-	AM_RANGE(0x0308, 0x0308) AM_WRITE_LEGACY( dsw_mask_w )
+	AM_RANGE(0x0307, 0x0307) AM_READ_LEGACY(dsw_r )
+	AM_RANGE(0x0308, 0x0308) AM_WRITE_LEGACY(dsw_mask_w )
 
-	AM_RANGE(0x0312, 0x0312) AM_READ_LEGACY( vblank_bit2_r ) AM_DEVWRITE_LEGACY( "oki", oki_bank_bit0_w )
+	AM_RANGE(0x0312, 0x0312) AM_READ_LEGACY(vblank_bit2_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit0_w )
 
 	// Peripheral Control Block
-	AM_RANGE(0xff00, 0xffff) AM_READWRITE_LEGACY( am188em_regs_r, am188em_regs_w ) AM_BASE( m_am188em_regs )
+	AM_RANGE(0xff00, 0xffff) AM_READWRITE_LEGACY(am188em_regs_r, am188em_regs_w ) AM_BASE(m_am188em_regs )
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1273,32 +1273,32 @@ static ADDRESS_MAP_START( xplan_map, AS_PROGRAM, 8, subsino2_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram")	// battery
 
 	// write both (L1, byte_lo2)
-	AM_RANGE( 0x10000, 0x11fff ) AM_WRITE_LEGACY( ss9601_videoram_1_hi_lo2_w )
+	AM_RANGE( 0x10000, 0x11fff ) AM_WRITE_LEGACY(ss9601_videoram_1_hi_lo2_w )
 	// read lo (L1)   (only half tilemap?)
-	AM_RANGE( 0x12000, 0x12fff ) AM_READ_LEGACY( ss9601_videoram_1_lo_r )
-	AM_RANGE( 0x13000, 0x131ff ) AM_READWRITE_LEGACY( ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w )
+	AM_RANGE( 0x12000, 0x12fff ) AM_READ_LEGACY(ss9601_videoram_1_lo_r )
+	AM_RANGE( 0x13000, 0x131ff ) AM_READWRITE_LEGACY(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w )
 
 	// write both (L0, byte_lo2)
-	AM_RANGE( 0x14000, 0x15fff ) AM_WRITE_LEGACY( ss9601_videoram_0_hi_lo2_w )
+	AM_RANGE( 0x14000, 0x15fff ) AM_WRITE_LEGACY(ss9601_videoram_0_hi_lo2_w )
 	// read lo (REEL)
-	AM_RANGE( 0x16000, 0x16fff ) AM_READ_LEGACY( ss9601_reelram_lo_r )
-	AM_RANGE( 0x17000, 0x171ff ) AM_READWRITE_LEGACY( ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w )
+	AM_RANGE( 0x16000, 0x16fff ) AM_READ_LEGACY(ss9601_reelram_lo_r )
+	AM_RANGE( 0x17000, 0x171ff ) AM_READWRITE_LEGACY(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w )
 
 	// read hi (L1)
-	AM_RANGE( 0x22000, 0x22fff ) AM_READ_LEGACY( ss9601_videoram_1_hi_r )
-	AM_RANGE( 0x23000, 0x231ff ) AM_READWRITE_LEGACY( ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w )
+	AM_RANGE( 0x22000, 0x22fff ) AM_READ_LEGACY(ss9601_videoram_1_hi_r )
+	AM_RANGE( 0x23000, 0x231ff ) AM_READWRITE_LEGACY(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w )
 	// read hi (REEL)
-	AM_RANGE( 0x26000, 0x26fff ) AM_READ_LEGACY( ss9601_reelram_hi_r )
-	AM_RANGE( 0x27000, 0x271ff ) AM_READWRITE_LEGACY( ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w )
+	AM_RANGE( 0x26000, 0x26fff ) AM_READ_LEGACY(ss9601_reelram_hi_r )
+	AM_RANGE( 0x27000, 0x271ff ) AM_READWRITE_LEGACY(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w )
 
 	// write both (L1, byte_lo)
-	AM_RANGE( 0x30000, 0x31fff ) AM_WRITE_LEGACY( ss9601_videoram_1_hi_lo_w )
-	AM_RANGE( 0x32000, 0x32fff ) AM_WRITE_LEGACY( ss9601_videoram_1_hi_lo_w )
-	AM_RANGE( 0x33000, 0x331ff ) AM_WRITE_LEGACY( ss9601_scrollram_1_hi_lo_w )
+	AM_RANGE( 0x30000, 0x31fff ) AM_WRITE_LEGACY(ss9601_videoram_1_hi_lo_w )
+	AM_RANGE( 0x32000, 0x32fff ) AM_WRITE_LEGACY(ss9601_videoram_1_hi_lo_w )
+	AM_RANGE( 0x33000, 0x331ff ) AM_WRITE_LEGACY(ss9601_scrollram_1_hi_lo_w )
 	// write both (L0 & REEL, byte_lo)
-	AM_RANGE( 0x34000, 0x35fff ) AM_WRITE_LEGACY( ss9601_videoram_0_hi_lo_w )
-	AM_RANGE( 0x36000, 0x36fff ) AM_WRITE_LEGACY( ss9601_reelram_hi_lo_w )
-	AM_RANGE( 0x37000, 0x371ff ) AM_WRITE_LEGACY( ss9601_scrollram_0_hi_lo_w )
+	AM_RANGE( 0x34000, 0x35fff ) AM_WRITE_LEGACY(ss9601_videoram_0_hi_lo_w )
+	AM_RANGE( 0x36000, 0x36fff ) AM_WRITE_LEGACY(ss9601_reelram_hi_lo_w )
+	AM_RANGE( 0x37000, 0x371ff ) AM_WRITE_LEGACY(ss9601_scrollram_0_hi_lo_w )
 
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
@@ -1306,32 +1306,32 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( xplan_io, AS_IO, 8, subsino2_state )
 	AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE(0x0020, 0x0020) AM_WRITE_LEGACY( ss9601_byte_lo2_w )
+	AM_RANGE(0x0020, 0x0020) AM_WRITE_LEGACY(ss9601_byte_lo2_w )
 
-	AM_RANGE(0x0040, 0x0040) AM_WRITE_LEGACY( ss9601_scrollctrl_w )
+	AM_RANGE(0x0040, 0x0040) AM_WRITE_LEGACY(ss9601_scrollctrl_w )
 
-	AM_RANGE(0x0060, 0x0063) AM_WRITE_LEGACY( hm86171_colorram_w )
-	AM_RANGE(0x0080, 0x0080) AM_WRITE_LEGACY( ss9601_tilesize_w )
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE_LEGACY( ss9601_byte_lo_w )
+	AM_RANGE(0x0060, 0x0063) AM_WRITE_LEGACY(hm86171_colorram_w )
+	AM_RANGE(0x0080, 0x0080) AM_WRITE_LEGACY(ss9601_tilesize_w )
+	AM_RANGE(0x00a0, 0x00a0) AM_WRITE_LEGACY(ss9601_byte_lo_w )
 
-	AM_RANGE(0x021f, 0x021f) AM_WRITE_LEGACY( ss9601_disable_w )
-	AM_RANGE(0x0220, 0x0225) AM_WRITE_LEGACY( ss9601_scroll_w )
+	AM_RANGE(0x021f, 0x021f) AM_WRITE_LEGACY(ss9601_disable_w )
+	AM_RANGE(0x0220, 0x0225) AM_WRITE_LEGACY(ss9601_scroll_w )
 
 	AM_RANGE(0x0235, 0x0235) AM_NOP	// INT0 Ack.?
 
-	AM_RANGE(0x0300, 0x0300) AM_READ_LEGACY( vblank_bit6_r ) AM_DEVWRITE_LEGACY( "oki", oki_bank_bit4_w )
-	AM_RANGE(0x0301, 0x0301) AM_WRITE_LEGACY( dsw_mask_w )
-	AM_RANGE(0x0302, 0x0302) AM_READ_LEGACY( dsw_r )
+	AM_RANGE(0x0300, 0x0300) AM_READ_LEGACY(vblank_bit6_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit4_w )
+	AM_RANGE(0x0301, 0x0301) AM_WRITE_LEGACY(dsw_mask_w )
+	AM_RANGE(0x0302, 0x0302) AM_READ_LEGACY(dsw_r )
 	AM_RANGE(0x0303, 0x0303) AM_READ_PORT( "IN C" )
 	AM_RANGE(0x0304, 0x0304) AM_READ_PORT( "IN B" )
 	AM_RANGE(0x0305, 0x0305) AM_READ_PORT( "IN A" )
 	AM_RANGE(0x0306, 0x0306) AM_READ_PORT( "IN D" )	// 0x40 serial out, 0x80 serial in
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE_LEGACY( xplan_outputs_w ) AM_BASE( m_outputs )
+	AM_RANGE(0x0306, 0x0309) AM_WRITE_LEGACY(xplan_outputs_w ) AM_BASE(m_outputs )
 
 	// Peripheral Control Block
-	AM_RANGE(0xff00, 0xffff) AM_READWRITE_LEGACY( am188em_regs_r, am188em_regs_w ) AM_BASE( m_am188em_regs )
+	AM_RANGE(0xff00, 0xffff) AM_READWRITE_LEGACY(am188em_regs_r, am188em_regs_w ) AM_BASE(m_am188em_regs )
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1375,14 +1375,14 @@ static WRITE8_HANDLER( xtrain_outputs_w )
 
 static ADDRESS_MAP_START( expcard_io, AS_IO, 8, subsino2_state )
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE_LEGACY( expcard_outputs_w ) AM_BASE( m_outputs )
+	AM_RANGE(0x0306, 0x0309) AM_WRITE_LEGACY(expcard_outputs_w ) AM_BASE(m_outputs )
 
 	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xtrain_io, AS_IO, 8, subsino2_state )
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE_LEGACY( xtrain_outputs_w ) AM_BASE( m_outputs )
+	AM_RANGE(0x0306, 0x0309) AM_WRITE_LEGACY(xtrain_outputs_w ) AM_BASE(m_outputs )
 
 	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END

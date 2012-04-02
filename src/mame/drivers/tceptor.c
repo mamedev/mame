@@ -165,9 +165,9 @@ static READ8_HANDLER( readFF )
 
 static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE_LEGACY(tceptor_tile_ram_w) AM_BASE( m_tile_ram)
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE_LEGACY(tceptor_tile_attr_w) AM_BASE( m_tile_attr)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE_LEGACY(tceptor_bg_ram_w) AM_BASE( m_bg_ram)	// background (VIEW RAM)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE_LEGACY(tceptor_tile_ram_w) AM_BASE(m_tile_ram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE_LEGACY(tceptor_tile_attr_w) AM_BASE(m_tile_attr)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE_LEGACY(tceptor_bg_ram_w) AM_BASE(m_bg_ram)	// background (VIEW RAM)
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITENOP				// 3D scope left/right?
 	AM_RANGE(0x4f00, 0x4f00) AM_READNOP				// unknown
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x4f03, 0x4f03) AM_READ_PORT("STICKY")			// analog input (up/down)
 	AM_RANGE(0x4f00, 0x4f03) AM_WRITENOP				// analog input control?
 	AM_RANGE(0x5000, 0x5006) AM_WRITE_LEGACY(tceptor_bg_scroll_w)	// bg scroll
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE( m_m68k_shared_ram) // COM RAM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE(m_m68k_shared_ram) // COM RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(m6809_irq_disable_w)
 	AM_RANGE(0x8800, 0x8800) AM_WRITE_LEGACY(m6809_irq_enable_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -209,7 +209,7 @@ static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, tceptor_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_ROM			// not sure
 	AM_RANGE(0x200000, 0x203fff) AM_RAM			// M68K ERROR 0
 	AM_RANGE(0x300000, 0x300001) AM_WRITEONLY
-	AM_RANGE(0x400000, 0x4001ff) AM_WRITEONLY AM_BASE( m_sprite_ram)
+	AM_RANGE(0x400000, 0x4001ff) AM_WRITEONLY AM_BASE(m_sprite_ram)
 	AM_RANGE(0x500000, 0x51ffff) AM_WRITE_LEGACY(namco_road16_w)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE_LEGACY(m68k_irq_enable_w)	// not sure
 	AM_RANGE(0x700000, 0x703fff) AM_READWRITE_LEGACY(m68k_shared_word_r, m68k_shared_word_w) AM_SHARE("share1")

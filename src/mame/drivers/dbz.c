@@ -141,8 +141,8 @@ static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 	AM_RANGE(0x4f8000, 0x4f801f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0xff00)		// 251 #1
 	AM_RANGE(0x4fc000, 0x4fc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)	// 251 #2
 
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(dbz_bg2_videoram_w) AM_BASE( m_bg2_videoram)
-	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE_LEGACY(dbz_bg1_videoram_w) AM_BASE( m_bg1_videoram)
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(dbz_bg2_videoram_w) AM_BASE(m_bg2_videoram)
+	AM_RANGE(0x508000, 0x509fff) AM_RAM_WRITE_LEGACY(dbz_bg1_videoram_w) AM_BASE(m_bg1_videoram)
 	AM_RANGE(0x510000, 0x513fff) AM_DEVREADWRITE_LEGACY("k053936_1", k053936_linectrl_r, k053936_linectrl_w) // ?? guess, it might not be
 	AM_RANGE(0x518000, 0x51bfff) AM_DEVREADWRITE_LEGACY("k053936_2", k053936_linectrl_r, k053936_linectrl_w) // ?? guess, it might not be
 	AM_RANGE(0x600000, 0x6fffff) AM_READNOP 			// PSAC 1 ROM readback window

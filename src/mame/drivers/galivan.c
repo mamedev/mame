@@ -57,9 +57,9 @@ static ADDRESS_MAP_START( galivan_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE_LEGACY(galivan_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE_LEGACY(galivan_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe100, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -67,9 +67,9 @@ static ADDRESS_MAP_START( ninjemak_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE_LEGACY(galivan_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE_LEGACY(galivan_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

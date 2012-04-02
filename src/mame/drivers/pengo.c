@@ -119,8 +119,8 @@ static WRITE8_HANDLER( irq_mask_w )
 
 static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(pacman_videoram_w) AM_BASE( m_videoram) /* video and color RAM, scratchpad RAM, sprite codes */
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(pacman_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(pacman_videoram_w) AM_BASE(m_videoram) /* video and color RAM, scratchpad RAM, sprite codes */
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(pacman_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
@@ -142,7 +142,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(jrpacman_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(jrpacman_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)

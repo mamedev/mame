@@ -110,14 +110,14 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_BASE( m_pf1_rowscroll)
-	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_BASE( m_pf2_rowscroll)
+	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_BASE(m_pf1_rowscroll)
+	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_BASE(m_pf2_rowscroll)
 
 	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
 	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf1_data_w)
 	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf2_data_w)
-	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_BASE( m_pf3_rowscroll)
-	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_BASE( m_pf4_rowscroll)
+	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_BASE(m_pf3_rowscroll)
+	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_BASE(m_pf4_rowscroll)
 
 	AM_RANGE(0x280000, 0x28000f) AM_NOP // ?
 	AM_RANGE(0x282000, 0x282001) AM_NOP // Palette setup?

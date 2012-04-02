@@ -147,16 +147,16 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 *****************************************************************************************************/
 
 static ADDRESS_MAP_START( limenko_map, AS_PROGRAM, 32, limenko_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE( m_mainram)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE(m_mainram)
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("user2",0)
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE_LEGACY(fg_videoram_w) AM_BASE( m_fg_videoram)
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE_LEGACY(md_videoram_w) AM_BASE( m_md_videoram)
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE_LEGACY(bg_videoram_w) AM_BASE( m_bg_videoram)
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE( m_spriteram2)
+	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE_LEGACY(fg_videoram_w) AM_BASE(m_fg_videoram)
+	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE_LEGACY(md_videoram_w) AM_BASE(m_md_videoram)
+	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE_LEGACY(bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE_LEGACY(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
-	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE( m_videoreg)
+	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(m_videoreg)
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE_LEGACY(spriteram_buffer_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
@@ -174,16 +174,16 @@ ADDRESS_MAP_END
 /* Spotty memory map */
 
 static ADDRESS_MAP_START( spotty_map, AS_PROGRAM, 32, limenko_state )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE( m_mainram)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_BASE(m_mainram)
 	AM_RANGE(0x40002000, 0x400024d3) AM_RAM //?
-	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE_LEGACY(fg_videoram_w) AM_BASE( m_fg_videoram)
-	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE_LEGACY(md_videoram_w) AM_BASE( m_md_videoram)
-	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE_LEGACY(bg_videoram_w) AM_BASE( m_bg_videoram)
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE( m_spriteram2)
+	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE_LEGACY(fg_videoram_w) AM_BASE(m_fg_videoram)
+	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE_LEGACY(md_videoram_w) AM_BASE(m_md_videoram)
+	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE_LEGACY(bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE_LEGACY(limenko_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
-	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE( m_videoreg)
+	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(m_videoreg)
 	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE_LEGACY(spriteram_buffer_w)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END

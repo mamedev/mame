@@ -357,8 +357,8 @@ static ADDRESS_MAP_START( ssingles_map, AS_PROGRAM, 8, ssingles_state )
 	AM_RANGE(0x0000, 0x00ff) AM_WRITE_LEGACY(ssingles_videoram_w)
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE_LEGACY(ssingles_colorram_w)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY( c000_r )
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE_LEGACY( c001_r, c001_w )
+	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(c000_r )
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE_LEGACY(c001_r, c001_w )
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -403,8 +403,8 @@ static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8, ssingles_state )
 //  AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_READ_LEGACY(atamanot_prot_r)
 //  AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
-//  AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY( c000_r )
-//  AM_RANGE(0xc001, 0xc001) AM_READWRITE_LEGACY( c001_r, c001_w )
+//  AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(c000_r )
+//  AM_RANGE(0xc001, 0xc001) AM_READWRITE_LEGACY(c001_r, c001_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8, ssingles_state )

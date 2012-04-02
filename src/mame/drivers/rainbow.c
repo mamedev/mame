@@ -380,7 +380,7 @@ static ADDRESS_MAP_START( jumping_map, AS_PROGRAM, 16, rbisland_state )
 	AM_RANGE(0x400006, 0x400007) AM_WRITE_LEGACY(jumping_sound_w)
 	AM_RANGE(0x420000, 0x420001) AM_READNOP			/* read, but result not used */
 	AM_RANGE(0x430000, 0x430003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_yscroll_word_w)
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x800000, 0x80ffff) AM_WRITENOP		/* original c-chip location (not used) */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE_LEGACY("pc080sn", pc080sn_word_r, pc080sn_word_w)
 	AM_RANGE(0xc20000, 0xc20003) AM_WRITENOP		/* seems it is a leftover from rbisland: scroll y written here too */

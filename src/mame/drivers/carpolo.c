@@ -34,8 +34,8 @@
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, carpolo_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x3000, 0x30ff) AM_WRITEONLY AM_BASE( m_alpharam)
-	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_BASE( m_spriteram)
+	AM_RANGE(0x3000, 0x30ff) AM_WRITEONLY AM_BASE(m_alpharam)
+	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_BASE(m_spriteram)
 	AM_RANGE(0x5400, 0x5403) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x5800, 0x5803) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(carpolo_ball_screen_collision_cause_r)

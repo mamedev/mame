@@ -210,7 +210,7 @@ static WRITE8_HANDLER( mw8080bw_reversable_shift_count_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mw8080bw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_SIZE( m_main_ram, m_main_ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_SIZE(m_main_ram, m_main_ram_size)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 

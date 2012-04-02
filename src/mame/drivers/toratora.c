@@ -311,7 +311,7 @@ static const pia6821_interface pia_u3_intf =
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, toratora_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x7fff) AM_ROM  /* not fully populated */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xa000, 0xf047) AM_NOP
 	AM_RANGE(0xf048, 0xf049) AM_NOP
 	AM_RANGE(0xf04a, 0xf04a) AM_WRITE_LEGACY(clear_tv_w)	/* the read is mark *LEDEN, but not used */

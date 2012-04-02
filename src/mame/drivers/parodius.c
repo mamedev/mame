@@ -145,7 +145,7 @@ static WRITE8_HANDLER( sound_arm_nmi_w )
 /********************************************/
 
 static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE( m_ram)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE(m_ram)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x3f8c, 0x3f8c) AM_READ_PORT("P1")
 	AM_RANGE(0x3f8d, 0x3f8d) AM_READ_PORT("P2")

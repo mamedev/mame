@@ -156,10 +156,10 @@ static WRITE16_HANDLER(bmc_2_videoram_w)
 
 static ADDRESS_MAP_START( koftball_mem, AS_PROGRAM, 16, koftball_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_BASE( m_main_ram)
+	AM_RANGE(0x220000, 0x22ffff) AM_RAM AM_BASE(m_main_ram)
 
-	AM_RANGE(0x260000, 0x260fff) AM_WRITE_LEGACY(bmc_1_videoram_w) AM_BASE( m_bmc_1_videoram)
-	AM_RANGE(0x261000, 0x261fff) AM_WRITE_LEGACY(bmc_2_videoram_w) AM_BASE( m_bmc_2_videoram)
+	AM_RANGE(0x260000, 0x260fff) AM_WRITE_LEGACY(bmc_1_videoram_w) AM_BASE(m_bmc_1_videoram)
+	AM_RANGE(0x261000, 0x261fff) AM_WRITE_LEGACY(bmc_2_videoram_w) AM_BASE(m_bmc_2_videoram)
 	AM_RANGE(0x262000, 0x26ffff) AM_RAM
 
 	AM_RANGE(0x280000, 0x28ffff) AM_RAM /* unused ? */

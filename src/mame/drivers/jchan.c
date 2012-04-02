@@ -496,22 +496,22 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // Work RAM - [A] grid tested, cleared ($9d6-$a54)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE( m_mcu_ram)	// MCU [G] grid tested, cleared ($a5a-$ad8)
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE(m_mcu_ram)	// MCU [G] grid tested, cleared ($a5a-$ad8)
 	AM_RANGE(0x330000, 0x330001) AM_WRITE_LEGACY(jchan_mcu_com0_w)	// _[ these 2 are set to 0xFFFF
 	AM_RANGE(0x340000, 0x340001) AM_WRITE_LEGACY(jchan_mcu_com1_w)	//  [ to trigger mcu to run cmd ?
 	AM_RANGE(0x350000, 0x350001) AM_WRITE_LEGACY(jchan_mcu_com2_w)	// _[ these 2 are set to 0xFFFF
 	AM_RANGE(0x360000, 0x360001) AM_WRITE_LEGACY(jchan_mcu_com3_w)	//  [ for mcu to return its status ?
 	AM_RANGE(0x370000, 0x370001) AM_READ_LEGACY(jchan_mcu_status_r)
 
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE( m_mainsub_shared_ram) AM_SHARE("share1")
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(m_mainsub_shared_ram) AM_SHARE("share1")
 
 	/* 1st sprite layer */
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE_LEGACY(jchan_suprnova_sprite32_1_w) AM_BASE( m_spriteram_1)
-	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE_LEGACY(jchan_suprnova_sprite32regs_1_w) AM_BASE( m_sprregs_1)
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE_LEGACY(jchan_suprnova_sprite32_1_w) AM_BASE(m_spriteram_1)
+	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE_LEGACY(jchan_suprnova_sprite32regs_1_w) AM_BASE(m_sprregs_1)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram) // palette for sprites?
 
-	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE_LEGACY(jchan_ctrl_r, jchan_ctrl_w) AM_BASE( m_ctrl)
+	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE_LEGACY(jchan_ctrl_r, jchan_ctrl_w) AM_BASE(m_ctrl)
 
 	AM_RANGE(0xf80000, 0xf80001) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 ADDRESS_MAP_END
@@ -521,18 +521,18 @@ static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM - grid tested, cleared ($612-$6dc)
 
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE( m_mainsub_shared_ram) AM_SHARE("share1")
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(m_mainsub_shared_ram) AM_SHARE("share1")
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE( m_vram[1])	// Layers 0
-	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE( m_vram[0])	//
-	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_BASE( m_vscroll[1])									//
-	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_BASE( m_vscroll[0])									//
-	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE( m_layers_0_regs)	// Layers 0 Regs
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
+	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_BASE(m_vscroll[1])									//
+	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_BASE(m_vscroll[0])									//
+	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs)	// Layers 0 Regs
 
 	/* background prites */
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE_LEGACY(jchan_suprnova_sprite32_2_w) AM_BASE( m_spriteram_2)
-	AM_RANGE(0x780000, 0x78003f) AM_RAM_WRITE_LEGACY(jchan_suprnova_sprite32regs_2_w) AM_BASE( m_sprregs_2)
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE_LEGACY(jchan_suprnova_sprite32_2_w) AM_BASE(m_spriteram_2)
+	AM_RANGE(0x780000, 0x78003f) AM_RAM_WRITE_LEGACY(jchan_suprnova_sprite32regs_2_w) AM_BASE(m_sprregs_2)
 
 	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff) // sound
 

@@ -481,46 +481,46 @@ static WRITE8_HANDLER( dunhuang_82_w )
 #endif
 
 static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
-	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE_LEGACY( dunhuang_pos_x_w )
-	AM_RANGE( 0x0001, 0x0001 ) AM_WRITE_LEGACY( dunhuang_pos_y_w )
-	AM_RANGE( 0x0002, 0x0004 ) AM_WRITE_LEGACY( dunhuang_tile_w )
-	AM_RANGE( 0x0005, 0x0007 ) AM_WRITE_LEGACY( dunhuang_tile2_w )
+	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE_LEGACY(dunhuang_pos_x_w )
+	AM_RANGE( 0x0001, 0x0001 ) AM_WRITE_LEGACY(dunhuang_pos_y_w )
+	AM_RANGE( 0x0002, 0x0004 ) AM_WRITE_LEGACY(dunhuang_tile_w )
+	AM_RANGE( 0x0005, 0x0007 ) AM_WRITE_LEGACY(dunhuang_tile2_w )
 
-	AM_RANGE( 0x0008, 0x0008 ) AM_WRITE_LEGACY( dunhuang_vert_clear_w )
+	AM_RANGE( 0x0008, 0x0008 ) AM_WRITE_LEGACY(dunhuang_vert_clear_w )
 
-	AM_RANGE( 0x000c, 0x000c ) AM_READ_LEGACY( watchdog_reset_r )
+	AM_RANGE( 0x000c, 0x000c ) AM_READ_LEGACY(watchdog_reset_r )
 
-	AM_RANGE( 0x000f, 0x000f ) AM_WRITE_LEGACY( dunhuang_block_addr_lo_w )
-	AM_RANGE( 0x0010, 0x0010 ) AM_WRITE_LEGACY( dunhuang_block_addr_hi_w )
+	AM_RANGE( 0x000f, 0x000f ) AM_WRITE_LEGACY(dunhuang_block_addr_lo_w )
+	AM_RANGE( 0x0010, 0x0010 ) AM_WRITE_LEGACY(dunhuang_block_addr_hi_w )
 //  AM_RANGE( 0x0011, 0x0011 ) ?
-	AM_RANGE( 0x0012, 0x0012 ) AM_WRITE_LEGACY( dunhuang_block_c_w )
-	AM_RANGE( 0x0015, 0x0015 ) AM_WRITE_LEGACY( dunhuang_block_x_w )
-	AM_RANGE( 0x0016, 0x0016 ) AM_WRITE_LEGACY( dunhuang_block_y_w )
-	AM_RANGE( 0x0017, 0x0017 ) AM_WRITE_LEGACY( dunhuang_block_w_w )
-	AM_RANGE( 0x0018, 0x0018 ) AM_WRITE_LEGACY( dunhuang_block_h_w )
+	AM_RANGE( 0x0012, 0x0012 ) AM_WRITE_LEGACY(dunhuang_block_c_w )
+	AM_RANGE( 0x0015, 0x0015 ) AM_WRITE_LEGACY(dunhuang_block_x_w )
+	AM_RANGE( 0x0016, 0x0016 ) AM_WRITE_LEGACY(dunhuang_block_y_w )
+	AM_RANGE( 0x0017, 0x0017 ) AM_WRITE_LEGACY(dunhuang_block_w_w )
+	AM_RANGE( 0x0018, 0x0018 ) AM_WRITE_LEGACY(dunhuang_block_h_w )
 
-	AM_RANGE( 0x0019, 0x0019 ) AM_WRITE_LEGACY( dunhuang_clear_y_w )
-	AM_RANGE( 0x001a, 0x001a ) AM_WRITE_LEGACY( dunhuang_horiz_clear_w )
+	AM_RANGE( 0x0019, 0x0019 ) AM_WRITE_LEGACY(dunhuang_clear_y_w )
+	AM_RANGE( 0x001a, 0x001a ) AM_WRITE_LEGACY(dunhuang_horiz_clear_w )
 
-	AM_RANGE( 0x001b, 0x001b ) AM_WRITE_LEGACY( dunhuang_block_dest_w )
+	AM_RANGE( 0x001b, 0x001b ) AM_WRITE_LEGACY(dunhuang_block_dest_w )
 
-	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_register_port_w	)
-	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_data_port_w		)
+	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w	)
+	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w		)
 
-//  AM_RANGE( 0x0082, 0x0082 ) AM_WRITE_LEGACY( dunhuang_82_w )
+//  AM_RANGE( 0x0082, 0x0082 ) AM_WRITE_LEGACY(dunhuang_82_w )
 
-	AM_RANGE( 0x0083, 0x0083 ) AM_WRITE_LEGACY( dunhuang_paloffs_w )
-	AM_RANGE( 0x008b, 0x008b ) AM_WRITE_LEGACY( dunhuang_paldata_w )
+	AM_RANGE( 0x0083, 0x0083 ) AM_WRITE_LEGACY(dunhuang_paloffs_w )
+	AM_RANGE( 0x008b, 0x008b ) AM_WRITE_LEGACY(dunhuang_paldata_w )
 
-	AM_RANGE( 0x0084, 0x0084 ) AM_READ_LEGACY( dunhuang_service_r )
-	AM_RANGE( 0x0085, 0x0085 ) AM_READ_LEGACY( dunhuang_input_r )
+	AM_RANGE( 0x0084, 0x0084 ) AM_READ_LEGACY(dunhuang_service_r )
+	AM_RANGE( 0x0085, 0x0085 ) AM_READ_LEGACY(dunhuang_input_r )
 
-	AM_RANGE( 0x0086, 0x0086 ) AM_WRITE_LEGACY( dunhuang_rombank_w )
-	AM_RANGE( 0x0087, 0x0087 ) AM_WRITE_LEGACY( dunhuang_layers_w )
+	AM_RANGE( 0x0086, 0x0086 ) AM_WRITE_LEGACY(dunhuang_rombank_w )
+	AM_RANGE( 0x0087, 0x0087 ) AM_WRITE_LEGACY(dunhuang_layers_w )
 
-	AM_RANGE( 0x0088, 0x0088 ) AM_DEVREAD_LEGACY( "ay8910", ay8910_r )
-	AM_RANGE( 0x0090, 0x0090 ) AM_DEVWRITE_LEGACY( "ay8910", ay8910_data_w )
-	AM_RANGE( 0x0098, 0x0098 ) AM_DEVWRITE_LEGACY( "ay8910", ay8910_address_w )
+	AM_RANGE( 0x0088, 0x0088 ) AM_DEVREAD_LEGACY("ay8910", ay8910_r )
+	AM_RANGE( 0x0090, 0x0090 ) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w )
+	AM_RANGE( 0x0098, 0x0098 ) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w )
 ADDRESS_MAP_END
 
 

@@ -513,7 +513,7 @@ static WRITE16_HANDLER( realpunc_output_w )
 
 #define TC0180VCU_MEMRW( ADDR )											\
 	AM_RANGE(ADDR+0x00000, ADDR+0x0ffff) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_word_r, tc0180vcu_word_w)	\
-	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_BASE( m_spriteram)	\
+	AM_RANGE(ADDR+0x10000, ADDR+0x1197f) AM_RAM AM_BASE(m_spriteram)	\
 	AM_RANGE(ADDR+0x11980, ADDR+0x137ff) AM_RAM					\
 	AM_RANGE(ADDR+0x13800, ADDR+0x13fff) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_scroll_r, tc0180vcu_scroll_w)	\
 	AM_RANGE(ADDR+0x18000, ADDR+0x1801f) AM_DEVREADWRITE_LEGACY("tc0180vcu", tc0180vcu_ctrl_r, tc0180vcu_ctrl_w)		\
@@ -573,7 +573,7 @@ static ADDRESS_MAP_START( hitice_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x700002, 0x700003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	/* Main RAM */
 	AM_RANGE(0xa00000, 0xa01fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE_LEGACY(hitice_pixelram_w) AM_BASE( m_pixelram)
+	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM_WRITE_LEGACY(hitice_pixelram_w) AM_BASE(m_pixelram)
 //  { 0xbffff0, 0xbffff1, ???
 	AM_RANGE(0xbffff2, 0xbffff5) AM_WRITE_LEGACY(hitice_pixel_scroll_w)
 //  { 0xbffffa, 0xbffffb, ???

@@ -739,11 +739,11 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	// 240000 = top 16 bits of DMA address?
 	// 250000 = write to initiate DMA?
 	// 260000 = ???
-	AM_RANGE(0x280000, 0x280fff) AM_READWRITE_LEGACY( shared_68k_r, shared_68k_w )
+	AM_RANGE(0x280000, 0x280fff) AM_READWRITE_LEGACY(shared_68k_r, shared_68k_w )
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("ide", twinkle_ide_r, twinkle_ide_w)
 	// 34000E = ???
 	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c400_r, rf5c400_w)
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE_LEGACY( twinkle_waveram_r, twinkle_waveram_w )	// 8 MB window wave RAM
+	AM_RANGE(0x800000, 0xffffff) AM_READWRITE_LEGACY(twinkle_waveram_r, twinkle_waveram_w )	// 8 MB window wave RAM
 ADDRESS_MAP_END
 
 /* SCSI */

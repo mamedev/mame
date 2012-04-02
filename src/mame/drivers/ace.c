@@ -166,9 +166,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aceal_state )
 
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
 
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE_LEGACY(ace_scoreram_w) AM_BASE( m_scoreram)	/* 2x2101 */
-	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE( m_ram2)	/* 2x2101 */
-	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE_LEGACY(ace_characterram_w) AM_BASE( m_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE_LEGACY(ace_scoreram_w) AM_BASE(m_scoreram)	/* 2x2101 */
+	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE(m_ram2)	/* 2x2101 */
+	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE_LEGACY(ace_characterram_w) AM_BASE(m_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
 
 	AM_RANGE(0xc000, 0xc005) AM_WRITE_LEGACY(ace_objpos_w)
 

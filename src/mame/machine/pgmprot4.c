@@ -551,7 +551,7 @@ DRIVER_INIT( drgw3 )
 static ADDRESS_MAP_START( killbld_mem, AS_PROGRAM, 16, pgm_022_025_state )
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x2fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE( m_sharedprotram) // Shared with protection device
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE(m_sharedprotram) // Shared with protection device
 ADDRESS_MAP_END
 
 

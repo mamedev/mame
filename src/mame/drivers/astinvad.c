@@ -398,14 +398,14 @@ static ADDRESS_MAP_START( kamikaze_map, AS_PROGRAM, 8, astinvad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x1bff) AM_ROM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spaceint_map, AS_PROGRAM, 8, astinvad_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE_LEGACY(spaceint_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE_LEGACY(spaceint_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 

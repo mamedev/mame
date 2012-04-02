@@ -135,9 +135,9 @@ static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
 
 
 static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8, pandoras_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1") AM_BASE( m_spriteram)				/* Work RAM (Shared with CPU B) */
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(pandoras_cram_w) AM_SHARE("share2") AM_BASE( m_colorram)	/* Color RAM (shared with CPU B) */
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(pandoras_vram_w) AM_SHARE("share3") AM_BASE( m_videoram)	/* Video RAM (shared with CPU B) */
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1") AM_BASE(m_spriteram)				/* Work RAM (Shared with CPU B) */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(pandoras_cram_w) AM_SHARE("share2") AM_BASE(m_colorram)	/* Color RAM (shared with CPU B) */
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(pandoras_vram_w) AM_SHARE("share3") AM_BASE(m_videoram)	/* Video RAM (shared with CPU B) */
 	AM_RANGE(0x1800, 0x1807) AM_WRITE_LEGACY(pandoras_int_control_w)								/* INT control */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITE_LEGACY(pandoras_scrolly_w)									/* bg scroll */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITE_LEGACY(pandoras_z80_irqtrigger_w)							/* cause INT on the Z80 */

@@ -70,9 +70,9 @@ static WRITE8_HANDLER( ltcasino_tile_atr_w )
 static ADDRESS_MAP_START( ltcasino_map, AS_PROGRAM, 8, ltcasino_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(ltcasino_tile_num_w) AM_BASE( m_tile_num_ram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(ltcasino_tile_num_w) AM_BASE(m_tile_num_ram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(ltcasino_tile_atr_w) AM_BASE( m_tile_atr_ram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(ltcasino_tile_atr_w) AM_BASE(m_tile_atr_ram)
 	AM_RANGE(0xe800, 0xebff) AM_RAM
 
 	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("IN0")

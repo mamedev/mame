@@ -232,11 +232,11 @@ static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM		// RAM
 	AM_RANGE(0x200000, 0x20001f) AM_READWRITE_LEGACY(galpanib_calc_r,galpanib_calc_w)	// Protection
-	AM_RANGE(0x300000, 0x30000f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE( m_layers_0_regs)	// Layers 0 Regs
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE( m_vram[1])	// Layers 0
-	AM_RANGE(0x401000, 0x401fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE( m_vram[0])	//
-	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_BASE( m_vscroll[1])									//
-	AM_RANGE(0x403000, 0x403fff) AM_RAM AM_BASE( m_vscroll[0])									//
+	AM_RANGE(0x300000, 0x30000f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs)	// Layers 0 Regs
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_1_w) AM_BASE(m_vram[1])	// Layers 0
+	AM_RANGE(0x401000, 0x401fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
+	AM_RANGE(0x402000, 0x402fff) AM_RAM AM_BASE(m_vscroll[1])									//
+	AM_RANGE(0x403000, 0x403fff) AM_RAM AM_BASE(m_vscroll[0])									//
 	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE_LEGACY(sandscrp_coin_counter_w)	// Coin Counters (Lockout unused)

@@ -116,11 +116,11 @@ static READ8_HANDLER( psurge_protection_r )
 static ADDRESS_MAP_START( timeplt_main_map, AS_PROGRAM, 8, timeplt_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(timeplt_colorram_w) AM_BASE( m_colorram)
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE_LEGACY(timeplt_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(timeplt_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE_LEGACY(timeplt_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE( m_spriteram)
-	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE( m_spriteram2)
+	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_nmi_enable_w)
@@ -140,11 +140,11 @@ static ADDRESS_MAP_START( psurge_main_map, AS_PROGRAM, 8, timeplt_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6004, 0x6004) AM_READ_LEGACY(psurge_protection_r)
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(timeplt_colorram_w) AM_BASE( m_colorram)
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE_LEGACY(timeplt_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(timeplt_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE_LEGACY(timeplt_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE( m_spriteram)
-	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE( m_spriteram2)
+	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_flipscreen_w)
@@ -162,11 +162,11 @@ static ADDRESS_MAP_START( chkun_main_map, AS_PROGRAM, 8, timeplt_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(timeplt_colorram_w) AM_BASE( m_colorram)
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE_LEGACY(timeplt_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(timeplt_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE_LEGACY(timeplt_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE( m_spriteram)
-	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE( m_spriteram2)
+	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_nmi_enable_w)

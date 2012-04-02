@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( mayumi_map, AS_PROGRAM, 8, mayumi_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE_LEGACY(mayumi_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE_LEGACY(mayumi_videoram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 

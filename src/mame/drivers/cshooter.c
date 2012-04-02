@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE_LEGACY(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(cshooter_txram_w) AM_BASE( m_txram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(cshooter_txram_w) AM_BASE(m_txram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -296,13 +296,13 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE_LEGACY(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(cshooter_txram_w) AM_BASE( m_txram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(cshooter_txram_w) AM_BASE(m_txram)
 	AM_RANGE(0xd800, 0xdbff) AM_WRITE_LEGACY(pal2_w) AM_READ_LEGACY(pal_r) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE_LEGACY(bank_w)
 	AM_RANGE(0xdc00, 0xdc1f) AM_RAM //video registers
 	AM_RANGE(0xde00, 0xde0f) AM_READWRITE_LEGACY(seibu_sound_comms_r,seibu_sound_comms_w)
-	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE( m_mainram)
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE(m_mainram)
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 

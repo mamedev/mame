@@ -210,9 +210,9 @@ static WRITE8_HANDLER( main_irq_ack_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dacholer_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(background_w) AM_BASE( m_bgvideoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(foreground_w) AM_BASE( m_fgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(background_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(foreground_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( itaten_main_map, AS_PROGRAM, 8, dacholer_state )

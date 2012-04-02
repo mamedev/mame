@@ -404,15 +404,15 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static ADDRESS_MAP_START( airsys_map, AS_PROGRAM, 16, taitoair_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_BASE( m_m68000_mainram)
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM AM_BASE(m_m68000_mainram)
 	AM_RANGE(0x140000, 0x140001) AM_WRITE_LEGACY(system_control_w)	/* Pause the TMS32025 */
-	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE_LEGACY(airsys_gradram_w) AM_BASE( m_gradram)           		/* "gradiation ram (0/1)" */
-	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE_LEGACY(airsys_paletteram16_w) AM_BASE( m_paletteram)
+	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE_LEGACY(airsys_gradram_w) AM_BASE(m_gradram)           		/* "gradiation ram (0/1)" */
+	AM_RANGE(0x188000, 0x189fff) AM_MIRROR(0x2000) AM_RAM_WRITE_LEGACY(airsys_paletteram16_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x800000, 0x820fff) AM_DEVREADWRITE_LEGACY("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)	/* tilemaps, sprites */
 	AM_RANGE(0x906000, 0x906007) AM_RAM // DMA?
-	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_BASE( m_line_ram)	/* "line ram" */
-	AM_RANGE(0x910000, 0x91ffff) AM_RAM	AM_BASE( m_dsp_ram)	/* "dsp common ram" (TMS320C25) */
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE( m_backregs)
+	AM_RANGE(0x908000, 0x90ffff) AM_RAM AM_BASE(m_line_ram)	/* "line ram" */
+	AM_RANGE(0x910000, 0x91ffff) AM_RAM	AM_BASE(m_dsp_ram)	/* "dsp common ram" (TMS320C25) */
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE(m_backregs)
 	AM_RANGE(0xa00000, 0xa00007) AM_READ_LEGACY(stick_input_r)
 	AM_RANGE(0xa00100, 0xa00107) AM_READ_LEGACY(stick2_input_r)
 	AM_RANGE(0xa00200, 0xa0020f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)	/* other I/O */

@@ -223,9 +223,9 @@ static WRITE8_HANDLER( coin_lockout_w )
 static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc800, 0xd7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE( m_videoram)
-	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE( m_spriteram)
-	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE( m_colorram) //per-column color + bank bits for the videoram
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0xea00, 0xea3f) AM_RAM AM_BASE(m_colorram) //per-column color + bank bits for the videoram
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("P2")
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW1")

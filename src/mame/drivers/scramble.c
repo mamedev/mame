@@ -1222,7 +1222,7 @@ static WRITE8_HANDLER(scramble_soundram_w)
 static ADDRESS_MAP_START( scramble_sound_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(scramble_soundram_r, scramble_soundram_w)
-	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE( m_soundram)  /* only here to initialize pointer */
+	AM_RANGE(0x8000, 0x83ff) AM_WRITENOP AM_BASE(m_soundram)  /* only here to initialize pointer */
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE_LEGACY(scramble_filter_w)
 ADDRESS_MAP_END
 

@@ -293,9 +293,9 @@ static WRITE8_HANDLER( palette_write )
 /* PROGRAM MAP */
 static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, gpworld_state )
 	AM_RANGE(0x0000,0xbfff) AM_ROM
-	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE( m_sprite_RAM)
-	AM_RANGE(0xc800,0xcfff) AM_WRITE_LEGACY(palette_write) AM_BASE( m_palette_RAM)	/* The memory test reads at 0xc800 */
-	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_BASE( m_tile_RAM)
+	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE(m_sprite_RAM)
+	AM_RANGE(0xc800,0xcfff) AM_WRITE_LEGACY(palette_write) AM_BASE(m_palette_RAM)	/* The memory test reads at 0xc800 */
+	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_BASE(m_tile_RAM)
 	AM_RANGE(0xd800,0xd800) AM_READWRITE_LEGACY(ldp_read,ldp_write)
 /*  AM_RANGE(0xd801,0xd801) AM_READ_LEGACY(???) */
 	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL")	//8255 here....

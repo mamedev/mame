@@ -241,8 +241,8 @@ static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(fg_ram_w) AM_BASE( m_fg_ram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE( m_sprites)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(fg_ram_w) AM_BASE(m_fg_ram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE(m_sprites)
 	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xde00, 0xde00) AM_WRITE_LEGACY(bg_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")

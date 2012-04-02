@@ -162,10 +162,10 @@ static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 
 static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM	/* ROM */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(drtomy_vram_fg_w) AM_BASE( m_videoram_fg)	/* Video RAM FG */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(drtomy_vram_bg_w) AM_BASE( m_videoram_bg) /* Video RAM BG */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(drtomy_vram_fg_w) AM_BASE(m_videoram_fg)	/* Video RAM FG */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(drtomy_vram_bg_w) AM_BASE(m_videoram_bg) /* Video RAM BG */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram) /* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE( m_spriteram) /* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(m_spriteram) /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")

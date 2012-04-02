@@ -151,9 +151,9 @@ static WRITE8_HANDLER( albazc_vregs_w )
 
 static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8, albazc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE( m_spriteram1)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE( m_spriteram2)
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE( m_spriteram3)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_spriteram1)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE(m_spriteram2)
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE(m_spriteram3)
 	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP	// ??? written once during P.O.S.T.
 	AM_RANGE(0xa300, 0xa304) AM_WRITE_LEGACY(albazc_vregs_w)	// ???
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40

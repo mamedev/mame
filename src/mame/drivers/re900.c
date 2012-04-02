@@ -222,7 +222,7 @@ static WRITE8_HANDLER(re900_watchdog_reset_w)
 *******************************/
 
 static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, re900_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE( m_rom)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE(m_rom)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mem_io, AS_IO, 8, re900_state )

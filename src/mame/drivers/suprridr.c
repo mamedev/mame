@@ -166,10 +166,10 @@ static WRITE8_HANDLER( coin_lock_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(suprridr_bgram_w) AM_BASE( m_bgram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(suprridr_fgram_w) AM_BASE( m_fgram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(suprridr_bgram_w) AM_BASE(m_bgram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(suprridr_fgram_w) AM_BASE(m_fgram)
 	AM_RANGE(0x9800, 0x983f) AM_RAM
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")

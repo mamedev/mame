@@ -1462,8 +1462,8 @@ static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE_LEGACY(bankswitch_w)					/* write bank (rom page select for 0x6000 - 0x7fff ) */
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE_LEGACY(vfd2_data_w)					/* vfd2 data */
 
-	AM_RANGE(0x3FFE, 0x3FFE) AM_READ_LEGACY( direct_input_r )
-	AM_RANGE(0x3FFF, 0x3FFF) AM_READ_LEGACY( coin_input_r)
+	AM_RANGE(0x3FFE, 0x3FFE) AM_READ_LEGACY(direct_input_r )
+	AM_RANGE(0x3FFF, 0x3FFF) AM_READ_LEGACY(coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM
 	AM_RANGE(0x4000, 0xFFFF) AM_WRITE_LEGACY(unknown_w)			// contains unknown I/O registers
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")
@@ -1480,8 +1480,8 @@ static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x2100, 0x21FF) AM_WRITENOP
 	AM_RANGE(0x2200, 0x22FF) AM_WRITENOP
 
-	AM_RANGE(0x3C00, 0x3C07) AM_READ_LEGACY(  key_r   )
-	AM_RANGE(0x3C80, 0x3C80) AM_WRITE_LEGACY( e2ram_w )
+	AM_RANGE(0x3C00, 0x3C07) AM_READ_LEGACY( key_r   )
+	AM_RANGE(0x3C80, 0x3C80) AM_WRITE_LEGACY(e2ram_w )
 
 	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE_LEGACY(vid_uart_ctrl_r, vid_uart_ctrl_w)		// video uart control reg
 	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE_LEGACY(vid_uart_rx_r, vid_uart_tx_w)			// video uart data  reg

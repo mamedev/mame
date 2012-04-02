@@ -562,7 +562,7 @@ static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8, fortecar_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_SIZE( m_vram,m_vram_size)
+	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_SIZE(m_vram,m_vram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8, fortecar_state )

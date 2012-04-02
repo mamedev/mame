@@ -67,37 +67,37 @@ static WRITE8_HANDLER( maniach_sh_command_w )
 
 static ADDRESS_MAP_START( matmania_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07df) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE( m_videoram2, m_videoram2_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE( m_colorram2)
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
-	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE( m_colorram)
-	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE_SIZE( m_videoram3, m_videoram3_size)
-	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE( m_colorram3)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE( m_pageselect)
+	AM_RANGE(0x0780, 0x07df) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE(m_videoram2, m_videoram2_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(m_colorram2)
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE_SIZE(m_videoram3, m_videoram3_size)
+	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE(m_colorram3)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE(m_pageselect)
 	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE_LEGACY(matmania_sh_command_w)
-	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE( m_scroll)
+	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP /* ?? */
-	AM_RANGE(0x3050, 0x307f) AM_WRITE_LEGACY(matmania_paletteram_w) AM_BASE( m_paletteram)
+	AM_RANGE(0x3050, 0x307f) AM_WRITE_LEGACY(matmania_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07df) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE( m_videoram2, m_videoram2_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE( m_colorram2)
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
-	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE( m_colorram)
-	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE_SIZE( m_videoram3, m_videoram3_size)
-	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE( m_colorram3)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE( m_pageselect)
+	AM_RANGE(0x0780, 0x07df) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE(m_videoram2, m_videoram2_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(m_colorram2)
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE_SIZE(m_videoram3, m_videoram3_size)
+	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE(m_colorram3)
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE(m_pageselect)
 	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE_LEGACY(maniach_sh_command_w)
-	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE( m_scroll)
+	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP	/* ?? */
 	AM_RANGE(0x3040, 0x3040) AM_READWRITE_LEGACY(maniach_mcu_r,maniach_mcu_w)
 	AM_RANGE(0x3041, 0x3041) AM_READ_LEGACY(maniach_mcu_status_r)
-	AM_RANGE(0x3050, 0x307f) AM_WRITE_LEGACY(matmania_paletteram_w) AM_BASE( m_paletteram)
+	AM_RANGE(0x3050, 0x307f) AM_WRITE_LEGACY(matmania_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

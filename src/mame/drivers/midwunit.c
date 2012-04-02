@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midwunit_state )
 	AM_RANGE(0x01880000, 0x018fffff) AM_RAM_WRITE_LEGACY(midtunit_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x01a00000, 0x01a000ff) AM_MIRROR(0x00080000) AM_READWRITE_LEGACY(midtunit_dma_r, midtunit_dma_w)
 	AM_RANGE(0x01b00000, 0x01b0001f) AM_READWRITE_LEGACY(midwunit_control_r, midwunit_control_w)
-	AM_RANGE(0x02000000, 0x06ffffff) AM_READ_LEGACY(midwunit_gfxrom_r) AM_BASE( m_decode_memory)
+	AM_RANGE(0x02000000, 0x06ffffff) AM_READ_LEGACY(midwunit_gfxrom_r) AM_BASE(m_decode_memory)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END

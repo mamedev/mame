@@ -64,10 +64,10 @@ static ADDRESS_MAP_START( quizpani_map, AS_PROGRAM, 16, quizpani_state )
 	AM_RANGE(0x104020, 0x104027) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_lsb_w)
 	AM_RANGE(0x108000, 0x1083ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x108400, 0x1085ff) AM_WRITENOP
-	AM_RANGE(0x10c000, 0x10c007) AM_RAM AM_BASE( m_scrollreg)
+	AM_RANGE(0x10c000, 0x10c007) AM_RAM AM_BASE(m_scrollreg)
 	AM_RANGE(0x10c008, 0x10c403) AM_WRITENOP
-	AM_RANGE(0x110000, 0x113fff) AM_RAM_WRITE_LEGACY(quizpani_bg_videoram_w) AM_BASE( m_bg_videoram)
-	AM_RANGE(0x11c000, 0x11ffff) AM_RAM_WRITE_LEGACY(quizpani_txt_videoram_w) AM_BASE( m_txt_videoram)
+	AM_RANGE(0x110000, 0x113fff) AM_RAM_WRITE_LEGACY(quizpani_bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x11c000, 0x11ffff) AM_RAM_WRITE_LEGACY(quizpani_txt_videoram_w) AM_BASE(m_txt_videoram)
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM
 	AM_RANGE(0x200000, 0x33ffff) AM_ROM
 ADDRESS_MAP_END

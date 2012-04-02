@@ -65,8 +65,8 @@ static WRITE8_HANDLER( out_w )
 static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, summit_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE( m_attr)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE( m_vram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(m_attr)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE(m_vram)
 
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
 //  AM_RANGE(0x3880, 0x3880) AM_WRITE_LEGACY(out_w)

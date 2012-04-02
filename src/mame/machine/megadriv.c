@@ -3733,20 +3733,20 @@ _32X_MAP_RAM_WRITEHANDLERS(paletteram) // _32x_sh2_paletteram_w
 static ADDRESS_MAP_START( sh2_main_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
-	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE_LEGACY( _32x_sh2_master_4000_common_4002_r, _32x_sh2_master_4000_common_4002_w )
-	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE_LEGACY( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
+	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE_LEGACY(_32x_sh2_master_4000_common_4002_r, _32x_sh2_master_4000_common_4002_w )
+	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE_LEGACY(_32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
 
-	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16_LEGACY( _32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
+	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16_LEGACY(_32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
 
-	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_master_4014_master_4016_w ) // IRQ clear
-	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_master_4018_master_401a_w ) // IRQ clear
-	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_master_401c_master_401e_w ) // IRQ clear
+	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_master_4014_master_4016_w ) // IRQ clear
+	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_master_4018_master_401a_w ) // IRQ clear
+	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_master_401c_master_401e_w ) // IRQ clear
 
-	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE_LEGACY( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
-	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16_LEGACY( _32x_pwm_r, _32x_pwm_w, 0xffffffff )
+	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE_LEGACY(_32x_sh2_commsram_r, _32x_sh2_commsram_w )
+	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16_LEGACY(_32x_pwm_r, _32x_pwm_w, 0xffffffff )
 
-	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16_LEGACY( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
-	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE_LEGACY( _32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
+	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16_LEGACY(_32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
+	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE_LEGACY(_32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
 
 	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
 	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
@@ -3762,19 +3762,19 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sh2_slave_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
-	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE_LEGACY( _32x_sh2_slave_4000_common_4002_r, _32x_sh2_slave_4000_common_4002_w )
-	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE_LEGACY( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
+	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE_LEGACY(_32x_sh2_slave_4000_common_4002_r, _32x_sh2_slave_4000_common_4002_w )
+	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE_LEGACY(_32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
 
-	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16_LEGACY( _32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
+	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16_LEGACY(_32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
 
-	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_slave_4014_slave_4016_w ) // IRQ clear
-	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_slave_4018_slave_401a_w ) // IRQ clear
-	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE_LEGACY( _32x_sh2_slave_401c_slave_401e_w ) // IRQ clear
+	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_slave_4014_slave_4016_w ) // IRQ clear
+	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_slave_4018_slave_401a_w ) // IRQ clear
+	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_slave_401c_slave_401e_w ) // IRQ clear
 
-	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE_LEGACY( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
-	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16_LEGACY( _32x_pwm_r, _32x_pwm_w, 0xffffffff )
+	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE_LEGACY(_32x_sh2_commsram_r, _32x_sh2_commsram_w )
+	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16_LEGACY(_32x_pwm_r, _32x_pwm_w, 0xffffffff )
 
-	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16_LEGACY( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
+	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16_LEGACY(_32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
 	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE_LEGACY(_32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
 
 	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)

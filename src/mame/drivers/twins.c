@@ -92,7 +92,7 @@ static WRITE16_HANDLER( porte_paloff0_w )
 
 static ADDRESS_MAP_START( twins_map, AS_PROGRAM, 16, twins_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 

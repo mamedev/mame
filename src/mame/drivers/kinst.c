@@ -399,12 +399,12 @@ static WRITE32_HANDLER( kinst_control_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, kinst_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE( m_rambase)
-	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_BASE( m_rambase2)
-	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE_LEGACY(kinst_control_r, kinst_control_w) AM_BASE( m_control)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(m_rambase)
+	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_BASE(m_rambase2)
+	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE_LEGACY(kinst_control_r, kinst_control_w) AM_BASE(m_control)
 	AM_RANGE(0x10000100, 0x1000013f) AM_DEVREADWRITE_LEGACY("ide", kinst_ide_r, kinst_ide_w)
 	AM_RANGE(0x10000170, 0x10000173) AM_DEVREADWRITE_LEGACY("ide", kinst_ide_extra_r, kinst_ide_extra_w)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE( m_rombase)
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rombase)
 ADDRESS_MAP_END
 
 

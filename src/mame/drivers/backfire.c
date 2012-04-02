@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 	AM_RANGE(0x150000, 0x150fff) AM_READWRITE_LEGACY(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
 	AM_RANGE(0x154000, 0x154fff) AM_READWRITE_LEGACY(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
 	AM_RANGE(0x160000, 0x161fff) AM_WRITE_LEGACY(backfire_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_BASE( m_mainram)// main ram
+	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_BASE(m_mainram)// main ram
 
 //  AM_RANGE(0x180010, 0x180013) AM_RAM AM_BASE_LEGACY(&backfire_180010) // always 180010 ?
 //  AM_RANGE(0x188010, 0x188013) AM_RAM AM_BASE_LEGACY(&backfire_188010) // always 188010 ?
@@ -284,8 +284,8 @@ static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 	AM_RANGE(0x194000, 0x194003) AM_READ_LEGACY(backfire_control2_r)
 	AM_RANGE(0x1a4000, 0x1a4003) AM_DEVWRITE_LEGACY("eeprom", backfire_eeprom_w)
 
-	AM_RANGE(0x1a8000, 0x1a8003) AM_RAM AM_BASE( m_left_priority)
-	AM_RANGE(0x1ac000, 0x1ac003) AM_RAM AM_BASE( m_right_priority)
+	AM_RANGE(0x1a8000, 0x1a8003) AM_RAM AM_BASE(m_left_priority)
+	AM_RANGE(0x1ac000, 0x1ac003) AM_RAM AM_BASE(m_right_priority)
 //  AM_RANGE(0x1b0000, 0x1b0003) AM_WRITENOP // always 1b0000
 
 	/* when set to pentometer in test mode */

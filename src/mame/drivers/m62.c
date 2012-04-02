@@ -176,10 +176,10 @@ static ADDRESS_MAP_START( kungfum_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(m62_hscroll_low_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(m62_hscroll_high_w)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	/* Kung Fu Master is the only game in this driver to have separated (but */
 	/* contiguous) videoram and colorram. They are interleaved in all the others. */
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(kungfum_tileram_w) AM_BASE( m_m62_tileram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(kungfum_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -195,9 +195,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( battroad_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE( m_m62_textram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE(m_m62_textram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -216,16 +216,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun2_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -245,8 +245,8 @@ static ADDRESS_MAP_START( ldrun3_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xc800, 0xc800) AM_READ_LEGACY(ldrun3_prot_5_r)
 	AM_RANGE(0xcc00, 0xcc00) AM_READ_LEGACY(ldrun3_prot_7_r)
 	AM_RANGE(0xcfff, 0xcfff) AM_READ_LEGACY(ldrun3_prot_7_r)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xd000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -264,9 +264,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ldrun4_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(ldrun4_bankswitch_w)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -283,18 +283,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lotlot_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE( m_m62_textram)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE(m_m62_textram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kidniki_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE( m_m62_textram)
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE(m_m62_textram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -316,9 +316,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spelunkr_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE( m_m62_textram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE(m_m62_textram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(m62_vscroll_low_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(m62_vscroll_high_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE_LEGACY(m62_hscroll_low_w)
@@ -332,9 +332,9 @@ static ADDRESS_MAP_START( spelunk2_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE( m_m62_textram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE(m_m62_textram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(m62_vscroll_low_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(m62_hscroll_low_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE_LEGACY(spelunk2_gfxport_w)
@@ -345,9 +345,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( youjyudn_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE( m_m62_textram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
+	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(m62_textram_w) AM_BASE(m_m62_textram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -365,9 +365,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( horizon_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc800, 0xc83f) AM_RAM_WRITE_LEGACY(horizon_scrollram_w) AM_BASE( m_scrollram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE( m_m62_tileram)
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc800, 0xc83f) AM_RAM_WRITE_LEGACY(horizon_scrollram_w) AM_BASE(m_scrollram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 

@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( imolagp_slave, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x0800, 0x0bff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_ROM
 	AM_RANGE(0x1c00, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE( m_slave_workram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(m_slave_workram)
 	AM_RANGE(0x9fff, 0xa000) AM_READ_LEGACY(receive_data_r)
 	AM_RANGE(0xc000, 0xffff) AM_WRITE_LEGACY(screenram_w)
 ADDRESS_MAP_END

@@ -292,12 +292,12 @@ static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8, statriv2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(statriv2_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(statriv2_videoram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8, statriv2_state )
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("ppi", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x28, 0x2b) AM_READ_LEGACY(question_data_r) AM_WRITEONLY AM_BASE( m_question_offset)
+	AM_RANGE(0x28, 0x2b) AM_READ_LEGACY(question_data_r) AM_WRITEONLY AM_BASE(m_question_offset)
 	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE_LEGACY("tms", tms9927_r, tms9927_w)

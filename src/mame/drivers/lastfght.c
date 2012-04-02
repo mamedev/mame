@@ -425,26 +425,26 @@ static ADDRESS_MAP_START( lastfght_map, AS_PROGRAM, 16, lastfght_state )
 
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_SHARE("nvram")	// battery
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_WRITE_LEGACY( lastfght_hi_w )
-	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE_LEGACY( lastfght_sound_r, lastfght_sound_w )
-	AM_RANGE( 0x600006, 0x600007 ) AM_WRITE_LEGACY( lastfght_blit_w )
-	AM_RANGE( 0x600008, 0x600009 ) AM_WRITE_LEGACY( colordac_w )
+	AM_RANGE( 0x600000, 0x600001 ) AM_WRITE_LEGACY(lastfght_hi_w )
+	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE_LEGACY(lastfght_sound_r, lastfght_sound_w )
+	AM_RANGE( 0x600006, 0x600007 ) AM_WRITE_LEGACY(lastfght_blit_w )
+	AM_RANGE( 0x600008, 0x600009 ) AM_WRITE_LEGACY(colordac_w )
 	AM_RANGE( 0x60000a, 0x60000b ) AM_WRITENOP	// colordac?
 
-	AM_RANGE( 0x800000, 0x800001 ) AM_WRITE_LEGACY( lastfght_sx_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_WRITE_LEGACY( lastfght_sd_w )
-	AM_RANGE( 0x800004, 0x800005 ) AM_WRITE_LEGACY( lastfght_sy_w )
-	AM_RANGE( 0x800006, 0x800007 ) AM_WRITE_LEGACY( lastfght_sr_w )
-	AM_RANGE( 0x800008, 0x800009 ) AM_WRITE_LEGACY( lastfght_x_w )
-	AM_RANGE( 0x80000a, 0x80000b ) AM_WRITE_LEGACY( lastfght_yw_w )
-	AM_RANGE( 0x80000c, 0x80000d ) AM_WRITE_LEGACY( lastfght_h_w )
+	AM_RANGE( 0x800000, 0x800001 ) AM_WRITE_LEGACY(lastfght_sx_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_WRITE_LEGACY(lastfght_sd_w )
+	AM_RANGE( 0x800004, 0x800005 ) AM_WRITE_LEGACY(lastfght_sy_w )
+	AM_RANGE( 0x800006, 0x800007 ) AM_WRITE_LEGACY(lastfght_sr_w )
+	AM_RANGE( 0x800008, 0x800009 ) AM_WRITE_LEGACY(lastfght_x_w )
+	AM_RANGE( 0x80000a, 0x80000b ) AM_WRITE_LEGACY(lastfght_yw_w )
+	AM_RANGE( 0x80000c, 0x80000d ) AM_WRITE_LEGACY(lastfght_h_w )
 
-	AM_RANGE( 0x800014, 0x800015 ) AM_WRITE_LEGACY( lastfght_dest_w )
+	AM_RANGE( 0x800014, 0x800015 ) AM_WRITE_LEGACY(lastfght_dest_w )
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ_LEGACY( lastfght_c00000_r )
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_LEGACY( lastfght_c00002_r )
-	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ_LEGACY( lastfght_c00004_r )
-	AM_RANGE( 0xc00006, 0xc00007 ) AM_READWRITE_LEGACY( lastfght_c00006_r, lastfght_c00006_w )
+	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ_LEGACY(lastfght_c00000_r )
+	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_LEGACY(lastfght_c00002_r )
+	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ_LEGACY(lastfght_c00004_r )
+	AM_RANGE( 0xc00006, 0xc00007 ) AM_READWRITE_LEGACY(lastfght_c00006_r, lastfght_c00006_w )
 
 	AM_RANGE( 0xff0000, 0xffffff ) AM_RAM
 ADDRESS_MAP_END

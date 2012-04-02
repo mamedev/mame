@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
 	AM_RANGE(0x30100000, 0x30100003) AM_WRITE_LEGACY(namcofl_spritebank_w)
 	AM_RANGE(0x30284000, 0x3028bfff) AM_READWRITE_LEGACY(namcofl_share_r, namcofl_share_w)
 	AM_RANGE(0x30300000, 0x30303fff) AM_RAM /* COMRAM */
-	AM_RANGE(0x30380000, 0x303800ff) AM_READ_LEGACY( fl_network_r )	/* network registers */
+	AM_RANGE(0x30380000, 0x303800ff) AM_READ_LEGACY(fl_network_r )	/* network registers */
 	AM_RANGE(0x30400000, 0x3040ffff) AM_RAM_WRITE_LEGACY(namcofl_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_le_r, namco_tilemapvideoram32_le_w )
 	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE_LEGACY(namco_tilemapcontrol32_le_r, namco_tilemapcontrol32_le_w )
@@ -244,8 +244,8 @@ static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
 	AM_RANGE(0x30d00000, 0x30d0001f) AM_READWRITE_LEGACY(namco_rozcontrol32_le_r,namco_rozcontrol32_le_w)
 	AM_RANGE(0x30e00000, 0x30e1ffff) AM_READWRITE_LEGACY(namco_obj32_le_r, namco_obj32_le_w)
 	AM_RANGE(0x30f00000, 0x30f0000f) AM_RAM /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
-	AM_RANGE(0x40000000, 0x4000005f) AM_READWRITE_LEGACY( namcofl_sysreg_r, namcofl_sysreg_w )
-	AM_RANGE(0xfffffffc, 0xffffffff) AM_READ_LEGACY( fl_unk1_r )
+	AM_RANGE(0x40000000, 0x4000005f) AM_READWRITE_LEGACY(namcofl_sysreg_r, namcofl_sysreg_w )
+	AM_RANGE(0xfffffffc, 0xffffffff) AM_READ_LEGACY(fl_unk1_r )
 ADDRESS_MAP_END
 
 
@@ -331,7 +331,7 @@ static READ8_HANDLER(dac0_r) { return 0xff; }
 
 static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namcofl_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE_LEGACY(mcu_shared_w) AM_BASE( m_shareram)
+	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE_LEGACY(mcu_shared_w) AM_BASE(m_shareram)
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
 ADDRESS_MAP_END

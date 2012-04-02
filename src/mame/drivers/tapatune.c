@@ -116,7 +116,7 @@ static READ16_HANDLER(irq_ack_r)
 
 static ADDRESS_MAP_START( tapatune_map, AS_PROGRAM, 16, tapatune_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM // program rom and graphics roms
-	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_BASE( m_videoram) // hardware video buffer
+	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_BASE(m_videoram) // hardware video buffer
 	AM_RANGE(0x320000, 0x327fff) AM_RAM // workram
 	AM_RANGE(0x328000, 0x32ffff) AM_RAM
 	AM_RANGE(0x330000, 0x337fff) AM_RAM // ram used as system video buffer

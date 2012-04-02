@@ -90,12 +90,12 @@ static WRITE8_HANDLER( tbowl_sound_command_w )
 static ADDRESS_MAP_START( 6206B_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(tbowl_bg2videoram_w) AM_BASE( m_bg2videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE_LEGACY(tbowl_bgvideoram_w) AM_BASE( m_bgvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(tbowl_txvideoram_w) AM_BASE( m_txvideoram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE_LEGACY(tbowl_bg2videoram_w) AM_BASE(m_bg2videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE_LEGACY(tbowl_bgvideoram_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(tbowl_txvideoram_w) AM_BASE(m_txvideoram)
 //  AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(unknown_write) * written during start-up, not again */
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(shared_r, shared_w) AM_BASE( m_shared_ram) /* check */
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(shared_r, shared_w) AM_BASE(m_shared_ram) /* check */
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("P1") AM_WRITE_LEGACY(tbowlb_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("P2")
 //  AM_RANGE(0xfc01, 0xfc01) AM_WRITE_LEGACY(unknown_write) /* written during start-up, not again */
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( 6206C_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READONLY
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITEONLY
-	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_BASE( m_spriteram)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITEONLY AM_BASE(m_spriteram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram) // 2x palettes, one for each monitor?
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(shared_r, shared_w)

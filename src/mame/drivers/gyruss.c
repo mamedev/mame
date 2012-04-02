@@ -160,8 +160,8 @@ static WRITE8_HANDLER( slave_irq_mask_w )
 
 static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE( m_colorram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW2") AM_WRITENOP	/* watchdog reset */
@@ -171,14 +171,14 @@ static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0xc0e0, 0xc0e0) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc180, 0xc180) AM_WRITE_LEGACY(master_nmi_mask_w)
-	AM_RANGE(0xc185, 0xc185) AM_WRITEONLY AM_BASE( m_flipscreen)
+	AM_RANGE(0xc185, 0xc185) AM_WRITEONLY AM_BASE(m_flipscreen)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x0000) AM_READ_LEGACY(gyruss_scanline_r)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(slave_irq_mask_w)
 	AM_RANGE(0x4000, 0x403f) AM_RAM
-	AM_RANGE(0x4040, 0x40ff) AM_RAM_WRITE_LEGACY(gyruss_spriteram_w) AM_BASE( m_spriteram)
+	AM_RANGE(0x4040, 0x40ff) AM_RAM_WRITE_LEGACY(gyruss_spriteram_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x4100, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xffff) AM_ROM

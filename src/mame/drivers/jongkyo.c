@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8, jongkyo_state )
 	AM_RANGE(0x4000, 0x6bff) AM_ROM // fixed rom
 	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")	// banked (8 banks)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 

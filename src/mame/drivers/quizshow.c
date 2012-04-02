@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( quizshow_mem_map, AS_PROGRAM, 8, quizshow_state )
 	AM_RANGE(0x1884, 0x1884) AM_READ_PORT("IN2")
 	AM_RANGE(0x1888, 0x1888) AM_READ_PORT("IN3")
 	AM_RANGE(0x1900, 0x1900) AM_READ_LEGACY(quizshow_timing_r)
-	AM_RANGE(0x1e00, 0x1fff) AM_RAM_WRITE_LEGACY(quizshow_main_ram_w) AM_BASE( m_main_ram)
+	AM_RANGE(0x1e00, 0x1fff) AM_RAM_WRITE_LEGACY(quizshow_main_ram_w) AM_BASE(m_main_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizshow_io_map, AS_IO, 8, quizshow_state )
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( quizshow_io_map, AS_IO, 8, quizshow_state )
 //	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_NOP // unused
 //	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // unused
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_LEGACY(quizshow_tape_signal_r)
-	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE( m_fo_state)
+	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE(m_fo_state)
 ADDRESS_MAP_END
 
 

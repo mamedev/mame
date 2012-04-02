@@ -242,24 +242,24 @@ static ADDRESS_MAP_START( fuuki32_map, AS_PROGRAM, 32, fuuki32_state )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																		// Work RAM
 	AM_RANGE(0x410000, 0x41ffff) AM_RAM																		// Work RAM (used by asurabus)
 
-	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(fuuki32_vram_0_w) AM_BASE( m_vram[0])	// Tilemap 1
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE_LEGACY(fuuki32_vram_1_w) AM_BASE( m_vram[1])	// Tilemap 2
-	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE_LEGACY(fuuki32_vram_2_w) AM_BASE( m_vram[2])	// Tilemap bg
-	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE_LEGACY(fuuki32_vram_3_w) AM_BASE( m_vram[3])	// Tilemap bg2
+	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(fuuki32_vram_0_w) AM_BASE(m_vram[0])	// Tilemap 1
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE_LEGACY(fuuki32_vram_1_w) AM_BASE(m_vram[1])	// Tilemap 2
+	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE_LEGACY(fuuki32_vram_2_w) AM_BASE(m_vram[2])	// Tilemap bg
+	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE_LEGACY(fuuki32_vram_3_w) AM_BASE(m_vram[3])	// Tilemap bg2
 	AM_RANGE(0x508000, 0x517fff) AM_RAM																		// More tilemap, or linescroll? Seems to be empty all of the time
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE_LEGACY(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE( m_paletteram) // Palette
+	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE_LEGACY(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE(m_paletteram) // Palette
 
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("800000") AM_WRITENOP											// Coin
 	AM_RANGE(0x810000, 0x810003) AM_READ_PORT("810000") AM_WRITENOP											// Player Inputs
 	AM_RANGE(0x880000, 0x880003) AM_READ_PORT("880000")														// Service + DIPS
 	AM_RANGE(0x890000, 0x890003) AM_READ_PORT("890000")														// More DIPS
 
-	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE_LEGACY(fuuki32_vregs_w) AM_BASE( m_vregs)		// Video Registers
+	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE_LEGACY(fuuki32_vregs_w) AM_BASE(m_vregs)		// Video Registers
 	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM 																	// Flipscreen Related
-	AM_RANGE(0x8e0000, 0x8e0003) AM_RAM AM_BASE( m_priority)							// Controls layer order
+	AM_RANGE(0x8e0000, 0x8e0003) AM_RAM AM_BASE(m_priority)							// Controls layer order
 	AM_RANGE(0x903fe0, 0x903fff) AM_READWRITE_LEGACY(snd_020_r, snd_020_w) 										// Shared with Z80
-	AM_RANGE(0xa00000, 0xa00003) AM_WRITEONLY AM_BASE( m_tilebank)						// Tilebank
+	AM_RANGE(0xa00000, 0xa00003) AM_WRITEONLY AM_BASE(m_tilebank)						// Tilebank
 ADDRESS_MAP_END
 
 

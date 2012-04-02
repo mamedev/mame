@@ -123,9 +123,9 @@ static ADDRESS_MAP_START( vroulet_map, AS_PROGRAM, 8, vroulet_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x8000) AM_NOP
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(vroulet_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(vroulet_colorram_w) AM_BASE( m_colorram)
-	AM_RANGE(0xa000, 0xa001) AM_RAM AM_BASE( m_ball)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(vroulet_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(vroulet_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xa000, 0xa001) AM_RAM AM_BASE(m_ball)
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITE_LEGACY(vroulet_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc000, 0xc000) AM_NOP
 ADDRESS_MAP_END

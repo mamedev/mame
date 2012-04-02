@@ -654,16 +654,16 @@ static ADDRESS_MAP_START( tumblepopb_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY	/* To write levels modifications */
 #endif
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE_LEGACY(tumblepb_prot_r, tumblepb_oki_w)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY /* writes past the end of spriteram */
 	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE_LEGACY(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE( m_pf1_data)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE( m_pf2_data)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
 	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
 	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
@@ -678,14 +678,14 @@ static ADDRESS_MAP_START( fncywld_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x100000, 0x100003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff)
 	AM_RANGE(0x100004, 0x100005) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* sprites */
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* sprites */
 	AM_RANGE(0x160800, 0x16080f) AM_WRITEONLY /* goes slightly past the end of spriteram? */
 	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE_LEGACY(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE_LEGACY(fncywld_pf1_data_w) AM_BASE( m_pf1_data)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE_LEGACY(fncywld_pf2_data_w) AM_BASE( m_pf2_data)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE_LEGACY(fncywld_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE_LEGACY(fncywld_pf2_data_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
 	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
 	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP
@@ -704,15 +704,15 @@ static ADDRESS_MAP_START( htchctch_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x100000, 0x10000f) AM_READ_LEGACY(semibase_unknown_r)
 	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(semicom_soundcmd_w)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE_LEGACY(bcstory_tilebank_w)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE_LEGACY(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE( m_pf1_data)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE( m_pf2_data)
+	AM_RANGE(0x320000, 0x321fff) AM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0x323000, 0x331fff) AM_NOP // metal saver writes there when clearing the above tilemaps, flaw in the program routine
 	AM_RANGE(0x341000, 0x342fff) AM_RAM				// Extra ram?
 ADDRESS_MAP_END
@@ -720,18 +720,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jumppop_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x180000, 0x180001) AM_NOP	/* IRQ ack? */
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("PLAYERS")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("DSW")
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITE_LEGACY(jumppop_sound_w)
 	AM_RANGE(0x1a0000, 0x1a7fff) AM_RAM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE( m_pf2_data)
-	AM_RANGE(0x320000, 0x323fff) AM_RAM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE( m_pf1_data)
-	AM_RANGE(0x380000, 0x38000f) AM_WRITEONLY AM_BASE( m_control)
+	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
+	AM_RANGE(0x320000, 0x323fff) AM_RAM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x380000, 0x38000f) AM_WRITEONLY AM_BASE(m_control)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( jumpkids_sound_w )
@@ -743,10 +743,10 @@ static WRITE16_HANDLER( jumpkids_sound_w )
 
 static ADDRESS_MAP_START( suprtrio_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_BASE( m_control)
-	AM_RANGE(0xa20000, 0xa20fff) AM_RAM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE( m_pf1_data)
-	AM_RANGE(0xa22000, 0xa22fff) AM_RAM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE( m_pf2_data)
+	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xa00000, 0xa0000f) AM_RAM AM_BASE(m_control)
+	AM_RANGE(0xa20000, 0xa20fff) AM_RAM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0xa22000, 0xa22fff) AM_RAM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0xcf0000, 0xcf05ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("PLAYERS") AM_WRITE_LEGACY(suprtrio_tilebank_w)
 	AM_RANGE(0xe40000, 0xe40001) AM_READ_PORT("SYSTEM")
@@ -757,15 +757,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pangpang_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY // writes past the end of spriteram
 	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(tumblepopb_controls_r)
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE_LEGACY(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE_LEGACY(pangpang_pf1_data_w) AM_BASE( m_pf1_data)
-	AM_RANGE(0x340000, 0x341fff) AM_RAM_WRITE_LEGACY(pangpang_pf2_data_w) AM_BASE( m_pf2_data)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE_LEGACY(pangpang_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x340000, 0x341fff) AM_RAM_WRITE_LEGACY(pangpang_pf2_data_w) AM_BASE(m_pf2_data)
 ADDRESS_MAP_END
 
 
@@ -841,16 +841,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jumpkids_main_map, AS_PROGRAM, 16, tumbleb_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(jumpkids_sound_w)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* Bootleg sprite buffer */
 	AM_RANGE(0x160800, 0x160807) AM_WRITEONLY /* writes past the end of spriteram */
 	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(tumblepopb_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_WRITE_LEGACY(tumblepb_control_0_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE( m_pf1_data)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE( m_pf2_data)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE_LEGACY(tumblepb_pf1_data_w) AM_BASE(m_pf1_data)
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE_LEGACY(tumblepb_pf2_data_w) AM_BASE(m_pf2_data)
 	AM_RANGE(0x340000, 0x3401ff) AM_WRITENOP /* Unused row scroll */
 	AM_RANGE(0x340400, 0x34047f) AM_WRITENOP /* Unused col scroll */
 	AM_RANGE(0x342000, 0x3421ff) AM_WRITENOP

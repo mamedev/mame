@@ -136,8 +136,8 @@ static WRITE8_HANDLER( nmi_mask_w )
 static ADDRESS_MAP_START( mario_map, AS_PROGRAM, 8, mario_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_RAM	AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* physical sprite ram */
-	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE_LEGACY(mario_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM	AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* physical sprite ram */
+	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE_LEGACY(mario_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_DEVWRITE_LEGACY("discrete", mario_sh1_w) /* Mario run sample */
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_DEVWRITE_LEGACY("discrete", mario_sh2_w) /* Luigi run sample */
 	AM_RANGE(0x7d00, 0x7d00) AM_WRITE_LEGACY(mario_scroll_w)
@@ -155,8 +155,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( masao_map, AS_PROGRAM, 8, mario_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x7000, 0x73ff) AM_RAM	AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* physical sprite ram */
-	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE_LEGACY(mario_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM	AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* physical sprite ram */
+	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE_LEGACY(mario_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")
 	AM_RANGE(0x7d00, 0x7d00) AM_WRITE_LEGACY(mario_scroll_w)

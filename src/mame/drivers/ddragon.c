@@ -502,21 +502,21 @@ static READ8_HANDLER( dd_adpcm_status_r )
  *************************************/
 
 static ADDRESS_MAP_START( ddragon_map, AS_PROGRAM, 8, ddragon_state )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE( m_rambase)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(m_rambase)
 	AM_RANGE(0x1000, 0x11ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1200, 0x13ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(ddragon_fgvideoram_w) AM_BASE( m_fgvideoram)
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE_LEGACY(ddragon_spriteram_r, ddragon_spriteram_w) AM_BASE( m_spriteram)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(ddragon_bgvideoram_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(ddragon_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0x2000, 0x2fff) AM_READWRITE_LEGACY(ddragon_spriteram_r, ddragon_spriteram_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(ddragon_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1")
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2")
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3804, 0x3804) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3808, 0x3808) AM_WRITE_LEGACY(ddragon_bankswitch_w)
-	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_BASE( m_scrollx_lo)
-	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_BASE( m_scrolly_lo)
+	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_BASE(m_scrollx_lo)
+	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_BASE(m_scrolly_lo)
 	AM_RANGE(0x380b, 0x380f) AM_WRITE_LEGACY(ddragon_interrupt_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -525,17 +525,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dd2_map, AS_PROGRAM, 8, ddragon_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(ddragon_fgvideoram_w) AM_BASE( m_fgvideoram)
-	AM_RANGE(0x2000, 0x2fff) AM_READWRITE_LEGACY(ddragon_spriteram_r, ddragon_spriteram_w) AM_BASE( m_spriteram)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(ddragon_bgvideoram_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(ddragon_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0x2000, 0x2fff) AM_READWRITE_LEGACY(ddragon_spriteram_r, ddragon_spriteram_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(ddragon_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1")
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2")
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3804, 0x3804) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3808, 0x3808) AM_WRITE_LEGACY(ddragon_bankswitch_w)
-	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_BASE( m_scrollx_lo)
-	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_BASE( m_scrolly_lo)
+	AM_RANGE(0x3809, 0x3809) AM_WRITEONLY AM_BASE(m_scrollx_lo)
+	AM_RANGE(0x380a, 0x380a) AM_WRITEONLY AM_BASE(m_scrolly_lo)
 	AM_RANGE(0x380b, 0x380f) AM_WRITE_LEGACY(ddragon_interrupt_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3e00, 0x3fff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
@@ -621,7 +621,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, ddragon_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE_LEGACY(darktowr_mcu_w) AM_BASE( m_darktowr_mcu_ports)
+	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE_LEGACY(darktowr_mcu_w) AM_BASE(m_darktowr_mcu_ports)
 	AM_RANGE(0x0008, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

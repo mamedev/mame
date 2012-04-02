@@ -112,7 +112,7 @@ static WRITE8_HANDLER( avalance_start_lamp_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1")
 	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( catch_map, AS_PROGRAM, 8, avalnche_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffc) AM_READ_PORT("IN0")
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1")
 	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")

@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( bssoccer_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM	// RAM
 	AM_RANGE(0x400000, 0x4001ff) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w)  // Banked Palette
 	AM_RANGE(0x400200, 0x400fff) AM_RAM	//
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE( m_spriteram)	// Sprites
+	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE(m_spriteram)	// Sprites
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("P1") AM_WRITE_LEGACY(suna16_soundlatch_w)	// To Sound CPU
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("P2") AM_WRITE_LEGACY(suna16_flipscreen_w)	// Flip Screen
 	AM_RANGE(0xa00004, 0xa00005) AM_READ_PORT("P3") AM_WRITE_LEGACY(bssoccer_leds_w)	// Leds
@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( uballoon_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	// RAM
 	AM_RANGE(0x200000, 0x2001ff) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w)	// Banked Palette
 	AM_RANGE(0x200200, 0x200fff) AM_RAM	//
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x1e0000) AM_RAM AM_BASE( m_spriteram)	// Sprites
+	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x1e0000) AM_RAM AM_BASE(m_spriteram)	// Sprites
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1") AM_WRITE_LEGACY(suna16_soundlatch_w)	// To Sound CPU
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(suna16_flipscreen_w)	// Flip Screen
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( sunaq_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x540000, 0x5401ff) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w)
 	AM_RANGE(0x540200, 0x540fff) AM_RAM   // RAM
 	AM_RANGE(0x580000, 0x583fff) AM_RAM	// RAM
-	AM_RANGE(0x5c0000, 0x5dffff) AM_RAM AM_BASE( m_spriteram)	// Sprites
+	AM_RANGE(0x5c0000, 0x5dffff) AM_RAM AM_BASE(m_spriteram)	// Sprites
 ADDRESS_MAP_END
 
 
@@ -175,13 +175,13 @@ static ADDRESS_MAP_START( bestbest_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("P1") AM_WRITE_LEGACY(suna16_soundlatch_w)		// To Sound CPU
 	AM_RANGE( 0x500002, 0x500003 ) AM_READ_PORT("P2") AM_WRITE_LEGACY(bestbest_flipscreen_w)	// P2 + Coins, Flip Screen
 	AM_RANGE( 0x500004, 0x500005 ) AM_READ_PORT("DSW") AM_WRITE_LEGACY(bestbest_coin_w)		// Coin Counter
-	AM_RANGE( 0x500008, 0x500009 ) AM_WRITE_LEGACY( bestbest_prot_w )		// Protection
-	AM_RANGE( 0x500018, 0x500019 ) AM_READ_LEGACY( bestbest_prot_r )		//
-	AM_RANGE( 0x540000, 0x540fff ) AM_READWRITE_LEGACY( suna16_paletteram16_r, suna16_paletteram16_w )	// Banked(?) Palette
+	AM_RANGE( 0x500008, 0x500009 ) AM_WRITE_LEGACY(bestbest_prot_w )		// Protection
+	AM_RANGE( 0x500018, 0x500019 ) AM_READ_LEGACY(bestbest_prot_r )		//
+	AM_RANGE( 0x540000, 0x540fff ) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w )	// Banked(?) Palette
 	AM_RANGE( 0x541000, 0x54ffff ) AM_RAM														//
 	AM_RANGE( 0x580000, 0x58ffff ) AM_RAM							// RAM
-	AM_RANGE( 0x5c0000, 0x5dffff ) AM_RAM AM_BASE( m_spriteram)	// Sprites (Chip 1)
-	AM_RANGE( 0x5e0000, 0x5fffff ) AM_RAM AM_BASE( m_spriteram2)	// Sprites (Chip 2)
+	AM_RANGE( 0x5c0000, 0x5dffff ) AM_RAM AM_BASE(m_spriteram)	// Sprites (Chip 1)
+	AM_RANGE( 0x5e0000, 0x5fffff ) AM_RAM AM_BASE(m_spriteram2)	// Sprites (Chip 2)
 ADDRESS_MAP_END
 
 
@@ -237,10 +237,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestbest_sound_map, AS_PROGRAM, 8, suna16_state )
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM									// ROM
-	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE_LEGACY( "ymsnd", ym3526_w	)	//
-	AM_RANGE( 0xc002, 0xc003 ) AM_DEVWRITE_LEGACY( "aysnd", ay8910_address_data_w	)	// AY8910
+	AM_RANGE( 0xc000, 0xc001 ) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w	)	//
+	AM_RANGE( 0xc002, 0xc003 ) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w	)	// AY8910
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM									// RAM
-	AM_RANGE( 0xf000, 0xf000 ) AM_WRITE_LEGACY( soundlatch2_w				)	// To PCM Z80
+	AM_RANGE( 0xf000, 0xf000 ) AM_WRITE_LEGACY(soundlatch2_w				)	// To PCM Z80
 	AM_RANGE( 0xf800, 0xf800 ) AM_READ ( soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 

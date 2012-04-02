@@ -518,10 +518,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16, polepos_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE_LEGACY(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(polepos_sprite16_r, polepos_sprite16_w) AM_BASE( m_sprite16_memory)	/* Motion Object */
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE_LEGACY(polepos_road16_r, polepos_road16_w) AM_BASE( m_road16_memory)		/* Road Memory */
-	AM_RANGE(0x9800, 0x9fff) AM_READWRITE_LEGACY(polepos_alpha16_r, polepos_alpha16_w) AM_BASE( m_alpha16_memory)	/* Alphanumeric (char ram) */
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE_LEGACY(polepos_view16_r, polepos_view16_w) AM_BASE( m_view16_memory)		/* Background memory */
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(polepos_sprite16_r, polepos_sprite16_w) AM_BASE(m_sprite16_memory)	/* Motion Object */
+	AM_RANGE(0x9000, 0x97ff) AM_READWRITE_LEGACY(polepos_road16_r, polepos_road16_w) AM_BASE(m_road16_memory)		/* Road Memory */
+	AM_RANGE(0x9800, 0x9fff) AM_READWRITE_LEGACY(polepos_alpha16_r, polepos_alpha16_w) AM_BASE(m_alpha16_memory)	/* Alphanumeric (char ram) */
+	AM_RANGE(0xa000, 0xafff) AM_READWRITE_LEGACY(polepos_view16_r, polepos_view16_w) AM_BASE(m_view16_memory)		/* Background memory */
 	AM_RANGE(0xc000, 0xc001) AM_MIRROR(0x38fe) AM_WRITE_LEGACY(polepos_view16_hscroll_w)						/* Background horz scroll position */
 	AM_RANGE(0xc100, 0xc101) AM_MIRROR(0x38fe) AM_WRITE_LEGACY(polepos_road16_vscroll_w)						/* Road vertical position */
 ADDRESS_MAP_END

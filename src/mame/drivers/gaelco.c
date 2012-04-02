@@ -123,12 +123,12 @@ static WRITE16_HANDLER(thoop_encrypted_w)
 
 static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(gaelco_vram_w) AM_BASE( m_videoram)				/* Video RAM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(gaelco_vram_w) AM_BASE(m_videoram)				/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM															/* Screen RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE( m_vregs)							/* Video Registers */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(m_vregs)							/* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE_LEGACY(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE( m_spriteram)								/* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(m_spriteram)								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
@@ -150,12 +150,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(gaelco_vram_w) AM_BASE( m_videoram)				/* Video RAM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(gaelco_vram_w) AM_BASE(m_videoram)				/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM															/* Screen RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE( m_vregs)							/* Video Registers */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(m_vregs)							/* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE_LEGACY(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE( m_spriteram)								/* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(m_spriteram)								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
@@ -167,12 +167,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(gaelco_vram_encrypted_w) AM_BASE( m_videoram)			/* Video RAM */
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(gaelco_encrypted_w) AM_BASE( m_screen)				/* Screen RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE( m_vregs)							/* Video Registers */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(gaelco_vram_encrypted_w) AM_BASE(m_videoram)			/* Video RAM */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(gaelco_encrypted_w) AM_BASE(m_screen)				/* Screen RAM */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(m_vregs)							/* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE_LEGACY(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE( m_spriteram)								/* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(m_spriteram)								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
@@ -184,12 +184,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(thoop_vram_encrypted_w) AM_BASE( m_videoram)			/* Video RAM */
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(thoop_encrypted_w) AM_BASE( m_screen)				/* Screen RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE( m_vregs)							/* Video Registers */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE_LEGACY(thoop_vram_encrypted_w) AM_BASE(m_videoram)			/* Video RAM */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE_LEGACY(thoop_encrypted_w) AM_BASE(m_screen)				/* Screen RAM */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE(m_vregs)							/* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE_LEGACY(watchdog_reset_w)                                                     /* INT 6 ACK/Watchdog timer */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)		/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE( m_spriteram)								/* Sprite RAM */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(m_spriteram)								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")

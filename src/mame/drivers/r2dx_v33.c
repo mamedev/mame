@@ -386,7 +386,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE_LEGACY(rdx_bg_vram_w) AM_BASE_LEGACY(&bg_vram)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE_LEGACY(rdx_md_vram_w) AM_BASE_LEGACY(&md_vram)
@@ -459,7 +459,7 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00800, 0x00fff) AM_RAM
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE_LEGACY(rdx_bg_vram_w) AM_BASE_LEGACY(&bg_vram)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE_LEGACY(rdx_md_vram_w) AM_BASE_LEGACY(&md_vram)

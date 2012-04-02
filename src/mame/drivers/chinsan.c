@@ -241,7 +241,7 @@ static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8, chinsan_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE( m_video)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE(m_video)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinsan_io, AS_IO, 8, chinsan_state )

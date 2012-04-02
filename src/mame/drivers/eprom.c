@@ -176,11 +176,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x360020, 0x360021) AM_WRITE_LEGACY(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE_LEGACY(atarigen_sound_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE( m_playfield)
+	AM_RANGE(0x3f0000, 0x3f1fff) AM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE(m_playfield)
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
-	AM_RANGE(0x3f4000, 0x3f4f7f) AM_WRITE_LEGACY(atarigen_alpha_w) AM_BASE( m_alpha)
+	AM_RANGE(0x3f4000, 0x3f4f7f) AM_WRITE_LEGACY(atarigen_alpha_w) AM_BASE(m_alpha)
 	AM_RANGE(0x3f4f80, 0x3f4fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
-	AM_RANGE(0x3f8000, 0x3f9fff) AM_WRITE_LEGACY(atarigen_playfield_upper_w) AM_BASE( m_playfield_upper)
+	AM_RANGE(0x3f8000, 0x3f9fff) AM_WRITE_LEGACY(atarigen_playfield_upper_w) AM_BASE(m_playfield_upper)
 	AM_RANGE(0x3f0000, 0x3f9fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -201,10 +201,10 @@ static ADDRESS_MAP_START( guts_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x360020, 0x360021) AM_WRITE_LEGACY(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE_LEGACY(atarigen_sound_w)
 	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xff0000, 0xff1fff) AM_WRITE_LEGACY(atarigen_playfield_upper_w) AM_BASE( m_playfield_upper)
-	AM_RANGE(0xff8000, 0xff9fff) AM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE( m_playfield)
+	AM_RANGE(0xff0000, 0xff1fff) AM_WRITE_LEGACY(atarigen_playfield_upper_w) AM_BASE(m_playfield_upper)
+	AM_RANGE(0xff8000, 0xff9fff) AM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE(m_playfield)
 	AM_RANGE(0xffa000, 0xffbfff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
-	AM_RANGE(0xffc000, 0xffcf7f) AM_WRITE_LEGACY(atarigen_alpha_w) AM_BASE( m_alpha)
+	AM_RANGE(0xffc000, 0xffcf7f) AM_WRITE_LEGACY(atarigen_alpha_w) AM_BASE(m_alpha)
 	AM_RANGE(0xffcf80, 0xffcfff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0xff0000, 0xff1fff) AM_RAM
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
@@ -220,7 +220,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( extra_map, AS_PROGRAM, 16, eprom_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE_LEGACY(sync_r, sync_w) AM_SHARE("share2") AM_BASE( m_sync_data)
+	AM_RANGE(0x16cc00, 0x16cc01) AM_READWRITE_LEGACY(sync_r, sync_w) AM_SHARE("share2") AM_BASE(m_sync_data)
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
 	AM_RANGE(0x260010, 0x26001f) AM_READ_LEGACY(special_port1_r)

@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, ggconnie_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sgx_io , AS_IO, 8, ggconnie_state )
-	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY( sgx_vdc_r, sgx_vdc_w )
+	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY(sgx_vdc_r, sgx_vdc_w )
 ADDRESS_MAP_END
 
 static const c6280_interface c6280_config =

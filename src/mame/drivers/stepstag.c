@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE_LEGACY(tetrisp2_vram_rot_w) AM_BASE(m_vram_rot)	// Rotation
 	AM_RANGE(0x900000, 0x903fff) AM_READWRITE_LEGACY(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0x904000, 0x907fff) AM_READWRITE_LEGACY(tetrisp2_nvram_r, tetrisp2_nvram_w)				// NVRAM (mirror)
-//  AM_RANGE(0xa00000, 0xa7ffff) AM_READ_LEGACY( unknown_read_0xc00000 ) // presumably comms with slave CPU
+//  AM_RANGE(0xa00000, 0xa7ffff) AM_READ_LEGACY(unknown_read_0xc00000 ) // presumably comms with slave CPU
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP								// Coin Counter plus other things
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// protection related?
 	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(m_scroll_fg)						// Foreground Scrolling

@@ -80,9 +80,9 @@ static WRITE8_HANDLER( sonson_coin2_counter_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sonson_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(sonson_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(sonson_colorram_w) AM_BASE( m_colorram)
-	AM_RANGE(0x2020, 0x207f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(sonson_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(sonson_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x2020, 0x207f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(sonson_scrollx_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("P2")

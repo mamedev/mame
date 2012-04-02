@@ -42,12 +42,12 @@ static WRITE16_HANDLER( ohmygod_ctrl_w )
 static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM
-	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE_LEGACY(ohmygod_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE_LEGACY(ohmygod_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x308000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE_LEGACY(ohmygod_scrollx_w)
 	AM_RANGE(0x400002, 0x400003) AM_WRITE_LEGACY(ohmygod_scrolly_w)
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x704000, 0x707fff) AM_RAM
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM 	/* Work RAM */
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")

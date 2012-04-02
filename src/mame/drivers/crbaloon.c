@@ -201,8 +201,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crbaloon_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)	/* A15 is not decoded */
 	AM_RANGE(0x0000, 0x3fff) AM_ROM		/* not fully populated */
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0400) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE_LEGACY(crbaloon_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE_LEGACY(crbaloon_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE_LEGACY(crbaloon_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x5000, 0x53ff) AM_MIRROR(0x0400) AM_RAM_WRITE_LEGACY(crbaloon_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x5800, 0x7fff) AM_NOP
 ADDRESS_MAP_END
 
@@ -223,10 +223,10 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, crbaloon_state )
 
 	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* not connected */
 	AM_RANGE(0x01, 0x01) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x02, 0x04) AM_WRITEONLY AM_BASE( m_spriteram)
+	AM_RANGE(0x02, 0x04) AM_WRITEONLY AM_BASE(m_spriteram)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("discrete", crbaloon_audio_set_music_freq)
 	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(port_sound_w)
-	AM_RANGE(0x07, 0x0b) AM_WRITE_LEGACY(pc3092_w) AM_BASE( m_pc3092_data)
+	AM_RANGE(0x07, 0x0b) AM_WRITE_LEGACY(pc3092_w) AM_BASE(m_pc3092_data)
 	AM_RANGE(0x0c, 0x0c) AM_WRITENOP /* MSK - to PC3259 */
 	AM_RANGE(0x0d, 0x0d) AM_WRITENOP /* schematics has it in a box marked "NOT USE" */
 	AM_RANGE(0x0e, 0x0f) AM_WRITENOP

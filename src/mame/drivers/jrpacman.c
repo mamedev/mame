@@ -134,7 +134,7 @@ static WRITE8_HANDLER( irq_mask_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, jrpacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE_LEGACY(jrpacman_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE_LEGACY(jrpacman_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x4800, 0x4fef) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("P1")

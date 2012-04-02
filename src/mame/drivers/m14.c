@@ -201,8 +201,8 @@ static WRITE8_HANDLER( hopper_w )
 static ADDRESS_MAP_START( m14_map, AS_PROGRAM, 8, m14_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(m14_vram_w) AM_BASE( m_video_ram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(m14_cram_w) AM_BASE( m_color_ram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(m14_vram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(m14_cram_w) AM_BASE(m_color_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m14_io_map, AS_IO, 8, m14_state )

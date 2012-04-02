@@ -98,10 +98,10 @@ static WRITE8_HANDLER( i8039_T0_w )
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
-	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_BASE( m_scroll)
+	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x0003, 0x0003) AM_WRITE_LEGACY(finalizr_videoctrl_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(finalizr_flipscreen_w)
-//  AM_RANGE(0x0020, 0x003f) AM_WRITEONLY AM_BASE( m_scroll)
+//  AM_RANGE(0x0020, 0x003f) AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0808, 0x0808) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0810, 0x0810) AM_READ_PORT("SYSTEM")
@@ -114,13 +114,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x081b, 0x081b) AM_WRITENOP		/* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE_LEGACY(finalizr_i8039_irq_w)	/* custom sound chip */
 	AM_RANGE(0x081d, 0x081d) AM_WRITE_LEGACY(soundlatch_w)			/* custom sound chip */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE( m_colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE( m_colorram2)
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE( m_videoram2)
-	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(m_colorram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE(m_colorram2)
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE(m_videoram2)
+	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3200, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE( m_spriteram_2)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE(m_spriteram_2)
 	AM_RANGE(0x3a00, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END

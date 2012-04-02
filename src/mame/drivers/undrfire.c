@@ -479,8 +479,8 @@ static WRITE32_HANDLER( cbombers_adc_w )
 
 static ADDRESS_MAP_START( undrfire_map, AS_PROGRAM, 32, undrfire_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE( m_ram)
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 //  AM_RANGE(0x304000, 0x304003) AM_RAM // debugging - doesn't change ???
 //  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
 	AM_RANGE(0x400000, 0x400003) AM_WRITE_LEGACY(motor_control_w)		/* gun vibration */
@@ -501,7 +501,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cbombers_cpua_map, AS_PROGRAM, 32, undrfire_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE_LEGACY(cbombers_cpua_ctrl_w)
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE_LEGACY(undrfire_input_r, undrfire_input_w)
 	AM_RANGE(0x600000, 0x600007) AM_READWRITE_LEGACY(cbombers_adc_r, cbombers_adc_w)
@@ -514,7 +514,7 @@ static ADDRESS_MAP_START( cbombers_cpua_map, AS_PROGRAM, 32, undrfire_state )
 	AM_RANGE(0xb00000, 0xb0000f) AM_RAM /* ? */
 	AM_RANGE(0xc00000, 0xc00007) AM_RAM /* LAN controller? */
 	AM_RANGE(0xd00000, 0xd00003) AM_WRITE_LEGACY(rotate_control_w)		/* perhaps port based rotate control? */
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE( m_shared_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE(m_shared_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbombers_cpub_map, AS_PROGRAM, 16, undrfire_state )

@@ -306,7 +306,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8, twincobr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE( m_sharedram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_sharedram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, twincobr_state )

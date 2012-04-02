@@ -119,9 +119,9 @@ static WRITE8_HANDLER( tutankhm_coin_counter_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE( m_videoram)
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_BASE( m_paletteram)
-	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_BASE( m_scroll)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_BASE(m_paletteram)
+	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_BASE(m_scroll)
 	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_READ_LEGACY(watchdog_reset_r)
 	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2")	/* DSW2 (inverted bits) */
 	AM_RANGE(0x8180, 0x8180) AM_MIRROR(0x000f) AM_READ_PORT("IN0")	/* IN0 I/O: Coin slots, service, 1P/2P buttons */

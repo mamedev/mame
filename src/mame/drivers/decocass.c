@@ -118,15 +118,15 @@ static READ8_HANDLER( mirrorcolorram_r )
 
 
 static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8, decocass_state )
-	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE_LEGACY(ram_w) AM_BASE( m_rambase)
-	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE_LEGACY(charram_w) AM_BASE( m_charram) /* still RMS3 RAM */
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(fgvideoram_w) AM_BASE_SIZE( m_fgvideoram, m_fgvideoram_size)  /* DSP3 RAM */
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(fgcolorram_w) AM_BASE_SIZE( m_colorram, m_colorram_size)
+	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE_LEGACY(ram_w) AM_BASE(m_rambase)
+	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE_LEGACY(charram_w) AM_BASE(m_charram) /* still RMS3 RAM */
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(fgvideoram_w) AM_BASE_SIZE(m_fgvideoram, m_fgvideoram_size)  /* DSP3 RAM */
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(fgcolorram_w) AM_BASE_SIZE(m_colorram, m_colorram_size)
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE_LEGACY(mirrorvideoram_r, mirrorvideoram_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE_LEGACY(mirrorcolorram_r, mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(tileram_w) AM_BASE_SIZE( m_tileram, m_tileram_size)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(objectram_w) AM_BASE_SIZE( m_objectram, m_objectram_size)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM_WRITE_LEGACY(decocass_paletteram_w) AM_BASE( m_paletteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(tileram_w) AM_BASE_SIZE(m_tileram, m_tileram_size)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(objectram_w) AM_BASE_SIZE(m_objectram, m_objectram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM_WRITE_LEGACY(decocass_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(decocass_watchdog_count_w)
 	AM_RANGE(0xe301, 0xe301) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(decocass_watchdog_flip_w)
 	AM_RANGE(0xe302, 0xe302) AM_WRITE_LEGACY(decocass_color_missiles_w)

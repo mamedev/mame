@@ -119,7 +119,7 @@ static WRITE8_HANDLER( hotblock_video_write )
 
 static ADDRESS_MAP_START( hotblock_map, AS_PROGRAM, 8, hotblock_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE_LEGACY(hotblock_video_read, hotblock_video_write) AM_BASE( m_vram)
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE_LEGACY(hotblock_video_read, hotblock_video_write) AM_BASE(m_vram)
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 

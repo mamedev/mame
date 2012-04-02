@@ -192,9 +192,9 @@ static READ8_HANDLER( rng_r )
 *************************/
 
 static ADDRESS_MAP_START( jokrwild_map, AS_PROGRAM, 8, jokrwild_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE_LEGACY(jokrwild_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE_LEGACY(jokrwild_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM //FIXME: backup RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(jokrwild_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(jokrwild_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM //stack RAM
 	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //optical sensor is here

@@ -740,11 +740,11 @@ static WRITE8_DEVICE_HANDLER( buckrog_ppi8255_0_w )
 
 static ADDRESS_MAP_START( turbo_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x0700) AM_MASK(0x0f7) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x0700) AM_MASK(0x0f7) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(turbo_coin_and_lamp_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE( m_sprite_position)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_sprite_position)
 	AM_RANGE(0xb800, 0xbfff) AM_WRITE_LEGACY(turbo_analog_reset_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(turbo_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(turbo_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_WRITE_LEGACY(turbo_collision_clear_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf803) AM_MIRROR(0x00fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
@@ -766,15 +766,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subroc3d_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE( m_sprite_position)	// CONT RAM
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM AM_BASE( m_spriteram)			// CONT RAM
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE(m_sprite_position)	// CONT RAM
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM AM_BASE(m_spriteram)			// CONT RAM
 	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07fc) AM_READ_PORT("IN0")					// INPUT 253
 	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x07fc) AM_READ_PORT("IN1")					// INPUT 253
 	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x07fc) AM_READ_PORT("DSW2")					// INPUT 253
 	AM_RANGE(0xa803, 0xa803) AM_MIRROR(0x07fc) AM_READ_PORT("DSW3")					// INPUT 253
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM 												// SCRATCH
 	AM_RANGE(0xb800, 0xbfff)														// HANDLE CL
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(turbo_videoram_w) AM_BASE( m_videoram)	// FIX PAGE
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(turbo_videoram_w) AM_BASE(m_videoram)	// FIX PAGE
 	AM_RANGE(0xe800, 0xe803) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf000, 0xf003) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf800, 0xf801) AM_MIRROR(0x07fe) AM_READWRITE_LEGACY(turbo_8279_r, turbo_8279_w)
@@ -791,12 +791,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(turbo_videoram_w) AM_BASE( m_videoram)		// FIX PAGE
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(turbo_videoram_w) AM_BASE(m_videoram)		// FIX PAGE
 	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, buckrog_ppi8255_0_w)	// 8255
 	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)			// 8255
 	AM_RANGE(0xd800, 0xd801) AM_MIRROR(0x07fe) AM_READWRITE_LEGACY(turbo_8279_r, turbo_8279_w)			// 8279
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE( m_sprite_position)				// CONT RAM
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE( m_spriteram)						// CONT RAM
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(m_sprite_position)				// CONT RAM
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE(m_spriteram)						// CONT RAM
 	AM_RANGE(0xe800, 0xe800) AM_MIRROR(0x07fc) AM_READ_PORT("IN0")								// INPUT
 	AM_RANGE(0xe801, 0xe801) AM_MIRROR(0x07fc) AM_READ_PORT("IN1")
 	AM_RANGE(0xe802, 0xe802) AM_MIRROR(0x07fc) AM_READ_LEGACY(buckrog_port_2_r)

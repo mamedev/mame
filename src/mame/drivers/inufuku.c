@@ -143,11 +143,11 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x280000, 0x280001) AM_WRITE_LEGACY(inufuku_soundcommand_w)	// sound command
 
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)						// palette ram
-	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_BASE( m_bg_rasterram)									// bg raster ram
-	AM_RANGE(0x400000, 0x401fff) AM_READWRITE_LEGACY(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_BASE( m_bg_videoram)		// bg ram
-	AM_RANGE(0x402000, 0x403fff) AM_READWRITE_LEGACY(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_BASE( m_tx_videoram)		// text ram
-	AM_RANGE(0x580000, 0x580fff) AM_RAM AM_BASE_SIZE( m_spriteram1, m_spriteram1_size)							// sprite table + sprite attribute
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE( m_spriteram2)											// cell table
+	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_BASE(m_bg_rasterram)									// bg raster ram
+	AM_RANGE(0x400000, 0x401fff) AM_READWRITE_LEGACY(inufuku_bg_videoram_r, inufuku_bg_videoram_w) AM_BASE(m_bg_videoram)		// bg ram
+	AM_RANGE(0x402000, 0x403fff) AM_READWRITE_LEGACY(inufuku_tx_videoram_r, inufuku_tx_videoram_w) AM_BASE(m_tx_videoram)		// text ram
+	AM_RANGE(0x580000, 0x580fff) AM_RAM AM_BASE_SIZE(m_spriteram1, m_spriteram1_size)							// sprite table + sprite attribute
+	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE(m_spriteram2)											// cell table
 
 	AM_RANGE(0x780000, 0x780013) AM_WRITE_LEGACY(inufuku_palettereg_w)	// bg & text palettebank register
 	AM_RANGE(0x7a0000, 0x7a0023) AM_WRITE_LEGACY(inufuku_scrollreg_w)	// bg & text scroll register

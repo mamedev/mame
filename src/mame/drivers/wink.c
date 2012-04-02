@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( wink_map, AS_PROGRAM, 8, wink_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(bgram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(bgram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 

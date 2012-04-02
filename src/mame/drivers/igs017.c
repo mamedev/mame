@@ -1163,29 +1163,29 @@ static READ8_HANDLER( input_r )
 static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
-	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE( m_spriteram)
-	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE_LEGACY( paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
 
 //  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
 
 	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD_LEGACY("ppi8255", ppi8255_r)
-	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE_LEGACY( video_disable_w )
+	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE_LEGACY(video_disable_w )
 
-	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE_LEGACY( nmi_enable_w )
-	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE_LEGACY( irq_enable_w )
+	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE_LEGACY(nmi_enable_w )
+	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE_LEGACY(irq_enable_w )
 
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE_LEGACY( fg_w ) AM_BASE( m_fg_videoram )
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE_LEGACY( bg_w ) AM_BASE( m_bg_videoram )
+	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE_LEGACY(fg_w ) AM_BASE(m_fg_videoram )
+	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE_LEGACY(bg_w ) AM_BASE(m_bg_videoram )
 
-	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE_LEGACY( input_select_w )
-	AM_RANGE( 0x8001, 0x8001 ) AM_READ_LEGACY( input_r )
+	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE_LEGACY(input_select_w )
+	AM_RANGE( 0x8001, 0x8001 ) AM_READ_LEGACY(input_r )
 
 	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
 	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "BUTTONS" )
 
-	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_w )
+	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 ADDRESS_MAP_END
 
 
@@ -1291,16 +1291,16 @@ static WRITE16_HANDLER( mgcs_paletteram_w )
 static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x300000, 0x303fff ) AM_RAM
-	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE_LEGACY( mgcs_magic_w )
-	AM_RANGE( 0x49c002, 0x49c003 ) AM_READ_LEGACY( mgcs_magic_r )
-	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE_LEGACY( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE( m_spriteram)
-	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE_LEGACY( mgcs_paletteram_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREAD8_LEGACY( "ppi8255", ppi8255_r, 0x00ff )
-	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE_LEGACY( video_disable_lsb_w )
-	AM_RANGE( 0xa04028, 0xa04029 ) AM_WRITE_LEGACY( irq2_enable_w )
-	AM_RANGE( 0xa0402a, 0xa0402b ) AM_WRITE_LEGACY( irq1_enable_w )
-	AM_RANGE( 0xa08000, 0xa0bfff ) AM_READWRITE_LEGACY( fg_lsb_r, fg_lsb_w ) AM_BASE( m_fg_videoram )
-	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE_LEGACY( bg_lsb_r, bg_lsb_w ) AM_BASE( m_bg_videoram )
+	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE_LEGACY(mgcs_magic_w )
+	AM_RANGE( 0x49c002, 0x49c003 ) AM_READ_LEGACY(mgcs_magic_r )
+	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE_LEGACY(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE_LEGACY(mgcs_paletteram_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
+	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE_LEGACY(video_disable_lsb_w )
+	AM_RANGE( 0xa04028, 0xa04029 ) AM_WRITE_LEGACY(irq2_enable_w )
+	AM_RANGE( 0xa0402a, 0xa0402b ) AM_WRITE_LEGACY(irq1_enable_w )
+	AM_RANGE( 0xa08000, 0xa0bfff ) AM_READWRITE_LEGACY(fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram )
+	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE_LEGACY(bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram )
 	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	// oki banking through protection (code at $1a350)?
 ADDRESS_MAP_END
@@ -1392,17 +1392,17 @@ static READ16_HANDLER( sdmg2_magic_r )
 static ADDRESS_MAP_START( sdmg2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
-	AM_RANGE(0x202000, 0x202fff) AM_READWRITE_LEGACY( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE( m_spriteram)
-	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE_LEGACY( sdmg2_paletteram_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE(0x204020, 0x204027) AM_DEVREAD8_LEGACY( "ppi8255", ppi8255_r, 0x00ff )
-	AM_RANGE(0x204024, 0x204025) AM_WRITE_LEGACY( video_disable_lsb_w )
-	AM_RANGE(0x204028, 0x204029) AM_WRITE_LEGACY( irq2_enable_w )
-	AM_RANGE(0x20402a, 0x20402b) AM_WRITE_LEGACY( irq1_enable_w )
-	AM_RANGE(0x208000, 0x20bfff) AM_READWRITE_LEGACY( fg_lsb_r, fg_lsb_w ) AM_BASE( m_fg_videoram )
-	AM_RANGE(0x20c000, 0x20ffff) AM_READWRITE_LEGACY( bg_lsb_r, bg_lsb_w ) AM_BASE( m_bg_videoram )
+	AM_RANGE(0x202000, 0x202fff) AM_READWRITE_LEGACY(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE_LEGACY(sdmg2_paletteram_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x204020, 0x204027) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
+	AM_RANGE(0x204024, 0x204025) AM_WRITE_LEGACY(video_disable_lsb_w )
+	AM_RANGE(0x204028, 0x204029) AM_WRITE_LEGACY(irq2_enable_w )
+	AM_RANGE(0x20402a, 0x20402b) AM_WRITE_LEGACY(irq1_enable_w )
+	AM_RANGE(0x208000, 0x20bfff) AM_READWRITE_LEGACY(fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram )
+	AM_RANGE(0x20c000, 0x20ffff) AM_READWRITE_LEGACY(bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram )
 	AM_RANGE(0x210000, 0x210001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE(0x300000, 0x300003) AM_WRITE_LEGACY( sdmg2_magic_w )
-	AM_RANGE(0x300002, 0x300003) AM_READ_LEGACY( sdmg2_magic_r )
+	AM_RANGE(0x300000, 0x300003) AM_WRITE_LEGACY(sdmg2_magic_w )
+	AM_RANGE(0x300002, 0x300003) AM_READ_LEGACY(sdmg2_magic_r )
 ADDRESS_MAP_END
 
 
@@ -1513,17 +1513,17 @@ static READ16_HANDLER( mgdha_magic_r )
 static ADDRESS_MAP_START( mgdha_map, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
-	AM_RANGE(0x876000, 0x876003) AM_WRITE_LEGACY( mgdha_magic_w )
-	AM_RANGE(0x876002, 0x876003) AM_READ_LEGACY( mgdha_magic_r )
-	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE_LEGACY( spriteram_lsb_r, spriteram_lsb_w ) AM_BASE( m_spriteram)
-	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE_LEGACY( sdmg2_paletteram_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x876000, 0x876003) AM_WRITE_LEGACY(mgdha_magic_w )
+	AM_RANGE(0x876002, 0x876003) AM_READ_LEGACY(mgdha_magic_r )
+	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE_LEGACY(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE_LEGACY(sdmg2_paletteram_w ) AM_BASE_GENERIC( paletteram )
 //  AM_RANGE(0xa04014, 0xa04015) // written with FF at boot
-	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8_LEGACY( "ppi8255", ppi8255_r, 0x00ff )
-	AM_RANGE(0xa04024, 0xa04025) AM_WRITE_LEGACY( video_disable_lsb_w )
-	AM_RANGE(0xa04028, 0xa04029) AM_WRITE_LEGACY( irq2_enable_w )
-	AM_RANGE(0xa0402a, 0xa0402b) AM_WRITE_LEGACY( irq1_enable_w )
-	AM_RANGE(0xa08000, 0xa0bfff) AM_READWRITE_LEGACY( fg_lsb_r, fg_lsb_w ) AM_BASE( m_fg_videoram )
-	AM_RANGE(0xa0c000, 0xa0ffff) AM_READWRITE_LEGACY( bg_lsb_r, bg_lsb_w ) AM_BASE( m_bg_videoram )
+	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
+	AM_RANGE(0xa04024, 0xa04025) AM_WRITE_LEGACY(video_disable_lsb_w )
+	AM_RANGE(0xa04028, 0xa04029) AM_WRITE_LEGACY(irq2_enable_w )
+	AM_RANGE(0xa0402a, 0xa0402b) AM_WRITE_LEGACY(irq1_enable_w )
+	AM_RANGE(0xa08000, 0xa0bfff) AM_READWRITE_LEGACY(fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram )
+	AM_RANGE(0xa0c000, 0xa0ffff) AM_READWRITE_LEGACY(bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram )
 	AM_RANGE(0xa10000, 0xa10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
 
@@ -1595,8 +1595,8 @@ static READ8_HANDLER( tjsb_input_r )
 
 static ADDRESS_MAP_START( tjsb_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
-	AM_RANGE( 0x0e000, 0x0e000 ) AM_WRITE_LEGACY( input_select_w )
-	AM_RANGE( 0x0e001, 0x0e001 ) AM_READWRITE_LEGACY( tjsb_input_r, tjsb_output_w )
+	AM_RANGE( 0x0e000, 0x0e000 ) AM_WRITE_LEGACY(input_select_w )
+	AM_RANGE( 0x0e001, 0x0e001 ) AM_READWRITE_LEGACY(tjsb_input_r, tjsb_output_w )
 	AM_RANGE( 0x0e002, 0x0efff ) AM_RAM
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
@@ -1605,24 +1605,24 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
-	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE( m_spriteram)
-	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE_LEGACY( tjsb_paletteram_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE_LEGACY(tjsb_paletteram_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
 
 //  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
 
 	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD_LEGACY("ppi8255", ppi8255_r)
-	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE_LEGACY( video_disable_w )
+	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE_LEGACY(video_disable_w )
 
-	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE_LEGACY( nmi_enable_w )
-	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE_LEGACY( irq_enable_w )
+	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE_LEGACY(nmi_enable_w )
+	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE_LEGACY(irq_enable_w )
 
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE_LEGACY( fg_w ) AM_BASE( m_fg_videoram )
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE_LEGACY( bg_w ) AM_BASE( m_bg_videoram )
+	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE_LEGACY(fg_w ) AM_BASE(m_fg_videoram )
+	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE_LEGACY(bg_w ) AM_BASE(m_bg_videoram )
 
 	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_w )
+	AM_RANGE( 0xb000, 0xb001 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 ADDRESS_MAP_END
 
 

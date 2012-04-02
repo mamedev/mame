@@ -116,12 +116,12 @@ static WRITE8_DEVICE_HANDLER( ddribble_vlm5030_ctrl_w )
 static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x0000, 0x0004) AM_WRITE_LEGACY(K005885_0_w)												/* video registers (005885 #1) */
 	AM_RANGE(0x0800, 0x0804) AM_WRITE_LEGACY(K005885_1_w)												/* video registers (005885 #2) */
-	AM_RANGE(0x1800, 0x187f) AM_RAM AM_BASE( m_paletteram)										/* palette */
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE_LEGACY(ddribble_fg_videoram_w) AM_BASE( m_fg_videoram)	/* Video RAM 1 */
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE( m_spriteram_1)								/* Object RAM 1 */
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE( m_sharedram)									/* shared RAM with CPU #1 */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE_LEGACY(ddribble_bg_videoram_w) AM_BASE( m_bg_videoram)	/* Video RAM 2 */
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE( m_spriteram_2)								/* Object RAM 2 */
+	AM_RANGE(0x1800, 0x187f) AM_RAM AM_BASE(m_paletteram)										/* palette */
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE_LEGACY(ddribble_fg_videoram_w) AM_BASE(m_fg_videoram)	/* Video RAM 1 */
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(m_spriteram_1)								/* Object RAM 1 */
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_sharedram)									/* shared RAM with CPU #1 */
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE_LEGACY(ddribble_bg_videoram_w) AM_BASE(m_bg_videoram)	/* Video RAM 2 */
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(m_spriteram_2)								/* Object RAM 2 */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(ddribble_bankswitch_w)										/* bankswitch control */
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")														/* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM																/* ROM */
@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, ddribble_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, ddribble_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE( m_snd_sharedram)		/* shared RAM with CPU #1 */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(m_snd_sharedram)		/* shared RAM with CPU #1 */
 	AM_RANGE(0x1000, 0x1001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)	/* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)			/* Speech data */
 	AM_RANGE(0x8000, 0xffff) AM_ROM										/* ROM */

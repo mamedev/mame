@@ -113,8 +113,8 @@ static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16, good_state )
 
 	AM_RANGE(0x800000, 0x8007ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE_LEGACY(fg_tilemapram_w) AM_BASE( m_fg_tilemapram)
-	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE_LEGACY(bg_tilemapram_w) AM_BASE( m_bg_tilemapram)
+	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE_LEGACY(fg_tilemapram_w) AM_BASE(m_fg_tilemapram)
+	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE_LEGACY(bg_tilemapram_w) AM_BASE(m_bg_tilemapram)
 
 	AM_RANGE(0xff0000, 0xffefff) AM_RAM
 ADDRESS_MAP_END

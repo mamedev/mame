@@ -444,12 +444,12 @@ static WRITE8_DEVICE_HANDLER( topspeed_msm5205_stop_w )
 
 static ADDRESS_MAP_START( topspeed_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE_SIZE( m_sharedram, m_sharedram_size)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE_SIZE(m_sharedram, m_sharedram_size)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600002, 0x600003) AM_WRITE_LEGACY(cpua_ctrl_w)
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
-	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_BASE( m_raster_ctrl)
+	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_BASE(m_raster_ctrl)
 	AM_RANGE(0x800400, 0x80ffff) AM_RAM
 	AM_RANGE(0xa00000, 0xa0ffff) AM_DEVREADWRITE_LEGACY("pc080sn_1", pc080sn_word_r, pc080sn_word_w)
 	AM_RANGE(0xa20000, 0xa20003) AM_DEVWRITE_LEGACY("pc080sn_1", pc080sn_yscroll_word_w)
@@ -459,13 +459,13 @@ static ADDRESS_MAP_START( topspeed_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0xb20000, 0xb20003) AM_DEVWRITE_LEGACY("pc080sn_2", pc080sn_yscroll_word_w)
 	AM_RANGE(0xb40000, 0xb40003) AM_DEVWRITE_LEGACY("pc080sn_2", pc080sn_xscroll_word_w)
 	AM_RANGE(0xb50000, 0xb50003) AM_DEVWRITE_LEGACY("pc080sn_2", pc080sn_ctrl_word_w)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE( m_spritemap)
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE(m_spritemap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( topspeed_cpub_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE( m_sharedram)
+	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0x880000, 0x880001) AM_READ8_LEGACY(topspeed_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE_LEGACY(topspeed_motor_r, topspeed_motor_w)	/* motor CPU */

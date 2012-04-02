@@ -455,13 +455,13 @@ static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x082000, 0x082005) AM_WRITE_LEGACY(ac_bgscroll_w)
 	AM_RANGE(0x082100, 0x082105) AM_WRITE_LEGACY(ac_txscroll_w)
 	AM_RANGE(0x082208, 0x082209) AM_WRITE_LEGACY(ac_unk2_w)
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE_LEGACY(ac_bgvram_w) AM_BASE( m_ac_bgvram)
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE_LEGACY(ac_txvram_w) AM_BASE( m_ac_txvram)
+	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE_LEGACY(ac_bgvram_w) AM_BASE(m_ac_bgvram)
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE_LEGACY(ac_txvram_w) AM_BASE(m_ac_txvram)
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
-	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x1000ff) AM_READ_LEGACY(ac_devices_r) AM_WRITE_LEGACY(ac_devices_w) AM_BASE( m_ac_devram)
+	AM_RANGE(0x100000, 0x1000ff) AM_READ_LEGACY(ac_devices_r) AM_WRITE_LEGACY(ac_devices_w) AM_BASE(m_ac_devram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acommand )

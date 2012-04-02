@@ -130,28 +130,28 @@ static WRITE8_HANDLER( senjyo_paletteram_w )
 static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(senjyo_fgvideoram_w) AM_BASE( m_fgvideoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(senjyo_fgcolorram_w) AM_BASE( m_fgcolorram)
-	AM_RANGE(0x9800, 0x987f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(senjyo_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(senjyo_fgcolorram_w) AM_BASE(m_fgcolorram)
+	AM_RANGE(0x9800, 0x987f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE_LEGACY(senjyo_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x9e00, 0x9e1f) AM_RAM AM_BASE( m_fgscroll)
-	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_BASE( m_scrolly3)
+	AM_RANGE(0x9e00, 0x9e1f) AM_RAM AM_BASE(m_fgscroll)
+	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_BASE(m_scrolly3)
 /*  AM_RANGE(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
-	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_BASE( m_scrollx3)
-	AM_RANGE(0x9e27, 0x9e27) AM_RAM_WRITE_LEGACY(senjyo_bgstripes_w) AM_BASE( m_bgstripesram)	/* controls width of background stripes */
-	AM_RANGE(0x9e28, 0x9e29) AM_RAM AM_BASE( m_scrolly2)
+	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_BASE(m_scrollx3)
+	AM_RANGE(0x9e27, 0x9e27) AM_RAM_WRITE_LEGACY(senjyo_bgstripes_w) AM_BASE(m_bgstripesram)	/* controls width of background stripes */
+	AM_RANGE(0x9e28, 0x9e29) AM_RAM AM_BASE(m_scrolly2)
 /*  AM_RANGE(0x9e2a, 0x9e2b) height of the layer (Senjyo only, fixed at 0x200) */
-	AM_RANGE(0x9e2d, 0x9e2d) AM_RAM AM_BASE( m_scrollx2)
-	AM_RANGE(0x9e30, 0x9e31) AM_RAM AM_BASE( m_scrolly1)
+	AM_RANGE(0x9e2d, 0x9e2d) AM_RAM AM_BASE(m_scrollx2)
+	AM_RANGE(0x9e30, 0x9e31) AM_RAM AM_BASE(m_scrolly1)
 /*  AM_RANGE(0x9e32, 0x9e33) height of the layer (Senjyo only, fixed at 0x100) */
-	AM_RANGE(0x9e35, 0x9e35) AM_RAM AM_BASE( m_scrollx1)
+	AM_RANGE(0x9e35, 0x9e35) AM_RAM AM_BASE(m_scrollx1)
 /*  AM_RANGE(0x9e38, 0x9e38) probably radar y position (Senjyo only, fixed at 0x61) */
 /*  AM_RANGE(0x9e3d, 0x9e3d) probably radar x position (Senjyo only, 0x00/0xc0 depending on screen flip) */
 	AM_RANGE(0x9e00, 0x9e3f) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE_LEGACY(senjyo_bg3videoram_w) AM_BASE( m_bg3videoram)
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE_LEGACY(senjyo_bg2videoram_w) AM_BASE( m_bg2videoram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(senjyo_bg1videoram_w) AM_BASE( m_bg1videoram)
-	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_BASE( m_radarram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE_LEGACY(senjyo_bg3videoram_w) AM_BASE(m_bg3videoram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE_LEGACY(senjyo_bg2videoram_w) AM_BASE(m_bg2videoram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(senjyo_bg1videoram_w) AM_BASE(m_bg1videoram)
+	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_BASE(m_radarram)
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1") AM_WRITE_LEGACY(flip_screen_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P2")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM")
@@ -200,21 +200,21 @@ static WRITE8_HANDLER(starforb_scrollx2)
 static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(senjyo_fgvideoram_w) AM_BASE( m_fgvideoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(senjyo_fgcolorram_w) AM_BASE( m_fgcolorram)
-	AM_RANGE(0x9800, 0x987f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(senjyo_fgvideoram_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(senjyo_fgcolorram_w) AM_BASE(m_fgcolorram)
+	AM_RANGE(0x9800, 0x987f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE_LEGACY(senjyo_paletteram_w) AM_BASE_GENERIC(paletteram)
 	/* The format / use of the ram here is different on the bootleg */
-	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_BASE( m_scrolly3)
-	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_BASE( m_scrollx3)
-	AM_RANGE(0x9e30, 0x9e31) AM_RAM_WRITE_LEGACY(starforb_scrolly2) AM_BASE( m_scrolly2) // ok
-	AM_RANGE(0x9e35, 0x9e35) AM_RAM_WRITE_LEGACY(starforb_scrollx2) AM_BASE( m_scrollx2) // ok
+	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_BASE(m_scrolly3)
+	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_BASE(m_scrollx3)
+	AM_RANGE(0x9e30, 0x9e31) AM_RAM_WRITE_LEGACY(starforb_scrolly2) AM_BASE(m_scrolly2) // ok
+	AM_RANGE(0x9e35, 0x9e35) AM_RAM_WRITE_LEGACY(starforb_scrollx2) AM_BASE(m_scrollx2) // ok
 	AM_RANGE(0x9e00, 0x9e3f) AM_RAM
 
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE_LEGACY(senjyo_bg3videoram_w) AM_BASE( m_bg3videoram)
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE_LEGACY(senjyo_bg2videoram_w) AM_BASE( m_bg2videoram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(senjyo_bg1videoram_w) AM_BASE( m_bg1videoram)
-	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_BASE( m_radarram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE_LEGACY(senjyo_bg3videoram_w) AM_BASE(m_bg3videoram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE_LEGACY(senjyo_bg2videoram_w) AM_BASE(m_bg2videoram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(senjyo_bg1videoram_w) AM_BASE(m_bg1videoram)
+	AM_RANGE(0xb800, 0xbbff) AM_RAM AM_BASE(m_radarram)
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("P1") AM_WRITE_LEGACY(flip_screen_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P2")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("SYSTEM")
@@ -222,10 +222,10 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0xd005, 0xd005) AM_READ_PORT("DSW2")
 
 	/* these aren't used / written, left here to make sure memory is allocated */
-	AM_RANGE(0xfe00, 0xfe1f) AM_RAM AM_BASE( m_fgscroll)
-	AM_RANGE(0xfe27, 0xfe27) AM_RAM_WRITE_LEGACY(senjyo_bgstripes_w) AM_BASE( m_bgstripesram)	/* controls width of background stripes */
-	AM_RANGE(0xfe28, 0xfe29) AM_RAM AM_BASE( m_scrolly1)
-	AM_RANGE(0xfe2d, 0xfe2d) AM_RAM AM_BASE( m_scrollx1)
+	AM_RANGE(0xfe00, 0xfe1f) AM_RAM AM_BASE(m_fgscroll)
+	AM_RANGE(0xfe27, 0xfe27) AM_RAM_WRITE_LEGACY(senjyo_bgstripes_w) AM_BASE(m_bgstripesram)	/* controls width of background stripes */
+	AM_RANGE(0xfe28, 0xfe29) AM_RAM AM_BASE(m_scrolly1)
+	AM_RANGE(0xfe2d, 0xfe2d) AM_RAM AM_BASE(m_scrollx1)
 ADDRESS_MAP_END
 
 

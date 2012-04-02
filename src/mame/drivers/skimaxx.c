@@ -310,7 +310,7 @@ static READ32_HANDLER( skimaxx_analog_r )
 
 static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x10000000, 0x10000003) AM_WRITE_LEGACY( skimaxx_sub_ctrl_w )
+	AM_RANGE(0x10000000, 0x10000003) AM_WRITE_LEGACY(skimaxx_sub_ctrl_w )
 	AM_RANGE(0x10100000, 0x1010000f) AM_READWRITE_LEGACY(m68k_tms_r, m68k_tms_w)//AM_NOP
 //  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE("share1")	// above 10188000 accessed at level end (game bug?)
@@ -321,15 +321,15 @@ static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x20000018, 0x2000001b) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x00ff)	// right
 	AM_RANGE(0x2000001c, 0x2000001f) AM_DEVREADWRITE8("oki4", okim6295_device, read, write, 0x00ff)	// right
 
-	AM_RANGE(0x20000020, 0x20000023) AM_READ_LEGACY( skimaxx_unk1_r )	// units linking?
-	AM_RANGE(0x20000024, 0x20000027) AM_WRITE_LEGACY( skimaxx_unk1_w )	// ""
+	AM_RANGE(0x20000020, 0x20000023) AM_READ_LEGACY(skimaxx_unk1_r )	// units linking?
+	AM_RANGE(0x20000024, 0x20000027) AM_WRITE_LEGACY(skimaxx_unk1_w )	// ""
 
 	AM_RANGE(0x20000040, 0x20000043) AM_RAM	// write
 	AM_RANGE(0x20000044, 0x20000047) AM_READ_PORT( "DSW" )
 	AM_RANGE(0x20000048, 0x2000004b) AM_READ_PORT( "COIN" )
 	AM_RANGE(0x2000004c, 0x2000004f) AM_READ_LEGACY(unk_r)	// bit 7, bit 0
 
-	AM_RANGE(0x20000050, 0x20000057) AM_READ_LEGACY( skimaxx_analog_r ) AM_WRITENOP	// read (0-1f), write motor?
+	AM_RANGE(0x20000050, 0x20000057) AM_READ_LEGACY(skimaxx_analog_r ) AM_WRITENOP	// read (0-1f), write motor?
 
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_MIRROR(0x00020000)
 ADDRESS_MAP_END
@@ -344,10 +344,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( 68030_2_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
 
-	AM_RANGE(0x20000000, 0x2007ffff) AM_READ_LEGACY( skimaxx_blitter_r )	// do blit
-	AM_RANGE(0x30000000, 0x3000000f) AM_WRITE_LEGACY( skimaxx_blitter_w ) AM_BASE( m_blitter_regs )
+	AM_RANGE(0x20000000, 0x2007ffff) AM_READ_LEGACY(skimaxx_blitter_r )	// do blit
+	AM_RANGE(0x30000000, 0x3000000f) AM_WRITE_LEGACY(skimaxx_blitter_w ) AM_BASE(m_blitter_regs )
 
-	AM_RANGE(0x40000000, 0x40000003) AM_WRITE_LEGACY( skimaxx_fpga_ctrl_w ) AM_BASE( m_fpga_ctrl )
+	AM_RANGE(0x40000000, 0x40000003) AM_WRITE_LEGACY(skimaxx_fpga_ctrl_w ) AM_BASE(m_fpga_ctrl )
 
 	AM_RANGE(0x50000000, 0x5007ffff) AM_RAMBANK("bank1")	// background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
 //  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")
@@ -369,7 +369,7 @@ static ADDRESS_MAP_START( tms_program_map, AS_PROGRAM, 16, skimaxx_state )
 	AM_RANGE(0x00000000, 0x000100ff) AM_RAM
 	AM_RANGE(0x00008000, 0x0003ffff) AM_RAM
 	AM_RANGE(0x00050000, 0x0005ffff) AM_RAM
-	AM_RANGE(0x00220000, 0x003fffff) AM_RAM AM_BASE( m_fg_buffer)
+	AM_RANGE(0x00220000, 0x003fffff) AM_RAM AM_BASE(m_fg_buffer)
 	AM_RANGE(0x02000000, 0x0200000f) AM_RAM
 	AM_RANGE(0x02100000, 0x0210000f) AM_RAM
 	AM_RANGE(0x04000000, 0x047fffff) AM_ROM AM_REGION("tmsgfx", 0)

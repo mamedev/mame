@@ -181,7 +181,7 @@ static const mc6845_interface mc6845_intf =
 
 static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8, slotcarn_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE( m_backup_ram)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(m_backup_ram)
 	AM_RANGE(0x6800, 0x6fff) AM_RAM // spielbud
 	AM_RANGE(0x7000, 0xafff) AM_ROM // spielbud
 
@@ -201,8 +201,8 @@ static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8, slotcarn_state )
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE( m_ram_attr)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE( m_ram_video)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
 ADDRESS_MAP_END
 

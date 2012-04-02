@@ -1750,7 +1750,7 @@ static MACHINE_START( firebeat )
 }
 
 static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE( m_work_ram)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE(m_work_ram)
 	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE_LEGACY(midi_uart_r, midi_uart_w)
 	AM_RANGE(0x70006000, 0x70006003) AM_WRITE_LEGACY(extend_board_irq_w)
 	AM_RANGE(0x70008000, 0x7000800f) AM_READ_LEGACY(keyboard_wheel_r)

@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, clayshoo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_ROM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)	/* 6k of video ram according to readme */
+	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)	/* 6k of video ram according to readme */
 	AM_RANGE(0x9800, 0xa800) AM_WRITENOP	  /* not really mapped, but cleared */
 	AM_RANGE(0xc800, 0xc800) AM_READWRITE_LEGACY(analog_r, analog_reset_w)
 ADDRESS_MAP_END

@@ -579,9 +579,9 @@ static MACHINE_START( pbillian )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe100, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(superqix_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(superqix_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -620,8 +620,8 @@ static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0408, 0x0408) AM_READ_LEGACY(mcu_acknowledge_r)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE_LEGACY(superqix_0410_w)	/* ROM bank, NMI enable, tile bank */
 	AM_RANGE(0x0418, 0x0418) AM_READ_LEGACY(nmi_ack_r)
-	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram_w) AM_BASE( m_bitmapram)
-	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram2_w) AM_BASE( m_bitmapram2)
+	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram_w) AM_BASE(m_bitmapram)
+	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram2_w) AM_BASE(m_bitmapram2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bootleg_port_map, AS_IO, 8, superqix_state )
@@ -633,8 +633,8 @@ static ADDRESS_MAP_START( bootleg_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0408, 0x0408) AM_WRITE_LEGACY(bootleg_flipscreen_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE_LEGACY(superqix_0410_w)	/* ROM bank, NMI enable, tile bank */
 	AM_RANGE(0x0418, 0x0418) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram_w) AM_BASE( m_bitmapram)
-	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram2_w) AM_BASE( m_bitmapram2)
+	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram_w) AM_BASE(m_bitmapram)
+	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram2_w) AM_BASE(m_bitmapram2)
 ADDRESS_MAP_END
 
 

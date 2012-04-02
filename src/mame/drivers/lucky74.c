@@ -809,10 +809,10 @@ static INTERRUPT_GEN( nmi_interrupt )
 static ADDRESS_MAP_START( lucky74_map, AS_PROGRAM, 8, lucky74_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")	/* NVRAM */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(lucky74_fg_videoram_w) AM_BASE( m_fg_videoram)				/* VRAM1-1 */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(lucky74_fg_colorram_w) AM_BASE( m_fg_colorram)				/* VRAM1-2 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(lucky74_bg_videoram_w) AM_BASE( m_bg_videoram)				/* VRAM2-1 */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(lucky74_bg_colorram_w) AM_BASE( m_bg_colorram)				/* VRAM2-2 */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(lucky74_fg_videoram_w) AM_BASE(m_fg_videoram)				/* VRAM1-1 */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(lucky74_fg_colorram_w) AM_BASE(m_fg_colorram)				/* VRAM1-2 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(lucky74_bg_videoram_w) AM_BASE(m_bg_videoram)				/* VRAM2-1 */
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(lucky74_bg_colorram_w) AM_BASE(m_bg_colorram)				/* VRAM2-2 */
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
 	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
 	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE_LEGACY("ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */

@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xc013, 0xc013) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc014, 0xc014) AM_READ_PORT("DSWB")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE( m_txvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE( m_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA") AM_WRITE_LEGACY(lastday_bankswitch_w)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("P1")
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE( m_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(lastday_bankswitch_w)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xc040, 0xc047) AM_WRITE_LEGACY(dooyong_bgscroll8_w)
 	AM_RANGE(0xc048, 0xc04f) AM_WRITE_LEGACY(dooyong_fgscroll8_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE( m_txvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -206,8 +206,8 @@ static ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xe020, 0xe020) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xe030, 0xe037) AM_WRITE_LEGACY(dooyong_bgscroll8_w)
 	AM_RANGE(0xe040, 0xe047) AM_WRITE_LEGACY(dooyong_fgscroll8_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(paletteram_flytiger_w) AM_BASE( m_paletteram_flytiger)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE( m_txvideoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(paletteram_flytiger_w) AM_BASE(m_paletteram_flytiger)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE(m_txvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8, dooyong_state )
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM /* what is this? looks like a palette? scratchpad RAM maybe? */
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE( m_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(primella_ctrl_w)	/* bank switch, flip screen etc */

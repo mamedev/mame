@@ -517,7 +517,7 @@ static WRITE32_HANDLER(at_page32_w)
 static ADDRESS_MAP_START( gamecstl_map, AS_PROGRAM, 32, gamecstl_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE( m_cga_ram)
+	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE(m_cga_ram)
 	AM_RANGE(0x000e0000, 0x000effff) AM_RAM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x000f0000, 0x000fffff) AM_WRITE_LEGACY(bios_ram_w)

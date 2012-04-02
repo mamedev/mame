@@ -204,11 +204,11 @@ static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
 	AM_RANGE(0x08000, 0x09fff) AM_ROM
 	AM_RANGE(0x0a000, 0x0ffff) AM_MIRROR(0x40000) AM_ROM
 	AM_RANGE(0x10000, 0x3ffff) AM_ROM
-	AM_RANGE(0x44000, 0x447ff) AM_RAM AM_BASE( m_video_ram)
+	AM_RANGE(0x44000, 0x447ff) AM_RAM AM_BASE(m_video_ram)
 	AM_RANGE(0x45040, 0x4505f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x44800, 0x45eff) AM_RAM
 	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE_LEGACY("namco", namcos1_cus30_w)
-	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_BASE( m_char_gfx_ram)
+	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_BASE(m_char_gfx_ram)
 	AM_RANGE(0x47100, 0x47100) AM_RAM	/* leftover from original Galaga code */
 	AM_RANGE(0x48000, 0x49fff) AM_READ_BANK("bank1") AM_WRITE_LEGACY(ram_48000_w)	/* this should be a mirror of 08000-09ffff */
 	AM_RANGE(0x4c000, 0x4dfff) AM_WRITE_LEGACY(sprite_gfx_w)
@@ -236,12 +236,12 @@ static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8, _20pacgal_state )
 	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(timer_pulse_w)		/* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE_LEGACY(irqack_w)
 	AM_RANGE(0x84, 0x84) AM_NOP	/* ?? */
-	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_BASE( m_stars_seed)	/* stars: rng seed (lo/hi) */
+	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_BASE(m_stars_seed)	/* stars: rng seed (lo/hi) */
 	AM_RANGE(0x87, 0x87) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x88, 0x88) AM_WRITE_LEGACY(ram_bank_select_w)
 	AM_RANGE(0x89, 0x89) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
-	AM_RANGE(0x8a, 0x8a) AM_WRITEONLY AM_BASE( m_stars_ctrl)	/* stars: bits 3-4 = active set; bit 5 = enable */
-	AM_RANGE(0x8b, 0x8b) AM_WRITEONLY AM_BASE( m_flip)
+	AM_RANGE(0x8a, 0x8a) AM_WRITEONLY AM_BASE(m_stars_ctrl)	/* stars: bits 3-4 = active set; bit 5 = enable */
+	AM_RANGE(0x8b, 0x8b) AM_WRITEONLY AM_BASE(m_flip)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE_LEGACY(_20pacgal_coin_counter_w)
 ADDRESS_MAP_END
 

@@ -1232,7 +1232,7 @@ static WRITE32_HANDLER( s12_dma_bias_w )
 static ADDRESS_MAP_START( namcos12_map, AS_PROGRAM, 32, namcos12_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f000003) AM_READNOP AM_WRITE_LEGACY(bankoffset_w)			/* banking */
-	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE( m_sharedram) /* shared ram?? */
+	AM_RANGE(0x1f080000, 0x1f083fff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE(m_sharedram) /* shared ram?? */
 	AM_RANGE(0x1f140000, 0x1f140fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1f1bff08, 0x1f1bff0f) AM_WRITENOP    /* ?? */
 	AM_RANGE(0x1f700000, 0x1f70ffff) AM_WRITE_LEGACY(dmaoffset_w)  /* dma */
@@ -1420,7 +1420,7 @@ static MACHINE_RESET( namcos12 )
 /* H8/3002 MCU stuff */
 static ADDRESS_MAP_START( s12h8rwmap, AS_PROGRAM, 16, namcos12_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE_LEGACY( sharedram_sub_r, sharedram_sub_w )
+	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE_LEGACY(sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE("c352", c352_device, read, write)
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")
@@ -1601,13 +1601,13 @@ static READ8_HANDLER( s12_mcu_gun_v_r )
 
 static ADDRESS_MAP_START( s12h8iomap, AS_IO, 8, namcos12_state )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT("DSW")
-	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ_LEGACY( s12_mcu_p8_r ) AM_WRITENOP
-	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE_LEGACY( s12_mcu_pa_r, s12_mcu_pa_w )
-	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE_LEGACY( s12_mcu_portB_r, s12_mcu_portB_w )
-	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READ_LEGACY( s12_mcu_rtc_r ) AM_WRITE_LEGACY( s12_mcu_settings_w )
+	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ_LEGACY(s12_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE_LEGACY(s12_mcu_pa_r, s12_mcu_pa_w )
+	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE_LEGACY(s12_mcu_portB_r, s12_mcu_portB_w )
+	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READ_LEGACY(s12_mcu_rtc_r ) AM_WRITE_LEGACY(s12_mcu_settings_w )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
-	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_READ_LEGACY( s12_mcu_gun_h_r )	// golgo 13 gun X-axis
-	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_READ_LEGACY( s12_mcu_gun_v_r )	// golgo 13 gun Y-axis
+	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_READ_LEGACY(s12_mcu_gun_h_r )	// golgo 13 gun X-axis
+	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_READ_LEGACY(s12_mcu_gun_v_r )	// golgo 13 gun Y-axis
 	AM_RANGE(H8_ADC_3_H, H8_ADC_3_L) AM_NOP
 ADDRESS_MAP_END
 

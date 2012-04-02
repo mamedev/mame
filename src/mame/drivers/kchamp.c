@@ -111,9 +111,9 @@ static WRITE8_HANDLER( sound_msm_w )
 static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(kchamp_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(kchamp_colorram_w) AM_BASE( m_colorram)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(kchamp_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(kchamp_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd900, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -166,9 +166,9 @@ static WRITE8_HANDLER( kc_sound_control_w )
 static ADDRESS_MAP_START( kchamp_map, AS_PROGRAM, 8, kchamp_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(kchamp_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(kchamp_colorram_w) AM_BASE( m_colorram)
-	AM_RANGE(0xea00, 0xeaff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(kchamp_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(kchamp_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xea00, 0xeaff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xeb00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

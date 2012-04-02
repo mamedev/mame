@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, speglsht_state )
 	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE_LEGACY("stsnd", st0016_snd_r, st0016_snd_w)
 	AM_RANGE(0xea00, 0xebff) AM_READ_LEGACY(st0016_palette_ram_r) AM_WRITE_LEGACY(st0016_palette_ram_w)
 	AM_RANGE(0xec00, 0xec1f) AM_READ_LEGACY(st0016_character_ram_r) AM_WRITE_LEGACY(st0016_character_ram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE( m_shared)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_shared)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, speglsht_state )
@@ -224,11 +224,11 @@ static READ32_HANDLER(irq_ack_clear)
 static ADDRESS_MAP_START( speglsht_mem, AS_PROGRAM, 32, speglsht_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x01007fff) AM_RAM //tested - STATIC RAM
-	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE_LEGACY(cop_r, cop_w) AM_BASE( m_cop_ram)
+	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE_LEGACY(cop_r, cop_w) AM_BASE(m_cop_ram)
 	AM_RANGE(0x01800200, 0x01800203) AM_WRITE_LEGACY(videoreg_w)
 	AM_RANGE(0x01800300, 0x01800303) AM_READ_PORT("IN0")
 	AM_RANGE(0x01800400, 0x01800403) AM_READ_PORT("IN1")
-	AM_RANGE(0x01a00000, 0x01afffff) AM_RAM AM_BASE( m_framebuffer)
+	AM_RANGE(0x01a00000, 0x01afffff) AM_RAM AM_BASE(m_framebuffer)
 	AM_RANGE(0x01b00000, 0x01b07fff) AM_RAM //cleared ...  video related ?
 	AM_RANGE(0x01c00000, 0x01dfffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0x0a000000, 0x0a003fff) AM_READWRITE_LEGACY(shared_r, shared_w)

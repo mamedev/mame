@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8, gbusters_state )
 	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE_LEGACY(gbusters_unknown_w)							/* ??? */
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
 	AM_RANGE(0x4000, 0x57ff) AM_RAM													/* RAM I12 */
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE( m_ram)	/* palette + work RAM (RAM D16 & C16) */
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE(m_ram)	/* palette + work RAM (RAM D16 & C16) */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")											/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM													/* ROM 878n02.rom */
 ADDRESS_MAP_END

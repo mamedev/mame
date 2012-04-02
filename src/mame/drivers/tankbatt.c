@@ -160,10 +160,10 @@ static WRITE8_HANDLER( tankbatt_coin_lockout_w )
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
-	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE( m_bulletsram) AM_SIZE(m_bulletsram_size)
+	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(tankbatt_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(tankbatt_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x0c00, 0x0c07) AM_READ_LEGACY(tankbatt_in0_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_WRITE_LEGACY(tankbatt_led_w)
 	AM_RANGE(0x0c02, 0x0c02) AM_WRITE_LEGACY(tankbatt_coin_counter_w)

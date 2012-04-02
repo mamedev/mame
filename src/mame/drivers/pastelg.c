@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( threeds_io_map, AS_IO, 8, pastelg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x81, 0x81) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x82, 0x83) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY( threeds_romsel_w )
+	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(threeds_romsel_w )
 	AM_RANGE(0xf0, 0xf6) AM_WRITE_LEGACY(pastelg_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(threeds_inputport1_r, threeds_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READ_LEGACY(threeds_inputport2_r) AM_WRITE_LEGACY(threeds_output_w)//writes: bit 3 is coin lockout, bit 1 is coin counter

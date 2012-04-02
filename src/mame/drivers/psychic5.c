@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0xf004, 0xf004) AM_NOP	// ???
 	AM_RANGE(0xf005, 0xf005) AM_READNOP AM_WRITE_LEGACY(psychic5_title_screen_w)
 	AM_RANGE(0xf006, 0xf1ff) AM_NOP
-	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -451,7 +451,7 @@ static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0xd005, 0xd005) AM_WRITE_LEGACY(bombsa_unknown_w) // ?
 
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
-	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE_LEGACY(psychic5_paged_ram_r, bombsa_paged_ram_w)

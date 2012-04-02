@@ -242,10 +242,10 @@ static WRITE8_HANDLER( i8257_LMSR_w )
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, ddayjlc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE( m_mainram)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE( m_spriteram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(ddayjlc_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE_LEGACY(ddayjlc_bgram_w) AM_BASE( m_bgram) /* 9800-981f - videoregs */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(m_mainram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(ddayjlc_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE_LEGACY(ddayjlc_bgram_w) AM_BASE(m_bgram) /* 9800-981f - videoregs */
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0xe000, 0xe003) AM_WRITE_LEGACY(i8257_CH0_w)
 	AM_RANGE(0xe008, 0xe008) AM_WRITENOP

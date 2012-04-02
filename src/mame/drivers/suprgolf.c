@@ -302,11 +302,11 @@ static READ8_DEVICE_HANDLER( p2_r )
 static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY( rom2_bank_select_w )
+	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(rom2_bank_select_w )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY( suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY( suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE(m_videoram) //foreground vram + paletteram
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY( suprgolf_pen_w )
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY(suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE(m_videoram) //foreground vram + paletteram
+	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(suprgolf_pen_w )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

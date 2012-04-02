@@ -244,10 +244,10 @@ static READ8_HANDLER( vblank_r )
 }
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
-	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE( m_main_ram)
-	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(exprraid_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE_LEGACY(exprraid_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE(m_main_ram)
+	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(exprraid_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE_LEGACY(exprraid_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x1317, 0x1317) AM_READNOP // ???
 	AM_RANGE(0x1700, 0x1700) AM_READNOP // ???
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW0")	/* DSW 0 */

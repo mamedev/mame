@@ -259,8 +259,8 @@ static ADDRESS_MAP_START( flyball_map, AS_PROGRAM, 8, flyball_state )
 	AM_RANGE(0x0900, 0x0900) AM_WRITE_LEGACY(flyball_potmask_w)
 	AM_RANGE(0x0a00, 0x0a07) AM_WRITE_LEGACY(flyball_misc_w)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ_LEGACY(flyball_input_r)
-	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_BASE( m_playfield_ram)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE( m_rombase) /* program */
+	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_BASE(m_playfield_ram)
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE(m_rombase) /* program */
 ADDRESS_MAP_END
 
 

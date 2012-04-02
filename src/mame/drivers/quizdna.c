@@ -36,7 +36,7 @@ static ADDRESS_MAP_START( quizdna_map, AS_PROGRAM, 8, quizdna_state )
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE_LEGACY(quizdna_fg_ram_w)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE_LEGACY(quizdna_bg_ram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe200, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE_LEGACY(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( gekiretu_map, AS_PROGRAM, 8, quizdna_state )
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE_LEGACY(quizdna_bg_ram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xf200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

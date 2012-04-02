@@ -122,10 +122,10 @@ static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
-	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x44000, 0x4ffff) AM_RAM
-	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE_LEGACY(cabal_text_videoram16_w) AM_BASE( m_colorram)
-	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE_LEGACY(cabal_background_videoram16_w) AM_BASE( m_videoram)
+	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE_LEGACY(cabal_text_videoram16_w) AM_BASE(m_colorram)
+	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE_LEGACY(cabal_background_videoram16_w) AM_BASE(m_videoram)
 	AM_RANGE(0x80200, 0x803ff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0008, 0xa000f) AM_READ_LEGACY(track_r)
@@ -141,10 +141,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
-	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x44000, 0x4ffff) AM_RAM
-	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE_LEGACY(cabal_text_videoram16_w) AM_BASE( m_colorram)
-	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE_LEGACY(cabal_background_videoram16_w) AM_BASE( m_videoram)
+	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE_LEGACY(cabal_text_videoram16_w) AM_BASE(m_colorram)
+	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE_LEGACY(cabal_background_videoram16_w) AM_BASE(m_videoram)
 	AM_RANGE(0x80200, 0x803ff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0008, 0xa0009) AM_READ_PORT("JOY")

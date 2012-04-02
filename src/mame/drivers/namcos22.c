@@ -1799,7 +1799,7 @@ static WRITE16_HANDLER( master_render_device_w )
 
 static ADDRESS_MAP_START( master_dsp_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM /* internal ROM (4k words) */
-	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_BASE( m_mpMasterExternalRAM)
+	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_BASE(m_mpMasterExternalRAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_dsp_data, AS_DATA, 16, namcos22_state )
@@ -1893,7 +1893,7 @@ static WRITE16_HANDLER( dsp_slave_portb_w )
 
 static ADDRESS_MAP_START( slave_dsp_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM /* internal ROM */
-	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE( m_mpSlaveExternalRAM)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE(m_mpSlaveExternalRAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_dsp_data, AS_DATA, 16, namcos22_state )
@@ -2555,23 +2555,23 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32, namcos22_state )
 	AM_RANGE(0x430000, 0x430003) AM_WRITE_LEGACY(namcos22_cpuleds_w)
 	AM_RANGE(0x440000, 0x440003) AM_READ_LEGACY(namcos22_dipswitch_r)
 	AM_RANGE(0x450008, 0x45000b) AM_READWRITE_LEGACY(namcos22_portbit_r, namcos22_portbit_w)
-	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE_LEGACY(namcos22s_nvmem_w) AM_BASE_SIZE( m_nvmem, m_nvmem_size)
-	AM_RANGE(0x700000, 0x70001f) AM_READWRITE_LEGACY(namcos22_system_controller_r, namcos22s_system_controller_w) AM_BASE( m_system_controller)
+	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE_LEGACY(namcos22s_nvmem_w) AM_BASE_SIZE(m_nvmem, m_nvmem_size)
+	AM_RANGE(0x700000, 0x70001f) AM_READWRITE_LEGACY(namcos22_system_controller_r, namcos22s_system_controller_w) AM_BASE(m_system_controller)
 	AM_RANGE(0x800000, 0x800003) AM_WRITE_LEGACY(namcos22s_chipselect_w)
-	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE( m_czattr)
+	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE(m_czattr)
 	AM_RANGE(0x810200, 0x8103ff) AM_READWRITE_LEGACY(namcos22s_czram_r, namcos22s_czram_w)
 	AM_RANGE(0x820000, 0x8202ff) AM_WRITENOP /* leftover of old (non-super) video mixer device */
-	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE_LEGACY(namcos22_gamma_r, namcos22_gamma_w) AM_BASE( m_gamma)
+	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE_LEGACY(namcos22_gamma_r, namcos22_gamma_w) AM_BASE(m_gamma)
 	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE_LEGACY(namcos22_paletteram_r, namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x860000, 0x860007) AM_READWRITE_LEGACY(namcos22s_spotram_r, namcos22s_spotram_w)
-	AM_RANGE(0x880000, 0x89dfff) AM_READWRITE_LEGACY(namcos22_cgram_r, namcos22_cgram_w) AM_BASE( m_cgram)
-	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE_LEGACY(namcos22_textram_r, namcos22_textram_w) AM_BASE( m_textram)
-	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE_LEGACY(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE( m_tilemapattr)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE( m_vics_data)
-	AM_RANGE(0x940000, 0x94007f) AM_READWRITE_LEGACY(namcos22s_vics_control_r, namcos22s_vics_control_w) AM_BASE( m_vics_control)
-	AM_RANGE(0x980000, 0x9affff) AM_RAM AM_BASE( m_spriteram) /* C374 */
-	AM_RANGE(0xa04000, 0xa0bfff) AM_READWRITE_LEGACY(namcos22_mcuram_r, namcos22_mcuram_w) AM_BASE( m_shareram) /* COM RAM */
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE_LEGACY(namcos22_dspram_r, namcos22_dspram_w) AM_BASE( m_polygonram)
+	AM_RANGE(0x880000, 0x89dfff) AM_READWRITE_LEGACY(namcos22_cgram_r, namcos22_cgram_w) AM_BASE(m_cgram)
+	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE_LEGACY(namcos22_textram_r, namcos22_textram_w) AM_BASE(m_textram)
+	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE_LEGACY(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE(m_tilemapattr)
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE(m_vics_data)
+	AM_RANGE(0x940000, 0x94007f) AM_READWRITE_LEGACY(namcos22s_vics_control_r, namcos22s_vics_control_w) AM_BASE(m_vics_control)
+	AM_RANGE(0x980000, 0x9affff) AM_RAM AM_BASE(m_spriteram) /* C374 */
+	AM_RANGE(0xa04000, 0xa0bfff) AM_READWRITE_LEGACY(namcos22_mcuram_r, namcos22_mcuram_w) AM_BASE(m_shareram) /* COM RAM */
+	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE_LEGACY(namcos22_dspram_r, namcos22_dspram_w) AM_BASE(m_polygonram)
 	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM /* workram */
 ADDRESS_MAP_END
 
@@ -2619,7 +2619,7 @@ static WRITE16_HANDLER( s22mcu_shared_w )
 // Super System 22 M37710
 static ADDRESS_MAP_START( mcu_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE_LEGACY( s22mcu_shared_r, s22mcu_shared_w )
+	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE_LEGACY(s22mcu_shared_r, s22mcu_shared_w )
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("user4", 0xc000)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user4", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user4", 0)
@@ -2631,7 +2631,7 @@ ADDRESS_MAP_END
 // System 22 37702
 static ADDRESS_MAP_START( mcu_s22_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE_LEGACY( s22mcu_shared_r, s22mcu_shared_w )
+	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE_LEGACY(s22mcu_shared_r, s22mcu_shared_w )
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user4", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user4", 0)
@@ -2946,10 +2946,10 @@ static READ8_HANDLER( airco22_mcu_adc_r )
 }
 
 static ADDRESS_MAP_START( mcu_io, AS_IO, 8, namcos22_state )
-	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ_LEGACY( mcu_port4_r ) AM_WRITE_LEGACY( mcu_port4_w )
-	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READ_LEGACY( mcu_port5_r ) AM_WRITE_LEGACY( mcu_port5_w )
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READ_LEGACY( mcu_port6_r ) AM_WRITE_LEGACY( mcu_port6_w )
-	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ_LEGACY( mcu_port7_r ) AM_WRITE_LEGACY( mcu_port7_w )
+	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ_LEGACY(mcu_port4_r ) AM_WRITE_LEGACY(mcu_port4_w )
+	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READ_LEGACY(mcu_port5_r ) AM_WRITE_LEGACY(mcu_port5_w )
+	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READ_LEGACY(mcu_port6_r ) AM_WRITE_LEGACY(mcu_port6_w )
+	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ_LEGACY(mcu_port7_r ) AM_WRITE_LEGACY(mcu_port7_w )
 ADDRESS_MAP_END
 
 static READ8_HANDLER( mcu_port4_s22_r )
@@ -2959,7 +2959,7 @@ static READ8_HANDLER( mcu_port4_s22_r )
 }
 
 static ADDRESS_MAP_START( mcu_s22_io, AS_IO, 8, namcos22_state )
-	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ_LEGACY( mcu_port4_s22_r )
+	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ_LEGACY(mcu_port4_s22_r )
 ADDRESS_MAP_END
 
 static TIMER_DEVICE_CALLBACK( mcu_irq )
@@ -3104,7 +3104,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
      * System Controller: Interrupt Control, Peripheral Control
      *
      */
-	AM_RANGE(0x40000000, 0x4000001f) AM_READWRITE_LEGACY(namcos22_system_controller_r, namcos22_system_controller_w) AM_BASE( m_system_controller)
+	AM_RANGE(0x40000000, 0x4000001f) AM_READWRITE_LEGACY(namcos22_system_controller_r, namcos22_system_controller_w) AM_BASE(m_system_controller)
 
 	/**
      * Unknown Device (optional for diagnostics?)
@@ -3127,7 +3127,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
      * Mounted position: CPU 9E
      * Known chip type: HN58C65P-25 (8k x 8bit EEPROM)
      */
-	AM_RANGE(0x58000000, 0x58001fff) AM_RAM AM_BASE_SIZE( m_nvmem, m_nvmem_size)
+	AM_RANGE(0x58000000, 0x58001fff) AM_RAM AM_BASE_SIZE(m_nvmem, m_nvmem_size)
 
 	/**
      * C74 (Mitsubishi M37702 MCU) Shared RAM (0x60004000 - 0x6000bfff)
@@ -3169,7 +3169,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
      * +0x0300 - 0x03ff?    Song Title (put messages here from Sound CPU)
      */
 	AM_RANGE(0x60000000, 0x60003fff) AM_WRITENOP
-	AM_RANGE(0x60004000, 0x6000bfff) AM_READWRITE_LEGACY(namcos22_mcuram_r, namcos22_mcuram_w) AM_BASE( m_shareram)
+	AM_RANGE(0x60004000, 0x6000bfff) AM_READWRITE_LEGACY(namcos22_mcuram_r, namcos22_mcuram_w) AM_BASE(m_shareram)
 
 	/**
      * C71 (TI TMS320C25 DSP) Shared RAM (0x70000000 - 0x70020000)
@@ -3179,7 +3179,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
      * Known chip type: TC55328P-25, N341256P-15
      * Notes: connected bits = 0x00ffffff (24bit)
      */
-	AM_RANGE(0x70000000, 0x7001ffff) AM_READWRITE_LEGACY(namcos22_dspram_r, namcos22_dspram_w) AM_BASE( m_polygonram)
+	AM_RANGE(0x70000000, 0x7001ffff) AM_READWRITE_LEGACY(namcos22_dspram_r, namcos22_dspram_w) AM_BASE(m_polygonram)
 
 	/**
      * LED on PCB(?)
@@ -3191,14 +3191,14 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
      * Mounted position: VIDEO 8P
      * Known chip type: TC55328P-25
      */
-	AM_RANGE(0x90010000, 0x90017fff) AM_RAM AM_BASE( m_czram)
+	AM_RANGE(0x90010000, 0x90017fff) AM_RAM AM_BASE(m_czram)
 
 	/**
      * C305 (Display Controller)
      * Mounted position: VIDEO 7D (C305)
      * Notes: Boot time check: 0x90020100 - 0x9002027f
      */
-	AM_RANGE(0x90020000, 0x90027fff) AM_READWRITE_LEGACY(namcos22_gamma_r, namcos22_gamma_w) AM_BASE( m_gamma)
+	AM_RANGE(0x90020000, 0x90027fff) AM_READWRITE_LEGACY(namcos22_gamma_r, namcos22_gamma_w) AM_BASE(m_gamma)
 
 	/**
      * Mounted position: VIDEO 6B, 7B, 8B (near C305)
@@ -3215,7 +3215,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
 	/**
      * Tilemap PCG Memory
      */
-	AM_RANGE(0x90080000, 0x9009dfff) AM_READWRITE_LEGACY(namcos22_cgram_r, namcos22_cgram_w) AM_BASE( m_cgram)
+	AM_RANGE(0x90080000, 0x9009dfff) AM_READWRITE_LEGACY(namcos22_cgram_r, namcos22_cgram_w) AM_BASE(m_cgram)
 
 	/**
      * Tilemap Memory (64 x 64)
@@ -3223,13 +3223,13 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
      * Known chip type: HM511664 (64k x 16bit SRAM)
      * Note: Self test: 90084000 - 9009ffff
      */
-	AM_RANGE(0x9009e000, 0x9009ffff) AM_READWRITE_LEGACY(namcos22_textram_r, namcos22_textram_w) AM_BASE( m_textram)
+	AM_RANGE(0x9009e000, 0x9009ffff) AM_READWRITE_LEGACY(namcos22_textram_r, namcos22_textram_w) AM_BASE(m_textram)
 
 	/**
      * Tilemap Register
      * Mounted position: unknown
      */
-	AM_RANGE(0x900a0000, 0x900a000f) AM_READWRITE_LEGACY(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE( m_tilemapattr)
+	AM_RANGE(0x900a0000, 0x900a000f) AM_READWRITE_LEGACY(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE(m_tilemapattr)
 ADDRESS_MAP_END
 
 

@@ -196,8 +196,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
 
 	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 
-	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8_LEGACY( gunpey_status_r,  gunpey_status_w, 0xffff )
-	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8_LEGACY( gunpey_blitter_w, 0xffff )
+	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8_LEGACY(gunpey_status_r,  gunpey_status_w, 0xffff )
+	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8_LEGACY(gunpey_blitter_w, 0xffff )
 ADDRESS_MAP_END
 
 

@@ -560,7 +560,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, metalmx_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE( m_adsp_internal_program_ram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(m_adsp_internal_program_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, metalmx_state )
@@ -580,8 +580,8 @@ static ADDRESS_MAP_START( gsp_map, AS_PROGRAM, 16, metalmx_state )
 	AM_RANGE(0x88800000, 0x8880000f) AM_RAM /* ? */
 	AM_RANGE(0x88c00000, 0x88c0000f) AM_RAM /* ? */
 	AM_RANGE(0xc0000000, 0xc00003ff) AM_READWRITE_LEGACY(tms34020_io_register_r, tms34020_io_register_w)
-	AM_RANGE(0xff000000, 0xff7fffff) AM_RAM AM_BASE( m_gsp_dram)
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE( m_gsp_vram)
+	AM_RANGE(0xff000000, 0xff7fffff) AM_RAM AM_BASE(m_gsp_dram)
+	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE(m_gsp_vram)
 ADDRESS_MAP_END
 
 

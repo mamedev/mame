@@ -428,17 +428,17 @@ static ADDRESS_MAP_START( driver_gsp_map, AS_PROGRAM, 16, harddriv_state )
 	AM_RANGE(0x00000000, 0x0000200f) AM_NOP					/* hit during self-test */
 	AM_RANGE(0x02000000, 0x0207ffff) AM_READWRITE_LEGACY(hdgsp_vram_2bpp_r, hdgsp_vram_1bpp_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, hdgsp_io_w)
-	AM_RANGE(0xf4000000, 0xf40000ff) AM_READWRITE_LEGACY(hdgsp_control_lo_r, hdgsp_control_lo_w) AM_BASE( m_gsp_control_lo)
-	AM_RANGE(0xf4800000, 0xf48000ff) AM_READWRITE_LEGACY(hdgsp_control_hi_r, hdgsp_control_hi_w) AM_BASE( m_gsp_control_hi)
-	AM_RANGE(0xf5000000, 0xf5000fff) AM_READWRITE_LEGACY(hdgsp_paletteram_lo_r, hdgsp_paletteram_lo_w) AM_BASE( m_gsp_paletteram_lo)
-	AM_RANGE(0xf5800000, 0xf5800fff) AM_READWRITE_LEGACY(hdgsp_paletteram_hi_r, hdgsp_paletteram_hi_w) AM_BASE( m_gsp_paletteram_hi)
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE_SIZE( m_gsp_vram, m_gsp_vram_size)
+	AM_RANGE(0xf4000000, 0xf40000ff) AM_READWRITE_LEGACY(hdgsp_control_lo_r, hdgsp_control_lo_w) AM_BASE(m_gsp_control_lo)
+	AM_RANGE(0xf4800000, 0xf48000ff) AM_READWRITE_LEGACY(hdgsp_control_hi_r, hdgsp_control_hi_w) AM_BASE(m_gsp_control_hi)
+	AM_RANGE(0xf5000000, 0xf5000fff) AM_READWRITE_LEGACY(hdgsp_paletteram_lo_r, hdgsp_paletteram_lo_w) AM_BASE(m_gsp_paletteram_lo)
+	AM_RANGE(0xf5800000, 0xf5800fff) AM_READWRITE_LEGACY(hdgsp_paletteram_hi_r, hdgsp_paletteram_hi_w) AM_BASE(m_gsp_paletteram_hi)
+	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE_SIZE(m_gsp_vram, m_gsp_vram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( driver_msp_map, AS_PROGRAM, 16, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("share1") AM_BASE( m_msp_ram)
+	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_SHARE("share1") AM_BASE(m_msp_ram)
 	AM_RANGE(0x00700000, 0x007fffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_RAM AM_SHARE("share1")
@@ -476,11 +476,11 @@ static ADDRESS_MAP_START( multisync_gsp_map, AS_PROGRAM, 16, harddriv_state )
 	AM_RANGE(0x00000000, 0x0000200f) AM_NOP					/* hit during self-test */
 	AM_RANGE(0x02000000, 0x020fffff) AM_READWRITE_LEGACY(hdgsp_vram_2bpp_r, hdgsp_vram_2bpp_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, hdgsp_io_w)
-	AM_RANGE(0xf4000000, 0xf40000ff) AM_READWRITE_LEGACY(hdgsp_control_lo_r, hdgsp_control_lo_w) AM_BASE( m_gsp_control_lo)
-	AM_RANGE(0xf4800000, 0xf48000ff) AM_READWRITE_LEGACY(hdgsp_control_hi_r, hdgsp_control_hi_w) AM_BASE( m_gsp_control_hi)
-	AM_RANGE(0xf5000000, 0xf5000fff) AM_READWRITE_LEGACY(hdgsp_paletteram_lo_r, hdgsp_paletteram_lo_w) AM_BASE( m_gsp_paletteram_lo)
-	AM_RANGE(0xf5800000, 0xf5800fff) AM_READWRITE_LEGACY(hdgsp_paletteram_hi_r, hdgsp_paletteram_hi_w) AM_BASE( m_gsp_paletteram_hi)
-	AM_RANGE(0xff800000, 0xffbfffff) AM_MIRROR(0x0400000) AM_RAM AM_BASE_SIZE( m_gsp_vram, m_gsp_vram_size)
+	AM_RANGE(0xf4000000, 0xf40000ff) AM_READWRITE_LEGACY(hdgsp_control_lo_r, hdgsp_control_lo_w) AM_BASE(m_gsp_control_lo)
+	AM_RANGE(0xf4800000, 0xf48000ff) AM_READWRITE_LEGACY(hdgsp_control_hi_r, hdgsp_control_hi_w) AM_BASE(m_gsp_control_hi)
+	AM_RANGE(0xf5000000, 0xf5000fff) AM_READWRITE_LEGACY(hdgsp_paletteram_lo_r, hdgsp_paletteram_lo_w) AM_BASE(m_gsp_paletteram_lo)
+	AM_RANGE(0xf5800000, 0xf5800fff) AM_READWRITE_LEGACY(hdgsp_paletteram_hi_r, hdgsp_paletteram_hi_w) AM_BASE(m_gsp_paletteram_hi)
+	AM_RANGE(0xff800000, 0xffbfffff) AM_MIRROR(0x0400000) AM_RAM AM_BASE_SIZE(m_gsp_vram, m_gsp_vram_size)
 ADDRESS_MAP_END
 
 
@@ -515,11 +515,11 @@ static ADDRESS_MAP_START( multisync2_gsp_map, AS_PROGRAM, 16, harddriv_state )
 	AM_RANGE(0x00000000, 0x0000200f) AM_NOP					/* hit during self-test */
 	AM_RANGE(0x02000000, 0x020fffff) AM_READWRITE_LEGACY(hdgsp_vram_2bpp_r, hdgsp_vram_2bpp_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, hdgsp_io_w)
-	AM_RANGE(0xf4000000, 0xf40000ff) AM_READWRITE_LEGACY(hdgsp_control_lo_r, hdgsp_control_lo_w) AM_BASE( m_gsp_control_lo)
-	AM_RANGE(0xf4800000, 0xf48000ff) AM_READWRITE_LEGACY(hdgsp_control_hi_r, hdgsp_control_hi_w) AM_BASE( m_gsp_control_hi)
-	AM_RANGE(0xf5000000, 0xf5000fff) AM_READWRITE_LEGACY(hdgsp_paletteram_lo_r, hdgsp_paletteram_lo_w) AM_BASE( m_gsp_paletteram_lo)
-	AM_RANGE(0xf5800000, 0xf5800fff) AM_READWRITE_LEGACY(hdgsp_paletteram_hi_r, hdgsp_paletteram_hi_w) AM_BASE( m_gsp_paletteram_hi)
-	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE_SIZE( m_gsp_vram, m_gsp_vram_size)
+	AM_RANGE(0xf4000000, 0xf40000ff) AM_READWRITE_LEGACY(hdgsp_control_lo_r, hdgsp_control_lo_w) AM_BASE(m_gsp_control_lo)
+	AM_RANGE(0xf4800000, 0xf48000ff) AM_READWRITE_LEGACY(hdgsp_control_hi_r, hdgsp_control_hi_w) AM_BASE(m_gsp_control_hi)
+	AM_RANGE(0xf5000000, 0xf5000fff) AM_READWRITE_LEGACY(hdgsp_paletteram_lo_r, hdgsp_paletteram_lo_w) AM_BASE(m_gsp_paletteram_lo)
+	AM_RANGE(0xf5800000, 0xf5800fff) AM_READWRITE_LEGACY(hdgsp_paletteram_hi_r, hdgsp_paletteram_hi_w) AM_BASE(m_gsp_paletteram_hi)
+	AM_RANGE(0xff800000, 0xffffffff) AM_RAM AM_BASE_SIZE(m_gsp_vram, m_gsp_vram_size)
 ADDRESS_MAP_END
 
 
@@ -532,13 +532,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE( m_adsp_pgm_memory)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_adsp_pgm_memory)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE( m_adsp_data_memory)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_adsp_data_memory)
 	AM_RANGE(0x2000, 0x2fff) AM_READWRITE_LEGACY(hdadsp_special_r, hdadsp_special_w)
 ADDRESS_MAP_END
 
@@ -552,13 +552,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ds3_program_map, AS_PROGRAM, 32, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE( m_adsp_pgm_memory)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(m_adsp_pgm_memory)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ds3_data_map, AS_DATA, 16, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE( m_adsp_data_memory)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_adsp_data_memory)
 	AM_RANGE(0x3800, 0x3bff) AM_RAM						/* internal RAM */
 	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(hdds3_control_r, hdds3_control_w)	/* adsp control regs */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(hdds3_special_r, hdds3_special_w)
@@ -655,7 +655,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( driversnd_dsp_program_map, AS_PROGRAM, 16, harddriv_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000, 0xfff) AM_RAM AM_BASE( m_sounddsp_ram)
+	AM_RANGE(0x000, 0xfff) AM_RAM AM_BASE(m_sounddsp_ram)
 ADDRESS_MAP_END
 
 

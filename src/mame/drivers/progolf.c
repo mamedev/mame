@@ -242,7 +242,7 @@ static WRITE8_HANDLER( progolf_videoram_w )
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, progolf_state )
 	AM_RANGE(0x0000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE_LEGACY(progolf_charram_w) AM_BASE( m_fbram)
+	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE_LEGACY(progolf_charram_w) AM_BASE(m_fbram)
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(progolf_videoram_r,progolf_videoram_w)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN2") AM_WRITE_LEGACY(progolf_char_vregs_w)
 	AM_RANGE(0x9200, 0x9200) AM_READ_PORT("P1") AM_WRITE_LEGACY(progolf_scrollx_hi_w) //p1 inputs

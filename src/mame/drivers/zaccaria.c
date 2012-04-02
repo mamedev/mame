@@ -262,10 +262,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_READONLY
 	AM_RANGE(0x6400, 0x6407) AM_READ_LEGACY(zaccaria_prot1_r)
-	AM_RANGE(0x6000, 0x67ff) AM_WRITE_LEGACY(zaccaria_videoram_w) AM_BASE( m_videoram)	/* 6400-67ff is 4 bits wide */
-	AM_RANGE(0x6800, 0x683f) AM_WRITE_LEGACY(zaccaria_attributes_w) AM_BASE( m_attributesram)
-	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE( m_spriteram)
-	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_BASE( m_spriteram2)
+	AM_RANGE(0x6000, 0x67ff) AM_WRITE_LEGACY(zaccaria_videoram_w) AM_BASE(m_videoram)	/* 6400-67ff is 4 bits wide */
+	AM_RANGE(0x6800, 0x683f) AM_WRITE_LEGACY(zaccaria_attributes_w) AM_BASE(m_attributesram)
+	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0x6c00, 0x6c00) AM_WRITE_LEGACY(zaccaria_flip_screen_x_w)
 	AM_RANGE(0x6c01, 0x6c01) AM_WRITE_LEGACY(zaccaria_flip_screen_y_w)
 	AM_RANGE(0x6c02, 0x6c02) AM_WRITENOP    /* sound reset */

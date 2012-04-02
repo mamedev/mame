@@ -118,17 +118,17 @@ DIP locations verified for:
 static ADDRESS_MAP_START( bloodbro_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
-	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE_LEGACY(bloodbro_bgvideoram_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE_LEGACY(bloodbro_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
-	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE_LEGACY(bloodbro_fgvideoram_w) AM_BASE( m_fgvideoram)
+	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE_LEGACY(bloodbro_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0x08d400, 0x08d7ff) AM_RAM
-	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE_LEGACY(bloodbro_txvideoram_w) AM_BASE( m_txvideoram)
+	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE_LEGACY(bloodbro_txvideoram_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0x08e000, 0x08e7ff) AM_RAM
 	AM_RANGE(0x08e800, 0x08f7ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08f800, 0x08ffff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a000d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_BASE( m_scroll)
+	AM_RANGE(0x0c0000, 0x0c007f) AM_RAM AM_BASE(m_scroll)
 	AM_RANGE(0x0c0080, 0x0c0081) AM_WRITENOP // ??? IRQ Ack VBL?
 	AM_RANGE(0x0c00c0, 0x0c00c1) AM_WRITENOP // ??? watchdog?
 	AM_RANGE(0x0c0100, 0x0c0101) AM_WRITENOP // ??? written once
@@ -140,12 +140,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( weststry_map, AS_PROGRAM, 16, bloodbro_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08afff) AM_RAM
-	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE_LEGACY(bloodbro_bgvideoram_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0x08b000, 0x08bfff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0x08c000, 0x08c3ff) AM_RAM_WRITE_LEGACY(bloodbro_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0x08c400, 0x08cfff) AM_RAM
-	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE_LEGACY(bloodbro_fgvideoram_w) AM_BASE( m_fgvideoram)
+	AM_RANGE(0x08d000, 0x08d3ff) AM_RAM_WRITE_LEGACY(bloodbro_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0x08d400, 0x08d7ff) AM_RAM
-	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE_LEGACY(bloodbro_txvideoram_w) AM_BASE( m_txvideoram)
+	AM_RANGE(0x08d800, 0x08dfff) AM_RAM_WRITE_LEGACY(bloodbro_txvideoram_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0x08e000, 0x08ffff) AM_RAM
 	AM_RANGE(0x0c1000, 0x0c1001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c1002, 0x0c1003) AM_READ_PORT("IN0")

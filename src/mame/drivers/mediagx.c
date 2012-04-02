@@ -908,15 +908,15 @@ static I8237_INTERFACE( dma8237_2_config )
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( mediagx_map, AS_PROGRAM, 32, mediagx_state )
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM AM_BASE( m_main_ram)
+	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM AM_BASE(m_main_ram)
 	AM_RANGE(0x000a0000, 0x000affff) AM_RAM
-	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE( m_cga_ram)
-	AM_RANGE(0x000c0000, 0x000fffff) AM_RAM AM_BASE( m_bios_ram)
+	AM_RANGE(0x000b0000, 0x000b7fff) AM_RAM AM_BASE(m_cga_ram)
+	AM_RANGE(0x000c0000, 0x000fffff) AM_RAM AM_BASE(m_bios_ram)
 	AM_RANGE(0x00100000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x40008000, 0x400080ff) AM_READWRITE_LEGACY(biu_ctrl_r, biu_ctrl_w)
 	AM_RANGE(0x40008300, 0x400083ff) AM_READWRITE_LEGACY(disp_ctrl_r, disp_ctrl_w)
 	AM_RANGE(0x40008400, 0x400084ff) AM_READWRITE_LEGACY(memory_ctrl_r, memory_ctrl_w)
-	AM_RANGE(0x40800000, 0x40bfffff) AM_RAM AM_BASE( m_vram)
+	AM_RANGE(0x40800000, 0x40bfffff) AM_RAM AM_BASE(m_vram)
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 

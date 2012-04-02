@@ -662,19 +662,19 @@ static READ8_HANDLER( soundport_r )
 static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE( m_spr_ram) // non-tile based sprite ram
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE_LEGACY(tx_vram_w) AM_BASE( m_tx_vram)
-	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_BASE( m_bg_vram)
-	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_BASE( m_fg_vram)
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE(m_spr_ram) // non-tile based sprite ram
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE_LEGACY(tx_vram_w) AM_BASE(m_tx_vram)
+	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_BASE(m_bg_vram)
+	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_BASE(m_fg_vram)
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE_LEGACY(io_r,io_w) AM_BASE( m_io_ram)
+	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE_LEGACY(io_r,io_w) AM_BASE(m_io_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_BASE( m_roadram)
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_BASE(m_roadram)
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END

@@ -605,7 +605,7 @@ static WRITE32_HANDLER(gun_w)
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE( m_workram)		/* Work RAM */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(m_workram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE_LEGACY(hornet_k037122_reg_r, hornet_k037122_reg_w)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE_LEGACY(hornet_k037122_sram_r, hornet_k037122_sram_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE_LEGACY(hornet_k037122_char_r, hornet_k037122_char_w)
@@ -708,7 +708,7 @@ static WRITE32_HANDLER( dsp_dataram1_w )
 
 static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32, hornet_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE_LEGACY(dsp_dataram0_r, dsp_dataram0_w) AM_BASE( m_sharc_dataram[0])
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE_LEGACY(dsp_dataram0_r, dsp_dataram0_w) AM_BASE(m_sharc_dataram[0])
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo0", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
@@ -718,7 +718,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sharc1_map, AS_DATA, 32, hornet_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE_LEGACY(dsp_dataram1_r, dsp_dataram1_w) AM_BASE( m_sharc_dataram[1])
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE_LEGACY(dsp_dataram1_r, dsp_dataram1_w) AM_BASE(m_sharc_dataram[1])
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo1", voodoo_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)

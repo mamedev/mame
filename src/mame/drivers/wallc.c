@@ -161,7 +161,7 @@ static WRITE8_HANDLER( wallc_coin_counter_w )
 
 static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(wallc_videoram_w) AM_MIRROR(0xc00) AM_BASE( m_videoram)	/* 2114, 2114 */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(wallc_videoram_w) AM_MIRROR(0xc00) AM_BASE(m_videoram)	/* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM		/* 2114, 2114 */
 
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")

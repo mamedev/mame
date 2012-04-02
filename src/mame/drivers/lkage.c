@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE( m_vreg) /* video registers */
+	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE(m_vreg) /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_WRITE_LEGACY(lkage_sound_command_w)
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ_LEGACY(sound_status_r)
 	AM_RANGE(0xf062, 0xf062) AM_READWRITE_LEGACY(lkage_mcu_r,lkage_mcu_w)
@@ -151,11 +151,11 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0xf086, 0xf086) AM_READ_PORT("P2")
 	AM_RANGE(0xf087, 0xf087) AM_READ_LEGACY(lkage_mcu_status_r)
 	AM_RANGE(0xf0a0, 0xf0a3) AM_RAM /* unknown */
-	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE( m_scroll)
+	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE(m_scroll)
 	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITENOP /* pulsed */
-	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xf160, 0xf1ff) AM_RAM /* unknown - no valid sprite data */
-	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE_LEGACY(lkage_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE_LEGACY(lkage_videoram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 

@@ -319,12 +319,12 @@ static WRITE8_HANDLER( locomotn_latch_w )
 
 static ADDRESS_MAP_START( rallyx_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(rallyx_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(rallyx_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")
-	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_BASE( m_radarattr)
+	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_BASE(m_radarattr)
 	AM_RANGE(0xa080, 0xa080) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE_LEGACY(rallyx_scrollx_w)
@@ -341,13 +341,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jungler_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(rallyx_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(rallyx_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE( m_radarattr)	// jungler writes to a03x
+	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(m_radarattr)	// jungler writes to a03x
 	AM_RANGE(0xa080, 0xa080) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa100) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE_LEGACY(rallyx_scrollx_w)	/* only jungler and tactcian */

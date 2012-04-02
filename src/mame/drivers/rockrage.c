@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE_LEGACY("k007342", k007342_r, k007342_w)					/* Color RAM + Video RAM */
 	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE_LEGACY("k007420", k007420_r, k007420_w)					/* Sprite RAM */
 	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE_LEGACY("k007342", k007342_scroll_r, k007342_scroll_w)	/* Scroll RAM */
-	AM_RANGE(0x2400, 0x247f) AM_RAM AM_BASE( m_paletteram)						/* Palette */
+	AM_RANGE(0x2400, 0x247f) AM_RAM AM_BASE(m_paletteram)						/* Palette */
 	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE_LEGACY("k007342", k007342_vreg_w)							/* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P1")

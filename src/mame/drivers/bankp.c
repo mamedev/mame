@@ -106,10 +106,10 @@
 static ADDRESS_MAP_START( bankp_map, AS_PROGRAM, 8, bankp_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE_LEGACY(bankp_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE_LEGACY(bankp_colorram_w) AM_BASE( m_colorram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE_LEGACY(bankp_videoram2_w) AM_BASE( m_videoram2)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE_LEGACY(bankp_colorram2_w) AM_BASE( m_colorram2)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE_LEGACY(bankp_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE_LEGACY(bankp_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE_LEGACY(bankp_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE_LEGACY(bankp_colorram2_w) AM_BASE(m_colorram2)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bankp_io_map, AS_IO, 8, bankp_state )

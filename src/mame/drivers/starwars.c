@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4701, 0x4701) AM_READ_LEGACY(starwars_div_rel_r)
 	AM_RANGE(0x4703, 0x4703) AM_READ_LEGACY(starwars_prng_r)			/* pseudo random number generator */
 	AM_RANGE(0x4800, 0x4fff) AM_RAM								/* CPU and Math RAM */
-	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE( m_mathram)	/* CPU and Math RAM */
+	AM_RANGE(0x5000, 0x5fff) AM_RAM AM_BASE(m_mathram)	/* CPU and Math RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* rest of main_rom */
 ADDRESS_MAP_END

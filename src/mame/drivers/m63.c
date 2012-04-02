@@ -448,11 +448,11 @@ static ADDRESS_MAP_START( m63_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
-	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xe300, 0xe3ff) AM_RAM AM_BASE( m_scrollram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(m63_videoram2_w) AM_BASE( m_videoram2)
-	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE_LEGACY(m63_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xec00, 0xefff) AM_RAM_WRITE_LEGACY(m63_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xe200, 0xe2ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe300, 0xe3ff) AM_RAM AM_BASE(m_scrollram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(m63_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE_LEGACY(m63_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xec00, 0xefff) AM_RAM_WRITE_LEGACY(m63_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(nmi_mask_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(m63_flipscreen_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(m63_palbank_w)
@@ -469,11 +469,11 @@ static ADDRESS_MAP_START( fghtbskt_map, AS_PROGRAM, 8, m63_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
-	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd300, 0xd3ff) AM_RAM AM_BASE( m_scrollram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(m63_videoram2_w) AM_BASE( m_videoram2)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(m63_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE_LEGACY(m63_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xd200, 0xd2ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd300, 0xd3ff) AM_RAM AM_BASE(m_scrollram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(m63_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(m63_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE_LEGACY(m63_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_LEGACY(snd_status_r)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("P1")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("P2")

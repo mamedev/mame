@@ -187,11 +187,11 @@ static WRITE8_HANDLER(t5182shared_w)
 
 
 static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
-	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE( m_mainram)
-	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE(m_mainram)
+	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
 	AM_RANGE(0x08000, 0x0bfff) AM_RAM AM_REGION("user3", 0) //attribue map ?
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x0d000, 0x0d000) AM_WRITE_LEGACY(t5182_sound_irq_w)
 	AM_RANGE(0x0d002, 0x0d002) AM_READ_LEGACY(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0x0d004, 0x0d004) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_acquire_w)
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
 	AM_RANGE(0x0d404, 0x0d404) AM_READ_PORT("START")
 	AM_RANGE(0x0d406, 0x0d406) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0d407, 0x0d407) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_BASE( m_scrollram)
+	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_BASE(m_scrollram)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 

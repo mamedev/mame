@@ -124,8 +124,8 @@ static WRITE8_HANDLER ( mogura_gfxram_w )
 static ADDRESS_MAP_START( mogura_map, AS_PROGRAM, 8, mogura_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // main ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(mogura_gfxram_w) AM_BASE( m_gfxram) // ram based characters
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE_LEGACY(mogura_tileram_w) AM_BASE( m_tileram) // tilemap
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(mogura_gfxram_w) AM_BASE(m_gfxram) // ram based characters
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE_LEGACY(mogura_tileram_w) AM_BASE(m_tileram) // tilemap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mogura_io_map, AS_IO, 8, mogura_state )

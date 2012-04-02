@@ -85,7 +85,7 @@ static READ8_HANDLER( bking3_ext_check_r )
 static ADDRESS_MAP_START( bking_map, AS_PROGRAM, 8, bking_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(bking_playfield_w) AM_BASE( m_playfield_ram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(bking_playfield_w) AM_BASE(m_playfield_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bking_io_map, AS_IO, 8, bking_state )

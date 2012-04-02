@@ -77,8 +77,8 @@ static CUSTOM_INPUT( battlex_in0_b4_r )
 
 static ADDRESS_MAP_START( battlex_map, AS_PROGRAM, 8, battlex_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(battlex_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(battlex_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM
 	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE_LEGACY(battlex_palette_w)
 ADDRESS_MAP_END

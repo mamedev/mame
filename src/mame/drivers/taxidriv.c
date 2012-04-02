@@ -157,21 +157,21 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x9000, 0x9fff) AM_RAM	/* ??? */
 	AM_RANGE(0xa000, 0xafff) AM_RAM	/* ??? */
 	AM_RANGE(0xb000, 0xbfff) AM_RAM	/* ??? */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE( m_vram4)			/* radar bitmap */
-	AM_RANGE(0xc800, 0xcfff) AM_WRITEONLY AM_BASE( m_vram5)	/* "sprite1" bitmap */
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITEONLY AM_BASE( m_vram6)	/* "sprite2" bitmap */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE( m_vram7)			/* "sprite3" bitmap */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(m_vram4)			/* radar bitmap */
+	AM_RANGE(0xc800, 0xcfff) AM_WRITEONLY AM_BASE(m_vram5)	/* "sprite1" bitmap */
+	AM_RANGE(0xd000, 0xd7ff) AM_WRITEONLY AM_BASE(m_vram6)	/* "sprite2" bitmap */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(m_vram7)			/* "sprite3" bitmap */
 	AM_RANGE(0xe000, 0xf3ff) AM_READONLY
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITEONLY AM_BASE( m_vram1)	/* car tilemap */
-	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_BASE( m_vram2)	/* bg1 tilemap */
-	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_BASE( m_vram0)	/* fg tilemap */
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_BASE( m_vram3)	/* bg2 tilemap */
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITEONLY AM_BASE(m_vram1)	/* car tilemap */
+	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_BASE(m_vram2)	/* bg1 tilemap */
+	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_BASE(m_vram0)	/* fg tilemap */
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_BASE(m_vram3)	/* bg2 tilemap */
 	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* "sprite1" placement */
 	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE_LEGACY("ppi8255_3", ppi8255_r, ppi8255_w)	/* "sprite2" placement */
 	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE_LEGACY("ppi8255_4", ppi8255_r, ppi8255_w)	/* "sprite3" placement */
 	//AM_RANGE(0xf780, 0xf781) AM_WRITEONLY     /* more scroll registers? */
-	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_BASE( m_scroll)	/* bg scroll (three copies always identical) */
+	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_BASE(m_scroll)	/* bg scroll (three copies always identical) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

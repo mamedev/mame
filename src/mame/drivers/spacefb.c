@@ -200,7 +200,7 @@ static MACHINE_RESET( spacefb )
 static ADDRESS_MAP_START( spacefb_main_map, AS_PROGRAM, 8, spacefb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM AM_BASE( m_videoram) AM_SIZE(m_videoram_size)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x3c00) AM_RAM AM_BASE(m_videoram) AM_SIZE(m_videoram_size)
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x3000) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_MIRROR(0x3000) AM_NOP
 ADDRESS_MAP_END

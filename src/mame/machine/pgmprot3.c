@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( 55857G_arm7_map, AS_PROGRAM, 32, pgm_arm_type3_state )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM
-	AM_RANGE(0x18000000, 0x1803ffff) AM_RAM AM_BASE( m_arm_ram)
+	AM_RANGE(0x18000000, 0x1803ffff) AM_RAM AM_BASE(m_arm_ram)
 	AM_RANGE(0x38000000, 0x3801ffff) AM_READWRITE_LEGACY(svg_arm7_shareram_r, svg_arm7_shareram_w)
 	AM_RANGE(0x48000000, 0x48000003) AM_READWRITE_LEGACY(svg_latch_arm_r, svg_latch_arm_w) /* 68k Latch */
 	AM_RANGE(0x40000018, 0x4000001b) AM_WRITE_LEGACY(svg_arm7_ram_sel_w) /* RAM SEL */

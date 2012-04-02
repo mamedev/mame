@@ -1662,8 +1662,8 @@ static MACHINE_RESET( coh1002e )
 static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8_LEGACY( "ymf", ymf271_r, ymf271_w, 0x00ff )
-	AM_RANGE(0x180008, 0x180009) AM_READ8_LEGACY( soundlatch_r, 0x00ff )
+	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8_LEGACY("ymf", ymf271_r, ymf271_w, 0x00ff )
+	AM_RANGE(0x180008, 0x180009) AM_READ8_LEGACY(soundlatch_r, 0x00ff )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITENOP
 	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
 ADDRESS_MAP_END
@@ -2581,9 +2581,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbaj_z80_port_map, AS_IO, 8, zn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x84, 0x85 ) AM_DEVREADWRITE_LEGACY( "ymz", ymz280b_r, ymz280b_w )
-	AM_RANGE( 0x90, 0x90 ) AM_READWRITE_LEGACY( cbaj_z80_latch_r, cbaj_z80_latch_w )
-	AM_RANGE( 0x91, 0x91 ) AM_READ_LEGACY( cbaj_z80_ready_r )
+	AM_RANGE( 0x84, 0x85 ) AM_DEVREADWRITE_LEGACY("ymz", ymz280b_r, ymz280b_w )
+	AM_RANGE( 0x90, 0x90 ) AM_READWRITE_LEGACY(cbaj_z80_latch_r, cbaj_z80_latch_w )
+	AM_RANGE( 0x91, 0x91 ) AM_READ_LEGACY(cbaj_z80_ready_r )
 ADDRESS_MAP_END
 
 

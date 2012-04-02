@@ -112,7 +112,7 @@ static ADDRESS_MAP_START( hotstuff_map, AS_PROGRAM, 16, hotstuff_state )
 	AM_RANGE(0x680000, 0x680001) AM_READWRITE8_LEGACY(ioboard_status_r,ioboard_data_w,0xff00)
 	AM_RANGE(0x680000, 0x680001) AM_READWRITE8_LEGACY(ioboard_unk_r,ioboard_reg_w,0x00ff)
 
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE( m_bitmapram)
+	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE(m_bitmapram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hotstuff )

@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( murogem_map, AS_PROGRAM, 8, murogem_state )
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("IN1")
 	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(outport_w)	/* output port */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

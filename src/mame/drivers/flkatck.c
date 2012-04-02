@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( flkatck_map, AS_PROGRAM, 8, flkatck_state )
 	AM_RANGE(0x0400, 0x041f) AM_READWRITE_LEGACY(flkatck_ls138_r, flkatck_ls138_w)							/* inputs, DIPS, bankswitch, counters, sound command */
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)	/* palette */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM																	/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE_LEGACY(flkatck_k007121_w) AM_BASE( m_k007121_ram)					/* Video RAM (007121) */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE_LEGACY(flkatck_k007121_w) AM_BASE(m_k007121_ram)					/* Video RAM (007121) */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")															/* banked ROM */
 	AM_RANGE(0x6000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END

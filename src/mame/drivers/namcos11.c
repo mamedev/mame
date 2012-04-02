@@ -693,8 +693,8 @@ static READ32_HANDLER( lightgun_r )
 
 static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32, namcos11_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_RAM AM_BASE( m_sharedram) /* shared ram with C76 */
-	AM_RANGE(0x1fa20000, 0x1fa2ffff) AM_WRITE_LEGACY(keycus_w) AM_BASE_SIZE( m_keycus, m_keycus_size) /* keycus */
+	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_RAM AM_BASE(m_sharedram) /* shared ram with C76 */
+	AM_RANGE(0x1fa20000, 0x1fa2ffff) AM_WRITE_LEGACY(keycus_w) AM_BASE_SIZE(m_keycus, m_keycus_size) /* keycus */
 	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1fbf6000, 0x1fbf6003) AM_WRITENOP /* ?? */
@@ -746,8 +746,8 @@ static READ16_HANDLER( c76_inputs_r )
 
 ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16, namcos11_state )
 	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
-	AM_RANGE(0x001000, 0x001007) AM_READ_LEGACY( c76_inputs_r )
-	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE_LEGACY( c76_shared_r, c76_shared_w )
+	AM_RANGE(0x001000, 0x001007) AM_READ_LEGACY(c76_inputs_r )
+	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE_LEGACY(c76_shared_r, c76_shared_w )
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c76", 0x40000)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("c76", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c76", 0)

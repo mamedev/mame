@@ -98,7 +98,7 @@ static SCREEN_UPDATE_RGB32( dotrikun )
 
 static ADDRESS_MAP_START( dotrikun_map, AS_PROGRAM, 8, dotrikun_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_BASE( m_dotrikun_bitmap)
+	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_BASE(m_dotrikun_bitmap)
 	AM_RANGE(0x8600, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 

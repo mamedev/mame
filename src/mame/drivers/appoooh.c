@@ -220,12 +220,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, appoooh_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM /* RAM ? */
 
-	AM_RANGE(0xf000, 0xf01f) AM_BASE( m_spriteram)
-	AM_RANGE(0xf020, 0xf3ff) AM_WRITE_LEGACY(appoooh_fg_videoram_w) AM_BASE( m_fg_videoram)
-	AM_RANGE(0xf420, 0xf7ff) AM_WRITE_LEGACY(appoooh_fg_colorram_w) AM_BASE( m_fg_colorram)
-	AM_RANGE(0xf800, 0xf81f) AM_BASE( m_spriteram_2)
-	AM_RANGE(0xf820, 0xfbff) AM_WRITE_LEGACY(appoooh_bg_videoram_w) AM_BASE( m_bg_videoram)
-	AM_RANGE(0xfc20, 0xffff) AM_WRITE_LEGACY(appoooh_bg_colorram_w) AM_BASE( m_bg_colorram)
+	AM_RANGE(0xf000, 0xf01f) AM_BASE(m_spriteram)
+	AM_RANGE(0xf020, 0xf3ff) AM_WRITE_LEGACY(appoooh_fg_videoram_w) AM_BASE(m_fg_videoram)
+	AM_RANGE(0xf420, 0xf7ff) AM_WRITE_LEGACY(appoooh_fg_colorram_w) AM_BASE(m_fg_colorram)
+	AM_RANGE(0xf800, 0xf81f) AM_BASE(m_spriteram_2)
+	AM_RANGE(0xf820, 0xfbff) AM_WRITE_LEGACY(appoooh_bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0xfc20, 0xffff) AM_WRITE_LEGACY(appoooh_bg_colorram_w) AM_BASE(m_bg_colorram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

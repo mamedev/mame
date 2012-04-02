@@ -731,7 +731,7 @@ GFXDECODE_END
 *************************/
 
 static ADDRESS_MAP_START( peplus_map, AS_PROGRAM, 8, peplus_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE( m_program_ram)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE(m_program_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
@@ -745,23 +745,23 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	AM_RANGE(0x2083, 0x2083) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE_LEGACY(peplus_crtc_display_w)
 
     // Superboard Data
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE_LEGACY(peplus_s3000_r, peplus_s3000_w) AM_BASE( m_s3000_ram)
+	AM_RANGE(0x3000, 0x3fff) AM_READWRITE_LEGACY(peplus_s3000_r, peplus_s3000_w) AM_BASE(m_s3000_ram)
 
 	// Sound and Dipswitches
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 
     // Superboard Data
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE_LEGACY(peplus_s5000_r, peplus_s5000_w) AM_BASE( m_s5000_ram)
+	AM_RANGE(0x5000, 0x5fff) AM_READWRITE_LEGACY(peplus_s5000_r, peplus_s5000_w) AM_BASE(m_s5000_ram)
 
 	// Background Color Latch
 	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(peplus_bgcolor_r) AM_WRITE_LEGACY(peplus_bgcolor_w)
 
     // Bogus Location for Video RAM
-	AM_RANGE(0x06001, 0x06400) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x06001, 0x06400) AM_RAM AM_BASE(m_videoram)
 
     // Superboard Data
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE_LEGACY(peplus_s7000_r, peplus_s7000_w) AM_BASE( m_s7000_ram)
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE_LEGACY(peplus_s7000_r, peplus_s7000_w) AM_BASE(m_s7000_ram)
 
 	// Input Bank A, Output Bank C
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD_LEGACY("i2cmem",peplus_input_bank_a_r) AM_WRITE_LEGACY(peplus_output_bank_c_w)
@@ -773,22 +773,22 @@ static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0") AM_WRITE_LEGACY(peplus_output_bank_b_w)
 
     // Superboard Data
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE_LEGACY(peplus_sb000_r, peplus_sb000_w) AM_BASE( m_sb000_ram)
+	AM_RANGE(0xb000, 0xbfff) AM_READWRITE_LEGACY(peplus_sb000_r, peplus_sb000_w) AM_BASE(m_sb000_ram)
 
 	// Output Bank A
 	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(peplus_watchdog_r) AM_WRITE_LEGACY(peplus_output_bank_a_w)
 
     // Superboard Data
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE_LEGACY(peplus_sd000_r, peplus_sd000_w) AM_BASE( m_sd000_ram)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE_LEGACY(peplus_sd000_r, peplus_sd000_w) AM_BASE(m_sd000_ram)
 
 	// DUART
 	AM_RANGE(0xe000, 0xe00f) AM_READWRITE_LEGACY(peplus_duart_r, peplus_duart_w)
 
     // Superboard Data
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE_LEGACY(peplus_sf000_r, peplus_sf000_w) AM_BASE( m_sf000_ram)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE_LEGACY(peplus_sf000_r, peplus_sf000_w) AM_BASE(m_sf000_ram)
 
 	/* Ports start here */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ_LEGACY(peplus_io_r) AM_WRITE_LEGACY(peplus_io_w) AM_BASE( m_io_port)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ_LEGACY(peplus_io_r) AM_WRITE_LEGACY(peplus_io_w) AM_BASE(m_io_port)
 ADDRESS_MAP_END
 
 

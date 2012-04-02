@@ -133,7 +133,7 @@ static READ16_HANDLER( peno_rand2 )
 
 static ADDRESS_MAP_START( ttchamp_map, AS_PROGRAM, 16, ttchamp_state )
     AM_RANGE(0x00000, 0x0ffff) AM_RAM
-    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE( m_peno_vram)
+    AM_RANGE(0x10000, 0x1ffff) AM_RAM AM_BASE(m_peno_vram)
     AM_RANGE(0x20000, 0x7ffff) AM_ROMBANK("bank1") // ?
     AM_RANGE(0x80000, 0xfffff) AM_ROMBANK("bank2") // ?
 ADDRESS_MAP_END

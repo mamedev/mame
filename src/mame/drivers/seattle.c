@@ -1763,7 +1763,7 @@ static READ32_DEVICE_HANDLER( seattle_ide_r )
 
 static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE( m_rambase)	// wg3dh only has 4MB; sfrush, blitz99 8MB
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(m_rambase)	// wg3dh only has 4MB; sfrush, blitz99 8MB
 	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD_LEGACY("voodoo", voodoo_r) AM_WRITE_LEGACY(seattle_voodoo_w)
 	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE_LEGACY("ide", seattle_ide_r, ide_controller32_w)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP						// IDE-related, but annoying
@@ -1774,15 +1774,15 @@ static ADDRESS_MAP_START( seattle_map, AS_PROGRAM, 32, seattle_state )
 	AM_RANGE(0x16100000, 0x1611ffff) AM_READWRITE_LEGACY(cmos_r, cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x17000000, 0x17000003) AM_READWRITE_LEGACY(cmos_protect_r, cmos_protect_w)
 	AM_RANGE(0x17100000, 0x17100003) AM_WRITE_LEGACY(seattle_watchdog_w)
-	AM_RANGE(0x17300000, 0x17300003) AM_RAM_WRITE_LEGACY(seattle_interrupt_enable_w) AM_BASE( m_interrupt_enable)
-	AM_RANGE(0x17400000, 0x17400003) AM_RAM_WRITE_LEGACY(interrupt_config_w) AM_BASE( m_interrupt_config)
+	AM_RANGE(0x17300000, 0x17300003) AM_RAM_WRITE_LEGACY(seattle_interrupt_enable_w) AM_BASE(m_interrupt_enable)
+	AM_RANGE(0x17400000, 0x17400003) AM_RAM_WRITE_LEGACY(interrupt_config_w) AM_BASE(m_interrupt_config)
 	AM_RANGE(0x17500000, 0x17500003) AM_READ_LEGACY(interrupt_state_r)
 	AM_RANGE(0x17600000, 0x17600003) AM_READ_LEGACY(interrupt_state2_r)
 	AM_RANGE(0x17700000, 0x17700003) AM_WRITE_LEGACY(vblank_clear_w)
 	AM_RANGE(0x17800000, 0x17800003) AM_NOP
 	AM_RANGE(0x17900000, 0x17900003) AM_READWRITE_LEGACY(status_leds_r, status_leds_w)
-	AM_RANGE(0x17f00000, 0x17f00003) AM_RAM_WRITE_LEGACY(asic_reset_w) AM_BASE( m_asic_reset)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE( m_rombase)
+	AM_RANGE(0x17f00000, 0x17f00003) AM_RAM_WRITE_LEGACY(asic_reset_w) AM_BASE(m_asic_reset)
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rombase)
 ADDRESS_MAP_END
 
 

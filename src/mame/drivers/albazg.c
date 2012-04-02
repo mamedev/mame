@@ -232,11 +232,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE_LEGACY(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0xaf80, 0xafff) AM_READWRITE_LEGACY(custom_ram_r, custom_ram_w) AM_BASE( m_cus_ram)
+	AM_RANGE(0xaf80, 0xafff) AM_READWRITE_LEGACY(custom_ram_r, custom_ram_w) AM_BASE(m_cus_ram)
 	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(yumefuda_vram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(yumefuda_cram_w) AM_BASE( m_colorram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(yumefuda_vram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(yumefuda_cram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

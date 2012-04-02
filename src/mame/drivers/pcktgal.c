@@ -74,7 +74,7 @@ static READ8_DEVICE_HANDLER( pcktgal_adpcm_reset_r )
 static ADDRESS_MAP_START( pcktgal_map, AS_PROGRAM, 8, pcktgal_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
-	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1800, 0x1807) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_r, deco_bac06_pf_control1_8bit_w)

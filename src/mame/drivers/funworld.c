@@ -856,8 +856,8 @@ static ADDRESS_MAP_START( funworld_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x4000, 0x4000) AM_READNOP
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -893,8 +893,8 @@ static ADDRESS_MAP_START( funquiz_map, AS_PROGRAM, 8, funworld_state )
 
 	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(question_bank_w)
 
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x4000, 0x7fff) AM_READ_LEGACY(questions_r)
 
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -911,8 +911,8 @@ static ADDRESS_MAP_START( magicrd2_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x2c00, 0x2cff) AM_RAM	/* range for protection */
 	AM_RANGE(0x3600, 0x36ff) AM_RAM	/* some games use $3603-05 range for protection */
 	AM_RANGE(0x3c00, 0x3cff) AM_RAM	/* range for protection */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -926,8 +926,8 @@ static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x2000, 0x2000) AM_READNOP	/* some unknown reads */
 	AM_RANGE(0x3e00, 0x3fff) AM_RAM	/* some games use $3e03-05 range for protection */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -941,8 +941,8 @@ static ADDRESS_MAP_START( saloon_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x1800, 0x1800) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
 	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
 //  AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads... maybe a DSW */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -967,8 +967,8 @@ static ADDRESS_MAP_START( witchryl_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

@@ -255,7 +255,7 @@ static const eeprom_interface eeprom_interface_policetr =
  *************************************/
 
 static ADDRESS_MAP_START( policetr_map, AS_PROGRAM, 32, policetr_state )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE( m_rambase)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE(m_rambase)
 	AM_RANGE(0x00200000, 0x0020000f) AM_WRITE_LEGACY(policetr_video_w)
 	AM_RANGE(0x00400000, 0x00400003) AM_READ_LEGACY(policetr_video_r)
 	AM_RANGE(0x00500000, 0x00500003) AM_WRITENOP		// copies ROM here at startup, plus checksum
@@ -274,7 +274,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sshooter_map, AS_PROGRAM, 32, policetr_state )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE( m_rambase)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE(m_rambase)
 	AM_RANGE(0x00200000, 0x00200003) AM_WRITE_LEGACY(policetr_bsmt2000_data_w)
 	AM_RANGE(0x00300000, 0x00300003) AM_WRITE_LEGACY(policetr_palette_offset_w)
 	AM_RANGE(0x00320000, 0x00320003) AM_WRITE_LEGACY(policetr_palette_data_w)

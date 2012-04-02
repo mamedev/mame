@@ -237,8 +237,8 @@ static WRITE8_HANDLER( llander_led_w )
 static ADDRESS_MAP_START( asteroid_map, AS_PROGRAM, 8, asteroid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE( m_ram1)
-	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE( m_ram2)
+	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE(m_ram1)
+	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE(m_ram2)
 	AM_RANGE(0x2000, 0x2007) AM_READ_LEGACY(asteroid_IN0_r)	/* IN0 */
 	AM_RANGE(0x2400, 0x2407) AM_READ_LEGACY(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ_LEGACY(asteroid_DSW1_r)	/* DSW1 */
@@ -258,8 +258,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE( m_ram1)
-	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE( m_ram2)
+	AM_RANGE(0x0200, 0x02ff) AM_RAMBANK("bank1") AM_BASE(m_ram1)
+	AM_RANGE(0x0300, 0x03ff) AM_RAMBANK("bank2") AM_BASE(m_ram2)
 	AM_RANGE(0x2000, 0x2007) AM_READ_LEGACY(asteroid_IN0_r)	/* IN0 */
 	AM_RANGE(0x2400, 0x2407) AM_READ_LEGACY(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ_LEGACY(asteroid_DSW1_r)	/* DSW1 */

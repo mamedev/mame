@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( megatech_bios_map, AS_PROGRAM, 8, mtech_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM // from bios rom (0x0000-0x2fff populated in ROM)
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE_LEGACY(megatech_banked_ram_r, megatech_banked_ram_w) // copies instruction data here at startup, must be banked
 	AM_RANGE(0x4000, 0x5fff) AM_RAM // plain ram?
-	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY( mt_z80_bank_w )
+	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(mt_z80_bank_w )
 	AM_RANGE(0x6400, 0x6400) AM_READ_PORT("BIOS_DSW0")
 	AM_RANGE(0x6401, 0x6401) AM_READ_PORT("BIOS_DSW1")
 	AM_RANGE(0x6404, 0x6404) AM_READWRITE_LEGACY(megatech_cart_select_r, megatech_cart_select_w) // cart select & ram bank

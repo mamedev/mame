@@ -163,9 +163,9 @@ static WRITE8_HANDLER(palette2_w)
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, onetwo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE_LEGACY(palette1_w) AM_BASE( m_paletteram)
-	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE_LEGACY(palette2_w) AM_BASE( m_paletteram2)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(onetwo_fgram_w) AM_BASE( m_fgram)
+	AM_RANGE(0xc800, 0xc87f) AM_RAM_WRITE_LEGACY(palette1_w) AM_BASE(m_paletteram)
+	AM_RANGE(0xc900, 0xc97f) AM_RAM_WRITE_LEGACY(palette2_w) AM_BASE(m_paletteram2)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(onetwo_fgram_w) AM_BASE(m_fgram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

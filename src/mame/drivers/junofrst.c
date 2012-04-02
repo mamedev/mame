@@ -277,8 +277,8 @@ static WRITE8_HANDLER( junofrst_irq_enable_w )
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE( m_videoram)
-	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE( m_paletteram)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE(m_paletteram)
 	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
 	AM_RANGE(0x801c, 0x801c) AM_READ_LEGACY(watchdog_reset_r)
 	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("SYSTEM")
@@ -287,7 +287,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x802c, 0x802c) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8030, 0x8030) AM_WRITE_LEGACY(junofrst_irq_enable_w)
 	AM_RANGE(0x8031, 0x8032) AM_WRITE_LEGACY(junofrst_coin_counter_w)
-	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_BASE( m_scroll)  /* not used in Juno */
+	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_BASE(m_scroll)  /* not used in Juno */
 	AM_RANGE(0x8034, 0x8035) AM_WRITE_LEGACY(flip_screen_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE_LEGACY(junofrst_sh_irqtrigger_w)
 	AM_RANGE(0x8050, 0x8050) AM_WRITE_LEGACY(soundlatch_w)

@@ -266,13 +266,13 @@ static WRITE32_HANDLER( gstream_tilemap3_scrolly_w )
 }
 
 static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
-	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE( m_workram) // work ram
+	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE(m_workram) // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
-	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE_LEGACY(gstream_vram_w) AM_BASE( m_vram) // video ram
+	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE_LEGACY(gstream_vram_w) AM_BASE(m_vram) // video ram
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE_LEGACY(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE_LEGACY(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE_LEGACY(gstream_palette_w) AM_BASE( m_paletteram)
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE_LEGACY(gstream_palette_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE_LEGACY(gstream_tilemap1_scrollx_w)
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE_LEGACY(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE_LEGACY(gstream_tilemap2_scrollx_w)

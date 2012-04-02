@@ -337,8 +337,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
 	AM_RANGE(0x0800, 0x7fff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM		/* PROM board ROM area */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(mainram_w) AM_BASE( m_mainram)
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE_LEGACY(vidram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(mainram_w) AM_BASE(m_mainram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE_LEGACY(vidram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 

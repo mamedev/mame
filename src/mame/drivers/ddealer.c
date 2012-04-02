@@ -460,18 +460,18 @@ static ADDRESS_MAP_START( ddealer, AS_PROGRAM, 16, ddealer_state )
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("UNK")
 	AM_RANGE(0x084000, 0x084003) AM_DEVWRITE8_LEGACY("ymsnd", ym2203_w, 0x00ff) // ym ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram) // palette ram
-	AM_RANGE(0x08c000, 0x08cfff) AM_RAM_WRITE_LEGACY(ddealer_vregs_w) AM_BASE( m_vregs) // palette ram
+	AM_RANGE(0x08c000, 0x08cfff) AM_RAM_WRITE_LEGACY(ddealer_vregs_w) AM_BASE(m_vregs) // palette ram
 
 	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */
-	AM_RANGE(0x090000, 0x090fff) AM_RAM AM_BASE( m_left_fg_vram_top)
-	AM_RANGE(0x091000, 0x091fff) AM_RAM AM_BASE( m_right_fg_vram_top)
-	AM_RANGE(0x092000, 0x092fff) AM_RAM AM_BASE( m_left_fg_vram_bottom)
-	AM_RANGE(0x093000, 0x093fff) AM_RAM AM_BASE( m_right_fg_vram_bottom)
+	AM_RANGE(0x090000, 0x090fff) AM_RAM AM_BASE(m_left_fg_vram_top)
+	AM_RANGE(0x091000, 0x091fff) AM_RAM AM_BASE(m_right_fg_vram_top)
+	AM_RANGE(0x092000, 0x092fff) AM_RAM AM_BASE(m_left_fg_vram_bottom)
+	AM_RANGE(0x093000, 0x093fff) AM_RAM AM_BASE(m_right_fg_vram_bottom)
 	//AM_RANGE(0x094000, 0x094001) AM_NOP // always 0?
 	AM_RANGE(0x098000, 0x098001) AM_WRITE_LEGACY(ddealer_flipscreen_w)
-	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE_LEGACY(back_vram_w) AM_BASE( m_back_vram) // bg tilemap
-	AM_RANGE(0x0f0000, 0x0fdfff) AM_RAM AM_BASE( m_work_ram)
-	AM_RANGE(0x0fe000, 0x0fefff) AM_RAM_WRITE_LEGACY(ddealer_mcu_shared_w) AM_BASE( m_mcu_shared_ram)
+	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE_LEGACY(back_vram_w) AM_BASE(m_back_vram) // bg tilemap
+	AM_RANGE(0x0f0000, 0x0fdfff) AM_RAM AM_BASE(m_work_ram)
+	AM_RANGE(0x0fe000, 0x0fefff) AM_RAM_WRITE_LEGACY(ddealer_mcu_shared_w) AM_BASE(m_mcu_shared_ram)
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 

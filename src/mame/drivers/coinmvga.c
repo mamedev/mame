@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
 
 //  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
 //  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
-	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE( m_vram)
+	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE(m_vram)
 //  AM_RANGE(0x40746e, 0x40746f) AM_READ_LEGACY(test_r) AM_WRITENOP //touch screen related, colorama
 //  AM_RANGE(0x403afa, 0x403afb) AM_READ_LEGACY(test_r) AM_WRITENOP //touch screen related, cmrltv75
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM

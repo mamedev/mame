@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8, cmmb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE_LEGACY(cmmb_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE_LEGACY(cmmb_input_r,cmmb_output_w) //i/o
 	AM_RANGE(0x4900, 0x4900) AM_READ_LEGACY(kludge_r)

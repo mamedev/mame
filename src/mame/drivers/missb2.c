@@ -159,8 +159,8 @@ static WRITE8_HANDLER( missb2_bg_bank_w )
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
-	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE( m_objectram, m_objectram_size)
+	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE(m_objectram, m_objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(bublbobl_sound_command_w)
@@ -184,11 +184,11 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank2")	// ROM data for the background palette ram
 	AM_RANGE(0xa000, 0xafff) AM_ROMBANK("bank3")	// ROM data for the background palette ram
 	AM_RANGE(0xb000, 0xb1ff) AM_ROM			// banked ???
-	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE_LEGACY(bg_paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE( m_bg_paletteram)
+	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE_LEGACY(bg_paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE(m_bg_paletteram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM			// main ???
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(missb2_bg_bank_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP
-	AM_RANGE(0xd003, 0xd003) AM_RAM AM_BASE( m_bgvram)
+	AM_RANGE(0xd003, 0xd003) AM_RAM AM_BASE(m_bgvram)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 

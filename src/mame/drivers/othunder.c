@@ -469,7 +469,7 @@ static ADDRESS_MAP_START( othunder_map, AS_PROGRAM, 16, othunder_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x300000, 0x300003) AM_READWRITE_LEGACY(othunder_sound_r, othunder_sound_w)
-	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x500000, 0x500007) AM_READWRITE_LEGACY(othunder_lightgun_r, othunder_lightgun_w)
 	AM_RANGE(0x600000, 0x600003) AM_WRITE_LEGACY(irq_ack_w)
 ADDRESS_MAP_END

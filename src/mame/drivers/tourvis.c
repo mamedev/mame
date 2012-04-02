@@ -274,17 +274,17 @@ INPUT_PORTS_END
 
 static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE( 0x000000, 0x0FFFFF) AM_ROM
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE_LEGACY( &pce_user_ram )
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE_LEGACY( vdc_0_r, vdc_0_w )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE_LEGACY( vce_r, vce_w )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE_LEGACY( "c6280", c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE_LEGACY( h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE_LEGACY( pce_joystick_r, pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE_LEGACY( h6280_irq_status_r, h6280_irq_status_w )
+	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE_LEGACY(&pce_user_ram )
+	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w )
+	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE_LEGACY(vce_r, vce_w )
+	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE_LEGACY("c6280", c6280_r, c6280_w )
+	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE_LEGACY(h6280_timer_r, h6280_timer_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE_LEGACY(pce_joystick_r, pce_joystick_w )
+	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE_LEGACY(h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pce_io , AS_IO, 8, tourvision_state )
-	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY( vdc_0_r, vdc_0_w )
+	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w )
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tourvision_8085_d000_w )
@@ -300,7 +300,7 @@ static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW2")
 	AM_RANGE(0xb000, 0xb000) AM_READNOP // unknown (must NOT be == 0x03 ? code at 0x1154)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY( tourvision_8085_d000_w )
+	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(tourvision_8085_d000_w )
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READNOP // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 ADDRESS_MAP_END

@@ -412,13 +412,13 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 #endif
 
 #define SSV_MAP( _ROM  )																							\
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE( m_mainram)										/*  RAM     */	\
-	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_BASE( m_spriteram)										/*  Sprites */	\
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE_LEGACY(paletteram16_xrgb_swap_word_w) AM_BASE( m_paletteram)	/*  Palette */	\
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(m_mainram)										/*  RAM     */	\
+	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_BASE(m_spriteram)										/*  Sprites */	\
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE_LEGACY(paletteram16_xrgb_swap_word_w) AM_BASE(m_paletteram)	/*  Palette */	\
 	AM_RANGE(0x160000, 0x17ffff) AM_RAM																/*          */	\
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_LEGACY(ssv_vblank_r			)									/*  Vblank? */	\
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY									/*  Scroll  */	\
-	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE_LEGACY(ssv_scroll_w) AM_BASE( m_scroll)             		/*  Scroll  */  \
+	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE_LEGACY(ssv_scroll_w) AM_BASE(m_scroll)             		/*  Scroll  */  \
 	AM_RANGE(0x210002, 0x210003) AM_READ_PORT("DSW1")																\
 	AM_RANGE(0x210004, 0x210005) AM_READ_PORT("DSW2")																\
 	AM_RANGE(0x210008, 0x210009) AM_READ_PORT("P1")																	\
@@ -426,7 +426,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x21000c, 0x21000d) AM_READ_PORT("SYSTEM")																\
 	AM_RANGE(0x21000e, 0x21000f) AM_READNOP AM_WRITE_LEGACY(ssv_lockout_w)								/*  Lockout */	\
 	AM_RANGE(0x210010, 0x210011) AM_WRITENOP                                                        				\
-	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_BASE( m_irq_vectors)	        		    /*  IRQ Vec */	\
+	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_BASE(m_irq_vectors)	        		    /*  IRQ Vec */	\
 	AM_RANGE(0x240000, 0x240071) AM_WRITE_LEGACY(ssv_irq_ack_w )                               			/*  IRQ Ack */	\
 	AM_RANGE(0x260000, 0x260001) AM_WRITE_LEGACY(ssv_irq_enable_w)                             			/*  IRQ En  */  \
 	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8_LEGACY("ensoniq", es5506_r, es5506_w, 0x00ff)			/*  Sound   */	\
@@ -588,14 +588,14 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 }
 
 static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE_LEGACY(gdfs_tmapram_w) AM_BASE( m_gdfs_tmapram)
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE_LEGACY(gdfs_tmapram_w) AM_BASE(m_gdfs_tmapram)
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM
-	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_BASE( m_gdfs_tmapscroll)
+	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_BASE(m_gdfs_tmapscroll)
 	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE_LEGACY("eeprom", gdfs_eeprom_w)
 	AM_RANGE(0x540000, 0x540001) AM_DEVREAD_LEGACY("eeprom", gdfs_eeprom_r)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE( m_spriteram2)
-	AM_RANGE(0x8c0000, 0x8c00ff) AM_READWRITE_LEGACY(gdfs_blitram_r, gdfs_blitram_w) AM_BASE( m_gdfs_blitram)
+	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE(m_spriteram2)
+	AM_RANGE(0x8c0000, 0x8c00ff) AM_READWRITE_LEGACY(gdfs_blitram_r, gdfs_blitram_w) AM_BASE(m_gdfs_blitram)
 	AM_RANGE(0x900000, 0x9fffff) AM_READWRITE_LEGACY(gdfs_gfxram_r, gdfs_gfxram_w)
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
@@ -632,7 +632,7 @@ static ADDRESS_MAP_START( hypreact_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE_LEGACY(ssv_lockout_inv_w)			// Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                       // ? read at the start, value not used
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_LEGACY(hypreact_input_r)				// Inputs
-	AM_RANGE(0xc00006, 0xc00007) AM_RAM AM_BASE( m_input_sel)			//
+	AM_RANGE(0xc00006, 0xc00007) AM_RAM AM_BASE(m_input_sel)			//
 	AM_RANGE(0xc00008, 0xc00009) AM_NOP									//
 	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
@@ -649,7 +649,7 @@ static ADDRESS_MAP_START( hypreac2_map, AS_PROGRAM, 16, ssv_state )
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                           // ? read at the start, value not used
 	AM_RANGE(0x500000, 0x500001) AM_READ_LEGACY(hypreact_input_r)					// Inputs
 	AM_RANGE(0x500002, 0x500003) AM_READ_LEGACY(hypreact_input_r)					// (again?)
-	AM_RANGE(0x520000, 0x520001) AM_WRITEONLY AM_BASE( m_input_sel)	// Inputs
+	AM_RANGE(0x520000, 0x520001) AM_WRITEONLY AM_BASE(m_input_sel)	// Inputs
 //  0x540000, 0x540003  communication with other units
 	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
@@ -665,7 +665,7 @@ static ADDRESS_MAP_START( janjans1_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_WRITENOP							// koikois2 but not janjans1
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
 	AM_RANGE(0x210006, 0x210007) AM_READNOP
-	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE( m_input_sel)	// Inputs
+	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE(m_input_sel)	// Inputs
 	AM_RANGE(0x800002, 0x800003) AM_READ_LEGACY(srmp4_input_r)						// Inputs
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
@@ -758,7 +758,7 @@ static ADDRESS_MAP_START( srmp4_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ_LEGACY(watchdog_reset16_r)				// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1,5 at the start
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_LEGACY(srmp4_input_r)						// Inputs
-	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITEONLY AM_BASE( m_input_sel)	// Inputs
+	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITEONLY AM_BASE(m_input_sel)	// Inputs
 	AM_RANGE(0xc00010, 0xc00011) AM_WRITENOP							//
 	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
@@ -812,7 +812,7 @@ static ADDRESS_MAP_START( srmp7_map, AS_PROGRAM, 16, ssv_state )
 //  0x540000, 0x540003, related to lev 5 irq?
 	AM_RANGE(0x580000, 0x580001) AM_WRITE_LEGACY(srmp7_sound_bank_w)				// Sound Bank
 	AM_RANGE(0x600000, 0x600001) AM_READ_LEGACY(srmp7_input_r)						// Inputs
-	AM_RANGE(0x680000, 0x680001) AM_WRITEONLY AM_BASE( m_input_sel)	// Inputs
+	AM_RANGE(0x680000, 0x680001) AM_WRITEONLY AM_BASE(m_input_sel)	// Inputs
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 

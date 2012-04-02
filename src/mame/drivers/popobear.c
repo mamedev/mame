@@ -288,11 +288,11 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM
-	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_BASE( m_spr) // unknown boundaries, 0x2ff800 contains a sprite list
-	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_BASE( m_vram)
+	AM_RANGE(0x280000, 0x2fffff) AM_RAM AM_BASE(m_spr) // unknown boundaries, 0x2ff800 contains a sprite list
+	AM_RANGE(0x300000, 0x3fffff) AM_RAM AM_BASE(m_vram)
 
 	/* Most if not all of these are vregs */
-	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_BASE( m_vregs)
+	AM_RANGE(0x480000, 0x48001f) AM_RAM AM_BASE(m_vregs)
 	AM_RANGE(0x480020, 0x480023) AM_RAM
 	AM_RANGE(0x480028, 0x48002d) AM_RAM
 //  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ_LEGACY(popo_480020_r) AM_WRITE_LEGACY(popo_480020_w)
@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")
 	AM_RANGE(0x520000, 0x520001) AM_READ_PORT("IN1")
 	AM_RANGE(0x540000, 0x540001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x550000, 0x550003) AM_DEVWRITE8_LEGACY( "ymsnd", ym2413_w, 0x00ff )
+	AM_RANGE(0x550000, 0x550003) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff )
 
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP
 	AM_RANGE(0x620000, 0x620001) AM_READ8_LEGACY(popo_620000_r,0xff00) AM_WRITENOP

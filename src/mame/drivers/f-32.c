@@ -54,7 +54,7 @@ static SCREEN_UPDATE_IND16( mosaicf2 )
 
 static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32, mosaicf2_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x80000000, 0x80ffffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END

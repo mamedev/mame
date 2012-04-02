@@ -68,8 +68,8 @@ static ADDRESS_MAP_START( carjmbre_map, AS_PROGRAM, 8, carjmbre_state )
 	AM_RANGE(0x8807, 0x8807) AM_WRITE_LEGACY(carjmbre_flipscreen_w)
 //  AM_RANGE(0x8fc1, 0x8fc1) AM_WRITENOP        // overrun during initial screen clear
 //  AM_RANGE(0x8fe1, 0x8fe1) AM_WRITENOP        // overrun during initial screen clear
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(carjmbre_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x9800, 0x985f) AM_MIRROR(0x80) AM_WRITEONLY AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(carjmbre_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9800, 0x985f) AM_MIRROR(0x80) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2")
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW") AM_WRITE_LEGACY(soundlatch_w)

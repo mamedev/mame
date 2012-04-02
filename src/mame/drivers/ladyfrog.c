@@ -136,7 +136,7 @@ static READ8_HANDLER( snd_flag_r )
 static ADDRESS_MAP_START( ladyfrog_map, AS_PROGRAM, 8, ladyfrog_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc07f) AM_RAM
-	AM_RANGE(0xc080, 0xc87f) AM_READWRITE_LEGACY(ladyfrog_videoram_r, ladyfrog_videoram_w) AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xc080, 0xc87f) AM_READWRITE_LEGACY(ladyfrog_videoram_r, ladyfrog_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(ladyfrog_gfxctrl2_w)
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( ladyfrog_map, AS_PROGRAM, 8, ladyfrog_state )
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xdc00, 0xdc9f) AM_READWRITE_LEGACY(ladyfrog_spriteram_r,ladyfrog_spriteram_w)
-	AM_RANGE(0xdca0, 0xdcbf) AM_READWRITE_LEGACY(ladyfrog_scrlram_r, ladyfrog_scrlram_w) AM_BASE( m_scrlram)
+	AM_RANGE(0xdca0, 0xdcbf) AM_READWRITE_LEGACY(ladyfrog_scrlram_r, ladyfrog_scrlram_w) AM_BASE(m_scrlram)
 	AM_RANGE(0xdcc0, 0xdcff) AM_RAM
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE_LEGACY(ladyfrog_palette_r, ladyfrog_palette_w)
 	AM_RANGE(0xd0d0, 0xd0d0) AM_READNOP /* code jumps to ASCII text "Alfa tecnology"  @ $b7 */

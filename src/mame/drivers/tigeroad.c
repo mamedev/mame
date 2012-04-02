@@ -175,11 +175,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM")
 /*  AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE_LEGACY(tigeroad_soundcmd_w) added by init_tigeroad() */
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE_LEGACY(tigeroad_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE_LEGACY(tigeroad_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE_LEGACY(tigeroad_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITEONLY    /* fe800e = watchdog or IRQ acknowledge */
 	AM_RANGE(0xff8200, 0xff867f) AM_RAM_WRITE_LEGACY(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE( m_ram16)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(m_ram16)
 ADDRESS_MAP_END
 
 

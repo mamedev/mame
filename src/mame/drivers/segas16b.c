@@ -7075,30 +7075,30 @@ static ADDRESS_MAP_START( isgsm_map, AS_PROGRAM, 16, segas1x_state )
 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK(ISGSM_MAIN_BANK) // this area is ALWAYS read-only, even when the game is banked in
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression
-	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE_LEGACY( rom_5704_bank_w )
+	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE_LEGACY(rom_5704_bank_w )
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_BASE_LEGACY(&segaic16_tileram_0)
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_BASE_LEGACY(&segaic16_textram_0)
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
 	AM_RANGE(0xC40000, 0xC43fff) AM_READWRITE_LEGACY(misc_io_r, misc_io_w)
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE_LEGACY( isgsm_data_w ) // writes decompressed data here (copied from RAM..)
-	AM_RANGE(0xe00002, 0xe00003) AM_WRITE_LEGACY( isgsm_type_w ) // selects which 'type' of data we're writing
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE_LEGACY( isgsm_addr_high_w ) // high address, and some mode bits
-	AM_RANGE(0xe00006, 0xe00007) AM_WRITE_LEGACY( isgsm_addr_low_w )  // low address
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE_LEGACY(isgsm_data_w ) // writes decompressed data here (copied from RAM..)
+	AM_RANGE(0xe00002, 0xe00003) AM_WRITE_LEGACY(isgsm_type_w ) // selects which 'type' of data we're writing
+	AM_RANGE(0xe00004, 0xe00005) AM_WRITE_LEGACY(isgsm_addr_high_w ) // high address, and some mode bits
+	AM_RANGE(0xe00006, 0xe00007) AM_WRITE_LEGACY(isgsm_addr_low_w )  // low address
 
-	AM_RANGE(0xe80000, 0xe80001) AM_READ_LEGACY( isgsm_cart_data_r ) // 8-bit port that the entire cart can be read from
+	AM_RANGE(0xe80000, 0xe80001) AM_READ_LEGACY(isgsm_cart_data_r ) // 8-bit port that the entire cart can be read from
 	AM_RANGE(0xe80002, 0xe80003) AM_READ_PORT("CARDDSW")
-	AM_RANGE(0xe80004, 0xe80005) AM_WRITE_LEGACY( isgsm_cart_addr_high_w )
-	AM_RANGE(0xe80006, 0xe80007) AM_WRITE_LEGACY( isgsm_cart_addr_low_w )
-	AM_RANGE(0xe80008, 0xe80009) AM_READWRITE_LEGACY( isgsm_cart_security_high_r, isgsm_cart_security_high_w ) // 32-bit bitswap device..
-	AM_RANGE(0xe8000a, 0xe8000b) AM_READWRITE_LEGACY( isgsm_cart_security_low_r,  isgsm_cart_security_low_w )
+	AM_RANGE(0xe80004, 0xe80005) AM_WRITE_LEGACY(isgsm_cart_addr_high_w )
+	AM_RANGE(0xe80006, 0xe80007) AM_WRITE_LEGACY(isgsm_cart_addr_low_w )
+	AM_RANGE(0xe80008, 0xe80009) AM_READWRITE_LEGACY(isgsm_cart_security_high_r, isgsm_cart_security_high_w ) // 32-bit bitswap device..
+	AM_RANGE(0xe8000a, 0xe8000b) AM_READWRITE_LEGACY(isgsm_cart_security_low_r,  isgsm_cart_security_low_w )
 
 	AM_RANGE(0xee0000, 0xefffff) AM_ROMBANK(ISGSM_CART_BANK) // only the first 0x20000 bytes of the cart are visible here..
 
-	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITE_LEGACY( isgsm_sound_w16 )
-	AM_RANGE(0xfe0008, 0xfe0009) AM_WRITE_LEGACY( isgsm_sound_reset_w )
-	AM_RANGE(0xfe000a, 0xfe000b) AM_WRITE_LEGACY( isgsm_main_bank_change_w )
+	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITE_LEGACY(isgsm_sound_w16 )
+	AM_RANGE(0xfe0008, 0xfe0009) AM_WRITE_LEGACY(isgsm_sound_reset_w )
+	AM_RANGE(0xfe000a, 0xfe000b) AM_WRITE_LEGACY(isgsm_main_bank_change_w )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_LEGACY(&workram)
 ADDRESS_MAP_END
 

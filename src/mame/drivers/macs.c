@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8, macs_state )
 	AM_RANGE(0xc000, 0xcfff) AM_READ_LEGACY(st0016_sprite_ram_r) AM_WRITE_LEGACY(st0016_sprite_ram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READ_LEGACY(st0016_sprite2_ram_r) AM_WRITE_LEGACY(st0016_sprite2_ram_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram ? */
-	AM_RANGE(0xe800, 0xe87f) AM_RAM AM_BASE( m_ram2)
+	AM_RANGE(0xe800, 0xe87f) AM_RAM AM_BASE(m_ram2)
 	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE_LEGACY("stsnd", st0016_snd_r, st0016_snd_w)
 	AM_RANGE(0xea00, 0xebff) AM_READ_LEGACY(st0016_palette_ram_r) AM_WRITE_LEGACY(st0016_palette_ram_w)
 	AM_RANGE(0xec00, 0xec1f) AM_READ_LEGACY(st0016_character_ram_r) AM_WRITE_LEGACY(st0016_character_ram_w)

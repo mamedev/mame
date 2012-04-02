@@ -174,8 +174,8 @@ static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
 
 static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32, galastrm_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE( m_ram)								/* main CPUA ram */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(m_ram)								/* main CPUA ram */
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("IN0")
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("IN1")
 	AM_RANGE(0x400000, 0x400007) AM_WRITE_LEGACY(galastrm_input_w)									/* eerom etc. */

@@ -787,19 +787,19 @@ static ADDRESS_MAP_START( srider_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INB" )
 
-	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE_LEGACY( subsino_out_b_w )
-	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE_LEGACY( subsino_out_a_w )
+	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE_LEGACY(subsino_out_b_w )
+	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE_LEGACY(subsino_out_a_w )
 
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE_LEGACY( "ymsnd", ym3812_w )
+	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
 
 	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE_LEGACY( subsino_tiles_offset_w )
+	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
 
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE_LEGACY( subsino_colorram_w ) AM_BASE( m_colorram )
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE_LEGACY( subsino_videoram_w ) AM_BASE( m_videoram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
 ADDRESS_MAP_END
 
 
@@ -814,20 +814,20 @@ static ADDRESS_MAP_START( sharkpy_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
 
-	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE_LEGACY( subsino_out_b_w )
-	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE_LEGACY( subsino_out_a_w )
+	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE_LEGACY(subsino_out_b_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE_LEGACY(subsino_out_a_w )
 
 	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE_LEGACY( "ymsnd", ym3812_w )
+	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
 
 	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE_LEGACY( subsino_tiles_offset_w )
+	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY( subsino_colorram_w ) AM_BASE( m_colorram )
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY( subsino_videoram_w ) AM_BASE( m_videoram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
 
 	AM_RANGE( 0x00000, 0x13fff ) AM_ROM //overlap unmapped regions
 ADDRESS_MAP_END
@@ -841,8 +841,8 @@ this event makes the game to reset without any money in the bank.
 static ADDRESS_MAP_START( victor21_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
-	AM_RANGE( 0x09000, 0x09000 ) AM_WRITE_LEGACY( subsino_out_a_w )
-	AM_RANGE( 0x09001, 0x09001 ) AM_WRITE_LEGACY( subsino_out_b_w )
+	AM_RANGE( 0x09000, 0x09000 ) AM_WRITE_LEGACY(subsino_out_a_w )
+	AM_RANGE( 0x09001, 0x09001 ) AM_WRITE_LEGACY(subsino_out_b_w )
 	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "INC" )
 	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INB" )
@@ -855,13 +855,13 @@ static ADDRESS_MAP_START( victor21_map, AS_PROGRAM, 8, subsino_state )
 
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_w )
+	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 
-	AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE_LEGACY( subsino_tiles_offset_w )
+	AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY( subsino_videoram_w ) AM_BASE( m_videoram )
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY( subsino_colorram_w ) AM_BASE( m_colorram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
 
 	AM_RANGE( 0x00000, 0x08fff ) AM_ROM //overlap unmapped regions
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
@@ -923,7 +923,7 @@ static WRITE8_HANDLER( flash_w )
 
 static ADDRESS_MAP_START( victor5_map, AS_PROGRAM, 8, subsino_state )
 	AM_IMPORT_FROM( victor21_map )
-	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE_LEGACY( flash_r, flash_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE_LEGACY(flash_r, flash_w )
 	AM_RANGE( 0x0900b, 0x0900b ) AM_READNOP //"flash" status, bit 0
 ADDRESS_MAP_END
 
@@ -942,24 +942,24 @@ static ADDRESS_MAP_START( crsbingo_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09003, 0x09003 ) AM_READ_PORT( "INB" )
 	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "INC" )
-	AM_RANGE( 0x09005, 0x09005 ) AM_WRITE_LEGACY( subsino_out_a_w )
+	AM_RANGE( 0x09005, 0x09005 ) AM_WRITE_LEGACY(subsino_out_a_w )
 
 	AM_RANGE( 0x09008, 0x09008 ) AM_READ_PORT( "SW4" )
-	AM_RANGE( 0x09009, 0x09009 ) AM_READ_PORT( "SW3" )	// AM_WRITE_LEGACY( subsino_out_a_w )
-	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE_LEGACY( hwcheck_r, subsino_out_b_w )
+	AM_RANGE( 0x09009, 0x09009 ) AM_READ_PORT( "SW3" )	// AM_WRITE_LEGACY(subsino_out_a_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE_LEGACY(hwcheck_r, subsino_out_b_w )
 
-	AM_RANGE( 0x09010, 0x09010 ) AM_READWRITE_LEGACY( flash_r, flash_w )
+	AM_RANGE( 0x09010, 0x09010 ) AM_READWRITE_LEGACY(flash_r, flash_w )
 //  AM_RANGE( 0x09011, 0x09011 ) //"flash" status, bit 0
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
-	AM_RANGE( 0x0900c, 0x0900d ) AM_DEVWRITE_LEGACY( "ymsnd", ym2413_w )
+	AM_RANGE( 0x0900c, 0x0900d ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 
 //  AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE("oki", okim6295_device, write)
 
-//  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE_LEGACY( subsino_tiles_offset_w )
+//  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY( subsino_videoram_w ) AM_BASE( m_videoram )
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY( subsino_colorram_w ) AM_BASE( m_colorram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
 
 	AM_RANGE( 0x00000, 0x8fff ) AM_ROM //overlap unmapped regions
 
@@ -995,33 +995,33 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
 
 	/* 0x09008: is marked as OUTPUT C in the test mode. */
-	AM_RANGE( 0x09008, 0x09008 ) AM_WRITE_LEGACY( subsino_out_c_w )
-	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE_LEGACY( subsino_out_b_w )
-	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE_LEGACY( subsino_out_a_w )
+	AM_RANGE( 0x09008, 0x09008 ) AM_WRITE_LEGACY(subsino_out_c_w )
+	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE_LEGACY(subsino_out_b_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE_LEGACY(subsino_out_a_w )
 
 	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE_LEGACY( "ymsnd", ym3812_w )
+	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
 
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE_LEGACY( subsino_tiles_offset_w )
+	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY( subsino_videoram_w ) AM_BASE( m_videoram )
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY( subsino_colorram_w ) AM_BASE( m_colorram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
 
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM // overlap unmapped regions
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
 	AM_RANGE( 0x14000, 0x14fff ) AM_ROM // reads the card face data here (see rom copy in rom loading)
 
-	AM_RANGE( 0x150c0, 0x150ff ) AM_RAM AM_BASE( m_reel3_scroll)
-	AM_RANGE( 0x15140, 0x1517f ) AM_RAM AM_BASE( m_reel2_scroll)
-	AM_RANGE( 0x15180, 0x151bf ) AM_RAM AM_BASE( m_reel1_scroll)
+	AM_RANGE( 0x150c0, 0x150ff ) AM_RAM AM_BASE(m_reel3_scroll)
+	AM_RANGE( 0x15140, 0x1517f ) AM_RAM AM_BASE(m_reel2_scroll)
+	AM_RANGE( 0x15180, 0x151bf ) AM_RAM AM_BASE(m_reel1_scroll)
 
-	AM_RANGE( 0x15800, 0x159ff ) AM_RAM_WRITE_LEGACY(subsino_reel1_ram_w) AM_BASE( m_reel1_ram)
-	AM_RANGE( 0x15a00, 0x15bff ) AM_RAM_WRITE_LEGACY(subsino_reel2_ram_w) AM_BASE( m_reel2_ram)
-	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE_LEGACY(subsino_reel3_ram_w) AM_BASE( m_reel3_ram)
+	AM_RANGE( 0x15800, 0x159ff ) AM_RAM_WRITE_LEGACY(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE( 0x15a00, 0x15bff ) AM_RAM_WRITE_LEGACY(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE_LEGACY(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
 ADDRESS_MAP_END
 
 
@@ -1127,27 +1127,27 @@ static ADDRESS_MAP_START( stisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INB" )
 	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INA" )
 
-	AM_RANGE( 0x0d008, 0x0d008 ) AM_WRITE_LEGACY( stisub_out_c_w )
+	AM_RANGE( 0x0d008, 0x0d008 ) AM_WRITE_LEGACY(stisub_out_c_w )
 
-	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE_LEGACY( subsino_out_b_w )
-	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE_LEGACY( subsino_out_a_w )
+	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE_LEGACY(subsino_out_b_w )
+	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE_LEGACY(subsino_out_a_w )
 
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
 	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE_LEGACY(colordac_w)
 
-	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE_LEGACY( "ymsnd", ym3812_w )
+	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
 
-//  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE_LEGACY( subsino_tiles_offset_w )
+//  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
 
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE_LEGACY( subsino_colorram_w ) AM_BASE( m_colorram )
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE_LEGACY( subsino_videoram_w ) AM_BASE( m_videoram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
 
 	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE_LEGACY(reel_scrollattr_r, reel_scrollattr_w)
 
-	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE_LEGACY(subsino_reel1_ram_w) AM_BASE( m_reel1_ram)
-	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE_LEGACY(subsino_reel2_ram_w) AM_BASE( m_reel2_ram)
-	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE_LEGACY(subsino_reel3_ram_w) AM_BASE( m_reel3_ram)
+	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE_LEGACY(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE_LEGACY(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE_LEGACY(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
 ADDRESS_MAP_END
 
 
@@ -1177,18 +1177,18 @@ static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
 
 //  AM_RANGE( 0x0d012, 0x0d012 ) AM_WRITE
 
-	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE_LEGACY( "ymsnd", ym3812_w )
+	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
 
 //  AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE_LEGACY( subsino_colorram_w ) AM_BASE( m_colorram )
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE_LEGACY( subsino_videoram_w ) AM_BASE( m_videoram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
 
 	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE_LEGACY(reel_scrollattr_r, reel_scrollattr_w)
 
-	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE_LEGACY(subsino_reel1_ram_w) AM_BASE( m_reel1_ram)
-	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE_LEGACY(subsino_reel2_ram_w) AM_BASE( m_reel2_ram)
-	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE_LEGACY(subsino_reel3_ram_w) AM_BASE( m_reel3_ram)
+	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE_LEGACY(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE_LEGACY(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE_LEGACY(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
 ADDRESS_MAP_END
 
 

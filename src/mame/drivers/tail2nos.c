@@ -41,9 +41,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0x500000, 0x500fff) AM_DEVREADWRITE8_LEGACY("k051316", k051316_r, k051316_w, 0x00ff)
 	AM_RANGE(0x510000, 0x51001f) AM_DEVWRITE8_LEGACY("k051316", k051316_ctrl_w, 0x00ff)
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work RAM */
-	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xffc000, 0xffc2ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(tail2nos_bgvideoram_w) AM_BASE( m_bgvideoram)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(tail2nos_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(tail2nos_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")

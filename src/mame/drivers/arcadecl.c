@@ -154,7 +154,7 @@ static WRITE16_HANDLER( latch_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE( m_bitmap)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(m_bitmap)
 	AM_RANGE(0x3c0000, 0x3c07ff) AM_RAM_WRITE_LEGACY(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM

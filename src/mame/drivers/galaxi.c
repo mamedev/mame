@@ -275,12 +275,12 @@ static CUSTOM_INPUT( hopper_r )
 static ADDRESS_MAP_START( galaxi_map, AS_PROGRAM, 16, galaxi_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE_LEGACY(galaxi_bg1_w) AM_BASE( m_bg1_ram)
-	AM_RANGE(0x100400, 0x1007ff) AM_RAM_WRITE_LEGACY(galaxi_bg2_w) AM_BASE( m_bg2_ram)
-	AM_RANGE(0x100800, 0x100bff) AM_RAM_WRITE_LEGACY(galaxi_bg3_w) AM_BASE( m_bg3_ram)
-	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE_LEGACY(galaxi_bg4_w) AM_BASE( m_bg4_ram)
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM_WRITE_LEGACY(galaxi_bg1_w) AM_BASE(m_bg1_ram)
+	AM_RANGE(0x100400, 0x1007ff) AM_RAM_WRITE_LEGACY(galaxi_bg2_w) AM_BASE(m_bg2_ram)
+	AM_RANGE(0x100800, 0x100bff) AM_RAM_WRITE_LEGACY(galaxi_bg3_w) AM_BASE(m_bg3_ram)
+	AM_RANGE(0x100c00, 0x100fff) AM_RAM_WRITE_LEGACY(galaxi_bg4_w) AM_BASE(m_bg4_ram)
 
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(galaxi_fg_w ) AM_BASE( m_fg_ram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(galaxi_fg_w ) AM_BASE(m_fg_ram)
 	AM_RANGE(0x102000, 0x1047ff) AM_READNOP	// unknown
 
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)

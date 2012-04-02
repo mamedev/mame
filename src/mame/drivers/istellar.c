@@ -169,9 +169,9 @@ static WRITE8_HANDLER(z80_2_ldp_write)
 static ADDRESS_MAP_START( z80_0_mem, AS_PROGRAM, 8, istellar_state )
 	AM_RANGE(0x0000,0x9fff) AM_ROM
 	AM_RANGE(0xa000,0xa7ff) AM_RAM
-	AM_RANGE(0xa800,0xabff) AM_RAM AM_BASE( m_tile_ram)
-	AM_RANGE(0xac00,0xafff) AM_RAM AM_BASE( m_tile_control_ram)
-	AM_RANGE(0xb000,0xb3ff) AM_RAM AM_BASE( m_sprite_ram)
+	AM_RANGE(0xa800,0xabff) AM_RAM AM_BASE(m_tile_ram)
+	AM_RANGE(0xac00,0xafff) AM_RAM AM_BASE(m_tile_control_ram)
+	AM_RANGE(0xb000,0xb3ff) AM_RAM AM_BASE(m_sprite_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_1_mem, AS_PROGRAM, 8, istellar_state )

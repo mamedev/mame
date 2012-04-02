@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, mgolf_state )
 	AM_RANGE(0x006d, 0x006d) AM_WRITENOP
 	AM_RANGE(0x0080, 0x00ff) AM_WRITE_LEGACY(mgolf_wram_w)
 	AM_RANGE(0x0180, 0x01ff) AM_WRITE_LEGACY(mgolf_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE_LEGACY(mgolf_vram_w) AM_BASE( m_video_ram)
+	AM_RANGE(0x0800, 0x0bff) AM_WRITE_LEGACY(mgolf_vram_w) AM_BASE(m_video_ram)
 
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END

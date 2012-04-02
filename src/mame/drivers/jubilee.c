@@ -163,7 +163,7 @@ static INTERRUPT_GEN( jubileep_interrupt )
 static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE_LEGACY(jubileep_videoram_w) AM_BASE( m_videoram)	/* wrong... just placed somewhere */
+	AM_RANGE(0x3000, 0x30ff) AM_WRITE_LEGACY(jubileep_videoram_w) AM_BASE(m_videoram)	/* wrong... just placed somewhere */
 	AM_RANGE(0x3100, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 

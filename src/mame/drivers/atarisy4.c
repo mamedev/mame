@@ -624,7 +624,7 @@ static WRITE16_HANDLER( dsp1_bank_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy4_state )
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE( m_m68k_ram)
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(m_m68k_ram)
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
 	AM_RANGE(0x580000, 0x580001) AM_READ_PORT("JOYSTICK")
 	AM_RANGE(0x588000, 0x588001) AM_READ_LEGACY(analog_r)
@@ -633,7 +633,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy4_state )
 	AM_RANGE(0x7c6000, 0x7c6001) AM_READWRITE_LEGACY(dsp1_status_r, dsp1_control_w)
 	AM_RANGE(0x7f0000, 0x7f4fff) AM_READWRITE_LEGACY(m68k_shared_0_r, m68k_shared_0_w)
 	AM_RANGE(0x7f6000, 0x7f6001) AM_READWRITE_LEGACY(dsp0_status_r, dsp0_control_w)
-	AM_RANGE(0xa00400, 0xbfffff) AM_RAM AM_BASE( m_screen_ram)
+	AM_RANGE(0xa00400, 0xbfffff) AM_RAM AM_BASE(m_screen_ram)
 	AM_RANGE(0xff8000, 0xff8fff) AM_READWRITE_LEGACY(gpu_r, gpu_w)
 ADDRESS_MAP_END
 

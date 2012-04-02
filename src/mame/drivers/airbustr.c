@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE( m_devram) // shared with protection device
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(m_devram) // shared with protection device
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
@@ -368,11 +368,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(airbustr_videoram2_w) AM_BASE( m_videoram2)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(airbustr_colorram2_w) AM_BASE( m_colorram2)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(airbustr_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(airbustr_colorram_w) AM_BASE( m_colorram)
-	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE_LEGACY(airbustr_paletteram_w) AM_BASE( m_paletteram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(airbustr_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(airbustr_colorram2_w) AM_BASE(m_colorram2)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(airbustr_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(airbustr_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE_LEGACY(airbustr_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xd600, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")

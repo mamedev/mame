@@ -203,11 +203,11 @@ static ADDRESS_MAP_START( jollyjgr_map, AS_PROGRAM, 8, jollyjgr_state )
 	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE_LEGACY(jollyjgr_misc_w)
 	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE_LEGACY(jollyjgr_coin_lookout_w)
 	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(jollyjgr_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE_LEGACY(jollyjgr_attrram_w) AM_BASE( m_colorram)
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(jollyjgr_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE_LEGACY(jollyjgr_attrram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE( m_bitmap)
+	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE(m_bitmap)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fspider_map, AS_PROGRAM, 8, jollyjgr_state )
@@ -220,13 +220,13 @@ static ADDRESS_MAP_START( fspider_map, AS_PROGRAM, 8, jollyjgr_state )
 	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE_LEGACY(jollyjgr_misc_w)
 	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE_LEGACY(jollyjgr_coin_lookout_w)
 	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(jollyjgr_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE_LEGACY(jollyjgr_attrram_w) AM_BASE( m_colorram)
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(jollyjgr_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE_LEGACY(jollyjgr_attrram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x9880, 0x989f) AM_RAM // ?
-	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_BASE( m_bulletram)
+	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_BASE(m_bulletram)
 	AM_RANGE(0x98b0, 0x9bff) AM_RAM // ?
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE( m_bitmap)
+	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE(m_bitmap)
 ADDRESS_MAP_END
 
 

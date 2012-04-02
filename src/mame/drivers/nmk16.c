@@ -323,10 +323,10 @@ static ADDRESS_MAP_START( vandyke_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE_LEGACY(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITE_LEGACY(vandyke_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
 	AM_RANGE(0x094000, 0x097fff) AM_RAM /* what is this? */
-	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vandykeb_map, AS_PROGRAM, 16, nmk16_state )
@@ -342,10 +342,10 @@ static ADDRESS_MAP_START( vandykeb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE_LEGACY(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITENOP	/* just in case... */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
 	AM_RANGE(0x094000, 0x097fff) AM_RAM /* what is this? */
-	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( manybloc_map, AS_PROGRAM, 16, nmk16_state )
@@ -359,10 +359,10 @@ static ADDRESS_MAP_START( manybloc_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x08001c, 0x08001d) AM_WRITENOP			/* See notes at the top of the driver */
 	AM_RANGE(0x08001e, 0x08001f) AM_READWRITE_LEGACY(soundlatch2_word_r,soundlatch_word_w)
 	AM_RANGE(0x088000, 0x0883ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE_LEGACY(manybloc_scroll_w) AM_BASE( m_gunnail_scrollram)
-	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE_LEGACY(manybloc_scroll_w) AM_BASE(m_gunnail_scrollram)
+	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_map, AS_PROGRAM, 16, nmk16_state )
@@ -379,10 +379,10 @@ static ADDRESS_MAP_START( tharrier_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080202, 0x080203) AM_READ_PORT("IN2")
 	AM_RANGE(0x088000, 0x0883ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 //  AM_RANGE(0x08c000, 0x08c007) AM_WRITE_LEGACY(nmk_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
 	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM /* Unused txvideoram area? */
-	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_BASE( m_mainram)
+	AM_RANGE(0x09d000, 0x09d7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_sound_map, AS_PROGRAM, 8, nmk16_state )
@@ -415,9 +415,9 @@ static ADDRESS_MAP_START( mustang_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE_LEGACY(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_BASE( m_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mustangb_map, AS_PROGRAM, 16, nmk16_state )
@@ -432,9 +432,9 @@ static ADDRESS_MAP_START( mustangb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE_LEGACY(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_BASE( m_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 
@@ -450,15 +450,15 @@ static ADDRESS_MAP_START( twinactn_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c001) AM_WRITE_LEGACY(mustang_scroll_w)
 	AM_RANGE(0x08c002, 0x08c087) AM_WRITENOP	// ??
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_BASE( m_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( acrobatm_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-	AM_RANGE(0x80000, 0x8ffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x80000, 0x8ffff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0xc0000, 0xc0001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc0002, 0xc0003) AM_READ_PORT("IN1")
 	AM_RANGE(0xc0008, 0xc0009) AM_READ_PORT("DSW1")
@@ -470,8 +470,8 @@ static ADDRESS_MAP_START( acrobatm_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0xc001e, 0xc001f) AM_WRITE_LEGACY(NMK004_w)
 	AM_RANGE(0xc4000, 0xc45ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc8000, 0xc8007) AM_RAM_WRITE_LEGACY(nmk_scroll_w)
-	AM_RANGE(0xcc000, 0xcffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0xd4000, 0xd47ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
+	AM_RANGE(0xcc000, 0xcffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0xd4000, 0xd47ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bioship_map, AS_PROGRAM, 16, nmk16_state )
@@ -487,9 +487,9 @@ static ADDRESS_MAP_START( bioship_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c007) AM_RAM_WRITE_LEGACY(bioshipbg_scroll_w)
 	AM_RANGE(0x08c010, 0x08c017) AM_RAM_WRITE_LEGACY(bioship_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 /******************************************************************************************
@@ -667,10 +667,10 @@ static ADDRESS_MAP_START( hachamf_map, AS_PROGRAM, 16, nmk16_state )
 	/* Video Region */
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c007) AM_WRITE_LEGACY(nmk_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
 	/* Main RAM, inc sprites, shared with MCU */
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(hachamf_mainram_w) AM_BASE( m_mainram) // ram is shared with MCU
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(hachamf_mainram_w) AM_BASE(m_mainram) // ram is shared with MCU
 ADDRESS_MAP_END
 
 
@@ -885,11 +885,11 @@ static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x044022, 0x044023) AM_READNOP  /* No Idea */
 //  AM_RANGE(0x0b0000, 0x0b7fff) AM_RAM    /* Work RAM */
-//  AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size) /* Sprite RAM */
+//  AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* Sprite RAM */
 //  AM_RANGE(0x0b9000, 0x0bdfff) AM_RAM AM_BASE_LEGACY(&nmk16_mcu_work_ram)   /* Work RAM */
 //  AM_RANGE(0x0be000, 0x0befff) AM_READWRITE_LEGACY(mcu_shared_r,tdragon_mcu_shared_w) AM_BASE_LEGACY(&nmk16_mcu_shared_ram)  /* Work RAM */
 //  AM_RANGE(0x0bf000, 0x0bffff) AM_RAM    /* Work RAM */
-	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM_WRITE_LEGACY( tdragon_mainram_w ) AM_BASE( m_mainram)
+	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM_WRITE_LEGACY(tdragon_mainram_w ) AM_BASE(m_mainram)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0008, 0x0c0009) AM_READ_PORT("DSW1")
@@ -900,14 +900,14 @@ static ADDRESS_MAP_START( tdragon_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE_LEGACY(NMK004_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE_LEGACY(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
+	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdragonb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x044022, 0x044023) AM_READNOP  /* No Idea */
-	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0008, 0x0c0009) AM_READ_PORT("DSW1")
@@ -917,13 +917,13 @@ static ADDRESS_MAP_START( tdragonb_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE_LEGACY(seibu_main_mustb_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE_LEGACY(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
+	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssmissin_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x0b0000, 0x0bffff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("IN1")
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("DSW1")
@@ -933,8 +933,8 @@ static ADDRESS_MAP_START( ssmissin_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0c001e, 0x0c001f) AM_WRITE_LEGACY(ssmissin_sound_w)
 	AM_RANGE(0x0c4000, 0x0c4007) AM_RAM_WRITE_LEGACY(nmk_scroll_w)
 	AM_RANGE(0x0c8000, 0x0c87ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_MIRROR(0x1800) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram) //mirror for airattck
+	AM_RANGE(0x0cc000, 0x0cffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_MIRROR(0x1800) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram) //mirror for airattck
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssmissin_sound_map, AS_PROGRAM, 8, nmk16_state )
@@ -958,10 +958,10 @@ static ADDRESS_MAP_START( strahl_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x84000, 0x84007) AM_RAM_WRITE_LEGACY(nmk_scroll_w)
 	AM_RANGE(0x88000, 0x88007) AM_RAM_WRITE_LEGACY(nmk_scroll_2_w)
 	AM_RANGE(0x8c000, 0x8c7ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x90000, 0x93fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x94000, 0x97fff) AM_RAM_WRITE_LEGACY(nmk_fgvideoram_w) AM_BASE( m_nmk_fgvideoram)
-	AM_RANGE(0x9c000, 0x9c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0xf0000, 0xfffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x90000, 0x93fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x94000, 0x97fff) AM_RAM_WRITE_LEGACY(nmk_fgvideoram_w) AM_BASE(m_nmk_fgvideoram)
+	AM_RANGE(0x9c000, 0x9c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0xf0000, 0xfffff) AM_RAM AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross_map, AS_PROGRAM, 16, nmk16_state )
@@ -977,9 +977,9 @@ static ADDRESS_MAP_START( macross_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE_LEGACY(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x08c000, 0x08c007) AM_RAM_WRITE_LEGACY(nmk_scroll_w)
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_BASE( m_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gunnail_map, AS_PROGRAM, 16, nmk16_state )
@@ -994,12 +994,12 @@ static ADDRESS_MAP_START( gunnail_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080018, 0x080019) AM_WRITE_LEGACY(nmk_tilebank_w)
 	AM_RANGE(0x08001e, 0x08001f) AM_WRITE_LEGACY(NMK004_w)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x08c000, 0x08c1ff) AM_WRITEONLY AM_BASE( m_gunnail_scrollram)
-	AM_RANGE(0x08c200, 0x08c3ff) AM_WRITEONLY AM_BASE( m_gunnail_scrollramy)
+	AM_RANGE(0x08c000, 0x08c1ff) AM_WRITEONLY AM_BASE(m_gunnail_scrollram)
+	AM_RANGE(0x08c200, 0x08c3ff) AM_WRITEONLY AM_BASE(m_gunnail_scrollramy)
 	AM_RANGE(0x08c400, 0x08c7ff) AM_WRITEONLY	// unknown
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x001000) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x001000) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross2_map, AS_PROGRAM, 16, nmk16_state )
@@ -1015,17 +1015,17 @@ static ADDRESS_MAP_START( macross2_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE_LEGACY(macross2_sound_command_w)	/* to Z80 */
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_BASE( m_gunnail_scrollram)
-	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_BASE( m_gunnail_scrollramy)
+	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_BASE(m_gunnail_scrollram)
+	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_BASE(m_gunnail_scrollramy)
 	AM_RANGE(0x130400, 0x1307ff) AM_RAM
 
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x144000, 0x147fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram1_w) AM_BASE( m_nmk_bgvideoram1)
-	AM_RANGE(0x148000, 0x14bfff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram2_w) AM_BASE( m_nmk_bgvideoram2)
-	AM_RANGE(0x14c000, 0x14ffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram3_w) AM_BASE( m_nmk_bgvideoram3)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x144000, 0x147fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram1_w) AM_BASE(m_nmk_bgvideoram1)
+	AM_RANGE(0x148000, 0x14bfff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram2_w) AM_BASE(m_nmk_bgvideoram2)
+	AM_RANGE(0x14c000, 0x14ffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram3_w) AM_BASE(m_nmk_bgvideoram3)
 
-	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( raphero_map, AS_PROGRAM, 16, nmk16_state )
@@ -1041,18 +1041,18 @@ static ADDRESS_MAP_START( raphero_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE_LEGACY(macross2_sound_command_w)	/* to Z80 */
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_BASE( m_gunnail_scrollram)
-	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_BASE( m_gunnail_scrollramy)
+	AM_RANGE(0x130000, 0x1301ff) AM_RAM AM_BASE(m_gunnail_scrollram)
+	AM_RANGE(0x130200, 0x1303ff) AM_RAM AM_BASE(m_gunnail_scrollramy)
 	AM_RANGE(0x130400, 0x1307ff) AM_RAM
 
-	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x144000, 0x147fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram1_w) AM_BASE( m_nmk_bgvideoram1)
-	AM_RANGE(0x148000, 0x14bfff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram2_w) AM_BASE( m_nmk_bgvideoram2)
-	AM_RANGE(0x14c000, 0x14ffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram3_w) AM_BASE( m_nmk_bgvideoram3)
+	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x144000, 0x147fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram1_w) AM_BASE(m_nmk_bgvideoram1)
+	AM_RANGE(0x148000, 0x14bfff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram2_w) AM_BASE(m_nmk_bgvideoram2)
+	AM_RANGE(0x14c000, 0x14ffff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram3_w) AM_BASE(m_nmk_bgvideoram3)
 
 
-	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)
-	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x170000, 0x170fff) AM_MIRROR(0x1000) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 #if 0
@@ -1118,8 +1118,8 @@ static ADDRESS_MAP_START( bjtwin_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x094000, 0x094001) AM_WRITE_LEGACY(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP	/* IRQ enable? */
-	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)
-	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE( m_mainram)
+	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)
+	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_BASE(m_mainram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vandyke )
@@ -4632,13 +4632,13 @@ static ADDRESS_MAP_START( afega, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x080020, 0x087fff) AM_WRITEONLY				//
 /**/AM_RANGE(0x088000, 0x0885ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram) // Palette
 	AM_RANGE(0x088600, 0x08bfff) AM_WRITEONLY				//
-/**/AM_RANGE(0x08c000, 0x08c003) AM_RAM_WRITE_LEGACY(afega_scroll0_w) AM_BASE( m_afega_scroll_0)	// Scroll
-/**/AM_RANGE(0x08c004, 0x08c007) AM_RAM_WRITE_LEGACY(afega_scroll1_w) AM_BASE( m_afega_scroll_1)	//
+/**/AM_RANGE(0x08c000, 0x08c003) AM_RAM_WRITE_LEGACY(afega_scroll0_w) AM_BASE(m_afega_scroll_0)	// Scroll
+/**/AM_RANGE(0x08c004, 0x08c007) AM_RAM_WRITE_LEGACY(afega_scroll1_w) AM_BASE(m_afega_scroll_1)	//
 	AM_RANGE(0x08c008, 0x08ffff) AM_WRITEONLY				//
-/**/AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE( m_nmk_bgvideoram0)	// Layer 0                  // ?
-/**/AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE( m_nmk_txvideoram)	// Layer 1
+/**/AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(nmk_bgvideoram0_w) AM_BASE(m_nmk_bgvideoram0)	// Layer 0                  // ?
+/**/AM_RANGE(0x09c000, 0x09c7ff) AM_RAM_WRITE_LEGACY(nmk_txvideoram_w) AM_BASE(m_nmk_txvideoram)	// Layer 1
 
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_SHARE("share1") AM_BASE( m_mainram)
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_SHARE("share1") AM_BASE(m_mainram)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM_WRITE_LEGACY(nmk16_mainram_strange_w) AM_SHARE("share1")
 ADDRESS_MAP_END
 

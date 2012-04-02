@@ -1183,14 +1183,14 @@ static WRITE16_HANDLER( jaguar_gpu_ram_w16 ) { if (!(offset&1)) { jaguar_gpu_ram
 
 static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, cojag_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffffff)
-	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE_LEGACY( jaguar_shared_ram_r16, jaguar_shared_ram_w16 );
-	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE_LEGACY( jaguar_cart_base_r16, jaguar_cart_base_w16 )
-	AM_RANGE(0xe00000, 0xe1ffff) AM_READWRITE_LEGACY( jaguar_rom_base_r16, jaguar_rom_base_w16 )
+	AM_RANGE(0x000000, 0x1fffff) AM_MIRROR(0x200000) AM_READWRITE_LEGACY(jaguar_shared_ram_r16, jaguar_shared_ram_w16 );
+	AM_RANGE(0x800000, 0xdfffff) AM_READWRITE_LEGACY(jaguar_cart_base_r16, jaguar_cart_base_w16 )
+	AM_RANGE(0xe00000, 0xe1ffff) AM_READWRITE_LEGACY(jaguar_rom_base_r16, jaguar_rom_base_w16 )
 	AM_RANGE(0xf00000, 0xf003ff) AM_READWRITE_LEGACY(jaguar_tom_regs_r, jaguar_tom_regs_w) // might be reversed endian of the others..
 	AM_RANGE(0xf00400, 0xf005ff) AM_MIRROR(0x000200) AM_READWRITE_LEGACY(jaguar_gpu_clut_r16, jaguar_gpu_clut_w16 )
 	AM_RANGE(0xf02100, 0xf021ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(gpuctrl_r16, gpuctrl_w16)
 	AM_RANGE(0xf02200, 0xf022ff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(jaguar_blitter_r16, jaguar_blitter_w16)
-	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY( jaguar_gpu_ram_r16, jaguar_gpu_ram_w16 )
+	AM_RANGE(0xf03000, 0xf03fff) AM_MIRROR(0x008000) AM_READWRITE_LEGACY(jaguar_gpu_ram_r16, jaguar_gpu_ram_w16 )
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE_LEGACY(jaguar_jerry_regs_r, jaguar_jerry_regs_w) // might be reversed endian of the others..
 	AM_RANGE(0xf14000, 0xf14003) AM_READWRITE_LEGACY(joystick_r16, joystick_w16)
 	AM_RANGE(0xf14800, 0xf14803) AM_READWRITE_LEGACY(jaguar_eeprom_clk16,jaguar_eeprom_w16)	// GPI00
@@ -1198,7 +1198,7 @@ static ADDRESS_MAP_START( jaguar_map, AS_PROGRAM, 16, cojag_state )
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE_LEGACY(dspctrl_r16, dspctrl_w16)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE_LEGACY(jaguar_serial_r16, jaguar_serial_w16)
 	AM_RANGE(0xf1b000, 0xf1cfff) AM_READWRITE_LEGACY(jaguar_dsp_ram_r16, jaguar_dsp_ram_w16)
-	AM_RANGE(0xf1d000, 0xf1dfff) AM_READWRITE_LEGACY( high_rom_base_r16, high_rom_base_w16 )
+	AM_RANGE(0xf1d000, 0xf1dfff) AM_READWRITE_LEGACY(high_rom_base_r16, high_rom_base_w16 )
 ADDRESS_MAP_END
 
 
@@ -1234,13 +1234,13 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x14000004, 0x14000007) AM_WRITE_LEGACY(watchdog_reset32_w)
 	AM_RANGE(0x16000000, 0x16000003) AM_WRITE_LEGACY(eeprom_enable_w)
 	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE_LEGACY(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
-	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_BASE( m_rom_base)
+	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE_LEGACY(&jaguar_shared_ram) AM_SHARE("share1")
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE( m_rom_base)
+	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
 	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM
 	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE_LEGACY(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0xa30000, 0xa30003) AM_WRITE_LEGACY(watchdog_reset32_w)

@@ -473,13 +473,13 @@ static MACHINE_RESET( exidy440 )
  *************************************/
 
 static ADDRESS_MAP_START( exidy440_map, AS_PROGRAM, 8, exidy440_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE( m_imageram)
-	AM_RANGE(0x2000, 0x209f) AM_RAM_WRITE_LEGACY(exidy440_spriteram_w) AM_BASE( m_spriteram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE(m_imageram)
+	AM_RANGE(0x2000, 0x209f) AM_RAM_WRITE_LEGACY(exidy440_spriteram_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x20a0, 0x29ff) AM_RAM
 	AM_RANGE(0x2a00, 0x2aff) AM_READWRITE_LEGACY(exidy440_videoram_r, exidy440_videoram_w)
 	AM_RANGE(0x2b00, 0x2b00) AM_READ_LEGACY(exidy440_vertical_pos_r)
 	AM_RANGE(0x2b01, 0x2b01) AM_READWRITE_LEGACY(exidy440_horizontal_pos_r, exidy440_interrupt_clear_w)
-	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_BASE( m_scanline)
+	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_BASE(m_scanline)
 	AM_RANGE(0x2b03, 0x2b03) AM_READ_PORT("IN0") AM_WRITE_LEGACY(exidy440_control_w)
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE_LEGACY(exidy440_paletteram_r, exidy440_paletteram_w)
 	AM_RANGE(0x2e00, 0x2e1f) AM_RAM_WRITE_LEGACY(sound_command_w)

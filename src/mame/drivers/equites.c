@@ -719,10 +719,10 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM area is written several times (dev system?)
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")	// nvram is for gekisou only
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE_LEGACY(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
-	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE_LEGACY(equites_bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE_LEGACY(equites_bg_videoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
 	AM_RANGE(0x100000, 0x100001) AM_READ_LEGACY(equites_spriteram_kludge_r)
-	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE_LEGACY(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_WRITE_LEGACY(soundlatch_word_w) // LSB: sound latch
 	AM_RANGE(0x184000, 0x184001) AM_WRITE_LEGACY(equites_flip0_w)
@@ -740,7 +740,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE( m_workram) // work RAM
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(m_workram) // work RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") // joyport [2211]
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE_LEGACY(splndrbt_flip0_w) // [MMLL] MM: bg color register, LL: normal screen
 	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITE_LEGACY(mcu_halt_clear_w) // 8404 control port1
@@ -755,10 +755,10 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE_LEGACY(splndrbt_bg_scrolly_w)
 	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE_LEGACY(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_READWRITE_LEGACY(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE_LEGACY(equites_bg_videoram_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE_LEGACY(equites_bg_videoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0x400800, 0x400fff) AM_RAM
-	AM_RANGE(0x600000, 0x6000ff) AM_RAM AM_BASE( m_spriteram)	// sprite RAM 0,1
-	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_BASE( m_spriteram_2)	// sprite RAM 2 (8-bit)
+	AM_RANGE(0x600000, 0x6000ff) AM_RAM AM_BASE(m_spriteram)	// sprite RAM 0,1
+	AM_RANGE(0x600100, 0x6001ff) AM_RAM AM_BASE(m_spriteram_2)	// sprite RAM 2 (8-bit)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
@@ -780,7 +780,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, equites_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE( m_mcu_ram) /* main CPU shared RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(m_mcu_ram) /* main CPU shared RAM */
 ADDRESS_MAP_END
 
 /******************************************************************************/

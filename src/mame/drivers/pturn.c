@@ -309,11 +309,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pturn_state )
 
 	AM_RANGE(0xdfe0, 0xdfe0) AM_NOP
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(pturn_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(pturn_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE_LEGACY(fgpalette_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(sound_w)
 
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITE_LEGACY(bg_scrollx_w)
 

@@ -139,8 +139,8 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, ettrivia_state )
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
 	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(b000_r) AM_WRITE_LEGACY(b000_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE_LEGACY(b800_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(ettrivia_fg_w) AM_BASE( m_fg_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(ettrivia_bg_w) AM_BASE( m_bg_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(ettrivia_fg_w) AM_BASE(m_fg_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(ettrivia_bg_w) AM_BASE(m_bg_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, ettrivia_state )

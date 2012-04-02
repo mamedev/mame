@@ -141,10 +141,10 @@ static ADDRESS_MAP_START( lastduel_map, AS_PROGRAM, 16, lastduel_state )
 	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc8000, 0xfc800f) AM_WRITE_LEGACY(lastduel_scroll_w)
-	AM_RANGE(0xfcc000, 0xfcdfff) AM_RAM_WRITE_LEGACY(lastduel_vram_w) AM_BASE( m_vram)
-	AM_RANGE(0xfd0000, 0xfd3fff) AM_RAM_WRITE_LEGACY(lastduel_scroll1_w) AM_BASE( m_scroll1)
-	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE_LEGACY(lastduel_scroll2_w) AM_BASE( m_scroll2)
-	AM_RANGE(0xfd8000, 0xfd87ff) AM_RAM_WRITE_LEGACY(lastduel_palette_word_w) AM_BASE( m_paletteram)
+	AM_RANGE(0xfcc000, 0xfcdfff) AM_RAM_WRITE_LEGACY(lastduel_vram_w) AM_BASE(m_vram)
+	AM_RANGE(0xfd0000, 0xfd3fff) AM_RAM_WRITE_LEGACY(lastduel_scroll1_w) AM_BASE(m_scroll1)
+	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE_LEGACY(lastduel_scroll2_w) AM_BASE(m_scroll2)
+	AM_RANGE(0xfd8000, 0xfd87ff) AM_RAM_WRITE_LEGACY(lastduel_palette_word_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -155,11 +155,11 @@ static ADDRESS_MAP_START( madgear_map, AS_PROGRAM, 16, lastduel_state )
 	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(lastduel_sound_w)
 	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xfc8000, 0xfc9fff) AM_RAM_WRITE_LEGACY(lastduel_vram_w) AM_BASE( m_vram)
-	AM_RANGE(0xfcc000, 0xfcc7ff) AM_RAM_WRITE_LEGACY(lastduel_palette_word_w) AM_BASE( m_paletteram)
+	AM_RANGE(0xfc8000, 0xfc9fff) AM_RAM_WRITE_LEGACY(lastduel_vram_w) AM_BASE(m_vram)
+	AM_RANGE(0xfcc000, 0xfcc7ff) AM_RAM_WRITE_LEGACY(lastduel_palette_word_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xfd0000, 0xfd000f) AM_WRITE_LEGACY(lastduel_scroll_w)
-	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE_LEGACY(madgear_scroll1_w) AM_BASE( m_scroll1)
-	AM_RANGE(0xfd8000, 0xfdffff) AM_RAM_WRITE_LEGACY(madgear_scroll2_w) AM_BASE( m_scroll2)
+	AM_RANGE(0xfd4000, 0xfd7fff) AM_RAM_WRITE_LEGACY(madgear_scroll1_w) AM_BASE(m_scroll1)
+	AM_RANGE(0xfd8000, 0xfdffff) AM_RAM_WRITE_LEGACY(madgear_scroll2_w) AM_BASE(m_scroll2)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

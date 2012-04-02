@@ -396,10 +396,10 @@ static READ16_HANDLER( raiga_protection_r )
 static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE_LEGACY(gaiden_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_READWRITE_LEGACY(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE( m_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_READWRITE_LEGACY(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE( m_videoram3)
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE_LEGACY(gaiden_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x072000, 0x073fff) AM_READWRITE_LEGACY(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0x074000, 0x075fff) AM_READWRITE_LEGACY(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE(m_videoram3)
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2") AM_WRITE_LEGACY(gaiden_sproffsety_w)
@@ -422,10 +422,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE_LEGACY(gaiden_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE_LEGACY(gaiden_videoram2_w) AM_BASE( m_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE_LEGACY(gaiden_videoram3_w) AM_BASE( m_videoram3)
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE_LEGACY(gaiden_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE_LEGACY(gaiden_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE_LEGACY(gaiden_videoram3_w) AM_BASE(m_videoram3)
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
@@ -918,10 +918,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE_LEGACY(gaiden_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_READWRITE_LEGACY(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE( m_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_READWRITE_LEGACY(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE( m_videoram3)
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE_LEGACY(gaiden_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x072000, 0x073fff) AM_READWRITE_LEGACY(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0x074000, 0x075fff) AM_READWRITE_LEGACY(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE(m_videoram3)
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 //  AM_RANGE(0x078800, 0x079fff) AM_RAM
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")

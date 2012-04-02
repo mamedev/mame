@@ -319,11 +319,11 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 
 static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE_LEGACY(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(psikyo_vram_0_w) AM_BASE( m_vram_0)		// Layer 0
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(psikyo_vram_1_w) AM_BASE( m_vram_1)		// Layer 1
-	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE( m_vregs)							// RAM + Vregs
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(psikyo_vram_0_w) AM_BASE(m_vram_0)		// Layer 0
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(psikyo_vram_1_w) AM_BASE(m_vram_1)		// Layer 1
+	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE(m_vregs)							// RAM + Vregs
 //  AM_RANGE(0xc00000, 0xc0000b) AM_READ_LEGACY(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
 //  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE_LEGACY(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
 //  AM_RANGE(0xc00010, 0xc00013) AM_WRITE_LEGACY(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
@@ -366,13 +366,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psikyo_bootleg_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE( m_bootleg_spritebuffer)				// RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(m_bootleg_spritebuffer)				// RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE_LEGACY(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(psikyo_vram_0_w) AM_BASE( m_vram_0)		// Layer 0
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(psikyo_vram_1_w) AM_BASE( m_vram_1)		// Layer 1
-	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE( m_vregs)								// RAM + Vregs
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(psikyo_vram_0_w) AM_BASE(m_vram_0)		// Layer 0
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(psikyo_vram_1_w) AM_BASE(m_vram_1)		// Layer 1
+	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE(m_vregs)								// RAM + Vregs
 //  AM_RANGE(0xc00000, 0xc0000b) AM_READ_LEGACY(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
 //  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE_LEGACY(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
 //  AM_RANGE(0xc00010, 0xc00013) AM_WRITE_LEGACY(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT

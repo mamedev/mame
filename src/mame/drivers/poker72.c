@@ -95,8 +95,8 @@ static WRITE8_HANDLER( tile_bank_w )
 static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8, poker72_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM //work ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE( m_vram)
-	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE_LEGACY(poker72_paletteram_w) AM_BASE( m_pal)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE_LEGACY(poker72_paletteram_w) AM_BASE(m_pal)
 	AM_RANGE(0xfc00, 0xfdff) AM_RAM //???
 	AM_RANGE(0xfe08, 0xfe08) AM_READ_PORT("IN0")
 	AM_RANGE(0xfe09, 0xfe09) AM_READ_PORT("IN1")

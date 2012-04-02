@@ -177,8 +177,8 @@ static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE( m_tilemapram) // text tilemap
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE( m_tilemapram2)// sprite list + sprite tilemaps
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_BASE(m_tilemapram) // text tilemap
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE(m_tilemapram2)// sprite list + sprite tilemaps
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM // main ram
 
@@ -474,9 +474,9 @@ static WRITE8_HANDLER( blackt96_soundio_port02_w )
 }
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, blackt96_state )
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY( blackt96_soundio_port00_w )
-	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY( blackt96_soundio_port01_r, blackt96_soundio_port01_w )
-	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY( blackt96_soundio_port02_r, blackt96_soundio_port02_w )
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(blackt96_soundio_port00_w )
+	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(blackt96_soundio_port01_r, blackt96_soundio_port01_w )
+	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(blackt96_soundio_port02_r, blackt96_soundio_port02_w )
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ_LEGACY(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 

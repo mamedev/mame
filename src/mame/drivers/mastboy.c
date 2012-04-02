@@ -700,9 +700,9 @@ static ADDRESS_MAP_START( mastboy_map, AS_PROGRAM, 8, mastboy_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // Internal ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROM // External ROM
 
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE( m_workram)// work ram
-	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_BASE( m_tileram)// tilemap ram
-	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE( m_colram) AM_MIRROR(0x0e00)  // colour ram
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(m_workram)// work ram
+	AM_RANGE(0x9000, 0x9fff) AM_RAM AM_BASE(m_tileram)// tilemap ram
+	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE(m_colram) AM_MIRROR(0x0e00)  // colour ram
 
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE_LEGACY(banked_ram_r,banked_ram_w) // mastboy bank area read / write
 

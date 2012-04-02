@@ -648,7 +648,7 @@ static WRITE16_HANDLER( scc68070_mmu_w )
 
 static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
-	AM_RANGE(0x00000000, 0x0017ffff) AM_MIRROR(0x7fe00000) AM_RAM AM_BASE( m_magicram) /*only 0-7ffff accessed in Magic Card*/
+	AM_RANGE(0x00000000, 0x0017ffff) AM_MIRROR(0x7fe00000) AM_RAM AM_BASE(m_magicram) /*only 0-7ffff accessed in Magic Card*/
 	AM_RANGE(0x00180000, 0x001ffbff) AM_MIRROR(0x7fe00000) AM_RAM AM_REGION("maincpu", 0)
 	/* 001ffc00-001ffdff System I/O */
 	AM_RANGE(0x001ffc00, 0x001ffc01) AM_MIRROR(0x7fe00000) AM_READ_LEGACY(test_r)
@@ -659,15 +659,15 @@ static ADDRESS_MAP_START( magicard_mem, AS_PROGRAM, 16, magicard_state )
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_READ_LEGACY(test_r)
 	AM_RANGE(0x001ffd80, 0x001ffd81) AM_MIRROR(0x7fe00000) AM_WRITENOP //?
 	AM_RANGE(0x001fff80, 0x001fffbf) AM_MIRROR(0x7fe00000) AM_RAM //DRAM I/O, not accessed by this game, CD buffer?
-	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE_LEGACY(philips_66470_r,philips_66470_w) AM_BASE( m_pcab_vregs) //video registers
-	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE_LEGACY(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_BASE( m_scc68070_ext_irqc_regs) //lir
-	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE_LEGACY(scc68070_iic_r,scc68070_iic_w) AM_BASE( m_scc68070_iic_regs) //i2c
-	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE_LEGACY(scc68070_uart_r,scc68070_uart_w) AM_BASE( m_scc68070_uart_regs)
-	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE_LEGACY(scc68070_timer_r,scc68070_timer_w) AM_BASE( m_scc68070_timer_regs)
-	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE_LEGACY(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_BASE( m_scc68070_int_irqc_regs)
-	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE_LEGACY(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_BASE( m_scc68070_dma_ch1_regs)
-	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE_LEGACY(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_BASE( m_scc68070_dma_ch2_regs)
-	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE_LEGACY(scc68070_mmu_r,scc68070_mmu_w) AM_BASE( m_scc68070_mmu_regs)
+	AM_RANGE(0x001fffe0, 0x001fffff) AM_MIRROR(0x7fe00000) AM_READWRITE_LEGACY(philips_66470_r,philips_66470_w) AM_BASE(m_pcab_vregs) //video registers
+	AM_RANGE(0x80001000, 0x8000100f) AM_READWRITE_LEGACY(scc68070_ext_irqc_r,scc68070_ext_irqc_w) AM_BASE(m_scc68070_ext_irqc_regs) //lir
+	AM_RANGE(0x80002000, 0x8000200f) AM_READWRITE_LEGACY(scc68070_iic_r,scc68070_iic_w) AM_BASE(m_scc68070_iic_regs) //i2c
+	AM_RANGE(0x80002010, 0x8000201f) AM_READWRITE_LEGACY(scc68070_uart_r,scc68070_uart_w) AM_BASE(m_scc68070_uart_regs)
+	AM_RANGE(0x80002020, 0x8000202f) AM_READWRITE_LEGACY(scc68070_timer_r,scc68070_timer_w) AM_BASE(m_scc68070_timer_regs)
+	AM_RANGE(0x80002040, 0x8000204f) AM_READWRITE_LEGACY(scc68070_int_irqc_r,scc68070_int_irqc_w) AM_BASE(m_scc68070_int_irqc_regs)
+	AM_RANGE(0x80004000, 0x8000403f) AM_READWRITE_LEGACY(scc68070_dma_ch1_r,scc68070_dma_ch1_w) AM_BASE(m_scc68070_dma_ch1_regs)
+	AM_RANGE(0x80004040, 0x8000407f) AM_READWRITE_LEGACY(scc68070_dma_ch2_r,scc68070_dma_ch2_w) AM_BASE(m_scc68070_dma_ch2_regs)
+	AM_RANGE(0x80008000, 0x8000807f) AM_READWRITE_LEGACY(scc68070_mmu_r,scc68070_mmu_w) AM_BASE(m_scc68070_mmu_regs)
 ADDRESS_MAP_END
 
 

@@ -287,10 +287,10 @@ static WRITE8_HANDLER(superwng_cointcnt2_w)
 static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8, superwng_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(superwng_bg_vram_w) AM_BASE( m_videoram_bg)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(superwng_fg_vram_w) AM_BASE( m_videoram_fg)
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(superwng_bg_cram_w) AM_BASE( m_colorram_bg)
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE_LEGACY(superwng_fg_cram_w) AM_BASE( m_colorram_fg)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(superwng_bg_vram_w) AM_BASE(m_videoram_bg)
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(superwng_fg_vram_w) AM_BASE(m_videoram_fg)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE_LEGACY(superwng_bg_cram_w) AM_BASE(m_colorram_bg)
+	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE_LEGACY(superwng_fg_cram_w) AM_BASE(m_colorram_fg)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM  //collision map
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP //unknown

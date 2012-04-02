@@ -436,7 +436,7 @@ static ADDRESS_MAP_START( ninjaw_master_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x210000, 0x210001) AM_WRITE_LEGACY(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE_LEGACY(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE_LEGACY(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE_LEGACY("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (2nd screen) */
@@ -472,7 +472,7 @@ static ADDRESS_MAP_START( darius2_master_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x210000, 0x210001) AM_WRITE_LEGACY(cpua_ctrl_w)
 	AM_RANGE(0x220000, 0x220003) AM_READWRITE_LEGACY(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE_LEGACY(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE_LEGACY("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (2nd screen) */

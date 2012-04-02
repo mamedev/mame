@@ -729,8 +729,8 @@ static WRITE8_HANDLER( nobb_outport24_w )
 static ADDRESS_MAP_START( system1_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE( m_ram)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(system1_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY(system1_videoram_r, system1_videoram_w)
 	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE_LEGACY(system1_mixer_collision_r, system1_mixer_collision_w)
@@ -747,10 +747,10 @@ static ADDRESS_MAP_START( nobo_map, AS_PROGRAM, 8, system1_state )
 	AM_RANGE(0xc400, 0xc7ff) AM_WRITE_LEGACY(system1_mixer_collision_reset_w)
 	AM_RANGE(0xc800, 0xcbff) AM_READWRITE_LEGACY(system1_sprite_collision_r, system1_sprite_collision_w)
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE_LEGACY(system1_sprite_collision_reset_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(system1_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY(system1_videoram_r, system1_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE( m_ram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_ram)
 ADDRESS_MAP_END
 
 /* I/O map for systems with an 8255 PPI */
@@ -810,8 +810,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nob_mcu_io_map, AS_IO, 8, system1_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_BASE( m_nob_mcu_latch)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_BASE( m_nob_mcu_status)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_RAM AM_BASE(m_nob_mcu_latch)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITEONLY AM_BASE(m_nob_mcu_status)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE_LEGACY(nob_mcu_control_p2_w)
 ADDRESS_MAP_END
 

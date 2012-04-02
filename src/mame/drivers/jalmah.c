@@ -984,13 +984,13 @@ static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16, jalmah_state )
 	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	//       0x084000, 0x084001  ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(sc0_vram_w) AM_BASE( m_sc0_vram)
-	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE_LEGACY(sc1_vram_w) AM_BASE( m_sc1_vram)
-	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE_LEGACY(sc2_vram_w) AM_BASE( m_sc2_vram)
-	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_WRITE_LEGACY(sc3_vram_w) AM_BASE( m_sc3_vram)
-	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_BASE( m_jm_shared_ram)/*shared with MCU*/
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(sc0_vram_w) AM_BASE(m_sc0_vram)
+	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE_LEGACY(sc1_vram_w) AM_BASE(m_sc1_vram)
+	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE_LEGACY(sc2_vram_w) AM_BASE(m_sc2_vram)
+	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_WRITE_LEGACY(sc3_vram_w) AM_BASE(m_sc3_vram)
+	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_BASE(m_jm_shared_ram)/*shared with MCU*/
 	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM /*Work Ram*/
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE( m_jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(m_jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16, jalmah_state )
@@ -1008,18 +1008,18 @@ static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16, jalmah_state )
 	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	//       0x084000, 0x084001  ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(urashima_sc0_vram_w) AM_BASE( m_sc0_vram)
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE_LEGACY(urashima_sc0_vram_w) AM_BASE(m_sc0_vram)
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE_LEGACY(urashima_sc0_vram_w)
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE_LEGACY(urashima_sc0_vram_w)
-//  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE_LEGACY(urashima_sc1_vram_w) AM_BASE( m_sc1_vram)/*unused*/
-//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE_LEGACY(urashima_sc2_vram_w) AM_BASE( m_sc2_vram)/*unused*/
+//  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE_LEGACY(urashima_sc1_vram_w) AM_BASE(m_sc1_vram)/*unused*/
+//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE_LEGACY(urashima_sc2_vram_w) AM_BASE(m_sc2_vram)/*unused*/
 	/*$9c000-$9cfff Video Registers*/
 /**/AM_RANGE(0x09c000, 0x09dfff) AM_WRITE_LEGACY(urashima_vregs_w)
 /**///AM_RANGE(0x09c480, 0x09c49f) AM_RAM_WRITE_LEGACY(urashima_sc2vregs_w)
-	AM_RANGE(0x09e000, 0x0a1fff) AM_RAM_WRITE_LEGACY(urashima_sc3_vram_w) AM_BASE( m_sc3_vram)
-	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_BASE( m_jm_shared_ram)/*shared with MCU*/
+	AM_RANGE(0x09e000, 0x0a1fff) AM_RAM_WRITE_LEGACY(urashima_sc3_vram_w) AM_BASE(m_sc3_vram)
+	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_BASE(m_jm_shared_ram)/*shared with MCU*/
 	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM /*Work Ram*/
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE( m_jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE(m_jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )

@@ -38,14 +38,14 @@ static READ8_HANDLER( n8080_shift_r )
 static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, n8080_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( helifire_main_cpu_map, AS_PROGRAM, 8, n8080_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE( m_videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE( m_colorram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(m_colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, n8080_state )

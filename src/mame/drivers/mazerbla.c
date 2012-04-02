@@ -976,7 +976,7 @@ static ADDRESS_MAP_START( mazerbla_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(cfb_zpu_int_req_clr)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xe800, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1007,7 +1007,7 @@ static ADDRESS_MAP_START( mazerbla_cpu3_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* GFX roms */
 	AM_RANGE(0x4000, 0x4003) AM_WRITE_LEGACY(vcu_video_reg_w)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE( m_cfb_ram)		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(m_cfb_ram)		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
 	AM_RANGE(0xa000, 0xa7ff) AM_READ_LEGACY(vcu_set_cmd_param_r)	/* VCU command and parameters LOAD */
 	AM_RANGE(0xc000, 0xdfff) AM_READ_LEGACY(vcu_set_gfx_addr_r)	/* gfx LOAD (blit) */
 	AM_RANGE(0xe000, 0xffff) AM_READ_LEGACY(vcu_set_clr_addr_r)	/* palette? LOAD */

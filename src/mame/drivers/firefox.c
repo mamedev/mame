@@ -490,11 +490,11 @@ static MACHINE_START( firefox )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, firefox_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(tileram_w) AM_BASE( m_tileram)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE( m_spriteram)
-	AM_RANGE(0x2800, 0x2aff) AM_RAM_WRITE_LEGACY(sprite_palette_w) AM_BASE( m_sprite_palette)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(m_spriteram)
+	AM_RANGE(0x2800, 0x2aff) AM_RAM_WRITE_LEGACY(sprite_palette_w) AM_BASE(m_sprite_palette)
 	AM_RANGE(0x2b00, 0x2b00) AM_MIRROR(0x04ff) AM_WRITE_LEGACY(firefox_objram_bank_w)
-	AM_RANGE(0x2c00, 0x2eff) AM_RAM_WRITE_LEGACY(tile_palette_w) AM_BASE( m_tile_palette)
+	AM_RANGE(0x2c00, 0x2eff) AM_RAM_WRITE_LEGACY(tile_palette_w) AM_BASE(m_tile_palette)
 	AM_RANGE(0x3000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x40ff) AM_READWRITE_LEGACY(nvram_r, nvram_w)						/* NOVRAM */
 	AM_RANGE(0x4100, 0x4100) AM_MIRROR(0x00f8) AM_READ_PORT("rdin0")			/* RDIN0 */

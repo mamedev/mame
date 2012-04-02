@@ -175,10 +175,10 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("IN1") AM_WRITENOP
 	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("IN2") AM_WRITENOP
 
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE( m_videoram)
-	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE( m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_BASE( m_bgram)
+	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_BASE(m_bgram)
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM

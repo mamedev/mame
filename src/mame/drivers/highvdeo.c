@@ -281,19 +281,19 @@ static WRITE16_HANDLER( write1_w )
 static ADDRESS_MAP_START( tv_vcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE( m_blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_vcf_io, AS_IO, 16, highvdeo_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY( write1_w ) // lamps
-	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY( "oki", tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ_LEGACY( read1_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ_LEGACY( read2_r )
-	AM_RANGE(0x000c, 0x000d) AM_READ_LEGACY( read3_r )
-	AM_RANGE(0x0010, 0x0015) AM_WRITE_LEGACY( tv_vcf_paletteram_w )
-	AM_RANGE(0x0030, 0x0031) AM_WRITE_LEGACY( tv_vcf_bankselect_w ) AM_DEVREAD_LEGACY( "oki", tv_oki6376_r )
+	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY(write1_w ) // lamps
+	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY("oki", tv_oki6376_w )
+	AM_RANGE(0x0008, 0x0009) AM_READ_LEGACY(read1_r )
+	AM_RANGE(0x000a, 0x000b) AM_READ_LEGACY(read2_r )
+	AM_RANGE(0x000c, 0x000d) AM_READ_LEGACY(read3_r )
+	AM_RANGE(0x0010, 0x0015) AM_WRITE_LEGACY(tv_vcf_paletteram_w )
+	AM_RANGE(0x0030, 0x0031) AM_WRITE_LEGACY(tv_vcf_bankselect_w ) AM_DEVREAD_LEGACY("oki", tv_oki6376_r )
 ADDRESS_MAP_END
 
 
@@ -328,19 +328,19 @@ static WRITE16_DEVICE_HANDLER( tv_ncf_oki6376_st_w )
 static ADDRESS_MAP_START( tv_ncf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_BASE( m_blit_ram) /*blitter ram*/
+	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
 	AM_RANGE(0x40000, 0xbffff) AM_ROM AM_REGION("user1",0x40000)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_ncf_io, AS_IO, 16, highvdeo_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY( write1_w ) // lamps
-	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE_LEGACY( "oki", tv_ncf_oki6376_w )
-	AM_RANGE(0x000a, 0x000b) AM_DEVWRITE_LEGACY( "oki", tv_ncf_oki6376_st_w )
-	AM_RANGE(0x000c, 0x000d) AM_READ_LEGACY( read1_r )
-	AM_RANGE(0x0010, 0x0011) AM_READ_LEGACY( tv_ncf_read2_r )
-	AM_RANGE(0x0012, 0x0013) AM_READ_LEGACY( read3_r )
-	AM_RANGE(0x0030, 0x0035) AM_WRITE_LEGACY( tv_vcf_paletteram_w )
+	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY(write1_w ) // lamps
+	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE_LEGACY("oki", tv_ncf_oki6376_w )
+	AM_RANGE(0x000a, 0x000b) AM_DEVWRITE_LEGACY("oki", tv_ncf_oki6376_st_w )
+	AM_RANGE(0x000c, 0x000d) AM_READ_LEGACY(read1_r )
+	AM_RANGE(0x0010, 0x0011) AM_READ_LEGACY(tv_ncf_read2_r )
+	AM_RANGE(0x0012, 0x0013) AM_READ_LEGACY(read3_r )
+	AM_RANGE(0x0030, 0x0035) AM_WRITE_LEGACY(tv_vcf_paletteram_w )
 ADDRESS_MAP_END
 
 
@@ -372,18 +372,18 @@ static WRITE16_HANDLER( tv_tcf_bankselect_w )
 static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE( m_blit_ram) /*blitter ram*/
-	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE_LEGACY( tv_tcf_paletteram_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
+	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE_LEGACY(tv_tcf_paletteram_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tv_tcf_io, AS_IO, 16, highvdeo_state )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY( write1_w ) // lamps
-	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY( "oki", tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ_LEGACY( read1_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ_LEGACY( read2_r )
-	AM_RANGE(0x0030, 0x0031) AM_READ_LEGACY( read3_r ) AM_WRITE_LEGACY( tv_tcf_bankselect_w )
+	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY(write1_w ) // lamps
+	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY("oki", tv_oki6376_w )
+	AM_RANGE(0x0008, 0x0009) AM_READ_LEGACY(read1_r )
+	AM_RANGE(0x000a, 0x000b) AM_READ_LEGACY(read2_r )
+	AM_RANGE(0x0030, 0x0031) AM_READ_LEGACY(read3_r ) AM_WRITE_LEGACY(tv_tcf_bankselect_w )
 ADDRESS_MAP_END
 
 /****************************
@@ -431,23 +431,23 @@ static WRITE16_HANDLER( write2_w )
 static ADDRESS_MAP_START( newmcard_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE( m_blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( newmcard_io, AS_IO, 16, highvdeo_state )
-	AM_RANGE(0x0030, 0x0033) AM_READ_LEGACY( newmcard_status_r )
-	AM_RANGE(0x0030, 0x0031) AM_WRITE_LEGACY( tv_tcf_bankselect_w )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY( write1_w ) // lamps
-	AM_RANGE(0x0002, 0x0003) AM_WRITE_LEGACY( write2_w ) // coin counter & coin lockout
-	AM_RANGE(0x0004, 0x0005) AM_WRITE_LEGACY( newmcard_vblank_w )
-	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY( "oki", tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ_LEGACY( read1_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ_LEGACY( read2_r )
-	AM_RANGE(0x000c, 0x000d) AM_READ_LEGACY( newmcard_vblank_r )
-	AM_RANGE(0x000e, 0x000f) AM_READ_LEGACY( read3_r )
-	AM_RANGE(0x0010, 0x0015) AM_WRITE_LEGACY( tv_vcf_paletteram_w )
+	AM_RANGE(0x0030, 0x0033) AM_READ_LEGACY(newmcard_status_r )
+	AM_RANGE(0x0030, 0x0031) AM_WRITE_LEGACY(tv_tcf_bankselect_w )
+	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY(write1_w ) // lamps
+	AM_RANGE(0x0002, 0x0003) AM_WRITE_LEGACY(write2_w ) // coin counter & coin lockout
+	AM_RANGE(0x0004, 0x0005) AM_WRITE_LEGACY(newmcard_vblank_w )
+	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY("oki", tv_oki6376_w )
+	AM_RANGE(0x0008, 0x0009) AM_READ_LEGACY(read1_r )
+	AM_RANGE(0x000a, 0x000b) AM_READ_LEGACY(read2_r )
+	AM_RANGE(0x000c, 0x000d) AM_READ_LEGACY(newmcard_vblank_r )
+	AM_RANGE(0x000e, 0x000f) AM_READ_LEGACY(read3_r )
+	AM_RANGE(0x0010, 0x0015) AM_WRITE_LEGACY(tv_vcf_paletteram_w )
 ADDRESS_MAP_END
 
 /****************************
@@ -500,20 +500,20 @@ static WRITE16_HANDLER( brasil_status_w )
 static ADDRESS_MAP_START( brasil_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE( m_blit_ram) /*blitter ram*/
+	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( brasil_io, AS_IO, 16, highvdeo_state )
-	AM_RANGE(0x0030, 0x0033) AM_READ_LEGACY( brasil_status_r )
-	AM_RANGE(0x0030, 0x0031) AM_WRITE_LEGACY( brasil_status_w )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY( write1_w ) // lamps
-	AM_RANGE(0x0002, 0x0003) AM_WRITE_LEGACY( write2_w ) // coin counter & coin lockout
-	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY( "oki", tv_oki6376_w )
-	AM_RANGE(0x0008, 0x0009) AM_READ_LEGACY( read1_r )
-	AM_RANGE(0x000a, 0x000b) AM_READ_LEGACY( read2_r )
-	AM_RANGE(0x000e, 0x000f) AM_READ_LEGACY( read3_r )
+	AM_RANGE(0x0030, 0x0033) AM_READ_LEGACY(brasil_status_r )
+	AM_RANGE(0x0030, 0x0031) AM_WRITE_LEGACY(brasil_status_w )
+	AM_RANGE(0x0000, 0x0001) AM_WRITE_LEGACY(write1_w ) // lamps
+	AM_RANGE(0x0002, 0x0003) AM_WRITE_LEGACY(write2_w ) // coin counter & coin lockout
+	AM_RANGE(0x0006, 0x0007) AM_DEVWRITE_LEGACY("oki", tv_oki6376_w )
+	AM_RANGE(0x0008, 0x0009) AM_READ_LEGACY(read1_r )
+	AM_RANGE(0x000a, 0x000b) AM_READ_LEGACY(read2_r )
+	AM_RANGE(0x000e, 0x000f) AM_READ_LEGACY(read3_r )
 //  AM_RANGE(0x000e, 0x000f) AM_WRITE
 //  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 ADDRESS_MAP_END

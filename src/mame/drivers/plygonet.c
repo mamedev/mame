@@ -520,7 +520,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x440000, 0x440fff) AM_READWRITE_LEGACY(polygonet_roz_ram_r, polygonet_roz_ram_w)
 	AM_RANGE(0x480000, 0x4bffff) AM_DEVREAD_LEGACY("eeprom", polygonet_eeprom_r)
 	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE_LEGACY(polygonet_eeprom_w)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE_LEGACY(shared_ram_write) AM_BASE( m_shared_ram)
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE_LEGACY(shared_ram_write) AM_BASE(m_shared_ram)
 	AM_RANGE(0x504000, 0x504003) AM_WRITE_LEGACY(dsp_w_lines)
 	AM_RANGE(0x506000, 0x50600f) AM_READWRITE_LEGACY(dsp_host_interface_r, dsp_host_interface_w)
 	AM_RANGE(0x540000, 0x540fff) AM_READWRITE_LEGACY(polygonet_ttl_ram_r, polygonet_ttl_ram_w)
@@ -539,8 +539,8 @@ ADDRESS_MAP_END
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( dsp_program_map, AS_PROGRAM, 16, polygonet_state )
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE( m_dsp56k_p_mirror)	/* Unsure of size, but 0x1000 matches bank01 */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE( m_dsp56k_p_8000)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(m_dsp56k_p_mirror)	/* Unsure of size, but 0x1000 matches bank01 */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_dsp56k_p_8000)
 	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(dsp56k_bootload_r)
 ADDRESS_MAP_END
 

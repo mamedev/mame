@@ -130,9 +130,9 @@ static WRITE16_HANDLER( m107_sound_reset_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xbffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE_LEGACY(m107_vram_w) AM_BASE( m_vram_data)
+	AM_RANGE(0xd0000, 0xdffff) AM_RAM_WRITE_LEGACY(m107_vram_w) AM_BASE(m_vram_data)
 	AM_RANGE(0xe0000, 0xeffff) AM_RAM /* System ram */
-	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0xf8000, 0xf8fff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xf9000, 0xf9fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("maincpu", 0x7fff0)
 ADDRESS_MAP_END

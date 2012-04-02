@@ -307,14 +307,14 @@ static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x30c010, 0x30c01f) AM_WRITE_LEGACY(dec0_control_w)									/* Priority, sound, etc. */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE_LEGACY(dec0_paletteram_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM_WRITE_LEGACY(dec0_paletteram_b_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE( m_ram)									/* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE( m_spriteram)								/* Sprites */
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(m_ram)									/* Main ram */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE(m_spriteram)								/* Sprites */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( robocop_sub_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAM									/* Main ram */
-	AM_RANGE(0x1f2000, 0x1f3fff) AM_RAM AM_BASE( m_robocop_shared_ram)	/* Shared ram */
+	AM_RANGE(0x1f2000, 0x1f3fff) AM_RAM AM_BASE(m_robocop_shared_ram)	/* Shared ram */
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 
@@ -507,8 +507,8 @@ static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x300c00, 0x300fff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x301000, 0x3017ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
-	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE( m_ram)	/* Sly spy main ram */
-	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE( m_spriteram)	/* Sprites */
+	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE(m_ram)	/* Sly spy main ram */
+	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE(m_spriteram)	/* Sprites */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x314003) AM_WRITE_LEGACY(slyspy_control_w)
 	AM_RANGE(0x314008, 0x31400f) AM_READ_LEGACY(slyspy_controls_r)
@@ -518,8 +518,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE( m_ram)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE(m_ram)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x160000, 0x160001) AM_WRITE_LEGACY(dec0_priority_w)
 	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(midres_controls_r)
@@ -607,9 +607,9 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x300800, 0x30087f) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 	AM_RANGE(0x300c00, 0x300fff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x301000, 0x3017ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_BASE( m_ram) /* Sly spy main ram */
+	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_BASE(m_ram) /* Sly spy main ram */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE( m_spriteram) /* Sprites */
+	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE(m_spriteram) /* Sprites */
 ADDRESS_MAP_END
 
 
@@ -641,8 +641,8 @@ static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM
 	AM_RANGE(0x400008, 0x400009) AM_WRITE_LEGACY(dec0_priority_w)				// NEW
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE( m_ram)				/* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE( m_spriteram)			/* Sprites */
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(m_ram)				/* Main ram */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE(m_spriteram)			/* Sprites */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( automat_adpcm_w )

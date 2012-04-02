@@ -485,8 +485,8 @@ static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8, blitz_state )
     AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 */
 
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(megadpkr_videoram_w) AM_BASE( m_videoram)
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE_LEGACY(megadpkr_colorram_w) AM_BASE( m_colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(megadpkr_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE_LEGACY(megadpkr_colorram_w) AM_BASE(m_colorram)
 
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END

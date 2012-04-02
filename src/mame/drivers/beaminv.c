@@ -238,7 +238,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, beaminv_state )
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ_LEGACY(controller_r)
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ_LEGACY(v128_r)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE( m_videoram, m_videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 

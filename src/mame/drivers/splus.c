@@ -582,7 +582,7 @@ static DRIVER_INIT( splus )
 *************************/
 
 static ADDRESS_MAP_START( splus_map, AS_PROGRAM, 8, splus_state )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE( m_program_ram)
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE(m_program_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
@@ -612,10 +612,10 @@ static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("cmosh")
 
     // SSxxxx Reel Chip
-    AM_RANGE(0x8000, 0x9fff) AM_READ_LEGACY(splus_m_reel_ram_r) AM_BASE( m_reel_ram)
+    AM_RANGE(0x8000, 0x9fff) AM_READ_LEGACY(splus_m_reel_ram_r) AM_BASE(m_reel_ram)
 
 	// Ports start here
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ_LEGACY(splus_io_r) AM_WRITE_LEGACY(splus_io_w) AM_BASE( m_io_port)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ_LEGACY(splus_io_r) AM_WRITE_LEGACY(splus_io_w) AM_BASE(m_io_port)
 ADDRESS_MAP_END
 
 /*************************

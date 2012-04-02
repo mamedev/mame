@@ -252,11 +252,11 @@ static WRITE8_HANDLER( cyclemb_flip_w )
 static ADDRESS_MAP_START( cyclemb_map, AS_PROGRAM, 8, cyclemb_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE( m_vram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE( m_cram)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE( m_obj1_ram) //ORAM1 (only a000-a3ff tested)
-	AM_RANGE(0xa800, 0xafff) AM_RAM AM_BASE( m_obj2_ram) //ORAM2 (only a800-abff tested)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_BASE( m_obj3_ram) //ORAM3 (only b000-b3ff tested)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE(m_vram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_cram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE(m_obj1_ram) //ORAM1 (only a000-a3ff tested)
+	AM_RANGE(0xa800, 0xafff) AM_RAM AM_BASE(m_obj2_ram) //ORAM2 (only a800-abff tested)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_BASE(m_obj3_ram) //ORAM3 (only b000-b3ff tested)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM //WRAM
 ADDRESS_MAP_END
 

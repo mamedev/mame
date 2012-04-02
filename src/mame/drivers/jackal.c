@@ -164,7 +164,7 @@ static WRITE8_HANDLER( jackal_spriteram_w )
  *************************************/
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, jackal_state )
-	AM_RANGE(0x0000, 0x0003) AM_RAM AM_BASE( m_videoctrl)	// scroll + other things
+	AM_RANGE(0x0000, 0x0003) AM_RAM AM_BASE(m_videoctrl)	// scroll + other things
 	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(jackal_flipscreen_w)
 	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("IN1")
@@ -184,7 +184,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, jackal_state )
 	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE( m_paletteram)	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(m_paletteram)	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
 	AM_RANGE(0x6000, 0x605f) AM_RAM						// SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
 	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM

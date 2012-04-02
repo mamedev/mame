@@ -94,7 +94,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 static ADDRESS_MAP_START( dynadice_map, AS_PROGRAM, 8, dynadice_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(dynadice_videoram_w) AM_BASE( m_videoram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(dynadice_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 

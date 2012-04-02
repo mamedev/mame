@@ -384,8 +384,8 @@ static WRITE8_HANDLER( led_array_w )
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_MIRROR(0xc00) AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(sc0_vram_w) AM_BASE( m_vram)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE_LEGACY(sc0_attr_w) AM_BASE( m_attr)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(sc0_vram_w) AM_BASE(m_vram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE_LEGACY(sc0_attr_w) AM_BASE(m_attr)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_io_map, AS_IO, 8, kingdrby_state )
@@ -400,7 +400,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x7801, 0x780f) AM_WRITE_LEGACY(led_array_w)
@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( slave_1986_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
 //  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w) /* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE( m_spriteram)
+	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("KEY0")

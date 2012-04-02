@@ -870,9 +870,9 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w)   AM_BASE_GENERIC(paletteram) // area [A] - palette for sprites
 
 	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE_LEGACY(galpani3_suprnova_sprite32_w) AM_SHARE("spriteram")
-	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE_LEGACY(galpani3_suprnova_sprite32regs_w) AM_BASE( m_sprregs)
+	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE_LEGACY(galpani3_suprnova_sprite32regs_w) AM_BASE(m_sprregs)
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE( m_mcu_ram) // area [C]
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE(m_mcu_ram) // area [C]
 
 	AM_RANGE(0x580000, 0x580001) AM_WRITE_LEGACY(galpani3_mcu_com0_w)	// ] see $387e8: these 2 locations are written (w.#$ffff)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE_LEGACY(galpani3_mcu_com1_w)	// ] then bit #0 of $780000.l is tested: 0 = OK!
@@ -886,14 +886,14 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0x800800, 0x800bff) AM_RAM // ??? see subroutine $39f42 (R?)
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE_LEGACY(galpani3_framebuffer1_scrolly_w) // scroll?
 	AM_RANGE(0x800c02, 0x800c03) AM_WRITE_LEGACY(galpani3_framebuffer1_enable_w) // enable?
-	AM_RANGE(0x800c06, 0x800c07) AM_WRITE_LEGACY(galpani3_framebuffer1_bgcol_w) AM_BASE( m_framebuffer1_bgcol) // bg colour? cycles ingame, for girls?
-	AM_RANGE(0x800c10, 0x800c11) AM_RAM AM_BASE( m_framebuffer1_bright1) // brightness / blend amount?
-	AM_RANGE(0x800c12, 0x800c13) AM_RAM AM_BASE( m_framebuffer1_bright2) // similar.
+	AM_RANGE(0x800c06, 0x800c07) AM_WRITE_LEGACY(galpani3_framebuffer1_bgcol_w) AM_BASE(m_framebuffer1_bgcol) // bg colour? cycles ingame, for girls?
+	AM_RANGE(0x800c10, 0x800c11) AM_RAM AM_BASE(m_framebuffer1_bright1) // brightness / blend amount?
+	AM_RANGE(0x800c12, 0x800c13) AM_RAM AM_BASE(m_framebuffer1_bright2) // similar.
 	AM_RANGE(0x800c18, 0x800c1b) AM_WRITE_LEGACY(galpani3_regs1_address_w) // ROM address of RLE data, in bytes
 	AM_RANGE(0x800c1e, 0x800c1f) AM_WRITE_LEGACY(galpani3_regs1_go_w) // ?
 	AM_RANGE(0x800c00, 0x800c1f) AM_READ_LEGACY(galpani3_regs1_r)// ? R layer regs ? see subroutine $3a03e
-	AM_RANGE(0x880000, 0x8801ff) AM_RAM_WRITE_LEGACY(galpani3_framebuffer1_palette_w) AM_BASE( m_framebuffer1_palette) // palette
-	AM_RANGE(0x900000, 0x97ffff) AM_RAM AM_BASE( m_framebuffer1)// area [D] - R area ? odd bytes only, initialized 00..ff,00..ff,...
+	AM_RANGE(0x880000, 0x8801ff) AM_RAM_WRITE_LEGACY(galpani3_framebuffer1_palette_w) AM_BASE(m_framebuffer1_palette) // palette
+	AM_RANGE(0x900000, 0x97ffff) AM_RAM AM_BASE(m_framebuffer1)// area [D] - R area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// GRAP2 2?
 	AM_RANGE(0xa00000, 0xa003ff) AM_RAM // ??? see subroutine $39f42 (G?)
@@ -901,14 +901,14 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0xa00800, 0xa00bff) AM_RAM // ??? see subroutine $39f42 (G?)
 	AM_RANGE(0xa00c00, 0xa00c01) AM_WRITE_LEGACY(galpani3_framebuffer2_scrolly_w)
 	AM_RANGE(0xa00c02, 0xa00c03) AM_WRITE_LEGACY(galpani3_framebuffer2_enable_w) // enable?
-	AM_RANGE(0xa00c06, 0xa00c07) AM_WRITE_LEGACY(galpani3_framebuffer2_bgcol_w) AM_BASE( m_framebuffer2_bgcol) // bg colour? same values as previous layer
-	AM_RANGE(0xa00c10, 0xa00c11) AM_RAM AM_BASE( m_framebuffer2_bright1) // similar..
-	AM_RANGE(0xa00c12, 0xa00c13) AM_RAM AM_BASE( m_framebuffer2_bright2) // brightness / blend amount?
+	AM_RANGE(0xa00c06, 0xa00c07) AM_WRITE_LEGACY(galpani3_framebuffer2_bgcol_w) AM_BASE(m_framebuffer2_bgcol) // bg colour? same values as previous layer
+	AM_RANGE(0xa00c10, 0xa00c11) AM_RAM AM_BASE(m_framebuffer2_bright1) // similar..
+	AM_RANGE(0xa00c12, 0xa00c13) AM_RAM AM_BASE(m_framebuffer2_bright2) // brightness / blend amount?
 	AM_RANGE(0xa00c00, 0xa00c1f) AM_READ_LEGACY(galpani3_regs2_r) // ? G layer regs ? see subroutine $3a03e
 	AM_RANGE(0xa00c18, 0xa00c1b) AM_WRITE_LEGACY(galpani3_regs2_address_w) // ROM address of RLE data, in bytes
 	AM_RANGE(0xa00c1e, 0xa00c1f) AM_WRITE_LEGACY(galpani3_regs2_go_w) // ?
-	AM_RANGE(0xa80000, 0xa801ff) AM_RAM_WRITE_LEGACY(galpani3_framebuffer2_palette_w) AM_BASE( m_framebuffer2_palette) // palette
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM AM_BASE( m_framebuffer2) // area [E] - G area ? odd bytes only, initialized 00..ff,00..ff,...
+	AM_RANGE(0xa80000, 0xa801ff) AM_RAM_WRITE_LEGACY(galpani3_framebuffer2_palette_w) AM_BASE(m_framebuffer2_palette) // palette
+	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM AM_BASE(m_framebuffer2) // area [E] - G area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// GRAP2 3?
 	AM_RANGE(0xc00000, 0xc003ff) AM_RAM // row scroll??
@@ -916,17 +916,17 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0xc00800, 0xc00bff) AM_RAM // column scroll??
 	AM_RANGE(0xc00c00, 0xc00c01) AM_WRITE_LEGACY(galpani3_framebuffer3_scrolly_w) // scroll?
 	AM_RANGE(0xc00c02, 0xc00c03) AM_WRITE_LEGACY(galpani3_framebuffer3_enable_w) // enable?
-	AM_RANGE(0xc00c06, 0xc00c07) AM_WRITE_LEGACY(galpani3_framebuffer3_bgcol_w) AM_BASE( m_framebuffer3_bgcol) // bg colour? not used?
-	AM_RANGE(0xc00c10, 0xc00c11) AM_RAM AM_BASE( m_framebuffer3_bright1) // brightness / blend amount?
-	AM_RANGE(0xc00c12, 0xc00c13) AM_RAM AM_BASE( m_framebuffer3_bright2) // similar..
+	AM_RANGE(0xc00c06, 0xc00c07) AM_WRITE_LEGACY(galpani3_framebuffer3_bgcol_w) AM_BASE(m_framebuffer3_bgcol) // bg colour? not used?
+	AM_RANGE(0xc00c10, 0xc00c11) AM_RAM AM_BASE(m_framebuffer3_bright1) // brightness / blend amount?
+	AM_RANGE(0xc00c12, 0xc00c13) AM_RAM AM_BASE(m_framebuffer3_bright2) // similar..
 	AM_RANGE(0xc00c18, 0xc00c1b) AM_WRITE_LEGACY(galpani3_regs3_address_w) // ROM address of RLE data, in bytes
 	AM_RANGE(0xc00c1e, 0xc00c1f) AM_WRITE_LEGACY(galpani3_regs3_go_w) // ?
 	AM_RANGE(0xc00c00, 0xc00c1f) AM_READ_LEGACY(galpani3_regs3_r) // ? B layer regs ? see subroutine $3a03e
-	AM_RANGE(0xc80000, 0xc801ff) AM_RAM_WRITE_LEGACY(galpani3_framebuffer3_palette_w) AM_BASE( m_framebuffer3_palette) // palette
-	AM_RANGE(0xd00000, 0xd7ffff) AM_RAM AM_BASE( m_framebuffer3) // area [F] - B area ? odd bytes only, initialized 00..ff,00..ff,...
+	AM_RANGE(0xc80000, 0xc801ff) AM_RAM_WRITE_LEGACY(galpani3_framebuffer3_palette_w) AM_BASE(m_framebuffer3_palette) // palette
+	AM_RANGE(0xd00000, 0xd7ffff) AM_RAM AM_BASE(m_framebuffer3) // area [F] - B area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// ?? priority / alpha buffer?
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_BASE( m_priority_buffer) // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_BASE(m_priority_buffer) // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE_LEGACY(galpani3_priority_buffer_scrollx_w) // scroll?
 	AM_RANGE(0xe80002, 0xe80003) AM_WRITE_LEGACY(galpani3_priority_buffer_scrolly_w) // scroll?
 

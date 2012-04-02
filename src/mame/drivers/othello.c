@@ -120,7 +120,7 @@ static PALETTE_INIT( othello )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x97ff) AM_NOP /* not populated */
-	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE( m_videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

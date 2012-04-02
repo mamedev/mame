@@ -510,7 +510,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dai3wksi_state )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(dai3wksi_audio_1_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(dai3wksi_audio_2_w)
 	AM_RANGE(0x3800, 0x3800) AM_WRITE_LEGACY(dai3wksi_audio_3_w)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_SIZE( m_dai3wksi_videoram, m_dai3wksi_videoram_size)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_SIZE(m_dai3wksi_videoram, m_dai3wksi_videoram_size)
 ADDRESS_MAP_END
 
 

@@ -1355,7 +1355,7 @@ static WRITE32_HANDLER(model2_3d_zclip_w)
 static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM AM_WRITENOP
 
-	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_BASE( m_workram)
+	AM_RANGE(0x00500000, 0x005fffff) AM_RAM AM_BASE(m_workram)
 
 	AM_RANGE(0x00800000, 0x00803fff) AM_READWRITE_LEGACY(geo_r, geo_w)
 	//AM_RANGE(0x00800010, 0x00800013) AM_WRITENOP
@@ -1364,7 +1364,7 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 
 	//AM_RANGE(0x00880000, 0x00883fff) AM_WRITE_LEGACY(copro_w)
 
-	AM_RANGE(0x00900000, 0x0097ffff) AM_RAM AM_BASE( m_bufferram)
+	AM_RANGE(0x00900000, 0x0097ffff) AM_RAM AM_BASE(m_bufferram)
 
 
 	AM_RANGE(0x00980004, 0x00980007) AM_READ_LEGACY(fifoctl_r)
@@ -1381,8 +1381,8 @@ static ADDRESS_MAP_START( model2_base_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x01070000, 0x01070003) AM_WRITENOP AM_MIRROR(0x100000)		// Video synchronization switch
 	AM_RANGE(0x01080000, 0x010fffff) AM_DEVREADWRITE("tile", segas24_tile, char32_r, char32_w) AM_MIRROR(0x100000)
 
-	AM_RANGE(0x01800000, 0x01803fff) AM_RAM_WRITE_LEGACY(pal32_w) AM_BASE( m_paletteram32)
-	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE( m_colorxlat)
+	AM_RANGE(0x01800000, 0x01803fff) AM_RAM_WRITE_LEGACY(pal32_w) AM_BASE(m_paletteram32)
+	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE(m_colorxlat)
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE_LEGACY(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE_LEGACY(network_r, network_w)
 	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_SHARE("backup1") // Backup sram
@@ -1408,22 +1408,22 @@ static ADDRESS_MAP_START( model2o_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE_LEGACY(copro_function_port_w)
 	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE_LEGACY(copro_fifo_r, copro_fifo_w)
 
-	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY( copro_ctl1_w )
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY( geo_ctl1_w )
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY( model2_serial_r, model2o_serial_w )
+	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY(copro_ctl1_w )
+	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY(geo_ctl1_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY(model2_serial_r, model2o_serial_w )
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE( m_textureram0)	// texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE( m_textureram1)	// texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE_LEGACY(model2o_luma_w) AM_BASE( m_lumaram) // polygon "luma" RAM
+	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(m_textureram0)	// texture RAM 0
+	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(m_textureram1)	// texture RAM 1
+	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE_LEGACY(model2o_luma_w) AM_BASE(m_lumaram) // polygon "luma" RAM
 
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000")
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_LEGACY( desert_unk_r )
-	AM_RANGE(0x01c00040, 0x01c00043) AM_READ_LEGACY( daytona_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_LEGACY(desert_unk_r )
+	AM_RANGE(0x01c00040, 0x01c00043) AM_READ_LEGACY(daytona_unk_r )
 	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_SHARE("backup2")
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY( model2_serial_r, model2o_serial_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY(model2_serial_r, model2o_serial_w )
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1438,21 +1438,21 @@ static ADDRESS_MAP_START( model2a_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE_LEGACY(copro_function_port_w)
 	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE_LEGACY(copro_fifo_r, copro_fifo_w)
 
-	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY( copro_ctl1_w )
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY( geo_ctl1_w )
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY( model2_serial_r, model2_serial_w )
+	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY(copro_ctl1_w )
+	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY(geo_ctl1_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE( m_textureram0)	// texture RAM 0
-	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE( m_textureram1)	// texture RAM 1
-	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE_LEGACY(model2o_luma_w) AM_BASE( m_lumaram) // polygon "luma" RAM
+	AM_RANGE(0x12000000, 0x121fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w0) AM_MIRROR(0x200000) AM_BASE(m_textureram0)	// texture RAM 0
+	AM_RANGE(0x12400000, 0x125fffff) AM_RAM_WRITE_LEGACY(model2o_tex_w1) AM_MIRROR(0x200000) AM_BASE(m_textureram1)	// texture RAM 1
+	AM_RANGE(0x12800000, 0x1281ffff) AM_RAM_WRITE_LEGACY(model2o_luma_w) AM_BASE(m_lumaram) // polygon "luma" RAM
 
-	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE_LEGACY( ctrl0_w )
+	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE_LEGACY(ctrl0_w )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
-	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ_LEGACY( hotd_unk_r )
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE_LEGACY( analog_2b_w )
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY( model2_serial_r, model2_serial_w )
+	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ_LEGACY(hotd_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE_LEGACY(analog_2b_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1469,25 +1469,25 @@ static ADDRESS_MAP_START( model2b_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE_LEGACY(copro_fifo_r, copro_fifo_w)
 	AM_RANGE(0x008c0000, 0x008c0fff) AM_WRITE_LEGACY(copro_sharc_iop_w)
 
-	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY( copro_ctl1_w )
+	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY(copro_ctl1_w )
 
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY( geo_ctl1_w )
-	//AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY( geo_sharc_ctl1_w )
+	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY(geo_ctl1_w )
+	//AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY(geo_sharc_ctl1_w )
 
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY( model2_serial_r, model2_serial_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x11000000, 0x111fffff) AM_RAM	AM_BASE( m_textureram0)	// texture RAM 0 (2b/2c)
-	AM_RANGE(0x11200000, 0x113fffff) AM_RAM	AM_BASE( m_textureram1)	// texture RAM 1 (2b/2c)
-	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM	AM_BASE( m_lumaram)		// polygon "luma" RAM (2b/2c)
+	AM_RANGE(0x11000000, 0x111fffff) AM_RAM	AM_BASE(m_textureram0)	// texture RAM 0 (2b/2c)
+	AM_RANGE(0x11200000, 0x113fffff) AM_RAM	AM_BASE(m_textureram1)	// texture RAM 1 (2b/2c)
+	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM	AM_BASE(m_lumaram)		// polygon "luma" RAM (2b/2c)
 
 
-	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE_LEGACY( ctrl0_w )
+	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE_LEGACY(ctrl0_w )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
-	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ_LEGACY( hotd_unk_r )
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE_LEGACY( analog_2b_w )
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY( model2_serial_r, model2_serial_w )
+	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ_LEGACY(hotd_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE_LEGACY(analog_2b_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1499,21 +1499,21 @@ static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE_LEGACY(geo_prg_r, geo_prg_w)
 	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE_LEGACY(copro_prg_r, copro_prg_w)
 
-	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY( copro_ctl1_w )
-	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY( geo_ctl1_w )
-	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY( model2_serial_r, model2_serial_w )
+	AM_RANGE(0x00980000, 0x00980003) AM_WRITE_LEGACY(copro_ctl1_w )
+	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE_LEGACY(geo_ctl1_w )
+	AM_RANGE(0x009c0000, 0x009cffff) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
 
-	AM_RANGE(0x11000000, 0x111fffff) AM_RAM	AM_BASE( m_textureram0)	// texture RAM 0 (2b/2c)
-	AM_RANGE(0x11200000, 0x113fffff) AM_RAM	AM_BASE( m_textureram1)	// texture RAM 1 (2b/2c)
-	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM	AM_BASE( m_lumaram)		// polygon "luma" RAM (2b/2c)
+	AM_RANGE(0x11000000, 0x111fffff) AM_RAM	AM_BASE(m_textureram0)	// texture RAM 0 (2b/2c)
+	AM_RANGE(0x11200000, 0x113fffff) AM_RAM	AM_BASE(m_textureram1)	// texture RAM 1 (2b/2c)
+	AM_RANGE(0x11400000, 0x1140ffff) AM_RAM	AM_BASE(m_lumaram)		// polygon "luma" RAM (2b/2c)
 
-	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE_LEGACY( ctrl0_w )
+	AM_RANGE(0x01c00000, 0x01c00003) AM_READ_PORT("1c00000") AM_WRITE_LEGACY(ctrl0_w )
 	AM_RANGE(0x01c00004, 0x01c00007) AM_READ_PORT("1c00004")
 	AM_RANGE(0x01c00010, 0x01c00013) AM_READ_PORT("1c00010")
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
-	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ_LEGACY( hotd_unk_r )
-	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE_LEGACY( analog_2b_w )
-	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY( model2_serial_r, model2_serial_w )
+	AM_RANGE(0x01c00018, 0x01c0001b) AM_READ_LEGACY(hotd_unk_r )
+	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ_PORT("1c0001c") AM_WRITE_LEGACY(analog_2b_w )
+	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE_LEGACY(model2_serial_r, model2_serial_w )
 
 	AM_IMPORT_FROM(model2_base_mem)
 ADDRESS_MAP_END
@@ -1861,14 +1861,14 @@ static WRITE16_HANDLER( m1_snd_68k_latch2_w )
 static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16, model2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM AM_REGION("audiocpu", 0x20000)	// mirror of second program ROM
-	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE_LEGACY( m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
-	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE_LEGACY( m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
-	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8_LEGACY( "sega1", multipcm_r, multipcm_w, 0x00ff )
+	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE_LEGACY(m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
+	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE_LEGACY(m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
+	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8_LEGACY("sega1", multipcm_r, multipcm_w, 0x00ff )
 	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
-	AM_RANGE(0xc50000, 0xc50001) AM_DEVWRITE_LEGACY( "sega1", m1_snd_mpcm_bnk_w )
-	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8_LEGACY( "sega2", multipcm_r, multipcm_w, 0x00ff )
-	AM_RANGE(0xc70000, 0xc70001) AM_DEVWRITE_LEGACY( "sega2", m1_snd_mpcm_bnk_w )
-	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8_LEGACY( "ymsnd", ym3438_r, ym3438_w, 0x00ff )
+	AM_RANGE(0xc50000, 0xc50001) AM_DEVWRITE_LEGACY("sega1", m1_snd_mpcm_bnk_w )
+	AM_RANGE(0xc60000, 0xc60007) AM_DEVREADWRITE8_LEGACY("sega2", multipcm_r, multipcm_w, 0x00ff )
+	AM_RANGE(0xc70000, 0xc70001) AM_DEVWRITE_LEGACY("sega2", m1_snd_mpcm_bnk_w )
+	AM_RANGE(0xd00000, 0xd00007) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3438_r, ym3438_w, 0x00ff )
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1894,7 +1894,7 @@ static WRITE16_HANDLER( model2snd_ctrl )
 }
 
 static ADDRESS_MAP_START( model2_snd, AS_PROGRAM, 16, model2_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audiocpu", 0) AM_BASE( m_soundram)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audiocpu", 0) AM_BASE(m_soundram)
 	AM_RANGE(0x100000, 0x100fff) AM_DEVREADWRITE_LEGACY("scsp", scsp_r, scsp_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE_LEGACY(model2snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audiocpu", 0x80000)
@@ -1984,7 +1984,7 @@ static WRITE32_HANDLER(copro_tgp_buffer_w)
 }
 
 static ADDRESS_MAP_START( copro_tgp_map, AS_PROGRAM, 32, model2_state )
-	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_BASE( m_tgp_program)
+	AM_RANGE(0x00000000, 0x00007fff) AM_RAM AM_BASE(m_tgp_program)
 	AM_RANGE(0x00400000, 0x00407fff) AM_READWRITE_LEGACY(copro_tgp_buffer_r, copro_tgp_buffer_w)
 	AM_RANGE(0xff800000, 0xff9fffff) AM_ROM AM_REGION("tgp", 0)
 ADDRESS_MAP_END

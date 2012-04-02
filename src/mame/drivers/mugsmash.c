@@ -174,14 +174,14 @@ static READ16_HANDLER ( mugsmash_input_ports_r )
 
 static ADDRESS_MAP_START( mugsmash_map, AS_PROGRAM, 16, mugsmash_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(mugsmash_videoram1_w) AM_BASE( m_videoram1)
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE_LEGACY(mugsmash_videoram2_w) AM_BASE( m_videoram2)
-	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE_LEGACY(mugsmash_reg_w) AM_BASE( m_regs1)	/* video registers*/
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(mugsmash_videoram1_w) AM_BASE(m_videoram1)
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE_LEGACY(mugsmash_videoram2_w) AM_BASE(m_videoram2)
+	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE_LEGACY(mugsmash_reg_w) AM_BASE(m_regs1)	/* video registers*/
 	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x140000, 0x140007) AM_WRITE_LEGACY(mugsmash_reg2_w) AM_BASE( m_regs2) /* sound + ? */
+	AM_RANGE(0x140000, 0x140007) AM_WRITE_LEGACY(mugsmash_reg2_w) AM_BASE(m_regs2) /* sound + ? */
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* main ram? */
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE( m_spriteram) /* sprite ram */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE(m_spriteram) /* sprite ram */
 #if USE_FAKE_INPUT_PORTS
 	AM_RANGE(0x180000, 0x180007) AM_READ_LEGACY(mugsmash_input_ports_r)
 #else

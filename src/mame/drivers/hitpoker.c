@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( hitpoker_map, AS_PROGRAM, 8, hitpoker_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hitpoker_io, AS_IO, 8, hitpoker_state )
-	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE_LEGACY(hitpoker_pic_r,hitpoker_pic_w) AM_BASE( m_sys_regs)
+	AM_RANGE(MC68HC11_IO_PORTA, MC68HC11_IO_PORTA) AM_READWRITE_LEGACY(hitpoker_pic_r,hitpoker_pic_w) AM_BASE(m_sys_regs)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hitpoker )

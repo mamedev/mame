@@ -869,12 +869,12 @@ static ADDRESS_MAP_START( marvins_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8600, 0x8600) AM_WRITE_LEGACY(marvins_flipscreen_w)
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE( m_spriteram) AM_SHARE("share1")	// + work ram
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share2") AM_BASE( m_fg_videoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share1")	// + work ram
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share2") AM_BASE(m_fg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share4") AM_BASE( m_bg_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share4") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("share5")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share6") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share6") AM_BASE(m_tx_videoram)	// + work RAM
 	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(snk_sp16_scrolly_w)
 	AM_RANGE(0xf900, 0xf900) AM_WRITE_LEGACY(snk_sp16_scrollx_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(snk_fg_scrolly_w)
@@ -916,13 +916,13 @@ static ADDRESS_MAP_START( madcrash_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0xff) AM_WRITE_LEGACY(marvins_flipscreen_w)
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE( m_spriteram) AM_SHARE("share1")	// + work ram
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share1")	// + work ram
 	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0xff) AM_WRITE_LEGACY(marvins_palette_bank_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE( m_bg_videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share4") AM_BASE( m_fg_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share4") AM_BASE(m_fg_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("share5")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share6") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share6") AM_BASE(m_tx_videoram)	// + work RAM
 	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0xff) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xf900, 0xf900) AM_MIRROR(0xff) AM_WRITE_LEGACY(snk_bg_scrollx_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_MIRROR(0xff) AM_WRITE_LEGACY(snk_sprite_split_point_w)
@@ -963,13 +963,13 @@ static ADDRESS_MAP_START( madcrush_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0xff) AM_WRITE_LEGACY(marvins_flipscreen_w)
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE( m_spriteram) AM_SHARE("share1")	// + work ram
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share4") AM_BASE( m_fg_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share1")	// + work ram
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share4") AM_BASE(m_fg_videoram)
 	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0xff) AM_WRITE_LEGACY(marvins_palette_bank_w)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share5")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE( m_bg_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share6") AM_BASE( m_tx_videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share6") AM_BASE(m_tx_videoram)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(snk_sp16_scrolly_w)
 	AM_RANGE(0xf900, 0xf900) AM_WRITE_LEGACY(snk_sp16_scrollx_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(snk_fg_scrolly_w)
@@ -1016,9 +1016,9 @@ static ADDRESS_MAP_START( jcross_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xd500, 0xd500) AM_WRITE_LEGACY(snk_sp16_scrollx_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xd700, 0xd700) AM_WRITE_LEGACY(snk_bg_scrollx_w)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE( m_spriteram) AM_SHARE("share1")	// + work ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE( m_bg_videoram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share1")	// + work ram
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE(m_bg_videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE(m_tx_videoram)	// + work RAM
 	AM_RANGE(0xffff, 0xffff) AM_WRITENOP	// simply a program patch to not write to two not existing video registers?
 ADDRESS_MAP_END
 
@@ -1047,10 +1047,10 @@ static ADDRESS_MAP_START( sgladiat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xd500, 0xd500) AM_WRITE_LEGACY(snk_sp16_scrollx_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xd700, 0xd700) AM_WRITE_LEGACY(snk_bg_scrollx_w)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE( m_spriteram) AM_SHARE("share1")	// + work ram
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE( m_bg_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share1")	// + work ram
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE(m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sgladiat_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1084,9 +1084,9 @@ static ADDRESS_MAP_START( hal21_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xd500, 0xd500) AM_WRITE_LEGACY(snk_sp16_scrollx_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xd700, 0xd700) AM_WRITE_LEGACY(snk_bg_scrollx_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE( m_spriteram) AM_SHARE("share1")	// + work ram
-	AM_RANGE(0xe800, 0xf7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE( m_bg_videoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share1")	// + work ram
+	AM_RANGE(0xe800, 0xf7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE(m_bg_videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE(m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hal21_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1115,9 +1115,9 @@ static ADDRESS_MAP_START( aso_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xce00, 0xce00) AM_WRITENOP	// always 05?
 	AM_RANGE(0xcf00, 0xcf00) AM_WRITE_LEGACY(aso_bg_bank_w)	// tile and palette bank
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share2") AM_BASE( m_spriteram)	// + work ram
-	AM_RANGE(0xe800, 0xf7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share3") AM_BASE( m_bg_videoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share2") AM_BASE(m_spriteram)	// + work ram
+	AM_RANGE(0xe800, 0xf7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share3") AM_BASE(m_bg_videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE(m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aso_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1148,9 +1148,9 @@ static ADDRESS_MAP_START( tnk3_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE_LEGACY(snk_bg_scrollx_w)
 	AM_RANGE(0xcf00, 0xcf00) AM_WRITENOP	// fitegolf/countryc only. Either 0 or 1. Video related?
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("share1") AM_BASE( m_spriteram)	// + work ram
-	AM_RANGE(0xd800, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share2") AM_BASE( m_bg_videoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("share1") AM_BASE(m_spriteram)	// + work ram
+	AM_RANGE(0xd800, 0xf7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share2") AM_BASE(m_bg_videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share3") AM_BASE(m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnk3_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1194,9 +1194,9 @@ static ADDRESS_MAP_START( ikari_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xcea0, 0xcea0) AM_READ_LEGACY(hardflags6_r)
 	AM_RANGE(0xcee0, 0xcee0) AM_READ_LEGACY(hardflags7_r)
 	// note the mirror. ikari and victroad use d800, ikarijp uses d000
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_MIRROR(0x0800) AM_SHARE("share2") AM_BASE( m_bg_videoram)
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share3") AM_BASE( m_spriteram)	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_MIRROR(0x0800) AM_SHARE("share2") AM_BASE(m_bg_videoram)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share3") AM_BASE(m_spriteram)	// + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE(m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ikari_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1257,10 +1257,10 @@ static ADDRESS_MAP_START( bermudat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xccd0, 0xccd0) AM_READ_LEGACY(turbocheck32_2_r)
 	AM_RANGE(0xcce0, 0xcce0) AM_READ_LEGACY(turbocheck32_3_r)
 	AM_RANGE(0xccf0, 0xccf0) AM_READ_LEGACY(turbocheck32_4_r)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share1") AM_BASE( m_bg_videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share1") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share3") AM_BASE( m_spriteram)	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share3") AM_BASE(m_spriteram)	// + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE(m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bermudat_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1303,10 +1303,10 @@ static ADDRESS_MAP_START( gwar_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP	// always 0?
 	AM_RANGE(0xca40, 0xca40) AM_WRITENOP	// always 0?
 	AM_RANGE(0xcac0, 0xcac0) AM_WRITE_LEGACY(snk_sprite_split_point_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share1") AM_BASE( m_bg_videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share1") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share3") AM_BASE( m_spriteram)	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share3") AM_BASE(m_spriteram)	// + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE(m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gwar_cpuB_map, AS_PROGRAM, 8, snk_state )
@@ -1330,10 +1330,10 @@ static ADDRESS_MAP_START( gwara_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share1") AM_BASE( m_tx_videoram)	// + work RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share2") AM_BASE( m_bg_videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share1") AM_BASE(m_tx_videoram)	// + work RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share2") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share4") AM_BASE( m_spriteram)	// + work ram
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share4") AM_BASE(m_spriteram)	// + work ram
 	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xf840, 0xf840) AM_WRITE_LEGACY(snk_bg_scrollx_w)
 	AM_RANGE(0xf880, 0xf880) AM_WRITE_LEGACY(gwara_videoattrs_w)	// flip screen, scroll msb
@@ -1352,7 +1352,7 @@ static ADDRESS_MAP_START( gwara_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share2")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share4") AM_BASE( m_spriteram)	// + work ram
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share4") AM_BASE(m_spriteram)	// + work ram
 	AM_RANGE(0xf8c0, 0xf8c0) AM_WRITE_LEGACY(gwar_tx_bank_w)	// char and palette bank
 ADDRESS_MAP_END
 
@@ -1381,10 +1381,10 @@ static ADDRESS_MAP_START( tdfever_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc900, 0xc900) AM_WRITE_LEGACY(tdfever_sp_scroll_msb_w)
 	AM_RANGE(0xc980, 0xc980) AM_WRITE_LEGACY(snk_sp32_scrolly_w)
 	AM_RANGE(0xc9c0, 0xc9c0) AM_WRITE_LEGACY(snk_sp32_scrollx_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share1") AM_BASE( m_bg_videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share1") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE_LEGACY(tdfever_spriteram_w) AM_SHARE("share3") AM_BASE( m_spriteram)	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE( m_tx_videoram)	// + work RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE_LEGACY(tdfever_spriteram_w) AM_SHARE("share3") AM_BASE(m_spriteram)	// + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4") AM_BASE(m_tx_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdfever_cpuB_map, AS_PROGRAM, 8, snk_state )
