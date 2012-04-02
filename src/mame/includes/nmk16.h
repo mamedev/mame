@@ -67,21 +67,20 @@ WRITE16_HANDLER( vandykeb_scroll_w );
 WRITE16_HANDLER( manybloc_scroll_w );
 
 VIDEO_START( macross );
-SCREEN_UPDATE_IND16( manybloc );
 VIDEO_START( gunnail );
 VIDEO_START( macross2 );
 VIDEO_START( raphero );
 VIDEO_START( bjtwin );
 VIDEO_START( bioship );
 VIDEO_START( strahl );
+SCREEN_UPDATE_IND16( macross );
+SCREEN_UPDATE_IND16( manybloc );
+SCREEN_UPDATE_IND16( tharrier );
+SCREEN_UPDATE_IND16( tdragon2 );
+SCREEN_UPDATE_IND16( gunnail );
 SCREEN_UPDATE_IND16( bioship );
 SCREEN_UPDATE_IND16( strahl );
-SCREEN_UPDATE_IND16( macross );
-SCREEN_UPDATE_IND16( gunnail );
 SCREEN_UPDATE_IND16( bjtwin );
-SCREEN_UPDATE_IND16( tharrier );
-SCREEN_UPDATE_IND16( hachamf );
-SCREEN_UPDATE_IND16( tdragon );
 SCREEN_VBLANK( nmk );
 SCREEN_VBLANK( strahl );
 

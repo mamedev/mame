@@ -3918,7 +3918,7 @@ static MACHINE_CONFIG_START( tdragon, nmk16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(tdragon)
+	MCFG_SCREEN_UPDATE_STATIC(macross)
 	MCFG_SCREEN_VBLANK_STATIC(nmk)
 
 	MCFG_GFXDECODE(macross)
@@ -4034,7 +4034,7 @@ static MACHINE_CONFIG_START( hachamf, nmk16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(256, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(hachamf)
+	MCFG_SCREEN_UPDATE_STATIC(macross)
 	MCFG_SCREEN_VBLANK_STATIC(nmk)
 
 	MCFG_GFXDECODE(macross)
@@ -4243,7 +4243,7 @@ static MACHINE_CONFIG_START( tdragon2, nmk16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(gunnail)
+	MCFG_SCREEN_UPDATE_STATIC(tdragon2)
 	MCFG_SCREEN_VBLANK_STATIC(nmk)
 
 	MCFG_GFXDECODE(macross2)
@@ -4284,7 +4284,7 @@ static MACHINE_CONFIG_START( raphero, nmk16_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(gunnail)
+	MCFG_SCREEN_UPDATE_STATIC(tdragon2)
 	MCFG_SCREEN_VBLANK_STATIC(nmk)
 
 	MCFG_GFXDECODE(macross2)
@@ -7125,41 +7125,41 @@ ROM_END
 ***************************************************************************/
 
 
-GAME( 1989, tharrier, 0,        tharrier, tharrier, 0,        ROT270, "UPL (American Sammy license)", "Task Force Harrier", 0  )
-GAME( 1989, tharrierj,tharrier, tharrier, tharrier, 0,        ROT270, "UPL",                          "Task Force Harrier (Japan)", 0 )
+GAME( 1989, tharrier, 0,        tharrier, tharrier, 0,        ROT270, "UPL (American Sammy license)", "Task Force Harrier", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, tharrierj,tharrier, tharrier, tharrier, 0,        ROT270, "UPL",                          "Task Force Harrier (Japan)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1990, mustang,  0,        mustang,  mustang,  0,        ROT0,   "UPL",                          "US AAF Mustang (25th May. 1990)", GAME_IMPERFECT_SOUND)
-GAME( 1990, mustangs, mustang,  mustang,  mustang,  0,        ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (25th May. 1990 / Seoul Trading)", GAME_IMPERFECT_SOUND )
+GAME( 1990, mustang,  0,        mustang,  mustang,  0,        ROT0,   "UPL",                          "US AAF Mustang (25th May. 1990)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, mustangs, mustang,  mustang,  mustang,  0,        ROT0,   "UPL (Seoul Trading license)",  "US AAF Mustang (25th May. 1990 / Seoul Trading)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1990, bioship,  0,        bioship,  bioship,  0,        ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", GAME_IMPERFECT_SOUND )
-GAME( 1990, sbsgomo,  bioship,  bioship,  bioship,  0,        ROT0,   "UPL",                          "Space Battle Ship Gomorrah", GAME_IMPERFECT_SOUND )
+GAME( 1990, bioship,  0,        bioship,  bioship,  0,        ROT0,   "UPL (American Sammy license)", "Bio-ship Paladin", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, sbsgomo,  bioship,  bioship,  bioship,  0,        ROT0,   "UPL",                          "Space Battle Ship Gomorrah", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1990, vandyke,    0,       vandyke,  vandyke, 0,        ROT270, "UPL",                          "Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandykejal, vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandykejal2,vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandykeb,  vandyke, vandykeb, vandykeb, vandykeb, ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  GAME_NO_SOUND )
+GAME( 1990, vandyke,    0,       vandyke,  vandyke, 0,        ROT270, "UPL",                          "Vandyke (Japan)",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, vandykejal, vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 1)",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, vandykejal2,vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, set 2)",  GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1990, vandykeb,  vandyke, vandykeb, vandykeb, vandykeb, ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1991, blkheart, 0,        blkheart,  blkheart, 0,       ROT0,   "UPL",                          "Black Heart", GAME_IMPERFECT_SOUND  )
-GAME( 1991, blkheartj,blkheart, blkheart,  blkheart, 0,       ROT0,   "UPL",                          "Black Heart (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1991, blkheart, 0,        blkheart,  blkheart, 0,       ROT0,   "UPL",                          "Black Heart", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, blkheartj,blkheart, blkheart,  blkheart, 0,       ROT0,   "UPL",                          "Black Heart (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1991, acrobatm, 0,        acrobatm, acrobatm, 0,        ROT270, "UPL (Taito license)",          "Acrobat Mission", GAME_IMPERFECT_SOUND )
+GAME( 1991, acrobatm, 0,        acrobatm, acrobatm, 0,        ROT270, "UPL (Taito license)",          "Acrobat Mission", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1992, strahl,   0,        strahl,   strahl,   0,        ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 1)", GAME_IMPERFECT_SOUND )
-GAME( 1992, strahla,  strahl,   strahl,   strahl,   0,        ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", GAME_IMPERFECT_SOUND )
+GAME( 1992, strahl,   0,        strahl,   strahl,   0,        ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, strahla,  strahl,   strahl,   strahl,   0,        ROT0,   "UPL",                          "Koutetsu Yousai Strahl (Japan set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1991, tdragon,  0,        tdragon,  tdragon,  tdragon,  ROT270, "NMK (Tecmo license)",          "Thunder Dragon (9th Jan. 1992)", GAME_IMPERFECT_SOUND )
-GAME( 1991, tdragon1, tdragon,  tdragon,  tdragon,  tdragon,  ROT270, "NMK (Tecmo license)",          "Thunder Dragon (4th Jun. 1991)", GAME_IMPERFECT_SOUND )
+GAME( 1991, tdragon,  0,        tdragon,  tdragon,  tdragon,  ROT270, "NMK (Tecmo license)",          "Thunder Dragon (9th Jan. 1992)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, tdragon1, tdragon,  tdragon,  tdragon,  tdragon,  ROT270, "NMK (Tecmo license)",          "Thunder Dragon (4th Jun. 1991)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1991, hachamf,  0,        hachamf,  hachamf,  hachamf,  ROT0,   "NMK",                          "Hacha Mecha Fighter (19th Sep. 1991)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1992, macross,  0,        macross,  macross,  nmk,      ROT270, "Banpresto",                    "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", GAME_IMPERFECT_SOUND )
-GAME( 1993, gunnail,  0,        gunnail,  gunnail,  nmk,      ROT270, "NMK / Tecmo",                  "GunNail (28th May. 1992)", GAME_IMPERFECT_SOUND )
-GAME( 1993, macross2, 0,        macross2, macross2, 0,        ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", GAME_NO_COCKTAIL )
+GAME( 1992, macross,  0,        macross,  macross,  nmk,      ROT270, "Banpresto",                    "Super Spacefortress Macross / Chou-Jikuu Yousai Macross", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, gunnail,  0,        gunnail,  gunnail,  nmk,      ROT270, "NMK / Tecmo",                  "GunNail (28th May. 1992)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, macross2, 0,        macross2, macross2, 0,        ROT0,   "Banpresto",                    "Super Spacefortress Macross II / Chou-Jikuu Yousai Macross II", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1993, tdragon2, 0,        tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", GAME_NO_COCKTAIL )
-GAME( 1993, tdragon2a,tdragon2, tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", GAME_NO_COCKTAIL )
-GAME( 1993, bigbang,  tdragon2, tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", GAME_NO_COCKTAIL )
+GAME( 1993, tdragon2, 0,        tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (9th Nov. 1993)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, tdragon2a,tdragon2, tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Thunder Dragon 2 (1st Oct. 1993)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, bigbang,  tdragon2, tdragon2, tdragon2, 0,        ROT270, "NMK",                          "Big Bang (9th Nov. 1993)", GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1994, raphero,  0,        raphero,  raphero,  0,        ROT270, "NMK / Media Shoji",            "Rapid Hero", GAME_IMPERFECT_SOUND ) // 23rd July 1993 in test mode, (c)1994 on title screen
+GAME( 1994, raphero,  0,        raphero,  raphero,  0,        ROT270, "NMK / Media Shoji",            "Rapid Hero", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS ) // 23rd July 1993 in test mode, (c)1994 on title screen
 
 /* both sets of both these games show a date of 9th Mar 1992 in the test mode, they look like different revisions so I doubt this is accurate */
 GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 1)", GAME_NO_COCKTAIL )
