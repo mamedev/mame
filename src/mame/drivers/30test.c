@@ -56,57 +56,60 @@ public:
 
 	UINT8 m_mux_data;
 	UINT8 m_oki_bank;
+	DECLARE_WRITE8_MEMBER(namco_30test_led_w);
+	DECLARE_WRITE8_MEMBER(namco_30test_led_rank_w);
+	DECLARE_WRITE8_MEMBER(namco_30test_lamps_w);
+	DECLARE_READ8_MEMBER(namco_30test_mux_r);
+	DECLARE_READ8_MEMBER(hc11_mux_r);
+	DECLARE_WRITE8_MEMBER(hc11_mux_w);
 };
 
 
 static const UINT8 led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
-static WRITE8_HANDLER( namco_30test_led_w )
+WRITE8_MEMBER(namco_30test_state::namco_30test_led_w)
 {
 	output_set_digit_value(0 + offset * 2, led_map[(data & 0xf0) >> 4]);
 	output_set_digit_value(1 + offset * 2, led_map[(data & 0x0f) >> 0]);
 }
 
-static WRITE8_HANDLER( namco_30test_led_rank_w )
+WRITE8_MEMBER(namco_30test_state::namco_30test_led_rank_w)
 {
 	output_set_digit_value(64 + offset * 2, led_map[(data & 0xf0) >> 4]);
 	output_set_digit_value(65 + offset * 2, led_map[(data & 0x0f) >> 0]);
 }
 
-static WRITE8_HANDLER( namco_30test_lamps_w )
+WRITE8_MEMBER(namco_30test_state::namco_30test_lamps_w)
 {
 	// d0-d5: ranking, d6: game over, d7: assume marquee lamp
 	for (int i = 0; i < 8; i++)
 		output_set_lamp_value(i, data >> i & 1);
 }
 
-static READ8_HANDLER(namco_30test_mux_r)
+READ8_MEMBER(namco_30test_state::namco_30test_mux_r)
 {
-	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
 	UINT8 res = 0xff;
 
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x01: res = input_port_read(space->machine(), "IN0"); break;
-		case 0x02: res = input_port_read(space->machine(), "IN1"); break;
-		case 0x04: res = input_port_read(space->machine(), "IN2"); break;
-		case 0x08: res = input_port_read(space->machine(), "IN3"); break;
+		case 0x01: res = input_port_read(machine(), "IN0"); break;
+		case 0x02: res = input_port_read(machine(), "IN1"); break;
+		case 0x04: res = input_port_read(machine(), "IN2"); break;
+		case 0x08: res = input_port_read(machine(), "IN3"); break;
 	}
 
 	return res;
 }
 
-static READ8_HANDLER(hc11_mux_r)
+READ8_MEMBER(namco_30test_state::hc11_mux_r)
 {
-	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
-	return state->m_mux_data;
+	return m_mux_data;
 }
 
-static WRITE8_HANDLER(hc11_mux_w)
+WRITE8_MEMBER(namco_30test_state::hc11_mux_w)
 {
-	namco_30test_state *state = space->machine().driver_data<namco_30test_state>();
-	state->m_mux_data = data;
+	m_mux_data = data;
 }
 
 static READ8_DEVICE_HANDLER( hc11_okibank_r )
@@ -127,26 +130,26 @@ static WRITE8_DEVICE_HANDLER( hc11_okibank_w )
 
 static ADDRESS_MAP_START( namco_30test_map, AS_PROGRAM, 8, namco_30test_state )
 	AM_RANGE(0x0000, 0x003f) AM_RAM // internal I/O
-	AM_RANGE(0x007c, 0x007c) AM_READWRITE_LEGACY(hc11_mux_r,hc11_mux_w)
+	AM_RANGE(0x007c, 0x007c) AM_READWRITE(hc11_mux_r,hc11_mux_w)
 	AM_RANGE(0x007e, 0x007e) AM_DEVREADWRITE_LEGACY("oki",hc11_okibank_r,hc11_okibank_w)
 	AM_RANGE(0x0040, 0x007f) AM_RAM // more internal I/O, HC11 change pending
 	AM_RANGE(0x0080, 0x037f) AM_RAM // internal RAM
 	AM_RANGE(0x0d80, 0x0dbf) AM_RAM	// EEPROM read-back data goes there
 	AM_RANGE(0x2000, 0x2000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	/* 0x401e-0x401f: time */
-	AM_RANGE(0x4000, 0x401f) AM_WRITE_LEGACY(namco_30test_led_w) // 7-seg leds
+	AM_RANGE(0x4000, 0x401f) AM_WRITE(namco_30test_led_w) // 7-seg leds
 	/* 0x6000: 1st place 7-seg led */
 	/* 0x6001: 2nd place 7-seg led */
 	/* 0x6002: 3rd place 7-seg led */
 	/* 0x6003: current / last play score */
 	/* 0x6004: lamps */
-	AM_RANGE(0x6000, 0x6003) AM_WRITE_LEGACY(namco_30test_led_rank_w)
-	AM_RANGE(0x6004, 0x6004) AM_WRITE_LEGACY(namco_30test_lamps_w)
+	AM_RANGE(0x6000, 0x6003) AM_WRITE(namco_30test_led_rank_w)
+	AM_RANGE(0x6004, 0x6004) AM_WRITE(namco_30test_lamps_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namco_30test_io, AS_IO, 8, namco_30test_state )
-	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ_LEGACY(namco_30test_mux_r)
+	AM_RANGE(MC68HC11_IO_PORTA,MC68HC11_IO_PORTA) AM_READ(namco_30test_mux_r)
 //  AM_RANGE(MC68HC11_IO_PORTD,MC68HC11_IO_PORTD) AM_RAM
 	AM_RANGE(MC68HC11_IO_PORTE,MC68HC11_IO_PORTE) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END

@@ -21,6 +21,7 @@ public:
 
 	UINT8 *m_ram;
 	UINT8 m_color;
+	DECLARE_WRITE8_MEMBER(color_w);
 };
 
 
@@ -66,11 +67,10 @@ static SCREEN_UPDATE_RGB32( tgtpanic )
 	return 0;
 }
 
-static WRITE8_HANDLER( color_w )
+WRITE8_MEMBER(tgtpanic_state::color_w)
 {
-	tgtpanic_state *state = space->machine().driver_data<tgtpanic_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->m_color = data;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_color = data;
 }
 
 
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, tgtpanic_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE_LEGACY(color_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(color_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 

@@ -109,6 +109,31 @@ public:
 
 	int m_planes_enabled[4];
 #endif
+	DECLARE_WRITE8_MEMBER(cfb_backgnd_color_w);
+	DECLARE_WRITE8_MEMBER(cfb_vbank_w);
+	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w);
+	DECLARE_WRITE8_MEMBER(cfb_rom_bank_sel_w_gg);
+	DECLARE_READ8_MEMBER(cfb_port_02_r);
+	DECLARE_WRITE8_MEMBER(vcu_video_reg_w);
+	DECLARE_READ8_MEMBER(vcu_set_cmd_param_r);
+	DECLARE_READ8_MEMBER(vcu_set_gfx_addr_r);
+	DECLARE_READ8_MEMBER(vcu_set_clr_addr_r);
+	DECLARE_WRITE8_MEMBER(cfb_zpu_int_req_set_w);
+	DECLARE_READ8_MEMBER(cfb_zpu_int_req_clr);
+	DECLARE_READ8_MEMBER(ls670_0_r);
+	DECLARE_WRITE8_MEMBER(ls670_0_w);
+	DECLARE_READ8_MEMBER(ls670_1_r);
+	DECLARE_WRITE8_MEMBER(ls670_1_w);
+	DECLARE_WRITE8_MEMBER(zpu_bcd_decoder_w);
+	DECLARE_READ8_MEMBER(zpu_inputs_r);
+	DECLARE_WRITE8_MEMBER(zpu_led_w);
+	DECLARE_WRITE8_MEMBER(zpu_lamps_w);
+	DECLARE_WRITE8_MEMBER(zpu_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(cfb_led_w);
+	DECLARE_WRITE8_MEMBER(vsb_ls273_audio_control_w);
+	DECLARE_WRITE8_MEMBER(main_sound_w);
+	DECLARE_WRITE8_MEMBER(sound_int_clear_w);
+	DECLARE_WRITE8_MEMBER(sound_nmi_clear_w);
 };
 
 
@@ -291,157 +316,149 @@ static SCREEN_UPDATE_IND16( mazerbla )
 }
 
 
-static WRITE8_HANDLER( cfb_backgnd_color_w )
+WRITE8_MEMBER(mazerbla_state::cfb_backgnd_color_w)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
 
-	if (state->m_bknd_col != data)
+	if (m_bknd_col != data)
 	{
 		int r, g, b, bit0, bit1, bit2;
 
-		state->m_bknd_col = data;
+		m_bknd_col = data;
 
 		/* red component */
 		bit1 = BIT(data, 7);
 		bit0 = BIT(data, 6);
-		r = combine_2_weights(state->m_weights_r, bit0, bit1);
+		r = combine_2_weights(m_weights_r, bit0, bit1);
 
 		/* green component */
 		bit2 = BIT(data, 5);
 		bit1 = BIT(data, 4);
 		bit0 = BIT(data, 3);
-		g = combine_3_weights(state->m_weights_g, bit0, bit1, bit2);
+		g = combine_3_weights(m_weights_g, bit0, bit1, bit2);
 
 		/* blue component */
 		bit2 = BIT(data, 2);
 		bit1 = BIT(data, 1);
 		bit0 = BIT(data, 0);
-		b = combine_3_weights(state->m_weights_b, bit0, bit1, bit2);
+		b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
-		palette_set_color(space->machine(), 255, MAKE_RGB(r, g, b));
+		palette_set_color(machine(), 255, MAKE_RGB(r, g, b));
 		//logerror("background color (port 01) write=%02x\n",data);
 	}
 }
 
 
-static WRITE8_HANDLER( cfb_vbank_w )
+WRITE8_MEMBER(mazerbla_state::cfb_vbank_w)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
 
 	/* only bit 6 connected */
-	state->m_vbank = BIT(data, 6);
+	m_vbank = BIT(data, 6);
 }
 
 
-static WRITE8_HANDLER( cfb_rom_bank_sel_w )	/* mazer blazer */
+WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w)/* mazer blazer */
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
-	state->m_gfx_rom_bank = data;
+	m_gfx_rom_bank = data;
 
-	memory_set_bankptr(space->machine(),  "bank1", space->machine().region("sub2")->base() + (state->m_gfx_rom_bank * 0x2000) + 0x10000);
+	memory_set_bankptr(machine(),  "bank1", machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
 }
 
-static WRITE8_HANDLER( cfb_rom_bank_sel_w_gg )	/* great guns */
+WRITE8_MEMBER(mazerbla_state::cfb_rom_bank_sel_w_gg)/* great guns */
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
-	state->m_gfx_rom_bank = data >> 1;
+	m_gfx_rom_bank = data >> 1;
 
-	memory_set_bankptr(space->machine(),  "bank1", space->machine().region("sub2")->base() + (state->m_gfx_rom_bank * 0x2000) + 0x10000);
+	memory_set_bankptr(machine(),  "bank1", machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000);
 }
 
 
 /* VCU status? */
-static READ8_HANDLER( cfb_port_02_r )
+READ8_MEMBER(mazerbla_state::cfb_port_02_r)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
-	state->m_port02_status ^= 0xff;
-	return state->m_port02_status;
+	m_port02_status ^= 0xff;
+	return m_port02_status;
 }
 
 
-static WRITE8_HANDLER( vcu_video_reg_w )
+WRITE8_MEMBER(mazerbla_state::vcu_video_reg_w)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
-	if (state->m_vcu_video_reg[offset] != data)
+	if (m_vcu_video_reg[offset] != data)
 	{
-		state->m_vcu_video_reg[offset] = data;
-		//popmessage("video_reg= %02x %02x %02x %02x", state->m_vcu_video_reg[0], state->m_vcu_video_reg[1], state->m_vcu_video_reg[2], state->m_vcu_video_reg[3]);
-		//logerror("video_reg= %02x %02x %02x %02x\n", state->m_vcu_video_reg[0], state->m_vcu_video_reg[1], state->m_vcu_video_reg[2], state->m_vcu_video_reg[3]);
+		m_vcu_video_reg[offset] = data;
+		//popmessage("video_reg= %02x %02x %02x %02x", m_vcu_video_reg[0], m_vcu_video_reg[1], m_vcu_video_reg[2], m_vcu_video_reg[3]);
+		//logerror("video_reg= %02x %02x %02x %02x\n", m_vcu_video_reg[0], m_vcu_video_reg[1], m_vcu_video_reg[2], m_vcu_video_reg[3]);
 	}
 }
 
-static READ8_HANDLER( vcu_set_cmd_param_r )
+READ8_MEMBER(mazerbla_state::vcu_set_cmd_param_r)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
-	state->m_vcu_gfx_param_addr = offset;
+	m_vcu_gfx_param_addr = offset;
 
 	/* offset  = 0 is not known */
-	state->m_xpos      = state->m_cfb_ram[state->m_vcu_gfx_param_addr + 1] | (state->m_cfb_ram[state->m_vcu_gfx_param_addr + 2]<<8);
-	state->m_ypos      = state->m_cfb_ram[state->m_vcu_gfx_param_addr + 3] | (state->m_cfb_ram[state->m_vcu_gfx_param_addr + 4]<<8);
-	state->m_color1    = state->m_cfb_ram[state->m_vcu_gfx_param_addr + 5];
-	state->m_color2    = state->m_cfb_ram[state->m_vcu_gfx_param_addr + 6];
-	state->m_mode      = state->m_cfb_ram[state->m_vcu_gfx_param_addr + 7];
-	state->m_pix_xsize = state->m_cfb_ram[state->m_vcu_gfx_param_addr + 8];
-	state->m_pix_ysize = state->m_cfb_ram[state->m_vcu_gfx_param_addr + 9];
+	m_xpos      = m_cfb_ram[m_vcu_gfx_param_addr + 1] | (m_cfb_ram[m_vcu_gfx_param_addr + 2]<<8);
+	m_ypos      = m_cfb_ram[m_vcu_gfx_param_addr + 3] | (m_cfb_ram[m_vcu_gfx_param_addr + 4]<<8);
+	m_color1    = m_cfb_ram[m_vcu_gfx_param_addr + 5];
+	m_color2    = m_cfb_ram[m_vcu_gfx_param_addr + 6];
+	m_mode      = m_cfb_ram[m_vcu_gfx_param_addr + 7];
+	m_pix_xsize = m_cfb_ram[m_vcu_gfx_param_addr + 8];
+	m_pix_ysize = m_cfb_ram[m_vcu_gfx_param_addr + 9];
 
-	state->m_plane = state->m_mode & 3;
+	m_plane = m_mode & 3;
 
 	return 0;
 }
 
 
-static READ8_HANDLER( vcu_set_gfx_addr_r )
+READ8_MEMBER(mazerbla_state::vcu_set_gfx_addr_r)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
-	UINT8 * rom = space->machine().region("sub2")->base() + (state->m_gfx_rom_bank * 0x2000) + 0x10000;
+	UINT8 * rom = machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
 	int x, y;
 	int bits = 0;
 	UINT8 color_base = 0;
 
-	if (state->m_game_id == MAZERBLA)
+	if (m_game_id == MAZERBLA)
 		color_base = 0x80;	/* 0x80 - good for Mazer Blazer: (only in game, CRT test mode is bad) */
 
-	if (state->m_game_id == GREATGUN)
+	if (m_game_id == GREATGUN)
 		color_base = 0x00;	/* 0x00 - good for Great Guns: (both in game and CRT test mode) */
 /*
     if ((mode <= 0x07) || (mode >= 0x10))
     {
         logerror("paradr=");
-        logerror("%3x ", state->m_vcu_gfx_param_addr );
+        logerror("%3x ", m_vcu_gfx_param_addr );
 
-        logerror("%02x ", state->m_cfb_ram[vcu_gfx_param_addr + 0] );
-        logerror("x=%04x ", state->m_xpos );                 //1,2
-        logerror("y=%04x ", state->m_ypos );                 //3,4
-        logerror("color1=%02x ", state->m_color1);             //5
-        logerror("color2=%02x ", state->m_color2);           //6
-        logerror("mode=%02x ", state->m_mode );              //7
-        logerror("xpix=%02x ", state->m_pix_xsize );         //8
-        logerror("ypix=%02x ", state->m_pix_ysize );         //9
+        logerror("%02x ", m_cfb_ram[vcu_gfx_param_addr + 0] );
+        logerror("x=%04x ", m_xpos );                 //1,2
+        logerror("y=%04x ", m_ypos );                 //3,4
+        logerror("color1=%02x ", m_color1);             //5
+        logerror("color2=%02x ", m_color2);           //6
+        logerror("mode=%02x ", m_mode );              //7
+        logerror("xpix=%02x ", m_pix_xsize );         //8
+        logerror("ypix=%02x ", m_pix_ysize );         //9
 
-        logerror("addr=%4i bank=%1i\n", offset, state->m_gfx_rom_bank);
+        logerror("addr=%4i bank=%1i\n", offset, m_gfx_rom_bank);
     }
 */
 
-	state->m_vcu_gfx_addr = offset;
+	m_vcu_gfx_addr = offset;
 
 	/* draw */
-	offs = state->m_vcu_gfx_addr;
+	offs = m_vcu_gfx_addr;
 
-	switch(state->m_mode)
+	switch(m_mode)
 	{
 		/* 2 bits per pixel */
 		case 0x0f:
 		case 0x0e:
 		case 0x0d:
 		case 0x0c:
-//      if (state->m_dbg_gfx_e)
+//      if (m_dbg_gfx_e)
 //      {
-//          if (state->m_vbank == state->m_dbg_vbank)
+//          if (m_vbank == m_dbg_vbank)
 		{
-			for (y = 0; y <= state->m_pix_ysize; y++)
+			for (y = 0; y <= m_pix_ysize; y++)
 			{
-				for (x = 0; x <= state->m_pix_xsize; x++)
+				for (x = 0; x <= m_pix_xsize; x++)
 				{
 					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
 					UINT8 data = (pixeldata >> (6 - (bits & 7))) & 3;
@@ -450,21 +467,21 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 					switch(data)
 					{
 						case 0:
-							col = color_base | ((state->m_color1 & 0x0f));		//background PEN
+							col = color_base | ((m_color1 & 0x0f));		//background PEN
 							break;
 						case 1:
-							col = color_base | ((state->m_color1 & 0xf0) >> 4);	//foreground PEN
+							col = color_base | ((m_color1 & 0xf0) >> 4);	//foreground PEN
 							break;
 						case 2:
-							col = color_base | ((state->m_color2 & 0x0f));	//background PEN2
+							col = color_base | ((m_color2 & 0x0f));	//background PEN2
 							break;
 						case 3:
-							col = color_base | ((state->m_color2 & 0xf0) >> 4);	//foreground PEN2
+							col = color_base | ((m_color2 & 0xf0) >> 4);	//foreground PEN2
 							break;
 					}
 
-					if (((state->m_xpos + x) < 256) && ((state->m_ypos + y) < 256) )
-						state->m_tmpbitmaps[state->m_plane].pix16(state->m_ypos + y, state->m_xpos + x) = col;
+					if (((m_xpos + x) < 256) && ((m_ypos + y) < 256) )
+						m_tmpbitmaps[m_plane].pix16(m_ypos + y, m_xpos + x) = col;
 
 					bits += 2;
 				}
@@ -478,22 +495,22 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 		case 0x0a:/* verified - 1bpp */
 		case 0x09:/* verified - 1bpp: gun crosshair */
 		case 0x08:/* */
-//      if (state->m_dbg_gfx_e)
+//      if (m_dbg_gfx_e)
 //      {
-//          if (state->m_vbank == state->m_dbg_vbank)
+//          if (m_vbank == m_dbg_vbank)
 		{
 
-			for (y = 0; y <= state->m_pix_ysize; y++)
+			for (y = 0; y <= m_pix_ysize; y++)
 			{
-				for (x = 0; x <= state->m_pix_xsize; x++)
+				for (x = 0; x <= m_pix_xsize; x++)
 				{
 					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
 					UINT8 data = (pixeldata >> (7 - (bits & 7))) & 1;
 
 					/* color = 4 MSB = front PEN, 4 LSB = background PEN */
 
-					if (((state->m_xpos + x) < 256) && ((state->m_ypos + y) < 256))
-						state->m_tmpbitmaps[state->m_plane].pix16(state->m_ypos + y, state->m_xpos + x) = data ? color_base | ((state->m_color1 & 0xf0) >> 4): color_base | ((state->m_color1 & 0x0f));
+					if (((m_xpos + x) < 256) && ((m_ypos + y) < 256))
+						m_tmpbitmaps[m_plane].pix16(m_ypos + y, m_xpos + x) = data ? color_base | ((m_color1 & 0xf0) >> 4): color_base | ((m_color1 & 0x0f));
 
 					bits += 1;
 				}
@@ -506,13 +523,13 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 		case 0x03:
 		case 0x01:
 		case 0x00:
-//      if (state->m_dbg_gfx_e)
+//      if (m_dbg_gfx_e)
 //      {
-//          if (state->m_vbank == state->m_dbg_vbank)
+//          if (m_vbank == m_dbg_vbank)
 		{
-			for (y = 0; y <= state->m_pix_ysize; y++)
+			for (y = 0; y <= m_pix_ysize; y++)
 			{
-				for (x = 0; x <= state->m_pix_xsize; x++)
+				for (x = 0; x <= m_pix_xsize; x++)
 				{
 					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
 					UINT8 data = (pixeldata >> (4 - (bits & 7))) & 15;
@@ -520,8 +537,8 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 
 					col = color_base | data;
 
-					if (((state->m_xpos + x) < 256) && ((state->m_ypos + y) < 256))
-						state->m_tmpbitmaps[state->m_plane].pix16(state->m_ypos + y, state->m_xpos + x) = col;
+					if (((m_xpos + x) < 256) && ((m_ypos + y) < 256))
+						m_tmpbitmaps[m_plane].pix16(m_ypos + y, m_xpos + x) = col;
 
 					bits += 4;
 				}
@@ -530,17 +547,16 @@ static READ8_HANDLER( vcu_set_gfx_addr_r )
 //      }
 		break;
 	default:
-		popmessage("not supported VCU drawing mode=%2x", state->m_mode);
+		popmessage("not supported VCU drawing mode=%2x", m_mode);
 		break;
 	}
 
 	return 0;
 }
 
-static READ8_HANDLER( vcu_set_clr_addr_r )
+READ8_MEMBER(mazerbla_state::vcu_set_clr_addr_r)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
-	UINT8 * rom = space->machine().region("sub2")->base() + (state->m_gfx_rom_bank * 0x2000) + 0x10000;
+	UINT8 * rom = machine().region("sub2")->base() + (m_gfx_rom_bank * 0x2000) + 0x10000;
 	int offs;
 	int x, y;
 	int bits = 0;
@@ -552,25 +568,25 @@ static READ8_HANDLER( vcu_set_clr_addr_r )
     //if (0) //(mode != 0x07)
     {
         logerror("paladr=");
-        logerror("%3x ", state->m_vcu_gfx_param_addr );
+        logerror("%3x ", m_vcu_gfx_param_addr );
 
-        logerror("%02x ", state->m_cfb_ram[state->m_vcu_gfx_param_addr + 0] );
-        logerror("x=%04x ", state->m_xpos );                 //1,2
-        logerror("y=%04x ", state->m_ypos );                 //3,4
-        logerror("color1=%02x ", state->m_color1);             //5
-        logerror("color2=%02x ", state->m_color2 );          //6
-        logerror("mode=%02x ", state->m_mode );              //7
-        logerror("xpix=%02x ", state->m_pix_xsize );         //8
-        logerror("ypix=%02x ", state->m_pix_ysize );         //9
+        logerror("%02x ", m_cfb_ram[m_vcu_gfx_param_addr + 0] );
+        logerror("x=%04x ", m_xpos );                 //1,2
+        logerror("y=%04x ", m_ypos );                 //3,4
+        logerror("color1=%02x ", m_color1);             //5
+        logerror("color2=%02x ", m_color2 );          //6
+        logerror("mode=%02x ", m_mode );              //7
+        logerror("xpix=%02x ", m_pix_xsize );         //8
+        logerror("ypix=%02x ", m_pix_ysize );         //9
 
-        logerror("addr=%4i bank=%1i\n", offset, state->m_gfx_rom_bank);
+        logerror("addr=%4i bank=%1i\n", offset, m_gfx_rom_bank);
 
         for (y = 0; y < 16; y++)
         {
             logerror("%04x: ", offset + y * 16);
             for (x = 0; x < 16; x++)
             {
-                logerror("%02x ", state->m_cfb_ram[offset + x + y * 16]);
+                logerror("%02x ", m_cfb_ram[offset + x + y * 16]);
             }
             logerror("\n");
         }
@@ -581,25 +597,25 @@ static READ8_HANDLER( vcu_set_clr_addr_r )
 /* copy palette / CLUT(???) */
 
 
-	switch (state->m_mode)
+	switch (m_mode)
 	{
 		case 0x13: /* draws sprites?? in mazer blazer and ... wrong sprite in place of targeting-cross and UFO laser */
 		case 0x03:
 		/* ... this may proove that there is really only one area and that
            the draw command/palette selector is done via the 'mode' only ... */
-		//if (state->m_dbg_clr_e)
+		//if (m_dbg_clr_e)
 		{
-			offs = state->m_vcu_gfx_addr;
+			offs = m_vcu_gfx_addr;
 
-			if (state->m_game_id == MAZERBLA)
+			if (m_game_id == MAZERBLA)
 				color_base = 0x80;	/* 0x80 constant: matches Mazer Blazer movie */
 
-			if (state->m_game_id == GREATGUN)
+			if (m_game_id == GREATGUN)
 				color_base = 0x00;
 
-			for (y = 0; y <= state->m_pix_ysize; y++)
+			for (y = 0; y <= m_pix_ysize; y++)
 			{
-				for (x = 0; x <= state->m_pix_xsize; x++)
+				for (x = 0; x <= m_pix_xsize; x++)
 				{
 					UINT8 pixeldata = rom[(offs + (bits >> 3)) % 0x2000];
 					UINT8 data = (pixeldata >> (6 - (bits & 7))) & 3;
@@ -608,21 +624,21 @@ static READ8_HANDLER( vcu_set_clr_addr_r )
 					switch(data)
 					{
 						case 0:
-							col = color_base | ((state->m_color1 & 0x0f));		//background PEN
+							col = color_base | ((m_color1 & 0x0f));		//background PEN
 							break;
 						case 1:
-							col = color_base | ((state->m_color1 & 0xf0) >> 4);	//foreground PEN
+							col = color_base | ((m_color1 & 0xf0) >> 4);	//foreground PEN
 							break;
 						case 2:
-							col = color_base | ((state->m_color2 & 0x0f));	//background PEN2
+							col = color_base | ((m_color2 & 0x0f));	//background PEN2
 							break;
 						case 3:
-							col = color_base | ((state->m_color2 & 0xf0) >> 4);	//foreground PEN2
+							col = color_base | ((m_color2 & 0xf0) >> 4);	//foreground PEN2
 							break;
 					}
 
-					if (((state->m_xpos + x) < 256) && ((state->m_ypos + y) < 256))
-						state->m_tmpbitmaps[state->m_plane].pix16(state->m_ypos + y, state->m_xpos + x) = col;
+					if (((m_xpos + x) < 256) && ((m_ypos + y) < 256))
+						m_tmpbitmaps[m_plane].pix16(m_ypos + y, m_xpos + x) = col;
 
 						bits += 2;
 				}
@@ -634,97 +650,97 @@ static READ8_HANDLER( vcu_set_clr_addr_r )
 		case 0x07:
 		offs = offset;
 
-		switch(state->m_ypos)
+		switch(m_ypos)
 		{
 			case 6: //seems to encode palette write
 			{
 				int r, g, b, bit0, bit1, bit2;
 
 				//pix_xsize and pix_ysize seem to be related to palette length ? (divide by 2)
-				int lookup_offs = (state->m_ypos >> 1) * 256; //=3*256
+				int lookup_offs = (m_ypos >> 1) * 256; //=3*256
 
 				for (y = 0; y < 16; y++)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 colour = state->m_cfb_ram[offs + x + y * 16];
+						UINT8 colour = m_cfb_ram[offs + x + y * 16];
 
 						/* red component */
 						bit1 = (colour >> 7) & 0x01;
 						bit0 = (colour >> 6) & 0x01;
-						r = combine_2_weights(state->m_weights_r, bit0, bit1);
+						r = combine_2_weights(m_weights_r, bit0, bit1);
 
 						/* green component */
 						bit2 = (colour >> 5) & 0x01;
 						bit1 = (colour >> 4) & 0x01;
 						bit0 = (colour >> 3) & 0x01;
-						g = combine_3_weights(state->m_weights_g, bit0, bit1, bit2);
+						g = combine_3_weights(m_weights_g, bit0, bit1, bit2);
 
 						/* blue component */
 						bit2 = (colour >> 2) & 0x01;
 						bit1 = (colour >> 1) & 0x01;
 						bit0 = (colour >> 0) & 0x01;
-						b = combine_3_weights(state->m_weights_b, bit0, bit1, bit2);
+						b = combine_3_weights(m_weights_b, bit0, bit1, bit2);
 
 						if ((x + y * 16) < 255)//keep color 255 free for use as background color
-							palette_set_color(space->machine(), x + y * 16, MAKE_RGB(r, g, b));
+							palette_set_color(machine(), x + y * 16, MAKE_RGB(r, g, b));
 
-						state->m_lookup_ram[lookup_offs + x + y * 16] = colour;
+						m_lookup_ram[lookup_offs + x + y * 16] = colour;
 					}
 				}
 			}
 			break;
 			case 4: //seems to encode lookup???? table write
 			{
-				int lookup_offs = (state->m_ypos >> 1) * 256; //=2*256
+				int lookup_offs = (m_ypos >> 1) * 256; //=2*256
 
 				for (y = 0; y < 16; y++)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = state->m_cfb_ram[offs + x + y * 16];
-						state->m_lookup_ram[lookup_offs + x + y * 16] = dat;
+						UINT8 dat = m_cfb_ram[offs + x + y * 16];
+						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
 			}
 			break;
 			case 2: //seems to encode lookup???? table write
 			{
-				int lookup_offs = (state->m_ypos >> 1) * 256; //=1*256
+				int lookup_offs = (m_ypos >> 1) * 256; //=1*256
 
 				for (y = 0; y < 16; y++)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = state->m_cfb_ram[offs + x + y * 16];
-						state->m_lookup_ram[lookup_offs + x + y * 16] = dat;
+						UINT8 dat = m_cfb_ram[offs + x + y * 16];
+						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
 			}
 			break;
 			case 0: //seems to encode lookup???? table write
 			{
-				int lookup_offs = (state->m_ypos >> 1) * 256; //=0*256
+				int lookup_offs = (m_ypos >> 1) * 256; //=0*256
 
 				for (y = 0; y < 16; y++)
 				{
 					for (x = 0; x < 16; x++)
 					{
-						UINT8 dat = state->m_cfb_ram[offs + x + y * 16];
-						state->m_lookup_ram[lookup_offs + x + y * 16] = dat;
+						UINT8 dat = m_cfb_ram[offs + x + y * 16];
+						m_lookup_ram[lookup_offs + x + y * 16] = dat;
 					}
 				}
 			}
 			break;
 
 			default:
-			popmessage("not supported lookup/color write mode=%2x", state->m_ypos);
+			popmessage("not supported lookup/color write mode=%2x", m_ypos);
 			break;
 		}
 		break;
 
 	default:
-		popmessage("not supported VCU color mode=%2x", state->m_mode);
+		popmessage("not supported VCU color mode=%2x", m_mode);
 		break;
 	}
 
@@ -737,36 +753,33 @@ static READ8_HANDLER( vcu_set_clr_addr_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( cfb_zpu_int_req_set_w )
+WRITE8_MEMBER(mazerbla_state::cfb_zpu_int_req_set_w)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
 
-	state->m_zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
+	m_zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
 
-	device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
+	device_set_input_line(m_maincpu, 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
 }
 
-static READ8_HANDLER( cfb_zpu_int_req_clr )
+READ8_MEMBER(mazerbla_state::cfb_zpu_int_req_clr)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
 
-	state->m_zpu_int_vector |= 2;
+	m_zpu_int_vector |= 2;
 
 	/* clear the INT line when there are no more interrupt requests */
-	if (state->m_zpu_int_vector == 0xff)
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	if (m_zpu_int_vector == 0xff)
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
 
-static READ8_HANDLER( ls670_0_r )
+READ8_MEMBER(mazerbla_state::ls670_0_r)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
 
 	/* set a timer to force synchronization after the read */
-	space->machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 
-	return state->m_ls670_0[offset];
+	return m_ls670_0[offset];
 }
 
 static TIMER_CALLBACK( deferred_ls670_0_w )
@@ -778,20 +791,19 @@ static TIMER_CALLBACK( deferred_ls670_0_w )
 	state->m_ls670_0[offset] = data;
 }
 
-static WRITE8_HANDLER( ls670_0_w )
+WRITE8_MEMBER(mazerbla_state::ls670_0_w)
 {
 	/* do this on a timer to let the CPUs synchronize */
-	space->machine().scheduler().synchronize(FUNC(deferred_ls670_0_w), (offset << 8) | data);
+	machine().scheduler().synchronize(FUNC(deferred_ls670_0_w), (offset << 8) | data);
 }
 
-static READ8_HANDLER( ls670_1_r )
+READ8_MEMBER(mazerbla_state::ls670_1_r)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
 
 	/* set a timer to force synchronization after the read */
-	space->machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 
-	return state->m_ls670_1[offset];
+	return m_ls670_1[offset];
 }
 
 static TIMER_CALLBACK( deferred_ls670_1_w )
@@ -803,10 +815,10 @@ static TIMER_CALLBACK( deferred_ls670_1_w )
 	state->m_ls670_1[offset] = data;
 }
 
-static WRITE8_HANDLER( ls670_1_w )
+WRITE8_MEMBER(mazerbla_state::ls670_1_w)
 {
 	/* do this on a timer to let the CPUs synchronize */
-	space->machine().scheduler().synchronize(FUNC(deferred_ls670_1_w), (offset << 8) | data);
+	machine().scheduler().synchronize(FUNC(deferred_ls670_1_w), (offset << 8) | data);
 }
 
 
@@ -862,53 +874,51 @@ Vertical movement of gun is Strobe 9, Bits 0-7.
 
 */
 
-static WRITE8_HANDLER( zpu_bcd_decoder_w )
+WRITE8_MEMBER(mazerbla_state::zpu_bcd_decoder_w)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
 
 	/* bcd decoder used a input select (a mux) for reads from port 0x62 */
-	state->m_bcd_7445 = data & 0xf;
+	m_bcd_7445 = data & 0xf;
 }
 
-static READ8_HANDLER( zpu_inputs_r )
+READ8_MEMBER(mazerbla_state::zpu_inputs_r)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
 	static const char *const strobenames[] = { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS", "STICK0_X", "STICK0_Y",
 	                                           "STICK1_X", "STICK1_Y", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED", "UNUSED" };
 
 	UINT8 ret = 0;
 
-	ret = input_port_read(space->machine(), strobenames[state->m_bcd_7445]);
+	ret = input_port_read(machine(), strobenames[m_bcd_7445]);
 
 	return ret;
 }
 
-static WRITE8_HANDLER( zpu_led_w )
+WRITE8_MEMBER(mazerbla_state::zpu_led_w)
 {
 	/* 0x6e - reset (offset = 0)*/
 	/* 0x6f - set */
-	set_led_status(space->machine(), 0, offset & 1);
+	set_led_status(machine(), 0, offset & 1);
 }
 
-static WRITE8_HANDLER( zpu_lamps_w)
+WRITE8_MEMBER(mazerbla_state::zpu_lamps_w)
 {
 	/* bit 4 = /LAMP0 */
 	/* bit 5 = /LAMP1 */
 
-	/*set_led_status(space->machine(), 0, (data & 0x10) >> 4);*/
-	/*set_led_status(space->machine(), 1, (data & 0x20) >> 4);*/
+	/*set_led_status(machine(), 0, (data & 0x10) >> 4);*/
+	/*set_led_status(machine(), 1, (data & 0x20) >> 4);*/
 }
 
-static WRITE8_HANDLER( zpu_coin_counter_w )
+WRITE8_MEMBER(mazerbla_state::zpu_coin_counter_w)
 {
 	/* bit 6 = coin counter */
-	coin_counter_w(space->machine(), offset, BIT(data, 6));
+	coin_counter_w(machine(), offset, BIT(data, 6));
 }
 
-static WRITE8_HANDLER(cfb_led_w)
+WRITE8_MEMBER(mazerbla_state::cfb_led_w)
 {
 	/* bit 7 - led on */
-	set_led_status(space->machine(), 2, BIT(data, 7));
+	set_led_status(machine(), 2, BIT(data, 7));
 }
 
 static WRITE8_DEVICE_HANDLER( gg_led_ctrl_w )
@@ -924,13 +934,12 @@ static WRITE8_DEVICE_HANDLER( gg_led_ctrl_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( vsb_ls273_audio_control_w )
+WRITE8_MEMBER(mazerbla_state::vsb_ls273_audio_control_w)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
-	state->m_vsb_ls273 = data;
+	m_vsb_ls273 = data;
 
 	/* bit 5 - led on */
-	set_led_status(space->machine(), 1, BIT(data, 5));
+	set_led_status(machine(), 1, BIT(data, 5));
 }
 
 static READ8_DEVICE_HANDLER( soundcommand_r )
@@ -948,21 +957,19 @@ static TIMER_CALLBACK( delayed_sound_w )
 	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( main_sound_w )
+WRITE8_MEMBER(mazerbla_state::main_sound_w)
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
+	machine().scheduler().synchronize(FUNC(delayed_sound_w), data & 0xff);
 }
 
-static WRITE8_HANDLER( sound_int_clear_w )
+WRITE8_MEMBER(mazerbla_state::sound_int_clear_w)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
-	device_set_input_line(state->m_subcpu, 0, CLEAR_LINE);
+	device_set_input_line(m_subcpu, 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( sound_nmi_clear_w )
+WRITE8_MEMBER(mazerbla_state::sound_nmi_clear_w)
 {
-	mazerbla_state *state = space->machine().driver_data<mazerbla_state>();
-	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(m_subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -975,19 +982,19 @@ static WRITE8_HANDLER( sound_nmi_clear_w )
 static ADDRESS_MAP_START( mazerbla_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(cfb_zpu_int_req_clr)
+	AM_RANGE(0xd800, 0xd800) AM_READ(cfb_zpu_int_req_clr)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xe800, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x4c, 0x4f) AM_READWRITE_LEGACY(ls670_1_r, ls670_0_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(zpu_bcd_decoder_w)
-	AM_RANGE(0x62, 0x62) AM_READ_LEGACY(zpu_inputs_r)
-	AM_RANGE(0x68, 0x68) AM_WRITE_LEGACY(zpu_coin_counter_w)
-	AM_RANGE(0x6a, 0x6a) AM_WRITE_LEGACY(zpu_lamps_w)
-	AM_RANGE(0x6e, 0x6f) AM_WRITE_LEGACY(zpu_led_w)
+	AM_RANGE(0x4c, 0x4f) AM_READWRITE(ls670_1_r, ls670_0_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
+	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
+	AM_RANGE(0x68, 0x68) AM_WRITE(zpu_coin_counter_w)
+	AM_RANGE(0x6a, 0x6a) AM_WRITE(zpu_lamps_w)
+	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu2_map, AS_PROGRAM, 8, mazerbla_state )
@@ -998,28 +1005,28 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu2_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(vsb_ls273_audio_control_w)
-	AM_RANGE(0x80, 0x83) AM_READWRITE_LEGACY(ls670_0_r, ls670_1_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(vsb_ls273_audio_control_w)
+	AM_RANGE(0x80, 0x83) AM_READWRITE(ls670_0_r, ls670_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu3_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")					/* GFX roms */
-	AM_RANGE(0x4000, 0x4003) AM_WRITE_LEGACY(vcu_video_reg_w)
+	AM_RANGE(0x4000, 0x4003) AM_WRITE(vcu_video_reg_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(m_cfb_ram)		/* Color Frame Buffer PCB, a.k.a. RAM for VCU commands and parameters */
-	AM_RANGE(0xa000, 0xa7ff) AM_READ_LEGACY(vcu_set_cmd_param_r)	/* VCU command and parameters LOAD */
-	AM_RANGE(0xc000, 0xdfff) AM_READ_LEGACY(vcu_set_gfx_addr_r)	/* gfx LOAD (blit) */
-	AM_RANGE(0xe000, 0xffff) AM_READ_LEGACY(vcu_set_clr_addr_r)	/* palette? LOAD */
+	AM_RANGE(0xa000, 0xa7ff) AM_READ(vcu_set_cmd_param_r)	/* VCU command and parameters LOAD */
+	AM_RANGE(0xc000, 0xdfff) AM_READ(vcu_set_gfx_addr_r)	/* gfx LOAD (blit) */
+	AM_RANGE(0xe000, 0xffff) AM_READ(vcu_set_clr_addr_r)	/* palette? LOAD */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazerbla_cpu3_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(cfb_backgnd_color_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(cfb_zpu_int_req_set_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(cfb_rom_bank_sel_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(cfb_vbank_w)	//visible/writable videopage select?
+	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
+	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
 ADDRESS_MAP_END
 
 
@@ -1031,23 +1038,23 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( greatgun_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x4c, 0x4c) AM_WRITE_LEGACY(main_sound_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(zpu_bcd_decoder_w)
-	AM_RANGE(0x62, 0x62) AM_READ_LEGACY(zpu_inputs_r)
+	AM_RANGE(0x4c, 0x4c) AM_WRITE(main_sound_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(zpu_bcd_decoder_w)
+	AM_RANGE(0x62, 0x62) AM_READ(zpu_inputs_r)
 	AM_RANGE(0x66, 0x66) AM_WRITENOP
 	AM_RANGE(0x68, 0x68) AM_WRITENOP
-	AM_RANGE(0x6e, 0x6f) AM_WRITE_LEGACY(zpu_led_w)
+	AM_RANGE(0x6e, 0x6f) AM_WRITE(zpu_led_w)
 ADDRESS_MAP_END
 
 /* Great Guns has a little different banking layout */
 static ADDRESS_MAP_START( greatgun_cpu3_io_map, AS_IO, 8, mazerbla_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(cfb_backgnd_color_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(cfb_zpu_int_req_set_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(cfb_rom_bank_sel_w_gg)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(cfb_vbank_w)	//visible/writable videopage select?
+	AM_RANGE(0x01, 0x01) AM_WRITE(cfb_backgnd_color_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(cfb_port_02_r, cfb_led_w)	/* Read = VCU status ? */
+	AM_RANGE(0x03, 0x03) AM_WRITE(cfb_zpu_int_req_set_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(cfb_rom_bank_sel_w_gg)
+	AM_RANGE(0x05, 0x05) AM_WRITE(cfb_vbank_w)	//visible/writable videopage select?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8, mazerbla_state )
@@ -1056,8 +1063,8 @@ static ADDRESS_MAP_START( greatgun_sound_map, AS_PROGRAM, 8, mazerbla_state )
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(sound_int_clear_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(sound_nmi_clear_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(sound_int_clear_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sound_nmi_clear_w)
 ADDRESS_MAP_END
 
 

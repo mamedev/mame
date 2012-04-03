@@ -25,6 +25,12 @@ public:
 
 	UINT32 *m_vram;
 	UINT32 *m_workram;
+	DECLARE_WRITE32_MEMBER(palette_w);
+	DECLARE_READ32_MEMBER(eeprom_r);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_WRITE32_MEMBER(int_ack_w);
+	DECLARE_READ16_MEMBER(K056800_68k_r);
+	DECLARE_WRITE16_MEMBER(K056800_68k_w);
 };
 
 
@@ -55,29 +61,29 @@ static SCREEN_UPDATE_IND16( ultrsprt )
 	return 0;
 }
 
-static WRITE32_HANDLER( palette_w )
+WRITE32_MEMBER(ultrsprt_state::palette_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	data = space->machine().generic.paletteram.u32[offset];
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	data = machine().generic.paletteram.u32[offset];
 
-	palette_set_color(space->machine(), (offset*2)+0, MAKE_RGB(pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16)));
-	palette_set_color(space->machine(), (offset*2)+1, MAKE_RGB(pal5bit(data >> 10), pal5bit(data >>  5), pal5bit(data >>  0)));
+	palette_set_color(machine(), (offset*2)+0, MAKE_RGB(pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16)));
+	palette_set_color(machine(), (offset*2)+1, MAKE_RGB(pal5bit(data >> 10), pal5bit(data >>  5), pal5bit(data >>  0)));
 }
 
-static READ32_HANDLER( eeprom_r )
+READ32_MEMBER(ultrsprt_state::eeprom_r)
 {
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_24_31)
-		r |= input_port_read(space->machine(), "SERVICE");
+		r |= input_port_read(machine(), "SERVICE");
 
 	return r;
 }
 
-static WRITE32_HANDLER( eeprom_w )
+WRITE32_MEMBER(ultrsprt_state::eeprom_w)
 {
 	if (ACCESSING_BITS_24_31)
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xffffffff);
+		input_port_write(machine(), "EEPROMOUT", data, 0xffffffff);
 }
 
 static CUSTOM_INPUT( analog_ctrl_r )
@@ -86,9 +92,9 @@ static CUSTOM_INPUT( analog_ctrl_r )
 	return input_port_read(field.machine(), tag) & 0xfff;
 }
 
-static WRITE32_HANDLER( int_ack_w )
+WRITE32_MEMBER(ultrsprt_state::int_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 static MACHINE_START( ultrsprt )
@@ -106,14 +112,14 @@ static MACHINE_START( ultrsprt )
 
 static ADDRESS_MAP_START( ultrsprt_map, AS_PROGRAM, 32, ultrsprt_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE(m_vram)
-	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE_LEGACY(eeprom_r, eeprom_w)
+	AM_RANGE(0x70000000, 0x70000003) AM_READWRITE(eeprom_r, eeprom_w)
 	AM_RANGE(0x70000020, 0x70000023) AM_READ_PORT("P1")
 	AM_RANGE(0x70000040, 0x70000043) AM_READ_PORT("P2")
 	AM_RANGE(0x70000080, 0x70000087) AM_DEVWRITE_LEGACY("k056800", k056800_host_w)
 	AM_RANGE(0x70000088, 0x7000008f) AM_DEVREAD_LEGACY("k056800", k056800_host_r)
-	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE_LEGACY(int_ack_w)
+	AM_RANGE(0x700000e0, 0x700000e3) AM_WRITE(int_ack_w)
 	AM_RANGE(0x7f000000, 0x7f01ffff) AM_RAM AM_BASE(m_workram)
-	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE_LEGACY(palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x7f700000, 0x7f703fff) AM_RAM_WRITE(palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x7f800000, 0x7f9fffff) AM_MIRROR(0x00600000) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -121,9 +127,9 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 
-static READ16_HANDLER( K056800_68k_r )
+READ16_MEMBER(ultrsprt_state::K056800_68k_r)
 {
-	device_t *k056800 = space->machine().device("k056800");
+	device_t *k056800 = machine().device("k056800");
 	UINT16 r = 0;
 
 	if (ACCESSING_BITS_8_15)
@@ -135,9 +141,9 @@ static READ16_HANDLER( K056800_68k_r )
 	return r;
 }
 
-static WRITE16_HANDLER( K056800_68k_w )
+WRITE16_MEMBER(ultrsprt_state::K056800_68k_w)
 {
-	device_t *k056800 = space->machine().device("k056800");
+	device_t *k056800 = machine().device("k056800");
 
 	if (ACCESSING_BITS_8_15)
 		k056800_sound_w(k056800, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
@@ -149,8 +155,8 @@ static WRITE16_HANDLER( K056800_68k_w )
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, ultrsprt_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
 	AM_RANGE(0x00100000, 0x00101fff) AM_RAM
-	AM_RANGE(0x00200000, 0x00200007) AM_WRITE_LEGACY(K056800_68k_w)
-	AM_RANGE(0x00200008, 0x0020000f) AM_READ_LEGACY(K056800_68k_r)
+	AM_RANGE(0x00200000, 0x00200007) AM_WRITE(K056800_68k_w)
+	AM_RANGE(0x00200008, 0x0020000f) AM_READ(K056800_68k_r)
 	AM_RANGE(0x00400000, 0x004002ff) AM_DEVREADWRITE8("konami", k054539_device, read, write, 0xffff)
 ADDRESS_MAP_END
 

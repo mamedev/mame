@@ -74,6 +74,12 @@ public:
 	emu_timer *m_mk5_VSYNC_timer;
 	UINT8 m_ext_latch;
 	UINT8 m_flyback;
+	DECLARE_WRITE32_MEMBER(Ns5w48);
+	DECLARE_READ32_MEMBER(Ns5x58);
+	DECLARE_READ32_MEMBER(mk5_ioc_r);
+	DECLARE_WRITE32_MEMBER(mk5_ioc_w);
+	DECLARE_READ32_MEMBER(Ns5r50);
+	DECLARE_WRITE32_MEMBER(sram_banksel_w);
 };
 
 
@@ -84,9 +90,8 @@ static TIMER_CALLBACK( mk5_VSYNC_callback )
 	state->m_mk5_VSYNC_timer->adjust(attotime::never);
 }
 
-static WRITE32_HANDLER(Ns5w48)
+WRITE32_MEMBER(aristmk5_state::Ns5w48)
 {
-
 
     /*
     There is one writeable register which is written with the Ns5w48 strobe. It contains four bits which are
@@ -122,25 +127,25 @@ static WRITE32_HANDLER(Ns5w48)
     ROM:03400968                 TST     R1, #8          ; test vsync
     */
 
-    aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
+
 	ioc_regs[IRQ_STATUS_A] &= ~0x08;
 
 	/*          bit 1              bit 0 */
 	if((data &~(0x02)) && (data & (0x01))) // external video crystal is enabled. 25 mhz
     {
-	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure but see above
+	        m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure but see above
     }
     if((data &~(0x02)) && (data &~(0x01))) // video clock is enabled. 24 mhz
     {
-	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
+	        m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
     }
     if((data & (0x02)) && (data &~(0x01))) // video clock is enabled. 36 mhz
     {
-	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
+	        m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
     }
     if((data &(0x02)) && (data &(0x01))) // video clock is enabled. 24 mhz
     {
-	        state->m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
+	        m_mk5_VSYNC_timer->adjust(attotime::from_hz(50000)); // not sure
     }
 }
 
@@ -152,7 +157,7 @@ static TIMER_CALLBACK( mk5_2KHz_callback )
 
 }
 
-static READ32_HANDLER(Ns5x58)
+READ32_MEMBER(aristmk5_state::Ns5x58)
 {
     /*
         1953.125 Hz for the operating system timer interrupt
@@ -172,18 +177,17 @@ static READ32_HANDLER(Ns5x58)
                   `-------'                `-------------'
     */
 
-	aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
+
 	// reset 2KHz timer
-    state->m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125));
+    m_mk5_2KHz_timer->adjust(attotime::from_hz(1953.125));
     ioc_regs[IRQ_STATUS_A] &= ~0x01;
-    cputag_set_input_line(space->machine(), "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
+    cputag_set_input_line(machine(), "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
 	return 0xffffffff;
 }
 
 /* same as plain AA but with the I2C unconnected */
-static READ32_HANDLER( mk5_ioc_r )
+READ32_MEMBER(aristmk5_state::mk5_ioc_r)
 {
-	aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
 	UINT32 ioc_addr;
 
 	ioc_addr = offset*4;
@@ -194,27 +198,26 @@ static READ32_HANDLER( mk5_ioc_r )
 	{
 		int vert_pos;
 
-		vert_pos = space->machine().primary_screen->vpos();
-		state->m_flyback = (vert_pos <= vidc_regs[VIDC_VDSR] || vert_pos >= vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
+		vert_pos = machine().primary_screen->vpos();
+		m_flyback = (vert_pos <= vidc_regs[VIDC_VDSR] || vert_pos >= vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
 
-		//i2c_data = (i2cmem_sda_read(space->machine().device("i2cmem")) & 1);
+		//i2c_data = (i2cmem_sda_read(machine().device("i2cmem")) & 1);
 
-		return (state->m_flyback) | (ioc_regs[CONTROL] & 0x7c) | (1<<1) | 1;
+		return (m_flyback) | (ioc_regs[CONTROL] & 0x7c) | (1<<1) | 1;
 	}
 
-	return archimedes_ioc_r(space,offset,mem_mask);
+	return archimedes_ioc_r(&space,offset,mem_mask);
 }
 
-static WRITE32_HANDLER( mk5_ioc_w )
+WRITE32_MEMBER(aristmk5_state::mk5_ioc_w)
 {
-	aristmk5_state *state = space->machine().driver_data<aristmk5_state>();
 	UINT32 ioc_addr;
 
 	ioc_addr = offset*4;
 	ioc_addr >>= 16;
 	ioc_addr &= 0x37;
 
-	if(!state->m_ext_latch)
+	if(!m_ext_latch)
 	{
 		if(((ioc_addr == 0x20) || (ioc_addr == 0x30)) && (offset & 0x1f) == 0)
 		{
@@ -222,16 +225,16 @@ static WRITE32_HANDLER( mk5_ioc_w )
 			return;
 		}
 		else
-			archimedes_ioc_w(space,offset,data,mem_mask);
+			archimedes_ioc_w(&space,offset,data,mem_mask);
 	}
 }
 
-static READ32_HANDLER( Ns5r50 )
+READ32_MEMBER(aristmk5_state::Ns5r50)
 {
 	return 0xf5; // checked inside the CPU check, unknown meaning
 }
 
-static WRITE32_HANDLER( sram_banksel_w )
+WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
 {
     /*
 
@@ -245,7 +248,7 @@ static WRITE32_HANDLER( sram_banksel_w )
     checked against the other to verify that the stored data is correct.
     Each chip is mapped to the same address, and the chip selected depends on the bank
     select register. Access is mutually exclusive, increasing security with only one chip
-    visible in the CPU address space at a time. If the CPU crashes and overwrites
+    visible in the CPU address &space at a time. If the CPU crashes and overwrites
     memory only one of the three devices can be corrupted. On reset the bank select
     register selects bank 0, which does not exist. The SRAMs are at banks 1,2,3.
     Each of the SRAM chips may be powered from a separate battery, further reducing
@@ -286,8 +289,8 @@ static WRITE32_HANDLER( sram_banksel_w )
 
          4 pages of 32k for each sram chip.
     */
-    memory_set_bank(space->machine(),"sram_bank", (data & 0xc0) >> 6);
-    memory_set_bank(space->machine(),"sram_bank_nz", (data & 0xc0) >> 6);
+    memory_set_bank(machine(),"sram_bank", (data & 0xc0) >> 6);
+    memory_set_bank(machine(),"sram_bank_nz", (data & 0xc0) >> 6);
 }
 
 /* U.S games have no dram emulator enabled */
@@ -296,7 +299,7 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE_LEGACY(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	/* MK-5 overrides */
-	AM_RANGE(0x03010420, 0x03010423) AM_WRITE_LEGACY(sram_banksel_w) // SRAM bank select write
+	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write
 
 //  AM_RANGE(0x0301049c, 0x0301051f) AM_DEVREADWRITE_LEGACY("eeprom", eeprom_r, eeprom_w) // eeprom ???
 
@@ -305,11 +308,11 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03220000, 0x0323ffff) AM_RAMBANK("sram_bank") //AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3
 
 	// bank5 slow
-	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE_LEGACY(Ns5w48) //IOEB control register
-	AM_RANGE(0x03250050, 0x03250053) AM_READ_LEGACY(Ns5r50)  //IOEB ID register
-	AM_RANGE(0x03250058, 0x0325005b) AM_READ_LEGACY(Ns5x58)  //IOEB interrupt Latch
+	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(Ns5w48) //IOEB control register
+	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
+	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB interrupt Latch
 
-	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE_LEGACY(mk5_ioc_r, mk5_ioc_w)
+	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)
 	AM_RANGE(0x03320000, 0x0333ffff) AM_RAMBANK("sram_bank_nz") // AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3 NZ
 	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE_LEGACY(archimedes_vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE_LEGACY(archimedes_memc_r, archimedes_memc_w)
@@ -322,7 +325,7 @@ static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE_LEGACY(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	/* MK-5 overrides */
-	AM_RANGE(0x03010420, 0x03010423) AM_WRITE_LEGACY(sram_banksel_w) // SRAM bank select write
+	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write
 
 //  AM_RANGE(0x0301049c, 0x0301051f) AM_DEVREADWRITE_LEGACY("eeprom", eeprom_r, eeprom_w) // eeprom ???
 
@@ -331,12 +334,12 @@ static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03220000, 0x0323ffff) AM_RAMBANK("sram_bank") //AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3
 
 	// bank5 slow
-	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE_LEGACY(Ns5w48) //IOEB control register
-	AM_RANGE(0x03250050, 0x03250053) AM_READ_LEGACY(Ns5r50)  //IOEB ID register
-	AM_RANGE(0x03250058, 0x0325005b) AM_READ_LEGACY(Ns5x58)  //IOEB interrupt Latch
+	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(Ns5w48) //IOEB control register
+	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
+	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB interrupt Latch
 
 
-	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE_LEGACY(mk5_ioc_r, mk5_ioc_w)
+	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)
 	AM_RANGE(0x03320000, 0x0333ffff) AM_RAMBANK("sram_bank_nz") // AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3 NZ
 	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE_LEGACY(archimedes_vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE_LEGACY(archimedes_memc_r, archimedes_memc_w)

@@ -24,6 +24,10 @@ public:
 
 	UINT16 *m_vram;
 	int m_vbuffer;
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_READ16_MEMBER(eolith16_custom_r);
+	DECLARE_WRITE16_MEMBER(vram_w);
+	DECLARE_READ16_MEMBER(vram_r);
 };
 
 
@@ -40,45 +44,42 @@ static const eeprom_interface eeprom_interface_93C66 =
 	"*10011xxxxxx"	// unlock       100 11xxxxxxx
 };
 
-static WRITE16_HANDLER( eeprom_w )
+WRITE16_MEMBER(eolith16_state::eeprom_w)
 {
-	eolith16_state *state = space->machine().driver_data<eolith16_state>();
-	state->m_vbuffer = (data & 0x80) >> 7;
-	coin_counter_w(space->machine(), 0, data & 1);
+	m_vbuffer = (data & 0x80) >> 7;
+	coin_counter_w(machine(), 0, data & 1);
 
-	input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+	input_port_write(machine(), "EEPROMOUT", data, 0xff);
 
 	//data & 0x100 and data & 0x004 always set
 }
 
-static READ16_HANDLER( eolith16_custom_r )
+READ16_MEMBER(eolith16_state::eolith16_custom_r)
 {
-	eolith_speedup_read(space);
-	return input_port_read(space->machine(), "SPECIAL");
+	eolith_speedup_read(&space);
+	return input_port_read(machine(), "SPECIAL");
 }
 
 
 
-static WRITE16_HANDLER( vram_w )
+WRITE16_MEMBER(eolith16_state::vram_w)
 {
-	eolith16_state *state = space->machine().driver_data<eolith16_state>();
-	COMBINE_DATA(&state->m_vram[offset + (0x10000/2) * state->m_vbuffer]);
+	COMBINE_DATA(&m_vram[offset + (0x10000/2) * m_vbuffer]);
 }
 
-static READ16_HANDLER( vram_r )
+READ16_MEMBER(eolith16_state::vram_r)
 {
-	eolith16_state *state = space->machine().driver_data<eolith16_state>();
-	return state->m_vram[offset + (0x10000/2) * state->m_vbuffer];
+	return m_vram[offset + (0x10000/2) * m_vbuffer];
 }
 
 static ADDRESS_MAP_START( eolith16_map, AS_PROGRAM, 16, eolith16_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x50000000, 0x5000ffff) AM_READWRITE_LEGACY(vram_r, vram_w)
+	AM_RANGE(0x50000000, 0x5000ffff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0x90000000, 0x9000002f) AM_WRITENOP //?
 	AM_RANGE(0xff000000, 0xff1fffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xffe40000, 0xffe40001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xffe80000, 0xffe80001) AM_WRITE_LEGACY(eeprom_w)
-	AM_RANGE(0xffea0000, 0xffea0001) AM_READ_LEGACY(eolith16_custom_r)
+	AM_RANGE(0xffe80000, 0xffe80001) AM_WRITE(eeprom_w)
+	AM_RANGE(0xffea0000, 0xffea0001) AM_READ(eolith16_custom_r)
 	AM_RANGE(0xffea0002, 0xffea0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xffec0000, 0xffec0001) AM_READNOP // not used?
 	AM_RANGE(0xffec0002, 0xffec0003) AM_READ_PORT("INPUTS")

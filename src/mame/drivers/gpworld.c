@@ -60,6 +60,12 @@ public:
 	UINT8* m_sprite_RAM;
 	UINT8* m_palette_RAM;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
+	DECLARE_READ8_MEMBER(ldp_read);
+	DECLARE_READ8_MEMBER(pedal_in);
+	DECLARE_WRITE8_MEMBER(ldp_write);
+	DECLARE_WRITE8_MEMBER(misc_io_write);
+	DECLARE_WRITE8_MEMBER(brake_gas_write);
+	DECLARE_WRITE8_MEMBER(palette_write);
 };
 
 
@@ -230,78 +236,72 @@ static MACHINE_START( gpworld )
 
 /* MEMORY HANDLERS */
 /* READS */
-static READ8_HANDLER( ldp_read )
+READ8_MEMBER(gpworld_state::ldp_read)
 {
-	gpworld_state *state = space->machine().driver_data<gpworld_state>();
-	return state->m_ldp_read_latch;
+	return m_ldp_read_latch;
 }
 
-static READ8_HANDLER( pedal_in )
+READ8_MEMBER(gpworld_state::pedal_in)
 {
-	gpworld_state *state = space->machine().driver_data<gpworld_state>();
-	if (state->m_brake_gas)
-		return	input_port_read(space->machine(), "INACCEL");
+	if (m_brake_gas)
+		return	input_port_read(machine(), "INACCEL");
 
-	return	input_port_read(space->machine(), "INBRAKE");
+	return	input_port_read(machine(), "INBRAKE");
 
 }
 
 /* WRITES */
-static WRITE8_HANDLER( ldp_write )
+WRITE8_MEMBER(gpworld_state::ldp_write)
 {
-	gpworld_state *state = space->machine().driver_data<gpworld_state>();
-	state->m_ldp_write_latch = data;
+	m_ldp_write_latch = data;
 }
 
-static WRITE8_HANDLER( misc_io_write )
+WRITE8_MEMBER(gpworld_state::misc_io_write)
 {
-	gpworld_state *state = space->machine().driver_data<gpworld_state>();
-	state->m_start_lamp = (data & 0x04) >> 1;
-	state->m_nmi_enable = (data & 0x40) >> 6;
+	m_start_lamp = (data & 0x04) >> 1;
+	m_nmi_enable = (data & 0x40) >> 6;
 	/*  dunno      = (data & 0x80) >> 7; */ //coin counter???
 
-	logerror("NMI : %x (0x%x)\n", state->m_nmi_enable, data);
+	logerror("NMI : %x (0x%x)\n", m_nmi_enable, data);
 }
 
-static WRITE8_HANDLER( brake_gas_write )
+WRITE8_MEMBER(gpworld_state::brake_gas_write)
 {
-	gpworld_state *state = space->machine().driver_data<gpworld_state>();
-	state->m_brake_gas = data & 0x01;
+	m_brake_gas = data & 0x01;
 }
 
-static WRITE8_HANDLER( palette_write )
+WRITE8_MEMBER(gpworld_state::palette_write)
 {
-	gpworld_state *state = space->machine().driver_data<gpworld_state>();
 	/* This is all just a (bad) guess */
 	int pal_index, r, g, b, a;
 
-	state->m_palette_RAM[offset] = data;
+	m_palette_RAM[offset] = data;
 
 	/* "Round down" to the nearest palette entry */
 	pal_index = offset & 0xffe;
 
-	g = (state->m_palette_RAM[pal_index]   & 0xf0) << 0;
-	b = (state->m_palette_RAM[pal_index]   & 0x0f) << 4;
-	r = (state->m_palette_RAM[pal_index+1] & 0x0f) << 4;
-	a = (state->m_palette_RAM[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
+	g = (m_palette_RAM[pal_index]   & 0xf0) << 0;
+	b = (m_palette_RAM[pal_index]   & 0x0f) << 4;
+	r = (m_palette_RAM[pal_index+1] & 0x0f) << 4;
+	a = (m_palette_RAM[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	palette_set_color(space->machine(), (pal_index & 0xffe) >> 1, MAKE_ARGB(a, r, g, b));
+	palette_set_color(machine(), (pal_index & 0xffe) >> 1, MAKE_ARGB(a, r, g, b));
 }
 
 /* PROGRAM MAP */
 static ADDRESS_MAP_START( mainmem, AS_PROGRAM, 8, gpworld_state )
 	AM_RANGE(0x0000,0xbfff) AM_ROM
 	AM_RANGE(0xc000,0xc7ff) AM_RAM AM_BASE(m_sprite_RAM)
-	AM_RANGE(0xc800,0xcfff) AM_WRITE_LEGACY(palette_write) AM_BASE(m_palette_RAM)	/* The memory test reads at 0xc800 */
+	AM_RANGE(0xc800,0xcfff) AM_WRITE(palette_write) AM_BASE(m_palette_RAM)	/* The memory test reads at 0xc800 */
 	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_BASE(m_tile_RAM)
-	AM_RANGE(0xd800,0xd800) AM_READWRITE_LEGACY(ldp_read,ldp_write)
+	AM_RANGE(0xd800,0xd800) AM_READWRITE(ldp_read,ldp_write)
 /*  AM_RANGE(0xd801,0xd801) AM_READ_LEGACY(???) */
 	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL")	//8255 here....
 /*  AM_RANGE(0xda01,0xda01) AM_WRITE_LEGACY(???) */					/* These inputs are interesting - there are writes and reads all over these addr's */
-	AM_RANGE(0xda02,0xda02) AM_WRITE_LEGACY(brake_gas_write)				/*bit 0 select gas/brake input */
-	AM_RANGE(0xda20,0xda20) AM_READ_LEGACY(pedal_in)
+	AM_RANGE(0xda02,0xda02) AM_WRITE(brake_gas_write)				/*bit 0 select gas/brake input */
+	AM_RANGE(0xda20,0xda20) AM_READ(pedal_in)
 
 	AM_RANGE(0xe000,0xffff) AM_RAM								/* Potentially not all work RAM? */
 ADDRESS_MAP_END
@@ -310,7 +310,7 @@ ADDRESS_MAP_END
 /* I/O MAP */
 static ADDRESS_MAP_START( mainport, AS_IO, 8, gpworld_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_WRITE_LEGACY(misc_io_write)
+	AM_RANGE(0x01,0x01) AM_WRITE(misc_io_write)
 	AM_RANGE(0x80,0x80) AM_READ_PORT("IN0")
 	AM_RANGE(0x81,0x81) AM_READ_PORT("IN1")
 	AM_RANGE(0x82,0x82) AM_READ_PORT("DSW1")

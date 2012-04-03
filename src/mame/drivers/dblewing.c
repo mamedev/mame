@@ -75,6 +75,9 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_deco_tilegen1;
+	DECLARE_READ16_MEMBER(dblewing_prot_r);
+	DECLARE_WRITE16_MEMBER(dblewing_prot_w);
+	DECLARE_READ8_MEMBER(irq_latch_r);
 };
 
 UINT16 dblwings_pri_callback(UINT16 x)
@@ -120,32 +123,31 @@ static SCREEN_UPDATE_IND16(dblewing)
  we need to log the PC of each read/write and check to
  see if the code makes any of them move obvious
 */
-static READ16_HANDLER ( dblewing_prot_r )
+READ16_MEMBER(dblewing_state::dblewing_prot_r)
 {
-	dblewing_state *state = space->machine().driver_data<dblewing_state>();
 
 	switch (offset * 2)
 	{
-		case 0x16a: return state->m_boss_move;          // boss 1 movement
-		case 0x6d6: return state->m_boss_move;          // boss 1 2nd pilot
-		case 0x748: return state->m_boss_move;          // boss 1 3rd pilot
+		case 0x16a: return m_boss_move;          // boss 1 movement
+		case 0x6d6: return m_boss_move;          // boss 1 2nd pilot
+		case 0x748: return m_boss_move;          // boss 1 3rd pilot
 
 		case 0x566: return 0x0009;  		   // boss BGM,might be a variable one (read->write to the sound latch)
-		case 0x1ea: return state->m_boss_shoot_type;    // boss 1 shoot type
-		case 0x596: return state->m_boss_3_data;		   // boss 3 appearing
-		case 0x692:	return state->m_boss_4_data;
-		case 0x6b0: return state->m_boss_5_data;
-		case 0x51e: return state->m_boss_5sx_data;
-		case 0x784: return state->m_boss_6_data;
+		case 0x1ea: return m_boss_shoot_type;    // boss 1 shoot type
+		case 0x596: return m_boss_3_data;		   // boss 3 appearing
+		case 0x692:	return m_boss_4_data;
+		case 0x6b0: return m_boss_5_data;
+		case 0x51e: return m_boss_5sx_data;
+		case 0x784: return m_boss_6_data;
 
 		case 0x330: return 0; // controls bonuses such as shoot type,bombs etc.
-		case 0x1d4: return state->m_70c_data;  //controls restart points
+		case 0x1d4: return m_70c_data;  //controls restart points
 
-		case 0x0ac: return (input_port_read(space->machine(), "DSW") & 0x40) << 4;//flip screen
-		case 0x4b0: return state->m_608_data;//coinage
+		case 0x0ac: return (input_port_read(machine(), "DSW") & 0x40) << 4;//flip screen
+		case 0x4b0: return m_608_data;//coinage
 		case 0x068:
 		{
-			switch (input_port_read(space->machine(), "DSW") & 0x0300) //I don't know how to relationate this...
+			switch (input_port_read(machine(), "DSW") & 0x0300) //I don't know how to relationate this...
 			{
 				case 0x0000: return 0x000;//0
 				case 0x0100: return 0x060;//3
@@ -153,155 +155,154 @@ static READ16_HANDLER ( dblewing_prot_r )
 				case 0x0300: return 0x160;//b
 			}
 		}
-		case 0x094: return state->m_104_data;// p1 inputs select screen  OK
-		case 0x24c: return state->m_008_data;//read DSW (mirror for coinage/territory)
-		case 0x298: return input_port_read(space->machine(), "SYSTEM");//vblank
-		case 0x476: return input_port_read(space->machine(), "SYSTEM");//mirror for coins
-		case 0x506: return input_port_read(space->machine(), "DSW");
-		case 0x5d8: return state->m_406_data;
-		case 0x2b4: return input_port_read(space->machine(), "P1_P2");
-		case 0x1a8: return (input_port_read(space->machine(), "DSW") & 0x4000) >> 12;//allow continue
-		case 0x3ec: return state->m_70c_data; //score entry
-		case 0x246: return state->m_580_data; // these three controls "perfect bonus" I suppose...
-		case 0x52e: return state->m_580_data;
-		case 0x532: return state->m_580_data;
+		case 0x094: return m_104_data;// p1 inputs select screen  OK
+		case 0x24c: return m_008_data;//read DSW (mirror for coinage/territory)
+		case 0x298: return input_port_read(machine(), "SYSTEM");//vblank
+		case 0x476: return input_port_read(machine(), "SYSTEM");//mirror for coins
+		case 0x506: return input_port_read(machine(), "DSW");
+		case 0x5d8: return m_406_data;
+		case 0x2b4: return input_port_read(machine(), "P1_P2");
+		case 0x1a8: return (input_port_read(machine(), "DSW") & 0x4000) >> 12;//allow continue
+		case 0x3ec: return m_70c_data; //score entry
+		case 0x246: return m_580_data; // these three controls "perfect bonus" I suppose...
+		case 0x52e: return m_580_data;
+		case 0x532: return m_580_data;
 	}
 
-//  printf("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask);
+//  printf("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(&space.device()), offset * 2, mem_mask);
 
-	if ((offset*2) == 0x0f8) return 0; // state->m_080_data;
+	if ((offset*2) == 0x0f8) return 0; // m_080_data;
 	if ((offset*2) == 0x104) return 0;
 	if ((offset*2) == 0x10e) return 0;
-	if ((offset*2) == 0x206) return 0; // state->m_70c_data;
+	if ((offset*2) == 0x206) return 0; // m_70c_data;
 	if ((offset*2) == 0x25c) return 0;
 	if ((offset*2) == 0x284) return 0; // 3rd player 2nd boss
 	if ((offset*2) == 0x432) return 0; // boss on water level?
 	if ((offset*2) == 0x54a) return 0; // 3rd player 2nd boss
 	if ((offset*2) == 0x786) return 0;
 
-	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask);
+	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n", cpu_get_pc(&space.device()), offset * 2, mem_mask);
 
-	return 0;//space->machine().rand();
+	return 0;//machine().rand();
 }
 
-static WRITE16_HANDLER( dblewing_prot_w )
+WRITE16_MEMBER(dblewing_state::dblewing_prot_w)
 {
-	dblewing_state *state = space->machine().driver_data<dblewing_state>();
 
 //  if (offset * 2 != 0x380)
-//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask, data);
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(&space.device()), offset * 2, mem_mask, data);
 
 	switch (offset * 2)
 	{
 		case 0x088:
-			state->m_088_data = data;
-			if(state->m_088_data == 0)          { state->m_boss_4_data = 0;    }
-			else if(state->m_088_data & 0x8000) { state->m_boss_4_data = 0x50; }
-			else                                { state->m_boss_4_data = 0x40; }
+			m_088_data = data;
+			if(m_088_data == 0)          { m_boss_4_data = 0;    }
+			else if(m_088_data & 0x8000) { m_boss_4_data = 0x50; }
+			else                                { m_boss_4_data = 0x40; }
 
 			return;
 
 		case 0x104:
-			state->m_104_data = data;
+			m_104_data = data;
 			return; // p1 inputs select screen  OK
 
 		case 0x18a:
-			state->m_18a_data = data;
-			switch (state->m_18a_data)
+			m_18a_data = data;
+			switch (m_18a_data)
 			{
-				case 0x6b94: state->m_boss_5_data = 0x10; break; //initialize
-				case 0x7c68: state->m_boss_5_data = 0x60; break; //go up
-				case 0xfb1d: state->m_boss_5_data = 0x50; break;
-				case 0x977c: state->m_boss_5_data = 0x50; break;
-				case 0x8a49: state->m_boss_5_data = 0x60; break;
+				case 0x6b94: m_boss_5_data = 0x10; break; //initialize
+				case 0x7c68: m_boss_5_data = 0x60; break; //go up
+				case 0xfb1d: m_boss_5_data = 0x50; break;
+				case 0x977c: m_boss_5_data = 0x50; break;
+				case 0x8a49: m_boss_5_data = 0x60; break;
 			}
 			return;
 		case 0x200:
-			state->m_200_data = data;
-			switch (state->m_200_data)
+			m_200_data = data;
+			switch (m_200_data)
 			{
-				case 0x5a19: state->m_boss_move = 1; break;
-				case 0x3b28: state->m_boss_move = 2; break;
-				case 0x1d4d: state->m_boss_move = 1; break;
+				case 0x5a19: m_boss_move = 1; break;
+				case 0x3b28: m_boss_move = 2; break;
+				case 0x1d4d: m_boss_move = 1; break;
 			}
-			//popmessage("%04x",state->m_200_data);
+			//popmessage("%04x",m_200_data);
 			return;
 		case 0x280:
-			state->m_280_data = data;
-			switch (state->m_280_data)
+			m_280_data = data;
+			switch (m_280_data)
 			{
-				case 0x6b94: state->m_boss_5sx_data = 0x10; break;
-				case 0x7519: state->m_boss_5sx_data = 0x60; break;
-				case 0xfc68: state->m_boss_5sx_data = 0x50; break;
-				case 0x02dd: state->m_boss_5sx_data = 0x50; break;
-				case 0x613c: state->m_boss_5sx_data = 0x50; break;
+				case 0x6b94: m_boss_5sx_data = 0x10; break;
+				case 0x7519: m_boss_5sx_data = 0x60; break;
+				case 0xfc68: m_boss_5sx_data = 0x50; break;
+				case 0x02dd: m_boss_5sx_data = 0x50; break;
+				case 0x613c: m_boss_5sx_data = 0x50; break;
 			}
-			//printf("%04x\n",state->m_280_data);
+			//printf("%04x\n",m_280_data);
 			return;
 		case 0x380: // sound write
 			soundlatch_w(space, 0, data & 0xff);
-			state->m_sound_irq |= 0x02;
-			device_set_input_line(state->m_audiocpu, 0, (state->m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+			m_sound_irq |= 0x02;
+			device_set_input_line(m_audiocpu, 0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 			return;
 		case 0x384:
-			state->m_384_data = data;
-			switch(state->m_384_data)
+			m_384_data = data;
+			switch(m_384_data)
 			{
-				case 0xaa41: state->m_boss_6_data = 1; break;
-				case 0x5a97: state->m_boss_6_data = 2; break;
-				case 0xbac5: state->m_boss_6_data = 3; break;
-				case 0x0afb: state->m_boss_6_data = 4; break;
-				case 0x6a99: state->m_boss_6_data = 5; break;
-				case 0xda8f: state->m_boss_6_data = 6; break;
+				case 0xaa41: m_boss_6_data = 1; break;
+				case 0x5a97: m_boss_6_data = 2; break;
+				case 0xbac5: m_boss_6_data = 3; break;
+				case 0x0afb: m_boss_6_data = 4; break;
+				case 0x6a99: m_boss_6_data = 5; break;
+				case 0xda8f: m_boss_6_data = 6; break;
 			}
 			return;
 		case 0x38e:
-			state->m_38e_data = data;
-			switch(state->m_38e_data)
+			m_38e_data = data;
+			switch(m_38e_data)
 			{
-				case 0x6c13: state->m_boss_shoot_type = 3; break;
-				case 0xc311: state->m_boss_shoot_type = 0; break;
-				case 0x1593: state->m_boss_shoot_type = 1; break;
-				case 0xf9db: state->m_boss_shoot_type = 2; break;
-				case 0xf742: state->m_boss_shoot_type = 3; break;
+				case 0x6c13: m_boss_shoot_type = 3; break;
+				case 0xc311: m_boss_shoot_type = 0; break;
+				case 0x1593: m_boss_shoot_type = 1; break;
+				case 0xf9db: m_boss_shoot_type = 2; break;
+				case 0xf742: m_boss_shoot_type = 3; break;
 
-				case 0xeff5: state->m_boss_move = 1; break;
-				case 0xd2f1: state->m_boss_move = 2; break;
-				//default:   printf("%04x\n",state->m_38e_data); break;
-				//case 0xe65a: state->m_boss_shoot_type = 0; break;
+				case 0xeff5: m_boss_move = 1; break;
+				case 0xd2f1: m_boss_move = 2; break;
+				//default:   printf("%04x\n",m_38e_data); break;
+				//case 0xe65a: m_boss_shoot_type = 0; break;
 			}
 			return;
 		case 0x58c: // 3rd player 1st level
-			state->m_58c_data = data;
-			if(state->m_58c_data == 0)     { state->m_boss_move = 5; }
-			else                           { state->m_boss_move = 2; }
+			m_58c_data = data;
+			if(m_58c_data == 0)     { m_boss_move = 5; }
+			else                           { m_boss_move = 2; }
 
 			return;
 		case 0x60a:
-			state->m_60a_data = data;
-			if(state->m_60a_data & 0x8000) { state->m_boss_3_data = 2; }
-			else                           { state->m_boss_3_data = 9; }
+			m_60a_data = data;
+			if(m_60a_data & 0x8000) { m_boss_3_data = 2; }
+			else                           { m_boss_3_data = 9; }
 
 			return;
 		case 0x580:
-			state->m_580_data = data;
+			m_580_data = data;
 			return;
 		case 0x406:
-			state->m_406_data = data;
+			m_406_data = data;
 			return;  // p2 inputs select screen  OK
 	}
 
-//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(&space->device()), offset * 2, mem_mask, data);
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n", cpu_get_pc(&space.device()), offset * 2, mem_mask, data);
 
-	if ((offset * 2) == 0x008) { state->m_008_data = data; return; }
-	if ((offset * 2) == 0x080) { state->m_080_data = data; return; } // p3 3rd boss?
-	if ((offset * 2) == 0x28c) { state->m_28c_data = data; return; }
-	if ((offset * 2) == 0x408) { state->m_408_data = data; return; } // 3rd player 1st level?
-	if ((offset * 2) == 0x40e) { state->m_40e_data = data; return; } // 3rd player 2nd level?
-	if ((offset * 2) == 0x608) { state->m_608_data = data; return; }
-	if ((offset * 2) == 0x70c) { state->m_70c_data = data; return; }
-	if ((offset * 2) == 0x78a) { state->m_78a_data = data; return; }
-	if ((offset * 2) == 0x788) { state->m_788_data = data; return; }
+	if ((offset * 2) == 0x008) { m_008_data = data; return; }
+	if ((offset * 2) == 0x080) { m_080_data = data; return; } // p3 3rd boss?
+	if ((offset * 2) == 0x28c) { m_28c_data = data; return; }
+	if ((offset * 2) == 0x408) { m_408_data = data; return; } // 3rd player 1st level?
+	if ((offset * 2) == 0x40e) { m_40e_data = data; return; } // 3rd player 2nd level?
+	if ((offset * 2) == 0x608) { m_608_data = data; return; }
+	if ((offset * 2) == 0x70c) { m_70c_data = data; return; }
+	if ((offset * 2) == 0x78a) { m_78a_data = data; return; }
+	if ((offset * 2) == 0x788) { m_788_data = data; return; }
 }
 
 static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
@@ -321,7 +322,7 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 //  AM_RANGE(0x280330, 0x280331) AM_READNOP               // sound?
 //  AM_RANGE(0x280380, 0x280381) AM_WRITENOP              // sound
 
-	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE_LEGACY(dblewing_prot_r, dblewing_prot_w)
+	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(dblewing_prot_r, dblewing_prot_w)
 
 
 	AM_RANGE(0x284000, 0x284001) AM_RAM
@@ -332,14 +333,13 @@ static ADDRESS_MAP_START( dblewing_map, AS_PROGRAM, 16, dblewing_state )
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER(irq_latch_r)
+READ8_MEMBER(dblewing_state::irq_latch_r)
 {
-	dblewing_state *state = space->machine().driver_data<dblewing_state>();
 
 	/* bit 1 of dblewing_sound_irq specifies IRQ command writes */
-	state->m_sound_irq &= ~0x02;
-	device_set_input_line(state->m_audiocpu, 0, (state->m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
-	return state->m_sound_irq;
+	m_sound_irq &= ~0x02;
+	device_set_input_line(m_audiocpu, 0, (m_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	return m_sound_irq;
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_status_port_r,ym2151_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xd000, 0xd000) AM_READ_LEGACY(irq_latch_r) //timing? sound latch?
+	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 

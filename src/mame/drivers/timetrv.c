@@ -35,6 +35,10 @@ public:
 
 	UINT8 *m_led_vram_lo;
 	UINT8 *m_led_vram_hi;
+	DECLARE_READ8_MEMBER(test1_r);
+	DECLARE_READ8_MEMBER(test2_r);
+	DECLARE_READ8_MEMBER(in_r);
+	DECLARE_READ8_MEMBER(ld_r);
 };
 
 
@@ -51,26 +55,26 @@ static SCREEN_UPDATE_IND16( timetrv )
 	return 0;
 }
 
-static READ8_HANDLER( test1_r )
+READ8_MEMBER(timetrv_state::test1_r)
 {
-	return input_port_read(space->machine(), "IN0");//space->machine().rand();
+	return input_port_read(machine(), "IN0");//machine().rand();
 }
 
-static READ8_HANDLER( test2_r )
+READ8_MEMBER(timetrv_state::test2_r)
 {
 	/*bit 7,eeprom read bit*/
-	return (input_port_read(space->machine(), "IN1") & 0x7f);//space->machine().rand();
+	return (input_port_read(machine(), "IN1") & 0x7f);//machine().rand();
 }
 
 
-static READ8_HANDLER( in_r )
+READ8_MEMBER(timetrv_state::in_r)
 {
 	return 0xff;
 }
 
-static READ8_HANDLER( ld_r )
+READ8_MEMBER(timetrv_state::ld_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( timetrv_map, AS_PROGRAM, 8, timetrv_state )
@@ -81,12 +85,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( timetrv_io, AS_IO, 8, timetrv_state )
 	AM_RANGE(0x0122, 0x0123) AM_WRITENOP //eeprom write bits
-	AM_RANGE(0x1000, 0x1000) AM_READ_LEGACY(test1_r) //inputs
-	AM_RANGE(0x1001, 0x1001) AM_READ_LEGACY(test2_r) //eeprom read bit + inputs
+	AM_RANGE(0x1000, 0x1000) AM_READ(test1_r) //inputs
+	AM_RANGE(0x1001, 0x1001) AM_READ(test2_r) //eeprom read bit + inputs
 
-	AM_RANGE(0x1080, 0x1082) AM_READ_LEGACY(in_r) //dsw
+	AM_RANGE(0x1080, 0x1082) AM_READ(in_r) //dsw
 	AM_RANGE(0x1100, 0x1105) AM_WRITENOP //laserdisc write area
-	AM_RANGE(0x1100, 0x1105) AM_READ_LEGACY(ld_r) //5 -> laserdisc read status
+	AM_RANGE(0x1100, 0x1105) AM_READ(ld_r) //5 -> laserdisc read status
 	AM_RANGE(0x1180, 0x1187) AM_RAM AM_BASE(m_led_vram_lo)//led string,part 1
 	AM_RANGE(0x1200, 0x1207) AM_RAM AM_BASE(m_led_vram_hi)//led string,part 2
 	AM_RANGE(0xff80, 0xffff) AM_RAM //am80188-em-like cpu internal regs?

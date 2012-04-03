@@ -38,6 +38,7 @@ public:
 		  m_v9938(*this, "v9938") { }
 
 	required_device<v9938_device> m_v9938;
+	DECLARE_WRITE8_MEMBER(tonton_outport_w);
 };
 
 #define MAIN_CLOCK XTAL_21_4772MHz
@@ -66,10 +67,10 @@ static void tonton_vdp0_interrupt(device_t *, v99x8_device &device, int i)
 *          Multi-Purpose Output Port             *
 *************************************************/
 
-static WRITE8_HANDLER( tonton_outport_w )
+WRITE8_MEMBER(tonton_state::tonton_outport_w)
 {
 	/* lockout perhaps? */
-	coin_counter_w(space->machine(), offset, data & 0x01);
+	coin_counter_w(machine(), offset, data & 0x01);
 
 	// data & 2 is hopper related
 
@@ -92,7 +93,7 @@ static ADDRESS_MAP_START( tonton_io, AS_IO, 8, tonton_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(tonton_outport_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE(tonton_outport_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE( "v9938", v9938_device, read, write )

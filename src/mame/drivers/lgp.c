@@ -80,6 +80,8 @@ public:
 	UINT8 *m_tile_ram;
 	UINT8 *m_tile_control_ram;
 	emu_timer *m_irq_timer;
+	DECLARE_READ8_MEMBER(ldp_read);
+	DECLARE_WRITE8_MEMBER(ldp_write);
 };
 
 
@@ -122,16 +124,14 @@ static SCREEN_UPDATE_IND16( lgp )
 
 /* MEMORY HANDLERS */
 /* Main Z80 R/W */
-static READ8_HANDLER(ldp_read)
+READ8_MEMBER(lgp_state::ldp_read)
 {
-	lgp_state *state = space->machine().driver_data<lgp_state>();
-	return state->m_laserdisc->status_r();
+	return m_laserdisc->status_r();
 }
 
-static WRITE8_HANDLER(ldp_write)
+WRITE8_MEMBER(lgp_state::ldp_write)
 {
-	lgp_state *state = space->machine().driver_data<lgp_state>();
-	state->m_laserdisc->data_w(data);
+	m_laserdisc->data_w(data);
 }
 
 
@@ -145,8 +145,8 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, lgp_state )
 	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_BASE(m_tile_control_ram)
 
 //  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
-	AM_RANGE(0xef80,0xef80) AM_READWRITE_LEGACY(ldp_read,ldp_write)
-	AM_RANGE(0xefb8,0xefb8) AM_READ_LEGACY(ldp_read)		/* Likely not right, calms it down though */
+	AM_RANGE(0xef80,0xef80) AM_READWRITE(ldp_read,ldp_write)
+	AM_RANGE(0xefb8,0xefb8) AM_READ(ldp_read)		/* Likely not right, calms it down though */
 	AM_RANGE(0xefc0,0xefc0) AM_READ_PORT("DSWA")	/* Not tested */
 	AM_RANGE(0xefc8,0xefc8) AM_READ_PORT("DSWB")
 	AM_RANGE(0xefd0,0xefd0) AM_READ_PORT("DSWC")

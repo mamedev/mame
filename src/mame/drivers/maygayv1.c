@@ -226,15 +226,23 @@ public:
 	device_t *m_duart68681;
 	i82716_t m_i82716;
 	i8279_t m_i8279;
+	DECLARE_WRITE16_MEMBER(i82716_w);
+	DECLARE_READ16_MEMBER(i82716_r);
+	DECLARE_WRITE16_MEMBER(write_odd);
+	DECLARE_READ16_MEMBER(read_odd);
+	DECLARE_READ16_MEMBER(maygay_8279_r);
+	DECLARE_WRITE16_MEMBER(maygay_8279_w);
+	DECLARE_WRITE16_MEMBER(vsync_int_ctrl);
+	DECLARE_READ8_MEMBER(mcu_r);
+	DECLARE_WRITE8_MEMBER(mcu_w);
 };
 
 
 
 
-static WRITE16_HANDLER( i82716_w )
+WRITE16_MEMBER(maygayv1_state::i82716_w)
 {
-	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
-	i82716_t &i82716 = state->m_i82716;
+	i82716_t &i82716 = m_i82716;
 	// Accessing register window?
 	if ((VREG(RWBA) & 0xfff0) == (offset & 0xfff0))
 	{
@@ -251,10 +259,9 @@ static WRITE16_HANDLER( i82716_w )
 	}
 }
 
-static READ16_HANDLER( i82716_r )
+READ16_MEMBER(maygayv1_state::i82716_r)
 {
-	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
-	i82716_t &i82716 = state->m_i82716;
+	i82716_t &i82716 = m_i82716;
 	// Accessing register window?
 	if ((VREG(RWBA) & ~0xf) == (offset & ~0xf))
 	{
@@ -469,12 +476,12 @@ static SCREEN_VBLANK( maygayv1 )
 
 
 
-static WRITE16_HANDLER( write_odd )
+WRITE16_MEMBER(maygayv1_state::write_odd)
 {
 }
 
 //;860008 is a latch of some sort
-static READ16_HANDLER( read_odd )
+READ16_MEMBER(maygayv1_state::read_odd)
 {
 	return 0;
 }
@@ -509,10 +516,9 @@ static void update_outputs(i8279_t &i8279, UINT16 which)
 		}
 }
 
-static READ16_HANDLER( maygay_8279_r )
+READ16_MEMBER(maygayv1_state::maygay_8279_r)
 {
-	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
-	i8279_t &i8279 = state->m_i8279;
+	i8279_t &i8279 = m_i8279;
 	static const char *const portnames[] = { "STROBE1","STROBE2","STROBE3","STROBE4","STROBE5","STROBE6","STROBE7","STROBE8" };
 	UINT8 result = 0xff;
 	UINT8 addr;
@@ -526,7 +532,7 @@ static READ16_HANDLER( maygay_8279_r )
 			case 0x40:
 				addr = i8279.command & 0x07;
 
-				result = input_port_read(space->machine(), portnames[addr]);
+				result = input_port_read(machine(), portnames[addr]);
 
 				/* handle autoincrement */
 				if (i8279.command & 0x10)
@@ -557,10 +563,9 @@ static READ16_HANDLER( maygay_8279_r )
 }
 
 
-static WRITE16_HANDLER( maygay_8279_w )
+WRITE16_MEMBER(maygayv1_state::maygay_8279_w)
 {
-	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
-	i8279_t &i8279 = state->m_i8279;
+	i8279_t &i8279 = m_i8279;
 	UINT8 addr;
 
 	data >>= 8;
@@ -660,25 +665,24 @@ static WRITE16_HANDLER( maygay_8279_w )
 
 
 
-static WRITE16_HANDLER( vsync_int_ctrl )
+WRITE16_MEMBER(maygayv1_state::vsync_int_ctrl)
 {
-	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
-	state->m_vsync_latch_preset = data & 0x0100;
+	m_vsync_latch_preset = data & 0x0100;
 
 	// Active low
-	if (!(state->m_vsync_latch_preset))
-		cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
+	if (!(m_vsync_latch_preset))
+		cputag_set_input_line(machine(), "maincpu", 3, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, maygayv1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("maincpu", 0x80000)
-	AM_RANGE(0x820000, 0x820003) AM_READWRITE_LEGACY(maygay_8279_r, maygay_8279_w)
+	AM_RANGE(0x820000, 0x820003) AM_READWRITE(maygay_8279_r, maygay_8279_w)
 	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0xff00 )
-	AM_RANGE(0x860000, 0x86000d) AM_READWRITE_LEGACY(read_odd, write_odd)
-	AM_RANGE(0x86000e, 0x86000f) AM_WRITE_LEGACY(vsync_int_ctrl)
-	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE_LEGACY(i82716_r, i82716_w)
+	AM_RANGE(0x860000, 0x86000d) AM_READWRITE(read_odd, write_odd)
+	AM_RANGE(0x86000e, 0x86000f) AM_WRITE(vsync_int_ctrl)
+	AM_RANGE(0x880000, 0x89ffff) AM_READWRITE(i82716_r, i82716_w)
 	AM_RANGE(0x8a0000, 0x8a001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff)
 	AM_RANGE(0x8c0000, 0x8c000f) AM_DEVREADWRITE8("pia", pia6821_device, read, write, 0xff)
 ADDRESS_MAP_END
@@ -719,15 +723,14 @@ ADDRESS_MAP_END
 
 */
 
-static READ8_HANDLER( mcu_r )
+READ8_MEMBER(maygayv1_state::mcu_r)
 {
-	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
 	switch (offset)
 	{
 		case 1:
 		{
-			if ( !BIT(state->m_p3, 4) )
-				return (input_port_read(space->machine(), "REEL"));	// Reels???
+			if ( !BIT(m_p3, 4) )
+				return (input_port_read(machine(), "REEL"));	// Reels???
 			else
 				return 0;
 		}
@@ -737,26 +740,25 @@ static READ8_HANDLER( mcu_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( mcu_w )
+WRITE8_MEMBER(maygayv1_state::mcu_w)
 {
-	maygayv1_state *state = space->machine().driver_data<maygayv1_state>();
 			logerror("O %x D %x",offset,data);
 
 	switch (offset)
 	{
 		// Bottom nibble = UPD
 		case 1:
-			state->m_p1 = data;
+			m_p1 = data;
 //          upd7759_msg_w(0, data);//?
 			break;
 		case 3:
 			upd7759_reset_w (0, BIT(data, 2));
 			upd7759_start_w(0, BIT(data, 6));
 
-//          if ( !BIT(state->m_p3, 7) && BIT(data, 7) )
+//          if ( !BIT(m_p3, 7) && BIT(data, 7) )
 				// P1 propagates to outputs
 
-			state->m_p3 = data;
+			m_p3 = data;
 			break;
 	}
 }
@@ -771,7 +773,7 @@ static ADDRESS_MAP_START( sound_data, AS_DATA, 8, maygayv1_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, AS_IO, 8, maygayv1_state )
-	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(mcu_r, mcu_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(mcu_r, mcu_w)
 ADDRESS_MAP_END
 
 

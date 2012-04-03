@@ -111,6 +111,19 @@ public:
 	UINT32 *m_tilemap_ram[4];
 	UINT32 *m_spriteram;
 	tilemap_t *m_tilemap[4];
+	DECLARE_WRITE32_MEMBER(rabbit_tilemap0_w);
+	DECLARE_WRITE32_MEMBER(rabbit_tilemap1_w);
+	DECLARE_WRITE32_MEMBER(rabbit_tilemap2_w);
+	DECLARE_WRITE32_MEMBER(rabbit_tilemap3_w);
+	DECLARE_WRITE32_MEMBER(rabbit_paletteram_dword_w);
+	DECLARE_READ32_MEMBER(rabbit_tilemap0_r);
+	DECLARE_READ32_MEMBER(rabbit_tilemap1_r);
+	DECLARE_READ32_MEMBER(rabbit_tilemap2_r);
+	DECLARE_READ32_MEMBER(rabbit_tilemap3_r);
+	DECLARE_READ32_MEMBER(randomrabbits);
+	DECLARE_WRITE32_MEMBER(rabbit_rombank_w);
+	DECLARE_WRITE32_MEMBER(rabbit_audio_w);
+	DECLARE_WRITE32_MEMBER(rabbit_blitter_w);
 };
 
 
@@ -182,33 +195,29 @@ static TILE_GET_INFO( get_rabbit_tilemap3_tile_info )
 	get_rabbit_tilemap_info(machine,tileinfo,tile_index,3,0);
 }
 
-static WRITE32_HANDLER( rabbit_tilemap0_w )
+WRITE32_MEMBER(rabbit_state::rabbit_tilemap0_w)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[0][offset]);
-	state->m_tilemap[0]->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemap_ram[0][offset]);
+	m_tilemap[0]->mark_tile_dirty(offset);
 }
 
-static WRITE32_HANDLER( rabbit_tilemap1_w )
+WRITE32_MEMBER(rabbit_state::rabbit_tilemap1_w)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[1][offset]);
-	state->m_tilemap[1]->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemap_ram[1][offset]);
+	m_tilemap[1]->mark_tile_dirty(offset);
 }
 
-static WRITE32_HANDLER( rabbit_tilemap2_w )
+WRITE32_MEMBER(rabbit_state::rabbit_tilemap2_w)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[2][offset]);
-	state->m_tilemap[2]->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemap_ram[2][offset]);
+	m_tilemap[2]->mark_tile_dirty(offset);
 }
 
 
-static WRITE32_HANDLER( rabbit_tilemap3_w )
+WRITE32_MEMBER(rabbit_state::rabbit_tilemap3_w)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[3][offset]);
-	state->m_tilemap[3]->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemap_ram[3][offset]);
+	m_tilemap[3]->mark_tile_dirty(offset);
 }
 
 /*
@@ -465,59 +474,55 @@ static SCREEN_UPDATE_IND16(rabbit)
 }
 
 
-static WRITE32_HANDLER( rabbit_paletteram_dword_w )
+WRITE32_MEMBER(rabbit_state::rabbit_paletteram_dword_w)
 {
 	int r,g,b;
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
 
-	b = ((space->machine().generic.paletteram.u32[offset] & 0x000000ff) >>0);
-	r = ((space->machine().generic.paletteram.u32[offset] & 0x0000ff00) >>8);
-	g = ((space->machine().generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	b = ((machine().generic.paletteram.u32[offset] & 0x000000ff) >>0);
+	r = ((machine().generic.paletteram.u32[offset] & 0x0000ff00) >>8);
+	g = ((machine().generic.paletteram.u32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
-static READ32_HANDLER( rabbit_tilemap0_r )
+READ32_MEMBER(rabbit_state::rabbit_tilemap0_r)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	return state->m_tilemap_ram[0][offset];
+	return m_tilemap_ram[0][offset];
 }
 
-static READ32_HANDLER( rabbit_tilemap1_r )
+READ32_MEMBER(rabbit_state::rabbit_tilemap1_r)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	return state->m_tilemap_ram[1][offset];
+	return m_tilemap_ram[1][offset];
 }
 
-static READ32_HANDLER( rabbit_tilemap2_r )
+READ32_MEMBER(rabbit_state::rabbit_tilemap2_r)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	return state->m_tilemap_ram[2][offset];
+	return m_tilemap_ram[2][offset];
 }
 
-static READ32_HANDLER( rabbit_tilemap3_r )
+READ32_MEMBER(rabbit_state::rabbit_tilemap3_r)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	return state->m_tilemap_ram[3][offset];
+	return m_tilemap_ram[3][offset];
 }
 
-static READ32_HANDLER( randomrabbits )
+READ32_MEMBER(rabbit_state::randomrabbits)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 /* rom bank is used when testing roms, not currently hooked up */
-static WRITE32_HANDLER ( rabbit_rombank_w )
+WRITE32_MEMBER(rabbit_state::rabbit_rombank_w)
 {
-	UINT8 *dataroms = space->machine().region("gfx1")->base();
+	UINT8 *dataroms = machine().region("gfx1")->base();
 #if 0
 	int bank;
 	printf("rabbit rombank %08x\n",data);
 	bank = data & 0x3ff;
 
-	memory_set_bankptr(space->machine(), "bank1",&dataroms[0x40000*(bank&0x3ff)]);
+	memory_set_bankptr(machine(), "bank1",&dataroms[0x40000*(bank&0x3ff)]);
 #else
-	memory_set_bankptr(space->machine(), "bank1",&dataroms[0]);
+	memory_set_bankptr(machine(), "bank1",&dataroms[0]);
 #endif
 
 }
@@ -540,7 +545,7 @@ static WRITE32_HANDLER ( rabbit_rombank_w )
     time (timer?  the game seems to "play music" fine with just the VBL).
 */
 
-static WRITE32_HANDLER( rabbit_audio_w )
+WRITE32_MEMBER(rabbit_state::rabbit_audio_w)
 {
 	int reg, voice, base, i;
 
@@ -703,14 +708,13 @@ static void rabbit_do_blit(running_machine &machine)
 
 
 
-static WRITE32_HANDLER( rabbit_blitter_w )
+WRITE32_MEMBER(rabbit_state::rabbit_blitter_w)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	COMBINE_DATA(&state->m_blitterregs[offset]);
+	COMBINE_DATA(&m_blitterregs[offset]);
 
 	if (offset == 0x0c/4)
 	{
-		rabbit_do_blit(space->machine());
+		rabbit_do_blit(machine());
 	}
 }
 
@@ -739,9 +743,9 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x000024, 0x000027) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x00719c, 0x00719f) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("INPUTS") AM_DEVWRITE_LEGACY("eeprom", rabbit_eeprom_write)
-	AM_RANGE(0x400010, 0x400013) AM_READ_LEGACY(randomrabbits) // gfx chip status?
-	AM_RANGE(0x400980, 0x400983) AM_READ_LEGACY(randomrabbits) // sound chip status?
-	AM_RANGE(0x400984, 0x400987) AM_READ_LEGACY(randomrabbits) // sound chip status?
+	AM_RANGE(0x400010, 0x400013) AM_READ(randomrabbits) // gfx chip status?
+	AM_RANGE(0x400980, 0x400983) AM_READ(randomrabbits) // sound chip status?
+	AM_RANGE(0x400984, 0x400987) AM_READ(randomrabbits) // sound chip status?
 	/* this lot are probably gfxchip/blitter etc. related */
 	AM_RANGE(0x400010, 0x400013) AM_WRITEONLY AM_BASE(m_viewregs0 )
 	AM_RANGE(0x400100, 0x400117) AM_WRITEONLY AM_BASE(m_tilemap_regs[0] ) // tilemap regs1
@@ -749,23 +753,23 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x400140, 0x400157) AM_WRITEONLY AM_BASE(m_tilemap_regs[2] ) // tilemap regs3
 	AM_RANGE(0x400160, 0x400177) AM_WRITEONLY AM_BASE(m_tilemap_regs[3] ) // tilemap regs4
 	AM_RANGE(0x400200, 0x40021b) AM_WRITEONLY AM_BASE(m_spriteregs ) // sprregs?
-	AM_RANGE(0x400300, 0x400303) AM_WRITE_LEGACY(rabbit_rombank_w) // used during rom testing, rombank/area select + something else?
+	AM_RANGE(0x400300, 0x400303) AM_WRITE(rabbit_rombank_w) // used during rom testing, rombank/area select + something else?
 	AM_RANGE(0x400400, 0x400413) AM_WRITEONLY AM_BASE(m_viewregs6 ) // some global controls? (brightness etc.?)
 	AM_RANGE(0x400500, 0x400503) AM_WRITEONLY AM_BASE(m_viewregs7 )
-	AM_RANGE(0x400700, 0x40070f) AM_WRITE_LEGACY(rabbit_blitter_w) AM_BASE(m_blitterregs )
+	AM_RANGE(0x400700, 0x40070f) AM_WRITE(rabbit_blitter_w) AM_BASE(m_blitterregs )
 	AM_RANGE(0x400800, 0x40080f) AM_WRITEONLY AM_BASE(m_viewregs9 ) // never changes?
-	AM_RANGE(0x400900, 0x40098f) AM_WRITE_LEGACY(rabbit_audio_w)
+	AM_RANGE(0x400900, 0x40098f) AM_WRITE(rabbit_audio_w)
 	/* hmm */
 	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_BASE(m_viewregs10 )
 
 	AM_RANGE(0x440000, 0x47ffff) AM_ROMBANK("bank1") // data (gfx / sound) rom readback for ROM testing
 	/* tilemaps */
-	AM_RANGE(0x480000, 0x483fff) AM_READWRITE_LEGACY(rabbit_tilemap0_r,rabbit_tilemap0_w)
-	AM_RANGE(0x484000, 0x487fff) AM_READWRITE_LEGACY(rabbit_tilemap1_r,rabbit_tilemap1_w)
-	AM_RANGE(0x488000, 0x48bfff) AM_READWRITE_LEGACY(rabbit_tilemap2_r,rabbit_tilemap2_w)
-	AM_RANGE(0x48c000, 0x48ffff) AM_READWRITE_LEGACY(rabbit_tilemap3_r,rabbit_tilemap3_w)
+	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(rabbit_tilemap0_r,rabbit_tilemap0_w)
+	AM_RANGE(0x484000, 0x487fff) AM_READWRITE(rabbit_tilemap1_r,rabbit_tilemap1_w)
+	AM_RANGE(0x488000, 0x48bfff) AM_READWRITE(rabbit_tilemap2_r,rabbit_tilemap2_w)
+	AM_RANGE(0x48c000, 0x48ffff) AM_READWRITE(rabbit_tilemap3_r,rabbit_tilemap3_w)
 	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_BASE(m_spriteram) // sprites?
-	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_WRITE_LEGACY(rabbit_paletteram_dword_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_WRITE(rabbit_paletteram_dword_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

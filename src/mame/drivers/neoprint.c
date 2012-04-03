@@ -37,6 +37,17 @@ public:
 	UINT8 m_audio_result;
 	UINT8 m_bank_val;
 	UINT8 m_vblank;
+	DECLARE_READ16_MEMBER(neoprint_calendar_r);
+	DECLARE_WRITE16_MEMBER(neoprint_calendar_w);
+	DECLARE_READ8_MEMBER(neoprint_unk_r);
+	DECLARE_READ16_MEMBER(neoprint_audio_result_r);
+	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
+	DECLARE_WRITE16_MEMBER(audio_command_w);
+	DECLARE_READ8_MEMBER(audio_command_r);
+	DECLARE_WRITE8_MEMBER(audio_result_w);
+	DECLARE_WRITE16_MEMBER(nprsp_palette_w);
+	DECLARE_WRITE8_MEMBER(nprsp_bank_w);
+	DECLARE_READ16_MEMBER(rom_window_r);
 };
 
 
@@ -113,39 +124,37 @@ SCREEN_UPDATE_IND16(nprsp)
 }
 
 
-static READ16_HANDLER( neoprint_calendar_r )
+READ16_MEMBER(neoprint_state::neoprint_calendar_r)
 {
-	//if(cpu_get_pc(&space->device()) != 0x4b38 )//&& cpu_get_pc(&space->device()) != 0x5f86 && cpu_get_pc(&space->device()) != 0x5f90)
-	//  printf("%08x\n",cpu_get_pc(&space->device()));
+	//if(cpu_get_pc(&space.device()) != 0x4b38 )//&& cpu_get_pc(&space.device()) != 0x5f86 && cpu_get_pc(&space.device()) != 0x5f90)
+	//  printf("%08x\n",cpu_get_pc(&space.device()));
 
-	return (upd4990a_databit_r(space->machine().device("upd4990a"), 0) << 15);
+	return (upd4990a_databit_r(machine().device("upd4990a"), 0) << 15);
 }
 
-static WRITE16_HANDLER( neoprint_calendar_w )
+WRITE16_MEMBER(neoprint_state::neoprint_calendar_w)
 {
-	 upd4990a_control_16_w(space->machine().device("upd4990a"), 0, ((data >> 8) & 7), mem_mask);
+	 upd4990a_control_16_w(machine().device("upd4990a"), 0, ((data >> 8) & 7), mem_mask);
 }
 
-static READ8_HANDLER( neoprint_unk_r )
+READ8_MEMBER(neoprint_state::neoprint_unk_r)
 {
-	neoprint_state *state = space->machine().driver_data<neoprint_state>();
 
 	/* ---x ---- tested in irq routine, odd/even field number? */
 	/* ---- xx-- one of these two must be high */
 	/* ---- --xx checked right before entering into attract mode, presumably printer/camera related */
 
-	state->m_vblank = (space->machine().primary_screen->frame_number() & 0x1) ? 0x10 : 0x00;
+	m_vblank = (machine().primary_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
-	//if(cpu_get_pc(&space->device()) != 0x1504 && cpu_get_pc(&space->device()) != 0x5f86 && cpu_get_pc(&space->device()) != 0x5f90)
-	//  printf("%08x\n",cpu_get_pc(&space->device()));
+	//if(cpu_get_pc(&space.device()) != 0x1504 && cpu_get_pc(&space.device()) != 0x5f86 && cpu_get_pc(&space.device()) != 0x5f90)
+	//  printf("%08x\n",cpu_get_pc(&space.device()));
 
-	return state->m_vblank| 4 | 3;
+	return m_vblank| 4 | 3;
 }
 
-static READ16_HANDLER( neoprint_audio_result_r )
+READ16_MEMBER(neoprint_state::neoprint_audio_result_r)
 {
-	neoprint_state *state = space->machine().driver_data<neoprint_state>();
-	return (state->m_audio_result << 8) | 0x00;
+	return (m_audio_result << 8) | 0x00;
 }
 
 static void audio_cpu_assert_nmi(running_machine &machine)
@@ -154,33 +163,33 @@ static void audio_cpu_assert_nmi(running_machine &machine)
 }
 
 
-static WRITE8_HANDLER( audio_cpu_clear_nmi_w )
+WRITE8_MEMBER(neoprint_state::audio_cpu_clear_nmi_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( audio_command_w )
+WRITE16_MEMBER(neoprint_state::audio_command_w)
 {
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)
 	{
 		soundlatch_w(space, 0, data >> 8);
 
-		audio_cpu_assert_nmi(space->machine());
+		audio_cpu_assert_nmi(machine());
 
 		/* boost the interleave to let the audio CPU read the command */
-		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 
-		//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(&space->device()), data, mem_mask);
+		//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(&space.device()), data, mem_mask);
 	}
 }
 
 
-static READ8_HANDLER( audio_command_r )
+READ8_MEMBER(neoprint_state::audio_command_r)
 {
 	UINT8 ret = soundlatch_r(space, 0);
 
-	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", cpu_get_pc(&space->device()), ret);
+	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", cpu_get_pc(&space.device()), ret);
 
 	/* this is a guess */
 	audio_cpu_clear_nmi_w(space, 0, 0);
@@ -190,14 +199,13 @@ static READ8_HANDLER( audio_command_r )
 
 
 
-static WRITE8_HANDLER( audio_result_w )
+WRITE8_MEMBER(neoprint_state::audio_result_w)
 {
-	neoprint_state *state = space->machine().driver_data<neoprint_state>();
-	//neogeo_state *state = space->machine().driver_data<neogeo_state>();
 
-	//if (LOG_CPU_COMM && (state->m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", cpu_get_pc(&space->device()), data);
 
-	state->m_audio_result = data;
+	//if (LOG_CPU_COMM && (m_audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", cpu_get_pc(&space.device()), data);
+
+	m_audio_result = data;
 }
 
 static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
@@ -207,12 +215,12 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(m_npvidram)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x600000, 0x600001) AM_READWRITE_LEGACY(neoprint_audio_result_r,audio_command_w)
-	AM_RANGE(0x600002, 0x600003) AM_READWRITE_LEGACY(neoprint_calendar_r,neoprint_calendar_w)
+	AM_RANGE(0x600000, 0x600001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
+	AM_RANGE(0x600002, 0x600003) AM_READWRITE(neoprint_calendar_r,neoprint_calendar_w)
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("IN") AM_WRITENOP
 	AM_RANGE(0x600008, 0x600009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x60000a, 0x60000b) AM_READ8_LEGACY(neoprint_unk_r,0xff00)
+	AM_RANGE(0x60000a, 0x60000b) AM_READ8(neoprint_unk_r,0xff00)
 	AM_RANGE(0x60000c, 0x60000d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x60000e, 0x60000f) AM_WRITENOP
 
@@ -221,16 +229,16 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP //watchdog
 ADDRESS_MAP_END
 
-static WRITE16_HANDLER( nprsp_palette_w )
+WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 {
 	UINT8 r,g,b,i;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
 
-	g = (space->machine().generic.paletteram.u16[offset & ~1] & 0xf800) >> 8;
-	r = (space->machine().generic.paletteram.u16[offset & ~1] & 0x00f8) >> 0;
-	i = (space->machine().generic.paletteram.u16[offset | 1] & 0x1c00) >> 10;
-	b = (space->machine().generic.paletteram.u16[offset | 1] & 0x00f8) >> 0;
+	g = (machine().generic.paletteram.u16[offset & ~1] & 0xf800) >> 8;
+	r = (machine().generic.paletteram.u16[offset & ~1] & 0x00f8) >> 0;
+	i = (machine().generic.paletteram.u16[offset | 1] & 0x1c00) >> 10;
+	b = (machine().generic.paletteram.u16[offset | 1] & 0x00f8) >> 0;
 	r |= i;
 	g |= i;
 	b |= i;
@@ -244,41 +252,39 @@ static WRITE16_HANDLER( nprsp_palette_w )
 
 		pal_entry = ((offset & 0xfffe) >> 1) + ((offset & 0x20000) ? 0x8000 : 0);
 
-		palette_set_color(space->machine(), pal_entry, MAKE_RGB(r,g,b));
+		palette_set_color(machine(), pal_entry, MAKE_RGB(r,g,b));
 	}
 }
 
-static WRITE8_HANDLER( nprsp_bank_w )
+WRITE8_MEMBER(neoprint_state::nprsp_bank_w)
 {
-	neoprint_state *state = space->machine().driver_data<neoprint_state>();
 	/* this register seems flip-flop based ... */
 
 	if((data & 0xf0) == 0x20)
 	{
 		if((data & 0xf) == 0x1)
-			state->m_bank_val = 1;
+			m_bank_val = 1;
 		if((data & 0xf) == 0x2)
-			state->m_bank_val = 0;
+			m_bank_val = 0;
 	}
 }
 
-static READ16_HANDLER( rom_window_r )
+READ16_MEMBER(neoprint_state::rom_window_r)
 {
-	neoprint_state *state = space->machine().driver_data<neoprint_state>();
-	UINT16 *rom = (UINT16 *)space->machine().region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine().region("maincpu")->base();
 
-	return rom[offset | 0x80000/2 | state->m_bank_val*0x40000/2];
+	return rom[offset | 0x80000/2 | m_bank_val*0x40000/2];
 }
 
 static ADDRESS_MAP_START( nprsp_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x0fffff) AM_READ_LEGACY(rom_window_r)
-	AM_RANGE(0x200000, 0x200001) AM_READWRITE_LEGACY(neoprint_audio_result_r,audio_command_w)
-	AM_RANGE(0x200002, 0x200003) AM_READWRITE_LEGACY(neoprint_calendar_r,neoprint_calendar_w)
+	AM_RANGE(0x080000, 0x0fffff) AM_READ(rom_window_r)
+	AM_RANGE(0x200000, 0x200001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
+	AM_RANGE(0x200002, 0x200003) AM_READWRITE(neoprint_calendar_r,neoprint_calendar_w)
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE(0x200006, 0x200007) AM_READ_PORT("IN") AM_WRITENOP
-	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("DSW1") AM_WRITE8_LEGACY(nprsp_bank_w,0xff00)
-	AM_RANGE(0x20000a, 0x20000b) AM_READ8_LEGACY(neoprint_unk_r,0xff00)
+	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("DSW1") AM_WRITE8(nprsp_bank_w,0xff00)
+	AM_RANGE(0x20000a, 0x20000b) AM_READ8(neoprint_unk_r,0xff00)
 	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x20000e, 0x20000f) AM_WRITENOP
 
@@ -288,7 +294,7 @@ static ADDRESS_MAP_START( nprsp_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x300000, 0x33ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(m_npvidram)
-	AM_RANGE(0x500000, 0x57ffff) AM_RAM_WRITE_LEGACY(nprsp_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x500000, 0x57ffff) AM_RAM_WRITE(nprsp_palette_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
 /*************************************
@@ -315,15 +321,15 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( neoprint_audio_io_map, AS_IO, 8, neoprint_state )
-  /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ_LEGACY(audio_command_r) AM_WRITENOP
+  /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_WRITENOP
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 //  AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
 //  AM_RANGE(0x08, 0x08) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ_LEGACY(audio_cpu_bank_select_f000_f7ff_r)
 //  AM_RANGE(0x09, 0x09) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ_LEGACY(audio_cpu_bank_select_e000_efff_r)
 //  AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ_LEGACY(audio_cpu_bank_select_c000_dfff_r)
 //  AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ_LEGACY(audio_cpu_bank_select_8000_bfff_r)
-	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE_LEGACY(audio_result_w)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(audio_result_w)
 //  AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
 ADDRESS_MAP_END
 

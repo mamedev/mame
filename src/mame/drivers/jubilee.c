@@ -98,6 +98,8 @@ public:
 
 	UINT8 *m_videoram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
+	DECLARE_READ8_MEMBER(unk_r);
 };
 
 
@@ -106,11 +108,10 @@ public:
 *************************/
 
 
-static WRITE8_HANDLER( jubileep_videoram_w )
+WRITE8_MEMBER(jubilee_state::jubileep_videoram_w)
 {
-	jubilee_state *state = space->machine().driver_data<jubilee_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -163,7 +164,7 @@ static INTERRUPT_GEN( jubileep_interrupt )
 static ADDRESS_MAP_START( jubileep_map, AS_PROGRAM, 8, jubilee_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_WRITE_LEGACY(jubileep_videoram_w) AM_BASE(m_videoram)	/* wrong... just placed somewhere */
+	AM_RANGE(0x3000, 0x30ff) AM_WRITE(jubileep_videoram_w) AM_BASE(m_videoram)	/* wrong... just placed somewhere */
 	AM_RANGE(0x3100, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -177,16 +178,16 @@ ADDRESS_MAP_END
 */
 
 
-static READ8_HANDLER(unk_r)
+READ8_MEMBER(jubilee_state::unk_r)
 {
-	return (space->machine().rand() & 0xff);
+	return (machine().rand() & 0xff);
 }
 
 static ADDRESS_MAP_START( jubileep_cru_map, AS_IO, 8, jubilee_state )
-//  AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(unk_r)
+//  AM_RANGE(0x0000, 0xffff) AM_READ(unk_r)
 //  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("crtc",  mc6845_status_r, mc6845_address_w)
 //  AM_RANGE(0x01, 0x01) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0xc8, 0xc8) AM_READ_LEGACY(unk_r)
+	AM_RANGE(0xc8, 0xc8) AM_READ(unk_r)
 ADDRESS_MAP_END
 
 /* I/O byte R/W

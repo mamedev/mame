@@ -271,10 +271,19 @@ public:
 		}
 		return 0;
 	}
+	DECLARE_READ16_MEMBER(wheelfir_status_r);
+	DECLARE_WRITE16_MEMBER(wheelfir_scanline_cnt_w);
+	DECLARE_WRITE16_MEMBER(wheelfir_blit_w);
+	DECLARE_WRITE16_MEMBER(pal_reset_pos_w);
+	DECLARE_WRITE16_MEMBER(pal_data_w);
+	DECLARE_WRITE16_MEMBER(wheelfir_7c0000_w);
+	DECLARE_WRITE16_MEMBER(wheelfir_snd_w);
+	DECLARE_READ16_MEMBER(wheelfir_snd_r);
+	DECLARE_WRITE16_MEMBER(coin_cnt_w);
 };
 
 
-static READ16_HANDLER( wheelfir_status_r )
+READ16_MEMBER(wheelfir_state::wheelfir_status_r)
 {
 /*
     fedcba9876543210
@@ -284,48 +293,46 @@ static READ16_HANDLER( wheelfir_status_r )
     ---------------x  ? eeprom
 
 */
-	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	return state->m_toggle_bit| (space->machine().rand()&0x2000);
+
+	return m_toggle_bit| (machine().rand()&0x2000);
 }
 
-static WRITE16_HANDLER( wheelfir_scanline_cnt_w )
+WRITE16_MEMBER(wheelfir_state::wheelfir_scanline_cnt_w)
 {
-	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	COMBINE_DATA(&state->m_scanline_cnt);
+	COMBINE_DATA(&m_scanline_cnt);
 }
 
 
-static WRITE16_HANDLER(wheelfir_blit_w)
+WRITE16_MEMBER(wheelfir_state::wheelfir_blit_w)
 {
-	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
 
-	COMBINE_DATA(&state->m_blitter_data[offset]);
+	COMBINE_DATA(&m_blitter_data[offset]);
 
 	if(!ACCESSING_BITS_8_15 && offset==0x6)  //LSB only!
 	{
 		int x,y;
 
 
-		int direct_width=state->m_direct_write_x1-state->m_direct_write_x0+1;
-		int direct_height=state->m_direct_write_y1-state->m_direct_write_y0+1;
+		int direct_width=m_direct_write_x1-m_direct_write_x0+1;
+		int direct_height=m_direct_write_y1-m_direct_write_y0+1;
 
 		int sixdat = data&0xff;
 
 		if(direct_width>0 && direct_height>0)
 		{
-			x= state->m_direct_write_idx % direct_width;
-			y = (state->m_direct_write_idx / direct_width) %direct_height;
+			x= m_direct_write_idx % direct_width;
+			y = (m_direct_write_idx / direct_width) %direct_height;
 
-			x+=state->m_direct_write_x0;
-			y+=state->m_direct_write_y0;
+			x+=m_direct_write_x0;
+			y+=m_direct_write_y0;
 
 			if(x<512 && y <512)
 			{
-				state->m_tmp_bitmap[LAYER_BG]->pix16(y, x) = sixdat;
+				m_tmp_bitmap[LAYER_BG]->pix16(y, x) = sixdat;
 			}
 		}
 
-		++state->m_direct_write_idx;
+		++m_direct_write_idx;
 
 		return;
 
@@ -336,72 +343,72 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 	if(offset==0x0a && ACCESSING_BITS_0_7)
 	{
-		xscroll = (state->m_blitter_data[0xa]&0x00ff) | (state->m_blitter_data[0x8]&0x0040) << 2;
+		xscroll = (m_blitter_data[0xa]&0x00ff) | (m_blitter_data[0x8]&0x0040) << 2;
 	}
 
 	if(offset==0x0b && ACCESSING_BITS_0_7)
 	{
-		yscroll = (state->m_blitter_data[0xb]&0x00ff) | (state->m_blitter_data[0x8]&0x0080) << 1;
+		yscroll = (m_blitter_data[0xb]&0x00ff) | (m_blitter_data[0x8]&0x0080) << 1;
 	}
 
 	if(offset==0x8 && ACCESSING_BITS_0_7)
 	{
-		xscroll = (state->m_blitter_data[0xa]&0x00ff) | (state->m_blitter_data[0x8]&0x0040) << 2;
-		yscroll = (state->m_blitter_data[0xb]&0x00ff) | (state->m_blitter_data[0x8]&0x0080) << 1;
+		xscroll = (m_blitter_data[0xa]&0x00ff) | (m_blitter_data[0x8]&0x0040) << 2;
+		yscroll = (m_blitter_data[0xb]&0x00ff) | (m_blitter_data[0x8]&0x0080) << 1;
 	}
 
 	if(xscroll>=0)
 	{
-		int scl=state->m_current_scanline>=NUM_SCANLINES?0:state->m_current_scanline;
-		state->m_scanlines[scl].x=xscroll;
-		state->m_scanlines[scl].unkbits=state->m_blitter_data[0x8]&0xff;
+		int scl=m_current_scanline>=NUM_SCANLINES?0:m_current_scanline;
+		m_scanlines[scl].x=xscroll;
+		m_scanlines[scl].unkbits=m_blitter_data[0x8]&0xff;
 	}
 
 	if(yscroll>=0)
 	{
-		int scl=state->m_current_scanline>=NUM_SCANLINES?0:state->m_current_scanline;
-		state->m_scanlines[scl].y=yscroll;
-		state->m_scanlines[scl].unkbits=state->m_blitter_data[0x8]&0xff;
+		int scl=m_current_scanline>=NUM_SCANLINES?0:m_current_scanline;
+		m_scanlines[scl].y=yscroll;
+		m_scanlines[scl].unkbits=m_blitter_data[0x8]&0xff;
 	}
 
 
 	if(offset==0xf && data==0xffff)
 	{
 
-		cputag_set_input_line(space->machine(), "maincpu", 1, HOLD_LINE);
+		cputag_set_input_line(machine(), "maincpu", 1, HOLD_LINE);
 
 		{
-			UINT8 *rom = space->machine().region("gfx1")->base();
+			UINT8 *rom = machine().region("gfx1")->base();
 
-			int width = space->machine().primary_screen->width();
-			int height = space->machine().primary_screen->height();
+			int width = machine().primary_screen->width();
+			int height = machine().primary_screen->height();
 
-			int src_x0=(state->m_blitter_data[0]>>8)+((state->m_blitter_data[6]&0x100)?256:0);
-			int src_y0=(state->m_blitter_data[2]>>8)+((state->m_blitter_data[6]&0x200)?256:0);
+			int src_x0=(m_blitter_data[0]>>8)+((m_blitter_data[6]&0x100)?256:0);
+			int src_y0=(m_blitter_data[2]>>8)+((m_blitter_data[6]&0x200)?256:0);
 
-			int dst_x0=(state->m_blitter_data[0]&0xff)+((state->m_blitter_data[7]&0x40)?256:0);
-			int dst_y0=(state->m_blitter_data[2]&0xff)+((state->m_blitter_data[7]&0x80)?256:0);
+			int dst_x0=(m_blitter_data[0]&0xff)+((m_blitter_data[7]&0x40)?256:0);
+			int dst_y0=(m_blitter_data[2]&0xff)+((m_blitter_data[7]&0x80)?256:0);
 
-			int dst_x1=(state->m_blitter_data[1]&0xff)+((state->m_blitter_data[9]&4)?256:0);
-			int dst_y1=(state->m_blitter_data[3]&0xff)+((state->m_blitter_data[9]&8)?256:0);
+			int dst_x1=(m_blitter_data[1]&0xff)+((m_blitter_data[9]&4)?256:0);
+			int dst_y1=(m_blitter_data[3]&0xff)+((m_blitter_data[9]&8)?256:0);
 
-			int x_dst_step=(state->m_blitter_data[7]&0x1)?1:-1;
-			int y_dst_step=(state->m_blitter_data[7]&0x2)?1:-1;
+			int x_dst_step=(m_blitter_data[7]&0x1)?1:-1;
+			int y_dst_step=(m_blitter_data[7]&0x2)?1:-1;
 
-			int x_src_step=(state->m_blitter_data[8]&0x4000)?1:-1;
-			int y_src_step=(state->m_blitter_data[8]&0x8000)?1:-1;
+			int x_src_step=(m_blitter_data[8]&0x4000)?1:-1;
+			int y_src_step=(m_blitter_data[8]&0x8000)?1:-1;
 
-			int page=((state->m_blitter_data[6])>>10)*0x40000;
+			int page=((m_blitter_data[6])>>10)*0x40000;
 
 
 			if(page>=0x400000) /* src set to  unav. page before direct write to the framebuffer */
 			{
 
-					state->m_direct_write_x0=dst_x0;
-					state->m_direct_write_x1=dst_x1;
-					state->m_direct_write_y0=dst_y0;
-					state->m_direct_write_y1=dst_y1;
-					state->m_direct_write_idx=0;
+					m_direct_write_x0=dst_x0;
+					m_direct_write_x1=dst_x1;
+					m_direct_write_y0=dst_y0;
+					m_direct_write_y1=dst_y1;
+					m_direct_write_idx=0;
 
 			}
 
@@ -447,36 +454,36 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 			int d1, d2, hflag, dflag, index;
 
-			d1=((state->m_blitter_data[0x0a]&0x1f00)>>8);
+			d1=((m_blitter_data[0x0a]&0x1f00)>>8);
 
-			d2=((state->m_blitter_data[0x0b]&0x1f00)>>8);
+			d2=((m_blitter_data[0x0b]&0x1f00)>>8);
 
 
-			d1|=((state->m_blitter_data[0x8]&0x100)>>3);
-			d2|=((state->m_blitter_data[0x8]&0x400)>>5);
-			hflag=(state->m_blitter_data[0x9]&0x1)?1:0;
-			dflag=(state->m_blitter_data[0x8]&0x1000)?1:0;
+			d1|=((m_blitter_data[0x8]&0x100)>>3);
+			d2|=((m_blitter_data[0x8]&0x400)>>5);
+			hflag=(m_blitter_data[0x9]&0x1)?1:0;
+			dflag=(m_blitter_data[0x8]&0x1000)?1:0;
 			index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
 
 
-			float scale_x=state->get_scale(index);
+			float scale_x=get_scale(index);
 
-			d1=((state->m_blitter_data[0x0b]&0xc000)>>14) |
-				((state->m_blitter_data[0x0c]&0xc000)>>12) |
-				((state->m_blitter_data[0x0a]&0x4000)>>10);
+			d1=((m_blitter_data[0x0b]&0xc000)>>14) |
+				((m_blitter_data[0x0c]&0xc000)>>12) |
+				((m_blitter_data[0x0a]&0x4000)>>10);
 
-			d2=((state->m_blitter_data[0x0c]&0x1f00)>>8);
+			d2=((m_blitter_data[0x0c]&0x1f00)>>8);
 
 
-			d1|=((state->m_blitter_data[0x8]&0x200)>>4);
-			d2|=((state->m_blitter_data[0x8]&0x800)>>6);
+			d1|=((m_blitter_data[0x8]&0x200)>>4);
+			d2|=((m_blitter_data[0x8]&0x800)>>6);
 
-			hflag=(state->m_blitter_data[0x9]&0x2)?1:0;
-			dflag=(state->m_blitter_data[0x8]&0x2000)?1:0;
+			hflag=(m_blitter_data[0x9]&0x2)?1:0;
+			dflag=(m_blitter_data[0x8]&0x2000)?1:0;
 			index=d1|(d2<<6)|(hflag<<12)|(dflag<<13);
 
 
-			float scale_y=state->get_scale(index);
+			float scale_y=get_scale(index);
 
 
 			if(scale_x==0 || scale_y==0) return;
@@ -491,15 +498,15 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 			float idx_x,idx_y;
 
 			int vpage=LAYER_FG;
-			if(state->m_blitter_data[0x7]&0x10)
+			if(m_blitter_data[0x7]&0x10)
 			{
 				vpage=LAYER_BG;
 /*
-                printf("bg -> %d %d   %d %d  %d %d @ %x\n",dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0,cpu_get_pc(&space->device()));
+                printf("bg -> %d %d   %d %d  %d %d @ %x\n",dst_x0,dst_y0, dst_x1,dst_y1, dst_x1-dst_x0, dst_y1-dst_y0,cpu_get_pc(&space.device()));
 
                 for(int i=0;i<16;++i)
                 {
-                    printf("%x = %.4x\n",i,state->m_blitter_data[i]);
+                    printf("%x = %.4x\n",i,m_blitter_data[i]);
                 }
 
                 printf("\n");
@@ -509,7 +516,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 			bool endx=false;
 			bool endy=false;
 
-			if(state->m_blitter_data[0x7]&0x0c)
+			if(m_blitter_data[0x7]&0x0c)
 			{
 				//???
 			}
@@ -539,7 +546,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 						//hack for clear
 						if(screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
 						{
-					//      state->m_tmp_bitmap[vpage]->pix16(screen_y , screen_x ) =0;
+					//      m_tmp_bitmap[vpage]->pix16(screen_y , screen_x ) =0;
 						}
 					}
 					else
@@ -548,7 +555,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 						if(pix && screen_x >0 && screen_y >0 && screen_x < width && screen_y <height)
 						{
-							state->m_tmp_bitmap[vpage]->pix16(screen_y , screen_x ) = pix;
+							m_tmp_bitmap[vpage]->pix16(screen_y , screen_x ) = pix;
 						}
 					}
 				}
@@ -606,54 +613,50 @@ static SCREEN_VBLANK( wheelfir )
 }
 
 
-static WRITE16_HANDLER( pal_reset_pos_w )
+WRITE16_MEMBER(wheelfir_state::pal_reset_pos_w)
 {
-	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	state->m_palpos = 0;
+	m_palpos = 0;
 }
 
-static WRITE16_HANDLER( pal_data_w )
+WRITE16_MEMBER(wheelfir_state::pal_data_w)
 {
-	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	int color=state->m_palpos/3;
-	state->m_palette[state->m_palpos] = data & 0xff;
-	++state->m_palpos;
+	int color=m_palpos/3;
+	m_palette[m_palpos] = data & 0xff;
+	++m_palpos;
 
-	state->m_palpos %=NUM_COLORS*3;
+	m_palpos %=NUM_COLORS*3;
 
 	{
-		int r = state->m_palette[color*3];
-		int g = state->m_palette[color*3+1];
-		int b = state->m_palette[color*3+2];
-		palette_set_color(space->machine(), color, MAKE_RGB(r,g,b));
+		int r = m_palette[color*3];
+		int g = m_palette[color*3+1];
+		int b = m_palette[color*3+2];
+		palette_set_color(machine(), color, MAKE_RGB(r,g,b));
 	}
 
 }
 
-static WRITE16_HANDLER(wheelfir_7c0000_w)
+WRITE16_MEMBER(wheelfir_state::wheelfir_7c0000_w)
 {
 	/* seems to be scanline width/2 (used for scanline int timing ? or real width of scanline ?) */
 }
 
-static WRITE16_HANDLER(wheelfir_snd_w)
+WRITE16_MEMBER(wheelfir_state::wheelfir_snd_w)
 {
-	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	COMBINE_DATA(&state->m_soundlatch);
-	cputag_set_input_line(space->machine(), "subcpu", 1, HOLD_LINE); /* guess, tested also with periodic interrupts and latch clear*/
-	space->machine().scheduler().synchronize();
+	COMBINE_DATA(&m_soundlatch);
+	cputag_set_input_line(machine(), "subcpu", 1, HOLD_LINE); /* guess, tested also with periodic interrupts and latch clear*/
+	machine().scheduler().synchronize();
 }
 
-static READ16_HANDLER( wheelfir_snd_r )
+READ16_MEMBER(wheelfir_state::wheelfir_snd_r)
 {
-	wheelfir_state *state = space->machine().driver_data<wheelfir_state>();
-	return state->m_soundlatch;
+	return m_soundlatch;
 }
 
-static WRITE16_HANDLER(coin_cnt_w)
+WRITE16_MEMBER(wheelfir_state::coin_cnt_w)
 {
 	/* bits 0/1 coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 }
 
 
@@ -661,15 +664,15 @@ static ADDRESS_MAP_START( wheelfir_main, AS_PROGRAM, 16, wheelfir_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x700000, 0x70001f) AM_WRITE_LEGACY(wheelfir_blit_w)
-	AM_RANGE(0x720000, 0x720001) AM_WRITE_LEGACY(pal_reset_pos_w)
-	AM_RANGE(0x720002, 0x720003) AM_WRITE_LEGACY(pal_data_w)
+	AM_RANGE(0x700000, 0x70001f) AM_WRITE(wheelfir_blit_w)
+	AM_RANGE(0x720000, 0x720001) AM_WRITE(pal_reset_pos_w)
+	AM_RANGE(0x720002, 0x720003) AM_WRITE(pal_data_w)
 	AM_RANGE(0x720004, 0x720005) AM_WRITENOP // always ffff?
-	AM_RANGE(0x740000, 0x740001) AM_WRITE_LEGACY(wheelfir_snd_w)
+	AM_RANGE(0x740000, 0x740001) AM_WRITE(wheelfir_snd_w)
 	AM_RANGE(0x780000, 0x78000f) AM_READNOP /* net comms ? */
-	AM_RANGE(0x760000, 0x760001) AM_WRITE_LEGACY(coin_cnt_w)
-	AM_RANGE(0x7a0000, 0x7a0001) AM_WRITE_LEGACY(wheelfir_scanline_cnt_w)
-	AM_RANGE(0x7c0000, 0x7c0001) AM_READWRITE_LEGACY(wheelfir_status_r, wheelfir_7c0000_w)
+	AM_RANGE(0x760000, 0x760001) AM_WRITE(coin_cnt_w)
+	AM_RANGE(0x7a0000, 0x7a0001) AM_WRITE(wheelfir_scanline_cnt_w)
+	AM_RANGE(0x7c0000, 0x7c0001) AM_READWRITE(wheelfir_status_r, wheelfir_7c0000_w)
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READ_PORT("P1")
 	AM_RANGE(0x7e0002, 0x7e0003) AM_READ_PORT("P2")
 
@@ -681,7 +684,7 @@ static ADDRESS_MAP_START( wheelfir_sub, AS_PROGRAM, 16, wheelfir_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x780000, 0x780001) AM_READ_LEGACY(wheelfir_snd_r)
+	AM_RANGE(0x780000, 0x780001) AM_READ(wheelfir_snd_r)
 
 	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE8_LEGACY("dac1", dac_w, 0xff00) //guess for now
 	AM_RANGE(0x740000, 0x740001) AM_DEVWRITE8_LEGACY("dac2", dac_w, 0xff00)

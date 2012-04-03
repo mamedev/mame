@@ -70,6 +70,13 @@ public:
 	int m_question_address;
 	int m_decryption_key;
 	UINT8 *m_backup_ram;
+	DECLARE_READ8_MEMBER(questions_r);
+	DECLARE_WRITE8_MEMBER(low_offset_w);
+	DECLARE_WRITE8_MEMBER(med_offset_w);
+	DECLARE_WRITE8_MEMBER(high_offset_w);
+	DECLARE_READ8_MEMBER(palette_r);
+	DECLARE_WRITE8_MEMBER(palette_w);
+	DECLARE_WRITE8_MEMBER(casino5_bank_w);
 };
 
 
@@ -87,13 +94,12 @@ static MACHINE_START(merit)
 }
 
 
-static READ8_HANDLER( questions_r )
+READ8_MEMBER(merit_state::questions_r)
 {
-	merit_state *state = space->machine().driver_data<merit_state>();
-	UINT8 *questions = space->machine().region("user1")->base();
+	UINT8 *questions = machine().region("user1")->base();
 	int address;
 
-	switch(state->m_question_address >> 16)
+	switch(m_question_address >> 16)
 	{
 		case 0x30: address = 0x00000;
 			break;
@@ -131,57 +137,52 @@ static READ8_HANDLER( questions_r )
  *          break;
  */
 
-		default: logerror("read unknown question rom: %02X\n",state->m_question_address >> 16);
+		default: logerror("read unknown question rom: %02X\n",m_question_address >> 16);
 			return 0xff;
 	}
 
-	address |= state->m_question_address & 0xffff;
+	address |= m_question_address & 0xffff;
 
 	return questions[address];
 }
 
-static WRITE8_HANDLER( low_offset_w )
+WRITE8_MEMBER(merit_state::low_offset_w)
 {
-	merit_state *state = space->machine().driver_data<merit_state>();
-	offset = (offset & 0xf0) | ((offset - state->m_decryption_key) & 0x0f);
+	offset = (offset & 0xf0) | ((offset - m_decryption_key) & 0x0f);
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
-	state->m_question_address = (state->m_question_address & 0xffff00) | offset;
+	m_question_address = (m_question_address & 0xffff00) | offset;
 }
 
-static WRITE8_HANDLER( med_offset_w )
+WRITE8_MEMBER(merit_state::med_offset_w)
 {
-	merit_state *state = space->machine().driver_data<merit_state>();
-	offset = (offset & 0xf0) | ((offset - state->m_decryption_key) & 0x0f);
+	offset = (offset & 0xf0) | ((offset - m_decryption_key) & 0x0f);
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
-	state->m_question_address = (state->m_question_address & 0xff00ff) | (offset << 8);
+	m_question_address = (m_question_address & 0xff00ff) | (offset << 8);
 }
 
-static WRITE8_HANDLER( high_offset_w )
+WRITE8_MEMBER(merit_state::high_offset_w)
 {
-	merit_state *state = space->machine().driver_data<merit_state>();
 	offset = BITSWAP8(offset,7,6,5,4,0,1,2,3);
-	state->m_question_address = (state->m_question_address & 0x00ffff) | (offset << 16);
+	m_question_address = (m_question_address & 0x00ffff) | (offset << 16);
 }
 
-static READ8_HANDLER( palette_r )
+READ8_MEMBER(merit_state::palette_r)
 {
-	merit_state *state = space->machine().driver_data<merit_state>();
 	int co;
 
-	co = ((state->m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
-	return state->m_ram_palette[co];
+	co = ((m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	return m_ram_palette[co];
 }
 
-static WRITE8_HANDLER( palette_w )
+WRITE8_MEMBER(merit_state::palette_w)
 {
-	merit_state *state = space->machine().driver_data<merit_state>();
 	int co;
 
-	space->machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 	data &= 0x0f;
 
-	co = ((state->m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
-	state->m_ram_palette[co] = data;
+	co = ((m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	m_ram_palette[co] = data;
 
 }
 
@@ -326,17 +327,17 @@ static WRITE8_DEVICE_HANDLER( misc_couple_w )
 	state->m_backup_ram[0x1011] = 0xc9; //ret
 }
 
-static WRITE8_HANDLER(casino5_bank_w)
+WRITE8_MEMBER(merit_state::casino5_bank_w)
 {
 	if ( data == 0 )
 	{
-		memory_set_bank(space->machine(), "bank1", 1);
-		memory_set_bank(space->machine(), "bank2", 1);
+		memory_set_bank(machine(), "bank1", 1);
+		memory_set_bank(machine(), "bank2", 1);
 	}
 	else if ( data == 0xff )
 	{
-		memory_set_bank(space->machine(), "bank1", 0);
-		memory_set_bank(space->machine(), "bank2", 0);
+		memory_set_bank(machine(), "bank1", 0);
+		memory_set_bank(machine(), "bank2", 0);
 	}
 	else
 	{
@@ -358,7 +359,7 @@ static ADDRESS_MAP_START( pitboss_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( casino5_map, AS_PROGRAM, 8, merit_state )
@@ -366,7 +367,7 @@ static ADDRESS_MAP_START( casino5_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x6000, 0x6fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(casino5_bank_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(casino5_bank_w)
 	AM_RANGE(0x7001, 0x7fff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
@@ -374,7 +375,7 @@ static ADDRESS_MAP_START( casino5_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigappg_map, AS_PROGRAM, 8, merit_state )
@@ -386,7 +387,7 @@ static ADDRESS_MAP_START( bigappg_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dodge_map, AS_PROGRAM, 8, merit_state )
@@ -398,7 +399,7 @@ static ADDRESS_MAP_START( dodge_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 /* Address decoding is done by prom u13 on crt200a hardware. It decodes
@@ -408,9 +409,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trvwhiz_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4c00, 0x4cff) AM_READWRITE_LEGACY(questions_r, high_offset_w)
-	AM_RANGE(0x5400, 0x54ff) AM_WRITE_LEGACY(low_offset_w)
-	AM_RANGE(0x5800, 0x58ff) AM_WRITE_LEGACY(med_offset_w)
+	AM_RANGE(0x4c00, 0x4cff) AM_READWRITE(questions_r, high_offset_w)
+	AM_RANGE(0x5400, 0x54ff) AM_WRITE(low_offset_w)
+	AM_RANGE(0x5800, 0x58ff) AM_WRITE(med_offset_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
@@ -418,7 +419,7 @@ static ADDRESS_MAP_START( trvwhiz_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trvwhiz_io_map, AS_IO, 8, merit_state )
@@ -432,14 +433,14 @@ static ADDRESS_MAP_START( phrcraze_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc00c, 0xc00f) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xce00, 0xceff) AM_READWRITE_LEGACY(questions_r, high_offset_w)
-	AM_RANGE(0xd600, 0xd6ff) AM_WRITE_LEGACY(low_offset_w)
-	AM_RANGE(0xda00, 0xdaff) AM_WRITE_LEGACY(med_offset_w)
+	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
+	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
+	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phrcraze_io_map, AS_IO, 8, merit_state )
@@ -453,14 +454,14 @@ static ADDRESS_MAP_START( tictac_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xce00, 0xceff) AM_READWRITE_LEGACY(questions_r, high_offset_w)
-	AM_RANGE(0xd600, 0xd6ff) AM_WRITE_LEGACY(low_offset_w)
-	AM_RANGE(0xda00, 0xdaff) AM_WRITE_LEGACY(med_offset_w)
+	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
+	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
+	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tictac_io_map, AS_IO, 8, merit_state )
@@ -474,14 +475,14 @@ static ADDRESS_MAP_START( trvwhziv_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xce00, 0xceff) AM_READWRITE_LEGACY(questions_r, high_offset_w)
-	AM_RANGE(0xd600, 0xd6ff) AM_WRITE_LEGACY(low_offset_w)
-	AM_RANGE(0xda00, 0xdaff) AM_WRITE_LEGACY(med_offset_w)
+	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
+	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
+	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dtrvwz5_map, AS_PROGRAM, 8, merit_state )
@@ -490,14 +491,14 @@ static ADDRESS_MAP_START( dtrvwz5_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xb000, 0xb0ff) AM_ROM /* protection? code jumps here */
 	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xce00, 0xceff) AM_READWRITE_LEGACY(questions_r, high_offset_w)
-	AM_RANGE(0xd600, 0xd6ff) AM_WRITE_LEGACY(low_offset_w)
-	AM_RANGE(0xda00, 0xdaff) AM_WRITE_LEGACY(med_offset_w)
+	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
+	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
+	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( couple_map, AS_PROGRAM, 8, merit_state )
@@ -510,7 +511,7 @@ static ADDRESS_MAP_START( couple_map, AS_PROGRAM, 8, merit_state )
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 

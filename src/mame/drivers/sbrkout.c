@@ -50,6 +50,17 @@ public:
 	UINT8 m_sync2_value;
 	UINT8 m_pot_mask[2];
 	UINT8 m_pot_trigger[2];
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_READ8_MEMBER(switches_r);
+	DECLARE_WRITE8_MEMBER(pot_mask1_w);
+	DECLARE_WRITE8_MEMBER(pot_mask2_w);
+	DECLARE_WRITE8_MEMBER(start_1_led_w);
+	DECLARE_WRITE8_MEMBER(start_2_led_w);
+	DECLARE_WRITE8_MEMBER(serve_led_w);
+	DECLARE_WRITE8_MEMBER(coincount_w);
+	DECLARE_READ8_MEMBER(sync_r);
+	DECLARE_READ8_MEMBER(sync2_r);
+	DECLARE_WRITE8_MEMBER(sbrkout_videoram_w);
 };
 
 
@@ -142,9 +153,9 @@ static TIMER_CALLBACK( scanline_callback )
 }
 
 
-static WRITE8_HANDLER( irq_ack_w )
+WRITE8_MEMBER(sbrkout_state::irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -155,32 +166,31 @@ static WRITE8_HANDLER( irq_ack_w )
  *
  *************************************/
 
-static READ8_HANDLER( switches_r )
+READ8_MEMBER(sbrkout_state::switches_r)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
 	UINT8 result = 0xff;
 
 	/* DIP switches are selected by ADR0+ADR1 if ADR3 == 0 */
 	if ((offset & 0x0b) == 0x00)
-		result &= (input_port_read(space->machine(), "DIPS") << 6) | 0x3f;
+		result &= (input_port_read(machine(), "DIPS") << 6) | 0x3f;
 	if ((offset & 0x0b) == 0x01)
-		result &= (input_port_read(space->machine(), "DIPS") << 4) | 0x3f;
+		result &= (input_port_read(machine(), "DIPS") << 4) | 0x3f;
 	if ((offset & 0x0b) == 0x02)
-		result &= (input_port_read(space->machine(), "DIPS") << 0) | 0x3f;
+		result &= (input_port_read(machine(), "DIPS") << 0) | 0x3f;
 	if ((offset & 0x0b) == 0x03)
-		result &= (input_port_read(space->machine(), "DIPS") << 2) | 0x3f;
+		result &= (input_port_read(machine(), "DIPS") << 2) | 0x3f;
 
 	/* other switches are selected by ADR0+ADR1+ADR2 if ADR4 == 0 */
 	if ((offset & 0x17) == 0x00)
-		result &= (input_port_read(space->machine(), "SELECT") << 7) | 0x7f;
+		result &= (input_port_read(machine(), "SELECT") << 7) | 0x7f;
 	if ((offset & 0x17) == 0x04)
-		result &= ((state->m_pot_trigger[0] & ~state->m_pot_mask[0]) << 7) | 0x7f;
+		result &= ((m_pot_trigger[0] & ~m_pot_mask[0]) << 7) | 0x7f;
 	if ((offset & 0x17) == 0x05)
-		result &= ((state->m_pot_trigger[1] & ~state->m_pot_mask[1]) << 7) | 0x7f;
+		result &= ((m_pot_trigger[1] & ~m_pot_mask[1]) << 7) | 0x7f;
 	if ((offset & 0x17) == 0x06)
-		result &= input_port_read(space->machine(), "SERVE");
+		result &= input_port_read(machine(), "SERVE");
 	if ((offset & 0x17) == 0x07)
-		result &= (input_port_read(space->machine(), "SELECT") << 6) | 0x7f;
+		result &= (input_port_read(machine(), "SELECT") << 6) | 0x7f;
 
 	return result;
 }
@@ -204,21 +214,19 @@ static TIMER_CALLBACK( pot_trigger_callback )
 }
 
 
-static WRITE8_HANDLER( pot_mask1_w )
+WRITE8_MEMBER(sbrkout_state::pot_mask1_w)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
-	state->m_pot_mask[0] = ~offset & 1;
-	state->m_pot_trigger[0] = 0;
-	update_nmi_state(space->machine());
+	m_pot_mask[0] = ~offset & 1;
+	m_pot_trigger[0] = 0;
+	update_nmi_state(machine());
 }
 
 
-static WRITE8_HANDLER( pot_mask2_w )
+WRITE8_MEMBER(sbrkout_state::pot_mask2_w)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
-	state->m_pot_mask[1] = ~offset & 1;
-	state->m_pot_trigger[1] = 0;
-	update_nmi_state(space->machine());
+	m_pot_mask[1] = ~offset & 1;
+	m_pot_trigger[1] = 0;
+	update_nmi_state(machine());
 }
 
 
@@ -235,27 +243,27 @@ static WRITE8_HANDLER( pot_mask2_w )
     reversed for the Serve LED, which has a NOT on the signal.
 */
 
-static WRITE8_HANDLER( start_1_led_w )
+WRITE8_MEMBER(sbrkout_state::start_1_led_w)
 {
 	output_set_led_value(0, offset & 1);
 }
 
 
-static WRITE8_HANDLER( start_2_led_w )
+WRITE8_MEMBER(sbrkout_state::start_2_led_w)
 {
 	output_set_led_value(1, offset & 1);
 }
 
 
-static WRITE8_HANDLER( serve_led_w )
+WRITE8_MEMBER(sbrkout_state::serve_led_w)
 {
 	output_set_led_value(0, ~offset & 1);
 }
 
 
-static WRITE8_HANDLER( coincount_w )
+WRITE8_MEMBER(sbrkout_state::coincount_w)
 {
-	coin_counter_w(space->machine(), 0, offset & 1);
+	coin_counter_w(machine(), 0, offset & 1);
 }
 
 
@@ -266,19 +274,17 @@ static WRITE8_HANDLER( coincount_w )
  *
  *************************************/
 
-static READ8_HANDLER( sync_r )
+READ8_MEMBER(sbrkout_state::sync_r)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
-	int hpos = space->machine().primary_screen->hpos();
-	state->m_sync2_value = (hpos >= 128 && hpos <= space->machine().primary_screen->visible_area().max_x);
-	return space->machine().primary_screen->vpos();
+	int hpos = machine().primary_screen->hpos();
+	m_sync2_value = (hpos >= 128 && hpos <= machine().primary_screen->visible_area().max_x);
+	return machine().primary_screen->vpos();
 }
 
 
-static READ8_HANDLER( sync2_r )
+READ8_MEMBER(sbrkout_state::sync2_r)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
-	return (state->m_sync2_value << 7) | 0x7f;
+	return (m_sync2_value << 7) | 0x7f;
 }
 
 
@@ -305,12 +311,11 @@ static VIDEO_START( sbrkout )
 }
 
 
-static WRITE8_HANDLER( sbrkout_videoram_w )
+WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -352,21 +357,21 @@ static SCREEN_UPDATE_IND16( sbrkout )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbrkout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE_LEGACY(sbrkout_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x0800, 0x083f) AM_READ_LEGACY(switches_r)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0800, 0x083f) AM_READ(switches_r)
 	AM_RANGE(0x0840, 0x0840) AM_MIRROR(0x003f) AM_READ_PORT("COIN")
 	AM_RANGE(0x0880, 0x0880) AM_MIRROR(0x003f) AM_READ_PORT("START")
 	AM_RANGE(0x08c0, 0x08c0) AM_MIRROR(0x003f) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_READ_LEGACY(sync_r)
-	AM_RANGE(0x0c10, 0x0c11) AM_MIRROR(0x000e) AM_WRITE_LEGACY(serve_led_w)
-	AM_RANGE(0x0c30, 0x0c31) AM_MIRROR(0x000e) AM_WRITE_LEGACY(start_1_led_w)
-	AM_RANGE(0x0c40, 0x0c41) AM_MIRROR(0x000e) AM_WRITE_LEGACY(start_2_led_w)
-	AM_RANGE(0x0c50, 0x0c51) AM_MIRROR(0x000e) AM_WRITE_LEGACY(pot_mask1_w)
-	AM_RANGE(0x0c60, 0x0c61) AM_MIRROR(0x000e) AM_WRITE_LEGACY(pot_mask2_w)
-	AM_RANGE(0x0c70, 0x0c71) AM_MIRROR(0x000e) AM_WRITE_LEGACY(coincount_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03ff) AM_READ(sync_r)
+	AM_RANGE(0x0c10, 0x0c11) AM_MIRROR(0x000e) AM_WRITE(serve_led_w)
+	AM_RANGE(0x0c30, 0x0c31) AM_MIRROR(0x000e) AM_WRITE(start_1_led_w)
+	AM_RANGE(0x0c40, 0x0c41) AM_MIRROR(0x000e) AM_WRITE(start_2_led_w)
+	AM_RANGE(0x0c50, 0x0c51) AM_MIRROR(0x000e) AM_WRITE(pot_mask1_w)
+	AM_RANGE(0x0c60, 0x0c61) AM_MIRROR(0x000e) AM_WRITE(pot_mask2_w)
+	AM_RANGE(0x0c70, 0x0c71) AM_MIRROR(0x000e) AM_WRITE(coincount_w)
 	AM_RANGE(0x0c80, 0x0c80) AM_MIRROR(0x007f) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_MIRROR(0x007f) AM_WRITE_LEGACY(irq_ack_w)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03ff) AM_READ_LEGACY(sync2_r)
+	AM_RANGE(0x0e00, 0x0e00) AM_MIRROR(0x007f) AM_WRITE(irq_ack_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03ff) AM_READ(sync2_r)
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 

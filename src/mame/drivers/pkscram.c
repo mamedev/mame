@@ -31,38 +31,38 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_md_tilemap;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE16_MEMBER(pkscramble_fgtilemap_w);
+	DECLARE_WRITE16_MEMBER(pkscramble_mdtilemap_w);
+	DECLARE_WRITE16_MEMBER(pkscramble_bgtilemap_w);
+	DECLARE_WRITE16_MEMBER(pkscramble_output_w);
 };
 
 
 enum { interrupt_scanline=192 };
 
 
-static WRITE16_HANDLER( pkscramble_fgtilemap_w )
+WRITE16_MEMBER(pkscram_state::pkscramble_fgtilemap_w)
 {
-	pkscram_state *state = space->machine().driver_data<pkscram_state>();
-	COMBINE_DATA(&state->m_pkscramble_fgtilemap_ram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
+	COMBINE_DATA(&m_pkscramble_fgtilemap_ram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-static WRITE16_HANDLER( pkscramble_mdtilemap_w )
+WRITE16_MEMBER(pkscram_state::pkscramble_mdtilemap_w)
 {
-	pkscram_state *state = space->machine().driver_data<pkscram_state>();
-	COMBINE_DATA(&state->m_pkscramble_mdtilemap_ram[offset]);
-	state->m_md_tilemap->mark_tile_dirty(offset >> 1);
+	COMBINE_DATA(&m_pkscramble_mdtilemap_ram[offset]);
+	m_md_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-static WRITE16_HANDLER( pkscramble_bgtilemap_w )
+WRITE16_MEMBER(pkscram_state::pkscramble_bgtilemap_w)
 {
-	pkscram_state *state = space->machine().driver_data<pkscram_state>();
-	COMBINE_DATA(&state->m_pkscramble_bgtilemap_ram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+	COMBINE_DATA(&m_pkscramble_bgtilemap_ram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 // input bit 0x20 in port1 should stay low until bit 0x20 is written here, then
 // it should stay high for some time (currently we cheat keeping the input always active)
-static WRITE16_HANDLER( pkscramble_output_w )
+WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
 {
-	pkscram_state *state = space->machine().driver_data<pkscram_state>();
 	// OUTPUT
 	// BIT
 	// 0x0001 -> STL
@@ -83,15 +83,15 @@ static WRITE16_HANDLER( pkscramble_output_w )
 	// 0x2000 -> vblank interrupt enable
 	// 0x4000 -> set on every second frame - not used
 
-	state->m_out = data;
+	m_out = data;
 
-	if (!(state->m_out & 0x2000) && state->m_interrupt_line_active)
+	if (!(m_out & 0x2000) && m_interrupt_line_active)
 	{
-	    cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
-		state->m_interrupt_line_active = 0;
+	    cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+		m_interrupt_line_active = 0;
 	}
 
-	coin_counter_w(space->machine(), 0, data & 0x80);
+	coin_counter_w(machine(), 0, data & 0x80);
 }
 
 static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16, pkscram_state )
@@ -99,14 +99,14 @@ static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16, pkscram_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x0400ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x041000, 0x043fff) AM_RAM // main ram
-	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE_LEGACY(pkscramble_fgtilemap_w) AM_BASE(m_pkscramble_fgtilemap_ram) // fg tilemap
-	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE_LEGACY(pkscramble_mdtilemap_w) AM_BASE(m_pkscramble_mdtilemap_ram) // md tilemap (just a copy of fg?)
-	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE_LEGACY(pkscramble_bgtilemap_w) AM_BASE(m_pkscramble_bgtilemap_ram) // bg tilemap
+	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(pkscramble_fgtilemap_w) AM_BASE(m_pkscramble_fgtilemap_ram) // fg tilemap
+	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(pkscramble_mdtilemap_w) AM_BASE(m_pkscramble_mdtilemap_ram) // md tilemap (just a copy of fg?)
+	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(pkscramble_bgtilemap_w) AM_BASE(m_pkscramble_bgtilemap_ram) // bg tilemap
 	AM_RANGE(0x047000, 0x047fff) AM_RAM // unused
 	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x049000, 0x049001) AM_READ_PORT("DSW")
 	AM_RANGE(0x049004, 0x049005) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x049008, 0x049009) AM_WRITE_LEGACY(pkscramble_output_w)
+	AM_RANGE(0x049008, 0x049009) AM_WRITE(pkscramble_output_w)
 	AM_RANGE(0x049010, 0x049011) AM_WRITENOP
 	AM_RANGE(0x049014, 0x049015) AM_WRITENOP
 	AM_RANGE(0x049018, 0x049019) AM_WRITENOP

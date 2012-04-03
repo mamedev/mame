@@ -61,6 +61,11 @@ public:
 	UINT8 m_mux_data;
 	int m_bank;
 	UINT8 m_prot_lock;
+	DECLARE_WRITE8_MEMBER(yumefuda_vram_w);
+	DECLARE_WRITE8_MEMBER(yumefuda_cram_w);
+	DECLARE_READ8_MEMBER(custom_ram_r);
+	DECLARE_WRITE8_MEMBER(custom_ram_w);
+	DECLARE_WRITE8_MEMBER(prot_lock_w);
 };
 
 static TILE_GET_INFO( y_get_bg_tile_info )
@@ -108,42 +113,37 @@ static GFXDECODE_START( yumefuda )
 GFXDECODE_END
 
 
-static WRITE8_HANDLER( yumefuda_vram_w )
+WRITE8_MEMBER(albazg_state::yumefuda_vram_w)
 {
-	albazg_state *state = space->machine().driver_data<albazg_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( yumefuda_cram_w )
+WRITE8_MEMBER(albazg_state::yumefuda_cram_w)
 {
-	albazg_state *state = space->machine().driver_data<albazg_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /*Custom RAM (Thrash Protection)*/
-static READ8_HANDLER( custom_ram_r )
+READ8_MEMBER(albazg_state::custom_ram_r)
 {
-	albazg_state *state = space->machine().driver_data<albazg_state>();
-//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, cpu_get_pc(&space->device()));
-	return state->m_cus_ram[offset];// ^ 0x55;
+//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, cpu_get_pc(&space.device()));
+	return m_cus_ram[offset];// ^ 0x55;
 }
 
-static WRITE8_HANDLER( custom_ram_w )
+WRITE8_MEMBER(albazg_state::custom_ram_w)
 {
-	albazg_state *state = space->machine().driver_data<albazg_state>();
-//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(&space->device()));
-	if(state->m_prot_lock)
-		state->m_cus_ram[offset] = data;
+//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(&space.device()));
+	if(m_prot_lock)
+		m_cus_ram[offset] = data;
 }
 
 /*this might be used as NVRAM commands btw*/
-static WRITE8_HANDLER( prot_lock_w )
+WRITE8_MEMBER(albazg_state::prot_lock_w)
 {
-	albazg_state *state = space->machine().driver_data<albazg_state>();
-//  logerror("PC %04x Prot lock value written %02x\n", cpu_get_pc(&space->device()), data);
-	state->m_prot_lock = data;
+//  logerror("PC %04x Prot lock value written %02x\n", cpu_get_pc(&space.device()), data);
+	m_prot_lock = data;
 }
 
 static READ8_DEVICE_HANDLER( mux_r )
@@ -230,13 +230,13 @@ static I8255A_INTERFACE( ppi8255_intf )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE_LEGACY(prot_lock_w)
+	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0xaf80, 0xafff) AM_READWRITE_LEGACY(custom_ram_r, custom_ram_w) AM_BASE(m_cus_ram)
+	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_BASE(m_cus_ram)
 	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(yumefuda_vram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(yumefuda_cram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

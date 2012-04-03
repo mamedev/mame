@@ -83,6 +83,11 @@ public:
 	UINT8 m_nmi_mask;
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;
+	DECLARE_WRITE8_MEMBER(audio_w);
+	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(mirax_sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(coin_lockout_w);
 };
 
 
@@ -177,11 +182,10 @@ static SOUND_START(mirax)
 	state->m_nAyCtrl = 0x00;
 }
 
-static WRITE8_HANDLER(audio_w)
+WRITE8_MEMBER(mirax_state::audio_w)
 {
-	mirax_state *state = space->machine().driver_data<mirax_state>();
 
-	state->m_nAyCtrl=offset;
+	m_nAyCtrl=offset;
 }
 
 static WRITE8_DEVICE_HANDLER(ay_sel)
@@ -194,30 +198,29 @@ static WRITE8_DEVICE_HANDLER(ay_sel)
 	}
 }
 
-static READ8_HANDLER( unk_r )
+READ8_MEMBER(mirax_state::unk_r)
 {
 	return 0xff;
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(mirax_state::nmi_mask_w)
 {
-	mirax_state *state = space->machine().driver_data<mirax_state>();
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 	if(data & 0xfe)
 		printf("Warning: %02x written at $f501\n",data);
 }
 
-static WRITE8_HANDLER( mirax_sound_cmd_w )
+WRITE8_MEMBER(mirax_state::mirax_sound_cmd_w)
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* might be coin counter instead */
-static WRITE8_HANDLER( coin_lockout_w )
+WRITE8_MEMBER(mirax_state::coin_lockout_w)
 {
-	coin_lockout_w(space->machine(), 0,data & 1);
-	coin_lockout_w(space->machine(), 1,data & 1);
+	coin_lockout_w(space, 0,data & 1);
+	coin_lockout_w(space, 1,data & 1);
 }
 
 static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8, mirax_state )
@@ -229,13 +232,13 @@ static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("P2")
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf300, 0xf300) AM_READ_LEGACY(unk_r) //watchdog? value is always read then discarded
+	AM_RANGE(0xf300, 0xf300) AM_READ(unk_r) //watchdog? value is always read then discarded
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf500, 0xf500) AM_WRITE_LEGACY(coin_lockout_w)
-	AM_RANGE(0xf501, 0xf501) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xf500, 0xf500) AM_WRITE(coin_lockout_w)
+	AM_RANGE(0xf501, 0xf501) AM_WRITE(nmi_mask_w)
 //  AM_RANGE(0xf506, 0xf506)
 //  AM_RANGE(0xf507, 0xf507)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(mirax_sound_cmd_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(mirax_sound_cmd_w)
 //  AM_RANGE(0xf900, 0xf900) //sound cmd mirror? ack?
 ADDRESS_MAP_END
 
@@ -252,7 +255,7 @@ static ADDRESS_MAP_START( mirax_sound_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0xe401, 0xe401) AM_WRITENOP
 	AM_RANGE(0xe403, 0xe403) AM_DEVWRITE_LEGACY("ay2", ay_sel) //2nd ay ?
 
-	AM_RANGE(0xf900, 0xf9ff) AM_WRITE_LEGACY(audio_w)
+	AM_RANGE(0xf900, 0xf9ff) AM_WRITE(audio_w)
 ADDRESS_MAP_END
 
 static const gfx_layout layout16 =

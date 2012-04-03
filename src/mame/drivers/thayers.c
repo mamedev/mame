@@ -55,6 +55,29 @@ public:
 	int m_cart_present;
 	int m_pr7820_enter;
 	struct ssi263_t m_ssi263;
+	DECLARE_WRITE8_MEMBER(intrq_w);
+	DECLARE_READ8_MEMBER(irqstate_r);
+	DECLARE_WRITE8_MEMBER(timer_int_ack_w);
+	DECLARE_WRITE8_MEMBER(data_rdy_int_ack_w);
+	DECLARE_WRITE8_MEMBER(cop_d_w);
+	DECLARE_READ8_MEMBER(cop_data_r);
+	DECLARE_WRITE8_MEMBER(cop_data_w);
+	DECLARE_READ8_MEMBER(cop_l_r);
+	DECLARE_WRITE8_MEMBER(cop_l_w);
+	DECLARE_READ8_MEMBER(cop_g_r);
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE8_MEMBER(cop_g_w);
+	DECLARE_READ8_MEMBER(cop_si_r);
+	DECLARE_WRITE8_MEMBER(cop_so_w);
+	DECLARE_WRITE8_MEMBER(control2_w);
+	DECLARE_READ8_MEMBER(dsw_b_r);
+	DECLARE_READ8_MEMBER(laserdsc_data_r);
+	DECLARE_WRITE8_MEMBER(laserdsc_data_w);
+	DECLARE_WRITE8_MEMBER(laserdsc_control_w);
+	DECLARE_WRITE8_MEMBER(den1_w);
+	DECLARE_WRITE8_MEMBER(den2_w);
+	DECLARE_WRITE8_MEMBER(ssi263_register_w);
+	DECLARE_READ8_MEMBER(ssi263_register_r);
 };
 
 
@@ -84,18 +107,17 @@ static TIMER_CALLBACK( intrq_tick )
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( intrq_w )
+WRITE8_MEMBER(thayers_state::intrq_w)
 {
 	// T = 1.1 * R30 * C53 = 1.1 * 750K * 0.01uF = 8.25 ms
 
-	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, HOLD_LINE);
 
-	space->machine().scheduler().timer_set(attotime::from_usec(8250), FUNC(intrq_tick));
+	machine().scheduler().timer_set(attotime::from_usec(8250), FUNC(intrq_tick));
 }
 
-static READ8_HANDLER( irqstate_r )
+READ8_MEMBER(thayers_state::irqstate_r)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
 	/*
 
         bit     description
@@ -111,28 +133,25 @@ static READ8_HANDLER( irqstate_r )
 
     */
 
-	return (state->m_data_rdy_int << 5) | (state->m_timer_int << 4) | 0x08 | (state->m_ssi_data_request << 2);
+	return (m_data_rdy_int << 5) | (m_timer_int << 4) | 0x08 | (m_ssi_data_request << 2);
 }
 
-static WRITE8_HANDLER( timer_int_ack_w )
+WRITE8_MEMBER(thayers_state::timer_int_ack_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
-	state->m_timer_int = 1;
+	m_timer_int = 1;
 
-	check_interrupt(space->machine());
+	check_interrupt(machine());
 }
 
-static WRITE8_HANDLER( data_rdy_int_ack_w )
+WRITE8_MEMBER(thayers_state::data_rdy_int_ack_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
-	state->m_data_rdy_int = 1;
+	m_data_rdy_int = 1;
 
-	check_interrupt(space->machine());
+	check_interrupt(machine());
 }
 
-static WRITE8_HANDLER( cop_d_w )
+WRITE8_MEMBER(thayers_state::cop_d_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
 	/*
 
         bit     description
@@ -146,44 +165,41 @@ static WRITE8_HANDLER( cop_d_w )
 
 	if (!BIT(data, 0))
 	{
-		state->m_timer_int = 0;
+		m_timer_int = 0;
 	}
 
 	if (!BIT(data, 1))
 	{
-		state->m_data_rdy_int = 0;
+		m_data_rdy_int = 0;
 	}
 
-	check_interrupt(space->machine());
+	check_interrupt(machine());
 }
 
 /* COP Communication */
 
-static READ8_HANDLER( cop_data_r )
+READ8_MEMBER(thayers_state::cop_data_r)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
-	if (!state->m_cop_data_latch_enable)
+	if (!m_cop_data_latch_enable)
 	{
-		return state->m_cop_data_latch;
+		return m_cop_data_latch;
 	}
 	else
 	{
-		return state->m_cop_l;
+		return m_cop_l;
 	}
 }
 
-static WRITE8_HANDLER( cop_data_w )
+WRITE8_MEMBER(thayers_state::cop_data_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
-	state->m_cop_data_latch = data;
+	m_cop_data_latch = data;
 }
 
-static READ8_HANDLER( cop_l_r )
+READ8_MEMBER(thayers_state::cop_l_r)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
-	if (!state->m_cop_data_latch_enable)
+	if (!m_cop_data_latch_enable)
 	{
-		return state->m_cop_data_latch;
+		return m_cop_data_latch;
 	}
 	else
 	{
@@ -191,15 +207,13 @@ static READ8_HANDLER( cop_l_r )
 	}
 }
 
-static WRITE8_HANDLER( cop_l_w )
+WRITE8_MEMBER(thayers_state::cop_l_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
-	state->m_cop_l = data;
+	m_cop_l = data;
 }
 
-static READ8_HANDLER( cop_g_r )
+READ8_MEMBER(thayers_state::cop_g_r)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
 	/*
 
         bit     description
@@ -211,12 +225,11 @@ static READ8_HANDLER( cop_g_r )
 
     */
 
-	return state->m_cop_cmd_latch;
+	return m_cop_cmd_latch;
 }
 
-static WRITE8_HANDLER( control_w )
+WRITE8_MEMBER(thayers_state::control_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
 	/*
 
         bit     description
@@ -232,12 +245,11 @@ static WRITE8_HANDLER( control_w )
 
     */
 
-	state->m_cop_cmd_latch = (data >> 5) & 0x07;
+	m_cop_cmd_latch = (data >> 5) & 0x07;
 }
 
-static WRITE8_HANDLER( cop_g_w )
+WRITE8_MEMBER(thayers_state::cop_g_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
 	/*
 
         bit     description
@@ -249,14 +261,13 @@ static WRITE8_HANDLER( cop_g_w )
 
     */
 
-	state->m_cop_data_latch_enable = BIT(data, 3);
+	m_cop_data_latch_enable = BIT(data, 3);
 }
 
 /* Keyboard */
 
-static READ8_HANDLER(cop_si_r)
+READ8_MEMBER(thayers_state::cop_si_r)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
 	/* keyboard data */
 
 	/*
@@ -267,7 +278,7 @@ static READ8_HANDLER(cop_si_r)
 
     */
 
-	switch (state->m_rx_bit)
+	switch (m_rx_bit)
 	{
 	case 0:
 	case 1:
@@ -275,7 +286,7 @@ static READ8_HANDLER(cop_si_r)
 		return 1;
 
 	case 4:
-		return (state->m_keylatch == 9);
+		return (m_keylatch == 9);
 
 	case 5:
 	case 6:
@@ -285,9 +296,9 @@ static READ8_HANDLER(cop_si_r)
 			UINT8 data;
 			char port[4];
 
-			sprintf(port, "R%d", state->m_keylatch);
+			sprintf(port, "R%d", m_keylatch);
 
-			data = BIT(input_port_read(space->machine(), port), state->m_rx_bit - 5);
+			data = BIT(input_port_read(machine(), port), m_rx_bit - 5);
 
 			return data;
 		}
@@ -297,24 +308,23 @@ static READ8_HANDLER(cop_si_r)
 	}
 }
 
-static WRITE8_HANDLER( cop_so_w )
+WRITE8_MEMBER(thayers_state::cop_so_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
 	/* keyboard clock */
 
 	if (data)
 	{
-		state->m_rx_bit++;
+		m_rx_bit++;
 
-		if (state->m_rx_bit == 10)
+		if (m_rx_bit == 10)
 		{
-			state->m_rx_bit = 0;
+			m_rx_bit = 0;
 
-			state->m_keylatch++;
+			m_keylatch++;
 
-			if (state->m_keylatch == 10)
+			if (m_keylatch == 10)
 			{
-				state->m_keylatch = 0;
+				m_keylatch = 0;
 			}
 		}
 	}
@@ -322,9 +332,8 @@ static WRITE8_HANDLER( cop_so_w )
 
 /* I/O Board */
 
-static WRITE8_HANDLER( control2_w )
+WRITE8_MEMBER(thayers_state::control2_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
 	/*
 
         bit     description
@@ -340,34 +349,31 @@ static WRITE8_HANDLER( control2_w )
 
     */
 
-	if ((!BIT(data, 2)) & state->m_cart_present)
+	if ((!BIT(data, 2)) & m_cart_present)
 	{
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, HOLD_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, HOLD_LINE);
 	}
 }
 
-static READ8_HANDLER( dsw_b_r )
+READ8_MEMBER(thayers_state::dsw_b_r)
 {
-	return (input_port_read(space->machine(), "COIN") & 0xf0) | (input_port_read(space->machine(), "DSWB") & 0x0f);
+	return (input_port_read(machine(), "COIN") & 0xf0) | (input_port_read(machine(), "DSWB") & 0x0f);
 }
 
-static READ8_HANDLER( laserdsc_data_r )
+READ8_MEMBER(thayers_state::laserdsc_data_r)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
-	if (state->m_ldv1000 != NULL) return state->m_ldv1000->status_r();
-	if (state->m_pr7820 != NULL) return state->m_pr7820->data_r();
+	if (m_ldv1000 != NULL) return m_ldv1000->status_r();
+	if (m_pr7820 != NULL) return m_pr7820->data_r();
 	return 0;
 }
 
-static WRITE8_HANDLER( laserdsc_data_w )
+WRITE8_MEMBER(thayers_state::laserdsc_data_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
-	state->m_laserdisc_data = data;
+	m_laserdisc_data = data;
 }
 
-static WRITE8_HANDLER( laserdsc_control_w )
+WRITE8_MEMBER(thayers_state::laserdsc_control_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
 	/*
 
         bit     description
@@ -383,26 +389,26 @@ static WRITE8_HANDLER( laserdsc_control_w )
 
     */
 
-	coin_counter_w(space->machine(), 0, BIT(data, 4));
+	coin_counter_w(machine(), 0, BIT(data, 4));
 
 	if (BIT(data, 5))
 	{
-		if (state->m_ldv1000 != NULL)
+		if (m_ldv1000 != NULL)
 		{
-			state->m_ldv1000->data_w(state->m_laserdisc_data);
-			state->m_ldv1000->enter_w(BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+			m_ldv1000->data_w(m_laserdisc_data);
+			m_ldv1000->enter_w(BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 		}
-		if (state->m_pr7820 != NULL)
+		if (m_pr7820 != NULL)
 		{
-			state->m_pr7820->data_w(state->m_laserdisc_data);
-			state->m_pr7820_enter = BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE;
-			state->m_pr7820->enter_w(state->m_pr7820_enter);
+			m_pr7820->data_w(m_laserdisc_data);
+			m_pr7820_enter = BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE;
+			m_pr7820->enter_w(m_pr7820_enter);
 			// BIT(data, 7) is INT/_EXT, but there is no such input line in laserdsc.h
 		}
 	}
 }
 
-static WRITE8_HANDLER( den1_w )
+WRITE8_MEMBER(thayers_state::den1_w)
 {
 	/*
 
@@ -422,7 +428,7 @@ static WRITE8_HANDLER( den1_w )
 	output_set_digit_value(data >> 4, led_map[data & 0x0f]);
 }
 
-static WRITE8_HANDLER( den2_w )
+WRITE8_MEMBER(thayers_state::den2_w)
 {
 	/*
 
@@ -467,10 +473,9 @@ static TIMER_CALLBACK( ssi263_phoneme_tick )
 	check_interrupt(machine);
 }
 
-static WRITE8_HANDLER( ssi263_register_w )
+WRITE8_MEMBER(thayers_state::ssi263_register_w)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
-	struct ssi263_t &ssi263 = state->m_ssi263;
+	struct ssi263_t &ssi263 = m_ssi263;
 	switch (offset)
 	{
 	case 0:
@@ -482,19 +487,19 @@ static WRITE8_HANDLER( ssi263_register_w )
 		ssi263.dr = (data >> 5) & 0x03;
 		ssi263.p = data & 0x3f;
 
-		state->m_ssi_data_request = 1;
-		check_interrupt(space->machine());
+		m_ssi_data_request = 1;
+		check_interrupt(machine());
 
 		switch (ssi263.mode)
 		{
 		case 0:
 		case 1:
 			// phoneme timing response
-			space->machine().scheduler().timer_set(attotime::from_usec(phoneme_time), FUNC(ssi263_phoneme_tick));
+			machine().scheduler().timer_set(attotime::from_usec(phoneme_time), FUNC(ssi263_phoneme_tick));
 			break;
 		case 2:
 			// frame timing response
-			space->machine().scheduler().timer_set(attotime::from_usec(frame_time), FUNC(ssi263_phoneme_tick));
+			machine().scheduler().timer_set(attotime::from_usec(frame_time), FUNC(ssi263_phoneme_tick));
 			break;
 		case 3:
 			// disable A/_R output
@@ -570,12 +575,11 @@ static WRITE8_HANDLER( ssi263_register_w )
 	}
 }
 
-static READ8_HANDLER( ssi263_register_r )
+READ8_MEMBER(thayers_state::ssi263_register_r)
 {
-	thayers_state *state = space->machine().driver_data<thayers_state>();
 	// D7 becomes an output, as the inverted state of A/_R. The register address bits are ignored.
 
-	return !state->m_ssi_data_request << 7;
+	return !m_ssi_data_request << 7;
 }
 
 /* Memory Maps */
@@ -588,28 +592,28 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thayers_io_map, AS_IO, 8, thayers_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x07) AM_READWRITE_LEGACY(ssi263_register_r, ssi263_register_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(control_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE_LEGACY(irqstate_r, control2_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE_LEGACY(cop_data_r, cop_data_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE_LEGACY(timer_int_ack_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(data_rdy_int_ack_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(laserdsc_data_r)
-	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(dsw_b_r)
+	AM_RANGE(0x00, 0x07) AM_READWRITE(ssi263_register_r, ssi263_register_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(control_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(irqstate_r, control2_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(cop_data_r, cop_data_w)
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(timer_int_ack_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(data_rdy_int_ack_w)
+	AM_RANGE(0xf0, 0xf0) AM_READ(laserdsc_data_r)
+	AM_RANGE(0xf1, 0xf1) AM_READ(dsw_b_r)
 	AM_RANGE(0xf2, 0xf2) AM_READ_PORT("DSWA")
-	AM_RANGE(0xf3, 0xf3) AM_WRITE_LEGACY(intrq_w)
-	AM_RANGE(0xf4, 0xf4) AM_WRITE_LEGACY(laserdsc_data_w)
-	AM_RANGE(0xf5, 0xf5) AM_WRITE_LEGACY(laserdsc_control_w)
-	AM_RANGE(0xf6, 0xf6) AM_WRITE_LEGACY(den1_w)
-	AM_RANGE(0xf7, 0xf7) AM_WRITE_LEGACY(den2_w)
+	AM_RANGE(0xf3, 0xf3) AM_WRITE(intrq_w)
+	AM_RANGE(0xf4, 0xf4) AM_WRITE(laserdsc_data_w)
+	AM_RANGE(0xf5, 0xf5) AM_WRITE(laserdsc_control_w)
+	AM_RANGE(0xf6, 0xf6) AM_WRITE(den1_w)
+	AM_RANGE(0xf7, 0xf7) AM_WRITE(den2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( thayers_cop_io_map, AS_IO, 8, thayers_state )
-	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE_LEGACY(cop_l_r, cop_l_w)
-	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_READWRITE_LEGACY(cop_g_r, cop_g_w)
-	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE_LEGACY(cop_d_w)
+	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(cop_l_r, cop_l_w)
+	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_READWRITE(cop_g_r, cop_g_w)
+	AM_RANGE(COP400_PORT_D, COP400_PORT_D) AM_WRITE(cop_d_w)
 	AM_RANGE(COP400_PORT_SK, COP400_PORT_SK) AM_WRITENOP
-	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_READ_LEGACY(cop_si_r) AM_WRITE_LEGACY(cop_so_w)
+	AM_RANGE(COP400_PORT_SIO, COP400_PORT_SIO) AM_READ(cop_si_r) AM_WRITE(cop_so_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

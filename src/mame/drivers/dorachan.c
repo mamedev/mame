@@ -30,6 +30,7 @@ public:
 
 	/* devices */
 	device_t *m_main_cpu;
+	DECLARE_WRITE8_MEMBER(dorachan_ctrl_w);
 };
 
 
@@ -120,10 +121,9 @@ static SCREEN_UPDATE_RGB32( dorachan )
 }
 
 
-static WRITE8_HANDLER(dorachan_ctrl_w)
+WRITE8_MEMBER(dorachan_state::dorachan_ctrl_w)
 {
-	dorachan_state *state = space->machine().driver_data<dorachan_state>();
-	state->m_flip_screen = (data >> 6) & 0x01;
+	m_flip_screen = (data >> 6) & 0x01;
 }
 
 
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( dorachan_io_map, AS_IO, 8, dorachan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITENOP
 	AM_RANGE(0x02, 0x02) AM_WRITENOP
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(dorachan_ctrl_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(dorachan_ctrl_w)
 ADDRESS_MAP_END
 
 

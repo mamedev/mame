@@ -85,18 +85,19 @@ public:
 	psattack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ32_MEMBER(psattack_unk_r);
 };
 
 
-static READ32_HANDLER( psattack_unk_r )
+READ32_MEMBER(psattack_state::psattack_unk_r)
 {
 	return 0xffffffff;
 }
 
 static ADDRESS_MAP_START( psattack_mem, AS_PROGRAM, 32, psattack_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x01402204, 0x01402207) AM_READ_LEGACY(psattack_unk_r)
-	AM_RANGE(0x01402804, 0x01402807) AM_READ_LEGACY(psattack_unk_r)
+	AM_RANGE(0x01402204, 0x01402207) AM_READ(psattack_unk_r)
+	AM_RANGE(0x01402804, 0x01402807) AM_READ(psattack_unk_r)
 
 
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM

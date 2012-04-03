@@ -124,6 +124,8 @@ public:
 	UINT8* m_spriteram;
 	UINT8* m_spriteram2;
 	UINT8 m_nmi_en;
+	DECLARE_WRITE8_MEMBER(subm_to_sound_w);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 };
 
 static VIDEO_START(sub)
@@ -235,28 +237,27 @@ static ADDRESS_MAP_START( subm_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0xf060, 0xf060) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( subm_to_sound_w )
+WRITE8_MEMBER(sub_state::subm_to_sound_w)
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "soundcpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "soundcpu", 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(sub_state::nmi_mask_w)
 {
-	sub_state *state = space->machine().driver_data<sub_state>();
 
-	state->m_nmi_en = data & 1;
+	m_nmi_en = data & 1;
 }
 
 static ADDRESS_MAP_START( subm_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(soundlatch2_r, subm_to_sound_w) // to/from sound CPU
+	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch2_r) AM_WRITE(subm_to_sound_w) // to/from sound CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subm_sound_map, AS_PROGRAM, 8, sub_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(nmi_mask_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subm_sound_io, AS_IO, 8, sub_state )

@@ -473,6 +473,10 @@ public:
 	namcos2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	{ }
+	DECLARE_READ16_MEMBER(namcos2_68k_dpram_word_r);
+	DECLARE_WRITE16_MEMBER(namcos2_68k_dpram_word_w);
+	DECLARE_READ8_MEMBER(namcos2_dpram_byte_r);
+	DECLARE_WRITE8_MEMBER(namcos2_dpram_byte_w);
 };
 
 static UINT8 *namcos2_dpram;	/* 2Kx8 */
@@ -536,12 +540,12 @@ GollyGhostUpdateDiorama_c0( int data )
 	}
 }
 
-static READ16_HANDLER( namcos2_68k_dpram_word_r )
+READ16_MEMBER(namcos2_state::namcos2_68k_dpram_word_r)
 {
 	return namcos2_dpram[offset];
 }
 
-static WRITE16_HANDLER( namcos2_68k_dpram_word_w )
+WRITE16_MEMBER(namcos2_state::namcos2_68k_dpram_word_w)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
@@ -570,12 +574,12 @@ static WRITE16_HANDLER( namcos2_68k_dpram_word_w )
 }
 
 
-static READ8_HANDLER( namcos2_dpram_byte_r )
+READ8_MEMBER(namcos2_state::namcos2_dpram_byte_r)
 {
 	return namcos2_dpram[offset];
 }
 
-static WRITE8_HANDLER( namcos2_dpram_byte_w )
+WRITE8_MEMBER(namcos2_state::namcos2_dpram_byte_w)
 {
 	namcos2_dpram[offset] = data;
 }
@@ -601,8 +605,8 @@ static ADDRESS_MAP_START( namcos2_68k_default_cpu_board_am, AS_PROGRAM, 16, namc
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram16_r,namco_tilemapvideoram16_w)
 	AM_RANGE(0x420000, 0x42003f) AM_READWRITE_LEGACY(namco_tilemapcontrol16_r,namco_tilemapcontrol16_w)
 	AM_RANGE(0x440000, 0x44ffff) AM_READWRITE_LEGACY(namcos2_68k_video_palette_r,namcos2_68k_video_palette_w) AM_BASE_LEGACY(&namcos2_68k_palette_ram) AM_SIZE_LEGACY(&namcos2_68k_palette_size)
-	AM_RANGE(0x460000, 0x460fff) AM_READWRITE_LEGACY(namcos2_68k_dpram_word_r,namcos2_68k_dpram_word_w)
-	AM_RANGE(0x468000, 0x468fff) AM_READWRITE_LEGACY(namcos2_68k_dpram_word_r,namcos2_68k_dpram_word_w) /* mirror */
+	AM_RANGE(0x460000, 0x460fff) AM_READWRITE(namcos2_68k_dpram_word_r,namcos2_68k_dpram_word_w)
+	AM_RANGE(0x468000, 0x468fff) AM_READWRITE(namcos2_68k_dpram_word_r,namcos2_68k_dpram_word_w) /* mirror */
 	AM_RANGE(0x480000, 0x483fff) AM_READWRITE_LEGACY(namcos2_68k_serial_comms_ram_r,namcos2_68k_serial_comms_ram_w) AM_BASE_LEGACY(&namcos2_68k_serial_comms_ram)
 	AM_RANGE(0x4a0000, 0x4a000f) AM_READWRITE_LEGACY(namcos2_68k_serial_comms_ctrl_r,namcos2_68k_serial_comms_ctrl_w)
 ADDRESS_MAP_END
@@ -747,8 +751,8 @@ static ADDRESS_MAP_START( sound_default_am, AS_PROGRAM, 8, namcos2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank6") /* banked */
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x5000, 0x6fff) AM_DEVREADWRITE_LEGACY("c140", c140_r,c140_w)
-	AM_RANGE(0x7000, 0x77ff) AM_READWRITE_LEGACY(namcos2_dpram_byte_r,namcos2_dpram_byte_w) AM_BASE_LEGACY(&namcos2_dpram)
-	AM_RANGE(0x7800, 0x7fff) AM_READWRITE_LEGACY(namcos2_dpram_byte_r,namcos2_dpram_byte_w) /* mirror */
+	AM_RANGE(0x7000, 0x77ff) AM_READWRITE(namcos2_dpram_byte_r,namcos2_dpram_byte_w) AM_BASE_LEGACY(&namcos2_dpram)
+	AM_RANGE(0x7800, 0x7fff) AM_READWRITE(namcos2_dpram_byte_r,namcos2_dpram_byte_w) /* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_WRITENOP /* Amplifier enable on 1st write */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE_LEGACY(namcos2_sound_bankselect_w)
@@ -779,7 +783,7 @@ static ADDRESS_MAP_START( mcu_default_am, AS_PROGRAM, 8, namcos2_state )
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("MCUDI1")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("MCUDI2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("MCUDI3")
-	AM_RANGE(0x5000, 0x57ff) AM_READWRITE_LEGACY(namcos2_dpram_byte_r,namcos2_dpram_byte_w) AM_BASE_LEGACY(&namcos2_dpram)
+	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(namcos2_dpram_byte_r,namcos2_dpram_byte_w) AM_BASE_LEGACY(&namcos2_dpram)
 	AM_RANGE(0x6000, 0x6fff) AM_READNOP /* watchdog */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

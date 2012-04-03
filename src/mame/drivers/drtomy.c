@@ -29,6 +29,8 @@ public:
 
 	/* misc */
 	int       m_oki_bank;
+	DECLARE_WRITE16_MEMBER(drtomy_vram_fg_w);
+	DECLARE_WRITE16_MEMBER(drtomy_vram_bg_w);
 };
 
 
@@ -133,18 +135,16 @@ static SCREEN_UPDATE_IND16( drtomy )
 	return 0;
 }
 
-static WRITE16_HANDLER( drtomy_vram_fg_w )
+WRITE16_MEMBER(drtomy_state::drtomy_vram_fg_w)
 {
-	drtomy_state *state = space->machine().driver_data<drtomy_state>();
-	COMBINE_DATA(&state->m_videoram_fg[offset]);
-	state->m_tilemap_fg->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram_fg[offset]);
+	m_tilemap_fg->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( drtomy_vram_bg_w )
+WRITE16_MEMBER(drtomy_state::drtomy_vram_bg_w)
 {
-	drtomy_state *state = space->machine().driver_data<drtomy_state>();
-	COMBINE_DATA(&state->m_videoram_bg[offset]);
-	state->m_tilemap_bg->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram_bg[offset]);
+	m_tilemap_bg->mark_tile_dirty(offset);
 }
 
 static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
@@ -162,8 +162,8 @@ static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 
 static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM	/* ROM */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(drtomy_vram_fg_w) AM_BASE(m_videoram_fg)	/* Video RAM FG */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(drtomy_vram_bg_w) AM_BASE(m_videoram_bg) /* Video RAM BG */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_BASE(m_videoram_fg)	/* Video RAM FG */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_BASE(m_videoram_bg) /* Video RAM BG */
 	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram) /* Palette */
 	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE(m_spriteram) /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")

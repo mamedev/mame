@@ -99,6 +99,13 @@ public:
 	UINT8 *m_fg_ram;
 	tilemap_t *m_bg_tmap;
 	tilemap_t *m_fg_tmap;
+	DECLARE_WRITE8_MEMBER(bg_ram_w);
+	DECLARE_WRITE8_MEMBER(fg_ram_w);
+	DECLARE_READ8_MEMBER(quizpun2_protection_r);
+	DECLARE_WRITE8_MEMBER(quizpun2_protection_w);
+	DECLARE_WRITE8_MEMBER(quizpun2_rombank_w);
+	DECLARE_WRITE8_MEMBER(quizpun2_irq_ack);
+	DECLARE_WRITE8_MEMBER(quizpun2_soundlatch_w);
 };
 
 
@@ -123,18 +130,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(1, code, color & 0x0f, 0);
 }
 
-static WRITE8_HANDLER( bg_ram_w )
+WRITE8_MEMBER(quizpun2_state::bg_ram_w)
 {
-	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
-	state->m_bg_ram[offset] = data;
-	state->m_bg_tmap->mark_tile_dirty(offset/2);
+	m_bg_ram[offset] = data;
+	m_bg_tmap->mark_tile_dirty(offset/2);
 }
 
-static WRITE8_HANDLER( fg_ram_w )
+WRITE8_MEMBER(quizpun2_state::fg_ram_w)
 {
-	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
-	state->m_fg_ram[offset] = data;
-	state->m_fg_tmap->mark_tile_dirty(offset/4);
+	m_fg_ram[offset] = data;
+	m_fg_tmap->mark_tile_dirty(offset/4);
 }
 
 static VIDEO_START(quizpun2)
@@ -206,10 +211,9 @@ static void log_protection( address_space *space, const char *warning )
 	);
 }
 
-static READ8_HANDLER( quizpun2_protection_r )
+READ8_MEMBER(quizpun2_state::quizpun2_protection_r)
 {
-	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
-	struct prot_t &prot = state->m_prot;
+	struct prot_t &prot = m_prot;
 	UINT8 ret;
 
 	switch ( prot.state )
@@ -236,25 +240,25 @@ static READ8_HANDLER( quizpun2_protection_r )
 					break;
 
 				default:
-					log_protection(space, "unknown address");
+					log_protection(&space, "unknown address");
 					ret = 0x2e59 >> ((prot.addr & 1) ? 0 : 8);	// return the address of: XOR A, RET
 			}
 			break;
 
 		case STATE_EEPROM_R:		// EEPROM read
 		{
-			UINT8 *eeprom = space->machine().region("eeprom")->base();
+			UINT8 *eeprom = machine().region("eeprom")->base();
 			ret = eeprom[prot.addr];
 			break;
 		}
 
 		default:
-			log_protection(space, "unknown read");
+			log_protection(&space, "unknown read");
 			ret = 0x00;
 	}
 
 #if VERBOSE_PROTECTION_LOG
-	log_protection(space, "info READ");
+	log_protection(&space, "info READ");
 #endif
 
 	prot.addr++;
@@ -262,16 +266,15 @@ static READ8_HANDLER( quizpun2_protection_r )
 	return ret;
 }
 
-static WRITE8_HANDLER( quizpun2_protection_w )
+WRITE8_MEMBER(quizpun2_state::quizpun2_protection_w)
 {
-	quizpun2_state *state = space->machine().driver_data<quizpun2_state>();
-	struct prot_t &prot = state->m_prot;
+	struct prot_t &prot = m_prot;
 
 	switch ( prot.state )
 	{
 		case STATE_EEPROM_W:
 		{
-			UINT8 *eeprom = space->machine().region("eeprom")->base();
+			UINT8 *eeprom = machine().region("eeprom")->base();
 			eeprom[prot.addr] = data;
 			prot.addr++;
 			if ((prot.addr % 8) == 0)
@@ -300,7 +303,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 						prot.addr = 0;
 					}
 					else
-						log_protection(space, "unknown command");
+						log_protection(&space, "unknown command");
 				}
 				else if (prot.cmd >= 0x00 && prot.cmd <= 0x0f )
 				{
@@ -315,7 +318,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 				else
 				{
 					prot.state = STATE_IDLE;
-					log_protection(space, "unknown command");
+					log_protection(&space, "unknown command");
 				}
 			}
 			else
@@ -327,7 +330,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 	}
 
 #if VERBOSE_PROTECTION_LOG
-	log_protection(space, "info WRITE");
+	log_protection(&space, "info WRITE");
 #endif
 }
 
@@ -336,29 +339,29 @@ static WRITE8_HANDLER( quizpun2_protection_w )
                             Memory Maps - Main CPU
 ***************************************************************************/
 
-static WRITE8_HANDLER( quizpun2_rombank_w )
+WRITE8_MEMBER(quizpun2_state::quizpun2_rombank_w)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
-	memory_set_bankptr(space->machine(),  "bank1", &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
+	UINT8 *ROM = machine().region("maincpu")->base();
+	memory_set_bankptr(machine(),  "bank1", &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
 }
 
-static WRITE8_HANDLER( quizpun2_irq_ack )
+WRITE8_MEMBER(quizpun2_state::quizpun2_irq_ack)
 {
-	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( quizpun2_soundlatch_w )
+WRITE8_MEMBER(quizpun2_state::quizpun2_soundlatch_w)
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( quizpun2_map, AS_PROGRAM, 8, quizpun2_state )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank1")
 
-	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE_LEGACY(fg_ram_w ) AM_BASE(m_fg_ram )	// 4 * 800
-	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE_LEGACY(bg_ram_w ) AM_BASE(m_bg_ram )	// 4 * 400
+	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE(fg_ram_w ) AM_BASE(m_fg_ram )	// 4 * 800
+	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE(bg_ram_w ) AM_BASE(m_bg_ram )	// 4 * 400
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAM										//
 
 	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_le_w )  AM_BASE_GENERIC( paletteram )
@@ -367,13 +370,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizpun2_io_map, AS_IO, 8, quizpun2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x40, 0x40 ) AM_WRITE_LEGACY(quizpun2_irq_ack )
-	AM_RANGE( 0x50, 0x50 ) AM_WRITE_LEGACY(quizpun2_soundlatch_w )
-	AM_RANGE( 0x60, 0x60 ) AM_WRITE_LEGACY(quizpun2_rombank_w )
+	AM_RANGE( 0x40, 0x40 ) AM_WRITE(quizpun2_irq_ack )
+	AM_RANGE( 0x50, 0x50 ) AM_WRITE(quizpun2_soundlatch_w )
+	AM_RANGE( 0x60, 0x60 ) AM_WRITE(quizpun2_rombank_w )
 	AM_RANGE( 0x80, 0x80 ) AM_READ_PORT( "DSW" )
 	AM_RANGE( 0x90, 0x90 ) AM_READ_PORT( "IN0" )
 	AM_RANGE( 0xa0, 0xa0 ) AM_READ_PORT( "IN1" )
-	AM_RANGE( 0xe0, 0xe0 ) AM_READWRITE_LEGACY(quizpun2_protection_r, quizpun2_protection_w )
+	AM_RANGE( 0xe0, 0xe0 ) AM_READWRITE(quizpun2_protection_r, quizpun2_protection_w )
 ADDRESS_MAP_END
 
 

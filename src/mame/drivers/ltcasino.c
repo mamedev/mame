@@ -27,6 +27,8 @@ public:
 	UINT8 *m_tile_num_ram;
 	UINT8 *m_tile_atr_ram;
 	tilemap_t *m_tilemap;
+	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
+	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
 };
 
 
@@ -52,27 +54,25 @@ static VIDEO_START(ltcasino)
 }
 
 
-static WRITE8_HANDLER( ltcasino_tile_num_w )
+WRITE8_MEMBER(ltcasino_state::ltcasino_tile_num_w)
 {
-	ltcasino_state *state = space->machine().driver_data<ltcasino_state>();
-	state->m_tile_num_ram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_tile_num_ram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( ltcasino_tile_atr_w )
+WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
 {
-	ltcasino_state *state = space->machine().driver_data<ltcasino_state>();
-	state->m_tile_atr_ram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_tile_atr_ram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 
 static ADDRESS_MAP_START( ltcasino_map, AS_PROGRAM, 8, ltcasino_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(ltcasino_tile_num_w) AM_BASE(m_tile_num_ram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ltcasino_tile_num_w) AM_BASE(m_tile_num_ram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(ltcasino_tile_atr_w) AM_BASE(m_tile_atr_ram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ltcasino_tile_atr_w) AM_BASE(m_tile_atr_ram)
 	AM_RANGE(0xe800, 0xebff) AM_RAM
 
 	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("IN0")

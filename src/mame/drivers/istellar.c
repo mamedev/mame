@@ -39,6 +39,14 @@ public:
 	UINT8 m_ldp_latch1;
 	UINT8 m_ldp_latch2;
 	UINT8 m_z80_2_nmi_enable;
+	DECLARE_READ8_MEMBER(z80_0_latch1_read);
+	DECLARE_WRITE8_MEMBER(z80_0_latch2_write);
+	DECLARE_READ8_MEMBER(z80_2_ldp_read);
+	DECLARE_READ8_MEMBER(z80_2_latch2_read);
+	DECLARE_READ8_MEMBER(z80_2_nmienable);
+	DECLARE_READ8_MEMBER(z80_2_unknown_read);
+	DECLARE_WRITE8_MEMBER(z80_2_latch1_write);
+	DECLARE_WRITE8_MEMBER(z80_2_ldp_write);
 };
 
 
@@ -93,25 +101,23 @@ static MACHINE_START( istellar )
 
 /* MEMORY HANDLERS */
 /* Z80 0 R/W */
-static READ8_HANDLER(z80_0_latch1_read)
+READ8_MEMBER(istellar_state::z80_0_latch1_read)
 {
-	istellar_state *state = space->machine().driver_data<istellar_state>();
-	/*logerror("CPU0 : reading LDP status latch (%x)\n", state->m_ldp_latch1);*/
-	return state->m_ldp_latch1;
+	/*logerror("CPU0 : reading LDP status latch (%x)\n", m_ldp_latch1);*/
+	return m_ldp_latch1;
 }
 
-static WRITE8_HANDLER(z80_0_latch2_write)
+WRITE8_MEMBER(istellar_state::z80_0_latch2_write)
 {
-	istellar_state *state = space->machine().driver_data<istellar_state>();
 	/*logerror("CPU0 : writing cpu_latch2 (%x).  Potentially followed by an IRQ.\n", data);*/
-	state->m_ldp_latch2 = data;
+	m_ldp_latch2 = data;
 
 	/* A CPU2 NMI */
-	if (state->m_z80_2_nmi_enable)
+	if (m_z80_2_nmi_enable)
 	{
 		logerror("Executing an NMI on CPU2\n");
-		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
-		state->m_z80_2_nmi_enable = 0;
+		cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
+		m_z80_2_nmi_enable = 0;
 	}
 }
 
@@ -120,47 +126,42 @@ static WRITE8_HANDLER(z80_0_latch2_write)
 
 
 /* Z80 2 R/W */
-static READ8_HANDLER(z80_2_ldp_read)
+READ8_MEMBER(istellar_state::z80_2_ldp_read)
 {
-	istellar_state *state = space->machine().driver_data<istellar_state>();
-	UINT8 readResult = state->m_laserdisc->status_r();
+	UINT8 readResult = m_laserdisc->status_r();
 	logerror("CPU2 : reading LDP : %x\n", readResult);
 	return readResult;
 }
 
-static READ8_HANDLER(z80_2_latch2_read)
+READ8_MEMBER(istellar_state::z80_2_latch2_read)
 {
-	istellar_state *state = space->machine().driver_data<istellar_state>();
-	logerror("CPU2 : reading latch2 (%x)\n", state->m_ldp_latch2);
-	return state->m_ldp_latch2;
+	logerror("CPU2 : reading latch2 (%x)\n", m_ldp_latch2);
+	return m_ldp_latch2;
 }
 
-static READ8_HANDLER(z80_2_nmienable)
+READ8_MEMBER(istellar_state::z80_2_nmienable)
 {
-	istellar_state *state = space->machine().driver_data<istellar_state>();
 	logerror("CPU2 : ENABLING NMI\n");
-	state->m_z80_2_nmi_enable = 1;
+	m_z80_2_nmi_enable = 1;
 	return 0x00;
 }
 
-static READ8_HANDLER(z80_2_unknown_read)
+READ8_MEMBER(istellar_state::z80_2_unknown_read)
 {
 	logerror("CPU2 : c000!\n");
 	return 0x00;
 }
 
-static WRITE8_HANDLER(z80_2_latch1_write)
+WRITE8_MEMBER(istellar_state::z80_2_latch1_write)
 {
-	istellar_state *state = space->machine().driver_data<istellar_state>();
 	logerror("CPU2 : writing latch1 (%x)\n", data);
-	state->m_ldp_latch1 = data;
+	m_ldp_latch1 = data;
 }
 
-static WRITE8_HANDLER(z80_2_ldp_write)
+WRITE8_MEMBER(istellar_state::z80_2_ldp_write)
 {
-	istellar_state *state = space->machine().driver_data<istellar_state>();
 	logerror("CPU2 : writing LDP : 0x%x\n", data);
-	state->m_laserdisc->data_w(data);
+	m_laserdisc->data_w(data);
 }
 
 
@@ -182,7 +183,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_2_mem, AS_PROGRAM, 8, istellar_state )
 	AM_RANGE(0x0000,0x17ff) AM_ROM
 	AM_RANGE(0x1800,0x1fff) AM_RAM
-	AM_RANGE(0xc000,0xc000) AM_READ_LEGACY(z80_2_unknown_read)		/* Seems to be thrown away every time it's read - maybe interrupt related? */
+	AM_RANGE(0xc000,0xc000) AM_READ(z80_2_unknown_read)		/* Seems to be thrown away every time it's read - maybe interrupt related? */
 ADDRESS_MAP_END
 
 
@@ -193,7 +194,7 @@ static ADDRESS_MAP_START( z80_0_io, AS_IO, 8, istellar_state )
 	AM_RANGE(0x02,0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03,0x03) AM_READ_PORT("DSW2")
 	/*AM_RANGE(0x04,0x04) AM_WRITE_LEGACY(volatile_palette_write)*/
-	AM_RANGE(0x05,0x05) AM_READWRITE_LEGACY(z80_0_latch1_read,z80_0_latch2_write)
+	AM_RANGE(0x05,0x05) AM_READWRITE(z80_0_latch1_read,z80_0_latch2_write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_1_io, AS_IO, 8, istellar_state )
@@ -205,9 +206,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_2_io, AS_IO, 8, istellar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_READWRITE_LEGACY(z80_2_ldp_read,z80_2_ldp_write)
-	AM_RANGE(0x01,0x01) AM_READWRITE_LEGACY(z80_2_latch2_read,z80_2_latch1_write)
-	AM_RANGE(0x02,0x02) AM_READ_LEGACY(z80_2_nmienable)
+	AM_RANGE(0x00,0x00) AM_READWRITE(z80_2_ldp_read,z80_2_ldp_write)
+	AM_RANGE(0x01,0x01) AM_READWRITE(z80_2_latch2_read,z80_2_latch1_write)
+	AM_RANGE(0x02,0x02) AM_READ(z80_2_nmienable)
 /*  AM_RANGE(0x03,0x03) AM_WRITE_LEGACY(z80_2_ldtrans_write)*/
 ADDRESS_MAP_END
 

@@ -77,6 +77,8 @@ public:
 	UINT8 *m_scrollram;
 	UINT8 *m_mainram;
 	UINT8 *m_spriteram;
+	DECLARE_READ8_MEMBER(t5182shared_r);
+	DECLARE_WRITE8_MEMBER(t5182shared_w);
 };
 
 
@@ -171,18 +173,18 @@ static TILE_GET_INFO( get_txttile_info )
 		0);
 }
 
-static READ8_HANDLER(t5182shared_r)
+READ8_MEMBER(panicr_state::t5182shared_r)
 {
 	if ((offset & 1) == 0)
-		return t5182_sharedram_r(space, offset/2);
+		return t5182_sharedram_r(&space, offset/2);
 	else
 		return 0;
 }
 
-static WRITE8_HANDLER(t5182shared_w)
+WRITE8_MEMBER(panicr_state::t5182shared_w)
 {
 	if ((offset & 1) == 0)
-		t5182_sharedram_w(space, offset/2, data);
+		t5182_sharedram_w(&space, offset/2, data);
 }
 
 
@@ -196,7 +198,7 @@ static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
 	AM_RANGE(0x0d002, 0x0d002) AM_READ_LEGACY(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0x0d004, 0x0d004) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_acquire_w)
 	AM_RANGE(0x0d006, 0x0d006) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_release_w)
-	AM_RANGE(0x0d200, 0x0d2ff) AM_READWRITE_LEGACY(t5182shared_r, t5182shared_w)
+	AM_RANGE(0x0d200, 0x0d2ff) AM_READWRITE(t5182shared_r, t5182shared_w)
 	AM_RANGE(0x0d400, 0x0d400) AM_READ_PORT("P1")
 	AM_RANGE(0x0d402, 0x0d402) AM_READ_PORT("P2")
 	AM_RANGE(0x0d404, 0x0d404) AM_READ_PORT("START")

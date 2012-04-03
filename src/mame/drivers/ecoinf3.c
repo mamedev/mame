@@ -8,9 +8,10 @@ class ecoinf3_state : public driver_device
 public:
 	ecoinf3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
+	DECLARE_WRITE8_MEMBER(py_port58_out_w);
 };
 
-static WRITE8_HANDLER( py_port58_out_w )
+WRITE8_MEMBER(ecoinf3_state::py_port58_out_w)
 {
 	// Watchdog?
 }
@@ -23,7 +24,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pyramid_portmap, AS_IO, 8, ecoinf3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x58, 0x58) AM_WRITE_LEGACY(py_port58_out_w)
+	AM_RANGE(0x58, 0x58) AM_WRITE(py_port58_out_w)
 ADDRESS_MAP_END
 
 /*

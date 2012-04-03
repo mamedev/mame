@@ -39,6 +39,11 @@ public:
 	UINT8 *m_tile_ram;
 	UINT8 *m_tile_control_ram;
 	UINT8 m_ld_video_visible;
+	DECLARE_READ8_MEMBER(ldp_read);
+	DECLARE_WRITE8_MEMBER(ldp_write);
+	DECLARE_WRITE8_MEMBER(misc_write);
+	DECLARE_WRITE8_MEMBER(led_writes);
+	DECLARE_WRITE8_MEMBER(nmi_line_w);
 };
 
 
@@ -81,34 +86,31 @@ static SCREEN_UPDATE_IND16( esh )
 
 
 /* MEMORY HANDLERS */
-static READ8_HANDLER(ldp_read)
+READ8_MEMBER(esh_state::ldp_read)
 {
-	esh_state *state = space->machine().driver_data<esh_state>();
-	return state->m_laserdisc->status_r();
+	return m_laserdisc->status_r();
 }
 
-static WRITE8_HANDLER(ldp_write)
+WRITE8_MEMBER(esh_state::ldp_write)
 {
-	esh_state *state = space->machine().driver_data<esh_state>();
-	state->m_laserdisc->data_w(data);
+	m_laserdisc->data_w(data);
 }
 
-static WRITE8_HANDLER(misc_write)
+WRITE8_MEMBER(esh_state::misc_write)
 {
-	esh_state *state = space->machine().driver_data<esh_state>();
 	/* Bit 0 unknown */
 
 	if (data & 0x02)
 		logerror("BEEP!\n");
 
 	/* Bit 2 unknown */
-	state->m_ld_video_visible = !((data & 0x08) >> 3);
+	m_ld_video_visible = !((data & 0x08) >> 3);
 
 	/* Bits 4-7 unknown */
 	/* They cycle through a repeating pattern though */
 }
 
-static WRITE8_HANDLER(led_writes)
+WRITE8_MEMBER(esh_state::led_writes)
 {
 	switch(offset)
 	{
@@ -139,12 +141,12 @@ static WRITE8_HANDLER(led_writes)
 	}
 }
 
-static WRITE8_HANDLER(nmi_line_w)
+WRITE8_MEMBER(esh_state::nmi_line_w)
 {
 	if (data == 0x00)
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	if (data == 0x01)
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	if (data != 0x00 && data != 0x01)
 		logerror("NMI line got a weird value!\n");
@@ -167,10 +169,10 @@ static ADDRESS_MAP_START( z80_0_io, AS_IO, 8, esh_state )
 	AM_RANGE(0xf1,0xf1) AM_READ_PORT("IN1")
 	AM_RANGE(0xf2,0xf2) AM_READ_PORT("IN2")
 	AM_RANGE(0xf3,0xf3) AM_READ_PORT("IN3")
-	AM_RANGE(0xf4,0xf4) AM_READWRITE_LEGACY(ldp_read,ldp_write)
-	AM_RANGE(0xf5,0xf5) AM_WRITE_LEGACY(misc_write)	/* Continuously writes repeating patterns */
-	AM_RANGE(0xf8,0xfd) AM_WRITE_LEGACY(led_writes)
-	AM_RANGE(0xfe,0xfe) AM_WRITE_LEGACY(nmi_line_w)	/* Both 0xfe and 0xff flip quickly between 0 and 1 */
+	AM_RANGE(0xf4,0xf4) AM_READWRITE(ldp_read,ldp_write)
+	AM_RANGE(0xf5,0xf5) AM_WRITE(misc_write)	/* Continuously writes repeating patterns */
+	AM_RANGE(0xf8,0xfd) AM_WRITE(led_writes)
+	AM_RANGE(0xfe,0xfe) AM_WRITE(nmi_line_w)	/* Both 0xfe and 0xff flip quickly between 0 and 1 */
 	AM_RANGE(0xff,0xff) AM_NOP					/*   (they're probably not NMI enables - likely LED's like their neighbors :) */
 ADDRESS_MAP_END									/*   (someday 0xf8-0xff will probably be a single handler) */
 

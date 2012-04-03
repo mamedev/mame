@@ -73,6 +73,21 @@ public:
 	device_t *m_n7751;
 	device_t *m_ay1;
 	device_t *m_ay2;
+	DECLARE_READ8_MEMBER(unk_87_r);
+	DECLARE_WRITE8_MEMBER(unk_8a_w);
+	DECLARE_WRITE8_MEMBER(unk_8c_w);
+	DECLARE_READ8_MEMBER(unk_8c_r);
+	DECLARE_READ8_MEMBER(sound_ack_r);
+	DECLARE_WRITE8_MEMBER(unk_8f_w);
+	DECLARE_WRITE8_MEMBER(tilebank_w);
+	DECLARE_READ8_MEMBER(latch_r);
+	DECLARE_WRITE8_MEMBER(ay_select_w);
+	DECLARE_WRITE8_MEMBER(ack_w);
+	DECLARE_WRITE8_MEMBER(ay_address_w);
+	DECLARE_WRITE8_MEMBER(ay_data_w);
+	DECLARE_READ8_MEMBER(n7751_rom_r);
+	DECLARE_READ8_MEMBER(n7751_command_r);
+	DECLARE_READ8_MEMBER(n7751_t1_r);
 };
 
 
@@ -124,51 +139,49 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, othello_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER( unk_87_r )
+READ8_MEMBER(othello_state::unk_87_r)
 {
 	/* n7751_status_r ?  bit 7 = ack/status from device connected  to port 8a? */
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static WRITE8_HANDLER( unk_8a_w )
+WRITE8_MEMBER(othello_state::unk_8a_w)
 {
 	/*
-    othello_state *state = space->machine().driver_data<othello_state>();
 
-    state->m_n7751_command = (data & 0x07);
-    device_set_input_line(state->m_n7751, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-    //device_set_input_line(state->m_n7751, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-    space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
+
+    m_n7751_command = (data & 0x07);
+    device_set_input_line(m_n7751, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+    //device_set_input_line(m_n7751, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+    machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
     */
 
 	logerror("8a -> %x\n", data);
 }
 
-static WRITE8_HANDLER( unk_8c_w )
+WRITE8_MEMBER(othello_state::unk_8c_w)
 {
 	logerror("8c -> %x\n", data);
 }
 
-static READ8_HANDLER( unk_8c_r )
+READ8_MEMBER(othello_state::unk_8c_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ8_HANDLER( sound_ack_r )
+READ8_MEMBER(othello_state::sound_ack_r)
 {
-	othello_state *state = space->machine().driver_data<othello_state>();
-	return state->m_ack_data;
+	return m_ack_data;
 }
 
-static WRITE8_HANDLER( unk_8f_w )
+WRITE8_MEMBER(othello_state::unk_8f_w)
 {
 	logerror("8f -> %x\n", data);
 }
 
-static WRITE8_HANDLER( tilebank_w )
+WRITE8_MEMBER(othello_state::tilebank_w)
 {
-	othello_state *state = space->machine().driver_data<othello_state>();
-	state->m_tile_bank = (data == 0x0f) ? 0x100 : 0x00;
+	m_tile_bank = (data == 0x0f) ? 0x100 : 0x00;
 	logerror("tilebank -> %x\n", data);
 }
 
@@ -179,47 +192,43 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("INP")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x83, 0x83) AM_READ_PORT("DSW")
-	AM_RANGE(0x86, 0x86) AM_WRITE_LEGACY(tilebank_w)
-	AM_RANGE(0x87, 0x87) AM_READ_LEGACY(unk_87_r)
-	AM_RANGE(0x8a, 0x8a) AM_WRITE_LEGACY(unk_8a_w)
-	AM_RANGE(0x8c, 0x8c) AM_READWRITE_LEGACY(unk_8c_r, unk_8c_w)
-	AM_RANGE(0x8d, 0x8d) AM_READWRITE_LEGACY(sound_ack_r, soundlatch_w)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE_LEGACY(unk_8f_w)
+	AM_RANGE(0x86, 0x86) AM_WRITE(tilebank_w)
+	AM_RANGE(0x87, 0x87) AM_READ(unk_87_r)
+	AM_RANGE(0x8a, 0x8a) AM_WRITE(unk_8a_w)
+	AM_RANGE(0x8c, 0x8c) AM_READWRITE(unk_8c_r, unk_8c_w)
+	AM_RANGE(0x8d, 0x8d) AM_READWRITE(sound_ack_r, soundlatch_w)
+	AM_RANGE(0x8f, 0x8f) AM_WRITE(unk_8f_w)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( latch_r )
+READ8_MEMBER(othello_state::latch_r)
 {
 	int retval = soundlatch_r(space, 0);
 	soundlatch_clear_w(space, 0, 0);
 	return retval;
 }
 
-static WRITE8_HANDLER( ay_select_w )
+WRITE8_MEMBER(othello_state::ay_select_w)
 {
-	othello_state *state = space->machine().driver_data<othello_state>();
-	state->m_ay_select = data;
+	m_ay_select = data;
 }
 
-static WRITE8_HANDLER( ack_w )
+WRITE8_MEMBER(othello_state::ack_w)
 {
-	othello_state *state = space->machine().driver_data<othello_state>();
-	state->m_ack_data = data;
+	m_ack_data = data;
 }
 
-static WRITE8_HANDLER( ay_address_w )
+WRITE8_MEMBER(othello_state::ay_address_w)
 {
-	othello_state *state = space->machine().driver_data<othello_state>();
 
-	if (state->m_ay_select & 1) ay8910_address_w(state->m_ay1, 0, data);
-	if (state->m_ay_select & 2) ay8910_address_w(state->m_ay2, 0, data);
+	if (m_ay_select & 1) ay8910_address_w(m_ay1, 0, data);
+	if (m_ay_select & 2) ay8910_address_w(m_ay2, 0, data);
 }
 
-static WRITE8_HANDLER( ay_data_w )
+WRITE8_MEMBER(othello_state::ay_data_w)
 {
-	othello_state *state = space->machine().driver_data<othello_state>();
 
-	if (state->m_ay_select & 1) ay8910_data_w(state->m_ay1, 0, data);
-	if (state->m_ay_select & 2) ay8910_data_w(state->m_ay2, 0, data);
+	if (m_ay_select & 1) ay8910_data_w(m_ay1, 0, data);
+	if (m_ay_select & 2) ay8910_data_w(m_ay2, 0, data);
 }
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, othello_state )
@@ -229,11 +238,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_portmap, AS_IO, 8, othello_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(latch_r)
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(ay_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(ay_address_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(ack_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(ay_select_w)
+	AM_RANGE(0x00, 0x00) AM_READ(latch_r)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay_data_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ay_address_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ack_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ay_select_w)
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
@@ -271,16 +280,14 @@ static WRITE8_DEVICE_HANDLER( n7751_rom_control_w )
 	}
 }
 
-static READ8_HANDLER( n7751_rom_r )
+READ8_MEMBER(othello_state::n7751_rom_r)
 {
-	othello_state *state = space->machine().driver_data<othello_state>();
-	return space->machine().region("n7751data")->base()[state->m_sound_addr];
+	return machine().region("n7751data")->base()[m_sound_addr];
 }
 
-static READ8_HANDLER( n7751_command_r )
+READ8_MEMBER(othello_state::n7751_command_r)
 {
-	othello_state *state = space->machine().driver_data<othello_state>();
-	return 0x80 | ((state->m_n7751_command & 0x07) << 4);
+	return 0x80 | ((m_n7751_command & 0x07) << 4);
 }
 
 static WRITE8_DEVICE_HANDLER( n7751_p2_w )
@@ -295,16 +302,16 @@ static WRITE8_DEVICE_HANDLER( n7751_p2_w )
 	state->m_n7751_busy = data;
 }
 
-static READ8_HANDLER( n7751_t1_r )
+READ8_MEMBER(othello_state::n7751_t1_r)
 {
 	/* T1 - labelled as "TEST", connected to ground */
 	return 0;
 }
 
 static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, othello_state )
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ_LEGACY(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ_LEGACY(n7751_command_r)
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ_LEGACY(n7751_rom_r)
+	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
+	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
 	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_DEVWRITE_LEGACY("n7751_8243", n7751_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE_LEGACY("n7751_8243", i8243_prog_w)

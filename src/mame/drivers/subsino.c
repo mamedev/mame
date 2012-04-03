@@ -257,6 +257,22 @@ public:
 	int m_colordac_offs;
 	UINT8* m_stisub_colorram;
 	UINT8 m_stisub_outc;
+	DECLARE_WRITE8_MEMBER(subsino_tiles_offset_w);
+	DECLARE_WRITE8_MEMBER(subsino_videoram_w);
+	DECLARE_WRITE8_MEMBER(subsino_colorram_w);
+	DECLARE_WRITE8_MEMBER(subsino_reel1_ram_w);
+	DECLARE_WRITE8_MEMBER(subsino_reel2_ram_w);
+	DECLARE_WRITE8_MEMBER(subsino_reel3_ram_w);
+	DECLARE_WRITE8_MEMBER(subsino_out_a_w);
+	DECLARE_WRITE8_MEMBER(subsino_out_b_w);
+	DECLARE_READ8_MEMBER(flash_r);
+	DECLARE_WRITE8_MEMBER(flash_w);
+	DECLARE_READ8_MEMBER(hwcheck_r);
+	DECLARE_WRITE8_MEMBER(subsino_out_c_w);
+	DECLARE_WRITE8_MEMBER(colordac_w);
+	DECLARE_WRITE8_MEMBER(stisub_out_c_w);
+	DECLARE_WRITE8_MEMBER(reel_scrollattr_w);
+	DECLARE_READ8_MEMBER(reel_scrollattr_r);
 };
 
 
@@ -266,26 +282,23 @@ public:
 ***************************************************************************/
 
 
-static WRITE8_HANDLER( subsino_tiles_offset_w )
+WRITE8_MEMBER(subsino_state::subsino_tiles_offset_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-	state->m_tiles_offset = (data & 1) ? 0x1000: 0;
-	state->m_tmap->mark_tile_dirty(offset);
+	m_tiles_offset = (data & 1) ? 0x1000: 0;
+	m_tmap->mark_tile_dirty(offset);
 //  popmessage("gfx %02x",data);
 }
 
-static WRITE8_HANDLER( subsino_videoram_w )
+WRITE8_MEMBER(subsino_state::subsino_videoram_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-	state->m_videoram[offset] = data;
-	state->m_tmap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tmap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( subsino_colorram_w )
+WRITE8_MEMBER(subsino_state::subsino_colorram_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-	state->m_colorram[offset] = data;
-	state->m_tmap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_tmap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_tile_info )
@@ -317,11 +330,10 @@ static VIDEO_START( subsino )
 
 
 
-static WRITE8_HANDLER( subsino_reel1_ram_w )
+WRITE8_MEMBER(subsino_state::subsino_reel1_ram_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-	state->m_reel1_ram[offset] = data;
-	state->m_reel1_tilemap->mark_tile_dirty(offset);
+	m_reel1_ram[offset] = data;
+	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_subsino_reel1_tile_info )
@@ -351,11 +363,10 @@ static TILE_GET_INFO( get_stisub_reel1_tile_info )
 }
 
 
-static WRITE8_HANDLER( subsino_reel2_ram_w )
+WRITE8_MEMBER(subsino_state::subsino_reel2_ram_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-	state->m_reel2_ram[offset] = data;
-	state->m_reel2_tilemap->mark_tile_dirty(offset);
+	m_reel2_ram[offset] = data;
+	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_subsino_reel2_tile_info )
@@ -384,11 +395,10 @@ static TILE_GET_INFO( get_stisub_reel2_tile_info )
 			0);
 }
 
-static WRITE8_HANDLER( subsino_reel3_ram_w )
+WRITE8_MEMBER(subsino_state::subsino_reel3_ram_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-	state->m_reel3_ram[offset] = data;
-	state->m_reel3_tilemap->mark_tile_dirty(offset);
+	m_reel3_ram[offset] = data;
+	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_subsino_reel3_tile_info )
@@ -584,9 +594,8 @@ static PALETTE_INIT( subsino_3proms )
 *                          Lamps & other outputs.                          *
 ***************************************************************************/
 
-static WRITE8_HANDLER( subsino_out_a_w )
+WRITE8_MEMBER(subsino_state::subsino_out_a_w)
 {
-
 /***** COIN PULSE: *****
 
 
@@ -625,16 +634,16 @@ static WRITE8_HANDLER( subsino_out_a_w )
 	output_set_lamp_value(14, (data >> 6) & 1);	/* Lamp 14 */
 	output_set_lamp_value(15, (data >> 7) & 1);	/* Lamp 15 */
 
-	coin_counter_w( space->machine(), 0, data & 0x01 );	/* coin / keyin */
-	coin_counter_w( space->machine(), 1, data & 0x02 );	/* keyin / coin */
-	coin_counter_w( space->machine(), 2, data & 0x10 );	/* keyout */
-	coin_counter_w( space->machine(), 3, data & 0x20 );	/* payout */
+	coin_counter_w( machine(), 0, data & 0x01 );	/* coin / keyin */
+	coin_counter_w( machine(), 1, data & 0x02 );	/* keyin / coin */
+	coin_counter_w( machine(), 2, data & 0x10 );	/* keyout */
+	coin_counter_w( machine(), 3, data & 0x20 );	/* payout */
 
 //  popmessage("Out A %02x",data);
 
 }
 
-static WRITE8_HANDLER( subsino_out_b_w )
+WRITE8_MEMBER(subsino_state::subsino_out_b_w)
 {
 /***** LAMPS: *****
 
@@ -787,8 +796,8 @@ static ADDRESS_MAP_START( srider_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INB" )
 
-	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE_LEGACY(subsino_out_b_w )
-	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE_LEGACY(subsino_out_a_w )
+	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE(subsino_out_b_w )
+	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE(subsino_out_a_w )
 
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
@@ -796,10 +805,10 @@ static ADDRESS_MAP_START( srider_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
+	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE(subsino_tiles_offset_w )
 
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
 ADDRESS_MAP_END
 
 
@@ -814,8 +823,8 @@ static ADDRESS_MAP_START( sharkpy_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
 
-	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE_LEGACY(subsino_out_b_w )
-	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE_LEGACY(subsino_out_a_w )
+	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE(subsino_out_b_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE(subsino_out_a_w )
 
 	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 
@@ -823,11 +832,11 @@ static ADDRESS_MAP_START( sharkpy_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
+	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
 
 	AM_RANGE( 0x00000, 0x13fff ) AM_ROM //overlap unmapped regions
 ADDRESS_MAP_END
@@ -841,8 +850,8 @@ this event makes the game to reset without any money in the bank.
 static ADDRESS_MAP_START( victor21_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
-	AM_RANGE( 0x09000, 0x09000 ) AM_WRITE_LEGACY(subsino_out_a_w )
-	AM_RANGE( 0x09001, 0x09001 ) AM_WRITE_LEGACY(subsino_out_b_w )
+	AM_RANGE( 0x09000, 0x09000 ) AM_WRITE(subsino_out_a_w )
+	AM_RANGE( 0x09001, 0x09001 ) AM_WRITE(subsino_out_b_w )
 	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "INC" )
 	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09005, 0x09005 ) AM_READ_PORT( "INB" )
@@ -857,11 +866,11 @@ static ADDRESS_MAP_START( victor21_map, AS_PROGRAM, 8, subsino_state )
 
 	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 
-	AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
+	AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
 
 	AM_RANGE( 0x00000, 0x08fff ) AM_ROM //overlap unmapped regions
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
@@ -886,49 +895,47 @@ what it is exactly and what it can possibly do.
 */
 
 
-static READ8_HANDLER( flash_r )
+READ8_MEMBER(subsino_state::flash_r)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-//  printf("R %02x\n",state->m_flash_val);
+//  printf("R %02x\n",m_flash_val);
 
-	if(state->m_flash_val == 0xff)
+	if(m_flash_val == 0xff)
 		return 0xd9;
-	else if(state->m_flash_val <= 0xa)
-		return state->m_flash_val;
-	else if(state->m_flash_val == 0x92)
+	else if(m_flash_val <= 0xa)
+		return m_flash_val;
+	else if(m_flash_val == 0x92)
 		return 0xeb; //protected GFXs in Cross Bingo
 	else
 		return 0xd9;
 }
 
-static WRITE8_HANDLER( flash_w )
+WRITE8_MEMBER(subsino_state::flash_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-	switch(state->m_flash_packet_start)
+	switch(m_flash_packet_start)
 	{
 		case 0:
-			state->m_flash_packet = data;
-			if((state->m_flash_packet & 0xf8) == 0xd0)
-				state->m_flash_packet_start = 1; //start of packet
+			m_flash_packet = data;
+			if((m_flash_packet & 0xf8) == 0xd0)
+				m_flash_packet_start = 1; //start of packet
 			break;
 		case 1:
-			state->m_flash_packet = data;
-			if((state->m_flash_packet & 0xf8) == 0xe0)
-				state->m_flash_packet_start = 0; //end of packet
+			m_flash_packet = data;
+			if((m_flash_packet & 0xf8) == 0xe0)
+				m_flash_packet_start = 0; //end of packet
 			else
-				state->m_flash_val = data;
+				m_flash_val = data;
 			break;
 	}
 }
 
 static ADDRESS_MAP_START( victor5_map, AS_PROGRAM, 8, subsino_state )
 	AM_IMPORT_FROM( victor21_map )
-	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE_LEGACY(flash_r, flash_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE(flash_r, flash_w )
 	AM_RANGE( 0x0900b, 0x0900b ) AM_READNOP //"flash" status, bit 0
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( hwcheck_r )
+READ8_MEMBER(subsino_state::hwcheck_r)
 {
 	/* Wants this at POST otherwise an "Hardware Error" occurs. */
 	return 0x55;
@@ -942,24 +949,24 @@ static ADDRESS_MAP_START( crsbingo_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09002, 0x09002 ) AM_READ_PORT( "INA" )
 	AM_RANGE( 0x09003, 0x09003 ) AM_READ_PORT( "INB" )
 	AM_RANGE( 0x09004, 0x09004 ) AM_READ_PORT( "INC" )
-	AM_RANGE( 0x09005, 0x09005 ) AM_WRITE_LEGACY(subsino_out_a_w )
+	AM_RANGE( 0x09005, 0x09005 ) AM_WRITE(subsino_out_a_w )
 
 	AM_RANGE( 0x09008, 0x09008 ) AM_READ_PORT( "SW4" )
-	AM_RANGE( 0x09009, 0x09009 ) AM_READ_PORT( "SW3" )	// AM_WRITE_LEGACY(subsino_out_a_w )
-	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE_LEGACY(hwcheck_r, subsino_out_b_w )
+	AM_RANGE( 0x09009, 0x09009 ) AM_READ_PORT( "SW3" )	// AM_WRITE(subsino_out_a_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_READWRITE(hwcheck_r, subsino_out_b_w )
 
-	AM_RANGE( 0x09010, 0x09010 ) AM_READWRITE_LEGACY(flash_r, flash_w )
+	AM_RANGE( 0x09010, 0x09010 ) AM_READWRITE(flash_r, flash_w )
 //  AM_RANGE( 0x09011, 0x09011 ) //"flash" status, bit 0
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 	AM_RANGE( 0x0900c, 0x0900d ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 
 //  AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE("oki", okim6295_device, write)
 
-//  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
+//  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
 
 	AM_RANGE( 0x00000, 0x8fff ) AM_ROM //overlap unmapped regions
 
@@ -967,19 +974,18 @@ static ADDRESS_MAP_START( crsbingo_map, AS_PROGRAM, 8, subsino_state )
 
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( subsino_out_c_w )
+WRITE8_MEMBER(subsino_state::subsino_out_c_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
 	// not 100% sure on this
 
 	// ???? eccc
 	// e = enable reels?
 	// c = reel colour bank?
-	state->m_out_c = data;
+	m_out_c = data;
 
-	state->m_reel1_tilemap->mark_all_dirty();
-	state->m_reel2_tilemap->mark_all_dirty();
-	state->m_reel3_tilemap->mark_all_dirty();
+	m_reel1_tilemap->mark_all_dirty();
+	m_reel2_tilemap->mark_all_dirty();
+	m_reel3_tilemap->mark_all_dirty();
 //  popmessage("data %02x\n",data);
 }
 
@@ -995,9 +1001,9 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x09006, 0x09006 ) AM_READ_PORT( "INB" )
 
 	/* 0x09008: is marked as OUTPUT C in the test mode. */
-	AM_RANGE( 0x09008, 0x09008 ) AM_WRITE_LEGACY(subsino_out_c_w )
-	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE_LEGACY(subsino_out_b_w )
-	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE_LEGACY(subsino_out_a_w )
+	AM_RANGE( 0x09008, 0x09008 ) AM_WRITE(subsino_out_c_w )
+	AM_RANGE( 0x09009, 0x09009 ) AM_WRITE(subsino_out_b_w )
+	AM_RANGE( 0x0900a, 0x0900a ) AM_WRITE(subsino_out_a_w )
 
 	AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 
@@ -1005,11 +1011,11 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
+	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE(subsino_tiles_offset_w )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM
-	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
-	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x08800, 0x08fff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x08000, 0x087ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
 
 	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM // overlap unmapped regions
 	AM_RANGE( 0x10000, 0x13fff ) AM_ROM
@@ -1019,29 +1025,28 @@ static ADDRESS_MAP_START( tisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x15140, 0x1517f ) AM_RAM AM_BASE(m_reel2_scroll)
 	AM_RANGE( 0x15180, 0x151bf ) AM_RAM AM_BASE(m_reel1_scroll)
 
-	AM_RANGE( 0x15800, 0x159ff ) AM_RAM_WRITE_LEGACY(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE( 0x15a00, 0x15bff ) AM_RAM_WRITE_LEGACY(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE_LEGACY(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE( 0x15800, 0x159ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE( 0x15a00, 0x15bff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE( 0x15c00, 0x15dff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER(colordac_w)
+WRITE8_MEMBER(subsino_state::colordac_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
 	switch ( offset )
 	{
 		case 0:
-			state->m_colordac_offs = data * 3;
+			m_colordac_offs = data * 3;
 			break;
 
 		case 1:
-			state->m_stisub_colorram[state->m_colordac_offs] = data;
-			palette_set_color_rgb(space->machine(), state->m_colordac_offs/3,
-				pal6bit(state->m_stisub_colorram[(state->m_colordac_offs/3)*3+0]),
-				pal6bit(state->m_stisub_colorram[(state->m_colordac_offs/3)*3+1]),
-				pal6bit(state->m_stisub_colorram[(state->m_colordac_offs/3)*3+2])
+			m_stisub_colorram[m_colordac_offs] = data;
+			palette_set_color_rgb(machine(), m_colordac_offs/3,
+				pal6bit(m_stisub_colorram[(m_colordac_offs/3)*3+0]),
+				pal6bit(m_stisub_colorram[(m_colordac_offs/3)*3+1]),
+				pal6bit(m_stisub_colorram[(m_colordac_offs/3)*3+2])
 			);
-			state->m_colordac_offs = (state->m_colordac_offs+1) % (256*3);
+			m_colordac_offs = (m_colordac_offs+1) % (256*3);
 			break;
 
 		case 2:
@@ -1054,31 +1059,29 @@ static WRITE8_HANDLER(colordac_w)
 }
 
 
-static WRITE8_HANDLER( stisub_out_c_w )
+WRITE8_MEMBER(subsino_state::stisub_out_c_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-	state->m_stisub_outc = data;
+	m_stisub_outc = data;
 
 }
 
 // this stuff is banked..
 // not 100% sure on the bank bits.. other bits are also set
-static WRITE8_HANDLER( reel_scrollattr_w )
+WRITE8_MEMBER(subsino_state::reel_scrollattr_w)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-	if (state->m_stisub_outc&0x20)
+	if (m_stisub_outc&0x20)
 	{
 		if (offset<0x200)
 		{
-			state->m_reel1_attr[offset&0x1ff] = data;
+			m_reel1_attr[offset&0x1ff] = data;
 		}
 		else if (offset<0x400)
 		{
-			state->m_reel2_attr[offset&0x1ff] = data;
+			m_reel2_attr[offset&0x1ff] = data;
 		}
 		else if (offset<0x600)
 		{
-			state->m_reel3_attr[offset&0x1ff] = data;
+			m_reel3_attr[offset&0x1ff] = data;
 		}
 		else
 		{
@@ -1095,23 +1098,22 @@ static WRITE8_HANDLER( reel_scrollattr_w )
 		}
 		else if (offset<0x80)
 		{
-			state->m_reel2_scroll[offset&0x3f] = data;
+			m_reel2_scroll[offset&0x3f] = data;
 		}
 		else if (offset<0xc0)
 		{
-			state->m_reel1_scroll[offset&0x3f] = data;
+			m_reel1_scroll[offset&0x3f] = data;
 		}
 		else
 		{
-			state->m_reel3_scroll[offset&0x3f] = data;
+			m_reel3_scroll[offset&0x3f] = data;
 		}
 	}
 }
 
-static READ8_HANDLER( reel_scrollattr_r )
+READ8_MEMBER(subsino_state::reel_scrollattr_r)
 {
-	subsino_state *state = space->machine().driver_data<subsino_state>();
-	return state->m_reel1_attr[offset];
+	return m_reel1_attr[offset];
 }
 
 static ADDRESS_MAP_START( stisub_map, AS_PROGRAM, 8, subsino_state )
@@ -1127,27 +1129,27 @@ static ADDRESS_MAP_START( stisub_map, AS_PROGRAM, 8, subsino_state )
 	AM_RANGE( 0x0d005, 0x0d005 ) AM_READ_PORT( "INB" )
 	AM_RANGE( 0x0d006, 0x0d006 ) AM_READ_PORT( "INA" )
 
-	AM_RANGE( 0x0d008, 0x0d008 ) AM_WRITE_LEGACY(stisub_out_c_w )
+	AM_RANGE( 0x0d008, 0x0d008 ) AM_WRITE(stisub_out_c_w )
 
-	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE_LEGACY(subsino_out_b_w )
-	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE_LEGACY(subsino_out_a_w )
+	AM_RANGE( 0x0d009, 0x0d009 ) AM_WRITE(subsino_out_b_w )
+	AM_RANGE( 0x0d00a, 0x0d00a ) AM_WRITE(subsino_out_a_w )
 
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE_LEGACY(colordac_w)
+	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE(colordac_w)
 
 	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
 
-//  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE_LEGACY(subsino_tiles_offset_w )
+//  AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE(subsino_tiles_offset_w )
 
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
 
-	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE_LEGACY(reel_scrollattr_r, reel_scrollattr_w)
+	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(reel_scrollattr_r, reel_scrollattr_w)
 
-	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE_LEGACY(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE_LEGACY(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE_LEGACY(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
 ADDRESS_MAP_END
 
 
@@ -1173,7 +1175,7 @@ static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
 //  AM_RANGE( 0x0d00b, 0x0d00b ) AM_WRITE
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE_LEGACY(colordac_w)
+	AM_RANGE( 0x0d010, 0x0d013 ) AM_WRITE(colordac_w)
 
 //  AM_RANGE( 0x0d012, 0x0d012 ) AM_WRITE
 
@@ -1181,14 +1183,14 @@ static ADDRESS_MAP_START( mtrainnv_map, AS_PROGRAM, 8, subsino_state )
 
 //  AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE_LEGACY(subsino_colorram_w ) AM_BASE(m_colorram )
-	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE_LEGACY(subsino_videoram_w ) AM_BASE(m_videoram )
+	AM_RANGE( 0x0e000, 0x0e7ff ) AM_RAM_WRITE(subsino_colorram_w ) AM_BASE(m_colorram )
+	AM_RANGE( 0x0e800, 0x0efff ) AM_RAM_WRITE(subsino_videoram_w ) AM_BASE(m_videoram )
 
-	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE_LEGACY(reel_scrollattr_r, reel_scrollattr_w)
+	AM_RANGE( 0xf000, 0xf7ff ) AM_READWRITE(reel_scrollattr_r, reel_scrollattr_w)
 
-	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE_LEGACY(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
-	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE_LEGACY(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
-	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE_LEGACY(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
+	AM_RANGE( 0xf800, 0xf9ff ) AM_RAM_WRITE(subsino_reel1_ram_w) AM_BASE(m_reel1_ram)
+	AM_RANGE( 0xfa00, 0xfbff ) AM_RAM_WRITE(subsino_reel2_ram_w) AM_BASE(m_reel2_ram)
+	AM_RANGE( 0xfc00, 0xfdff ) AM_RAM_WRITE(subsino_reel3_ram_w) AM_BASE(m_reel3_ram)
 ADDRESS_MAP_END
 
 

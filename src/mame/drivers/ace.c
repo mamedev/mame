@@ -56,20 +56,23 @@ public:
 
 	/* input-related */
 	int m_objpos[8];
+	DECLARE_WRITE8_MEMBER(ace_objpos_w);
+	DECLARE_READ8_MEMBER(ace_objpos_r);
+	DECLARE_WRITE8_MEMBER(ace_characterram_w);
+	DECLARE_WRITE8_MEMBER(ace_scoreram_w);
+	DECLARE_READ8_MEMBER(unk_r);
 };
 
 
-static WRITE8_HANDLER( ace_objpos_w )
+WRITE8_MEMBER(aceal_state::ace_objpos_w)
 {
-	aceal_state *state = space->machine().driver_data<aceal_state>();
-	state->m_objpos[offset] = data;
+	m_objpos[offset] = data;
 }
 
 #if 0
-static READ8_HANDLER( ace_objpos_r )
+READ8_MEMBER(aceal_state::ace_objpos_r)
 {
-	aceal_state *state = space->machine().driver_data<aceal_state>();
-	return state->m_objpos[offset];
+	return m_objpos[offset];
 }
 #endif
 
@@ -128,33 +131,31 @@ static PALETTE_INIT( ace )
 }
 
 
-static WRITE8_HANDLER( ace_characterram_w )
+WRITE8_MEMBER(aceal_state::ace_characterram_w)
 {
-	aceal_state *state = space->machine().driver_data<aceal_state>();
-	if (state->m_characterram[offset] != data)
+	if (m_characterram[offset] != data)
 	{
 		if (data & ~0x07)
 		{
 			logerror("write to %04x data = %02x\n", 0x8000 + offset, data);
 			popmessage("write to %04x data = %02x\n", 0x8000 + offset, data);
 		}
-		state->m_characterram[offset] = data;
-		gfx_element_mark_dirty(space->machine().gfx[1], 0);
-		gfx_element_mark_dirty(space->machine().gfx[2], 0);
-		gfx_element_mark_dirty(space->machine().gfx[3], 0);
+		m_characterram[offset] = data;
+		gfx_element_mark_dirty(machine().gfx[1], 0);
+		gfx_element_mark_dirty(machine().gfx[2], 0);
+		gfx_element_mark_dirty(machine().gfx[3], 0);
 	}
 }
 
-static WRITE8_HANDLER( ace_scoreram_w )
+WRITE8_MEMBER(aceal_state::ace_scoreram_w)
 {
-	aceal_state *state = space->machine().driver_data<aceal_state>();
-	state->m_scoreram[offset] = data;
-	gfx_element_mark_dirty(space->machine().gfx[4], offset / 32);
+	m_scoreram[offset] = data;
+	gfx_element_mark_dirty(machine().gfx[4], offset / 32);
 }
 
-static READ8_HANDLER( unk_r )
+READ8_MEMBER(aceal_state::unk_r)
 {
-	return space->machine().rand() & 0xff;
+	return machine().rand() & 0xff;
 }
 
 
@@ -166,11 +167,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aceal_state )
 
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
 
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE_LEGACY(ace_scoreram_w) AM_BASE(m_scoreram)	/* 2x2101 */
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_BASE(m_scoreram)	/* 2x2101 */
 	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE(m_ram2)	/* 2x2101 */
-	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE_LEGACY(ace_characterram_w) AM_BASE(m_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
+	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_BASE(m_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
 
-	AM_RANGE(0xc000, 0xc005) AM_WRITE_LEGACY(ace_objpos_w)
+	AM_RANGE(0xc000, 0xc005) AM_WRITE(ace_objpos_w)
 
 	/* players inputs */
 	AM_RANGE(0xc008, 0xc008) AM_READ_PORT("c008")
@@ -184,7 +185,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aceal_state )
 	AM_RANGE(0xc010, 0xc010) AM_READ_PORT("c010")
 	AM_RANGE(0xc011, 0xc011) AM_READ_PORT("c011")
 
-	AM_RANGE(0xc012, 0xc012) AM_READ_LEGACY(unk_r)
+	AM_RANGE(0xc012, 0xc012) AM_READ(unk_r)
 
 	/* vblank */
 	AM_RANGE(0xc014, 0xc014) AM_READ_PORT("c014")
@@ -195,17 +196,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aceal_state )
 	/* start (must read 1 at least once to make the game run) */
 	AM_RANGE(0xc016, 0xc016) AM_READ_PORT("c016")
 
-	AM_RANGE(0xc017, 0xc017) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0xc018, 0xc018) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0xc019, 0xc019) AM_READ_LEGACY(unk_r)
+	AM_RANGE(0xc017, 0xc017) AM_READ(unk_r)
+	AM_RANGE(0xc018, 0xc018) AM_READ(unk_r)
+	AM_RANGE(0xc019, 0xc019) AM_READ(unk_r)
 
-	AM_RANGE(0xc020, 0xc020) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0xc021, 0xc021) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0xc022, 0xc022) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0xc023, 0xc023) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0xc024, 0xc024) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0xc025, 0xc025) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0xc026, 0xc026) AM_READ_LEGACY(unk_r)
+	AM_RANGE(0xc020, 0xc020) AM_READ(unk_r)
+	AM_RANGE(0xc021, 0xc021) AM_READ(unk_r)
+	AM_RANGE(0xc022, 0xc022) AM_READ(unk_r)
+	AM_RANGE(0xc023, 0xc023) AM_READ(unk_r)
+	AM_RANGE(0xc024, 0xc024) AM_READ(unk_r)
+	AM_RANGE(0xc025, 0xc025) AM_READ(unk_r)
+	AM_RANGE(0xc026, 0xc026) AM_READ(unk_r)
 
 ADDRESS_MAP_END
 

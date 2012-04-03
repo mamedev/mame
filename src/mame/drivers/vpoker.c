@@ -120,6 +120,8 @@ public:
 
 	UINT8 *m_videoram;
 	UINT8 m_blit_ram[8];
+	DECLARE_READ8_MEMBER(blitter_r);
+	DECLARE_WRITE8_MEMBER(blitter_w);
 };
 
 
@@ -153,29 +155,28 @@ static SCREEN_UPDATE_IND16( vpoker )
 	return 0;
 }
 
-static READ8_HANDLER( blitter_r )
+READ8_MEMBER(vpoker_state::blitter_r)
 {
 	if(offset == 6)
-		return input_port_read(space->machine(), "IN0");
+		return input_port_read(machine(), "IN0");
 
 	return 0;
 }
 
-static WRITE8_HANDLER( blitter_w )
+WRITE8_MEMBER(vpoker_state::blitter_w)
 {
-	vpoker_state *state = space->machine().driver_data<vpoker_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 
-	state->m_blit_ram[offset] = data;
+	m_blit_ram[offset] = data;
 
 	if(offset == 2)
 	{
 		int blit_offs;
 
-		blit_offs = (state->m_blit_ram[1] & 0x01)<<8|(state->m_blit_ram[2] & 0xff);
+		blit_offs = (m_blit_ram[1] & 0x01)<<8|(m_blit_ram[2] & 0xff);
 
-		videoram[blit_offs] = state->m_blit_ram[0];
-//      printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",state->m_blit_ram[0],state->m_blit_ram[1],state->m_blit_ram[2],state->m_blit_ram[3],state->m_blit_ram[4],state->m_blit_ram[5],state->m_blit_ram[6],state->m_blit_ram[7]);
+		videoram[blit_offs] = m_blit_ram[0];
+//      printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",m_blit_ram[0],m_blit_ram[1],m_blit_ram[2],m_blit_ram[3],m_blit_ram[4],m_blit_ram[5],m_blit_ram[6],m_blit_ram[7]);
 	}
 }
 
@@ -183,7 +184,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vpoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM		/* vpoker has 0x100, 5acespkr has 0x200 */
 	AM_RANGE(0x0400, 0x0407) AM_DEVREADWRITE("6840ptm", ptm6840_device, read, write)
-	AM_RANGE(0x0800, 0x0807) AM_READ_LEGACY(blitter_r) AM_WRITE_LEGACY(blitter_w)
+	AM_RANGE(0x0800, 0x0807) AM_READ(blitter_r) AM_WRITE(blitter_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 

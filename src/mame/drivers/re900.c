@@ -95,6 +95,9 @@ public:
 	UINT8 m_ledant;
 	UINT8 m_player;
 	UINT8 m_stat_a;
+	DECLARE_READ8_MEMBER(rom_r);
+	DECLARE_WRITE8_MEMBER(cpu_port_0_w);
+	DECLARE_WRITE8_MEMBER(re900_watchdog_reset_w);
 };
 
 
@@ -168,10 +171,9 @@ static READ8_DEVICE_HANDLER (re_psg_portB_r)
 	return retval;
 }
 
-static READ8_HANDLER (rom_r)
+READ8_MEMBER(re900_state::rom_r)
 {
-	re900_state *state = space->machine().driver_data<re900_state>();
-	return state->m_rom[offset];
+	return m_rom[offset];
 }
 
 
@@ -205,13 +207,13 @@ static WRITE8_DEVICE_HANDLER (re_mux_port_B_w)
 	}
 }
 
-static WRITE8_HANDLER (cpu_port_0_w)
+WRITE8_MEMBER(re900_state::cpu_port_0_w)
 {
 //  output_set_lamp_value(7,1 ^ ( (data >> 4) & 1)); /* Cont. Sal */
 //  output_set_lamp_value(8,1 ^ ( (data >> 5) & 1)); /* Cont. Ent */
 }
 
-static WRITE8_HANDLER(re900_watchdog_reset_w)
+WRITE8_MEMBER(re900_state::re900_watchdog_reset_w)
 {
 	//watchdog_reset_w(space,0,0); /* To do! */
 }
@@ -226,14 +228,14 @@ static ADDRESS_MAP_START( mem_prg, AS_PROGRAM, 8, re900_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mem_io, AS_IO, 8, re900_state )
-	AM_RANGE(0x0000, 0xbfff) AM_READ_LEGACY(rom_r)
+	AM_RANGE(0x0000, 0xbfff) AM_READ(rom_r)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("tms9128", tms9928a_device, vram_write)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("tms9128", tms9928a_device, register_write)
 	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE_LEGACY("ay_re900", ay8910_address_data_w)
 	AM_RANGE(0xe802, 0xe802) AM_DEVREAD_LEGACY("ay_re900", ay8910_r)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE_LEGACY(re900_watchdog_reset_w)
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_WRITE_LEGACY(cpu_port_0_w)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(re900_watchdog_reset_w)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_WRITE(cpu_port_0_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_NOP
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_NOP
 ADDRESS_MAP_END

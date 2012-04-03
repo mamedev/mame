@@ -62,6 +62,10 @@ public:
 	UINT8    m_adpcm_idle;
 	UINT8	 m_adpcm_data;
 	UINT8    m_trigger;
+	DECLARE_WRITE8_MEMBER(ctrl_w);
+	DECLARE_WRITE8_MEMBER(chinsan_port00_w);
+	DECLARE_READ8_MEMBER(chinsan_input_port_0_r);
+	DECLARE_READ8_MEMBER(chinsan_input_port_1_r);
 };
 
 
@@ -112,9 +116,9 @@ static SCREEN_UPDATE_IND16( chinsan )
  *
  *************************************/
 
-static WRITE8_HANDLER( ctrl_w )
+WRITE8_MEMBER(chinsan_state::ctrl_w)
 {
-	memory_set_bank(space->machine(), "bank1", data >> 6);
+	memory_set_bank(machine(), "bank1", data >> 6);
 }
 
 static WRITE8_DEVICE_HANDLER( ym_port_w1 )
@@ -141,11 +145,10 @@ static const ym2203_interface ym2203_config =
 	},
 };
 
-static WRITE8_HANDLER( chinsan_port00_w )
+WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
 {
-	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
-	state->m_port_select = data;
+	m_port_select = data;
 
 	if (
 	   (data != 0x40) &&
@@ -159,68 +162,66 @@ static WRITE8_HANDLER( chinsan_port00_w )
 
 }
 
-static READ8_HANDLER( chinsan_input_port_0_r )
+READ8_MEMBER(chinsan_state::chinsan_input_port_0_r)
 {
-	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
 	//return 0xff; // the inputs don't seem to work, so just return ff for now
 
-	switch (state->m_port_select)
+	switch (m_port_select)
 	{
 		/* i doubt these are both really the same.. */
 		case 0x40:
 		case 0x4f:
-			return input_port_read(space->machine(), "MAHJONG_P2_1");
+			return input_port_read(machine(), "MAHJONG_P2_1");
 
 		case 0x53:
-			return input_port_read(space->machine(), "MAHJONG_P2_2");
+			return input_port_read(machine(), "MAHJONG_P2_2");
 
 		case 0x57:
-			return input_port_read(space->machine(), "MAHJONG_P2_3");
+			return input_port_read(machine(), "MAHJONG_P2_3");
 
 		case 0x5b:
-			return input_port_read(space->machine(), "MAHJONG_P2_4");
+			return input_port_read(machine(), "MAHJONG_P2_4");
 
 		case 0x5d:
-			return input_port_read(space->machine(), "MAHJONG_P2_5");
+			return input_port_read(machine(), "MAHJONG_P2_5");
 
 		case 0x5e:
-			return input_port_read(space->machine(), "MAHJONG_P2_6");
+			return input_port_read(machine(), "MAHJONG_P2_6");
 	}
 
-	printf("chinsan_input_port_0_r unk_r %02x\n", state->m_port_select);
-	return space->machine().rand();
+	printf("chinsan_input_port_0_r unk_r %02x\n", m_port_select);
+	return machine().rand();
 }
 
-static READ8_HANDLER( chinsan_input_port_1_r )
+READ8_MEMBER(chinsan_state::chinsan_input_port_1_r)
 {
-	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
-	switch (state->m_port_select)
+	switch (m_port_select)
 	{
 		/* i doubt these are both really the same.. */
 		case 0x40:
 		case 0x4f:
-			return input_port_read(space->machine(), "MAHJONG_P1_1");
+			return input_port_read(machine(), "MAHJONG_P1_1");
 
 		case 0x53:
-			return input_port_read(space->machine(), "MAHJONG_P1_2");
+			return input_port_read(machine(), "MAHJONG_P1_2");
 
 		case 0x57:
-			return input_port_read(space->machine(), "MAHJONG_P1_3");
+			return input_port_read(machine(), "MAHJONG_P1_3");
 
 		case 0x5b:
-			return input_port_read(space->machine(), "MAHJONG_P1_4");
+			return input_port_read(machine(), "MAHJONG_P1_4");
 
 		case 0x5d:
-			return input_port_read(space->machine(), "MAHJONG_P1_5");
+			return input_port_read(machine(), "MAHJONG_P1_5");
 
 		case 0x5e:
-			return input_port_read(space->machine(), "MAHJONG_P1_6");
+			return input_port_read(machine(), "MAHJONG_P1_6");
 	}
 
-	printf("chinsan_input_port_1_r unk_r %02x\n", state->m_port_select);
-	return space->machine().rand();
+	printf("chinsan_input_port_1_r unk_r %02x\n", m_port_select);
+	return machine().rand();
 }
 
 static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
@@ -246,12 +247,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinsan_io, AS_IO, 8, chinsan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(chinsan_port00_w)
-	AM_RANGE(0x01, 0x01) AM_READ_LEGACY(chinsan_input_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(chinsan_input_port_1_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE(chinsan_port00_w)
+	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)
+	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("adpcm", chin_adpcm_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
+	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
 ADDRESS_MAP_END
 
 

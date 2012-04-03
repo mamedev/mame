@@ -24,6 +24,9 @@ public:
 	UINT8 *m_vram;
 	UINT8 *m_pal;
 	UINT8 m_tile_bank;
+	DECLARE_WRITE8_MEMBER(poker72_paletteram_w);
+	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_WRITE8_MEMBER(tile_bank_w);
 };
 
 
@@ -58,45 +61,43 @@ static SCREEN_UPDATE_IND16(poker72)
 	return 0;
 }
 
-static WRITE8_HANDLER( poker72_paletteram_w )
+WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
 {
-	poker72_state *state = space->machine().driver_data<poker72_state>();
 	int r,g,b;
-	state->m_pal[offset] = data;
+	m_pal[offset] = data;
 
-	r = state->m_pal[(offset & 0x3ff)+0x000] & 0x3f;
-	g = state->m_pal[(offset & 0x3ff)+0x400] & 0x3f;
-	b = state->m_pal[(offset & 0x3ff)+0x800] & 0x3f;
+	r = m_pal[(offset & 0x3ff)+0x000] & 0x3f;
+	g = m_pal[(offset & 0x3ff)+0x400] & 0x3f;
+	b = m_pal[(offset & 0x3ff)+0x800] & 0x3f;
 
-	palette_set_color_rgb( space->machine(), offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb( machine(), offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
-static WRITE8_HANDLER( output_w )
+WRITE8_MEMBER(poker72_state::output_w)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = machine().region("maincpu")->base();
 
 	printf("%02x\n",data);
 
 /*  if((data & 0xc) == 0xc)
-        memory_set_bankptr(space->machine(), "bank1", &ROM[0x10000]);
+        memory_set_bankptr(machine(), "bank1", &ROM[0x10000]);
     else*/
 	if(data & 8)
-		memory_set_bankptr(space->machine(), "bank1", &ROM[0x08000]);
+		memory_set_bankptr(machine(), "bank1", &ROM[0x08000]);
 	else
-		memory_set_bankptr(space->machine(), "bank1", &ROM[0x00000]);
+		memory_set_bankptr(machine(), "bank1", &ROM[0x00000]);
 }
 
-static WRITE8_HANDLER( tile_bank_w )
+WRITE8_MEMBER(poker72_state::tile_bank_w)
 {
-	poker72_state *state = space->machine().driver_data<poker72_state>();
-	state->m_tile_bank = (data & 4) >> 2;
+	m_tile_bank = (data & 4) >> 2;
 }
 
 static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8, poker72_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM //work ram
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(m_vram)
-	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE_LEGACY(poker72_paletteram_w) AM_BASE(m_pal)
+	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE(poker72_paletteram_w) AM_BASE(m_pal)
 	AM_RANGE(0xfc00, 0xfdff) AM_RAM //???
 	AM_RANGE(0xfe08, 0xfe08) AM_READ_PORT("IN0")
 	AM_RANGE(0xfe09, 0xfe09) AM_READ_PORT("IN1")
@@ -106,8 +107,8 @@ static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8, poker72_state )
 	AM_RANGE(0xfe0e, 0xfe0e) AM_READ_PORT("IN5")
 
 	AM_RANGE(0xfe17, 0xfe17) AM_READNOP //irq ack
-	AM_RANGE(0xfe20, 0xfe20) AM_WRITE_LEGACY(output_w) //output, irq enable?
-	AM_RANGE(0xfe22, 0xfe22) AM_WRITE_LEGACY(tile_bank_w)
+	AM_RANGE(0xfe20, 0xfe20) AM_WRITE(output_w) //output, irq enable?
+	AM_RANGE(0xfe22, 0xfe22) AM_WRITE(tile_bank_w)
 	AM_RANGE(0xfe40, 0xfe40) AM_DEVREADWRITE_LEGACY("ay", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xfe60, 0xfe60) AM_DEVWRITE_LEGACY("ay", ay8910_address_w)
 ADDRESS_MAP_END

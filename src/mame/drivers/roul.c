@@ -76,6 +76,10 @@ public:
 	UINT8 m_reg[0x10];
 	UINT8 *m_videobuf;
 	UINT8 m_lamp_old;
+	DECLARE_READ8_MEMBER(blitter_status_r);
+	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
+	DECLARE_WRITE8_MEMBER(sound_latch_w);
+	DECLARE_WRITE8_MEMBER(ball_w);
 };
 
 
@@ -107,7 +111,7 @@ static PALETTE_INIT( roul )
 	}
 }
 
-static READ8_HANDLER( blitter_status_r )
+READ8_MEMBER(roul_state::blitter_status_r)
 {
 /*
 code check bit 6 and bit 7
@@ -115,66 +119,64 @@ bit 7 -> blitter ready
 bit 6 -> ??? (after unknown blitter command : [80][80][08][02])
 */
 //  return 0x80; // blitter ready
-//  logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(&space->device()));
-	return space->machine().rand() & 0x00c0;
+//  logerror("Read unknown port $f5 at %04x\n",cpu_get_pc(&space.device()));
+	return machine().rand() & 0x00c0;
 }
 
-static WRITE8_HANDLER( blitter_cmd_w )
+WRITE8_MEMBER(roul_state::blitter_cmd_w)
 {
-	roul_state *state = space->machine().driver_data<roul_state>();
-	state->m_reg[offset] = data;
+	m_reg[offset] = data;
 	if (offset==2)
 	{
 		int i,j;
-		int width	= state->m_reg[2];
-		int y		= state->m_reg[0];
-		int x		= state->m_reg[1];
-		int color	= state->m_reg[3] & 0x0f;
+		int width	= m_reg[2];
+		int y		= m_reg[0];
+		int x		= m_reg[1];
+		int color	= m_reg[3] & 0x0f;
 		int xdirection = 1, ydirection = 1;
 
-		if (state->m_reg[3] & 0x10) ydirection = -1;
-		if (state->m_reg[3] & 0x20) xdirection = -1;
+		if (m_reg[3] & 0x10) ydirection = -1;
+		if (m_reg[3] & 0x20) xdirection = -1;
 
 		if (width == 0x00) width = 0x100;
 
-		switch(state->m_reg[3] & 0xc0)
+		switch(m_reg[3] & 0xc0)
 		{
-			case 0x00: // state->m_reg[4] used?
+			case 0x00: // m_reg[4] used?
 				for (i = - width / 2; i < width / 2; i++)
 					for (j = - width / 2; j < width / 2; j++)
-						state->m_videobuf[(y + j) * 256 + x + i] = color;
-				logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n",state->m_reg[0],state->m_reg[1],state->m_reg[2],state->m_reg[3],state->m_reg[4]);
+						m_videobuf[(y + j) * 256 + x + i] = color;
+				logerror("Blitter command 0 : [%02x][%02x][%02x][%02x][%02x]\n",m_reg[0],m_reg[1],m_reg[2],m_reg[3],m_reg[4]);
 				break;
-			case 0x40: // vertical line - state->m_reg[4] not used
+			case 0x40: // vertical line - m_reg[4] not used
 				for (i = 0; i < width; i++ )
-					state->m_videobuf[(y + i * ydirection) * 256 + x] = color;
+					m_videobuf[(y + i * ydirection) * 256 + x] = color;
 				break;
-			case 0x80: // horizontal line - state->m_reg[4] not used
+			case 0x80: // horizontal line - m_reg[4] not used
 				for (i = 0; i < width; i++ )
-					state->m_videobuf[y * 256 + x + i * xdirection] = color;
+					m_videobuf[y * 256 + x + i * xdirection] = color;
 				break;
-			case 0xc0: // diagonal line - state->m_reg[4] not used
+			case 0xc0: // diagonal line - m_reg[4] not used
 				for (i = 0; i < width; i++ )
-					state->m_videobuf[(y + i * ydirection) * 256 + x + i * xdirection] = color;
+					m_videobuf[(y + i * ydirection) * 256 + x + i * xdirection] = color;
 		}
 	}
 
 }
 
-static WRITE8_HANDLER( sound_latch_w )
+WRITE8_MEMBER(roul_state::sound_latch_w)
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "soundcpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "soundcpu", 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( ball_w )
+WRITE8_MEMBER(roul_state::ball_w)
 {
-	roul_state *state = space->machine().driver_data<roul_state>();
 	int lamp = data;
 
 	output_set_lamp_value(data, 1);
-	output_set_lamp_value(state->m_lamp_old, 0);
-	state->m_lamp_old = lamp;
+	output_set_lamp_value(m_lamp_old, 0);
+	m_lamp_old = lamp;
 }
 
 static ADDRESS_MAP_START( roul_map, AS_PROGRAM, 8, roul_state )
@@ -184,13 +186,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roul_cpu_io_map, AS_IO, 8, roul_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf4) AM_WRITE_LEGACY(blitter_cmd_w)
-	AM_RANGE(0xf5, 0xf5) AM_READ_LEGACY(blitter_status_r)
+	AM_RANGE(0xf0, 0xf4) AM_WRITE(blitter_cmd_w)
+	AM_RANGE(0xf5, 0xf5) AM_READ(blitter_status_r)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW")
-	AM_RANGE(0xf9, 0xf9) AM_WRITE_LEGACY(ball_w)
+	AM_RANGE(0xf9, 0xf9) AM_WRITE(ball_w)
 	AM_RANGE(0xfa, 0xfa) AM_READ_PORT("IN0")
 	AM_RANGE(0xfd, 0xfd) AM_READ_PORT("IN1")
-	AM_RANGE(0xfe, 0xfe) AM_WRITE_LEGACY(sound_latch_w)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, roul_state )

@@ -45,6 +45,11 @@ public:
 	/* memory pointers */
 	UINT8 *  m_videoram;
 	UINT8    m_videoram2[0x4000];
+	DECLARE_WRITE8_MEMBER(bank_select_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(jongkyo_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(videoram2_w);
+	DECLARE_WRITE8_MEMBER(unknown_w);
 };
 
 
@@ -109,30 +114,28 @@ static SCREEN_UPDATE_IND16( jongkyo )
  *
  *************************************/
 
-static WRITE8_HANDLER( bank_select_w )
+WRITE8_MEMBER(jongkyo_state::bank_select_w)
 {
-	jongkyo_state *state = space->machine().driver_data<jongkyo_state>();
 	int mask = 1 << (offset >> 1);
 
-	state->m_rom_bank &= ~mask;
+	m_rom_bank &= ~mask;
 
 	if (offset & 1)
-		state->m_rom_bank |= mask;
+		m_rom_bank |= mask;
 
-	memory_set_bank(space->machine(), "bank1", state->m_rom_bank);
+	memory_set_bank(machine(), "bank1", m_rom_bank);
 }
 
-static WRITE8_HANDLER( mux_w )
+WRITE8_MEMBER(jongkyo_state::mux_w)
 {
-	jongkyo_state *state = space->machine().driver_data<jongkyo_state>();
-	state->m_mux_data = ~data;
-	//  printf("%02x\n", state->m_mux_data);
+	m_mux_data = ~data;
+	//  printf("%02x\n", m_mux_data);
 }
 
-static WRITE8_HANDLER( jongkyo_coin_counter_w )
+WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
 {
 	/* bit 1 = coin counter */
-	coin_counter_w(space->machine(), 0, data & 2);
+	coin_counter_w(machine(), 0, data & 2);
 
 	/* bit 2 always set? */
 }
@@ -177,13 +180,12 @@ static READ8_DEVICE_HANDLER( input_2p_r )
 	       input_port_read(device->machine(), "PL2_4") & input_port_read(device->machine(), "PL2_5") & input_port_read(device->machine(), "PL2_6")) | coin_port;
 }
 
-static WRITE8_HANDLER( videoram2_w )
+WRITE8_MEMBER(jongkyo_state::videoram2_w)
 {
-	jongkyo_state *state = space->machine().driver_data<jongkyo_state>();
-	state->m_videoram2[offset] = data;
+	m_videoram2[offset] = data;
 }
 
-static WRITE8_HANDLER( unknown_w )
+WRITE8_MEMBER(jongkyo_state::unknown_w)
 {
 	switch (offset)
 	{
@@ -218,7 +220,7 @@ static WRITE8_HANDLER( unknown_w )
  *************************************/
 
 static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8, jongkyo_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE_LEGACY(videoram2_w) // wrong, this doesn't seem to be video ram on write..
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE(videoram2_w) // wrong, this doesn't seem to be video ram on write..
 	AM_RANGE(0x4000, 0x6bff) AM_ROM // fixed rom
 	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")	// banked (8 banks)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
@@ -232,11 +234,11 @@ static ADDRESS_MAP_START( jongkyo_portmap, AS_IO, 8, jongkyo_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW") AM_WRITE_LEGACY(jongkyo_coin_counter_w)
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0") AM_WRITE_LEGACY(mux_w)
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW") AM_WRITE(jongkyo_coin_counter_w)
+	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0") AM_WRITE(mux_w)
 	// W 11 select keyboard row (fe fd fb f7)
-	AM_RANGE(0x40, 0x45) AM_WRITE_LEGACY(bank_select_w)
-	AM_RANGE(0x46, 0x4f) AM_WRITE_LEGACY(unknown_w)
+	AM_RANGE(0x40, 0x45) AM_WRITE(bank_select_w)
+	AM_RANGE(0x46, 0x4f) AM_WRITE(unknown_w)
 ADDRESS_MAP_END
 
 /*************************************

@@ -38,6 +38,9 @@ public:
 	tilemap_t *m_fg_tilemap;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE16_MEMBER(bestleag_txram_w);
+	DECLARE_WRITE16_MEMBER(bestleag_bgram_w);
+	DECLARE_WRITE16_MEMBER(bestleag_fgram_w);
 };
 
 
@@ -197,25 +200,22 @@ static SCREEN_UPDATE_IND16(bestleaw)
 	return 0;
 }
 
-static WRITE16_HANDLER( bestleag_txram_w )
+WRITE16_MEMBER(bestleag_state::bestleag_txram_w)
 {
-	bestleag_state *state = space->machine().driver_data<bestleag_state>();
-	state->m_txram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_txram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( bestleag_bgram_w )
+WRITE16_MEMBER(bestleag_state::bestleag_bgram_w)
 {
-	bestleag_state *state = space->machine().driver_data<bestleag_state>();
-	state->m_bgram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( bestleag_fgram_w )
+WRITE16_MEMBER(bestleag_state::bestleag_fgram_w)
 {
-	bestleag_state *state = space->machine().driver_data<bestleag_state>();
-	state->m_fgram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_DEVICE_HANDLER( oki_bank_w )
@@ -230,9 +230,9 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 static ADDRESS_MAP_START( bestleag_map, AS_PROGRAM, 16, bestleag_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d2000, 0x0d3fff) AM_NOP // left over from the original game (only read / written in memory test)
-	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE_LEGACY(bestleag_bgram_w) AM_BASE(m_bgram)
-	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE_LEGACY(bestleag_fgram_w) AM_BASE(m_fgram)
-	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE_LEGACY(bestleag_txram_w) AM_BASE(m_txram)
+	AM_RANGE(0x0e0000, 0x0e3fff) AM_RAM_WRITE(bestleag_bgram_w) AM_BASE(m_bgram)
+	AM_RANGE(0x0e8000, 0x0ebfff) AM_RAM_WRITE(bestleag_fgram_w) AM_BASE(m_fgram)
+	AM_RANGE(0x0f0000, 0x0f3fff) AM_RAM_WRITE(bestleag_txram_w) AM_BASE(m_txram)
 	AM_RANGE(0x0f8000, 0x0f800b) AM_RAM AM_BASE(m_vregs)
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)

@@ -27,6 +27,11 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_WRITE8_MEMBER(mgolf_vram_w);
+	DECLARE_READ8_MEMBER(mgolf_wram_r);
+	DECLARE_READ8_MEMBER(mgolf_dial_r);
+	DECLARE_READ8_MEMBER(mgolf_misc_r);
+	DECLARE_WRITE8_MEMBER(mgolf_wram_w);
 };
 
 
@@ -39,11 +44,10 @@ static TILE_GET_INFO( get_tile_info )
 }
 
 
-static WRITE8_HANDLER( mgolf_vram_w )
+WRITE8_MEMBER(mgolf_state::mgolf_vram_w)
 {
-	mgolf_state *state = space->machine().driver_data<mgolf_state>();
-	state->m_video_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_video_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -130,22 +134,21 @@ static double calc_plunger_pos(running_machine &machine)
 }
 
 
-static READ8_HANDLER( mgolf_wram_r )
+READ8_MEMBER(mgolf_state::mgolf_wram_r)
 {
-	mgolf_state *state = space->machine().driver_data<mgolf_state>();
-	return state->m_video_ram[0x380 + offset];
+	return m_video_ram[0x380 + offset];
 }
 
 
-static READ8_HANDLER( mgolf_dial_r )
+READ8_MEMBER(mgolf_state::mgolf_dial_r)
 {
-	UINT8 val = input_port_read(space->machine(), "41");
+	UINT8 val = input_port_read(machine(), "41");
 
-	if ((input_port_read(space->machine(), "DIAL") + 0x00) & 0x20)
+	if ((input_port_read(machine(), "DIAL") + 0x00) & 0x20)
 	{
 		val |= 0x01;
 	}
-	if ((input_port_read(space->machine(), "DIAL") + 0x10) & 0x20)
+	if ((input_port_read(machine(), "DIAL") + 0x10) & 0x20)
 	{
 		val |= 0x02;
 	}
@@ -154,11 +157,11 @@ static READ8_HANDLER( mgolf_dial_r )
 }
 
 
-static READ8_HANDLER( mgolf_misc_r )
+READ8_MEMBER(mgolf_state::mgolf_misc_r)
 {
-	double plunger = calc_plunger_pos(space->machine()); /* see Video Pinball */
+	double plunger = calc_plunger_pos(machine()); /* see Video Pinball */
 
-	UINT8 val = input_port_read(space->machine(), "61");
+	UINT8 val = input_port_read(machine(), "61");
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{
@@ -173,10 +176,9 @@ static READ8_HANDLER( mgolf_misc_r )
 }
 
 
-static WRITE8_HANDLER( mgolf_wram_w )
+WRITE8_MEMBER(mgolf_state::mgolf_wram_w)
 {
-	mgolf_state *state = space->machine().driver_data<mgolf_state>();
-	state->m_video_ram[0x380 + offset] = data;
+	m_video_ram[0x380 + offset] = data;
 }
 
 
@@ -185,11 +187,11 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, mgolf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0040, 0x0040) AM_READ_PORT("40")
-	AM_RANGE(0x0041, 0x0041) AM_READ_LEGACY(mgolf_dial_r)
+	AM_RANGE(0x0041, 0x0041) AM_READ(mgolf_dial_r)
 	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("60")
-	AM_RANGE(0x0061, 0x0061) AM_READ_LEGACY(mgolf_misc_r)
-	AM_RANGE(0x0080, 0x00ff) AM_READ_LEGACY(mgolf_wram_r)
-	AM_RANGE(0x0180, 0x01ff) AM_READ_LEGACY(mgolf_wram_r)
+	AM_RANGE(0x0061, 0x0061) AM_READ(mgolf_misc_r)
+	AM_RANGE(0x0080, 0x00ff) AM_READ(mgolf_wram_r)
+	AM_RANGE(0x0180, 0x01ff) AM_READ(mgolf_wram_r)
 	AM_RANGE(0x0800, 0x0bff) AM_READONLY
 
 	AM_RANGE(0x0000, 0x0009) AM_WRITENOP
@@ -203,9 +205,9 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, mgolf_state )
 	AM_RANGE(0x006a, 0x006a) AM_WRITENOP
 	AM_RANGE(0x006c, 0x006c) AM_WRITENOP
 	AM_RANGE(0x006d, 0x006d) AM_WRITENOP
-	AM_RANGE(0x0080, 0x00ff) AM_WRITE_LEGACY(mgolf_wram_w)
-	AM_RANGE(0x0180, 0x01ff) AM_WRITE_LEGACY(mgolf_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_WRITE_LEGACY(mgolf_vram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x0080, 0x00ff) AM_WRITE(mgolf_wram_w)
+	AM_RANGE(0x0180, 0x01ff) AM_WRITE(mgolf_wram_w)
+	AM_RANGE(0x0800, 0x0bff) AM_WRITE(mgolf_vram_w) AM_BASE(m_video_ram)
 
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END

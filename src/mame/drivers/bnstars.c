@@ -120,6 +120,19 @@ public:
 	int m_ms32_reverse_sprite_order;
 	int m_flipscreen;
 	UINT16 m_irqreq;
+	DECLARE_WRITE32_MEMBER(ms32_tx0_ram_w);
+	DECLARE_WRITE32_MEMBER(ms32_tx1_ram_w);
+	DECLARE_WRITE32_MEMBER(ms32_bg0_ram_w);
+	DECLARE_WRITE32_MEMBER(ms32_bg1_ram_w);
+	DECLARE_WRITE32_MEMBER(ms32_roz0_ram_w);
+	DECLARE_WRITE32_MEMBER(ms32_roz1_ram_w);
+	DECLARE_WRITE32_MEMBER(ms32_pal0_ram_w);
+	DECLARE_WRITE32_MEMBER(ms32_pal1_ram_w);
+	DECLARE_WRITE32_MEMBER(ms32_spramx_w);
+	DECLARE_READ32_MEMBER(bnstars1_r);
+	DECLARE_READ32_MEMBER(bnstars2_r);
+	DECLARE_READ32_MEMBER(bnstars3_r);
+	DECLARE_WRITE32_MEMBER(bnstars1_mahjong_select_w);
 };
 
 
@@ -146,18 +159,16 @@ static TILE_GET_INFO( get_ms32_tx1_tile_info )
 	SET_TILE_INFO(7,tileno,colour,0);
 }
 
-static WRITE32_HANDLER( ms32_tx0_ram_w )
+WRITE32_MEMBER(bnstars_state::ms32_tx0_ram_w)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	COMBINE_DATA(&state->m_ms32_tx0_ram[offset]);
-	state->m_ms32_tx_tilemap[0]->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_ms32_tx0_ram[offset]);
+	m_ms32_tx_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
-static WRITE32_HANDLER( ms32_tx1_ram_w )
+WRITE32_MEMBER(bnstars_state::ms32_tx1_ram_w)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	COMBINE_DATA(&state->m_ms32_tx1_ram[offset]);
-	state->m_ms32_tx_tilemap[1]->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_ms32_tx1_ram[offset]);
+	m_ms32_tx_tilemap[1]->mark_tile_dirty(offset/2);
 }
 
 /* BG Layers */
@@ -184,18 +195,16 @@ static TILE_GET_INFO( get_ms32_bg1_tile_info )
 	SET_TILE_INFO(6,tileno,colour,0);
 }
 
-static WRITE32_HANDLER( ms32_bg0_ram_w )
+WRITE32_MEMBER(bnstars_state::ms32_bg0_ram_w)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	COMBINE_DATA(&state->m_ms32_bg0_ram[offset]);
-	state->m_ms32_bg_tilemap[0]->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_ms32_bg0_ram[offset]);
+	m_ms32_bg_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
-static WRITE32_HANDLER( ms32_bg1_ram_w )
+WRITE32_MEMBER(bnstars_state::ms32_bg1_ram_w)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	COMBINE_DATA(&state->m_ms32_bg1_ram[offset]);
-	state->m_ms32_bg_tilemap[1]->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_ms32_bg1_ram[offset]);
+	m_ms32_bg_tilemap[1]->mark_tile_dirty(offset/2);
 }
 
 /* ROZ Layers */
@@ -308,18 +317,16 @@ static TILE_GET_INFO( get_ms32_roz1_tile_info )
 	SET_TILE_INFO(5,tileno,colour,0);
 }
 
-static WRITE32_HANDLER( ms32_roz0_ram_w )
+WRITE32_MEMBER(bnstars_state::ms32_roz0_ram_w)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	COMBINE_DATA(&state->m_ms32_roz0_ram[offset]);
-	state->m_ms32_roz_tilemap[0]->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_ms32_roz0_ram[offset]);
+	m_ms32_roz_tilemap[0]->mark_tile_dirty(offset/2);
 }
 
-static WRITE32_HANDLER( ms32_roz1_ram_w )
+WRITE32_MEMBER(bnstars_state::ms32_roz1_ram_w)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	COMBINE_DATA(&state->m_ms32_roz1_ram[offset]);
-	state->m_ms32_roz_tilemap[1]->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_ms32_roz1_ram[offset]);
+	m_ms32_roz_tilemap[1]->mark_tile_dirty(offset/2);
 }
 
 
@@ -335,18 +342,16 @@ static void update_color(running_machine &machine, int color, int screen)
 	palette_set_color(machine,color+screen*0x8000,MAKE_RGB(r,g,b));
 }
 
-static WRITE32_HANDLER( ms32_pal0_ram_w )
+WRITE32_MEMBER(bnstars_state::ms32_pal0_ram_w)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	COMBINE_DATA(&state->m_ms32_pal_ram[0][offset]);
-	update_color(space->machine(), offset/2, 0);
+	COMBINE_DATA(&m_ms32_pal_ram[0][offset]);
+	update_color(machine(), offset/2, 0);
 }
 
-static WRITE32_HANDLER( ms32_pal1_ram_w )
+WRITE32_MEMBER(bnstars_state::ms32_pal1_ram_w)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	COMBINE_DATA(&state->m_ms32_pal_ram[1][offset]);
-	update_color(space->machine(), offset/2, 1);
+	COMBINE_DATA(&m_ms32_pal_ram[1][offset]);
+	update_color(machine(), offset/2, 1);
 }
 
 
@@ -479,10 +484,9 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 
 
-static WRITE32_HANDLER( ms32_spramx_w )
+WRITE32_MEMBER(bnstars_state::ms32_spramx_w)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	COMBINE_DATA(&state->m_ms32_spram[offset]);
+	COMBINE_DATA(&m_ms32_spram[offset]);
 }
 
 
@@ -1220,53 +1224,51 @@ static GFXDECODE_START( bnstars )
 
 GFXDECODE_END
 
-static READ32_HANDLER( bnstars1_r )
+READ32_MEMBER(bnstars_state::bnstars1_r)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	switch (state->m_bnstars1_mahjong_select & 0x2080)
+	switch (m_bnstars1_mahjong_select & 0x2080)
 	{
 		default:
-			printf("unk bnstars1_r %08x\n",state->m_bnstars1_mahjong_select);
+			printf("unk bnstars1_r %08x\n",m_bnstars1_mahjong_select);
 			return 0xffffffff;
 
 		case 0x0000:
-			return input_port_read(space->machine(), "IN0");
+			return input_port_read(machine(), "IN0");
 
 		case 0x0080:
-			return input_port_read(space->machine(), "IN1");
+			return input_port_read(machine(), "IN1");
 
 		case 0x2000:
-			return input_port_read(space->machine(), "IN2");
+			return input_port_read(machine(), "IN2");
 
 		case 0x2080:
-			return input_port_read(space->machine(), "IN3");
+			return input_port_read(machine(), "IN3");
 
 	}
 }
 
-static READ32_HANDLER( bnstars2_r )
+READ32_MEMBER(bnstars_state::bnstars2_r)
 {
-	return input_port_read(space->machine(), "IN4");
+	return input_port_read(machine(), "IN4");
 }
 
-static READ32_HANDLER( bnstars3_r )
+READ32_MEMBER(bnstars_state::bnstars3_r)
 {
-	return input_port_read(space->machine(), "IN5");
+	return input_port_read(machine(), "IN5");
 }
 
-static WRITE32_HANDLER( bnstars1_mahjong_select_w )
+WRITE32_MEMBER(bnstars_state::bnstars1_mahjong_select_w)
 {
-	bnstars_state *state = space->machine().driver_data<bnstars_state>();
-	state->m_bnstars1_mahjong_select = data;
-//  printf("%08x\n",state->m_bnstars1_mahjong_select);
+	m_bnstars1_mahjong_select = data;
+//  printf("%08x\n",m_bnstars1_mahjong_select);
 }
 
 static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 
-	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_LEGACY(bnstars1_r )
-	AM_RANGE(0xfcc00008, 0xfcc0000b) AM_READ_LEGACY(bnstars2_r )
-	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_LEGACY(bnstars3_r )
+	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ(bnstars1_r )
+	AM_RANGE(0xfcc00008, 0xfcc0000b) AM_READ(bnstars2_r )
+	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ(bnstars3_r )
 
 	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP
 
@@ -1281,20 +1283,20 @@ static ADDRESS_MAP_START( bnstars_map, AS_PROGRAM, 32, bnstars_state )
 	AM_RANGE(0xfce00c00, 0xfce00c17) AM_WRITEONLY AM_BASE(m_ms32_tx1_scroll)
 	AM_RANGE(0xfce00c20, 0xfce00c37) AM_WRITEONLY AM_BASE(m_ms32_bg1_scroll)
 
-	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE_LEGACY(bnstars1_mahjong_select_w) // ?
+	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(bnstars1_mahjong_select_w) // ?
 
 	/* wrote together */
 	AM_RANGE(0xfd040000, 0xfd047fff) AM_RAM // priority ram
 	AM_RANGE(0xfd080000, 0xfd087fff) AM_RAM
-	AM_RANGE(0xfd200000, 0xfd237fff) AM_RAM_WRITE_LEGACY(ms32_pal1_ram_w) AM_BASE(m_ms32_pal_ram[1])
-	AM_RANGE(0xfd400000, 0xfd437fff) AM_RAM_WRITE_LEGACY(ms32_pal0_ram_w) AM_BASE(m_ms32_pal_ram[0])
-	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE_LEGACY(ms32_roz1_ram_w) AM_BASE(m_ms32_roz1_ram)
-	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE_LEGACY(ms32_roz0_ram_w) AM_BASE(m_ms32_roz0_ram)
-	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM_WRITE_LEGACY(ms32_spramx_w) AM_BASE(m_ms32_spram)
-	AM_RANGE(0xfea00000, 0xfea07fff) AM_RAM_WRITE_LEGACY(ms32_tx1_ram_w) AM_BASE(m_ms32_tx1_ram)
-	AM_RANGE(0xfea08000, 0xfea0ffff) AM_RAM_WRITE_LEGACY(ms32_bg1_ram_w) AM_BASE(m_ms32_bg1_ram)
-	AM_RANGE(0xfec00000, 0xfec07fff) AM_RAM_WRITE_LEGACY(ms32_tx0_ram_w) AM_BASE(m_ms32_tx0_ram)
-	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM_WRITE_LEGACY(ms32_bg0_ram_w) AM_BASE(m_ms32_bg0_ram)
+	AM_RANGE(0xfd200000, 0xfd237fff) AM_RAM_WRITE(ms32_pal1_ram_w) AM_BASE(m_ms32_pal_ram[1])
+	AM_RANGE(0xfd400000, 0xfd437fff) AM_RAM_WRITE(ms32_pal0_ram_w) AM_BASE(m_ms32_pal_ram[0])
+	AM_RANGE(0xfe000000, 0xfe01ffff) AM_RAM_WRITE(ms32_roz1_ram_w) AM_BASE(m_ms32_roz1_ram)
+	AM_RANGE(0xfe400000, 0xfe41ffff) AM_RAM_WRITE(ms32_roz0_ram_w) AM_BASE(m_ms32_roz0_ram)
+	AM_RANGE(0xfe800000, 0xfe83ffff) AM_RAM_WRITE(ms32_spramx_w) AM_BASE(m_ms32_spram)
+	AM_RANGE(0xfea00000, 0xfea07fff) AM_RAM_WRITE(ms32_tx1_ram_w) AM_BASE(m_ms32_tx1_ram)
+	AM_RANGE(0xfea08000, 0xfea0ffff) AM_RAM_WRITE(ms32_bg1_ram_w) AM_BASE(m_ms32_bg1_ram)
+	AM_RANGE(0xfec00000, 0xfec07fff) AM_RAM_WRITE(ms32_tx0_ram_w) AM_BASE(m_ms32_tx0_ram)
+	AM_RANGE(0xfec08000, 0xfec0ffff) AM_RAM_WRITE(ms32_bg0_ram_w) AM_BASE(m_ms32_bg0_ram)
 
 	AM_RANGE(0xfee00000, 0xfee1ffff) AM_RAM
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROMBANK("bank1")

@@ -193,6 +193,7 @@ public:
 	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
 };
 
 
@@ -287,7 +288,7 @@ static ADDRESS_MAP_START( pce_io , AS_IO, 8, tourvision_state )
 	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w )
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( tourvision_8085_d000_w )
+WRITE8_MEMBER(tourvision_state::tourvision_8085_d000_w)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
@@ -300,7 +301,7 @@ static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW2")
 	AM_RANGE(0xb000, 0xb000) AM_READNOP // unknown (must NOT be == 0x03 ? code at 0x1154)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(tourvision_8085_d000_w )
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(tourvision_8085_d000_w )
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READNOP // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 ADDRESS_MAP_END

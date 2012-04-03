@@ -92,37 +92,63 @@ public:
 	int m_signature_answer;
 	int m_signature_pos;
 	UINT8 m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(gei_drawctrl_w);
+	DECLARE_WRITE8_MEMBER(gei_bitmap_w);
+	DECLARE_READ8_MEMBER(catchall);
+	DECLARE_WRITE8_MEMBER(banksel_main_w);
+	DECLARE_WRITE8_MEMBER(banksel_1_w);
+	DECLARE_WRITE8_MEMBER(banksel_2_w);
+	DECLARE_WRITE8_MEMBER(banksel_3_w);
+	DECLARE_WRITE8_MEMBER(banksel_4_w);
+	DECLARE_WRITE8_MEMBER(banksel_5_w);
+	DECLARE_WRITE8_MEMBER(banksel_1_1_w);
+	DECLARE_WRITE8_MEMBER(banksel_2_1_w);
+	DECLARE_WRITE8_MEMBER(banksel_3_1_w);
+	DECLARE_WRITE8_MEMBER(banksel_4_1_w);
+	DECLARE_WRITE8_MEMBER(banksel_5_1_w);
+	DECLARE_WRITE8_MEMBER(banksel_1_2_w);
+	DECLARE_WRITE8_MEMBER(banksel_2_2_w);
+	DECLARE_WRITE8_MEMBER(banksel_3_2_w);
+	DECLARE_WRITE8_MEMBER(banksel_4_2_w);
+	DECLARE_WRITE8_MEMBER(banksel_5_2_w);
+	DECLARE_WRITE8_MEMBER(geimulti_bank_w);
+	DECLARE_READ8_MEMBER(banksel_1_r);
+	DECLARE_READ8_MEMBER(banksel_2_r);
+	DECLARE_READ8_MEMBER(banksel_3_r);
+	DECLARE_READ8_MEMBER(banksel_4_r);
+	DECLARE_READ8_MEMBER(banksel_5_r);
+	DECLARE_READ8_MEMBER(signature_r);
+	DECLARE_WRITE8_MEMBER(signature_w);
+	DECLARE_WRITE8_MEMBER(signature2_w);
 };
 
 
-static WRITE8_HANDLER( gei_drawctrl_w )
+WRITE8_MEMBER(gei_state::gei_drawctrl_w)
 {
-	gei_state *state = space->machine().driver_data<gei_state>();
-	state->m_drawctrl[offset] = data;
+	m_drawctrl[offset] = data;
 	if (offset == 2)
 	{
 		int i;
 		for (i = 0; i < 8; i++)
-			if (BIT(state->m_drawctrl[1],i)) state->m_color[i] = state->m_drawctrl[0] & 7;
+			if (BIT(m_drawctrl[1],i)) m_color[i] = m_drawctrl[0] & 7;
 	}
 }
 
-static WRITE8_HANDLER( gei_bitmap_w )
+WRITE8_MEMBER(gei_state::gei_bitmap_w)
 {
-	gei_state *state = space->machine().driver_data<gei_state>();
 	int sx,sy;
 	int i;
 
-	state->m_yadd = (offset==state->m_prevoffset) ? (state->m_yadd+1):0;
-	state->m_prevoffset = offset;
+	m_yadd = (offset==m_prevoffset) ? (m_yadd+1):0;
+	m_prevoffset = offset;
 
 	sx = 8 * (offset % 64);
 	sy = offset / 64;
-	sy = (sy + state->m_yadd) & 0xff;
+	sy = (sy + m_yadd) & 0xff;
 
 
 	for (i = 0; i < 8; i++)
-		state->m_bitmap.pix16(sy, sx+i) = state->m_color[8-i-1];
+		m_bitmap.pix16(sy, sx+i) = m_color[8-i-1];
 }
 
 static PALETTE_INIT(gei)
@@ -226,9 +252,9 @@ static WRITE8_DEVICE_HANDLER( nmi_w )
 	state->m_nmi_mask = data & 0x40;
 }
 
-static READ8_HANDLER( catchall )
+READ8_MEMBER(gei_state::catchall)
 {
-	int pc = cpu_get_pc(&space->device());
+	int pc = cpu_get_pc(&space.device());
 
 	if (pc != 0x3c74 && pc != 0x0364 && pc != 0x036d)	/* weed out spurious blit reads */
 		logerror("%04x: unmapped memory read from %04x\n",pc,offset);
@@ -241,73 +267,73 @@ static READ8_DEVICE_HANDLER( portC_r )
 	return 4;
 }
 
-static WRITE8_HANDLER( banksel_main_w )
+WRITE8_MEMBER(gei_state::banksel_main_w)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x8000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x8000);
 }
-static WRITE8_HANDLER( banksel_1_w )
+WRITE8_MEMBER(gei_state::banksel_1_w)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x10000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x10000);
 }
-static WRITE8_HANDLER( banksel_2_w )
+WRITE8_MEMBER(gei_state::banksel_2_w)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x18000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x18000);
 }
-static WRITE8_HANDLER( banksel_3_w )
+WRITE8_MEMBER(gei_state::banksel_3_w)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x20000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x20000);
 }
-static WRITE8_HANDLER( banksel_4_w )
+WRITE8_MEMBER(gei_state::banksel_4_w)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x28000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x28000);
 }
-static WRITE8_HANDLER( banksel_5_w )
+WRITE8_MEMBER(gei_state::banksel_5_w)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x30000);
-}
-
-static WRITE8_HANDLER( banksel_1_1_w )
-{
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x10000);
-}
-static WRITE8_HANDLER( banksel_2_1_w )
-{
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x14000);
-}
-static WRITE8_HANDLER( banksel_3_1_w )
-{
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x18000);
-}
-static WRITE8_HANDLER( banksel_4_1_w )
-{
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x1c000);
-}
-static WRITE8_HANDLER( banksel_5_1_w )
-{
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x20000);
-}
-static WRITE8_HANDLER( banksel_1_2_w )
-{
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x12000);
-}
-static WRITE8_HANDLER( banksel_2_2_w )
-{
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x16000);
-}
-static WRITE8_HANDLER( banksel_3_2_w )
-{
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x1a000);
-}
-static WRITE8_HANDLER( banksel_4_2_w )
-{
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x1e000);
-}
-static WRITE8_HANDLER( banksel_5_2_w )
-{
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x22000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x30000);
 }
 
-static WRITE8_HANDLER(geimulti_bank_w)
+WRITE8_MEMBER(gei_state::banksel_1_1_w)
+{
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x10000);
+}
+WRITE8_MEMBER(gei_state::banksel_2_1_w)
+{
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x14000);
+}
+WRITE8_MEMBER(gei_state::banksel_3_1_w)
+{
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x18000);
+}
+WRITE8_MEMBER(gei_state::banksel_4_1_w)
+{
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x1c000);
+}
+WRITE8_MEMBER(gei_state::banksel_5_1_w)
+{
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x20000);
+}
+WRITE8_MEMBER(gei_state::banksel_1_2_w)
+{
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x12000);
+}
+WRITE8_MEMBER(gei_state::banksel_2_2_w)
+{
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x16000);
+}
+WRITE8_MEMBER(gei_state::banksel_3_2_w)
+{
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x1a000);
+}
+WRITE8_MEMBER(gei_state::banksel_4_2_w)
+{
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x1e000);
+}
+WRITE8_MEMBER(gei_state::banksel_5_2_w)
+{
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x22000);
+}
+
+WRITE8_MEMBER(gei_state::geimulti_bank_w)
 {
 	int bank = -1;
 
@@ -332,72 +358,69 @@ static WRITE8_HANDLER(geimulti_bank_w)
 	}
 
 	if (bank != -1)
-		memory_set_bankptr(space->machine(), "bank1", space->machine().region("bank")->base() + bank*0x8000);
+		memory_set_bankptr(machine(), "bank1", machine().region("bank")->base() + bank*0x8000);
 }
 
-static READ8_HANDLER(banksel_1_r)
+READ8_MEMBER(gei_state::banksel_1_r)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x10000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x10000);
 	return 0x03;
 };
 
-static READ8_HANDLER(banksel_2_r)
+READ8_MEMBER(gei_state::banksel_2_r)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x18000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x18000);
 	return 0x03;
 }
 
-static READ8_HANDLER(banksel_3_r)
+READ8_MEMBER(gei_state::banksel_3_r)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x20000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x20000);
 	return 0x03;
 }
 
-static READ8_HANDLER(banksel_4_r)
+READ8_MEMBER(gei_state::banksel_4_r)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x28000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x28000);
 	return 0x03;
 }
 
-static READ8_HANDLER(banksel_5_r)
+READ8_MEMBER(gei_state::banksel_5_r)
 {
-	memory_set_bankptr(space->machine(), "bank1",space->machine().region("maincpu")->base() + 0x30000);
+	memory_set_bankptr(machine(), "bank1",machine().region("maincpu")->base() + 0x30000);
 	return 0x03;
 }
 
 /* This signature is used to validate the ROMs in sportauth. Simple protection check? */
 
-static READ8_HANDLER( signature_r )
+READ8_MEMBER(gei_state::signature_r)
 {
-	gei_state *state = space->machine().driver_data<gei_state>();
-	return state->m_signature_answer;
+	return m_signature_answer;
 }
 
-static WRITE8_HANDLER( signature_w )
+WRITE8_MEMBER(gei_state::signature_w)
 {
-	gei_state *state = space->machine().driver_data<gei_state>();
-	if (data == 0) state->m_signature_pos = 0;
+	if (data == 0) m_signature_pos = 0;
 	else
 	{
 		static const UINT8 signature[8] = { 0xff, 0x01, 0xfd, 0x05, 0xf5, 0x15, 0xd5, 0x55 };
 
-		state->m_signature_answer = signature[state->m_signature_pos++];
+		m_signature_answer = signature[m_signature_pos++];
 
-		state->m_signature_pos &= 7;	/* safety; shouldn't happen */
+		m_signature_pos &= 7;	/* safety; shouldn't happen */
 	}
 }
 
-static WRITE8_HANDLER( signature2_w )
+WRITE8_MEMBER(gei_state::signature2_w)
 {
-	gei_state *state = space->machine().driver_data<gei_state>();
-	if (data == 0) state->m_signature_pos = 0;
+	if (data == 0) m_signature_pos = 0;
 	else
 	{
 		static const UINT8 signature[8] = { 0xff, 0x01, 0xf7, 0x11, 0xd7, 0x51, 0x57, 0x51 };
 
-		state->m_signature_answer = signature[state->m_signature_pos++];
+		m_signature_answer = signature[m_signature_pos++];
 
-		state->m_signature_pos &= 7;	/* safety; shouldn't happen */
+		m_signature_pos &= 7;	/* safety; shouldn't happen */
 	}
 }
 
@@ -407,34 +430,34 @@ static ADDRESS_MAP_START( getrivia_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x600f, 0x600f) AM_WRITE_LEGACY(banksel_5_1_w)
-	AM_RANGE(0x6017, 0x6017) AM_WRITE_LEGACY(banksel_4_1_w)
-	AM_RANGE(0x601b, 0x601b) AM_WRITE_LEGACY(banksel_3_1_w)
-	AM_RANGE(0x601d, 0x601d) AM_WRITE_LEGACY(banksel_2_1_w)
-	AM_RANGE(0x601e, 0x601e) AM_WRITE_LEGACY(banksel_1_1_w)
-	AM_RANGE(0x608f, 0x608f) AM_WRITE_LEGACY(banksel_5_2_w)
-	AM_RANGE(0x6097, 0x6097) AM_WRITE_LEGACY(banksel_4_2_w)
-	AM_RANGE(0x609b, 0x609b) AM_WRITE_LEGACY(banksel_3_2_w)
-	AM_RANGE(0x609d, 0x609d) AM_WRITE_LEGACY(banksel_2_2_w)
-	AM_RANGE(0x609e, 0x609e) AM_WRITE_LEGACY(banksel_1_2_w)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE_LEGACY(gei_drawctrl_w)
+	AM_RANGE(0x600f, 0x600f) AM_WRITE(banksel_5_1_w)
+	AM_RANGE(0x6017, 0x6017) AM_WRITE(banksel_4_1_w)
+	AM_RANGE(0x601b, 0x601b) AM_WRITE(banksel_3_1_w)
+	AM_RANGE(0x601d, 0x601d) AM_WRITE(banksel_2_1_w)
+	AM_RANGE(0x601e, 0x601e) AM_WRITE(banksel_1_1_w)
+	AM_RANGE(0x608f, 0x608f) AM_WRITE(banksel_5_2_w)
+	AM_RANGE(0x6097, 0x6097) AM_WRITE(banksel_4_2_w)
+	AM_RANGE(0x609b, 0x609b) AM_WRITE(banksel_3_2_w)
+	AM_RANGE(0x609d, 0x609d) AM_WRITE(banksel_2_2_w)
+	AM_RANGE(0x609e, 0x609e) AM_WRITE(banksel_1_2_w)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0x9fff) AM_ROM /* space for diagnostic ROM? */
 	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE_LEGACY(gei_bitmap_w)
+	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gselect_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4400, 0x4400) AM_WRITE_LEGACY(banksel_1_1_w)
-	AM_RANGE(0x4401, 0x4401) AM_WRITE_LEGACY(banksel_1_2_w)
-	AM_RANGE(0x4402, 0x4402) AM_WRITE_LEGACY(banksel_2_1_w)
-	AM_RANGE(0x4403, 0x4403) AM_WRITE_LEGACY(banksel_2_2_w)
+	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_1_1_w)
+	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_1_2_w)
+	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_2_1_w)
+	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_2_2_w)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE_LEGACY(gei_drawctrl_w)
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE_LEGACY(gei_bitmap_w)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
+	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
 // TODO: where are mapped the lower 0x2000 bytes of the banks?
@@ -444,14 +467,14 @@ static ADDRESS_MAP_START( amuse_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x606f, 0x606f) AM_WRITE_LEGACY(banksel_5_1_w)
-	AM_RANGE(0x6077, 0x6077) AM_WRITE_LEGACY(banksel_4_1_w)
-	AM_RANGE(0x607b, 0x607b) AM_WRITE_LEGACY(banksel_3_1_w)
-	AM_RANGE(0x607d, 0x607d) AM_WRITE_LEGACY(banksel_2_1_w)
-	AM_RANGE(0x607e, 0x607e) AM_WRITE_LEGACY(banksel_1_1_w)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE_LEGACY(gei_drawctrl_w)
+	AM_RANGE(0x606f, 0x606f) AM_WRITE(banksel_5_1_w)
+	AM_RANGE(0x6077, 0x6077) AM_WRITE(banksel_4_1_w)
+	AM_RANGE(0x607b, 0x607b) AM_WRITE(banksel_3_1_w)
+	AM_RANGE(0x607d, 0x607d) AM_WRITE(banksel_2_1_w)
+	AM_RANGE(0x607e, 0x607e) AM_WRITE(banksel_1_1_w)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE_LEGACY(gei_bitmap_w)
+	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gepoker_map, AS_PROGRAM, 8, gei_state )
@@ -460,32 +483,32 @@ static ADDRESS_MAP_START( gepoker_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x60ef, 0x60ef) AM_WRITE_LEGACY(banksel_3_1_w)
-	AM_RANGE(0x60f7, 0x60f7) AM_WRITE_LEGACY(banksel_2_2_w)
-	AM_RANGE(0x60fb, 0x60fb) AM_WRITE_LEGACY(banksel_2_1_w)
-	AM_RANGE(0x60fd, 0x60fd) AM_WRITE_LEGACY(banksel_1_2_w)
-	AM_RANGE(0x60fe, 0x60fe) AM_WRITE_LEGACY(banksel_1_1_w)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE_LEGACY(gei_drawctrl_w)
+	AM_RANGE(0x60ef, 0x60ef) AM_WRITE(banksel_3_1_w)
+	AM_RANGE(0x60f7, 0x60f7) AM_WRITE(banksel_2_2_w)
+	AM_RANGE(0x60fb, 0x60fb) AM_WRITE(banksel_2_1_w)
+	AM_RANGE(0x60fd, 0x60fd) AM_WRITE(banksel_1_2_w)
+	AM_RANGE(0x60fe, 0x60fe) AM_WRITE(banksel_1_1_w)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM /* space for diagnostic ROM? */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE_LEGACY(gei_bitmap_w)
+	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amuse1_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4400, 0x4400) AM_WRITE_LEGACY(banksel_1_1_w)
-	AM_RANGE(0x4401, 0x4401) AM_WRITE_LEGACY(banksel_2_1_w)
-	AM_RANGE(0x4402, 0x4402) AM_WRITE_LEGACY(banksel_3_1_w)
-	AM_RANGE(0x4403, 0x4403) AM_WRITE_LEGACY(banksel_4_1_w)
+	AM_RANGE(0x4400, 0x4400) AM_WRITE(banksel_1_1_w)
+	AM_RANGE(0x4401, 0x4401) AM_WRITE(banksel_2_1_w)
+	AM_RANGE(0x4402, 0x4402) AM_WRITE(banksel_3_1_w)
+	AM_RANGE(0x4403, 0x4403) AM_WRITE(banksel_4_1_w)
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5800, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8002) AM_WRITE_LEGACY(gei_drawctrl_w)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM /* space for diagnostic ROM? */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE_LEGACY(gei_bitmap_w)
+	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( findout_map, AS_PROGRAM, 8, gei_state )
@@ -494,19 +517,19 @@ static ADDRESS_MAP_START( findout_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r,ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r,ppi8255_w)
 	/* banked ROMs are enabled by low 6 bits of the address */
-	AM_RANGE(0x601f, 0x601f) AM_WRITE_LEGACY(banksel_main_w)
-	AM_RANGE(0x602f, 0x602f) AM_WRITE_LEGACY(banksel_5_w)
-	AM_RANGE(0x6037, 0x6037) AM_WRITE_LEGACY(banksel_4_w)
-	AM_RANGE(0x603b, 0x603b) AM_WRITE_LEGACY(banksel_3_w)
-	AM_RANGE(0x603d, 0x603d) AM_WRITE_LEGACY(banksel_2_w)
-	AM_RANGE(0x603e, 0x603e) AM_WRITE_LEGACY(banksel_1_w)
-	AM_RANGE(0x6200, 0x6200) AM_WRITE_LEGACY(signature_w)
-	AM_RANGE(0x6400, 0x6400) AM_READ_LEGACY(signature_r)
+	AM_RANGE(0x601f, 0x601f) AM_WRITE(banksel_main_w)
+	AM_RANGE(0x602f, 0x602f) AM_WRITE(banksel_5_w)
+	AM_RANGE(0x6037, 0x6037) AM_WRITE(banksel_4_w)
+	AM_RANGE(0x603b, 0x603b) AM_WRITE(banksel_3_w)
+	AM_RANGE(0x603d, 0x603d) AM_WRITE(banksel_2_w)
+	AM_RANGE(0x603e, 0x603e) AM_WRITE(banksel_1_w)
+	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature_w)
+	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM /*space for diagnostic ROM?*/
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8002) AM_WRITE_LEGACY(gei_drawctrl_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE_LEGACY(gei_bitmap_w)
-	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(catchall)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
+	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizvid_map, AS_PROGRAM, 8, gei_state )
@@ -515,16 +538,16 @@ static ADDRESS_MAP_START( quizvid_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r,ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r,ppi8255_w)
 	/* banked ROMs are enabled by low 6 bits of the address */
-	AM_RANGE(0x602f, 0x602f) AM_READ_LEGACY(banksel_5_r)
-	AM_RANGE(0x6037, 0x6037) AM_READ_LEGACY(banksel_4_r)
-	AM_RANGE(0x603b, 0x603b) AM_READ_LEGACY(banksel_3_r)
-	AM_RANGE(0x603d, 0x603d) AM_READ_LEGACY(banksel_2_r)
-	AM_RANGE(0x603e, 0x603e) AM_READ_LEGACY(banksel_1_r)
+	AM_RANGE(0x602f, 0x602f) AM_READ(banksel_5_r)
+	AM_RANGE(0x6037, 0x6037) AM_READ(banksel_4_r)
+	AM_RANGE(0x603b, 0x603b) AM_READ(banksel_3_r)
+	AM_RANGE(0x603d, 0x603d) AM_READ(banksel_2_r)
+	AM_RANGE(0x603e, 0x603e) AM_READ(banksel_1_r)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM /*space for diagnostic ROM?*/
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8002) AM_WRITE_LEGACY(gei_drawctrl_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE_LEGACY(gei_bitmap_w)
-	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(catchall)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
+	AM_RANGE(0x0000, 0xffff) AM_READ(catchall)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( suprpokr_map, AS_PROGRAM, 8, gei_state )
@@ -532,10 +555,10 @@ static ADDRESS_MAP_START( suprpokr_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x6200, 0x6200) AM_WRITE_LEGACY(signature2_w)
-	AM_RANGE(0x6400, 0x6400) AM_READ_LEGACY(signature_r)
-	AM_RANGE(0x8000, 0x8002) AM_WRITE_LEGACY(gei_drawctrl_w)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE_LEGACY(gei_bitmap_w)
+	AM_RANGE(0x6200, 0x6200) AM_WRITE(signature2_w)
+	AM_RANGE(0x6400, 0x6400) AM_READ(signature_r)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(gei_bitmap_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -545,11 +568,11 @@ static ADDRESS_MAP_START( geimulti_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5800, 0x5fff) AM_ROM
-	AM_RANGE(0x5a00, 0x5cff) AM_WRITE_LEGACY(geimulti_bank_w)
+	AM_RANGE(0x5a00, 0x5cff) AM_WRITE(geimulti_bank_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8002) AM_WRITE_LEGACY(gei_drawctrl_w)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE_LEGACY(gei_bitmap_w)
+	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprtauth_map, AS_PROGRAM, 8, gei_state )
@@ -557,13 +580,13 @@ static ADDRESS_MAP_START( sprtauth_map, AS_PROGRAM, 8, gei_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4800, 0x4803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x5600, 0x5600) AM_READ_LEGACY(signature_r)
-	AM_RANGE(0x5800, 0x5800) AM_WRITE_LEGACY(signature_w)
-	AM_RANGE(0x5a00, 0x5cff) AM_WRITE_LEGACY(geimulti_bank_w)
+	AM_RANGE(0x5600, 0x5600) AM_READ(signature_r)
+	AM_RANGE(0x5800, 0x5800) AM_WRITE(signature_w)
+	AM_RANGE(0x5a00, 0x5cff) AM_WRITE(geimulti_bank_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8002) AM_WRITE_LEGACY(gei_drawctrl_w)
+	AM_RANGE(0x8000, 0x8002) AM_WRITE(gei_drawctrl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE_LEGACY(gei_bitmap_w)
+	AM_RANGE(0xc000, 0xffff) AM_RAM_WRITE(gei_bitmap_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(reelfun_standard)

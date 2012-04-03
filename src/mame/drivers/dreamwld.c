@@ -146,6 +146,12 @@ public:
 
 	/* misc */
 	int      m_protindex;
+	DECLARE_WRITE32_MEMBER(dreamwld_bg_videoram_w);
+	DECLARE_WRITE32_MEMBER(dreamwld_bg2_videoram_w);
+	DECLARE_READ32_MEMBER(dreamwld_protdata_r);
+	DECLARE_WRITE32_MEMBER(dreamwld_6295_0_bank_w);
+	DECLARE_WRITE32_MEMBER(dreamwld_6295_1_bank_w);
+	DECLARE_WRITE32_MEMBER(dreamwld_palette_w);
 };
 
 
@@ -215,12 +221,11 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 }
 
 
-static WRITE32_HANDLER( dreamwld_bg_videoram_w )
+WRITE32_MEMBER(dreamwld_state::dreamwld_bg_videoram_w)
 {
-	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset * 2);
-	state->m_bg_tilemap->mark_tile_dirty(offset * 2 + 1);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset * 2);
+	m_bg_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
 static TILE_GET_INFO( get_dreamwld_bg_tile_info )
@@ -234,12 +239,11 @@ static TILE_GET_INFO( get_dreamwld_bg_tile_info )
 }
 
 
-static WRITE32_HANDLER( dreamwld_bg2_videoram_w )
+WRITE32_MEMBER(dreamwld_state::dreamwld_bg2_videoram_w)
 {
-	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
-	COMBINE_DATA(&state->m_bg2_videoram[offset]);
-	state->m_bg2_tilemap->mark_tile_dirty(offset * 2);
-	state->m_bg2_tilemap->mark_tile_dirty(offset * 2 + 1);
+	COMBINE_DATA(&m_bg2_videoram[offset]);
+	m_bg2_tilemap->mark_tile_dirty(offset * 2);
+	m_bg2_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
 static TILE_GET_INFO( get_dreamwld_bg2_tile_info )
@@ -389,17 +393,17 @@ static SCREEN_UPDATE_IND16( dreamwld )
 
 
 
-static READ32_HANDLER( dreamwld_protdata_r )
+READ32_MEMBER(dreamwld_state::dreamwld_protdata_r)
 {
 	//static int count = 0;
-	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
+
 
 	//printf("protection read %04x\n", count);
 	//count++;
 
-	UINT8 *protdata = space->machine().region("user1")->base();
-	size_t protsize = space->machine().region("user1")->bytes();
-	UINT8 dat = protdata[(state->m_protindex++) % protsize];
+	UINT8 *protdata = machine().region("user1")->base();
+	size_t protsize = machine().region("user1")->bytes();
+	UINT8 dat = protdata[(m_protindex++) % protsize];
 
 	// real hw returns 00 after end of data, I haven't checked if it's possible to overflow the read counter
 	// and read out the internal rom.
@@ -408,9 +412,9 @@ static READ32_HANDLER( dreamwld_protdata_r )
 }
 
 
-static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
+WRITE32_MEMBER(dreamwld_state::dreamwld_6295_0_bank_w)
 {
-	UINT8 *sound = space->machine().region("oki1")->base();
+	UINT8 *sound = machine().region("oki1")->base();
 
 	if (ACCESSING_BITS_0_7)
 		memcpy(sound + 0x30000, sound + 0xb0000 + 0x10000 * (data&0x3), 0x10000);
@@ -418,9 +422,9 @@ static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 		logerror("OKI0: unk bank write %x mem_mask %8x\n", data, mem_mask);
 }
 
-static WRITE32_HANDLER( dreamwld_6295_1_bank_w )
+WRITE32_MEMBER(dreamwld_state::dreamwld_6295_1_bank_w)
 {
-	UINT8 *sound = space->machine().region("oki2")->base();
+	UINT8 *sound = machine().region("oki2")->base();
 
 	if (ACCESSING_BITS_0_7)
 		memcpy(sound + 0x30000, sound + 0xb0000 + 0x10000 * (data&0x3), 0x10000);
@@ -430,20 +434,19 @@ static WRITE32_HANDLER( dreamwld_6295_1_bank_w )
 
 // why doesn't using paletteram16_xRRRRRGGGGGBBBBB_word_w with a 16-bit handler work? colours are
 // severely corrupt on dream world's semicom screen + many sprites, seems palette values get duplicated.
-static WRITE32_HANDLER( dreamwld_palette_w )
+WRITE32_MEMBER(dreamwld_state::dreamwld_palette_w)
 {
-	dreamwld_state *state = space->machine().driver_data<dreamwld_state>();
 	UINT16 dat;
 	int color;
 
-	COMBINE_DATA(&state->m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 	color = offset * 2;
 
-	dat = state->m_paletteram[offset] & 0x7fff;
-	palette_set_color_rgb(space->machine(), color+1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
+	dat = m_paletteram[offset] & 0x7fff;
+	palette_set_color_rgb(machine(), color+1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 
-	dat = (state->m_paletteram[offset] >> 16) & 0x7fff;
-	palette_set_color_rgb(space->machine(), color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
+	dat = (m_paletteram[offset] >> 16) & 0x7fff;
+	palette_set_color_rgb(machine(), color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 }
 
 
@@ -452,18 +455,18 @@ static ADDRESS_MAP_START( baryon_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM  AM_WRITENOP
 
 	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE_LEGACY(dreamwld_palette_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE_LEGACY(dreamwld_bg_videoram_w ) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE_LEGACY(dreamwld_bg2_videoram_w ) AM_BASE(m_bg2_videoram)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM AM_WRITE(dreamwld_palette_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(dreamwld_bg_videoram_w ) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(dreamwld_bg2_videoram_w ) AM_BASE(m_bg2_videoram)
 	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE(m_vregs)  // scroll regs etc.
 
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
 
-	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE_LEGACY(dreamwld_6295_0_bank_w) // sfx
+	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE(dreamwld_6295_0_bank_w) // sfx
 	AM_RANGE(0xc00018, 0xc0001b) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0xff000000) // sfx
 
-	AM_RANGE(0xc00030, 0xc00033) AM_READ_LEGACY(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
+	AM_RANGE(0xc00030, 0xc00033) AM_READ(dreamwld_protdata_r) // it reads protection data (irq code) from here and puts it at ffd000
 
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM AM_BASE(m_workram) // work ram
 ADDRESS_MAP_END
@@ -471,7 +474,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dreamwld_map, AS_PROGRAM, 32, dreamwld_state )
 	AM_IMPORT_FROM( baryon_map )
 
-	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE_LEGACY(dreamwld_6295_1_bank_w) // sfx
+	AM_RANGE(0xc0002c, 0xc0002f) AM_WRITE(dreamwld_6295_1_bank_w) // sfx
 	AM_RANGE(0xc00028, 0xc0002b) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0xff000000) // sfx
 ADDRESS_MAP_END
 

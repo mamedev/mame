@@ -65,6 +65,10 @@ public:
 
 	/* memory */
 	UINT16       m_tileram[0x400];
+	DECLARE_WRITE8_MEMBER(mole_videoram_w);
+	DECLARE_WRITE8_MEMBER(mole_tilebank_w);
+	DECLARE_WRITE8_MEMBER(mole_flipscreen_w);
+	DECLARE_READ8_MEMBER(mole_protection_r);
 };
 
 
@@ -99,25 +103,23 @@ static VIDEO_START( mole )
 	state->save_item(NAME(state->m_tileram));
 }
 
-static WRITE8_HANDLER( mole_videoram_w )
+WRITE8_MEMBER(mole_state::mole_videoram_w)
 {
-	mole_state *state = space->machine().driver_data<mole_state>();
 
-	state->m_tileram[offset] = data | (state->m_tile_bank << 8);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_tileram[offset] = data | (m_tile_bank << 8);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( mole_tilebank_w )
+WRITE8_MEMBER(mole_state::mole_tilebank_w)
 {
-	mole_state *state = space->machine().driver_data<mole_state>();
 
-	state->m_tile_bank = data;
-	state->m_bg_tilemap->mark_all_dirty();
+	m_tile_bank = data;
+	m_bg_tilemap->mark_all_dirty();
 }
 
-static WRITE8_HANDLER( mole_flipscreen_w )
+WRITE8_MEMBER(mole_state::mole_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 }
 
 static SCREEN_UPDATE_IND16( mole )
@@ -136,9 +138,8 @@ static SCREEN_UPDATE_IND16( mole )
  *
  *************************************/
 
-static READ8_HANDLER( mole_protection_r )
+READ8_MEMBER(mole_state::mole_protection_r)
 {
-
     /*  Following are all known examples of Mole Attack
     **  code reading from the protection circuitry:
     **
@@ -164,7 +165,7 @@ static READ8_HANDLER( mole_protection_r )
 	{
 	case 0x08: return 0xb0; /* random mole placement */
 	case 0x26:
-		if (cpu_get_pc(&space->device()) == 0x53d7)
+		if (cpu_get_pc(&space.device()) == 0x53d7)
 		{
 			return 0x06; /* bonus round */
 		}
@@ -194,12 +195,12 @@ static READ8_HANDLER( mole_protection_r )
 
 static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_READ_LEGACY(mole_protection_r)
+	AM_RANGE(0x0800, 0x08ff) AM_READ(mole_protection_r)
 	AM_RANGE(0x0800, 0x0800) AM_WRITENOP // ???
 	AM_RANGE(0x0820, 0x0820) AM_WRITENOP // ???
 	AM_RANGE(0x5000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE_LEGACY(mole_videoram_w)
-	AM_RANGE(0x8400, 0x8400) AM_WRITE_LEGACY(mole_tilebank_w)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(mole_videoram_w)
+	AM_RANGE(0x8400, 0x8400) AM_WRITE(mole_tilebank_w)
 	AM_RANGE(0x8c00, 0x8c01) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x8c40, 0x8c40) AM_WRITENOP // ???
 	AM_RANGE(0x8c80, 0x8c80) AM_WRITENOP // ???
@@ -207,7 +208,7 @@ static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
 	AM_RANGE(0x8d00, 0x8d00) AM_READ_PORT("DSW") AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x8d40, 0x8d40) AM_READ_PORT("IN0")
 	AM_RANGE(0x8d80, 0x8d80) AM_READ_PORT("IN1")
-	AM_RANGE(0x8dc0, 0x8dc0) AM_READ_PORT("IN2") AM_WRITE_LEGACY(mole_flipscreen_w)
+	AM_RANGE(0x8dc0, 0x8dc0) AM_READ_PORT("IN2") AM_WRITE(mole_flipscreen_w)
 ADDRESS_MAP_END
 
 

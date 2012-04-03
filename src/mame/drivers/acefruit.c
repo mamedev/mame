@@ -25,6 +25,11 @@ public:
 	UINT8 *m_colorram;
 	UINT8 *m_videoram;
 	emu_timer *m_refresh_timer;
+	DECLARE_WRITE8_MEMBER(acefruit_colorram_w);
+	DECLARE_WRITE8_MEMBER(acefruit_coin_w);
+	DECLARE_WRITE8_MEMBER(acefruit_sound_w);
+	DECLARE_WRITE8_MEMBER(acefruit_lamp_w);
+	DECLARE_WRITE8_MEMBER(acefruit_solenoid_w);
 };
 
 
@@ -215,23 +220,22 @@ static CUSTOM_INPUT( starspnr_payout_r )
 	}
 }
 
-static WRITE8_HANDLER( acefruit_colorram_w )
+WRITE8_MEMBER(acefruit_state::acefruit_colorram_w)
 {
-	acefruit_state *state = space->machine().driver_data<acefruit_state>();
-	state->m_colorram[ offset ] = data & 0xf;
+	m_colorram[ offset ] = data & 0xf;
 }
 
-static WRITE8_HANDLER( acefruit_coin_w )
-{
-	/* TODO: ? */
-}
-
-static WRITE8_HANDLER( acefruit_sound_w )
+WRITE8_MEMBER(acefruit_state::acefruit_coin_w)
 {
 	/* TODO: ? */
 }
 
-static WRITE8_HANDLER( acefruit_lamp_w )
+WRITE8_MEMBER(acefruit_state::acefruit_sound_w)
+{
+	/* TODO: ? */
+}
+
+WRITE8_MEMBER(acefruit_state::acefruit_lamp_w)
 {
 	int i;
 
@@ -241,7 +245,7 @@ static WRITE8_HANDLER( acefruit_lamp_w )
 	}
 }
 
-static WRITE8_HANDLER( acefruit_solenoid_w )
+WRITE8_MEMBER(acefruit_state::acefruit_solenoid_w)
 {
 	int i;
 
@@ -278,7 +282,7 @@ static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE_LEGACY(acefruit_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(acefruit_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
@@ -288,10 +292,10 @@ static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("IN6")
 	AM_RANGE(0x8007, 0x8007) AM_READ_PORT("IN7")
 	AM_RANGE(0x6000, 0x6005) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xa000, 0xa001) AM_WRITE_LEGACY(acefruit_lamp_w)
-	AM_RANGE(0xa002, 0xa003) AM_WRITE_LEGACY(acefruit_coin_w)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(acefruit_solenoid_w)
-	AM_RANGE(0xa005, 0xa006) AM_WRITE_LEGACY(acefruit_sound_w)
+	AM_RANGE(0xa000, 0xa001) AM_WRITE(acefruit_lamp_w)
+	AM_RANGE(0xa002, 0xa003) AM_WRITE(acefruit_coin_w)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(acefruit_solenoid_w)
+	AM_RANGE(0xa005, 0xa006) AM_WRITE(acefruit_sound_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

@@ -227,6 +227,10 @@ public:
 
 	UINT16 *m_vram;
 	struct { int r,g,b,offs,offs_internal; } m_bgpal, m_fgpal;
+	DECLARE_WRITE8_MEMBER(debug_w);
+	DECLARE_WRITE16_MEMBER(ramdac_bg_w);
+	DECLARE_WRITE16_MEMBER(ramdac_fg_w);
+	DECLARE_READ16_MEMBER(test_r);
 };
 
 
@@ -276,76 +280,74 @@ static PALETTE_INIT( coinmvga )
 *  Read / Write Handlers  *
 **************************/
 
-//static WRITE8_HANDLER( debug_w )
+//WRITE8_MEMBER(coinmvga_state::debug_w)
 //{
 //  popmessage("written : %02X", data);
 //}
 
-static WRITE16_HANDLER( ramdac_bg_w )
+WRITE16_MEMBER(coinmvga_state::ramdac_bg_w)
 {
-	coinmvga_state *state = space->machine().driver_data<coinmvga_state>();
 	if(ACCESSING_BITS_8_15)
 	{
-		state->m_bgpal.offs = data >> 8;
-		state->m_bgpal.offs_internal = 0;
+		m_bgpal.offs = data >> 8;
+		m_bgpal.offs_internal = 0;
 	}
 	else //if(mem_mask == 0x00ff)
 	{
-		switch(state->m_bgpal.offs_internal)
+		switch(m_bgpal.offs_internal)
 		{
 			case 0:
-				state->m_bgpal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				state->m_bgpal.offs_internal++;
+				m_bgpal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				m_bgpal.offs_internal++;
 				break;
 			case 1:
-				state->m_bgpal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				state->m_bgpal.offs_internal++;
+				m_bgpal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				m_bgpal.offs_internal++;
 				break;
 			case 2:
-				state->m_bgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(space->machine(), state->m_bgpal.offs, MAKE_RGB(state->m_bgpal.r, state->m_bgpal.g, state->m_bgpal.b));
-				state->m_bgpal.offs_internal = 0;
-				state->m_bgpal.offs++;
+				m_bgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				palette_set_color(machine(), m_bgpal.offs, MAKE_RGB(m_bgpal.r, m_bgpal.g, m_bgpal.b));
+				m_bgpal.offs_internal = 0;
+				m_bgpal.offs++;
 				break;
 		}
 	}
 }
 
 
-static WRITE16_HANDLER( ramdac_fg_w )
+WRITE16_MEMBER(coinmvga_state::ramdac_fg_w)
 {
-	coinmvga_state *state = space->machine().driver_data<coinmvga_state>();
 	if(ACCESSING_BITS_8_15)
 	{
-		state->m_fgpal.offs = data >> 8;
-		state->m_fgpal.offs_internal = 0;
+		m_fgpal.offs = data >> 8;
+		m_fgpal.offs_internal = 0;
 	}
 	else
 	{
-		switch(state->m_fgpal.offs_internal)
+		switch(m_fgpal.offs_internal)
 		{
 			case 0:
-				state->m_fgpal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				state->m_fgpal.offs_internal++;
+				m_fgpal.r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				m_fgpal.offs_internal++;
 				break;
 			case 1:
-				state->m_fgpal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				state->m_fgpal.offs_internal++;
+				m_fgpal.g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				m_fgpal.offs_internal++;
 				break;
 			case 2:
-				state->m_fgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
-				palette_set_color(space->machine(), 0x100+state->m_fgpal.offs, MAKE_RGB(state->m_fgpal.r, state->m_fgpal.g, state->m_fgpal.b));
-				state->m_fgpal.offs_internal = 0;
-				state->m_fgpal.offs++;
+				m_fgpal.b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+				palette_set_color(machine(), 0x100+m_fgpal.offs, MAKE_RGB(m_fgpal.r, m_fgpal.g, m_fgpal.b));
+				m_fgpal.offs_internal = 0;
+				m_fgpal.offs++;
 				break;
 		}
 	}
 }
 
 /*
-static READ16_HANDLER( test_r )
+READ16_MEMBER(coinmvga_state::test_r)
 {
-    return space->machine().rand();
+    return machine().rand();
 }*/
 
 /*************************
@@ -359,12 +361,12 @@ static ADDRESS_MAP_START( coinmvga_map, AS_PROGRAM, 16, coinmvga_state )
 //  AM_RANGE(0x0a0000, 0x0fffff) AM_RAM
 //  AM_RANGE(0x100000, 0x1fffff) AM_RAM //colorama
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM AM_BASE(m_vram)
-//  AM_RANGE(0x40746e, 0x40746f) AM_READ_LEGACY(test_r) AM_WRITENOP //touch screen related, colorama
-//  AM_RANGE(0x403afa, 0x403afb) AM_READ_LEGACY(test_r) AM_WRITENOP //touch screen related, cmrltv75
+//  AM_RANGE(0x40746e, 0x40746f) AM_READ(test_r) AM_WRITENOP //touch screen related, colorama
+//  AM_RANGE(0x403afa, 0x403afb) AM_READ(test_r) AM_WRITENOP //touch screen related, cmrltv75
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
 
-	AM_RANGE(0x600000, 0x600001) AM_WRITE_LEGACY(ramdac_bg_w)
-	AM_RANGE(0x600004, 0x600005) AM_WRITE_LEGACY(ramdac_fg_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(ramdac_bg_w)
+	AM_RANGE(0x600004, 0x600005) AM_WRITE(ramdac_fg_w)
 	AM_RANGE(0x600008, 0x600009) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff)
 	AM_RANGE(0x610000, 0x61000f) AM_RAM //touch screen i/o
 

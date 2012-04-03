@@ -61,6 +61,14 @@ public:
 
 	UINT16* m_tilemapram;
 	UINT16* m_tilemapram2;
+	DECLARE_WRITE16_MEMBER(blackt96_c0000_w);
+	DECLARE_WRITE16_MEMBER(blackt96_80000_w);
+	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
+	DECLARE_WRITE8_MEMBER(blackt96_soundio_port00_w);
+	DECLARE_READ8_MEMBER(blackt96_soundio_port01_r);
+	DECLARE_WRITE8_MEMBER(blackt96_soundio_port01_w);
+	DECLARE_READ8_MEMBER(blackt96_soundio_port02_r);
+	DECLARE_WRITE8_MEMBER(blackt96_soundio_port02_w);
 };
 
 
@@ -156,12 +164,12 @@ static SCREEN_UPDATE_IND16( blackt96 )
 }
 
 
-static WRITE16_HANDLER( blackt96_c0000_w )
+WRITE16_MEMBER(blackt96_state::blackt96_c0000_w)
 {
 	printf("blackt96_c0000_w %04x %04x\n",data,mem_mask);
 }
 
-static WRITE16_HANDLER( blackt96_80000_w )
+WRITE16_MEMBER(blackt96_state::blackt96_80000_w)
 {
 	// TO sound MCU?
 	printf("blackt96_80000_w %04x %04x\n",data,mem_mask);
@@ -170,8 +178,8 @@ static WRITE16_HANDLER( blackt96_80000_w )
 
 static ADDRESS_MAP_START( blackt96_map, AS_PROGRAM, 16, blackt96_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1_P2") AM_WRITE_LEGACY(blackt96_80000_w)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE_LEGACY(blackt96_c0000_w) // COIN INPUT
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1_P2") AM_WRITE(blackt96_80000_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE(blackt96_c0000_w) // COIN INPUT
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("IN2")
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READ_PORT("IN3")
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
@@ -443,41 +451,38 @@ static GFXDECODE_START( blackt96 )
 GFXDECODE_END
 
 
-static READ8_HANDLER( PIC16C5X_T0_clk_r )
+READ8_MEMBER(blackt96_state::PIC16C5X_T0_clk_r)
 {
 	return 0;
 }
 
-static WRITE8_HANDLER( blackt96_soundio_port00_w )
+WRITE8_MEMBER(blackt96_state::blackt96_soundio_port00_w)
 {
-
 }
 
-static READ8_HANDLER( blackt96_soundio_port01_r )
+READ8_MEMBER(blackt96_state::blackt96_soundio_port01_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static WRITE8_HANDLER( blackt96_soundio_port01_w )
+WRITE8_MEMBER(blackt96_state::blackt96_soundio_port01_w)
 {
-
 }
 
-static READ8_HANDLER( blackt96_soundio_port02_r )
+READ8_MEMBER(blackt96_state::blackt96_soundio_port02_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static WRITE8_HANDLER( blackt96_soundio_port02_w )
+WRITE8_MEMBER(blackt96_state::blackt96_soundio_port02_w)
 {
-
 }
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, blackt96_state )
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(blackt96_soundio_port00_w )
-	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(blackt96_soundio_port01_r, blackt96_soundio_port01_w )
-	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(blackt96_soundio_port02_r, blackt96_soundio_port02_w )
-	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ_LEGACY(PIC16C5X_T0_clk_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE(blackt96_soundio_port00_w )
+	AM_RANGE(0x01, 0x01) AM_READWRITE(blackt96_soundio_port01_r, blackt96_soundio_port01_w )
+	AM_RANGE(0x02, 0x02) AM_READWRITE(blackt96_soundio_port02_r, blackt96_soundio_port02_w )
+	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 
 

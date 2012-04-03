@@ -71,6 +71,15 @@ public:
 	taitopjc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 	{ }
+	DECLARE_READ64_MEMBER(video_r);
+	DECLARE_WRITE64_MEMBER(video_w);
+	DECLARE_READ64_MEMBER(ppc_common_r);
+	DECLARE_READ64_MEMBER(dsp_r);
+	DECLARE_WRITE64_MEMBER(dsp_w);
+	DECLARE_READ8_MEMBER(tlcs_common_r);
+	DECLARE_WRITE8_MEMBER(tlcs_common_w);
+	DECLARE_READ8_MEMBER(tlcs_sound_r);
+	DECLARE_WRITE8_MEMBER(tlcs_sound_w);
 };
 
 static VIDEO_START( taitopjc )
@@ -157,7 +166,7 @@ static void videochip_w(address_space *space, offs_t address, UINT32 data)
 	}
 }
 
-static READ64_HANDLER(video_r)
+READ64_MEMBER(taitopjc_state::video_r)
 {
 	UINT64 r = 0;
 
@@ -165,21 +174,21 @@ static READ64_HANDLER(video_r)
 	{
 		if (ACCESSING_BITS_32_63)
 		{
-			r |= (UINT64)(videochip_r(space, video_address)) << 32;
+			r |= (UINT64)(videochip_r(&space, video_address)) << 32;
 		}
 	}
 
 	return r;
 }
 
-static WRITE64_HANDLER(video_w)
+WRITE64_MEMBER(taitopjc_state::video_w)
 {
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_32_63)
 		{
 			//printf("Address %08X = %08X\n", video_address, (UINT32)(data >> 32));
-			videochip_w(space, video_address, (UINT32)(data >> 32));
+			videochip_w(&space, video_address, (UINT32)(data >> 32));
 		}
 	}
 	if (offset == 1)
@@ -205,7 +214,7 @@ static UINT16 com_ram[256] =
 };
 */
 
-static READ64_HANDLER(ppc_common_r)
+READ64_MEMBER(taitopjc_state::ppc_common_r)
 {
 	UINT64 r = 0;
 	UINT32 address;
@@ -247,7 +256,7 @@ static UINT32 dsp_value = 0x4f4b0000;
 
 static UINT16 dsp_ram[0x1000];
 
-static READ64_HANDLER(dsp_r)
+READ64_MEMBER(taitopjc_state::dsp_r)
 {
 	UINT64 r = 0;
 
@@ -262,7 +271,7 @@ static READ64_HANDLER(dsp_r)
 	return r;
 }
 
-static WRITE64_HANDLER(dsp_w)
+WRITE64_MEMBER(taitopjc_state::dsp_w)
 {
 	logerror("dsp_w: %08X, %08X%08X, %08X%08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
 
@@ -311,9 +320,9 @@ static WRITE64_HANDLER(dsp_w)
 
 static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64, taitopjc_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM // Work RAM
-	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE_LEGACY(video_r, video_w)
-	AM_RANGE(0x80000000, 0x80003fff) AM_READWRITE_LEGACY(dsp_r, dsp_w)
-	AM_RANGE(0xc0000000, 0xc000ffff) AM_READ_LEGACY(ppc_common_r)
+	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE(video_r, video_w)
+	AM_RANGE(0x80000000, 0x80003fff) AM_READWRITE(dsp_r, dsp_w)
+	AM_RANGE(0xc0000000, 0xc000ffff) AM_READ(ppc_common_r)
 	AM_RANGE(0xff000000, 0xff01ffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -321,19 +330,19 @@ ADDRESS_MAP_END
 
 
 
-static READ8_HANDLER(tlcs_common_r)
+READ8_MEMBER(taitopjc_state::tlcs_common_r)
 {
 	return common_ram[offset];
 }
 
-static WRITE8_HANDLER(tlcs_common_w)
+WRITE8_MEMBER(taitopjc_state::tlcs_common_w)
 {
 //  printf("tlcs_common_w: %08X, %02X\n", offset, data);
 
 	common_ram[offset] = data;
 }
 
-static READ8_HANDLER(tlcs_sound_r)
+READ8_MEMBER(taitopjc_state::tlcs_sound_r)
 {
 	if (offset == 0x17)
 	{
@@ -343,7 +352,7 @@ static READ8_HANDLER(tlcs_sound_r)
 	return 0;
 }
 
-static WRITE8_HANDLER(tlcs_sound_w)
+WRITE8_MEMBER(taitopjc_state::tlcs_sound_w)
 {
 //  printf("tlcs_sound_w: %08X, %02X\n", offset, data);
 }
@@ -367,8 +376,8 @@ static WRITE8_HANDLER(tlcs_sound_w)
 
 static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 8, taitopjc_state )
 	AM_RANGE(0x010000, 0x02ffff) AM_RAM		// Work RAM
-	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE_LEGACY(tlcs_sound_r, tlcs_sound_w)
-	AM_RANGE(0x060000, 0x061fff) AM_READWRITE_LEGACY(tlcs_common_r, tlcs_common_w)
+	AM_RANGE(0x040000, 0x0400ff) AM_READWRITE(tlcs_sound_r, tlcs_sound_w)
+	AM_RANGE(0x060000, 0x061fff) AM_READWRITE(tlcs_common_r, tlcs_common_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 

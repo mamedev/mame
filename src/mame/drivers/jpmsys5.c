@@ -69,6 +69,15 @@ public:
 	UINT8 m_a2_acia_dcd;
 	UINT8 m_a2_data_out;
 	UINT8 m_a2_data_in;
+	DECLARE_WRITE16_MEMBER(sys5_tms34061_w);
+	DECLARE_READ16_MEMBER(sys5_tms34061_r);
+	DECLARE_WRITE16_MEMBER(ramdac_w);
+	DECLARE_WRITE16_MEMBER(rombank_w);
+	DECLARE_READ16_MEMBER(coins_r);
+	DECLARE_WRITE16_MEMBER(coins_w);
+	DECLARE_READ16_MEMBER(unk_r);
+	DECLARE_WRITE16_MEMBER(mux_w);
+	DECLARE_READ16_MEMBER(mux_r);
 };
 
 
@@ -110,7 +119,7 @@ static const struct tms34061_interface tms34061intf =
 	tms_interrupt	/* Interrupt gen callback */
 };
 
-static WRITE16_HANDLER( sys5_tms34061_w )
+WRITE16_MEMBER(jpmsys5_state::sys5_tms34061_w)
 {
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0x1ff;
@@ -127,13 +136,13 @@ static WRITE16_HANDLER( sys5_tms34061_w )
 	}
 
 	if (ACCESSING_BITS_8_15)
-		tms34061_w(space, col, row, func, data >> 8);
+		tms34061_w(&space, col, row, func, data >> 8);
 
 	if (ACCESSING_BITS_0_7)
-		tms34061_w(space, col | 1, row, func, data & 0xff);
+		tms34061_w(&space, col | 1, row, func, data & 0xff);
 }
 
-static READ16_HANDLER( sys5_tms34061_r )
+READ16_MEMBER(jpmsys5_state::sys5_tms34061_r)
 {
 	UINT16 data = 0;
 	int func = (offset >> 19) & 3;
@@ -151,32 +160,31 @@ static READ16_HANDLER( sys5_tms34061_r )
 	}
 
 	if (ACCESSING_BITS_8_15)
-		data |= tms34061_r(space, col, row, func) << 8;
+		data |= tms34061_r(&space, col, row, func) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		data |= tms34061_r(space, col | 1, row, func);
+		data |= tms34061_r(&space, col | 1, row, func);
 
 	return data;
 }
 
-static WRITE16_HANDLER( ramdac_w )
+WRITE16_MEMBER(jpmsys5_state::ramdac_w)
 {
-	jpmsys5_state *state = space->machine().driver_data<jpmsys5_state>();
 	if (offset == 0)
 	{
-		state->m_pal_addr = data;
-		state->m_pal_idx = 0;
+		m_pal_addr = data;
+		m_pal_idx = 0;
 	}
 	else if (offset == 1)
 	{
-		state->m_palette[state->m_pal_addr][state->m_pal_idx] = data;
+		m_palette[m_pal_addr][m_pal_idx] = data;
 
-		if (++state->m_pal_idx == 3)
+		if (++m_pal_idx == 3)
 		{
 			/* Update the MAME palette */
-			palette_set_color_rgb(space->machine(), state->m_pal_addr, pal6bit(state->m_palette[state->m_pal_addr][0]), pal6bit(state->m_palette[state->m_pal_addr][1]), pal6bit(state->m_palette[state->m_pal_addr][2]));
-			state->m_pal_addr++;
-			state->m_pal_idx = 0;
+			palette_set_color_rgb(machine(), m_pal_addr, pal6bit(m_palette[m_pal_addr][0]), pal6bit(m_palette[m_pal_addr][1]), pal6bit(m_palette[m_pal_addr][2]));
+			m_pal_addr++;
+			m_pal_idx = 0;
 		}
 	}
 	else
@@ -238,41 +246,40 @@ static void sys5_draw_lamps(jpmsys5_state *state)
  *
  ****************************************/
 
-static WRITE16_HANDLER( rombank_w )
+WRITE16_MEMBER(jpmsys5_state::rombank_w)
 {
-	UINT8 *rom = space->machine().region("maincpu")->base();
+	UINT8 *rom = machine().region("maincpu")->base();
 	data &= 0x1f;
-	memory_set_bankptr(space->machine(), "bank1", &rom[0x20000 + 0x20000 * data]);
+	memory_set_bankptr(machine(), "bank1", &rom[0x20000 + 0x20000 * data]);
 }
 
-static READ16_HANDLER( coins_r )
+READ16_MEMBER(jpmsys5_state::coins_r)
 {
 	if (offset == 2)
-		return input_port_read(space->machine(), "COINS") << 8;
+		return input_port_read(machine(), "COINS") << 8;
 	else
 		return 0xffff;
 }
 
-static WRITE16_HANDLER( coins_w )
+WRITE16_MEMBER(jpmsys5_state::coins_w)
 {
 	/* TODO */
 }
 
-static READ16_HANDLER( unk_r )
+READ16_MEMBER(jpmsys5_state::unk_r)
 {
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( mux_w )
+WRITE16_MEMBER(jpmsys5_state::mux_w)
 {
-	jpmsys5_state *state = space->machine().driver_data<jpmsys5_state>();
-	state->m_muxram[offset]=data;
+	m_muxram[offset]=data;
 }
 
-static READ16_HANDLER( mux_r )
+READ16_MEMBER(jpmsys5_state::mux_r)
 {
 	if (offset == 0x81/2)
-		return input_port_read(space->machine(), "DSW");
+		return input_port_read(machine(), "DSW");
 
 	return 0xffff;
 }
@@ -310,7 +317,7 @@ static READ16_DEVICE_HANDLER( jpm_upd7759_r )
 
 static ADDRESS_MAP_START( 68000_map, AS_PROGRAM, 16, jpmsys5_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x01fffe, 0x01ffff) AM_WRITE_LEGACY(rombank_w)
+	AM_RANGE(0x01fffe, 0x01ffff) AM_WRITE(rombank_w)
 	AM_RANGE(0x020000, 0x03ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x046000, 0x046001) AM_WRITENOP
@@ -323,17 +330,17 @@ static ADDRESS_MAP_START( 68000_map, AS_PROGRAM, 16, jpmsys5_state )
 	AM_RANGE(0x046066, 0x046067) AM_WRITENOP
 	AM_RANGE(0x046080, 0x046081) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff)
 	AM_RANGE(0x046082, 0x046083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
-	AM_RANGE(0x046084, 0x046085) AM_READ_LEGACY(unk_r) // PIA?
-	AM_RANGE(0x046088, 0x046089) AM_READ_LEGACY(unk_r) // PIA?
+	AM_RANGE(0x046084, 0x046085) AM_READ(unk_r) // PIA?
+	AM_RANGE(0x046088, 0x046089) AM_READ(unk_r) // PIA?
 	AM_RANGE(0x04608c, 0x04608d) AM_DEVREADWRITE8("acia6850_2", acia6850_device, status_read, control_write, 0xff)
 	AM_RANGE(0x04608e, 0x04608f) AM_DEVREADWRITE8("acia6850_2", acia6850_device, data_read, data_write, 0xff)
 	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8_LEGACY("ym2413", ym2413_w, 0x00ff)
 	AM_RANGE(0x0460c0, 0x0460c1) AM_WRITENOP
-	AM_RANGE(0x0460e0, 0x0460e5) AM_WRITE_LEGACY(ramdac_w)
-	AM_RANGE(0x048000, 0x04801f) AM_READWRITE_LEGACY(coins_r, coins_w)
-	AM_RANGE(0x04c000, 0x04c0ff) AM_READ_LEGACY(mux_r) AM_WRITE_LEGACY(mux_w)
+	AM_RANGE(0x0460e0, 0x0460e5) AM_WRITE(ramdac_w)
+	AM_RANGE(0x048000, 0x04801f) AM_READWRITE(coins_r, coins_w)
+	AM_RANGE(0x04c000, 0x04c0ff) AM_READ(mux_r) AM_WRITE(mux_w)
 	AM_RANGE(0x04c100, 0x04c105) AM_DEVREADWRITE_LEGACY("upd7759", jpm_upd7759_r, jpm_upd7759_w)
-	AM_RANGE(0x800000, 0xcfffff) AM_READWRITE_LEGACY(sys5_tms34061_r, sys5_tms34061_w)
+	AM_RANGE(0x800000, 0xcfffff) AM_READWRITE(sys5_tms34061_r, sys5_tms34061_w)
 ADDRESS_MAP_END
 
 
@@ -694,7 +701,7 @@ MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( 68000_awp_map, AS_PROGRAM, 16, jpmsys5_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x01fffe, 0x01ffff) AM_WRITE_LEGACY(rombank_w)
+	AM_RANGE(0x01fffe, 0x01ffff) AM_WRITE(rombank_w)
 	AM_RANGE(0x020000, 0x03ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x046000, 0x046001) AM_WRITENOP
@@ -707,14 +714,14 @@ static ADDRESS_MAP_START( 68000_awp_map, AS_PROGRAM, 16, jpmsys5_state )
 	AM_RANGE(0x046066, 0x046067) AM_WRITENOP
 	AM_RANGE(0x046080, 0x046081) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff)
 	AM_RANGE(0x046082, 0x046083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
-	AM_RANGE(0x046084, 0x046085) AM_READ_LEGACY(unk_r) // PIA?
-	AM_RANGE(0x046088, 0x046089) AM_READ_LEGACY(unk_r) // PIA?
+	AM_RANGE(0x046084, 0x046085) AM_READ(unk_r) // PIA?
+	AM_RANGE(0x046088, 0x046089) AM_READ(unk_r) // PIA?
 	AM_RANGE(0x04608c, 0x04608d) AM_DEVREADWRITE8("acia6850_2", acia6850_device, status_read, control_write, 0xff)
 	AM_RANGE(0x04608e, 0x04608f) AM_DEVREADWRITE8("acia6850_2", acia6850_device, data_read, data_write, 0xff)
 	AM_RANGE(0x0460a0, 0x0460a3) AM_DEVWRITE8_LEGACY("ym2413", ym2413_w, 0x00ff)
 	AM_RANGE(0x0460c0, 0x0460c1) AM_WRITENOP
-	AM_RANGE(0x048000, 0x04801f) AM_READWRITE_LEGACY(coins_r, coins_w)
-	AM_RANGE(0x04c000, 0x04c0ff) AM_READ_LEGACY(mux_r) AM_WRITE_LEGACY(mux_w)
+	AM_RANGE(0x048000, 0x04801f) AM_READWRITE(coins_r, coins_w)
+	AM_RANGE(0x04c000, 0x04c0ff) AM_READ(mux_r) AM_WRITE(mux_w)
 	AM_RANGE(0x04c100, 0x04c105) AM_DEVREADWRITE_LEGACY("upd7759", jpm_upd7759_r, jpm_upd7759_w)
 ADDRESS_MAP_END
 

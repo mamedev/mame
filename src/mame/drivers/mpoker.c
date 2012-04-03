@@ -183,6 +183,17 @@ public:
 	UINT8 m_output[8];
 	UINT8* m_video;
 	int m_mixdata;
+	DECLARE_READ8_MEMBER(mixport_r);
+	DECLARE_WRITE8_MEMBER(muxed_w);
+	DECLARE_WRITE8_MEMBER(outport0_w);
+	DECLARE_WRITE8_MEMBER(outport1_w);
+	DECLARE_WRITE8_MEMBER(outport2_w);
+	DECLARE_WRITE8_MEMBER(outport3_w);
+	DECLARE_WRITE8_MEMBER(outport4_w);
+	DECLARE_WRITE8_MEMBER(outport5_w);
+	DECLARE_WRITE8_MEMBER(outport6_w);
+	DECLARE_WRITE8_MEMBER(outport7_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
 };
 
 
@@ -230,9 +241,8 @@ static PALETTE_INIT(mpoker)
 	}
 }
 
-static READ8_HANDLER( mixport_r )
+READ8_MEMBER(mpoker_state::mixport_r)
 {
-	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 /*  - bits -
     7654 3210
     ---- ---x   Unknown.
@@ -247,9 +257,9 @@ static READ8_HANDLER( mixport_r )
     If you change the status *every* read, the HW stucks.
 */
 
-	state->m_mixdata = (input_port_read(space->machine(), "SW2") & 0xfd) | (space->machine().rand() & 0x02);
+	m_mixdata = (input_port_read(machine(), "SW2") & 0xfd) | (machine().rand() & 0x02);
 
-	return state->m_mixdata;
+	return m_mixdata;
 }
 
 /***** Port 0158 *****
@@ -264,7 +274,7 @@ static READ8_HANDLER( mixport_r )
     xxx- ----   Unknown.
 */
 
-//static WRITE8_HANDLER( muxed_w )
+//WRITE8_MEMBER(mpoker_state::muxed_w)
 //{
 //  popmessage("written : %02X %02X %02X %02X %02X %02X %02X %02X", data & 0x01, data & 0x02, data & 0x04, data & 0x08, data & 0x10, data & 0x20, data & 0x40, data & 0x80);
 //}
@@ -281,14 +291,13 @@ static READ8_HANDLER( mixport_r )
     xxx- ----   Unknown.
 */
 
-static WRITE8_HANDLER( outport0_w )
+WRITE8_MEMBER(mpoker_state::outport0_w)
 {
-	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - BET */
 	output_set_lamp_value(5, (data >> 1) & 1);		/* Lamp 5 - HOLD 1 */
 
-	state->m_output[0] = data;
-	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
+	m_output[0] = data;
+	popmessage("outport0 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
 }
 
 /***** Port 8001 *****
@@ -303,14 +312,13 @@ static WRITE8_HANDLER( outport0_w )
     xxx- ----   Unknown.
 */
 
-static WRITE8_HANDLER( outport1_w )
+WRITE8_MEMBER(mpoker_state::outport1_w)
 {
-	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(2, (data & 1));			/* Lamp 2 - DEAL */
 	output_set_lamp_value(6, (data >> 1) & 1);		/* Lamp 6 - HOLD 2 */
 
-	state->m_output[1] = data;
-	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
+	m_output[1] = data;
+	popmessage("outport1 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
 }
 
 /***** Port 8002 *****
@@ -325,14 +333,13 @@ static WRITE8_HANDLER( outport1_w )
     xxx- ----   Unknown.
 */
 
-static WRITE8_HANDLER( outport2_w )
+WRITE8_MEMBER(mpoker_state::outport2_w)
 {
-	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(3, (data & 1));			/* Lamp 3 - CANCEL */
 	output_set_lamp_value(7, (data >> 1) & 1);		/* Lamp 7 - HOLD 3 */
 
-	state->m_output[2] = data;
-	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
+	m_output[2] = data;
+	popmessage("outport2 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
 }
 
 /***** Port 8003 *****
@@ -347,14 +354,13 @@ static WRITE8_HANDLER( outport2_w )
     xxx- ----   Unknown.
 */
 
-static WRITE8_HANDLER( outport3_w )
+WRITE8_MEMBER(mpoker_state::outport3_w)
 {
-	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(4, (data & 1));			/* Lamp 4 - STAND */
 	output_set_lamp_value(8, (data >> 1) & 1);		/* Lamp 8 - HOLD 4 */
 
-	state->m_output[3] = data;
-	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
+	m_output[3] = data;
+	popmessage("outport3 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
 }
 
 /***** Port 8004 *****
@@ -369,13 +375,12 @@ static WRITE8_HANDLER( outport3_w )
     xxx- ----   Unknown.
 */
 
-static WRITE8_HANDLER( outport4_w )
+WRITE8_MEMBER(mpoker_state::outport4_w)
 {
-	mpoker_state *state = space->machine().driver_data<mpoker_state>();
 	output_set_lamp_value(9, (data >> 1) & 1);		/* Lamp 9 - HOLD 5 */
 
-	state->m_output[4] = data;
-	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
+	m_output[4] = data;
+	popmessage("outport4 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
 }
 
 /***** Port 8005 *****
@@ -390,11 +395,10 @@ static WRITE8_HANDLER( outport4_w )
     xxx- ----   Unknown.
 */
 
-static WRITE8_HANDLER( outport5_w )
+WRITE8_MEMBER(mpoker_state::outport5_w)
 {
-	mpoker_state *state = space->machine().driver_data<mpoker_state>();
-	state->m_output[5] = data;
-	popmessage("outport5 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
+	m_output[5] = data;
+	popmessage("outport5 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
 }
 
 /***** Port 8006 *****
@@ -409,13 +413,12 @@ static WRITE8_HANDLER( outport5_w )
     xxx- ----   Unknown.
 */
 
-static WRITE8_HANDLER( outport6_w )
+WRITE8_MEMBER(mpoker_state::outport6_w)
 {
-	mpoker_state *state = space->machine().driver_data<mpoker_state>();
-	coin_counter_w(space->machine(), 1, data & 0x02);	/* Payout pulse */
+	coin_counter_w(machine(), 1, data & 0x02);	/* Payout pulse */
 
-	state->m_output[6] = data;
-	popmessage("outport6 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
+	m_output[6] = data;
+	popmessage("outport6 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
 }
 
 /***** Port 8007 *****
@@ -430,13 +433,12 @@ static WRITE8_HANDLER( outport6_w )
     xxx- ----   Unknown.
 */
 
-static WRITE8_HANDLER( outport7_w )
+WRITE8_MEMBER(mpoker_state::outport7_w)
 {
-	mpoker_state *state = space->machine().driver_data<mpoker_state>();
-	coin_counter_w(space->machine(), 0, data & 0x02);	/* Coin pulse */
+	coin_counter_w(machine(), 0, data & 0x02);	/* Coin pulse */
 
-	state->m_output[7] = data;
-	popmessage("outport7 : %02X %02X %02X %02X %02X %02X %02X %02X", state->m_output[0], state->m_output[1], state->m_output[2], state->m_output[3], state->m_output[4], state->m_output[5], state->m_output[6], state->m_output[7]);
+	m_output[7] = data;
+	popmessage("outport7 : %02X %02X %02X %02X %02X %02X %02X %02X", m_output[0], m_output[1], m_output[2], m_output[3], m_output[4], m_output[5], m_output[6], m_output[7]);
 }
 
 
@@ -462,9 +464,9 @@ static WRITE8_HANDLER( outport7_w )
    05   | ---- | ---- | ---- | bit2
 
 
-//static WRITE8_HANDLER( sound_w )
+WRITE8_MEMBER(mpoker_state::sound_w)
 //{
-//  dac_data_w(space->machine().device("dac"), data);
+//  dac_data_w(machine().device("dac"), data);
 //}
 */
 
@@ -474,17 +476,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mpoker_state )
 	AM_RANGE(0x3800, 0x38ff) AM_RAM AM_SHARE("nvram")	/* NVRAM = 2x SCM5101E */
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE(m_video)	/* 4x MM2114N-3 */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("SW1")
-	AM_RANGE(0x8001, 0x8001) AM_READ_LEGACY(mixport_r) /* DIP switch bank 2 + a sort of watchdog */
+	AM_RANGE(0x8001, 0x8001) AM_READ(mixport_r) /* DIP switch bank 2 + a sort of watchdog */
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN1")
 	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN2")
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(outport0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE_LEGACY(outport1_w)
-	AM_RANGE(0x8002, 0x8002) AM_WRITE_LEGACY(outport2_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE_LEGACY(outport3_w)
-	AM_RANGE(0x8004, 0x8004) AM_WRITE_LEGACY(outport4_w)
-	AM_RANGE(0x8005, 0x8005) AM_WRITE_LEGACY(outport5_w)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE_LEGACY(outport6_w)
-	AM_RANGE(0x8007, 0x8007) AM_WRITE_LEGACY(outport7_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(outport0_w)
+	AM_RANGE(0x8001, 0x8001) AM_WRITE(outport1_w)
+	AM_RANGE(0x8002, 0x8002) AM_WRITE(outport2_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITE(outport3_w)
+	AM_RANGE(0x8004, 0x8004) AM_WRITE(outport4_w)
+	AM_RANGE(0x8005, 0x8005) AM_WRITE(outport5_w)
+	AM_RANGE(0x8006, 0x8006) AM_WRITE(outport6_w)
+	AM_RANGE(0x8007, 0x8007) AM_WRITE(outport7_w)
 
 ADDRESS_MAP_END
 

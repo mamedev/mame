@@ -120,6 +120,11 @@ public:
 	size_t m_stats_ram_size;
 	int m_clr_offset;
 	int m_bmc_input;
+	DECLARE_READ16_MEMBER(bmc_random_read);
+	DECLARE_READ16_MEMBER(bmc_protection_r);
+	DECLARE_WRITE16_MEMBER(bmc_RAMDAC_offset_w);
+	DECLARE_WRITE16_MEMBER(bmc_RAMDAC_color_w);
+	DECLARE_WRITE16_MEMBER(scroll_w);
 };
 
 
@@ -181,17 +186,17 @@ static SCREEN_UPDATE_IND16( bmcbowl )
 	return 0;
 }
 
-static READ16_HANDLER( bmc_random_read )
+READ16_MEMBER(bmcbowl_state::bmc_random_read)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ16_HANDLER( bmc_protection_r )
+READ16_MEMBER(bmcbowl_state::bmc_protection_r)
 {
-	switch(cpu_get_previouspc(&space->device()))
+	switch(cpu_get_previouspc(&space.device()))
 	{
 		case 0xca68:
-			switch(cpu_get_reg(&space->device(), M68K_D2))
+			switch(cpu_get_reg(&space.device(), M68K_D2))
 			{
 				case 0: 		 return 0x37<<8;
 				case 0x1013: return 0;
@@ -199,25 +204,23 @@ static READ16_HANDLER( bmc_protection_r )
 			}
 			break;
 	}
-	logerror("Protection read @ %X\n",cpu_get_previouspc(&space->device()));
-	return space->machine().rand();
+	logerror("Protection read @ %X\n",cpu_get_previouspc(&space.device()));
+	return machine().rand();
 }
 
-static WRITE16_HANDLER( bmc_RAMDAC_offset_w )
+WRITE16_MEMBER(bmcbowl_state::bmc_RAMDAC_offset_w)
 {
-	bmcbowl_state *state = space->machine().driver_data<bmcbowl_state>();
-	state->m_clr_offset=data*3;
+	m_clr_offset=data*3;
 }
 
-static WRITE16_HANDLER( bmc_RAMDAC_color_w )
+WRITE16_MEMBER(bmcbowl_state::bmc_RAMDAC_color_w)
 {
-	bmcbowl_state *state = space->machine().driver_data<bmcbowl_state>();
-	state->m_bmc_colorram[state->m_clr_offset]=data;
-	palette_set_color_rgb(space->machine(),state->m_clr_offset/3,pal6bit(state->m_bmc_colorram[(state->m_clr_offset/3)*3]),pal6bit(state->m_bmc_colorram[(state->m_clr_offset/3)*3+1]),pal6bit(state->m_bmc_colorram[(state->m_clr_offset/3)*3+2]));
-	state->m_clr_offset=(state->m_clr_offset+1)%768;
+	m_bmc_colorram[m_clr_offset]=data;
+	palette_set_color_rgb(machine(),m_clr_offset/3,pal6bit(m_bmc_colorram[(m_clr_offset/3)*3]),pal6bit(m_bmc_colorram[(m_clr_offset/3)*3+1]),pal6bit(m_bmc_colorram[(m_clr_offset/3)*3+2]));
+	m_clr_offset=(m_clr_offset+1)%768;
 }
 
-static WRITE16_HANDLER( scroll_w )
+WRITE16_MEMBER(bmcbowl_state::scroll_w)
 {
 	//TODO - scroll
 }
@@ -326,13 +329,13 @@ static NVRAM_HANDLER( bmcbowl )
 static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
-	AM_RANGE(0x090000, 0x090001) AM_WRITE_LEGACY(bmc_RAMDAC_offset_w)
-	AM_RANGE(0x090002, 0x090003) AM_WRITE_LEGACY(bmc_RAMDAC_color_w)
+	AM_RANGE(0x090000, 0x090001) AM_WRITE(bmc_RAMDAC_offset_w)
+	AM_RANGE(0x090002, 0x090003) AM_WRITE(bmc_RAMDAC_color_w)
 	AM_RANGE(0x090004, 0x090005) AM_WRITENOP//RAMDAC
 
 	AM_RANGE(0x090800, 0x090803) AM_WRITENOP
 	AM_RANGE(0x091000, 0x091001) AM_WRITENOP
-	AM_RANGE(0x091800, 0x091801) AM_WRITE_LEGACY(scroll_w)
+	AM_RANGE(0x091800, 0x091801) AM_WRITE(scroll_w)
 
 	AM_RANGE(0x092000, 0x09201f) AM_DEVREADWRITE8("via6522_0", via6522_device, read, write, 0x00ff)
 
@@ -354,9 +357,9 @@ static ADDRESS_MAP_START( bmcbowl_mem, AS_PROGRAM, 16, bmcbowl_state )
 	AM_RANGE(0x30c040, 0x30c041) AM_WRITENOP
 	AM_RANGE(0x30c080, 0x30c081) AM_WRITENOP
 	AM_RANGE(0x30c0c0, 0x30c0c1) AM_WRITENOP
-	AM_RANGE(0x30c100, 0x30c101) AM_READ_LEGACY(bmc_protection_r)
+	AM_RANGE(0x30c100, 0x30c101) AM_READ(bmc_protection_r)
 	AM_RANGE(0x30c140, 0x30c141) AM_WRITENOP
-	AM_RANGE(0x30ca00, 0x30ca01) AM_READ_LEGACY(bmc_random_read) AM_WRITENOP
+	AM_RANGE(0x30ca00, 0x30ca01) AM_READ(bmc_random_read) AM_WRITENOP
 ADDRESS_MAP_END
 
 

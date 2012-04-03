@@ -37,6 +37,7 @@ public:
 	UINT8 *m_main_mem;
 	UINT8 m_mem_map;
 	UINT8 m_mem_banks[4];
+	DECLARE_WRITE8_MEMBER(mem_w);
 };
 
 
@@ -122,20 +123,19 @@ static void mem_map_banks(running_machine &machine)
 	}
 }
 
-static WRITE8_HANDLER(mem_w)
+WRITE8_MEMBER(pengadvb_state::mem_w)
 {
-	pengadvb_state *state = space->machine().driver_data<pengadvb_state>();
 	if (offset >= 0xc000)
 	{
 		// write to RAM
-		if ((state->m_mem_map >> 6 & 3) == 3)
-			state->m_main_mem[offset - 0xc000] = data;
+		if ((m_mem_map >> 6 & 3) == 3)
+			m_main_mem[offset - 0xc000] = data;
 	}
-	else if (offset >= 0x4000 && (state->m_mem_map >> (offset >> 13 & 6) & 3) == 1 && (state->m_mem_banks[(offset - 0x4000) >> 13] != (data & 0xf)))
+	else if (offset >= 0x4000 && (m_mem_map >> (offset >> 13 & 6) & 3) == 1 && (m_mem_banks[(offset - 0x4000) >> 13] != (data & 0xf)))
 	{
 		// ROM bankswitch
-		state->m_mem_banks[(offset - 0x4000) >> 13] = data & 0xf;
-		mem_map_banks(space->machine());
+		m_mem_banks[(offset - 0x4000) >> 13] = data & 0xf;
+		mem_map_banks(machine());
 	}
 }
 
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8, pengadvb_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank31")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank32")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank4")
-	AM_RANGE(0x0000, 0xffff) AM_WRITE_LEGACY(mem_w)
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(mem_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_mem, AS_IO, 8, pengadvb_state )

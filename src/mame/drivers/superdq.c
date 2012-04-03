@@ -41,6 +41,10 @@ public:
 	UINT8 *m_videoram;
 	tilemap_t *m_tilemap;
 	int m_color_bank;
+	DECLARE_WRITE8_MEMBER(superdq_videoram_w);
+	DECLARE_WRITE8_MEMBER(superdq_io_w);
+	DECLARE_READ8_MEMBER(superdq_ld_r);
+	DECLARE_WRITE8_MEMBER(superdq_ld_w);
 };
 
 static TILE_GET_INFO( get_tile_info )
@@ -139,35 +143,33 @@ static INTERRUPT_GEN( superdq_vblank )
 	device_set_input_line(device, 0, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( superdq_videoram_w )
+WRITE8_MEMBER(superdq_state::superdq_videoram_w)
 {
-	superdq_state *state = space->machine().driver_data<superdq_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( superdq_io_w )
+WRITE8_MEMBER(superdq_state::superdq_io_w)
 {
-	superdq_state *state = space->machine().driver_data<superdq_state>();
 	int 			i;
 	static const UINT8 black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
 	if ( data & 0x40 ) /* bit 6 = irqack */
-		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 
-	coin_counter_w( space->machine(), 0, data & 0x08 );
-	coin_counter_w( space->machine(), 1, data & 0x04 );
+	coin_counter_w( machine(), 0, data & 0x08 );
+	coin_counter_w( machine(), 1, data & 0x04 );
 
-	state->m_color_bank = ( data & 2 ) ? 1 : 0;
+	m_color_bank = ( data & 2 ) ? 1 : 0;
 
 	for( i = 0; i < ARRAY_LENGTH( black_color_entries ); i++ )
 	{
 		int index = black_color_entries[i];
 		if (data & 0x80)
-			palette_set_color(space->machine(), index, palette_get_color(space->machine(), index) & MAKE_ARGB(0,255,255,255));
+			palette_set_color(machine(), index, palette_get_color(machine(), index) & MAKE_ARGB(0,255,255,255));
 		else
-			palette_set_color(space->machine(), index, palette_get_color(space->machine(), index) | MAKE_ARGB(255,0,0,0));
+			palette_set_color(machine(), index, palette_get_color(machine(), index) | MAKE_ARGB(255,0,0,0));
 	}
 
 	/*
@@ -177,18 +179,16 @@ static WRITE8_HANDLER( superdq_io_w )
     */
 }
 
-static READ8_HANDLER( superdq_ld_r )
+READ8_MEMBER(superdq_state::superdq_ld_r)
 {
-	superdq_state *state = space->machine().driver_data<superdq_state>();
 
-	return state->m_ld_in_latch;
+	return m_ld_in_latch;
 }
 
-static WRITE8_HANDLER( superdq_ld_w )
+WRITE8_MEMBER(superdq_state::superdq_ld_w)
 {
-	superdq_state *state = space->machine().driver_data<superdq_state>();
 
-	state->m_ld_out_latch = data;
+	m_ld_out_latch = data;
 }
 
 
@@ -202,17 +202,17 @@ static WRITE8_HANDLER( superdq_ld_w )
 static ADDRESS_MAP_START( superdq_map, AS_PROGRAM, 8, superdq_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE_LEGACY(superdq_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x5c00, 0x5fff) AM_RAM_WRITE(superdq_videoram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superdq_io, AS_IO, 8, superdq_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE_LEGACY(superdq_ld_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(superdq_ld_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(superdq_ld_r) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(superdq_io_w)
+	AM_RANGE(0x04, 0x04) AM_READ(superdq_ld_r) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(superdq_io_w)
 	AM_RANGE(0x0c, 0x0d) AM_NOP /* HD46505S */
 ADDRESS_MAP_END
 

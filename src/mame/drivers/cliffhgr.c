@@ -99,60 +99,66 @@ public:
 	UINT32 m_phillips_code;
 
 	emu_timer *m_irq_timer;
+	DECLARE_WRITE8_MEMBER(cliff_test_led_w);
+	DECLARE_WRITE8_MEMBER(cliff_port_bank_w);
+	DECLARE_READ8_MEMBER(cliff_port_r);
+	DECLARE_READ8_MEMBER(cliff_phillips_code_r);
+	DECLARE_WRITE8_MEMBER(cliff_phillips_clear_w);
+	DECLARE_WRITE8_MEMBER(cliff_coin_counter_w);
+	DECLARE_READ8_MEMBER(cliff_irq_ack_r);
+	DECLARE_WRITE8_MEMBER(cliff_ldwire_w);
 };
 
 
 /********************************************************/
 
-static WRITE8_HANDLER( cliff_test_led_w )
+WRITE8_MEMBER(cliffhgr_state::cliff_test_led_w)
 {
-	set_led_status(space->machine(), 0, offset ^ 1);
+	set_led_status(machine(), 0, offset ^ 1);
 }
 
-static WRITE8_HANDLER( cliff_port_bank_w )
+WRITE8_MEMBER(cliffhgr_state::cliff_port_bank_w)
 {
-	cliffhgr_state *state = space->machine().driver_data<cliffhgr_state>();
 
 	/* writing 0x0f clears the LS174 flip flop */
 	if (data == 0x0f)
-		state->m_port_bank = 0;
+		m_port_bank = 0;
 	else
-		state->m_port_bank = data & 0x0f; /* only D3-D0 are connected */
+		m_port_bank = data & 0x0f; /* only D3-D0 are connected */
 }
 
-static READ8_HANDLER( cliff_port_r )
+READ8_MEMBER(cliffhgr_state::cliff_port_r)
 {
 	static const char *const banknames[] = { "BANK0", "BANK1", "BANK2", "BANK3", "BANK4", "BANK5", "BANK6" };
 
-	cliffhgr_state *state = space->machine().driver_data<cliffhgr_state>();
 
-	if (state->m_port_bank < 7)
-		return input_port_read(space->machine(),  banknames[state->m_port_bank]);
+
+	if (m_port_bank < 7)
+		return input_port_read(machine(),  banknames[m_port_bank]);
 
 	/* output is pulled up for non-mapped ports */
 	return 0xff;
 }
 
-static READ8_HANDLER( cliff_phillips_code_r )
+READ8_MEMBER(cliffhgr_state::cliff_phillips_code_r)
 {
-	cliffhgr_state *state = space->machine().driver_data<cliffhgr_state>();
-	return (state->m_phillips_code >> (8 * offset)) & 0xff;
+	return (m_phillips_code >> (8 * offset)) & 0xff;
 }
 
-static WRITE8_HANDLER( cliff_phillips_clear_w )
+WRITE8_MEMBER(cliffhgr_state::cliff_phillips_clear_w)
 {
 	/* reset serial to parallel converters */
 }
 
-static WRITE8_HANDLER( cliff_coin_counter_w )
+WRITE8_MEMBER(cliffhgr_state::cliff_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, (data & 0x40) ? 1 : 0 );
+	coin_counter_w(machine(), 0, (data & 0x40) ? 1 : 0 );
 }
 
-static READ8_HANDLER( cliff_irq_ack_r )
+READ8_MEMBER(cliffhgr_state::cliff_irq_ack_r)
 {
 	/* deassert IRQ on the CPU */
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 
 	return 0x00;
 }
@@ -166,10 +172,9 @@ static WRITE8_DEVICE_HANDLER( cliff_sound_overlay_w )
 	// bit 4 (data & 0x10) is overlay related?
 }
 
-static WRITE8_HANDLER( cliff_ldwire_w )
+WRITE8_MEMBER(cliffhgr_state::cliff_ldwire_w)
 {
-	cliffhgr_state *state = space->machine().driver_data<cliffhgr_state>();
-	state->m_laserdisc->control_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_laserdisc->control_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -237,18 +242,18 @@ static ADDRESS_MAP_START( mainport, AS_IO, 8, cliffhgr_state )
 	AM_RANGE(0x44, 0x44) AM_DEVWRITE("tms9928a", tms9928a_device, vram_write)
 	AM_RANGE(0x45, 0x45) AM_DEVREAD("tms9928a", tms9928a_device, vram_read)
 	AM_RANGE(0x46, 0x46) AM_DEVWRITE_LEGACY("discrete", cliff_sound_overlay_w)
-	AM_RANGE(0x50, 0x52) AM_READ_LEGACY(cliff_phillips_code_r)
-	AM_RANGE(0x53, 0x53) AM_READ_LEGACY(cliff_irq_ack_r)
+	AM_RANGE(0x50, 0x52) AM_READ(cliff_phillips_code_r)
+	AM_RANGE(0x53, 0x53) AM_READ(cliff_irq_ack_r)
 	AM_RANGE(0x54, 0x54) AM_DEVWRITE("tms9928a", tms9928a_device, register_write)
 	AM_RANGE(0x55, 0x55) AM_DEVREAD("tms9928a", tms9928a_device, register_read)
-	AM_RANGE(0x57, 0x57) AM_WRITE_LEGACY(cliff_phillips_clear_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(cliff_port_bank_w)
-	AM_RANGE(0x62, 0x62) AM_READ_LEGACY(cliff_port_r)
+	AM_RANGE(0x57, 0x57) AM_WRITE(cliff_phillips_clear_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(cliff_port_bank_w)
+	AM_RANGE(0x62, 0x62) AM_READ(cliff_port_r)
 	AM_RANGE(0x64, 0x64) AM_WRITENOP /* unused in schematics, may be used as timing delay for IR interface */
-	AM_RANGE(0x66, 0x66) AM_WRITE_LEGACY(cliff_ldwire_w)
-	AM_RANGE(0x68, 0x68) AM_WRITE_LEGACY(cliff_coin_counter_w)
+	AM_RANGE(0x66, 0x66) AM_WRITE(cliff_ldwire_w)
+	AM_RANGE(0x68, 0x68) AM_WRITE(cliff_coin_counter_w)
 	AM_RANGE(0x6a, 0x6a) AM_WRITENOP /* /LAMP0 (Infrared?) */
-	AM_RANGE(0x6e, 0x6f) AM_WRITE_LEGACY(cliff_test_led_w)
+	AM_RANGE(0x6e, 0x6f) AM_WRITE(cliff_test_led_w)
 ADDRESS_MAP_END
 
 

@@ -58,6 +58,16 @@ public:
 	UINT32 m_blitter_src_y;
 	UINT32 m_blitter_src_dy;
 	UINT32 *m_fpga_ctrl;
+	DECLARE_WRITE32_MEMBER(skimaxx_blitter_w);
+	DECLARE_READ32_MEMBER(skimaxx_blitter_r);
+	DECLARE_WRITE32_MEMBER(m68k_tms_w);
+	DECLARE_READ32_MEMBER(m68k_tms_r);
+	DECLARE_WRITE32_MEMBER(skimaxx_fpga_ctrl_w);
+	DECLARE_READ32_MEMBER(unk_r);
+	DECLARE_READ32_MEMBER(skimaxx_unk1_r);
+	DECLARE_WRITE32_MEMBER(skimaxx_unk1_w);
+	DECLARE_WRITE32_MEMBER(skimaxx_sub_ctrl_w);
+	DECLARE_READ32_MEMBER(skimaxx_analog_r);
 };
 
 
@@ -68,29 +78,28 @@ public:
  *************************************/
 
 // Set up blit parameters
-static WRITE32_HANDLER( skimaxx_blitter_w )
+WRITE32_MEMBER(skimaxx_state::skimaxx_blitter_w)
 {
-	skimaxx_state *state = space->machine().driver_data<skimaxx_state>();
-	UINT32 newdata = COMBINE_DATA( &state->m_blitter_regs[offset] );
+	UINT32 newdata = COMBINE_DATA( &m_blitter_regs[offset] );
 
 	switch (offset)
 	{
 		case 0:
-			state->m_blitter_src_dy = (newdata & 0x7fff) - (newdata & 0x8000);
+			m_blitter_src_dy = (newdata & 0x7fff) - (newdata & 0x8000);
 			break;
 
 		case 1:
-			state->m_blitter_src_x = (newdata & 0x1ff) << 8;
-			state->m_blitter_src_y = (newdata >> 9) << 8;
+			m_blitter_src_x = (newdata & 0x1ff) << 8;
+			m_blitter_src_y = (newdata >> 9) << 8;
 			break;
 
 		case 2:
 			if (ACCESSING_BITS_16_31)
-				state->m_blitter_src_dx = (newdata >> 16) & 0xffff;
+				m_blitter_src_dx = (newdata >> 16) & 0xffff;
 			if (ACCESSING_BITS_0_15)
-				state->m_blitter_src_dx = newdata & 0xffff;
+				m_blitter_src_dx = newdata & 0xffff;
 
-			state->m_blitter_src_dx = (state->m_blitter_src_dx & 0x7fff) - (state->m_blitter_src_dx & 0x8000);
+			m_blitter_src_dx = (m_blitter_src_dx & 0x7fff) - (m_blitter_src_dx & 0x8000);
 			break;
 
 		case 3:
@@ -100,12 +109,11 @@ static WRITE32_HANDLER( skimaxx_blitter_w )
 }
 
 // A read by the 68030 from this area blits one pixel to the back buffer (at the same offset)
-static READ32_HANDLER( skimaxx_blitter_r )
+READ32_MEMBER(skimaxx_state::skimaxx_blitter_r)
 {
-	skimaxx_state *state = space->machine().driver_data<skimaxx_state>();
-	UINT32 penaddr = ((state->m_blitter_src_x >> 8) & 0x1ff) + ((state->m_blitter_src_y >> 8) << 9);
-	UINT16 *src = state->m_blitter_gfx + (penaddr % state->m_blitter_gfx_len);
-	UINT32 *dst = state->m_bg_buffer_back + offset;
+	UINT32 penaddr = ((m_blitter_src_x >> 8) & 0x1ff) + ((m_blitter_src_y >> 8) << 9);
+	UINT16 *src = m_blitter_gfx + (penaddr % m_blitter_gfx_len);
+	UINT32 *dst = m_bg_buffer_back + offset;
 
 	UINT16 pen = (*src) & 0x7fff;
 
@@ -117,8 +125,8 @@ static READ32_HANDLER( skimaxx_blitter_r )
 			*dst = (*dst & 0xffff0000) | pen;
 	}
 
-	state->m_blitter_src_x = (state->m_blitter_src_x & 0x10000) | ((state->m_blitter_src_x + state->m_blitter_src_dx) & 0xffff);
-	state->m_blitter_src_y = (state->m_blitter_src_y & 0xffff0000) | ((state->m_blitter_src_y + state->m_blitter_src_dy) & 0xffff);
+	m_blitter_src_x = (m_blitter_src_x & 0x10000) | ((m_blitter_src_x + m_blitter_src_dx) & 0xffff);
+	m_blitter_src_y = (m_blitter_src_y & 0xffff0000) | ((m_blitter_src_y + m_blitter_src_dy) & 0xffff);
 
 	return 0;
 }
@@ -216,14 +224,14 @@ static void skimaxx_scanline_update(screen_device &screen, bitmap_ind16 &bitmap,
  *
  *************************************/
 
-static WRITE32_HANDLER( m68k_tms_w )
+WRITE32_MEMBER(skimaxx_state::m68k_tms_w)
 {
-	tms34010_host_w(space->machine().device("tms"), offset, data);
+	tms34010_host_w(machine().device("tms"), offset, data);
 }
 
-static READ32_HANDLER( m68k_tms_r )
+READ32_MEMBER(skimaxx_state::m68k_tms_r)
 {
-	return tms34010_host_r(space->machine().device("tms"), offset);
+	return tms34010_host_r(machine().device("tms"), offset);
 }
 
 
@@ -242,46 +250,44 @@ static READ32_HANDLER( m68k_tms_r )
   bit 0: bit banging data
 */
 
-static WRITE32_HANDLER( skimaxx_fpga_ctrl_w )
+WRITE32_MEMBER(skimaxx_state::skimaxx_fpga_ctrl_w)
 {
-	skimaxx_state *state = space->machine().driver_data<skimaxx_state>();
-	UINT32 newdata = COMBINE_DATA( state->m_fpga_ctrl );
+	UINT32 newdata = COMBINE_DATA( m_fpga_ctrl );
 
 	if (ACCESSING_BITS_0_7)
 	{
 		// double buffering
 		UINT8 bank_bg_buffer = (newdata & 0x40) ? 1 : 0;
 
-		state->m_bg_buffer_back  = state->m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * bank_bg_buffer;
-		state->m_bg_buffer_front = state->m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * (1 - bank_bg_buffer);
+		m_bg_buffer_back  = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * bank_bg_buffer;
+		m_bg_buffer_front = m_bg_buffer + 0x400 * 0x100 * sizeof(UINT16) / sizeof(UINT32) * (1 - bank_bg_buffer);
 
-		memory_set_bank(space->machine(), "bank1", bank_bg_buffer);
+		memory_set_bank(machine(), "bank1", bank_bg_buffer);
 	}
 }
 
 // 0x2000004c: bit 7, bit 0
-static READ32_HANDLER( unk_r )
+READ32_MEMBER(skimaxx_state::unk_r)
 {
-	skimaxx_state *state = space->machine().driver_data<skimaxx_state>();
-	return (*state->m_fpga_ctrl & 0x20) ? 0x80 : 0x00;
+	return (*m_fpga_ctrl & 0x20) ? 0x80 : 0x00;
 }
 
 // 0x20000023
-static READ32_HANDLER( skimaxx_unk1_r )
+READ32_MEMBER(skimaxx_state::skimaxx_unk1_r)
 {
 	return 0x80;
 }
 
-static WRITE32_HANDLER( skimaxx_unk1_w )
+WRITE32_MEMBER(skimaxx_state::skimaxx_unk1_w)
 {
 }
 
-static WRITE32_HANDLER( skimaxx_sub_ctrl_w )
+WRITE32_MEMBER(skimaxx_state::skimaxx_sub_ctrl_w)
 {
 	// 7e/7f at the start. 3f/7f, related to reads from 1018xxxx
 	if (ACCESSING_BITS_0_7)
 	{
-		device_t *subcpu = space->machine().device("subcpu");
+		device_t *subcpu = machine().device("subcpu");
 
 		device_set_input_line(subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 		device_set_input_line(subcpu, INPUT_LINE_HALT,  (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -297,9 +303,9 @@ static WRITE32_HANDLER( skimaxx_sub_ctrl_w )
     ..
     1f      left max
 */
-static READ32_HANDLER( skimaxx_analog_r )
+READ32_MEMBER(skimaxx_state::skimaxx_analog_r)
 {
-	return BITSWAP8(input_port_read(space->machine(), offset ? "Y" : "X"), 0,1,2,3,4,5,6,7);
+	return BITSWAP8(input_port_read(machine(), offset ? "Y" : "X"), 0,1,2,3,4,5,6,7);
 }
 
 /*************************************
@@ -310,8 +316,8 @@ static READ32_HANDLER( skimaxx_analog_r )
 
 static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
-	AM_RANGE(0x10000000, 0x10000003) AM_WRITE_LEGACY(skimaxx_sub_ctrl_w )
-	AM_RANGE(0x10100000, 0x1010000f) AM_READWRITE_LEGACY(m68k_tms_r, m68k_tms_w)//AM_NOP
+	AM_RANGE(0x10000000, 0x10000003) AM_WRITE(skimaxx_sub_ctrl_w )
+	AM_RANGE(0x10100000, 0x1010000f) AM_READWRITE(m68k_tms_r, m68k_tms_w)//AM_NOP
 //  AM_RANGE(0x10180000, 0x10187fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE("share1")	// above 10188000 accessed at level end (game bug?)
 	AM_RANGE(0x20000000, 0x20000003) AM_READNOP	// watchdog_r?
@@ -321,15 +327,15 @@ static ADDRESS_MAP_START( 68030_1_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x20000018, 0x2000001b) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x00ff)	// right
 	AM_RANGE(0x2000001c, 0x2000001f) AM_DEVREADWRITE8("oki4", okim6295_device, read, write, 0x00ff)	// right
 
-	AM_RANGE(0x20000020, 0x20000023) AM_READ_LEGACY(skimaxx_unk1_r )	// units linking?
-	AM_RANGE(0x20000024, 0x20000027) AM_WRITE_LEGACY(skimaxx_unk1_w )	// ""
+	AM_RANGE(0x20000020, 0x20000023) AM_READ(skimaxx_unk1_r )	// units linking?
+	AM_RANGE(0x20000024, 0x20000027) AM_WRITE(skimaxx_unk1_w )	// ""
 
 	AM_RANGE(0x20000040, 0x20000043) AM_RAM	// write
 	AM_RANGE(0x20000044, 0x20000047) AM_READ_PORT( "DSW" )
 	AM_RANGE(0x20000048, 0x2000004b) AM_READ_PORT( "COIN" )
-	AM_RANGE(0x2000004c, 0x2000004f) AM_READ_LEGACY(unk_r)	// bit 7, bit 0
+	AM_RANGE(0x2000004c, 0x2000004f) AM_READ(unk_r)	// bit 7, bit 0
 
-	AM_RANGE(0x20000050, 0x20000057) AM_READ_LEGACY(skimaxx_analog_r ) AM_WRITENOP	// read (0-1f), write motor?
+	AM_RANGE(0x20000050, 0x20000057) AM_READ(skimaxx_analog_r ) AM_WRITENOP	// read (0-1f), write motor?
 
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_RAM AM_MIRROR(0x00020000)
 ADDRESS_MAP_END
@@ -344,10 +350,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( 68030_2_map, AS_PROGRAM, 32, skimaxx_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM
 
-	AM_RANGE(0x20000000, 0x2007ffff) AM_READ_LEGACY(skimaxx_blitter_r )	// do blit
-	AM_RANGE(0x30000000, 0x3000000f) AM_WRITE_LEGACY(skimaxx_blitter_w ) AM_BASE(m_blitter_regs )
+	AM_RANGE(0x20000000, 0x2007ffff) AM_READ(skimaxx_blitter_r )	// do blit
+	AM_RANGE(0x30000000, 0x3000000f) AM_WRITE(skimaxx_blitter_w ) AM_BASE(m_blitter_regs )
 
-	AM_RANGE(0x40000000, 0x40000003) AM_WRITE_LEGACY(skimaxx_fpga_ctrl_w ) AM_BASE(m_fpga_ctrl )
+	AM_RANGE(0x40000000, 0x40000003) AM_WRITE(skimaxx_fpga_ctrl_w ) AM_BASE(m_fpga_ctrl )
 
 	AM_RANGE(0x50000000, 0x5007ffff) AM_RAMBANK("bank1")	// background ram allocated here at video_start (skimaxx_bg_buffer_back/front)
 //  AM_RANGE(0xfffc0000, 0xfffc7fff) AM_RAM AM_SHARE("share1")

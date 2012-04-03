@@ -35,6 +35,7 @@ public:
 
 	/* video-related */
 	UINT8          m_color;
+	DECLARE_WRITE8_MEMBER(dotrikun_color_w);
 };
 
 
@@ -44,9 +45,8 @@ public:
  *
  *************************************/
 
-static WRITE8_HANDLER( dotrikun_color_w )
+WRITE8_MEMBER(dotrikun_state::dotrikun_color_w)
 {
-	dotrikun_state *state = space->machine().driver_data<dotrikun_state>();
 	/*
     x--- ---- screen color swap?
     ---- -x-- B
@@ -54,8 +54,8 @@ static WRITE8_HANDLER( dotrikun_color_w )
     ---- ---x R
     */
 
-	state->m_color = data;
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+	m_color = data;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 }
 
 
@@ -104,7 +104,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, dotrikun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(dotrikun_color_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("INPUTS") AM_WRITE(dotrikun_color_w)
 ADDRESS_MAP_END
 
 

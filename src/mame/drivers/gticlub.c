@@ -244,14 +244,27 @@ public:
 	UINT32 *m_work_ram;
 	UINT32 *m_sharc_dataram_0;
 	UINT32 *m_sharc_dataram_1;
+	DECLARE_WRITE32_MEMBER(paletteram32_w);
+	DECLARE_READ32_MEMBER(gticlub_k001604_tile_r);
+	DECLARE_WRITE32_MEMBER(gticlub_k001604_tile_w);
+	DECLARE_READ32_MEMBER(gticlub_k001604_char_r);
+	DECLARE_WRITE32_MEMBER(gticlub_k001604_char_w);
+	DECLARE_READ32_MEMBER(gticlub_k001604_reg_r);
+	DECLARE_WRITE32_MEMBER(gticlub_k001604_reg_w);
+	DECLARE_READ8_MEMBER(sysreg_r);
+	DECLARE_WRITE8_MEMBER(sysreg_w);
+	DECLARE_READ32_MEMBER(dsp_dataram0_r);
+	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
+	DECLARE_READ32_MEMBER(dsp_dataram1_r);
+	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
 };
 
 
-static WRITE32_HANDLER( paletteram32_w )
+WRITE32_MEMBER(gticlub_state::paletteram32_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	data = space->machine().generic.paletteram.u32[offset];
-	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	data = machine().generic.paletteram.u32[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static void voodoo_vblank_0(device_t *device, int param)
@@ -264,40 +277,40 @@ static void voodoo_vblank_1(device_t *device, int param)
 	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ1, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static READ32_HANDLER( gticlub_k001604_tile_r )
+READ32_MEMBER(gticlub_state::gticlub_k001604_tile_r)
 {
-	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_tile_r(k001604, offset, mem_mask);
 }
 
-static WRITE32_HANDLER( gticlub_k001604_tile_w )
+WRITE32_MEMBER(gticlub_state::gticlub_k001604_tile_w)
 {
-	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_tile_w(k001604, offset, data, mem_mask);
 }
 
 
-static READ32_HANDLER( gticlub_k001604_char_r )
+READ32_MEMBER(gticlub_state::gticlub_k001604_char_r)
 {
-	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_char_r(k001604, offset, mem_mask);
 }
 
-static WRITE32_HANDLER( gticlub_k001604_char_w )
+WRITE32_MEMBER(gticlub_state::gticlub_k001604_char_w)
 {
-	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_char_w(k001604, offset, data, mem_mask);
 }
 
-static READ32_HANDLER( gticlub_k001604_reg_r )
+READ32_MEMBER(gticlub_state::gticlub_k001604_reg_r)
 {
-	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	return k001604_reg_r(k001604, offset, mem_mask);
 }
 
-static WRITE32_HANDLER( gticlub_k001604_reg_w )
+WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
 {
-	device_t *k001604 = space->machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
+	device_t *k001604 = machine().device(get_cgboard_id() ? "k001604_2" : "k001604_1");
 	k001604_reg_w(k001604, offset, data, mem_mask);
 }
 
@@ -318,18 +331,18 @@ static const eeprom_interface eeprom_intf =
 	0				/* reset_delay */
 };
 
-static READ8_HANDLER( sysreg_r )
+READ8_MEMBER(gticlub_state::sysreg_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	device_t *adc1038 = space->machine().device("adc1038");
-	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+	device_t *adc1038 = machine().device("adc1038");
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 
 	switch (offset)
 	{
 		case 0:
 		case 1:
 		case 3:
-			return input_port_read(space->machine(), portnames[offset]);
+			return input_port_read(machine(), portnames[offset]);
 
 		case 2:
 			return adc1038_sars_read(adc1038) << 7;
@@ -354,10 +367,10 @@ static READ8_HANDLER( sysreg_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( sysreg_w )
+WRITE8_MEMBER(gticlub_state::sysreg_w)
 {
-	device_t *adc1038 = space->machine().device("adc1038");
-	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+	device_t *adc1038 = machine().device("adc1038");
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 
 	switch (offset)
 	{
@@ -374,10 +387,10 @@ static WRITE8_HANDLER( sysreg_w )
 
 		case 4:
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			adc1038_di_write(adc1038, (data >> 0) & 1);
 			adc1038_clk_write(adc1038, (data >> 1) & 1);
@@ -402,15 +415,15 @@ static MACHINE_START( gticlub )
 
 static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(m_work_ram)		/* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE_LEGACY(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
-	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE_LEGACY(paletteram32_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE_LEGACY(gticlub_k001604_tile_r, gticlub_k001604_tile_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE_LEGACY(gticlub_k001604_char_r, gticlub_k001604_char_w)
+	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(gticlub_k001604_tile_r, gticlub_k001604_tile_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(gticlub_k001604_char_r, gticlub_k001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x78040000, 0x7804000f) AM_READWRITE_LEGACY(K001006_0_r, K001006_0_w)
 	AM_RANGE(0x78080000, 0x7808000f) AM_READWRITE_LEGACY(K001006_1_r, K001006_1_w)
 	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8_LEGACY(sysreg_r, sysreg_w, 0xffffffff)
+	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8_LEGACY("k056230", k056230_r, k056230_w, 0xffffffff)
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE_LEGACY("k056230", lanc_ram_r, lanc_ram_w)
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVWRITE_LEGACY("k056800", k056800_host_w)
@@ -434,40 +447,36 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static READ32_HANDLER( dsp_dataram0_r )
+READ32_MEMBER(gticlub_state::dsp_dataram0_r)
 {
-	gticlub_state *state = space->machine().driver_data<gticlub_state>();
-	return state->m_sharc_dataram_0[offset] & 0xffff;
+	return m_sharc_dataram_0[offset] & 0xffff;
 }
 
-static WRITE32_HANDLER( dsp_dataram0_w )
+WRITE32_MEMBER(gticlub_state::dsp_dataram0_w)
 {
-	gticlub_state *state = space->machine().driver_data<gticlub_state>();
-	state->m_sharc_dataram_0[offset] = data;
+	m_sharc_dataram_0[offset] = data;
 }
 
-static READ32_HANDLER( dsp_dataram1_r )
+READ32_MEMBER(gticlub_state::dsp_dataram1_r)
 {
-	gticlub_state *state = space->machine().driver_data<gticlub_state>();
-	return state->m_sharc_dataram_1[offset] & 0xffff;
+	return m_sharc_dataram_1[offset] & 0xffff;
 }
 
-static WRITE32_HANDLER( dsp_dataram1_w )
+WRITE32_MEMBER(gticlub_state::dsp_dataram1_w)
 {
-	gticlub_state *state = space->machine().driver_data<gticlub_state>();
-	state->m_sharc_dataram_1[offset] = data;
+	m_sharc_dataram_1[offset] = data;
 }
 
 static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, gticlub_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE_LEGACY(dsp_dataram0_r, dsp_dataram0_w)
+	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(K001005_r, K001005_w)
 	AM_RANGE(0x700000, 0x7000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hangplt_sharc0_map, AS_DATA, 32, gticlub_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE_LEGACY(dsp_dataram0_r, dsp_dataram0_w)
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo0", nwk_voodoo_0_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
@@ -478,7 +487,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hangplt_sharc1_map, AS_DATA, 32, gticlub_state )
 	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE_LEGACY(dsp_dataram1_r, dsp_dataram1_w)
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
 	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo1", nwk_voodoo_1_r, voodoo_w)
 	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)

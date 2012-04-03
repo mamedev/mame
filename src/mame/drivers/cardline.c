@@ -33,6 +33,11 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;
 	int m_var;
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(attr_w);
+	DECLARE_WRITE8_MEMBER(video_w);
+	DECLARE_READ8_MEMBER(unk_r);
+	DECLARE_WRITE8_MEMBER(lamps_w);
 };
 
 
@@ -70,35 +75,31 @@ static SCREEN_UPDATE_IND16( cardline )
 	return 0;
 }
 
-static WRITE8_HANDLER(vram_w)
+WRITE8_MEMBER(cardline_state::vram_w)
 {
-	cardline_state *state = space->machine().driver_data<cardline_state>();
-	offset+=0x1000*((state->m_video&2)>>1);
-	state->m_videoram[offset]=data;
+	offset+=0x1000*((m_video&2)>>1);
+	m_videoram[offset]=data;
 }
 
-static WRITE8_HANDLER(attr_w)
+WRITE8_MEMBER(cardline_state::attr_w)
 {
-	cardline_state *state = space->machine().driver_data<cardline_state>();
-	offset+=0x1000*((state->m_video&2)>>1);
-	state->m_colorram[offset]=data;
+	offset+=0x1000*((m_video&2)>>1);
+	m_colorram[offset]=data;
 }
 
-static WRITE8_HANDLER(video_w)
+WRITE8_MEMBER(cardline_state::video_w)
 {
-	cardline_state *state = space->machine().driver_data<cardline_state>();
-	state->m_video=data;
+	m_video=data;
 }
 
-static READ8_HANDLER(unk_r)
+READ8_MEMBER(cardline_state::unk_r)
 {
-	cardline_state *state = space->machine().driver_data<cardline_state>();
-	state->m_var^=0x10;
-	//printf("var %d\n",state->m_var);
-	return state->m_var;
+	m_var^=0x10;
+	//printf("var %d\n",m_var);
+	return m_var;
 }
 
-static WRITE8_HANDLER(lamps_w)
+WRITE8_MEMBER(cardline_state::lamps_w)
 {
 	/* button lamps 1-8 (collect, card 1-5, bet, start) */
 	output_set_lamp_value(5,(data >> 0) & 1);
@@ -120,7 +121,7 @@ static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("IN0")
 	AM_RANGE(0x2005, 0x2005) AM_READ_PORT("IN1")
 	AM_RANGE(0x2006, 0x2006) AM_READ_PORT("DSW")
-	AM_RANGE(0x2007, 0x2007) AM_WRITE_LEGACY(lamps_w)
+	AM_RANGE(0x2007, 0x2007) AM_WRITE(lamps_w)
 	AM_RANGE(0x2008, 0x2008) AM_NOP
 	AM_RANGE(0x2080, 0x213f) AM_NOP
 	AM_RANGE(0x2400, 0x2400) AM_DEVREADWRITE("oki", okim6295_device, read, write)
@@ -128,10 +129,10 @@ static ADDRESS_MAP_START( mem_io, AS_IO, 8, cardline_state )
 	AM_RANGE(0x2840, 0x2840) AM_NOP
 	AM_RANGE(0x2880, 0x2880) AM_NOP
 	AM_RANGE(0x3003, 0x3003) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE_LEGACY(vram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xe000, 0xffff) AM_WRITE_LEGACY(attr_w) AM_BASE(m_colorram)
+	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_BASE(m_colorram)
 	/* Ports */
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE_LEGACY(unk_r, video_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(unk_r, video_w)
 ADDRESS_MAP_END
 
 

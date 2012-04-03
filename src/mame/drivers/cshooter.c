@@ -101,6 +101,16 @@ public:
 	int m_counter;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(cshooter_txram_w);
+	DECLARE_READ8_MEMBER(cshooter_coin_r);
+	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
+	DECLARE_WRITE8_MEMBER(cshooter_c700_w);
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(pal_w);
+	DECLARE_WRITE8_MEMBER(pal2_w);
+	DECLARE_READ8_MEMBER(pal_r);
+	DECLARE_READ8_MEMBER(seibu_sound_comms_r);
+	DECLARE_WRITE8_MEMBER(seibu_sound_comms_w);
 };
 
 
@@ -121,11 +131,10 @@ static TILE_GET_INFO( get_cstx_tile_info )
 			0);
 }
 
-static WRITE8_HANDLER(cshooter_txram_w)
+WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
 {
-	cshooter_state *state = space->machine().driver_data<cshooter_state>();
-	state->m_txram[offset] = data;
-	state->m_txtilemap->mark_tile_dirty(offset/2);
+	m_txram[offset] = data;
+	m_txtilemap->mark_tile_dirty(offset/2);
 }
 
 static VIDEO_START(cshooter)
@@ -210,76 +219,75 @@ static MACHINE_RESET( airraid )
 	MACHINE_RESET_CALL(seibu_sound);
 }
 
-static READ8_HANDLER ( cshooter_coin_r )
+READ8_MEMBER(cshooter_state::cshooter_coin_r)
 {
-	cshooter_state *state = space->machine().driver_data<cshooter_state>();
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
        Code at 0x5061 is executed once during P.O.S.T. where there is one read.
        Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
-	return ( (state->m_counter++ & 1) ? 0xff : input_port_read(space->machine(), "COIN") );
+	return ( (m_counter++ & 1) ? 0xff : input_port_read(machine(), "COIN") );
 }
 
-static WRITE8_HANDLER ( cshooter_c500_w )
+WRITE8_MEMBER(cshooter_state::cshooter_c500_w)
 {
 }
 
-static WRITE8_HANDLER ( cshooter_c700_w )
+WRITE8_MEMBER(cshooter_state::cshooter_c700_w)
 {
 }
 
-static WRITE8_HANDLER ( bank_w )
+WRITE8_MEMBER(cshooter_state::bank_w)
 {
-	memory_set_bankptr(space->machine(), "bank1",&space->machine().region("user1")->base()[0x4000*((data>>4)&3)]);
+	memory_set_bankptr(machine(), "bank1",&machine().region("user1")->base()[0x4000*((data>>4)&3)]);
 }
 
 
-static WRITE8_HANDLER(pal_w)
+WRITE8_MEMBER(cshooter_state::pal_w)
 {
-	space->machine().generic.paletteram.u8[offset]=data;
+	machine().generic.paletteram.u8[offset]=data;
 	offset&=0xff;
-	palette_set_color_rgb(space->machine(), offset, pal4bit(space->machine().generic.paletteram.u8[offset] >> 4), pal4bit(space->machine().generic.paletteram.u8[offset]), pal4bit(space->machine().generic.paletteram.u8[offset+0x100]));
+	palette_set_color_rgb(machine(), offset, pal4bit(machine().generic.paletteram.u8[offset] >> 4), pal4bit(machine().generic.paletteram.u8[offset]), pal4bit(machine().generic.paletteram.u8[offset+0x100]));
 }
 
-static WRITE8_HANDLER(pal2_w)
+WRITE8_MEMBER(cshooter_state::pal2_w)
 {
-	space->machine().generic.paletteram.u8[offset]=data;
+	machine().generic.paletteram.u8[offset]=data;
 	offset&=0x1ff;
-	palette_set_color_rgb(space->machine(), offset, pal4bit(space->machine().generic.paletteram.u8[offset] >> 4), pal4bit(space->machine().generic.paletteram.u8[offset]), pal4bit(space->machine().generic.paletteram.u8[offset+0x200]));
+	palette_set_color_rgb(machine(), offset, pal4bit(machine().generic.paletteram.u8[offset] >> 4), pal4bit(machine().generic.paletteram.u8[offset]), pal4bit(machine().generic.paletteram.u8[offset+0x200]));
 }
 
-static READ8_HANDLER(pal_r)
+READ8_MEMBER(cshooter_state::pal_r)
 {
-	return space->machine().generic.paletteram.u8[offset];
+	return machine().generic.paletteram.u8[offset];
 }
 
 static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITEONLY
 	AM_RANGE(0xb000, 0xb0ff) AM_READONLY			// sound related ?
-	AM_RANGE(0xc000, 0xc1ff) AM_WRITE_LEGACY(pal_w) AM_READ_LEGACY(pal_r) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN0")
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("IN1")
 	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("IN2")
 	AM_RANGE(0xc203, 0xc203) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc204, 0xc204) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc205, 0xc205) AM_READ_LEGACY(cshooter_coin_r)	// hack until I understand
-	AM_RANGE(0xc500, 0xc500) AM_WRITE_LEGACY(cshooter_c500_w)
+	AM_RANGE(0xc205, 0xc205) AM_READ(cshooter_coin_r)	// hack until I understand
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_c500_w)
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
-	AM_RANGE(0xc700, 0xc700) AM_WRITE_LEGACY(cshooter_c700_w)
+	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(cshooter_txram_w) AM_BASE(m_txram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE(m_txram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER( seibu_sound_comms_r )
+READ8_MEMBER(cshooter_state::seibu_sound_comms_r)
 {
-	return seibu_main_word_r(space,offset,0x00ff);
+	return seibu_main_word_r(&space,offset,0x00ff);
 }
 
-static WRITE8_HANDLER( seibu_sound_comms_w )
+WRITE8_MEMBER(cshooter_state::seibu_sound_comms_w)
 {
-	seibu_main_word_w(space,offset,data,0x00ff);
+	seibu_main_word_w(&space,offset,data,0x00ff);
 }
 
 static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
@@ -292,15 +300,15 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc500, 0xc500) AM_WRITE_LEGACY(cshooter_c500_w)
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_c500_w)
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
-	AM_RANGE(0xc700, 0xc700) AM_WRITE_LEGACY(cshooter_c700_w)
+	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(cshooter_txram_w) AM_BASE(m_txram)
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE_LEGACY(pal2_w) AM_READ_LEGACY(pal_r) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xdc11, 0xdc11) AM_WRITE_LEGACY(bank_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE(m_txram)
+	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
 	AM_RANGE(0xdc00, 0xdc1f) AM_RAM //video registers
-	AM_RANGE(0xde00, 0xde0f) AM_READWRITE_LEGACY(seibu_sound_comms_r,seibu_sound_comms_w)
+	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END

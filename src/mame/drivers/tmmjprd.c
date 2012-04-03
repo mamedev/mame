@@ -49,33 +49,43 @@ public:
 	UINT8 m_system_in;
 	double m_old_brt1;
 	double m_old_brt2;
+	DECLARE_WRITE32_MEMBER(tmmjprd_tilemap0_w);
+	DECLARE_WRITE32_MEMBER(tmmjprd_tilemap1_w);
+	DECLARE_WRITE32_MEMBER(tmmjprd_tilemap2_w);
+	DECLARE_WRITE32_MEMBER(tmmjprd_tilemap3_w);
+	DECLARE_READ32_MEMBER(tmmjprd_tilemap0_r);
+	DECLARE_READ32_MEMBER(tmmjprd_tilemap1_r);
+	DECLARE_READ32_MEMBER(tmmjprd_tilemap2_r);
+	DECLARE_READ32_MEMBER(tmmjprd_tilemap3_r);
+	DECLARE_READ32_MEMBER(randomtmmjprds);
+	DECLARE_WRITE32_MEMBER(tmmjprd_blitter_w);
+	DECLARE_READ32_MEMBER(tmmjprd_mux_r);
+	DECLARE_WRITE32_MEMBER(tmmjprd_paletteram_dword_w);
+	DECLARE_WRITE32_MEMBER(tmmjprd_brt_1_w);
+	DECLARE_WRITE32_MEMBER(tmmjprd_brt_2_w);
 };
 
 
-static WRITE32_HANDLER( tmmjprd_tilemap0_w )
+WRITE32_MEMBER(tmmjprd_state::tmmjprd_tilemap0_w)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[0][offset]);
+	COMBINE_DATA(&m_tilemap_ram[0][offset]);
 }
 
 
 
-static WRITE32_HANDLER( tmmjprd_tilemap1_w )
+WRITE32_MEMBER(tmmjprd_state::tmmjprd_tilemap1_w)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[1][offset]);
+	COMBINE_DATA(&m_tilemap_ram[1][offset]);
 }
 
-static WRITE32_HANDLER( tmmjprd_tilemap2_w )
+WRITE32_MEMBER(tmmjprd_state::tmmjprd_tilemap2_w)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[2][offset]);
+	COMBINE_DATA(&m_tilemap_ram[2][offset]);
 }
 
-static WRITE32_HANDLER( tmmjprd_tilemap3_w )
+WRITE32_MEMBER(tmmjprd_state::tmmjprd_tilemap3_w)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[3][offset]);
+	COMBINE_DATA(&m_tilemap_ram[3][offset]);
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen)
@@ -335,33 +345,29 @@ static VIDEO_START(tmmjprd)
 	state->m_tilemap_ram[3] = auto_alloc_array_clear(machine, UINT32, 0x8000);
 }
 
-static READ32_HANDLER( tmmjprd_tilemap0_r )
+READ32_MEMBER(tmmjprd_state::tmmjprd_tilemap0_r)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
-	return state->m_tilemap_ram[0][offset];
+	return m_tilemap_ram[0][offset];
 }
 
-static READ32_HANDLER( tmmjprd_tilemap1_r )
+READ32_MEMBER(tmmjprd_state::tmmjprd_tilemap1_r)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
-	return state->m_tilemap_ram[1][offset];
+	return m_tilemap_ram[1][offset];
 }
 
-static READ32_HANDLER( tmmjprd_tilemap2_r )
+READ32_MEMBER(tmmjprd_state::tmmjprd_tilemap2_r)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
-	return state->m_tilemap_ram[2][offset];
+	return m_tilemap_ram[2][offset];
 }
 
-static READ32_HANDLER( tmmjprd_tilemap3_r )
+READ32_MEMBER(tmmjprd_state::tmmjprd_tilemap3_r)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
-	return state->m_tilemap_ram[3][offset];
+	return m_tilemap_ram[3][offset];
 }
 
-static READ32_HANDLER( randomtmmjprds )
+READ32_MEMBER(tmmjprd_state::randomtmmjprds)
 {
-	return 0x0000;//space->machine().rand();
+	return 0x0000;//machine().rand();
 }
 
 
@@ -470,13 +476,13 @@ static void tmmjprd_do_blit(running_machine &machine)
 
 
 
-static WRITE32_HANDLER( tmmjprd_blitter_w )
+WRITE32_MEMBER(tmmjprd_state::tmmjprd_blitter_w)
 {
 	COMBINE_DATA(&tmmjprd_blitterregs[offset]);
 
 	if (offset == 0x0c/4)
 	{
-		tmmjprd_do_blit(space->machine());
+		tmmjprd_do_blit(machine());
 	}
 }
 #endif
@@ -504,22 +510,21 @@ static WRITE32_DEVICE_HANDLER( tmmjprd_eeprom_write )
 	}
 }
 
-static READ32_HANDLER( tmmjprd_mux_r )
+READ32_MEMBER(tmmjprd_state::tmmjprd_mux_r)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
 
-	state->m_system_in = input_port_read(space->machine(), "SYSTEM");
+	m_system_in = input_port_read(machine(), "SYSTEM");
 
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x01: return (state->m_system_in & 0xff) | (input_port_read(space->machine(), "PL1_1")<<8) | (input_port_read(space->machine(), "PL2_1")<<16) | 0xff000000;
-		case 0x02: return (state->m_system_in & 0xff) | (input_port_read(space->machine(), "PL1_2")<<8) | (input_port_read(space->machine(), "PL2_2")<<16) | 0xff000000;
-		case 0x04: return (state->m_system_in & 0xff) | (input_port_read(space->machine(), "PL1_3")<<8) | (input_port_read(space->machine(), "PL2_3")<<16) | 0xff000000;
-		case 0x08: return (state->m_system_in & 0xff) | (input_port_read(space->machine(), "PL1_4")<<8) | (input_port_read(space->machine(), "PL2_4")<<16) | 0xff000000;
-		case 0x10: return (state->m_system_in & 0xff) | (input_port_read(space->machine(), "PL1_5")<<8) | (input_port_read(space->machine(), "PL2_5")<<16) | 0xff000000;
+		case 0x01: return (m_system_in & 0xff) | (input_port_read(machine(), "PL1_1")<<8) | (input_port_read(machine(), "PL2_1")<<16) | 0xff000000;
+		case 0x02: return (m_system_in & 0xff) | (input_port_read(machine(), "PL1_2")<<8) | (input_port_read(machine(), "PL2_2")<<16) | 0xff000000;
+		case 0x04: return (m_system_in & 0xff) | (input_port_read(machine(), "PL1_3")<<8) | (input_port_read(machine(), "PL2_3")<<16) | 0xff000000;
+		case 0x08: return (m_system_in & 0xff) | (input_port_read(machine(), "PL1_4")<<8) | (input_port_read(machine(), "PL2_4")<<16) | 0xff000000;
+		case 0x10: return (m_system_in & 0xff) | (input_port_read(machine(), "PL1_5")<<8) | (input_port_read(machine(), "PL2_5")<<16) | 0xff000000;
 	}
 
-	return (state->m_system_in & 0xff) | 0xffffff00;
+	return (m_system_in & 0xff) | 0xffffff00;
 }
 
 static INPUT_PORTS_START( tmmjprd )
@@ -609,24 +614,23 @@ static INPUT_PORTS_START( tmmjprd )
 INPUT_PORTS_END
 
 
-static WRITE32_HANDLER( tmmjprd_paletteram_dword_w )
+WRITE32_MEMBER(tmmjprd_state::tmmjprd_paletteram_dword_w)
 {
 	int r,g,b;
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
 
-	b = ((space->machine().generic.paletteram.u32[offset] & 0x000000ff) >>0);
-	r = ((space->machine().generic.paletteram.u32[offset] & 0x0000ff00) >>8);
-	g = ((space->machine().generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	b = ((machine().generic.paletteram.u32[offset] & 0x000000ff) >>0);
+	r = ((machine().generic.paletteram.u32[offset] & 0x0000ff00) >>8);
+	g = ((machine().generic.paletteram.u32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
 
 /* notice that data & 0x4 is always cleared on brt_1 and set on brt_2.        *
  * My wild guess is that bits 0,1 and 2 controls what palette entries to dim. */
-static WRITE32_HANDLER( tmmjprd_brt_1_w )
+WRITE32_MEMBER(tmmjprd_state::tmmjprd_brt_1_w)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
 	int i;
 	double brt;
 	int bank;
@@ -635,17 +639,16 @@ static WRITE32_HANDLER( tmmjprd_brt_1_w )
 	brt = ((data & 0x78)>>3) / 15.0;
 	bank = data & 0x4 ? 0x800 : 0; //guess
 
-	if(data & 0x80 && state->m_old_brt1 != brt)
+	if(data & 0x80 && m_old_brt1 != brt)
 	{
-		state->m_old_brt1 = brt;
+		m_old_brt1 = brt;
 		for (i = bank; i < 0x800+bank; i++)
-			palette_set_pen_contrast(space->machine(), i, brt);
+			palette_set_pen_contrast(machine(), i, brt);
 	}
 }
 
-static WRITE32_HANDLER( tmmjprd_brt_2_w )
+WRITE32_MEMBER(tmmjprd_state::tmmjprd_brt_2_w)
 {
-	tmmjprd_state *state = space->machine().driver_data<tmmjprd_state>();
 	int i;
 	double brt;
 	int bank;
@@ -654,19 +657,19 @@ static WRITE32_HANDLER( tmmjprd_brt_2_w )
 	brt = ((data & 0x78)>>3) / 15.0;
 	bank = data & 0x4 ? 0x800 : 0; //guess
 
-	if(data & 0x80 && state->m_old_brt2 != brt)
+	if(data & 0x80 && m_old_brt2 != brt)
 	{
-		state->m_old_brt2 = brt;
+		m_old_brt2 = brt;
 		for (i = bank; i < 0x800+bank; i++)
-			palette_set_pen_contrast(space->machine(), i, brt);
+			palette_set_pen_contrast(machine(), i, brt);
 	}
 }
 
 static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200010, 0x200013) AM_READ_LEGACY(randomtmmjprds) // gfx chip status?
-	AM_RANGE(0x200980, 0x200983) AM_READ_LEGACY(randomtmmjprds) // sound chip status?
-	AM_RANGE(0x200984, 0x200987) AM_READ_LEGACY(randomtmmjprds) // sound chip status?
+	AM_RANGE(0x200010, 0x200013) AM_READ(randomtmmjprds) // gfx chip status?
+	AM_RANGE(0x200980, 0x200983) AM_READ(randomtmmjprds) // sound chip status?
+	AM_RANGE(0x200984, 0x200987) AM_READ(randomtmmjprds) // sound chip status?
 	/* check these are used .. */
 //  AM_RANGE(0x200010, 0x200013) AM_WRITEONLY AM_BASE_LEGACY(&tmmjprd_viewregs0 )
 	AM_RANGE(0x200100, 0x200117) AM_WRITEONLY AM_BASE(m_tilemap_regs[0] ) // tilemap regs1
@@ -675,24 +678,24 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x200160, 0x200177) AM_WRITEONLY AM_BASE(m_tilemap_regs[3] ) // tilemap regs4
 	AM_RANGE(0x200200, 0x20021b) AM_WRITEONLY AM_BASE(m_spriteregs ) // sprregs?
 //  AM_RANGE(0x200300, 0x200303) AM_WRITE_LEGACY(tmmjprd_rombank_w) // used during rom testing, rombank/area select + something else?
-	AM_RANGE(0x20040c, 0x20040f) AM_WRITE_LEGACY(tmmjprd_brt_1_w)
-    AM_RANGE(0x200410, 0x200413) AM_WRITE_LEGACY(tmmjprd_brt_2_w)
+	AM_RANGE(0x20040c, 0x20040f) AM_WRITE(tmmjprd_brt_1_w)
+    AM_RANGE(0x200410, 0x200413) AM_WRITE(tmmjprd_brt_2_w)
 //  AM_RANGE(0x200500, 0x200503) AM_WRITEONLY AM_BASE_LEGACY(&tmmjprd_viewregs7 )
-//  AM_RANGE(0x200700, 0x20070f) AM_WRITE_LEGACY(tmmjprd_blitter_w) AM_BASE_LEGACY(&tmmjprd_blitterregs )
+//  AM_RANGE(0x200700, 0x20070f) AM_WRITE(tmmjprd_blitter_w) AM_BASE_LEGACY(&tmmjprd_blitterregs )
 //  AM_RANGE(0x200800, 0x20080f) AM_WRITEONLY AM_BASE_LEGACY(&tmmjprd_viewregs9 ) // never changes?
 //  AM_RANGE(0x200900, 0x20098f) AM_WRITE_LEGACY(tmmjprd_audio_w)
 	/* hmm */
 //  AM_RANGE(0x279700, 0x279713) AM_WRITEONLY AM_BASE_LEGACY(&tmmjprd_viewregs10 )
 	/* tilemaps */
-	AM_RANGE(0x280000, 0x283fff) AM_READWRITE_LEGACY(tmmjprd_tilemap0_r,tmmjprd_tilemap0_w)
-	AM_RANGE(0x284000, 0x287fff) AM_READWRITE_LEGACY(tmmjprd_tilemap1_r,tmmjprd_tilemap1_w)
-	AM_RANGE(0x288000, 0x28bfff) AM_READWRITE_LEGACY(tmmjprd_tilemap2_r,tmmjprd_tilemap2_w)
-	AM_RANGE(0x28c000, 0x28ffff) AM_READWRITE_LEGACY(tmmjprd_tilemap3_r,tmmjprd_tilemap3_w)
+	AM_RANGE(0x280000, 0x283fff) AM_READWRITE(tmmjprd_tilemap0_r,tmmjprd_tilemap0_w)
+	AM_RANGE(0x284000, 0x287fff) AM_READWRITE(tmmjprd_tilemap1_r,tmmjprd_tilemap1_w)
+	AM_RANGE(0x288000, 0x28bfff) AM_READWRITE(tmmjprd_tilemap2_r,tmmjprd_tilemap2_w)
+	AM_RANGE(0x28c000, 0x28ffff) AM_READWRITE(tmmjprd_tilemap3_r,tmmjprd_tilemap3_w)
 	/* ?? is palette ram shared with sprites in this case or just a different map */
 	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_WRITE_LEGACY(tmmjprd_paletteram_dword_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_WRITE(tmmjprd_paletteram_dword_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x400000, 0x400003) AM_READ_LEGACY(tmmjprd_mux_r) AM_DEVWRITE_LEGACY("eeprom", tmmjprd_eeprom_write)
+	AM_RANGE(0x400000, 0x400003) AM_READ(tmmjprd_mux_r) AM_DEVWRITE_LEGACY("eeprom", tmmjprd_eeprom_write)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

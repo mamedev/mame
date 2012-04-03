@@ -49,6 +49,14 @@ public:
 	/* memory */
 	UINT8 m_videoram0[0x8000];
 	UINT8 m_videoram1[0x8000];
+	DECLARE_WRITE8_MEMBER(mjsister_videoram_w);
+	DECLARE_WRITE8_MEMBER(mjsister_dac_adr_s_w);
+	DECLARE_WRITE8_MEMBER(mjsister_dac_adr_e_w);
+	DECLARE_WRITE8_MEMBER(mjsister_banksel1_w);
+	DECLARE_WRITE8_MEMBER(mjsister_banksel2_w);
+	DECLARE_WRITE8_MEMBER(mjsister_input_sel1_w);
+	DECLARE_WRITE8_MEMBER(mjsister_input_sel2_w);
+	DECLARE_READ8_MEMBER(mjsister_keys_r);
 };
 
 
@@ -103,18 +111,17 @@ static void mjsister_plot1( running_machine &machine, int offset, UINT8 data )
 	state->m_tmpbitmap1->pix16(y, x * 2 + 1) = c2;
 }
 
-static WRITE8_HANDLER( mjsister_videoram_w )
+WRITE8_MEMBER(mjsister_state::mjsister_videoram_w)
 {
-	mjsister_state *state = space->machine().driver_data<mjsister_state>();
-	if (state->m_vrambank)
+	if (m_vrambank)
 	{
-		state->m_videoram1[offset] = data;
-		mjsister_plot1(space->machine(), offset, data);
+		m_videoram1[offset] = data;
+		mjsister_plot1(machine(), offset, data);
 	}
 	else
 	{
-		state->m_videoram0[offset] = data;
-		mjsister_plot0(space->machine(), offset, data);
+		m_videoram0[offset] = data;
+		mjsister_plot0(machine(), offset, data);
 	}
 }
 
@@ -169,104 +176,97 @@ static TIMER_CALLBACK( dac_callback )
 		state->m_dac_busy = 0;
 }
 
-static WRITE8_HANDLER( mjsister_dac_adr_s_w )
+WRITE8_MEMBER(mjsister_state::mjsister_dac_adr_s_w)
 {
-	mjsister_state *state = space->machine().driver_data<mjsister_state>();
-	state->m_dac_adr_s = data;
+	m_dac_adr_s = data;
 }
 
-static WRITE8_HANDLER( mjsister_dac_adr_e_w )
+WRITE8_MEMBER(mjsister_state::mjsister_dac_adr_e_w)
 {
-	mjsister_state *state = space->machine().driver_data<mjsister_state>();
-	state->m_dac_adr_e = data;
-	state->m_dac_adr = state->m_dac_adr_s << 8;
+	m_dac_adr_e = data;
+	m_dac_adr = m_dac_adr_s << 8;
 
-	if (state->m_dac_busy == 0)
-		space->machine().scheduler().synchronize(FUNC(dac_callback));
+	if (m_dac_busy == 0)
+		machine().scheduler().synchronize(FUNC(dac_callback));
 
-	state->m_dac_busy = 1;
+	m_dac_busy = 1;
 }
 
-static WRITE8_HANDLER( mjsister_banksel1_w )
+WRITE8_MEMBER(mjsister_state::mjsister_banksel1_w)
 {
-	mjsister_state *state = space->machine().driver_data<mjsister_state>();
-	int tmp = state->m_colorbank;
+	int tmp = m_colorbank;
 
 	switch (data)
 	{
-		case 0x0: state->m_rombank0 = 0 ; break;
-		case 0x1: state->m_rombank0 = 1 ; break;
+		case 0x0: m_rombank0 = 0 ; break;
+		case 0x1: m_rombank0 = 1 ; break;
 
-		case 0x2: state->m_flip_screen = 0 ; break;
-		case 0x3: state->m_flip_screen = 1 ; break;
+		case 0x2: m_flip_screen = 0 ; break;
+		case 0x3: m_flip_screen = 1 ; break;
 
-		case 0x4: state->m_colorbank &= 0xfe; break;
-		case 0x5: state->m_colorbank |= 0x01; break;
-		case 0x6: state->m_colorbank &= 0xfd; break;
-		case 0x7: state->m_colorbank |= 0x02; break;
-		case 0x8: state->m_colorbank &= 0xfb; break;
-		case 0x9: state->m_colorbank |= 0x04; break;
+		case 0x4: m_colorbank &= 0xfe; break;
+		case 0x5: m_colorbank |= 0x01; break;
+		case 0x6: m_colorbank &= 0xfd; break;
+		case 0x7: m_colorbank |= 0x02; break;
+		case 0x8: m_colorbank &= 0xfb; break;
+		case 0x9: m_colorbank |= 0x04; break;
 
-		case 0xa: state->m_video_enable = 0 ; break;
-		case 0xb: state->m_video_enable = 1 ; break;
+		case 0xa: m_video_enable = 0 ; break;
+		case 0xb: m_video_enable = 1 ; break;
 
-		case 0xe: state->m_vrambank = 0 ; break;
-		case 0xf: state->m_vrambank = 1 ; break;
+		case 0xe: m_vrambank = 0 ; break;
+		case 0xf: m_vrambank = 1 ; break;
 
 		default:
-			logerror("%04x p30_w:%02x\n", cpu_get_pc(&space->device()), data);
+			logerror("%04x p30_w:%02x\n", cpu_get_pc(&space.device()), data);
 	}
 
-	if (tmp != state->m_colorbank)
-		state->m_screen_redraw = 1;
+	if (tmp != m_colorbank)
+		m_screen_redraw = 1;
 
-	memory_set_bank(space->machine(), "bank1", state->m_rombank0 * 2 + state->m_rombank1);
+	memory_set_bank(machine(), "bank1", m_rombank0 * 2 + m_rombank1);
 }
 
-static WRITE8_HANDLER( mjsister_banksel2_w )
+WRITE8_MEMBER(mjsister_state::mjsister_banksel2_w)
 {
-	mjsister_state *state = space->machine().driver_data<mjsister_state>();
 
 	switch (data)
 	{
-		case 0xa: state->m_dac_bank = 0; break;
-		case 0xb: state->m_dac_bank = 1; break;
+		case 0xa: m_dac_bank = 0; break;
+		case 0xb: m_dac_bank = 1; break;
 
-		case 0xc: state->m_rombank1 = 0; break;
-		case 0xd: state->m_rombank1 = 1; break;
+		case 0xc: m_rombank1 = 0; break;
+		case 0xd: m_rombank1 = 1; break;
 
 		default:
-			logerror("%04x p31_w:%02x\n", cpu_get_pc(&space->device()), data);
+			logerror("%04x p31_w:%02x\n", cpu_get_pc(&space.device()), data);
 	}
 
-	memory_set_bank(space->machine(), "bank1", state->m_rombank0 * 2 + state->m_rombank1);
+	memory_set_bank(machine(), "bank1", m_rombank0 * 2 + m_rombank1);
 }
 
-static WRITE8_HANDLER( mjsister_input_sel1_w )
+WRITE8_MEMBER(mjsister_state::mjsister_input_sel1_w)
 {
-	mjsister_state *state = space->machine().driver_data<mjsister_state>();
-	state->m_input_sel1 = data;
+	m_input_sel1 = data;
 }
 
-static WRITE8_HANDLER( mjsister_input_sel2_w )
+WRITE8_MEMBER(mjsister_state::mjsister_input_sel2_w)
 {
-	mjsister_state *state = space->machine().driver_data<mjsister_state>();
-	state->m_input_sel2 = data;
+	m_input_sel2 = data;
 }
 
-static READ8_HANDLER( mjsister_keys_r )
+READ8_MEMBER(mjsister_state::mjsister_keys_r)
 {
-	mjsister_state *state = space->machine().driver_data<mjsister_state>();
 	int p, i, ret = 0;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
-	p = state->m_input_sel1 & 0x3f;
-	//  p |= ((state->m_input_sel2 & 8) << 4) | ((state->m_input_sel2 & 0x20) << 1);
+	p = m_input_sel1 & 0x3f;
+	//  p |= ((m_input_sel2 & 8) << 4) | ((m_input_sel2 & 0x20) << 1);
 
 	for (i = 0; i < 6; i++)
 	{
 		if (BIT(p, i))
-			ret |= input_port_read(space->machine(), keynames[i]);
+			ret |= input_port_read(machine(), keynames[i]);
 	}
 
 	return ret;
@@ -281,7 +281,7 @@ static READ8_HANDLER( mjsister_keys_r )
 static ADDRESS_MAP_START( mjsister_map, AS_PROGRAM, 8, mjsister_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(mjsister_videoram_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") AM_WRITE(mjsister_videoram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjsister_io_map, AS_IO, 8, mjsister_state )
@@ -290,14 +290,14 @@ static ADDRESS_MAP_START( mjsister_io_map, AS_IO, 8, mjsister_state )
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x12, 0x12) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0x20, 0x20) AM_READ_LEGACY(mjsister_keys_r)
+	AM_RANGE(0x20, 0x20) AM_READ(mjsister_keys_r)
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
-	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(mjsister_banksel1_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(mjsister_banksel2_w)
-	AM_RANGE(0x32, 0x32) AM_WRITE_LEGACY(mjsister_input_sel1_w)
-	AM_RANGE(0x33, 0x33) AM_WRITE_LEGACY(mjsister_input_sel2_w)
-	AM_RANGE(0x34, 0x34) AM_WRITE_LEGACY(mjsister_dac_adr_s_w)
-	AM_RANGE(0x35, 0x35) AM_WRITE_LEGACY(mjsister_dac_adr_e_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(mjsister_banksel1_w)
+	AM_RANGE(0x31, 0x31) AM_WRITE(mjsister_banksel2_w)
+	AM_RANGE(0x32, 0x32) AM_WRITE(mjsister_input_sel1_w)
+	AM_RANGE(0x33, 0x33) AM_WRITE(mjsister_input_sel2_w)
+	AM_RANGE(0x34, 0x34) AM_WRITE(mjsister_dac_adr_s_w)
+	AM_RANGE(0x35, 0x35) AM_WRITE(mjsister_dac_adr_e_w)
 ADDRESS_MAP_END
 
 

@@ -146,43 +146,45 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_fgram;
 	UINT8 *m_bgram;
+	DECLARE_WRITE8_MEMBER(ppmast93_fgram_w);
+	DECLARE_WRITE8_MEMBER(ppmast93_bgram_w);
+	DECLARE_WRITE8_MEMBER(ppmast93_port4_w);
+	DECLARE_WRITE8_MEMBER(ppmast_sound_w);
 };
 
 
 
 
-static WRITE8_HANDLER( ppmast93_fgram_w )
+WRITE8_MEMBER(ppmast93_state::ppmast93_fgram_w)
 {
-	ppmast93_state *state = space->machine().driver_data<ppmast93_state>();
-	state->m_fgram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset/2);
+	m_fgram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-static WRITE8_HANDLER( ppmast93_bgram_w )
+WRITE8_MEMBER(ppmast93_state::ppmast93_bgram_w)
 {
-	ppmast93_state *state = space->machine().driver_data<ppmast93_state>();
-	state->m_bgram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-static WRITE8_HANDLER( ppmast93_port4_w )
+WRITE8_MEMBER(ppmast93_state::ppmast93_port4_w)
 {
-	UINT8 *rom = space->machine().region("maincpu")->base();
+	UINT8 *rom = machine().region("maincpu")->base();
 	int bank;
 
-	coin_counter_w(space->machine(), 0, data & 0x08);
-	coin_counter_w(space->machine(), 1, data & 0x10);
+	coin_counter_w(machine(), 0, data & 0x08);
+	coin_counter_w(machine(), 1, data & 0x10);
 
 	bank = data & 0x07;
-	memory_set_bankptr(space->machine(), "bank1",&rom[0x10000+(bank*0x4000)]);
+	memory_set_bankptr(machine(), "bank1",&rom[0x10000+(bank*0x4000)]);
 }
 
 static ADDRESS_MAP_START( ppmast93_cpu1_map, AS_PROGRAM, 8, ppmast93_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(ppmast93_bgram_w) AM_BASE(m_bgram) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ppmast93_bgram_w) AM_BASE(m_bgram) AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xdfff) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE_LEGACY(ppmast93_fgram_w) AM_BASE(m_fgram) AM_SHARE("share2")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(ppmast93_fgram_w) AM_BASE(m_fgram) AM_SHARE("share2")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -195,7 +197,7 @@ static ADDRESS_MAP_START( ppmast93_cpu1_io, AS_IO, 8, ppmast93_state )
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(ppmast93_port4_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ppmast93_port4_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppmast93_cpu2_map, AS_PROGRAM, 8, ppmast93_state )
@@ -205,19 +207,19 @@ static ADDRESS_MAP_START( ppmast93_cpu2_map, AS_PROGRAM, 8, ppmast93_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER(ppmast_sound_w)
+WRITE8_MEMBER(ppmast93_state::ppmast_sound_w)
 {
 	switch(offset&0xff)
 	{
 		case 0:
-		case 1: ym2413_w(space->machine().device("ymsnd"),offset,data); break;
-		case 2: dac_data_w(space->machine().device("dac"),data);break;
-		default: logerror("%x %x - %x\n",offset,data,cpu_get_previouspc(&space->device()));
+		case 1: ym2413_w(machine().device("ymsnd"),offset,data); break;
+		case 2: dac_data_w(machine().device("dac"),data);break;
+		default: logerror("%x %x - %x\n",offset,data,cpu_get_previouspc(&space.device()));
 	}
 }
 
 static ADDRESS_MAP_START( ppmast93_cpu2_io, AS_IO, 8, ppmast93_state )
-	  AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITE_LEGACY(ppmast_sound_w) AM_REGION("sub", 0x20000)
+	  AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITE(ppmast_sound_w) AM_REGION("sub", 0x20000)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ppmast93 )

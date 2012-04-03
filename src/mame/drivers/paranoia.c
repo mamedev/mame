@@ -49,6 +49,11 @@ public:
 	paranoia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(paranoia_8085_d000_w);
+	DECLARE_READ8_MEMBER(paranoia_z80_io_01_r);
+	DECLARE_READ8_MEMBER(paranoia_z80_io_02_r);
+	DECLARE_WRITE8_MEMBER(paranoia_z80_io_17_w);
+	DECLARE_WRITE8_MEMBER(paranoia_z80_io_37_w);
 };
 
 
@@ -79,7 +84,7 @@ static ADDRESS_MAP_START( pce_io , AS_IO, 8, paranoia_state )
 	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w )
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( paranoia_8085_d000_w )
+WRITE8_MEMBER(paranoia_state::paranoia_8085_d000_w)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
@@ -88,7 +93,7 @@ static ADDRESS_MAP_START(paranoia_8085_map, AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x0000, 0x7fff) AM_ROM
 	AM_RANGE( 0x8000, 0x80ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
 	AM_RANGE( 0x8100, 0x8107) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
-	AM_RANGE( 0xd000, 0xd000) AM_WRITE_LEGACY(paranoia_8085_d000_w )
+	AM_RANGE( 0xd000, 0xd000) AM_WRITE(paranoia_8085_d000_w )
 	AM_RANGE( 0xe000, 0xe1ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -101,30 +106,30 @@ static ADDRESS_MAP_START(paranoia_z80_map, AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x7000, 0x73ff) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER(paranoia_z80_io_01_r)
+READ8_MEMBER(paranoia_state::paranoia_z80_io_01_r)
 {
 	return 0;
 }
 
-static READ8_HANDLER(paranoia_z80_io_02_r)
+READ8_MEMBER(paranoia_state::paranoia_z80_io_02_r)
 {
 	return 0;
 }
 
-static WRITE8_HANDLER(paranoia_z80_io_17_w)
+WRITE8_MEMBER(paranoia_state::paranoia_z80_io_17_w)
 {
 }
 
-static WRITE8_HANDLER(paranoia_z80_io_37_w)
+WRITE8_MEMBER(paranoia_state::paranoia_z80_io_37_w)
 {
 }
 
 static ADDRESS_MAP_START(paranoia_z80_io_map, AS_IO, 8, paranoia_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ_LEGACY(paranoia_z80_io_01_r )
-	AM_RANGE( 0x02, 0x02 ) AM_READ_LEGACY(paranoia_z80_io_02_r )
-	AM_RANGE( 0x17, 0x17 ) AM_WRITE_LEGACY(paranoia_z80_io_17_w )
-	AM_RANGE( 0x37, 0x37 ) AM_WRITE_LEGACY(paranoia_z80_io_37_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ(paranoia_z80_io_01_r )
+	AM_RANGE( 0x02, 0x02 ) AM_READ(paranoia_z80_io_02_r )
+	AM_RANGE( 0x17, 0x17 ) AM_WRITE(paranoia_z80_io_17_w )
+	AM_RANGE( 0x37, 0x37 ) AM_WRITE(paranoia_z80_io_37_w )
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER(paranoia_i8155_a_w)

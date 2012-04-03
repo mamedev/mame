@@ -68,6 +68,19 @@ public:
 	UINT8    m_ram_3[0x1000];
 	UINT8    m_ram_4[0x1000];
 	UINT8    m_ram_att[0x800];
+	DECLARE_WRITE8_MEMBER(rambank_select_w);
+	DECLARE_WRITE8_MEMBER(discoboy_port_00_w);
+	DECLARE_WRITE8_MEMBER(discoboy_port_01_w);
+	DECLARE_WRITE8_MEMBER(discoboy_port_03_w);
+	DECLARE_WRITE8_MEMBER(discoboy_port_06_w);
+	DECLARE_WRITE8_MEMBER(rambank_w);
+	DECLARE_READ8_MEMBER(rambank_r);
+	DECLARE_READ8_MEMBER(rambank2_r);
+	DECLARE_WRITE8_MEMBER(rambank2_w);
+	DECLARE_READ8_MEMBER(discoboy_ram_att_r);
+	DECLARE_WRITE8_MEMBER(discoboy_ram_att_w);
+	DECLARE_READ8_MEMBER(discoboy_port_06_r);
+	DECLARE_WRITE8_MEMBER(yunsung8_adpcm_w);
 };
 
 
@@ -192,131 +205,121 @@ void discoboy_setrombank( running_machine &machine, UINT8 data )
 }
 #endif
 
-static WRITE8_HANDLER( rambank_select_w )
+WRITE8_MEMBER(discoboy_state::rambank_select_w)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
-	state->m_ram_bank = data;
+	m_ram_bank = data;
 	if (data &= 0x83) logerror("rambank_select_w !!!!!");
 }
 
-static WRITE8_HANDLER( discoboy_port_00_w )
+WRITE8_MEMBER(discoboy_state::discoboy_port_00_w)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 	if (data & 0xfe) logerror("unk discoboy_port_00_w %02x\n",data);
-	state->m_port_00 = data;
+	m_port_00 = data;
 }
 
-static WRITE8_HANDLER( discoboy_port_01_w )
+WRITE8_MEMBER(discoboy_state::discoboy_port_01_w)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
 	// 00 10 20 30 during gameplay  1,2,3 other times?? title screen bit 0x40 toggle
 	//printf("unk discoboy_port_01_w %02x\n",data);
 	// discoboy gfxbank
-	state->m_gfxbank = data & 0xf0;
+	m_gfxbank = data & 0xf0;
 
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	memory_set_bank(machine(), "bank1", data & 0x07);
 }
 
-static WRITE8_HANDLER( discoboy_port_03_w ) // sfx? (to sound cpu)
+WRITE8_MEMBER(discoboy_state::discoboy_port_03_w)// sfx? (to sound cpu)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 	//  printf("unk discoboy_port_03_w %02x\n", data);
-	//  device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, HOLD_LINE);
+	//  device_set_input_line(m_audiocpu, INPUT_LINE_NMI, HOLD_LINE);
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( discoboy_port_06_w )
+WRITE8_MEMBER(discoboy_state::discoboy_port_06_w)
 {
 	//printf("unk discoboy_port_06_w %02x\n",data);
 	if (data != 0) logerror("port 06!!!! %02x\n",data);
 }
 
 
-static WRITE8_HANDLER( rambank_w )
+WRITE8_MEMBER(discoboy_state::rambank_w)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
-	if (state->m_ram_bank & 0x20)
-		state->m_ram_2[offset] = data;
+	if (m_ram_bank & 0x20)
+		m_ram_2[offset] = data;
 	else
-		state->m_ram_1[offset] = data;
+		m_ram_1[offset] = data;
 }
 
-static READ8_HANDLER( rambank_r )
+READ8_MEMBER(discoboy_state::rambank_r)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
-	if (state->m_ram_bank & 0x20)
-		return state->m_ram_2[offset];
+	if (m_ram_bank & 0x20)
+		return m_ram_2[offset];
 	else
-		return state->m_ram_1[offset];
+		return m_ram_1[offset];
 }
 
-static READ8_HANDLER( rambank2_r )
+READ8_MEMBER(discoboy_state::rambank2_r)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
-	if (state->m_port_00 == 0x00)
-		return state->m_ram_3[offset];
-	else if (state->m_port_00 == 0x01)
-		return state->m_ram_4[offset];
+	if (m_port_00 == 0x00)
+		return m_ram_3[offset];
+	else if (m_port_00 == 0x01)
+		return m_ram_4[offset];
 	else
 		printf("unk rb2_r\n");
 
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static WRITE8_HANDLER( rambank2_w )
+WRITE8_MEMBER(discoboy_state::rambank2_w)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
-	if (state->m_port_00 == 0x00)
-		state->m_ram_3[offset] = data;
-	else if (state->m_port_00 == 0x01)
-		state->m_ram_4[offset] = data;
+	if (m_port_00 == 0x00)
+		m_ram_3[offset] = data;
+	else if (m_port_00 == 0x01)
+		m_ram_4[offset] = data;
 	else
 		printf("unk rb2_w\n");
 }
 
-static READ8_HANDLER( discoboy_ram_att_r )
+READ8_MEMBER(discoboy_state::discoboy_ram_att_r)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
-	return state->m_ram_att[offset];
+	return m_ram_att[offset];
 }
 
-static WRITE8_HANDLER( discoboy_ram_att_w )
+WRITE8_MEMBER(discoboy_state::discoboy_ram_att_w)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
-	state->m_ram_att[offset] = data;
+	m_ram_att[offset] = data;
 }
 
 static ADDRESS_MAP_START( discoboy_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE_LEGACY(rambank_r, rambank_w)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(discoboy_ram_att_r, discoboy_ram_att_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE_LEGACY(rambank2_r, rambank2_w)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(rambank_r, rambank_w)
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(discoboy_ram_att_r, discoboy_ram_att_w)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(rambank2_r, rambank2_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( discoboy_port_06_r )
+READ8_MEMBER(discoboy_state::discoboy_port_06_r)
 {
 	return 0x00;
 }
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, discoboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA") AM_WRITE_LEGACY(discoboy_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(discoboy_port_01_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA") AM_WRITE(discoboy_port_00_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(discoboy_port_01_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2") AM_WRITE_LEGACY(discoboy_port_03_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2") AM_WRITE(discoboy_port_03_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWB")
-	AM_RANGE(0x06, 0x06) AM_READWRITE_LEGACY(discoboy_port_06_r, discoboy_port_06_w) // ???
-	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(rambank_select_w) // 0x20 is palette bank bit.. others?
+	AM_RANGE(0x06, 0x06) AM_READWRITE(discoboy_port_06_r, discoboy_port_06_w) // ???
+	AM_RANGE(0x07, 0x07) AM_WRITE(rambank_select_w) // 0x20 is palette bank bit.. others?
 ADDRESS_MAP_END
 
 /* Sound */
@@ -332,19 +335,18 @@ static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 		logerror("%s: Bank %02X\n", device->machine().describe_context(), data);
 }
 
-static WRITE8_HANDLER( yunsung8_adpcm_w )
+WRITE8_MEMBER(discoboy_state::yunsung8_adpcm_w)
 {
-	discoboy_state *state = space->machine().driver_data<discoboy_state>();
 
 	/* Swap the nibbles */
-	state->m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
+	m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sndbank")
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm",yunsung8_sound_bankswitch_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE_LEGACY(yunsung8_adpcm_w)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r)

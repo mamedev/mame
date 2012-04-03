@@ -102,6 +102,24 @@ public:
 
 	/* memory */
 	UINT8   m_colorram[256 * 3];
+	DECLARE_WRITE16_MEMBER(colordac_w);
+	DECLARE_WRITE16_MEMBER(lastfght_hi_w);
+	DECLARE_WRITE16_MEMBER(lastfght_x_w);
+	DECLARE_WRITE16_MEMBER(lastfght_yw_w);
+	DECLARE_WRITE16_MEMBER(lastfght_h_w);
+	DECLARE_WRITE16_MEMBER(lastfght_sx_w);
+	DECLARE_WRITE16_MEMBER(lastfght_sy_w);
+	DECLARE_WRITE16_MEMBER(lastfght_sr_w);
+	DECLARE_WRITE16_MEMBER(lastfght_sd_w);
+	DECLARE_WRITE16_MEMBER(lastfght_blit_w);
+	DECLARE_WRITE16_MEMBER(lastfght_dest_w);
+	DECLARE_READ16_MEMBER(lastfght_c00000_r);
+	DECLARE_READ16_MEMBER(lastfght_c00002_r);
+	DECLARE_READ16_MEMBER(lastfght_c00004_r);
+	DECLARE_READ16_MEMBER(lastfght_c00006_r);
+	DECLARE_WRITE16_MEMBER(lastfght_c00006_w);
+	DECLARE_READ16_MEMBER(lastfght_sound_r);
+	DECLARE_WRITE16_MEMBER(lastfght_sound_w);
 };
 
 
@@ -165,204 +183,193 @@ static SCREEN_UPDATE_IND16( lastfght )
 
 // Palette: HMC HM86171 VGA 256 colour RAMDAC
 
-static WRITE16_HANDLER( colordac_w )
+WRITE16_MEMBER(lastfght_state::colordac_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_colorram[state->m_clr_offset] = data;
-		palette_set_color_rgb(space->machine(), state->m_clr_offset / 3,
-			pal6bit(state->m_colorram[(state->m_clr_offset / 3) * 3 + 0]),
-			pal6bit(state->m_colorram[(state->m_clr_offset / 3) * 3 + 1]),
-			pal6bit(state->m_colorram[(state->m_clr_offset / 3) * 3 + 2])
+		m_colorram[m_clr_offset] = data;
+		palette_set_color_rgb(machine(), m_clr_offset / 3,
+			pal6bit(m_colorram[(m_clr_offset / 3) * 3 + 0]),
+			pal6bit(m_colorram[(m_clr_offset / 3) * 3 + 1]),
+			pal6bit(m_colorram[(m_clr_offset / 3) * 3 + 2])
 		);
-		state->m_clr_offset = (state->m_clr_offset + 1) % (256 * 3);
+		m_clr_offset = (m_clr_offset + 1) % (256 * 3);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_clr_offset = (data >> 8) * 3;
+		m_clr_offset = (data >> 8) * 3;
 	}
 }
 
 //  Blitter (supports zooming)
 
 // high byte of a 16 bit register
-static WRITE16_HANDLER( lastfght_hi_w )
+WRITE16_MEMBER(lastfght_state::lastfght_hi_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
-		logerror("%06x: 600000.b = %02x\n", cpu_get_pc(&space->device()), data >> 8);
+		logerror("%06x: 600000.b = %02x\n", cpu_get_pc(&space.device()), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_hi = data << 8;
-		//logerror("%06x: lastfght_hi  = %02x\n", cpu_get_pc(&space->device()), data);
+		m_hi = data << 8;
+		//logerror("%06x: lastfght_hi  = %02x\n", cpu_get_pc(&space.device()), data);
 	}
 }
 
 // screen x
-static WRITE16_HANDLER( lastfght_x_w )
+WRITE16_MEMBER(lastfght_state::lastfght_x_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
-		logerror("%06x: 800008.b = %02x\n", cpu_get_pc(&space->device()), data >> 8);
+		logerror("%06x: 800008.b = %02x\n", cpu_get_pc(&space.device()), data >> 8);
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_x = state->m_hi | data;
-		//logerror("%06x: lastfght_x   = %02x\n", cpu_get_pc(&space->device()),data);
+		m_x = m_hi | data;
+		//logerror("%06x: lastfght_x   = %02x\n", cpu_get_pc(&space.device()),data);
 	}
 }
 
 // screen y, screen width - 1
-static WRITE16_HANDLER( lastfght_yw_w )
+WRITE16_MEMBER(lastfght_state::lastfght_yw_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_y = state->m_hi | (data >> 8);
-		//logerror("%06x: lastfght_y   = %02x\n", cpu_get_pc(&space->device()), data >> 8);
+		m_y = m_hi | (data >> 8);
+		//logerror("%06x: lastfght_y   = %02x\n", cpu_get_pc(&space.device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_w = state->m_hi | data;
-		//logerror("%06x: lastfght_w   = %02x\n", cpu_get_pc(&space->device()), data);
+		m_w = m_hi | data;
+		//logerror("%06x: lastfght_w   = %02x\n", cpu_get_pc(&space.device()), data);
 	}
 }
 
 // screen height - 1
-static WRITE16_HANDLER( lastfght_h_w )
+WRITE16_MEMBER(lastfght_state::lastfght_h_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_h = state->m_hi | (data >> 8);
-		//logerror("%06x: lastfght_h   = %02x\n", cpu_get_pc(&space->device()), data >> 8);
+		m_h = m_hi | (data >> 8);
+		//logerror("%06x: lastfght_h   = %02x\n", cpu_get_pc(&space.device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x: 80000d.b = %02x\n", cpu_get_pc(&space->device()), data);
+		logerror("%06x: 80000d.b = %02x\n", cpu_get_pc(&space.device()), data);
 }
 
 // source delta x << 6, source x << 6
-static WRITE16_HANDLER( lastfght_sx_w )
+WRITE16_MEMBER(lastfght_state::lastfght_sx_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_dsx = state->m_hi | (data >> 8);
-		//logerror("%06x: lastfght_dsx = %02x\n", cpu_get_pc(&space->device()), data >> 8);
+		m_dsx = m_hi | (data >> 8);
+		//logerror("%06x: lastfght_dsx = %02x\n", cpu_get_pc(&space.device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_sx = state->m_hi | data;
-		//logerror("%06x: lastfght_sx  = %02x\n", cpu_get_pc(&space->device()), data);
+		m_sx = m_hi | data;
+		//logerror("%06x: lastfght_sx  = %02x\n", cpu_get_pc(&space.device()), data);
 	}
 }
 
 // source y << 6, source y1 << 6
-static WRITE16_HANDLER( lastfght_sy_w )
+WRITE16_MEMBER(lastfght_state::lastfght_sy_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_sy = state->m_hi | (data >> 8);
-		//logerror("%06x: lastfght_sy  = %02x\n", cpu_get_pc(&space->device()), data >> 8);
+		m_sy = m_hi | (data >> 8);
+		//logerror("%06x: lastfght_sy  = %02x\n", cpu_get_pc(&space.device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_sy1 = state->m_hi | data;
-		//logerror("%06x: lastfght_sy1 = %02x\n", cpu_get_pc(&space->device()), data);
+		m_sy1 = m_hi | data;
+		//logerror("%06x: lastfght_sy1 = %02x\n", cpu_get_pc(&space.device()), data);
 	}
 }
 
 // source rom (0x200000 bytes), source page (512x256 bytes)
-static WRITE16_HANDLER( lastfght_sr_w )
+WRITE16_MEMBER(lastfght_state::lastfght_sr_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_sp = (state->m_hi >> 8) >> 4;
-		//logerror("%06x: lastfght_sp  = %02x\n", cpu_get_pc(&space->device()), data >> 8);
+		m_sp = (m_hi >> 8) >> 4;
+		//logerror("%06x: lastfght_sp  = %02x\n", cpu_get_pc(&space.device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_sr = data;
-		//logerror("%06x: lastfght_sr  = %02x\n", cpu_get_pc(&space->device()), data);
+		m_sr = data;
+		//logerror("%06x: lastfght_sr  = %02x\n", cpu_get_pc(&space.device()), data);
 	}
 }
 
 // source x1 << 6, source delta y << 6
-static WRITE16_HANDLER( lastfght_sd_w )
+WRITE16_MEMBER(lastfght_state::lastfght_sd_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
-		state->m_sx1 = state->m_hi | (data >> 8);
-		//logerror("%06x: lastfght_sx1 = %02x\n", cpu_get_pc(&space->device()), data >> 8);
+		m_sx1 = m_hi | (data >> 8);
+		//logerror("%06x: lastfght_sx1 = %02x\n", cpu_get_pc(&space.device()), data >> 8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_dsy = state->m_hi | data;
-		//logerror("%06x: lastfght_dsy = %02x\n", cpu_get_pc(&space->device()), data);
+		m_dsy = m_hi | data;
+		//logerror("%06x: lastfght_dsy = %02x\n", cpu_get_pc(&space.device()), data);
 	}
 }
 
 // start blit
-static WRITE16_HANDLER( lastfght_blit_w )
+WRITE16_MEMBER(lastfght_state::lastfght_blit_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
 		int x, y, addr;
-		UINT8 *gfxdata = space->machine().region( "gfx1" )->base();
-		bitmap_ind16 &dest = state->m_bitmap[state->m_dest];
+		UINT8 *gfxdata = machine().region( "gfx1" )->base();
+		bitmap_ind16 &dest = m_bitmap[m_dest];
 
 #if 0
-		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", cpu_get_pc(&space->device()),
-				state->m_x, state->m_y, state->m_w + 1, state->m_h + 1,
-				state->m_sx >> 6, state->m_sx & 0x3f, state->m_sx1 >> 6, state->m_dsx & 0x3f, state->m_sx1 >> 6, state->m_sx1 & 0x3f,
-				state->m_sy >> 6, state->m_sy & 0x3f, state->m_sy1 >> 6, state->m_dsy & 0x3f, state->m_sy1 >> 6, state->m_sy1 & 0x3f,
-				state->m_sp, state->m_sr,
+		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", cpu_get_pc(&space.device()),
+				m_x, m_y, m_w + 1, m_h + 1,
+				m_sx >> 6, m_sx & 0x3f, m_sx1 >> 6, m_dsx & 0x3f, m_sx1 >> 6, m_sx1 & 0x3f,
+				m_sy >> 6, m_sy & 0x3f, m_sy1 >> 6, m_dsy & 0x3f, m_sy1 >> 6, m_sy1 & 0x3f,
+				m_sp, m_sr,
 				data >> 8);
 #endif
 
-		for (y = 0; y <= state->m_h; y++)
+		for (y = 0; y <= m_h; y++)
 		{
-			for (x = 0; x <= state->m_w; x++)
+			for (x = 0; x <= m_w; x++)
 			{
-				addr = (((state->m_sx + state->m_sx1 + state->m_dsx * x) >> 6) & 0x1ff) +
-							(((state->m_sy + state->m_sy1 + state->m_dsy * y) >> 6) & 0xff) * 0x200 +
-							state->m_sp * 0x200 * 0x100 + state->m_sr * 0x200000;
+				addr = (((m_sx + m_sx1 + m_dsx * x) >> 6) & 0x1ff) +
+							(((m_sy + m_sy1 + m_dsy * y) >> 6) & 0xff) * 0x200 +
+							m_sp * 0x200 * 0x100 + m_sr * 0x200000;
 
 				data = gfxdata[addr];
 
-				if (data && (state->m_x + x >= 0) && (state->m_x + x < 512) && (state->m_y + y >= 0) && (state->m_y + y < 256))
-					dest.pix16(state->m_y + y, state->m_x + x) = data;
+				if (data && (m_x + x >= 0) && (m_x + x < 512) && (m_y + y >= 0) && (m_y + y < 256))
+					dest.pix16(m_y + y, m_x + x) = data;
 			}
 		}
 	}
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x: 600007.b = %02x\n", cpu_get_pc(&space->device()), data);
+		logerror("%06x: 600007.b = %02x\n", cpu_get_pc(&space.device()), data);
 }
 
 // toggle framebuffer
-static WRITE16_HANDLER( lastfght_dest_w )
+WRITE16_MEMBER(lastfght_state::lastfght_dest_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_dest ^= 1;
+		m_dest ^= 1;
 }
 
-static READ16_HANDLER( lastfght_c00000_r )
+READ16_MEMBER(lastfght_state::lastfght_c00000_r)
 {
 	// high byte:
 	// bit 7 = blitter busy
@@ -371,46 +378,45 @@ static READ16_HANDLER( lastfght_c00000_r )
 
 }
 
-static READ16_HANDLER( lastfght_c00002_r )
+READ16_MEMBER(lastfght_state::lastfght_c00002_r)
 {
 	// high byte:
 	// mask 0x1c: from sound?
-	return (space->machine().rand() & 0x1c00) | input_port_read(space->machine(), "IN0");
+	return (machine().rand() & 0x1c00) | input_port_read(machine(), "IN0");
 }
 
-static READ16_HANDLER( lastfght_c00004_r )
+READ16_MEMBER(lastfght_state::lastfght_c00004_r)
 {
-	return input_port_read(space->machine(), "IN1");
+	return input_port_read(machine(), "IN1");
 }
 
-static READ16_HANDLER( lastfght_c00006_r )
+READ16_MEMBER(lastfght_state::lastfght_c00006_r)
 {
 	// low byte:
 	// bit 7 = protection?
 	// bit 5 = blitter?
-	return input_port_read(space->machine(), "IN2");
+	return input_port_read(machine(), "IN2");
 }
 
-static WRITE16_HANDLER( lastfght_c00006_w )
+WRITE16_MEMBER(lastfght_state::lastfght_c00006_w)
 {
-	lastfght_state *state = space->machine().driver_data<lastfght_state>();
-	COMBINE_DATA(&state->m_c00006);
-	//  popmessage("%04x", state->m_c00006);
+	COMBINE_DATA(&m_c00006);
+	//  popmessage("%04x", m_c00006);
 }
 
-static READ16_HANDLER( lastfght_sound_r )
+READ16_MEMBER(lastfght_state::lastfght_sound_r)
 {
 	// low byte:
 	// bit 3
 	return 8;
 }
 
-static WRITE16_HANDLER( lastfght_sound_w )
+WRITE16_MEMBER(lastfght_state::lastfght_sound_w)
 {
 	if (ACCESSING_BITS_8_15)
-		logerror("%06x: sound_w msb = %02x\n", cpu_get_pc(&space->device()), data >> 8);
+		logerror("%06x: sound_w msb = %02x\n", cpu_get_pc(&space.device()), data >> 8);
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x: sound_w lsb = %02x\n", cpu_get_pc(&space->device()), data);
+		logerror("%06x: sound_w lsb = %02x\n", cpu_get_pc(&space.device()), data);
 }
 
 /***************************************************************************
@@ -425,26 +431,26 @@ static ADDRESS_MAP_START( lastfght_map, AS_PROGRAM, 16, lastfght_state )
 
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_SHARE("nvram")	// battery
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_WRITE_LEGACY(lastfght_hi_w )
-	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE_LEGACY(lastfght_sound_r, lastfght_sound_w )
-	AM_RANGE( 0x600006, 0x600007 ) AM_WRITE_LEGACY(lastfght_blit_w )
-	AM_RANGE( 0x600008, 0x600009 ) AM_WRITE_LEGACY(colordac_w )
+	AM_RANGE( 0x600000, 0x600001 ) AM_WRITE(lastfght_hi_w )
+	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE(lastfght_sound_r, lastfght_sound_w )
+	AM_RANGE( 0x600006, 0x600007 ) AM_WRITE(lastfght_blit_w )
+	AM_RANGE( 0x600008, 0x600009 ) AM_WRITE(colordac_w )
 	AM_RANGE( 0x60000a, 0x60000b ) AM_WRITENOP	// colordac?
 
-	AM_RANGE( 0x800000, 0x800001 ) AM_WRITE_LEGACY(lastfght_sx_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_WRITE_LEGACY(lastfght_sd_w )
-	AM_RANGE( 0x800004, 0x800005 ) AM_WRITE_LEGACY(lastfght_sy_w )
-	AM_RANGE( 0x800006, 0x800007 ) AM_WRITE_LEGACY(lastfght_sr_w )
-	AM_RANGE( 0x800008, 0x800009 ) AM_WRITE_LEGACY(lastfght_x_w )
-	AM_RANGE( 0x80000a, 0x80000b ) AM_WRITE_LEGACY(lastfght_yw_w )
-	AM_RANGE( 0x80000c, 0x80000d ) AM_WRITE_LEGACY(lastfght_h_w )
+	AM_RANGE( 0x800000, 0x800001 ) AM_WRITE(lastfght_sx_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_WRITE(lastfght_sd_w )
+	AM_RANGE( 0x800004, 0x800005 ) AM_WRITE(lastfght_sy_w )
+	AM_RANGE( 0x800006, 0x800007 ) AM_WRITE(lastfght_sr_w )
+	AM_RANGE( 0x800008, 0x800009 ) AM_WRITE(lastfght_x_w )
+	AM_RANGE( 0x80000a, 0x80000b ) AM_WRITE(lastfght_yw_w )
+	AM_RANGE( 0x80000c, 0x80000d ) AM_WRITE(lastfght_h_w )
 
-	AM_RANGE( 0x800014, 0x800015 ) AM_WRITE_LEGACY(lastfght_dest_w )
+	AM_RANGE( 0x800014, 0x800015 ) AM_WRITE(lastfght_dest_w )
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ_LEGACY(lastfght_c00000_r )
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_LEGACY(lastfght_c00002_r )
-	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ_LEGACY(lastfght_c00004_r )
-	AM_RANGE( 0xc00006, 0xc00007 ) AM_READWRITE_LEGACY(lastfght_c00006_r, lastfght_c00006_w )
+	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ(lastfght_c00000_r )
+	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ(lastfght_c00002_r )
+	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(lastfght_c00004_r )
+	AM_RANGE( 0xc00006, 0xc00007 ) AM_READWRITE(lastfght_c00006_r, lastfght_c00006_w )
 
 	AM_RANGE( 0xff0000, 0xffffff ) AM_RAM
 ADDRESS_MAP_END

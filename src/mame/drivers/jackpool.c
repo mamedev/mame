@@ -30,6 +30,9 @@ public:
 	UINT16 *m_vram;
 	UINT8 m_map_vreg;
 	UINT16 *m_io;
+	DECLARE_READ16_MEMBER(jackpool_ff_r);
+	DECLARE_READ16_MEMBER(jackpool_io_r);
+	DECLARE_WRITE16_MEMBER(jackpool_io_w);
 };
 
 
@@ -83,45 +86,43 @@ static SCREEN_UPDATE_IND16(jackpool)
 }
 
 /*Communication ram*/
-static READ16_HANDLER( jackpool_ff_r )
+READ16_MEMBER(jackpool_state::jackpool_ff_r)
 {
 	return 0xffff;
 }
 
-static READ16_HANDLER( jackpool_io_r )
+READ16_MEMBER(jackpool_state::jackpool_io_r)
 {
-	jackpool_state *state = space->machine().driver_data<jackpool_state>();
 	switch(offset*2)
 	{
-		case 0x00: return input_port_read(space->machine(),"COIN1");
-		case 0x04: return input_port_read(space->machine(),"UNK1");
-		case 0x06: return input_port_read(space->machine(),"UNK2");
-		case 0x08: return input_port_read(space->machine(),"SERVICE1");
-		case 0x0a: return input_port_read(space->machine(),"SERVICE2");//probably not a button, remote?
-		case 0x0c: return input_port_read(space->machine(),"PAYOUT");
-		case 0x0e: return input_port_read(space->machine(),"START2");
-		case 0x10: return input_port_read(space->machine(),"HOLD3");
-		case 0x12: return input_port_read(space->machine(),"HOLD4");
-		case 0x14: return input_port_read(space->machine(),"HOLD2");
-		case 0x16: return input_port_read(space->machine(),"HOLD1");
-		case 0x18: return input_port_read(space->machine(),"HOLD5");
-		case 0x1a: return input_port_read(space->machine(),"START1");
-		case 0x1c: return input_port_read(space->machine(),"BET");
+		case 0x00: return input_port_read(machine(),"COIN1");
+		case 0x04: return input_port_read(machine(),"UNK1");
+		case 0x06: return input_port_read(machine(),"UNK2");
+		case 0x08: return input_port_read(machine(),"SERVICE1");
+		case 0x0a: return input_port_read(machine(),"SERVICE2");//probably not a button, remote?
+		case 0x0c: return input_port_read(machine(),"PAYOUT");
+		case 0x0e: return input_port_read(machine(),"START2");
+		case 0x10: return input_port_read(machine(),"HOLD3");
+		case 0x12: return input_port_read(machine(),"HOLD4");
+		case 0x14: return input_port_read(machine(),"HOLD2");
+		case 0x16: return input_port_read(machine(),"HOLD1");
+		case 0x18: return input_port_read(machine(),"HOLD5");
+		case 0x1a: return input_port_read(machine(),"START1");
+		case 0x1c: return input_port_read(machine(),"BET");
 		case 0x1e: return 0xff; //ticket motor
 		case 0x20: return 0xff; //hopper motor
-    	case 0x2c: return space->machine().device<eeprom_device>("eeprom")->read_bit();
-    	case 0x2e: return space->machine().device<eeprom_device>("eeprom")->read_bit();
+    	case 0x2c: return machine().device<eeprom_device>("eeprom")->read_bit();
+    	case 0x2e: return machine().device<eeprom_device>("eeprom")->read_bit();
 //      default: printf("R %02x\n",offset*2); break;
 	}
 
 //  printf("R %02x\n",offset*2);
-	return state->m_io[offset];
+	return m_io[offset];
 }
 
-static WRITE16_HANDLER( jackpool_io_w )
+WRITE16_MEMBER(jackpool_state::jackpool_io_w)
 {
-	jackpool_state *state = space->machine().driver_data<jackpool_state>();
-	COMBINE_DATA(&state->m_io[offset]);
+	COMBINE_DATA(&m_io[offset]);
 
 	switch(offset*2)
 	{
@@ -137,12 +138,12 @@ static WRITE16_HANDLER( jackpool_io_w )
 		case 0x46: /* ---- ---x coin counter */break;
 		case 0x4a: /* ---- ---x Ticket motor */break;
 		case 0x4c: /* ---- ---x Hopper motor */break;
-		case 0x4e: state->m_map_vreg = data & 1;        break;
-		case 0x50: space->machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-		case 0x52: space->machine().device<eeprom_device>("eeprom")->set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
-		case 0x54: space->machine().device<eeprom_device>("eeprom")->write_bit(data & 1); break;
-//      case 0x5a: space->machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
-//      case 0x5c: space->machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+		case 0x4e: m_map_vreg = data & 1;        break;
+		case 0x50: machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+		case 0x52: machine().device<eeprom_device>("eeprom")->set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE ); break;
+		case 0x54: machine().device<eeprom_device>("eeprom")->write_bit(data & 1); break;
+//      case 0x5a: machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
+//      case 0x5c: machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE ); break;
 		case 0x60: break;
 //      default: printf("[%02x] <- %02x W\n",offset*2,data);      break;
 	}
@@ -151,17 +152,17 @@ static WRITE16_HANDLER( jackpool_io_w )
 	if(offset*2 == 0x54)
 	{
 		printf("Write bit %02x\n",data);
-		space->machine().device<eeprom_device>("eeprom")->write_bit(data & 1);
+		machine().device<eeprom_device>("eeprom")->write_bit(data & 1);
 	}
 	if(offset*2 == 0x52)
 	{
 		printf("Clock bit %02x\n",data);
-		space->machine().device<eeprom_device>("eeprom")->set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE );
+		machine().device<eeprom_device>("eeprom")->set_clock_line((data & 1) ? ASSERT_LINE : CLEAR_LINE );
 	}
 	if(offset*2 == 0x50)
 	{
 		printf("chip select bit %02x\n",data);
-		space->machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE );
+		machine().device<eeprom_device>("eeprom")->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE );
 	}
 	#endif
 }
@@ -174,9 +175,9 @@ static ADDRESS_MAP_START( jackpool_mem, AS_PROGRAM, 16, jackpool_state )
 	AM_RANGE(0x348000, 0x34ffff) AM_RAM //<- vram banks 2 & 3?
 
 	AM_RANGE(0x360000, 0x3603ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x380000, 0x380061) AM_READWRITE_LEGACY(jackpool_io_r,jackpool_io_w) AM_BASE(m_io)//AM_READ_LEGACY(jackpool_io_r)
+	AM_RANGE(0x380000, 0x380061) AM_READWRITE(jackpool_io_r,jackpool_io_w) AM_BASE(m_io)//AM_READ(jackpool_io_r)
 
-	AM_RANGE(0x800000, 0x80000f) AM_READ_LEGACY(jackpool_ff_r) AM_WRITENOP //UART
+	AM_RANGE(0x800000, 0x80000f) AM_READ(jackpool_ff_r) AM_WRITENOP //UART
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 

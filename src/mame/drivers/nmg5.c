@@ -254,66 +254,66 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_soundcpu;
+	DECLARE_WRITE16_MEMBER(fg_videoram_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(nmg5_soundlatch_w);
+	DECLARE_READ16_MEMBER(prot_r);
+	DECLARE_WRITE16_MEMBER(prot_w);
+	DECLARE_WRITE16_MEMBER(gfx_bank_w);
+	DECLARE_WRITE16_MEMBER(priority_reg_w);
 };
 
 
 
-static WRITE16_HANDLER( fg_videoram_w )
+WRITE16_MEMBER(nmg5_state::fg_videoram_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
-	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( bg_videoram_w )
+WRITE16_MEMBER(nmg5_state::bg_videoram_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( nmg5_soundlatch_w )
+WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-static READ16_HANDLER( prot_r )
+READ16_MEMBER(nmg5_state::prot_r)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
-	return state->m_prot_val | state->m_input_data;
+	return m_prot_val | m_input_data;
 }
 
-static WRITE16_HANDLER( prot_w )
+WRITE16_MEMBER(nmg5_state::prot_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
-	state->m_input_data = data & 0x0f;
+	m_input_data = data & 0x0f;
 }
 
-static WRITE16_HANDLER( gfx_bank_w )
+WRITE16_MEMBER(nmg5_state::gfx_bank_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 
-	if (state->m_gfx_bank != (data & 3))
+	if (m_gfx_bank != (data & 3))
 	{
-		state->m_gfx_bank = data & 3;
-		space->machine().tilemap().mark_all_dirty();
+		m_gfx_bank = data & 3;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-static WRITE16_HANDLER( priority_reg_w )
+WRITE16_MEMBER(nmg5_state::priority_reg_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 
-	state->m_priority_reg = data & 7;
+	m_priority_reg = data & 7;
 
-	if (state->m_priority_reg == 4 || state->m_priority_reg == 5 || state->m_priority_reg == 6)
-		popmessage("unknown priority_reg value = %d\n", state->m_priority_reg);
+	if (m_priority_reg == 4 || m_priority_reg == 5 || m_priority_reg == 6)
+		popmessage("unknown priority_reg value = %d\n", m_priority_reg);
 }
 
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
@@ -332,18 +332,18 @@ static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x180000, 0x180001) AM_WRITE_LEGACY(nmg5_soundlatch_w)
+	AM_RANGE(0x180000, 0x180001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP
-	AM_RANGE(0x180004, 0x180005) AM_READWRITE_LEGACY(prot_r, prot_w)
-	AM_RANGE(0x180006, 0x180007) AM_WRITE_LEGACY(gfx_bank_w)
+	AM_RANGE(0x180004, 0x180005) AM_READWRITE(prot_r, prot_w)
+	AM_RANGE(0x180006, 0x180007) AM_WRITE(gfx_bank_w)
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSW")
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x18000e, 0x18000f) AM_WRITE_LEGACY(priority_reg_w)
+	AM_RANGE(0x18000e, 0x18000f) AM_WRITE(priority_reg_w)
 	AM_RANGE(0x300002, 0x300009) AM_WRITEONLY AM_BASE(m_scroll_ram)
 	AM_RANGE(0x30000a, 0x30000f) AM_WRITENOP
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE_LEGACY(bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE_LEGACY(fg_videoram_w) AM_BASE(m_fg_videoram)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(m_fg_videoram)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(m_bitmap)
 ADDRESS_MAP_END
 
@@ -352,17 +352,17 @@ static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x460000, 0x4607ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x480000, 0x480001) AM_WRITE_LEGACY(nmg5_soundlatch_w)
+	AM_RANGE(0x480000, 0x480001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x480002, 0x480003) AM_WRITENOP
-	AM_RANGE(0x480004, 0x480005) AM_READWRITE_LEGACY(prot_r, prot_w)
-	AM_RANGE(0x480006, 0x480007) AM_WRITE_LEGACY(gfx_bank_w)
+	AM_RANGE(0x480004, 0x480005) AM_READWRITE(prot_r, prot_w)
+	AM_RANGE(0x480006, 0x480007) AM_WRITE(gfx_bank_w)
 	AM_RANGE(0x480008, 0x480009) AM_READ_PORT("DSW")
 	AM_RANGE(0x48000a, 0x48000b) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x48000c, 0x48000d) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x48000e, 0x48000f) AM_WRITE_LEGACY(priority_reg_w)
+	AM_RANGE(0x48000e, 0x48000f) AM_WRITE(priority_reg_w)
 	AM_RANGE(0x500002, 0x500009) AM_WRITEONLY AM_BASE(m_scroll_ram)
-	AM_RANGE(0x520000, 0x521fff) AM_RAM_WRITE_LEGACY(bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x522000, 0x523fff) AM_RAM_WRITE_LEGACY(fg_videoram_w) AM_BASE(m_fg_videoram)
+	AM_RANGE(0x520000, 0x521fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x522000, 0x523fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(m_fg_videoram)
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(m_bitmap)
 ADDRESS_MAP_END
 

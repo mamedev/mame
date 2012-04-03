@@ -33,6 +33,10 @@ public:
 	UINT32 *m_igs_palette32;
 	tilemap_t *m_igs_tx_tilemap;
 	tilemap_t *m_igs_bg_tilemap;
+	DECLARE_WRITE32_MEMBER(igs_cg_videoram_w);
+	DECLARE_WRITE32_MEMBER(igs_tx_videoram_w);
+	DECLARE_WRITE32_MEMBER(igs_bg_videoram_w);
+	DECLARE_WRITE32_MEMBER(igs_palette32_w);
 };
 
 
@@ -52,12 +56,11 @@ public:
 
 
 /* CGLayer */
-static WRITE32_HANDLER( igs_cg_videoram_w )
+WRITE32_MEMBER(igs_m027_state::igs_cg_videoram_w)
 {
-	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
-	COMBINE_DATA(&state->m_igs_cg_videoram[offset]);
+	COMBINE_DATA(&m_igs_cg_videoram[offset]);
 	//if(data!=0)
-	logerror("PC(%08X) CG @%x = %x!\n",cpu_get_pc(&space->device()),offset ,state->m_igs_cg_videoram[offset]);
+	logerror("PC(%08X) CG @%x = %x!\n",cpu_get_pc(&space.device()),offset ,m_igs_cg_videoram[offset]);
 
 
 
@@ -96,13 +99,12 @@ static WRITE32_HANDLER( igs_cg_videoram_w )
 
 
 /* TX Layer */
-static WRITE32_HANDLER( igs_tx_videoram_w )
+WRITE32_MEMBER(igs_m027_state::igs_tx_videoram_w)
 {
-	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
-	COMBINE_DATA(&state->m_igs_tx_videoram[offset]);
-	state->m_igs_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_igs_tx_videoram[offset]);
+	m_igs_tx_tilemap->mark_tile_dirty(offset);
 	//if(data!=0)
-	//logerror( "TX VIDEO RAM OFFSET %x ,data %x!\n",offset ,state->m_igs_tx_videoram[offset]);
+	//logerror( "TX VIDEO RAM OFFSET %x ,data %x!\n",offset ,m_igs_tx_videoram[offset]);
 }
 
 static TILE_GET_INFO( get_tx_tilemap_tile_info )
@@ -117,13 +119,12 @@ static TILE_GET_INFO( get_tx_tilemap_tile_info )
 }
 
 /* BG Layer */
-static WRITE32_HANDLER( igs_bg_videoram_w )
+WRITE32_MEMBER(igs_m027_state::igs_bg_videoram_w)
 {
-	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
-	COMBINE_DATA(&state->m_igs_bg_videoram[offset]);
-	state->m_igs_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_igs_bg_videoram[offset]);
+	m_igs_bg_tilemap->mark_tile_dirty(offset);
 	//if(data!=0)
-	logerror("BG VIDEO RAM OFFSET %x ,data %x!\n",offset ,state->m_igs_bg_videoram[offset]);
+	logerror("BG VIDEO RAM OFFSET %x ,data %x!\n",offset ,m_igs_bg_videoram[offset]);
 }
 
 static TILE_GET_INFO( get_bg_tilemap_tile_info )
@@ -139,15 +140,14 @@ static TILE_GET_INFO( get_bg_tilemap_tile_info )
 
 
 /* Palette Layer */
-static WRITE32_HANDLER( igs_palette32_w )
+WRITE32_MEMBER(igs_m027_state::igs_palette32_w)
 {
-	igs_m027_state *state = space->machine().driver_data<igs_m027_state>();
-	space->machine().generic.paletteram.u16=(UINT16 *)state->m_igs_palette32;
-	COMBINE_DATA(&state->m_igs_palette32[offset]);
-	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2,space->machine().generic.paletteram.u16[offset*2],0);
-	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2+1,space->machine().generic.paletteram.u16[offset*2+1],0);
+	machine().generic.paletteram.u16=(UINT16 *)m_igs_palette32;
+	COMBINE_DATA(&m_igs_palette32[offset]);
+	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2,machine().generic.paletteram.u16[offset*2],0);
+	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2+1,machine().generic.paletteram.u16[offset*2+1],0);
 	//if(data!=0)
-	//fprintf(stdout,"PALETTE RAM OFFSET %x ,data %x!\n",offset ,state->m_igs_palette32[offset]);
+	//fprintf(stdout,"PALETTE RAM OFFSET %x ,data %x!\n",offset ,m_igs_palette32[offset]);
 }
 
 
@@ -197,11 +197,11 @@ static ADDRESS_MAP_START( igs_majhong_map, AS_PROGRAM, 32, igs_m027_state )
 	AM_RANGE(0x10000000, 0x100003ff) AM_RAM AM_BASE(m_igs_mainram)// main ram for asic?
 	AM_RANGE(0x18000000, 0x18007fff) AM_RAM
 
-	AM_RANGE(0x38001000, 0x380017ff) AM_RAM_WRITE_LEGACY(igs_cg_videoram_w) AM_BASE(m_igs_cg_videoram)		//0x200 * 1   CG PALETTE?
-	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_WRITE_LEGACY(igs_palette32_w) AM_BASE(m_igs_palette32)		//0x200 * 1
+	AM_RANGE(0x38001000, 0x380017ff) AM_RAM_WRITE(igs_cg_videoram_w) AM_BASE(m_igs_cg_videoram)		//0x200 * 1   CG PALETTE?
+	AM_RANGE(0x38001800, 0x38001fff) AM_RAM_WRITE(igs_palette32_w) AM_BASE(m_igs_palette32)		//0x200 * 1
 
-	AM_RANGE(0x38004000, 0x38005FFF) AM_RAM_WRITE_LEGACY(igs_tx_videoram_w) AM_BASE(m_igs_tx_videoram) /* Text Layer */
-	AM_RANGE(0x38006000, 0x38007FFF) AM_RAM_WRITE_LEGACY(igs_bg_videoram_w) AM_BASE(m_igs_bg_videoram) /* CG Layer */
+	AM_RANGE(0x38004000, 0x38005FFF) AM_RAM_WRITE(igs_tx_videoram_w) AM_BASE(m_igs_tx_videoram) /* Text Layer */
+	AM_RANGE(0x38006000, 0x38007FFF) AM_RAM_WRITE(igs_bg_videoram_w) AM_BASE(m_igs_bg_videoram) /* CG Layer */
 
 
 	AM_RANGE(0x38002010, 0x38002017) AM_RAM		//??????????????

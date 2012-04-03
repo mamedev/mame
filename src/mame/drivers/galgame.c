@@ -37,6 +37,13 @@ public:
 	int m_point_work_list_index;
 	int m_point_display_list_index;
 	int m_interrupt;
+	DECLARE_READ16_MEMBER(ke_r);
+	DECLARE_WRITE16_MEMBER(ke_w);
+	DECLARE_READ16_MEMBER(x_r);
+	DECLARE_WRITE16_MEMBER(x_w);
+	DECLARE_READ16_MEMBER(y_r);
+	DECLARE_WRITE16_MEMBER(y_w);
+	DECLARE_WRITE16_MEMBER(clk_w);
 };
 
 /*************************************
@@ -45,9 +52,8 @@ public:
  *
  *************************************/
 
-static READ16_HANDLER(ke_r)
+READ16_MEMBER(galaxygame_state::ke_r)
 {
-	galaxygame_state *state = space->machine().driver_data<galaxygame_state>();
 
 	UINT16 ret;
 
@@ -57,10 +63,10 @@ static READ16_HANDLER(ke_r)
 			ret = 0;
 			break;
 		case 1: // AC
-			ret = state->m_ac;
+			ret = m_ac;
 			break;
 		case 2: // MQ
-			ret = state->m_mq;
+			ret = m_mq;
 			break;
 		case 7: // ASH
 			ret = 0;
@@ -73,9 +79,8 @@ static READ16_HANDLER(ke_r)
 	return ret;
 }
 
-static WRITE16_HANDLER(ke_w)
+WRITE16_MEMBER(galaxygame_state::ke_w)
 {
-	galaxygame_state *state = space->machine().driver_data<galaxygame_state>();
 
 	switch( offset )
 	{
@@ -83,42 +88,42 @@ static WRITE16_HANDLER(ke_w)
 			{
 				if ( data != 0 )
 				{
-					INT32 dividend = (INT32)((UINT32)((UINT16)state->m_ac << 16) | (UINT16)(state->m_mq));
-					state->m_mq = dividend / (INT16)data;
-					state->m_ac = dividend % (INT16)data;
+					INT32 dividend = (INT32)((UINT32)((UINT16)m_ac << 16) | (UINT16)(m_mq));
+					m_mq = dividend / (INT16)data;
+					m_ac = dividend % (INT16)data;
 				}
 				else
 				{
-					state->m_mq = 0;
-					state->m_ac = 0;
+					m_mq = 0;
+					m_ac = 0;
 				}
 			}
 			break;
 		case 1: // AC
-			state->m_ac = (INT16)data;
+			m_ac = (INT16)data;
 			break;
 		case 2: // MQ
-			state->m_mq = (INT16)data;
-			if (state->m_mq < 0)
+			m_mq = (INT16)data;
+			if (m_mq < 0)
 			{
-				state->m_ac = -1;
+				m_ac = -1;
 			}
 			else
 			{
-				state->m_ac = 0;
+				m_ac = 0;
 			}
 			break;
 		case 3: // X
 			{
-				INT32 mulres = (INT32)state->m_mq*(INT32)(INT16)data;
-				state->m_ac = mulres >> 16;
-				state->m_mq = mulres & 0xffff;
+				INT32 mulres = (INT32)m_mq*(INT32)(INT16)data;
+				m_ac = mulres >> 16;
+				m_mq = mulres & 0xffff;
 			}
 			break;
 		case 6: // LSH
 			{
 				data &= 63;
-				INT32 val = (INT32)((UINT32)((UINT16)state->m_ac << 16) | (UINT16)(state->m_mq));
+				INT32 val = (INT32)((UINT32)((UINT16)m_ac << 16) | (UINT16)(m_mq));
 				if ( data < 32 )
 				{
 					val = val << data;
@@ -127,14 +132,14 @@ static WRITE16_HANDLER(ke_w)
 				{
 					val = val >> (64 - data);
 				}
-				state->m_mq = val & 0xffff;
-				state->m_ac = (val >> 16) & 0xffff;
+				m_mq = val & 0xffff;
+				m_ac = (val >> 16) & 0xffff;
 			}
 			break;
 		case 7: // ASH
 			{
 				data &= 63;
-				INT32 val = (INT32)((UINT32)((UINT16)state->m_ac << 16) | (UINT16)(state->m_mq));
+				INT32 val = (INT32)((UINT32)((UINT16)m_ac << 16) | (UINT16)(m_mq));
 				if ( data < 32 )
 				{
 					val = val << data;
@@ -143,8 +148,8 @@ static WRITE16_HANDLER(ke_w)
 				{
 					val = val >> (64 - data);
 				}
-				state->m_mq = val & 0xffff;
-				state->m_ac = (val >> 16) & 0xffff;
+				m_mq = val & 0xffff;
+				m_ac = (val >> 16) & 0xffff;
 			}
 			break;
 		default:
@@ -171,55 +176,51 @@ static SCREEN_UPDATE_IND16( galaxygame )
 	return 0;
 }
 
-static READ16_HANDLER(x_r)
+READ16_MEMBER(galaxygame_state::x_r)
 {
-	galaxygame_state *state = space->machine().driver_data<galaxygame_state>();
-	return state->m_x;
+	return m_x;
 }
 
-static WRITE16_HANDLER(x_w)
+WRITE16_MEMBER(galaxygame_state::x_w)
 {
-	galaxygame_state *state = space->machine().driver_data<galaxygame_state>();
-	state->m_x = data;
+	m_x = data;
 }
 
-static READ16_HANDLER(y_r)
+READ16_MEMBER(galaxygame_state::y_r)
 {
-	galaxygame_state *state = space->machine().driver_data<galaxygame_state>();
-	return state->m_y;
+	return m_y;
 }
 
-static WRITE16_HANDLER(y_w)
+WRITE16_MEMBER(galaxygame_state::y_w)
 {
-	galaxygame_state *state = space->machine().driver_data<galaxygame_state>();
-	state->m_y = data;
+	m_y = data;
 	if ( data == 0x0101 )
 	{
 		// send points list to display device
 		// seems to happen on first 0x0101 write after interrupt
-		if ( state->m_interrupt )
+		if ( m_interrupt )
 		{
-			for ( int i = 0; i < state->m_point_work_list_index ; i++ )
+			for ( int i = 0; i < m_point_work_list_index ; i++ )
 			{
-				state->m_point_display_list[i].x = state->m_point_work_list[i].x;
-				state->m_point_display_list[i].y = state->m_point_work_list[i].y;
+				m_point_display_list[i].x = m_point_work_list[i].x;
+				m_point_display_list[i].y = m_point_work_list[i].y;
 			}
-			state->m_point_display_list_index = state->m_point_work_list_index;
-			state->m_point_work_list_index = 0;
-			state->m_interrupt = 0;
+			m_point_display_list_index = m_point_work_list_index;
+			m_point_work_list_index = 0;
+			m_interrupt = 0;
 		}
 	}
 	else
 	{
-		if ( state->m_point_work_list_index >= MAX_POINTS )
+		if ( m_point_work_list_index >= MAX_POINTS )
 		{
 			logerror("Work list overflow\n");
 		}
 		else
 		{
-			state->m_point_work_list[state->m_point_work_list_index].x = state->m_x;
-			state->m_point_work_list[state->m_point_work_list_index].y = state->m_y;
-			state->m_point_work_list_index++;
+			m_point_work_list[m_point_work_list_index].x = m_x;
+			m_point_work_list[m_point_work_list_index].y = m_y;
+			m_point_work_list_index++;
 		}
 	}
 }
@@ -269,20 +270,19 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static WRITE16_HANDLER(clk_w)
+WRITE16_MEMBER(galaxygame_state::clk_w)
 {
-	galaxygame_state *state = space->machine().driver_data<galaxygame_state>();
-	state->m_clk = data;
+	m_clk = data;
 }
 
 static ADDRESS_MAP_START( galaxygame_map, AS_PROGRAM, 16, galaxygame_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0xfec0, 0xfecf) AM_READWRITE_LEGACY(ke_r, ke_w)
-	AM_RANGE(0xff52, 0xff53) AM_READWRITE_LEGACY(y_r, y_w) // 177522 Y
+	AM_RANGE(0xfec0, 0xfecf) AM_READWRITE(ke_r, ke_w)
+	AM_RANGE(0xff52, 0xff53) AM_READWRITE(y_r, y_w) // 177522 Y
 	AM_RANGE(0xff54, 0xff55) AM_READ_PORT("COINAC") // 177524 COINAC
-	AM_RANGE(0xff5a, 0xff5b) AM_READWRITE_LEGACY(x_r, x_w)	// 177532 X
+	AM_RANGE(0xff5a, 0xff5b) AM_READWRITE(x_r, x_w)	// 177532 X
 	AM_RANGE(0xff5c, 0xff5d) AM_READ_PORT("SR")		// 177534 SR
-	AM_RANGE(0xff66, 0xff67) AM_WRITE_LEGACY(clk_w)		// 177546 KW11 line frequency clock
+	AM_RANGE(0xff66, 0xff67) AM_WRITE(clk_w)		// 177546 KW11 line frequency clock
 ADDRESS_MAP_END
 
 

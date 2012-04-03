@@ -26,14 +26,18 @@ public:
 
 	UINT32 *m_vega_vram;
 	UINT8 m_vega_vbuffer;
+	DECLARE_WRITE32_MEMBER(vega_vram_w);
+	DECLARE_READ32_MEMBER(vega_vram_r);
+	DECLARE_WRITE32_MEMBER(vega_palette_w);
+	DECLARE_WRITE32_MEMBER(vega_misc_w);
+	DECLARE_READ32_MEMBER(vegaeo_custom_read);
 };
 
 
 
 
-static WRITE32_HANDLER( vega_vram_w )
+WRITE32_MEMBER(vegaeo_state::vega_vram_w)
 {
-	vegaeo_state *state = space->machine().driver_data<vegaeo_state>();
 	switch(mem_mask)
 	{
 		case 0xffffffff:
@@ -59,49 +63,47 @@ static WRITE32_HANDLER( vega_vram_w )
 				return;
 	}
 
-	COMBINE_DATA(&state->m_vega_vram[offset + state->m_vega_vbuffer * (0x14000/4)]);
+	COMBINE_DATA(&m_vega_vram[offset + m_vega_vbuffer * (0x14000/4)]);
 }
 
-static READ32_HANDLER( vega_vram_r )
+READ32_MEMBER(vegaeo_state::vega_vram_r)
 {
-	vegaeo_state *state = space->machine().driver_data<vegaeo_state>();
-	return state->m_vega_vram[offset + (0x14000/4) * state->m_vega_vbuffer];
+	return m_vega_vram[offset + (0x14000/4) * m_vega_vbuffer];
 }
 
-static WRITE32_HANDLER( vega_palette_w )
+WRITE32_MEMBER(vegaeo_state::vega_palette_w)
 {
 	UINT16 paldata;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
 
-	paldata = space->machine().generic.paletteram.u32[offset] & 0x7fff;
-	palette_set_color_rgb(space->machine(), offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	paldata = machine().generic.paletteram.u32[offset] & 0x7fff;
+	palette_set_color_rgb(machine(), offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
-static WRITE32_HANDLER( vega_misc_w )
+WRITE32_MEMBER(vegaeo_state::vega_misc_w)
 {
-	vegaeo_state *state = space->machine().driver_data<vegaeo_state>();
 	// other bits ???
 
-	state->m_vega_vbuffer = data & 1;
+	m_vega_vbuffer = data & 1;
 }
 
 
-static READ32_HANDLER( vegaeo_custom_read )
+READ32_MEMBER(vegaeo_state::vegaeo_custom_read)
 {
-	eolith_speedup_read(space);
-	return input_port_read(space->machine(), "SYSTEM");
+	eolith_speedup_read(&space);
+	return input_port_read(machine(), "SYSTEM");
 }
 
 static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32, vegaeo_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE_LEGACY(vega_vram_r, vega_vram_w)
+	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
 	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x000000ff)
-	AM_RANGE(0xfc200000, 0xfc2003ff) AM_RAM_WRITE_LEGACY(vega_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xfc200000, 0xfc2003ff) AM_RAM_WRITE(vega_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
 	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITENOP // soundlatch
-	AM_RANGE(0xfca00000, 0xfca00003) AM_WRITE_LEGACY(vega_misc_w)
-	AM_RANGE(0xfcc00000, 0xfcc00003) AM_READ_LEGACY(vegaeo_custom_read)
+	AM_RANGE(0xfca00000, 0xfca00003) AM_WRITE(vega_misc_w)
+	AM_RANGE(0xfcc00000, 0xfcc00003) AM_READ(vegaeo_custom_read)
 	AM_RANGE(0xfce00000, 0xfce00003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xfd000000, 0xfeffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0)

@@ -38,6 +38,20 @@ public:
 	UINT8 m_reset_latch;
 	required_device<simutrek_special_device> m_laserdisc;
 	rgb_t *m_colormap;
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_READ16_MEMBER(line_r);
+	DECLARE_WRITE16_MEMBER(laserdisc_w);
+	DECLARE_READ16_MEMBER(laserdisc_r);
+	DECLARE_WRITE16_MEMBER(ldaud_w);
+	DECLARE_WRITE16_MEMBER(control_w);
+	DECLARE_WRITE16_MEMBER(reset_w);
+	DECLARE_WRITE16_MEMBER(io_w);
+	DECLARE_READ16_MEMBER(io_r);
+	DECLARE_READ16_MEMBER(chop_r);
+	DECLARE_READ16_MEMBER(read_rotram);
+	DECLARE_WRITE16_MEMBER(write_rotram);
+	DECLARE_READ16_MEMBER(read_sndram);
+	DECLARE_WRITE16_MEMBER(write_sndram);
 };
 
 
@@ -87,10 +101,10 @@ static PALETTE_INIT( cubeqst )
 	}
 }
 
-static WRITE16_HANDLER( palette_w )
+WRITE16_MEMBER(cubeqst_state::palette_w)
 {
-	space->machine().primary_screen->update_now();
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	machine().primary_screen->update_now();
+	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
 }
 
 /* TODO: This is a simplified version of what actually happens */
@@ -170,10 +184,10 @@ static SCREEN_UPDATE_RGB32( cubeqst )
 	return 0;
 }
 
-static READ16_HANDLER( line_r )
+READ16_MEMBER(cubeqst_state::line_r)
 {
 	/* I think this is unusued */
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 static INTERRUPT_GEN( vblank )
@@ -194,31 +208,28 @@ static INTERRUPT_GEN( vblank )
  *
  *************************************/
 
-static WRITE16_HANDLER( laserdisc_w )
+WRITE16_MEMBER(cubeqst_state::laserdisc_w)
 {
-	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	state->m_laserdisc->data_w(data & 0xff);
+	m_laserdisc->data_w(data & 0xff);
 }
 
 /*
     D0: Command acknowledge
     D1: Seek status (0 = searching, 1 = ready)
 */
-static READ16_HANDLER( laserdisc_r )
+READ16_MEMBER(cubeqst_state::laserdisc_r)
 {
-	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	int ldp_command_flag = (state->m_laserdisc->ready_r() == ASSERT_LINE) ? 0 : 1;
-	int ldp_seek_status = (state->m_laserdisc->status_r() == ASSERT_LINE) ? 1 : 0;
+	int ldp_command_flag = (m_laserdisc->ready_r() == ASSERT_LINE) ? 0 : 1;
+	int ldp_seek_status = (m_laserdisc->status_r() == ASSERT_LINE) ? 1 : 0;
 
 	return (ldp_seek_status << 1) | ldp_command_flag;
 }
 
 
 /* LDP audio squelch control */
-static WRITE16_HANDLER( ldaud_w )
+WRITE16_MEMBER(cubeqst_state::ldaud_w)
 {
-	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	state->m_laserdisc->set_external_audio_squelch(data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	m_laserdisc->set_external_audio_squelch(data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*
@@ -231,10 +242,9 @@ static WRITE16_HANDLER( ldaud_w )
 
     Note: Can only be written during VBLANK (as with palette RAM)
 */
-static WRITE16_HANDLER( control_w )
+WRITE16_MEMBER(cubeqst_state::control_w)
 {
-	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	state->m_laserdisc->video_enable(data & 1);
+	m_laserdisc->video_enable(data & 1);
 }
 
 
@@ -268,21 +278,20 @@ static void swap_linecpu_banks(running_machine &machine)
     D1: /Sound
     D2: /Disk
 */
-static WRITE16_HANDLER( reset_w )
+WRITE16_MEMBER(cubeqst_state::reset_w)
 {
-	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	cputag_set_input_line(space->machine(), "rotate_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(space->machine(), "line_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(space->machine(), "sound_cpu", INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "rotate_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "line_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "sound_cpu", INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Swap stack and pointer RAM banks on rising edge of display reset */
-	if (!BIT(state->m_reset_latch, 0) && BIT(data, 0))
-		swap_linecpu_banks(space->machine());
+	if (!BIT(m_reset_latch, 0) && BIT(data, 0))
+		swap_linecpu_banks(machine());
 
 	if (!BIT(data, 2))
-		state->m_laserdisc->reset();
+		m_laserdisc->reset();
 
-	state->m_reset_latch = data & 0xff;
+	m_reset_latch = data & 0xff;
 }
 
 
@@ -292,9 +301,8 @@ static WRITE16_HANDLER( reset_w )
  *
  *************************************/
 
-static WRITE16_HANDLER( io_w )
+WRITE16_MEMBER(cubeqst_state::io_w)
 {
-	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
 	/*
        0: Spare lamp
        1: Spare driver
@@ -307,7 +315,7 @@ static WRITE16_HANDLER( io_w )
     */
 
 	/* TODO: On rising edge of Q7, status LED latch is written */
-	if ( !BIT(state->m_io_latch, 7) && BIT(data, 7) )
+	if ( !BIT(m_io_latch, 7) && BIT(data, 7) )
 	{
 		/*
             0: Battery failure
@@ -316,13 +324,12 @@ static WRITE16_HANDLER( io_w )
         */
 	}
 
-	state->m_io_latch = data;
+	m_io_latch = data;
 }
 
-static READ16_HANDLER( io_r )
+READ16_MEMBER(cubeqst_state::io_r)
 {
-	cubeqst_state *state = space->machine().driver_data<cubeqst_state>();
-	UINT16 port_data = input_port_read(space->machine(), "IO");
+	UINT16 port_data = input_port_read(machine(), "IO");
 
 	/*
          Certain bits depend on Q7 of the IO latch:
@@ -333,7 +340,7 @@ static READ16_HANDLER( io_r )
          10: Spare  / Trackball V data
     */
 
-	if ( !BIT(state->m_io_latch, 7) )
+	if ( !BIT(m_io_latch, 7) )
 		return port_data;
 	else
 		/* Return zeroes for the trackball signals for now */
@@ -341,9 +348,9 @@ static READ16_HANDLER( io_r )
 }
 
 /* Trackball ('CHOP') */
-static READ16_HANDLER( chop_r )
+READ16_MEMBER(cubeqst_state::chop_r)
 {
-	return (input_port_read(space->machine(), "TRACK_X") << 8) | input_port_read(space->machine(), "TRACK_Y");
+	return (input_port_read(machine(), "TRACK_X") << 8) | input_port_read(machine(), "TRACK_Y");
 }
 
 
@@ -382,37 +389,37 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static READ16_HANDLER( read_rotram )
+READ16_MEMBER(cubeqst_state::read_rotram)
 {
-	return cubeqcpu_rotram_r(space->machine().device("rotate_cpu"), offset, mem_mask);
+	return cubeqcpu_rotram_r(machine().device("rotate_cpu"), offset, mem_mask);
 }
 
-static WRITE16_HANDLER( write_rotram )
+WRITE16_MEMBER(cubeqst_state::write_rotram)
 {
-	cubeqcpu_rotram_w(space->machine().device("rotate_cpu"), offset, data, mem_mask);
+	cubeqcpu_rotram_w(machine().device("rotate_cpu"), offset, data, mem_mask);
 }
 
-static READ16_HANDLER( read_sndram )
+READ16_MEMBER(cubeqst_state::read_sndram)
 {
-	return cubeqcpu_sndram_r(space->machine().device("sound_cpu"), offset, mem_mask);
+	return cubeqcpu_sndram_r(machine().device("sound_cpu"), offset, mem_mask);
 }
 
-static WRITE16_HANDLER( write_sndram )
+WRITE16_MEMBER(cubeqst_state::write_sndram)
 {
-	cubeqcpu_sndram_w(space->machine().device("sound_cpu"), offset, data, mem_mask);
+	cubeqcpu_sndram_w(machine().device("sound_cpu"), offset, data, mem_mask);
 }
 
 static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, cubeqst_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x03ffff)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x020000, 0x027fff) AM_READWRITE_LEGACY(read_rotram, write_rotram)
-	AM_RANGE(0x028000, 0x028fff) AM_READWRITE_LEGACY(read_sndram, write_sndram)
-	AM_RANGE(0x038000, 0x038001) AM_READWRITE_LEGACY(io_r, io_w)
-	AM_RANGE(0x038002, 0x038003) AM_READWRITE_LEGACY(chop_r, ldaud_w)
-	AM_RANGE(0x038008, 0x038009) AM_READWRITE_LEGACY(line_r, reset_w)
-	AM_RANGE(0x03800e, 0x03800f) AM_READWRITE_LEGACY(laserdisc_r, laserdisc_w)
-	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM_WRITE_LEGACY(palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x03cc00, 0x03cc01) AM_WRITE_LEGACY(control_w)
+	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(read_rotram, write_rotram)
+	AM_RANGE(0x028000, 0x028fff) AM_READWRITE(read_sndram, write_sndram)
+	AM_RANGE(0x038000, 0x038001) AM_READWRITE(io_r, io_w)
+	AM_RANGE(0x038002, 0x038003) AM_READWRITE(chop_r, ldaud_w)
+	AM_RANGE(0x038008, 0x038009) AM_READWRITE(line_r, reset_w)
+	AM_RANGE(0x03800e, 0x03800f) AM_READWRITE(laserdisc_r, laserdisc_w)
+	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM_WRITE(palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x03cc00, 0x03cc01) AM_WRITE(control_w)
 	AM_RANGE(0x03e000, 0x03efff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x03f000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END

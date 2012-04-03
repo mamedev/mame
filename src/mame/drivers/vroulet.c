@@ -51,13 +51,16 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(vroulet_paletteram_w);
+	DECLARE_WRITE8_MEMBER(vroulet_videoram_w);
+	DECLARE_WRITE8_MEMBER(vroulet_colorram_w);
 };
 
 
 /* video */
 
 
-static WRITE8_HANDLER(vroulet_paletteram_w)
+WRITE8_MEMBER(vroulet_state::vroulet_paletteram_w)
 {
 	/*
      paletteram_xxxxBBBBGGGGRRRR_be_w
@@ -65,30 +68,28 @@ static WRITE8_HANDLER(vroulet_paletteram_w)
     */
 
 	int i,j,a,b;
-	space->machine().generic.paletteram.u8[offset]=data;
+	machine().generic.paletteram.u8[offset]=data;
 	for(i=0;i<32;i++)
 	{
 		for(j=0;j<16;j++)
 		{
-			a=space->machine().generic.paletteram.u8[((i*8+j)*2)&0xff ];
-			b=space->machine().generic.paletteram.u8[((i*8+j)*2+1)&0xff ];
-			palette_set_color_rgb(space->machine(),i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
+			a=machine().generic.paletteram.u8[((i*8+j)*2)&0xff ];
+			b=machine().generic.paletteram.u8[((i*8+j)*2+1)&0xff ];
+			palette_set_color_rgb(machine(),i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
 		}
 	}
 }
 
-static WRITE8_HANDLER( vroulet_videoram_w )
+WRITE8_MEMBER(vroulet_state::vroulet_videoram_w)
 {
-	vroulet_state *state = space->machine().driver_data<vroulet_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( vroulet_colorram_w )
+WRITE8_MEMBER(vroulet_state::vroulet_colorram_w)
 {
-	vroulet_state *state = space->machine().driver_data<vroulet_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -123,10 +124,10 @@ static ADDRESS_MAP_START( vroulet_map, AS_PROGRAM, 8, vroulet_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x8000) AM_NOP
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(vroulet_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(vroulet_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xa000, 0xa001) AM_RAM AM_BASE(m_ball)
-	AM_RANGE(0xb000, 0xb0ff) AM_WRITE_LEGACY(vroulet_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(vroulet_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc000, 0xc000) AM_NOP
 ADDRESS_MAP_END
 

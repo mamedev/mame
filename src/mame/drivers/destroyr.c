@@ -39,6 +39,12 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_WRITE8_MEMBER(destroyr_misc_w);
+	DECLARE_WRITE8_MEMBER(destroyr_cursor_load_w);
+	DECLARE_WRITE8_MEMBER(destroyr_interrupt_ack_w);
+	DECLARE_WRITE8_MEMBER(destroyr_output_w);
+	DECLARE_READ8_MEMBER(destroyr_input_r);
+	DECLARE_READ8_MEMBER(destroyr_scanline_r);
 };
 
 
@@ -160,49 +166,46 @@ static MACHINE_RESET( destroyr )
 }
 
 
-static WRITE8_HANDLER( destroyr_misc_w )
+WRITE8_MEMBER(destroyr_state::destroyr_misc_w)
 {
-	destroyr_state *state = space->machine().driver_data<destroyr_state>();
 
 	/* bits 0 to 2 connect to the sound circuits */
-	state->m_attract = data & 0x01;
-	state->m_noise = data & 0x02;
-	state->m_motor_speed = data & 0x04;
-	state->m_potmask[0] = data & 0x08;
-	state->m_wavemod = data & 0x10;
-	state->m_potmask[1] = data & 0x20;
+	m_attract = data & 0x01;
+	m_noise = data & 0x02;
+	m_motor_speed = data & 0x04;
+	m_potmask[0] = data & 0x08;
+	m_wavemod = data & 0x10;
+	m_potmask[1] = data & 0x20;
 
-	coin_lockout_w(space->machine(), 0, !state->m_attract);
-	coin_lockout_w(space->machine(), 1, !state->m_attract);
+	coin_lockout_w(machine(), 0, !m_attract);
+	coin_lockout_w(machine(), 1, !m_attract);
 }
 
 
-static WRITE8_HANDLER( destroyr_cursor_load_w )
+WRITE8_MEMBER(destroyr_state::destroyr_cursor_load_w)
 {
-	destroyr_state *state = space->machine().driver_data<destroyr_state>();
-	state->m_cursor = data;
+	m_cursor = data;
 	watchdog_reset_w(space, offset, data);
 }
 
 
-static WRITE8_HANDLER( destroyr_interrupt_ack_w )
+WRITE8_MEMBER(destroyr_state::destroyr_interrupt_ack_w)
 {
-	destroyr_state *state = space->machine().driver_data<destroyr_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( destroyr_output_w )
+WRITE8_MEMBER(destroyr_state::destroyr_output_w)
 {
 	if (offset & 8) destroyr_misc_w(space, 8, data);
 
 	else switch (offset & 7)
 	{
 	case 0:
-		set_led_status(space->machine(), 0, data & 1);
+		set_led_status(machine(), 0, data & 1);
 		break;
 	case 1:
-		set_led_status(space->machine(), 1, data & 1); /* no second LED present on cab */
+		set_led_status(machine(), 1, data & 1); /* no second LED present on cab */
 		break;
 	case 2:
 		/* bit 0 => songate */
@@ -226,22 +229,21 @@ static WRITE8_HANDLER( destroyr_output_w )
 }
 
 
-static READ8_HANDLER( destroyr_input_r )
+READ8_MEMBER(destroyr_state::destroyr_input_r)
 {
-	destroyr_state *state = space->machine().driver_data<destroyr_state>();
 
 	if (offset & 1)
 	{
-		return input_port_read(space->machine(), "IN1");
+		return input_port_read(machine(), "IN1");
 	}
 
 	else
 	{
-		UINT8 ret = input_port_read(space->machine(), "IN0");
+		UINT8 ret = input_port_read(machine(), "IN0");
 
-		if (state->m_potsense[0] && state->m_potmask[0])
+		if (m_potsense[0] && m_potmask[0])
 			ret |= 4;
-		if (state->m_potsense[1] && state->m_potmask[1])
+		if (m_potsense[1] && m_potmask[1])
 			ret |= 8;
 
 		return ret;
@@ -249,23 +251,23 @@ static READ8_HANDLER( destroyr_input_r )
 }
 
 
-static READ8_HANDLER( destroyr_scanline_r )
+READ8_MEMBER(destroyr_state::destroyr_scanline_r)
 {
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 
 static ADDRESS_MAP_START( destroyr_map, AS_PROGRAM, 8, destroyr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_READWRITE_LEGACY(destroyr_input_r, destroyr_output_w)
+	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(destroyr_input_r, destroyr_output_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ_PORT("IN2")
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0xf00) AM_WRITEONLY AM_BASE(m_alpha_num_ram)
 	AM_RANGE(0x4000, 0x401f) AM_MIRROR(0xfe0) AM_WRITEONLY AM_BASE(m_major_obj_ram)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xff8) AM_WRITE_LEGACY(destroyr_cursor_load_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xff8) AM_WRITE_LEGACY(destroyr_interrupt_ack_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xff8) AM_WRITE(destroyr_cursor_load_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xff8) AM_WRITE(destroyr_interrupt_ack_w)
 	AM_RANGE(0x5002, 0x5007) AM_MIRROR(0xff8) AM_WRITEONLY AM_BASE(m_minor_obj_ram)
-	AM_RANGE(0x6000, 0x6fff) AM_READ_LEGACY(destroyr_scanline_r)
+	AM_RANGE(0x6000, 0x6fff) AM_READ(destroyr_scanline_r)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 

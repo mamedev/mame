@@ -82,6 +82,25 @@ public:
 #ifdef DEBUG_CHAR
 	UINT8 m_tileduty[0x2000];
 #endif
+	DECLARE_READ32_MEMBER(srmp5_palette_r);
+	DECLARE_WRITE32_MEMBER(srmp5_palette_w);
+	DECLARE_WRITE32_MEMBER(bank_w);
+	DECLARE_READ32_MEMBER(tileram_r);
+	DECLARE_WRITE32_MEMBER(tileram_w);
+	DECLARE_READ32_MEMBER(spr_r);
+	DECLARE_WRITE32_MEMBER(spr_w);
+	DECLARE_READ32_MEMBER(data_r);
+	DECLARE_WRITE32_MEMBER(input_select_w);
+	DECLARE_READ32_MEMBER(srmp5_inputs_r);
+	DECLARE_WRITE32_MEMBER(cmd1_w);
+	DECLARE_WRITE32_MEMBER(cmd2_w);
+	DECLARE_READ32_MEMBER(cmd_stat32_r);
+	DECLARE_READ32_MEMBER(srmp5_vidregs_r);
+	DECLARE_WRITE32_MEMBER(srmp5_vidregs_w);
+	DECLARE_READ32_MEMBER(irq_ack_clear);
+	DECLARE_READ8_MEMBER(cmd1_r);
+	DECLARE_READ8_MEMBER(cmd2_r);
+	DECLARE_READ8_MEMBER(cmd_stat8_r);
 };
 
 
@@ -201,145 +220,130 @@ static SCREEN_UPDATE_RGB32( srmp5 )
 	return 0;
 }
 
-static READ32_HANDLER(srmp5_palette_r)
+READ32_MEMBER(srmp5_state::srmp5_palette_r)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	return state->m_palram[offset];
+	return m_palram[offset];
 }
 
-static WRITE32_HANDLER(srmp5_palette_w)
+WRITE32_MEMBER(srmp5_state::srmp5_palette_w)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	COMBINE_DATA(&state->m_palram[offset]);
-	palette_set_color(space->machine(), offset, MAKE_RGB(data << 3 & 0xFF, data >> 2 & 0xFF, data >> 7 & 0xFF));
+	COMBINE_DATA(&m_palram[offset]);
+	palette_set_color(machine(), offset, MAKE_RGB(data << 3 & 0xFF, data >> 2 & 0xFF, data >> 7 & 0xFF));
 }
-static WRITE32_HANDLER(bank_w)
+WRITE32_MEMBER(srmp5_state::bank_w)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	COMBINE_DATA(&state->m_databank);
+	COMBINE_DATA(&m_databank);
 }
 
-static READ32_HANDLER(tileram_r)
+READ32_MEMBER(srmp5_state::tileram_r)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	return state->m_tileram[offset];
+	return m_tileram[offset];
 }
 
-static WRITE32_HANDLER(tileram_w)
+WRITE32_MEMBER(srmp5_state::tileram_w)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	state->m_tileram[offset] = data & 0xFFFF; //lower 16bit only
+	m_tileram[offset] = data & 0xFFFF; //lower 16bit only
 #ifdef DEBUG_CHAR
-	state->m_tileduty[offset >> 6] = 1;
+	m_tileduty[offset >> 6] = 1;
 #endif
 }
 
-static READ32_HANDLER(spr_r)
+READ32_MEMBER(srmp5_state::spr_r)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	return state->m_sprram[offset];
+	return m_sprram[offset];
 }
 
-static WRITE32_HANDLER(spr_w)
+WRITE32_MEMBER(srmp5_state::spr_w)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	state->m_sprram[offset] = data & 0xFFFF; //lower 16bit only
+	m_sprram[offset] = data & 0xFFFF; //lower 16bit only
 }
 
-static READ32_HANDLER(data_r)
+READ32_MEMBER(srmp5_state::data_r)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 	UINT32 data;
-	const UINT8 *usr = space->machine().region("user2")->base();
+	const UINT8 *usr = machine().region("user2")->base();
 
-	data=((state->m_databank>>4)&0xf)*0x100000; //guess
+	data=((m_databank>>4)&0xf)*0x100000; //guess
 	data=usr[data+offset*2]+usr[data+offset*2+1]*256;
 	return data|(data<<16);
 }
 
-static WRITE32_HANDLER(input_select_w)
+WRITE32_MEMBER(srmp5_state::input_select_w)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	state->m_input_select = data & 0x0F;
+	m_input_select = data & 0x0F;
 }
 
-static READ32_HANDLER(srmp5_inputs_r)
+READ32_MEMBER(srmp5_state::srmp5_inputs_r)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 	UINT32 ret = 0;
 
-	switch (state->m_input_select)
+	switch (m_input_select)
 	{
 	case 0x01:
-		ret = input_port_read(space->machine(), "IN0");
+		ret = input_port_read(machine(), "IN0");
 		break;
 	case 0x02:
-		ret = input_port_read(space->machine(), "IN1");
+		ret = input_port_read(machine(), "IN1");
 		break;
 	case 0x04:
-		ret = input_port_read(space->machine(), "IN2");
+		ret = input_port_read(machine(), "IN2");
 		break;
 	case 0x00:
 	case 0x08:
-		ret = input_port_read(space->machine(), "IN3");
+		ret = input_port_read(machine(), "IN3");
 		break;
 	}
 	return ret;
 }
 
 //almost all cmds are sound related
-static WRITE32_HANDLER(cmd1_w)
+WRITE32_MEMBER(srmp5_state::cmd1_w)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	state->m_cmd1 = data & 0xFF;
+	m_cmd1 = data & 0xFF;
 	logerror("cmd1_w %08X\n", data);
 }
 
-static WRITE32_HANDLER(cmd2_w)
+WRITE32_MEMBER(srmp5_state::cmd2_w)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	state->m_cmd2 = data & 0xFF;
-	state->m_cmd_stat = 5;
+	m_cmd2 = data & 0xFF;
+	m_cmd_stat = 5;
 	logerror("cmd2_w %08X\n", data);
 }
 
-static READ32_HANDLER(cmd_stat32_r)
+READ32_MEMBER(srmp5_state::cmd_stat32_r)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	return state->m_cmd_stat;
+	return m_cmd_stat;
 }
 
-static READ32_HANDLER(srmp5_vidregs_r)
+READ32_MEMBER(srmp5_state::srmp5_vidregs_r)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	logerror("vidregs read  %08X %08X\n", offset << 2, state->m_vidregs[offset]);
-	return state->m_vidregs[offset];
+	logerror("vidregs read  %08X %08X\n", offset << 2, m_vidregs[offset]);
+	return m_vidregs[offset];
 }
 
-static WRITE32_HANDLER(srmp5_vidregs_w)
+WRITE32_MEMBER(srmp5_state::srmp5_vidregs_w)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	COMBINE_DATA(&state->m_vidregs[offset]);
+	COMBINE_DATA(&m_vidregs[offset]);
 	if(offset != 0x10C / 4)
-		logerror("vidregs write %08X %08X\n", offset << 2, state->m_vidregs[offset]);
+		logerror("vidregs write %08X %08X\n", offset << 2, m_vidregs[offset]);
 }
 
-static READ32_HANDLER(irq_ack_clear)
+READ32_MEMBER(srmp5_state::irq_ack_clear)
 {
-	cputag_set_input_line(space->machine(), "sub", R3000_IRQ4, CLEAR_LINE);
+	cputag_set_input_line(machine(), "sub", R3000_IRQ4, CLEAR_LINE);
 	return 0;
 }
 
@@ -350,26 +354,26 @@ static ADDRESS_MAP_START( srmp5_mem, AS_PROGRAM, 32, srmp5_state )
 	AM_RANGE(0x01800000, 0x01800003) AM_RAM //?1
 	AM_RANGE(0x01800004, 0x01800007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01800008, 0x0180000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0180000c, 0x0180000f) AM_WRITE_LEGACY(bank_w)
-	AM_RANGE(0x01800010, 0x01800013) AM_READ_LEGACY(srmp5_inputs_r) //multiplexed controls (selected by writes to 1c)
+	AM_RANGE(0x0180000c, 0x0180000f) AM_WRITE(bank_w)
+	AM_RANGE(0x01800010, 0x01800013) AM_READ(srmp5_inputs_r) //multiplexed controls (selected by writes to 1c)
 	AM_RANGE(0x01800014, 0x01800017) AM_READ_PORT("TEST")
-	AM_RANGE(0x0180001c, 0x0180001f) AM_WRITE_LEGACY(input_select_w)//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
+	AM_RANGE(0x0180001c, 0x0180001f) AM_WRITE(input_select_w)//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
 	AM_RANGE(0x01800200, 0x01800203) AM_RAM  //sound related ? only few writes after boot
-	AM_RANGE(0x01802000, 0x01802003) AM_WRITE_LEGACY(cmd1_w)
-	AM_RANGE(0x01802004, 0x01802007) AM_WRITE_LEGACY(cmd2_w)
-	AM_RANGE(0x01802008, 0x0180200b) AM_READ_LEGACY(cmd_stat32_r)
-	AM_RANGE(0x01a00000, 0x01bfffff) AM_READ_LEGACY(data_r)
+	AM_RANGE(0x01802000, 0x01802003) AM_WRITE(cmd1_w)
+	AM_RANGE(0x01802004, 0x01802007) AM_WRITE(cmd2_w)
+	AM_RANGE(0x01802008, 0x0180200b) AM_READ(cmd_stat32_r)
+	AM_RANGE(0x01a00000, 0x01bfffff) AM_READ(data_r)
 	AM_RANGE(0x01c00000, 0x01c00003) AM_READNOP // debug? 'Toru'
 
-	AM_RANGE(0x0a000000, 0x0a0fffff) AM_READWRITE_LEGACY(spr_r, spr_w)
-	AM_RANGE(0x0a100000, 0x0a17ffff) AM_READWRITE_LEGACY(srmp5_palette_r, srmp5_palette_w)
+	AM_RANGE(0x0a000000, 0x0a0fffff) AM_READWRITE(spr_r, spr_w)
+	AM_RANGE(0x0a100000, 0x0a17ffff) AM_READWRITE(srmp5_palette_r, srmp5_palette_w)
 	//0?N???A?????????i??????????
 	AM_RANGE(0x0a180000, 0x0a180003) AM_READNOP // write 0x00000400
-	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE_LEGACY(srmp5_vidregs_r, srmp5_vidregs_w)
-	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE_LEGACY(tileram_r, tileram_w)
+	AM_RANGE(0x0a180000, 0x0a18011f) AM_READWRITE(srmp5_vidregs_r, srmp5_vidregs_w)
+	AM_RANGE(0x0a200000, 0x0a3fffff) AM_READWRITE(tileram_r, tileram_w)
 
 	AM_RANGE(0x1eff0000, 0x1eff001f) AM_WRITEONLY
-	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ_LEGACY(irq_ack_clear)
+	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -382,34 +386,31 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, srmp5_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER(cmd1_r)
+READ8_MEMBER(srmp5_state::cmd1_r)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	state->m_cmd_stat = 0;
-	return state->m_cmd1;
+	m_cmd_stat = 0;
+	return m_cmd1;
 }
 
-static READ8_HANDLER(cmd2_r)
+READ8_MEMBER(srmp5_state::cmd2_r)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	return state->m_cmd2;
+	return m_cmd2;
 }
 
-static READ8_HANDLER(cmd_stat8_r)
+READ8_MEMBER(srmp5_state::cmd_stat8_r)
 {
-	srmp5_state *state = space->machine().driver_data<srmp5_state>();
 
-	return state->m_cmd_stat;
+	return m_cmd_stat;
 }
 
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, srmp5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ_LEGACY(st0016_vregs_r) AM_WRITE_LEGACY(st0016_vregs_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(cmd1_r)
-	AM_RANGE(0xc1, 0xc1) AM_READ_LEGACY(cmd2_r)
-	AM_RANGE(0xc2, 0xc2) AM_READ_LEGACY(cmd_stat8_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(cmd1_r)
+	AM_RANGE(0xc1, 0xc1) AM_READ(cmd2_r)
+	AM_RANGE(0xc2, 0xc2) AM_READ(cmd_stat8_r)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
 	AM_RANGE(0xe7, 0xe7) AM_WRITE_LEGACY(st0016_rom_bank_w)
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(st0016_dma_r)

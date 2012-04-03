@@ -46,6 +46,27 @@ public:
 	UINT16 m_dsp_HOLD_signal;
 	UINT8 *m_mecha_ram;
 	UINT8 m_trigger;
+	DECLARE_WRITE16_MEMBER(ml_tileram_w);
+	DECLARE_READ16_MEMBER(ml_tileram_r);
+	DECLARE_READ16_MEMBER(io1_r);
+	DECLARE_WRITE16_MEMBER(ml_output_w);
+	DECLARE_WRITE16_MEMBER(ml_sub_reset_w);
+	DECLARE_WRITE16_MEMBER(ml_to_sound_w);
+	DECLARE_WRITE8_MEMBER(ml_sound_to_main_w);
+	DECLARE_READ16_MEMBER(ml_analog1_lsb_r);
+	DECLARE_READ16_MEMBER(ml_analog2_lsb_r);
+	DECLARE_READ16_MEMBER(ml_analog3_lsb_r);
+	DECLARE_READ16_MEMBER(ml_analog1_msb_r);
+	DECLARE_READ16_MEMBER(ml_analog2_msb_r);
+	DECLARE_READ16_MEMBER(ml_analog3_msb_r);
+	DECLARE_WRITE16_MEMBER(ml_nmi_to_sound_w);
+	DECLARE_READ16_MEMBER(ml_mecha_ram_r);
+	DECLARE_WRITE16_MEMBER(ml_mecha_ram_w);
+	DECLARE_WRITE8_MEMBER(ml_msm_start_msb_w);
+	DECLARE_READ16_MEMBER(ml_dotram_r);
+	DECLARE_WRITE16_MEMBER(ml_dotram_w);
+	DECLARE_READ16_MEMBER(dsp_HOLD_signal_r);
+	DECLARE_READ8_MEMBER(test_r);
 };
 
 
@@ -200,22 +221,19 @@ static int start_dma(running_machine &machine)
 	return 1;
 }
 
-static WRITE16_HANDLER(ml_tileram_w)
+WRITE16_MEMBER(mlanding_state::ml_tileram_w)
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
-	COMBINE_DATA(&state->m_ml_tileram[offset]);
+	COMBINE_DATA(&m_ml_tileram[offset]);
 }
 
-static READ16_HANDLER(ml_tileram_r)
+READ16_MEMBER(mlanding_state::ml_tileram_r)
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
-	return state->m_ml_tileram[offset];
+	return m_ml_tileram[offset];
 }
 
 
-static READ16_HANDLER( io1_r ) //240006
+READ16_MEMBER(mlanding_state::io1_r)//240006
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
 	/*
     fedcba9876543210
                    x  - mecha driver status
@@ -227,14 +245,13 @@ static READ16_HANDLER( io1_r ) //240006
     */
 // multiplexed? or just overriden?
 
-	int retval = (state->m_dma_active << 15) | (input_port_read(space->machine(), "DSW") & 0x7fff);
+	int retval = (m_dma_active << 15) | (input_port_read(machine(), "DSW") & 0x7fff);
 	return retval;
 }
 
 /* output */
-static WRITE16_HANDLER(ml_output_w)
+WRITE16_MEMBER(mlanding_state::ml_output_w)
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
 	/*
     x--- ---- palette fg bankswitch
     ---x ---- coin lockout?
@@ -243,7 +260,7 @@ static WRITE16_HANDLER(ml_output_w)
     */
 //  popmessage("%04x",data);
 
-	state->m_pal_fg_bank = (data & 0x80)>>7;
+	m_pal_fg_bank = (data & 0x80)>>7;
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
@@ -292,69 +309,68 @@ static TIMER_CALLBACK( dma_complete )
 }
 
 /* TODO: this uses many bits */
-static WRITE16_HANDLER( ml_sub_reset_w )
+WRITE16_MEMBER(mlanding_state::ml_sub_reset_w)
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
 	int pixels;
 
 	// Return the number of pixels drawn?
-	pixels = start_dma(space->machine());
+	pixels = start_dma(machine());
 
 	if (pixels)
 	{
-		state->m_dma_active = 1;
-		space->machine().scheduler().timer_set(attotime::from_msec(20), FUNC(dma_complete));
+		m_dma_active = 1;
+		machine().scheduler().timer_set(attotime::from_msec(20), FUNC(dma_complete));
 	}
 
 	if(!(data & 0x40)) // unknown line used
-		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
 
 	//data & 0x20 sound cpu?
 
 	if(!(data & 0x80)) // unknown line used
 	{
-		cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, CLEAR_LINE);
-		state->m_dsp_HOLD_signal = data & 0x80;
+		cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, CLEAR_LINE);
+		m_dsp_HOLD_signal = data & 0x80;
 	}
 }
 
-static WRITE16_HANDLER( ml_to_sound_w )
+WRITE16_MEMBER(mlanding_state::ml_to_sound_w)
 {
-	device_t *tc0140syt = space->machine().device("tc0140syt");
+	device_t *tc0140syt = machine().device("tc0140syt");
 	if (offset == 0)
 		tc0140syt_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
 	{
-		//cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+		//cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 		tc0140syt_comm_w(tc0140syt, 0, data & 0xff);
 	}
 }
 
-static WRITE8_HANDLER( ml_sound_to_main_w )
+WRITE8_MEMBER(mlanding_state::ml_sound_to_main_w)
 {
-	device_t *tc0140syt = space->machine().device("tc0140syt");
+	device_t *tc0140syt = machine().device("tc0140syt");
 	if (offset == 0)
 		tc0140syt_slave_port_w(tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
 	{
-		//cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+		//cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 		tc0140syt_slave_comm_w(tc0140syt, 0, data & 0xff);
 	}
 }
 
-static READ16_HANDLER( ml_analog1_lsb_r )
+READ16_MEMBER(mlanding_state::ml_analog1_lsb_r)
 {
-	return input_port_read(space->machine(), "STICKX") & 0xff;
+	return input_port_read(machine(), "STICKX") & 0xff;
 }
 
-static READ16_HANDLER( ml_analog2_lsb_r )
+READ16_MEMBER(mlanding_state::ml_analog2_lsb_r)
 {
-	return input_port_read(space->machine(), "STICKY") & 0xff;
+	return input_port_read(machine(), "STICKY") & 0xff;
 }
 
-static READ16_HANDLER( ml_analog3_lsb_r )
+READ16_MEMBER(mlanding_state::ml_analog3_lsb_r)
 {
-	return (input_port_read(space->machine(), "STICKZ") & 0xff);
+	return (input_port_read(machine(), "STICKZ") & 0xff);
 }
 
 /*
@@ -378,18 +394,18 @@ static READ16_HANDLER( ml_analog3_lsb_r )
 */
 
 /* high bits of analog inputs + "limiters"/ADC converters. */
-static READ16_HANDLER( ml_analog1_msb_r )
+READ16_MEMBER(mlanding_state::ml_analog1_msb_r)
 {
-	return ((input_port_read(space->machine(), "STICKY") & 0xf00)>>8) | (input_port_read(space->machine(), "IN2") & 0xf0);
+	return ((input_port_read(machine(), "STICKY") & 0xf00)>>8) | (input_port_read(machine(), "IN2") & 0xf0);
 }
 
-static READ16_HANDLER( ml_analog2_msb_r )
+READ16_MEMBER(mlanding_state::ml_analog2_msb_r)
 {
 	UINT8 res;
 	UINT16 y_adc,x_adc;
 
-	y_adc = input_port_read(space->machine(), "STICKY");
-	x_adc = input_port_read(space->machine(), "STICKZ");
+	y_adc = input_port_read(machine(), "STICKY");
+	x_adc = input_port_read(machine(), "STICKZ");
 
 	res = 0;
 
@@ -405,16 +421,16 @@ static READ16_HANDLER( ml_analog2_msb_r )
 
 //  popmessage("%04x %04x",x_adc,y_adc);
 
-	return ((input_port_read(space->machine(), "STICKZ") & 0xf00)>>8) | res;
+	return ((input_port_read(machine(), "STICKZ") & 0xf00)>>8) | res;
 }
 
-static READ16_HANDLER( ml_analog3_msb_r )
+READ16_MEMBER(mlanding_state::ml_analog3_msb_r)
 {
 	UINT8 z_adc,res;
 	UINT16 x_adc;
 
-	z_adc = input_port_read(space->machine(), "STICKX");
-	x_adc = input_port_read(space->machine(), "STICKZ");
+	z_adc = input_port_read(machine(), "STICKX");
+	x_adc = input_port_read(machine(), "STICKZ");
 
 	res = 0;
 
@@ -428,27 +444,25 @@ static READ16_HANDLER( ml_analog3_msb_r )
 	if(x_adc & 0x800 || x_adc == 0)
 		res|= 0x10;
 
-	return ((input_port_read(space->machine(), "STICKX") & 0xf00)>>8) | res;
+	return ((input_port_read(machine(), "STICKX") & 0xf00)>>8) | res;
 }
 
-static WRITE16_HANDLER( ml_nmi_to_sound_w )
+WRITE16_MEMBER(mlanding_state::ml_nmi_to_sound_w)
 {
-//  cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+//  cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-static READ16_HANDLER( ml_mecha_ram_r )
+READ16_MEMBER(mlanding_state::ml_mecha_ram_r)
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
-	return (state->m_mecha_ram[offset*2]<<8)|state->m_mecha_ram[offset*2+1];
+	return (m_mecha_ram[offset*2]<<8)|m_mecha_ram[offset*2+1];
 }
 
-static WRITE16_HANDLER( ml_mecha_ram_w )
+WRITE16_MEMBER(mlanding_state::ml_mecha_ram_w)
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
-	COMBINE_DATA(state->m_mecha_ram+offset*2+1);
+	COMBINE_DATA(m_mecha_ram+offset*2+1);
 	data >>= 8;
 	mem_mask >>= 8;
-	COMBINE_DATA(state->m_mecha_ram+offset*2);
+	COMBINE_DATA(m_mecha_ram+offset*2);
 }
 
 static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
@@ -456,34 +470,34 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 
 	AM_RANGE(0x100000, 0x17ffff) AM_RAM AM_BASE(m_g_ram)// 512kB G RAM - enough here for double buffered 512x400x8 frame
-	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE_LEGACY(ml_tileram_r, ml_tileram_w) AM_BASE(m_ml_tileram)
+	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(ml_tileram_r, ml_tileram_w) AM_BASE(m_ml_tileram)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM AM_SHARE("share2") AM_BASE(m_dma_ram)
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM AM_SHARE("share1")
 
-	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE_LEGACY(ml_sub_reset_w)
-	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE_LEGACY(ml_nmi_to_sound_w) //sound reset ??
+	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(ml_sub_reset_w)
+	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(ml_nmi_to_sound_w) //sound reset ??
 
-	AM_RANGE(0x2d0000, 0x2d0003) AM_WRITE_LEGACY(ml_to_sound_w)
+	AM_RANGE(0x2d0000, 0x2d0003) AM_WRITE(ml_to_sound_w)
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP
 	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREAD8_LEGACY("tc0140syt", tc0140syt_comm_r, 0x00ff)
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE_LEGACY(ml_mecha_ram_r,ml_mecha_ram_w)
+	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(ml_mecha_ram_r,ml_mecha_ram_w)
 
 	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")
 	AM_RANGE(0x290002, 0x290003) AM_READ_PORT("IN0")
 
 	AM_RANGE(0x240004, 0x240005) AM_NOP //watchdog ??
-	AM_RANGE(0x240006, 0x240007) AM_READ_LEGACY(io1_r) // vblank ?
-	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE_LEGACY(ml_output_w)
+	AM_RANGE(0x240006, 0x240007) AM_READ(io1_r) // vblank ?
+	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(ml_output_w)
 
 	/*  */
-	AM_RANGE(0x2b0000, 0x2b0001) AM_READ_LEGACY(ml_analog1_lsb_r)		//-40 .. 40 analog controls ?
-	AM_RANGE(0x2b0004, 0x2b0005) AM_READ_LEGACY(ml_analog2_lsb_r)		//-40 .. 40 analog controls ?
-	AM_RANGE(0x2b0006, 0x2b0007) AM_READ_LEGACY(ml_analog1_msb_r) // tested in service mode, dips?
-	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_LEGACY(ml_analog3_lsb_r)		//-60 .. 60 analog controls ?
-	AM_RANGE(0x2c0002, 0x2c0003) AM_READ_LEGACY(ml_analog2_msb_r)
-	AM_RANGE(0x2b0002, 0x2b0003) AM_READ_LEGACY(ml_analog3_msb_r)		// IN2/IN3 could be switched
+	AM_RANGE(0x2b0000, 0x2b0001) AM_READ(ml_analog1_lsb_r)		//-40 .. 40 analog controls ?
+	AM_RANGE(0x2b0004, 0x2b0005) AM_READ(ml_analog2_lsb_r)		//-40 .. 40 analog controls ?
+	AM_RANGE(0x2b0006, 0x2b0007) AM_READ(ml_analog1_msb_r) // tested in service mode, dips?
+	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(ml_analog3_lsb_r)		//-60 .. 60 analog controls ?
+	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(ml_analog2_msb_r)
+	AM_RANGE(0x2b0002, 0x2b0003) AM_READ(ml_analog3_msb_r)		// IN2/IN3 could be switched
 ADDRESS_MAP_END
 
 
@@ -507,10 +521,9 @@ static WRITE8_DEVICE_HANDLER( ml_msm_start_lsb_w )
 	state->m_adpcm_end = (state->m_adpcm_pos+0x800);
 }
 
-static WRITE8_HANDLER( ml_msm_start_msb_w )
+WRITE8_MEMBER(mlanding_state::ml_msm_start_msb_w)
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
-	state->m_adpcm_pos = (state->m_adpcm_pos & 0x00ff00) | ((data & 0x0f)<<16) | 0x20;
+	m_adpcm_pos = (m_adpcm_pos & 0x00ff00) | ((data & 0x0f)<<16) | 0x20;
 }
 
 static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8, mlanding_state )
@@ -518,7 +531,7 @@ static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_MIRROR(0x00fe) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xa000, 0xa001) AM_WRITE_LEGACY(ml_sound_to_main_w)
+	AM_RANGE(0xa000, 0xa001) AM_WRITE(ml_sound_to_main_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD_LEGACY("tc0140syt", tc0140syt_slave_comm_r)
 
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(ml_msm5205_address_w) //guess
@@ -526,31 +539,28 @@ static ADDRESS_MAP_START( mlanding_z80_mem, AS_PROGRAM, 8, mlanding_state )
 //  AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", ml_msm5205_stop_w)
 
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("msm",ml_msm_start_lsb_w)
-	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(ml_msm_start_msb_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(ml_msm_start_msb_w)
 ADDRESS_MAP_END
 
-static READ16_HANDLER( ml_dotram_r )
+READ16_MEMBER(mlanding_state::ml_dotram_r)
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
-	return state->m_ml_dotram[offset];
+	return m_ml_dotram[offset];
 }
 
-static WRITE16_HANDLER( ml_dotram_w )
+WRITE16_MEMBER(mlanding_state::ml_dotram_w)
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
-	state->m_ml_dotram[offset] = data;
+	m_ml_dotram[offset] = data;
 }
 
-static READ16_HANDLER( dsp_HOLD_signal_r )
+READ16_MEMBER(mlanding_state::dsp_HOLD_signal_r)
 {
-	mlanding_state *state = space->machine().driver_data<mlanding_state>();
-	return state->m_dsp_HOLD_signal;
+	return m_dsp_HOLD_signal;
 }
 
 
-static READ8_HANDLER( test_r )
+READ8_MEMBER(mlanding_state::test_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 //mecha driver ?
@@ -559,8 +569,8 @@ static ADDRESS_MAP_START( mlanding_z80_sub_mem, AS_PROGRAM, 8, mlanding_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(m_mecha_ram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 
-	AM_RANGE(0x9000, 0x9001) AM_READ_LEGACY(test_r)
-	AM_RANGE(0x9800, 0x9803) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x9000, 0x9001) AM_READ(test_r)
+	AM_RANGE(0x9800, 0x9803) AM_READ(test_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16, mlanding_state )
@@ -568,11 +578,11 @@ static ADDRESS_MAP_START( DSP_map_program, AS_PROGRAM, 16, mlanding_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16, mlanding_state )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_LEGACY(ml_dotram_r,ml_dotram_w)
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ml_dotram_r,ml_dotram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( DSP_map_io, AS_IO, 16, mlanding_state )
-	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ_LEGACY(dsp_HOLD_signal_r)
+	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_HOLD_signal_r)
 //  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE_LEGACY(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 

@@ -89,78 +89,79 @@ public:
 	int m_mcu_latch;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE16_MEMBER(sound_w);
+	DECLARE_READ16_MEMBER(alpha_mcu_r);
 };
 
 
 
-static WRITE16_HANDLER( sound_w )
+WRITE16_MEMBER(meijinsn_state::sound_w)
 {
 	if (ACCESSING_BITS_0_7)
 		soundlatch_w(space, 0, data & 0xff);
 }
 
-static READ16_HANDLER( alpha_mcu_r )
+READ16_MEMBER(meijinsn_state::alpha_mcu_r)
 {
-	meijinsn_state *state = space->machine().driver_data<meijinsn_state>();
 	static const UINT8 coinage1[2][2] = {{1,1}, {1,2}};
 	static const UINT8 coinage2[2][2] = {{1,5}, {2,1}};
 
-	int source = state->m_shared_ram[offset];
+	int source = m_shared_ram[offset];
 
 	switch (offset)
 	{
 		case 0: /* Dipswitch 2 */
-			state->m_shared_ram[0] = (source & 0xff00) | input_port_read(space->machine(), "DSW");
+			m_shared_ram[0] = (source & 0xff00) | input_port_read(machine(), "DSW");
 			return 0;
 
 		case 0x22: /* Coin value */
-			state->m_shared_ram[0x22] = (source & 0xff00) | (state->m_credits & 0x00ff);
+			m_shared_ram[0x22] = (source & 0xff00) | (m_credits & 0x00ff);
 			return 0;
 
 		case 0x29: /* Query microcontroller for coin insert */
 
-			state->m_credits = 0;
+			m_credits = 0;
 
-			if ((input_port_read(space->machine(), "COINS") & 0x3) == 3)
-				state->m_mcu_latch = 0;
+			if ((input_port_read(machine(), "COINS") & 0x3) == 3)
+				m_mcu_latch = 0;
 
-			if ((input_port_read(space->machine(), "COINS") & 0x1) == 0 && !state->m_mcu_latch)
+			if ((input_port_read(machine(), "COINS") & 0x1) == 0 && !m_mcu_latch)
 			{
-				state->m_shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
-				state->m_shared_ram[0x22] = (source & 0xff00) | 0x00;
-				state->m_mcu_latch = 1;
+				m_shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
+				m_shared_ram[0x22] = (source & 0xff00) | 0x00;
+				m_mcu_latch = 1;
 
-				state->m_coinvalue = (~input_port_read(space->machine(), "DSW")>>3) & 1;
+				m_coinvalue = (~input_port_read(machine(), "DSW")>>3) & 1;
 
-				state->m_deposits1++;
-				if (state->m_deposits1 == coinage1[state->m_coinvalue][0])
+				m_deposits1++;
+				if (m_deposits1 == coinage1[m_coinvalue][0])
 				{
-					state->m_credits = coinage1[state->m_coinvalue][1];
-					state->m_deposits1 = 0;
+					m_credits = coinage1[m_coinvalue][1];
+					m_deposits1 = 0;
 				}
 				else
-					state->m_credits = 0;
+					m_credits = 0;
 			}
-			else if ((input_port_read(space->machine(), "COINS") & 0x2) == 0 && !state->m_mcu_latch)
+			else if ((input_port_read(machine(), "COINS") & 0x2) == 0 && !m_mcu_latch)
 			{
-				state->m_shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
-				state->m_shared_ram[0x22] = (source & 0xff00) | 0x00;
-				state->m_mcu_latch = 1;
+				m_shared_ram[0x29] = (source & 0xff00) | 0x22;	// coinA
+				m_shared_ram[0x22] = (source & 0xff00) | 0x00;
+				m_mcu_latch = 1;
 
-				state->m_coinvalue = (~input_port_read(space->machine(), "DSW") >> 3) & 1;
+				m_coinvalue = (~input_port_read(machine(), "DSW") >> 3) & 1;
 
-				state->m_deposits2++;
-				if (state->m_deposits2 == coinage2[state->m_coinvalue][0])
+				m_deposits2++;
+				if (m_deposits2 == coinage2[m_coinvalue][0])
 				{
-					state->m_credits = coinage2[state->m_coinvalue][1];
-					state->m_deposits2 = 0;
+					m_credits = coinage2[m_coinvalue][1];
+					m_deposits2 = 0;
 				}
 				else
-					state->m_credits = 0;
+					m_credits = 0;
 			}
 			else
 			{
-				state->m_shared_ram[0x29] = (source & 0xff00) | 0x22;
+				m_shared_ram[0x29] = (source & 0xff00) | 0x22;
 			}
 			return 0;
 	}
@@ -171,13 +172,13 @@ static READ16_HANDLER( alpha_mcu_r )
 
 static ADDRESS_MAP_START( meijinsn_map, AS_PROGRAM, 16, meijinsn_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080e00, 0x080fff) AM_READ_LEGACY(alpha_mcu_r) AM_WRITENOP
+	AM_RANGE(0x080e00, 0x080fff) AM_READ(alpha_mcu_r) AM_WRITENOP
 	AM_RANGE(0x100000, 0x107fff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x180000, 0x180dff) AM_RAM
 	AM_RANGE(0x180e00, 0x180fff) AM_RAM AM_BASE(m_shared_ram)
 	AM_RANGE(0x181000, 0x181fff) AM_RAM
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P2")
-	AM_RANGE(0x1a0000, 0x1a0001) AM_READ_PORT("P1") AM_WRITE_LEGACY(sound_w)
+	AM_RANGE(0x1a0000, 0x1a0001) AM_READ_PORT("P1") AM_WRITE(sound_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meijinsn_sound_map, AS_PROGRAM, 8, meijinsn_state )

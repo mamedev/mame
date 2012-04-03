@@ -99,6 +99,9 @@ public:
 	UINT32 video_ram_ptr;
 
 	bitmap_rgb32 framebuffer;
+	DECLARE_WRITE64_MEMBER(video_chip_w);
+	DECLARE_READ64_MEMBER(ppc_common_r);
+	DECLARE_WRITE64_MEMBER(ppc_common_w);
 };
 
 
@@ -234,11 +237,10 @@ static void video_reg_w(running_machine &machine, UINT32 reg, UINT32 data)
 // 0xB1000000, size 0x800000  : texture RAM
 
 
-static WRITE64_HANDLER(video_chip_w)
+WRITE64_MEMBER(taitotz_state::video_chip_w)
 {
-	taitotz_state *state = space->machine().driver_data<taitotz_state>();
 
-	//printf("unk_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), cpu_get_pc(space->cpu));
+	//printf("unk_w: %08X, %08X%08X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), (UINT32)(mem_mask >> 32), (UINT32)(mem_mask), cpu_get_pc(cpu));
 
 	UINT32 reg = offset * 8;
 	UINT32 regdata;
@@ -257,25 +259,25 @@ static WRITE64_HANDLER(video_chip_w)
 	{
 		case 0:
 			{
-				video_reg_w(space->machine(), state->video_reg, regdata);
+				video_reg_w(machine(), video_reg, regdata);
 				break;
 			}
 		case 0x8:
 			{
-				state->video_reg = regdata;
+				video_reg = regdata;
 
-				if ((state->video_reg & 0xf0000000) == 0xb0000000)
+				if ((video_reg & 0xf0000000) == 0xb0000000)
 				{
-					state->video_ram_ptr = 0;
+					video_ram_ptr = 0;
 
-					switch (state->video_reg & 0x0fffffff)
+					switch (video_reg & 0x0fffffff)
 					{
-						case 0x0980000: state->video_ram = state->video_char_ram; break;
-						case 0x09c0000: state->video_ram = state->video_tile_ram; break;
-						case 0x1800000: state->video_ram = state->video_screen_ram; break;
+						case 0x0980000: video_ram = video_char_ram; break;
+						case 0x09c0000: video_ram = video_tile_ram; break;
+						case 0x1800000: video_ram = video_screen_ram; break;
 						default:
 							{
-								fatalerror("video_chip_ram sel %08X\n", state->video_reg & 0x0fffffff);
+								fatalerror("video_chip_ram sel %08X\n", video_reg & 0x0fffffff);
 								break;
 							}
 					}
@@ -290,7 +292,7 @@ static WRITE64_HANDLER(video_chip_w)
 	}
 }
 
-static READ64_HANDLER(ppc_common_r)
+READ64_MEMBER(taitotz_state::ppc_common_r)
 {
 	if (offset == 0x7ff)
 	{
@@ -303,11 +305,11 @@ static READ64_HANDLER(ppc_common_r)
 	return 0;
 }
 
-static WRITE64_HANDLER(ppc_common_w)
+WRITE64_MEMBER(taitotz_state::ppc_common_w)
 {
 	if (offset == 0x7ff)
 	{
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
@@ -328,9 +330,9 @@ static WRITE64_HANDLER(ppc_common_w)
 static ADDRESS_MAP_START( ppc603e_mem, AS_PROGRAM, 64, taitotz_state )
 	//AM_RANGE(0x00000000, 0x00000007) AM_RAM   // Register/RAM access port? - Written 128k+256k times on boot
 	//AM_RANGE(0x00000008, 0x0000000f) AM_RAM   // Register/RAM address port?
-	AM_RANGE(0x00000000, 0x0000000f) AM_WRITE_LEGACY(video_chip_w)
+	AM_RANGE(0x00000000, 0x0000000f) AM_WRITE(video_chip_w)
 	AM_RANGE(0x40000000, 0x400fffff) AM_RAM   // Work RAM
-	AM_RANGE(0xa8000000, 0xa8003fff) AM_READWRITE_LEGACY(ppc_common_r, ppc_common_w)   // Common RAM (with TLCS-900)
+	AM_RANGE(0xa8000000, 0xa8003fff) AM_READWRITE(ppc_common_r, ppc_common_w)   // Common RAM (with TLCS-900)
 	//AM_RANGE(0xa8003ff8, 0xa8003fff) AM_RAM   // TLCS-900 related?
 	AM_RANGE(0xac000000, 0xac0fffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)

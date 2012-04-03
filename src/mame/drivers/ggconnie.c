@@ -29,6 +29,8 @@ public:
 	ggconnie_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(lamp_w);
+	DECLARE_WRITE8_MEMBER(output_w);
 };
 
 
@@ -113,12 +115,12 @@ static INPUT_PORTS_START(ggconnie)
 
 INPUT_PORTS_END
 
-static WRITE8_HANDLER(lamp_w)
+WRITE8_MEMBER(ggconnie_state::lamp_w)
 {
 	output_set_value("lamp", !BIT(data,0));
 }
 
-static WRITE8_HANDLER(output_w)
+WRITE8_MEMBER(ggconnie_state::output_w)
 {
 	// written in "Output Test" in test mode
 }
@@ -132,14 +134,14 @@ static ADDRESS_MAP_START( sgx_mem , AS_PROGRAM, 8, ggconnie_state )
 	AM_RANGE( 0x1f7100, 0x1f7100) AM_READ_PORT("SWB")
 	AM_RANGE( 0x1f7200, 0x1f7200) AM_READ_PORT("SWC")
 	AM_RANGE( 0x1f7700, 0x1f7700) AM_READ_PORT("IN1")
-	AM_RANGE( 0x1f7800, 0x1f7800) AM_WRITE_LEGACY(output_w)
+	AM_RANGE( 0x1f7800, 0x1f7800) AM_WRITE(output_w)
 	AM_RANGE( 0x1fe000, 0x1fe007) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w) AM_MIRROR(0x03e0)
 	AM_RANGE( 0x1fe008, 0x1fe00f) AM_READWRITE_LEGACY(vpc_r, vpc_w) AM_MIRROR(0x03e0)
 	AM_RANGE( 0x1fe010, 0x1fe017) AM_READWRITE_LEGACY(vdc_1_r, vdc_1_w) AM_MIRROR(0x03e0)
 	AM_RANGE( 0x1fe400, 0x1fe7ff) AM_READWRITE_LEGACY(vce_r, vce_w)
 	AM_RANGE( 0x1fe800, 0x1febff) AM_DEVREADWRITE_LEGACY("c6280", c6280_r, c6280_w)
 	AM_RANGE( 0x1fec00, 0x1fefff) AM_READWRITE_LEGACY(h6280_timer_r, h6280_timer_w)
-	AM_RANGE( 0x1ff000, 0x1ff000) AM_READ_PORT("IN0") AM_WRITE_LEGACY(lamp_w)
+	AM_RANGE( 0x1ff000, 0x1ff000) AM_READ_PORT("IN0") AM_WRITE(lamp_w)
 	AM_RANGE( 0x1ff400, 0x1ff7ff) AM_READWRITE_LEGACY(h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 

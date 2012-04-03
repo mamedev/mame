@@ -40,6 +40,9 @@ public:
 	int m_reg0;
 	int m_reg1;
 	int m_ctrl;
+	DECLARE_WRITE8_MEMBER(tugboat_hd46505_0_w);
+	DECLARE_WRITE8_MEMBER(tugboat_hd46505_1_w);
+	DECLARE_WRITE8_MEMBER(tugboat_score_w);
 };
 
 
@@ -69,25 +72,22 @@ static PALETTE_INIT( tugboat )
 
 /* see mc6845.c. That file is only a placeholder, I process the writes here
    because I need the start_addr register to handle scrolling */
-static WRITE8_HANDLER( tugboat_hd46505_0_w )
+WRITE8_MEMBER(tugboat_state::tugboat_hd46505_0_w)
 {
-	tugboat_state *state = space->machine().driver_data<tugboat_state>();
-	if (offset == 0) state->m_reg0 = data & 0x0f;
-	else if (state->m_reg0 < 18) state->m_hd46505_0_reg[state->m_reg0] = data;
+	if (offset == 0) m_reg0 = data & 0x0f;
+	else if (m_reg0 < 18) m_hd46505_0_reg[m_reg0] = data;
 }
-static WRITE8_HANDLER( tugboat_hd46505_1_w )
+WRITE8_MEMBER(tugboat_state::tugboat_hd46505_1_w)
 {
-	tugboat_state *state = space->machine().driver_data<tugboat_state>();
-	if (offset == 0) state->m_reg1 = data & 0x0f;
-	else if (state->m_reg1 < 18) state->m_hd46505_1_reg[state->m_reg1] = data;
+	if (offset == 0) m_reg1 = data & 0x0f;
+	else if (m_reg1 < 18) m_hd46505_1_reg[m_reg1] = data;
 }
 
 
-static WRITE8_HANDLER( tugboat_score_w )
+WRITE8_MEMBER(tugboat_state::tugboat_score_w)
 {
-	tugboat_state *state = space->machine().driver_data<tugboat_state>();
-      if (offset>=0x8) state->m_ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
-      if (offset<0x8 ) state->m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
+      if (offset>=0x8) m_ram[0x291d + 32*offset + 32*(1-8)] = data ^ 0x0f;
+      if (offset<0x8 ) m_ram[0x291d + 32*offset + 32*9] = data ^ 0x0f;
 }
 
 static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,
@@ -213,12 +213,12 @@ static MACHINE_RESET( tugboat )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tugboat_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM AM_BASE(m_ram)
 	AM_RANGE(0x1060, 0x1061) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x10a0, 0x10a1) AM_WRITE_LEGACY(tugboat_hd46505_0_w)	/* scrolling is performed changing the start_addr register (0C/0D) */
-	AM_RANGE(0x10c0, 0x10c1) AM_WRITE_LEGACY(tugboat_hd46505_1_w)
+	AM_RANGE(0x10a0, 0x10a1) AM_WRITE(tugboat_hd46505_0_w)	/* scrolling is performed changing the start_addr register (0C/0D) */
+	AM_RANGE(0x10c0, 0x10c1) AM_WRITE(tugboat_hd46505_1_w)
 	AM_RANGE(0x11e4, 0x11e7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x11e8, 0x11eb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	//AM_RANGE(0x1700, 0x1fff) AM_RAM
-	AM_RANGE(0x18e0, 0x18ef) AM_WRITE_LEGACY(tugboat_score_w)
+	AM_RANGE(0x18e0, 0x18ef) AM_WRITE(tugboat_score_w)
 	AM_RANGE(0x2000, 0x2fff) AM_RAM	/* tilemap RAM */
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 	AM_RANGE(0xfff0, 0xffff) AM_ROM	/* vectors */

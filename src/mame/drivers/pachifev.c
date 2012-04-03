@@ -103,30 +103,31 @@ public:
 	UINT8 m_adpcm_idle;
 	UINT8 m_trigger;
 	UINT8 m_adpcm_data;
+	DECLARE_WRITE8_MEMBER(controls_w);
+	DECLARE_READ8_MEMBER(controls_r);
 };
 
-static WRITE8_HANDLER(controls_w)
+WRITE8_MEMBER(pachifev_state::controls_w)
 {
     if(!data)
     {
-        pachifev_state *state = space->machine().driver_data<pachifev_state>();
+
 
         /*end of input read*/
-        state->m_power=0;
-        state->m_max_power=state->m_input_power;
-        if(--state->m_cnt <= 0) /* why to do it N times? no idea.. someone should fix it */
+        m_power=0;
+        m_max_power=m_input_power;
+        if(--m_cnt <= 0) /* why to do it N times? no idea.. someone should fix it */
         {
-            state->m_cnt=0;
-            state->m_input_power=0;
+            m_cnt=0;
+            m_input_power=0;
         }
     }
 }
 
-static READ8_HANDLER(controls_r)
+READ8_MEMBER(pachifev_state::controls_r)
 {
-    pachifev_state *state = space->machine().driver_data<pachifev_state>();
-    int output_bit=(state->m_power < state->m_max_power)?0:1;
-    ++state->m_power;
+    int output_bit=(m_power < m_max_power)?0:1;
+    ++m_power;
     return output_bit;
 }
 
@@ -144,14 +145,14 @@ static ADDRESS_MAP_START( pachifev_map, AS_PROGRAM, 8, pachifev_state )
     AM_RANGE(0xff12, 0xff12) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
     AM_RANGE(0xff20, 0xff20) AM_DEVWRITE_LEGACY("sn76_1", sn76496_w)
     AM_RANGE(0xff30, 0xff30) AM_DEVWRITE_LEGACY("sn76_2", sn76496_w)
-    AM_RANGE(0xff40, 0xff40) AM_WRITE_LEGACY(controls_w)
+    AM_RANGE(0xff40, 0xff40) AM_WRITE(controls_w)
     AM_RANGE(0xff50, 0xff50) AM_WRITENOP /* unknown */
     AM_RANGE(0xfffa, 0xfffb) AM_NOP /* decrementer */
     AM_RANGE(0xfffc, 0xffff) AM_NOP /* nmi */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pachifev_cru, AS_IO, 8, pachifev_state )
-    AM_RANGE(0x000, 0x000) AM_READ_LEGACY(controls_r)
+    AM_RANGE(0x000, 0x000) AM_READ(controls_r)
 ADDRESS_MAP_END
 
 

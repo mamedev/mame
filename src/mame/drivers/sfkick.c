@@ -70,6 +70,10 @@ public:
 	int m_bank[8];
 	int m_input_mux;
 	required_device<v9938_device> m_v9938;
+	DECLARE_WRITE8_MEMBER(page0_w);
+	DECLARE_WRITE8_MEMBER(page1_w);
+	DECLARE_WRITE8_MEMBER(page2_w);
+	DECLARE_WRITE8_MEMBER(page3_w);
 };
 
 
@@ -241,73 +245,69 @@ static void sfkick_bank_set(running_machine &machine,int num, int data)
 	sfkick_remap_banks(machine);
 }
 
-static WRITE8_HANDLER(page0_w)
+WRITE8_MEMBER(sfkick_state::page0_w)
 {
-	sfkick_state *state = space->machine().driver_data<sfkick_state>();
-	if((state->m_bank_cfg&3)==2)
+	if((m_bank_cfg&3)==2)
 	{
 		if(offset<0x2000)
 		{
-			sfkick_bank_set(space->machine(),0,data);
+			sfkick_bank_set(machine(),0,data);
 		}
 		else
 		{
-			sfkick_bank_set(space->machine(),1,data);
+			sfkick_bank_set(machine(),1,data);
 		}
 	}
 }
 
-static WRITE8_HANDLER(page1_w)
+WRITE8_MEMBER(sfkick_state::page1_w)
 {
-	sfkick_state *state = space->machine().driver_data<sfkick_state>();
-	if(((state->m_bank_cfg>>2)&3)==2)
+	if(((m_bank_cfg>>2)&3)==2)
 	{
 		if(offset<0x2000)
 		{
-			sfkick_bank_set(space->machine(),2,data);
+			sfkick_bank_set(machine(),2,data);
 		}
 		else
 		{
-			sfkick_bank_set(space->machine(),3,data);
+			sfkick_bank_set(machine(),3,data);
 		}
 	}
 }
 
-static WRITE8_HANDLER(page2_w)
+WRITE8_MEMBER(sfkick_state::page2_w)
 {
-	sfkick_state *state = space->machine().driver_data<sfkick_state>();
-	if(((state->m_bank_cfg>>4)&3)==2)
+	if(((m_bank_cfg>>4)&3)==2)
 	{
 		if(offset<0x2000)
 		{
-			sfkick_bank_set(space->machine(),4,data);
+			sfkick_bank_set(machine(),4,data);
 		}
 		else
 		{
-			sfkick_bank_set(space->machine(),5,data);
+			sfkick_bank_set(machine(),5,data);
 		}
 	}
 }
 
-static WRITE8_HANDLER(page3_w)
+WRITE8_MEMBER(sfkick_state::page3_w)
 {
-	sfkick_state *state = space->machine().driver_data<sfkick_state>();
-	if(((state->m_bank_cfg>>6)&3)==2)
+	if(((m_bank_cfg>>6)&3)==2)
 	{
 		if(offset<0x2000)
 		{
-			sfkick_bank_set(space->machine(),6,data);
+			sfkick_bank_set(machine(),6,data);
 		}
 		else
 		{
-			sfkick_bank_set(space->machine(),7,data);
+			sfkick_bank_set(machine(),7,data);
 		}
 	}
 	else
 	{
-		if(((state->m_bank_cfg>>6)&3)==3)
+		if(((m_bank_cfg>>6)&3)==3)
 		{
-			state->m_main_mem[offset]=data;
+			m_main_mem[offset]=data;
 		}
 	}
 }
@@ -323,10 +323,10 @@ static ADDRESS_MAP_START( sfkick_map, AS_PROGRAM, 8, sfkick_state )
 	AM_RANGE( 0xa000, 0xbfff) AM_ROMBANK("bank6")
 	AM_RANGE( 0xc000, 0xdfff) AM_ROMBANK("bank7")
 	AM_RANGE( 0xe000, 0xffff) AM_ROMBANK("bank8")
-	AM_RANGE( 0x0000, 0x3fff) AM_WRITE_LEGACY(page0_w )
-	AM_RANGE( 0x4000, 0x7fff) AM_WRITE_LEGACY(page1_w )
-	AM_RANGE( 0x8000, 0xbfff) AM_WRITE_LEGACY(page2_w )
-	AM_RANGE( 0xc000, 0xffff) AM_WRITE_LEGACY(page3_w )
+	AM_RANGE( 0x0000, 0x3fff) AM_WRITE(page0_w )
+	AM_RANGE( 0x4000, 0x7fff) AM_WRITE(page1_w )
+	AM_RANGE( 0x8000, 0xbfff) AM_WRITE(page2_w )
+	AM_RANGE( 0xc000, 0xffff) AM_WRITE(page3_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sfkick_io_map, AS_IO, 8, sfkick_state )

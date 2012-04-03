@@ -106,6 +106,9 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(jokrwild_videoram_w);
+	DECLARE_WRITE8_MEMBER(jokrwild_colorram_w);
+	DECLARE_READ8_MEMBER(rng_r);
 };
 
 
@@ -114,19 +117,17 @@ public:
 *************************/
 
 
-static WRITE8_HANDLER( jokrwild_videoram_w )
+WRITE8_MEMBER(jokrwild_state::jokrwild_videoram_w)
 {
-	jokrwild_state *state = space->machine().driver_data<jokrwild_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-static WRITE8_HANDLER( jokrwild_colorram_w )
+WRITE8_MEMBER(jokrwild_state::jokrwild_colorram_w)
 {
-	jokrwild_state *state = space->machine().driver_data<jokrwild_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -176,15 +177,15 @@ static PALETTE_INIT( jokrwild )
 *    Read/Write  Handlers    *
 *****************************/
 
-static READ8_HANDLER( rng_r )
+READ8_MEMBER(jokrwild_state::rng_r)
 {
-	if(cpu_get_pc(&space->device()) == 0xab32)
+	if(cpu_get_pc(&space.device()) == 0xab32)
 		return (offset == 0) ? 0x9e : 0x27;
 
-	if(cpu_get_pc(&space->device()) == 0xab3a)
+	if(cpu_get_pc(&space.device()) == 0xab3a)
 		return (offset == 2) ? 0x49 : 0x92;
 
-	return space->machine().rand() & 0xff;
+	return machine().rand() & 0xff;
 }
 
 /*************************
@@ -192,9 +193,9 @@ static READ8_HANDLER( rng_r )
 *************************/
 
 static ADDRESS_MAP_START( jokrwild_map, AS_PROGRAM, 8, jokrwild_state )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE_LEGACY(jokrwild_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0x03ff) AM_RAM_WRITE(jokrwild_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM //FIXME: backup RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(jokrwild_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(jokrwild_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM //stack RAM
 	AM_RANGE(0x4004, 0x4007) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4008, 0x400b) AM_DEVREADWRITE("pia1", pia6821_device, read, write) //optical sensor is here
@@ -202,7 +203,7 @@ static ADDRESS_MAP_START( jokrwild_map, AS_PROGRAM, 8, jokrwild_state )
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x6100, 0x6100) AM_READ_PORT("SW1")
-	AM_RANGE(0x6200, 0x6203) AM_READ_LEGACY(rng_r)//another PIA?
+	AM_RANGE(0x6200, 0x6203) AM_READ(rng_r)//another PIA?
 	AM_RANGE(0x6300, 0x6300) AM_READ_PORT("SW2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

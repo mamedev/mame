@@ -74,6 +74,9 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(v128_r);
+	DECLARE_WRITE8_MEMBER(controller_select_w);
+	DECLARE_READ8_MEMBER(controller_r);
 };
 
 
@@ -192,9 +195,9 @@ static SCREEN_UPDATE_RGB32( beaminv )
 }
 
 
-static READ8_HANDLER( v128_r )
+READ8_MEMBER(beaminv_state::v128_r)
 {
-	return (space->machine().primary_screen->vpos() >> 7) & 0x01;
+	return (machine().primary_screen->vpos() >> 7) & 0x01;
 }
 
 
@@ -209,18 +212,16 @@ static READ8_HANDLER( v128_r )
 #define P2_CONTROL_PORT_TAG	("CONTP2")
 
 
-static WRITE8_HANDLER( controller_select_w )
+WRITE8_MEMBER(beaminv_state::controller_select_w)
 {
-	beaminv_state *state = space->machine().driver_data<beaminv_state>();
 	/* 0x01 (player 1) or 0x02 (player 2) */
-	state->m_controller_select = data;
+	m_controller_select = data;
 }
 
 
-static READ8_HANDLER( controller_r )
+READ8_MEMBER(beaminv_state::controller_r)
 {
-	beaminv_state *state = space->machine().driver_data<beaminv_state>();
-	return input_port_read(space->machine(), (state->m_controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
+	return input_port_read(machine(), (m_controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
 }
 
 
@@ -236,8 +237,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, beaminv_state )
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW")
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ_LEGACY(controller_r)
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ_LEGACY(v128_r)
+	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_READ(controller_r)
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ(v128_r)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
@@ -251,7 +252,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, beaminv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(controller_select_w) /* to be confirmed */
+	AM_RANGE(0x00, 0x00) AM_WRITE(controller_select_w) /* to be confirmed */
 ADDRESS_MAP_END
 
 

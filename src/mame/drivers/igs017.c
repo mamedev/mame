@@ -78,6 +78,35 @@ public:
 	UINT8 *m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(video_disable_w);
+	DECLARE_WRITE16_MEMBER(video_disable_lsb_w);
+	DECLARE_WRITE8_MEMBER(fg_w);
+	DECLARE_WRITE8_MEMBER(bg_w);
+	DECLARE_READ16_MEMBER(fg_lsb_r);
+	DECLARE_WRITE16_MEMBER(fg_lsb_w);
+	DECLARE_READ16_MEMBER(bg_lsb_r);
+	DECLARE_WRITE16_MEMBER(bg_lsb_w);
+	DECLARE_READ16_MEMBER(spriteram_lsb_r);
+	DECLARE_WRITE16_MEMBER(spriteram_lsb_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE8_MEMBER(input_select_w);
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE16_MEMBER(mgcs_magic_w);
+	DECLARE_READ16_MEMBER(mgcs_magic_r);
+	DECLARE_WRITE16_MEMBER(irq1_enable_w);
+	DECLARE_WRITE16_MEMBER(irq2_enable_w);
+	DECLARE_WRITE16_MEMBER(mgcs_paletteram_w);
+	DECLARE_WRITE16_MEMBER(sdmg2_paletteram_w);
+	DECLARE_READ8_MEMBER(sdmg2_keys_r);
+	DECLARE_WRITE16_MEMBER(sdmg2_magic_w);
+	DECLARE_READ16_MEMBER(sdmg2_magic_r);
+	DECLARE_READ8_MEMBER(mgdh_keys_r);
+	DECLARE_WRITE16_MEMBER(mgdha_magic_w);
+	DECLARE_READ16_MEMBER(mgdha_magic_r);
+	DECLARE_WRITE8_MEMBER(tjsb_paletteram_w);
+	DECLARE_WRITE8_MEMBER(tjsb_output_w);
+	DECLARE_READ8_MEMBER(tjsb_input_r);
 };
 
 
@@ -86,15 +115,14 @@ public:
                                 Video Hardware
 ***************************************************************************/
 
-static WRITE8_HANDLER( video_disable_w )
+WRITE8_MEMBER(igs017_state::video_disable_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	state->m_video_disable = data & 1;
+	m_video_disable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: unknown bits of video_disable written = %02x\n",cpu_get_pc(&space->device()),data);
+		logerror("PC %06X: unknown bits of video_disable written = %02x\n",cpu_get_pc(&space.device()),data);
 //  popmessage("VIDEO %02X",data);
 }
-static WRITE16_HANDLER( video_disable_lsb_w )
+WRITE16_MEMBER(igs017_state::video_disable_lsb_w)
 {
 	if (ACCESSING_BITS_0_7)
 		video_disable_w(space,offset,data);
@@ -124,54 +152,48 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, COLOR(attr)+8, TILE_FLIPXY( attr >> 5 ));
 }
 
-static WRITE8_HANDLER( fg_w )
+WRITE8_MEMBER(igs017_state::fg_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset/4);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset/4);
 }
 
-static WRITE8_HANDLER( bg_w )
+WRITE8_MEMBER(igs017_state::bg_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset/4);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset/4);
 }
 
 // 16-bit handlers for an 8-bit chip
 
-static READ16_HANDLER( fg_lsb_r )
+READ16_MEMBER(igs017_state::fg_lsb_r)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	return state->m_fg_videoram[offset];
+	return m_fg_videoram[offset];
 }
-static WRITE16_HANDLER( fg_lsb_w )
+WRITE16_MEMBER(igs017_state::fg_lsb_w)
 {
 	if (ACCESSING_BITS_0_7)
 		fg_w(space,offset,data);
 }
 
-static READ16_HANDLER( bg_lsb_r )
+READ16_MEMBER(igs017_state::bg_lsb_r)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	return state->m_bg_videoram[offset];
+	return m_bg_videoram[offset];
 }
-static WRITE16_HANDLER( bg_lsb_w )
+WRITE16_MEMBER(igs017_state::bg_lsb_w)
 {
 	if (ACCESSING_BITS_0_7)
 		bg_w(space,offset,data);
 }
 
-static READ16_HANDLER( spriteram_lsb_r )
+READ16_MEMBER(igs017_state::spriteram_lsb_r)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	return state->m_spriteram[offset];
+	return m_spriteram[offset];
 }
-static WRITE16_HANDLER( spriteram_lsb_w )
+WRITE16_MEMBER(igs017_state::spriteram_lsb_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_spriteram[offset] = data;
+		m_spriteram[offset] = data;
 }
 
 
@@ -1099,36 +1121,32 @@ static ADDRESS_MAP_START( iqblocka_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(igs017_state::nmi_enable_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	state->m_nmi_enable = data & 1;
+	m_nmi_enable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: nmi_enable = %02x\n",cpu_get_pc(&space->device()),data);
+		logerror("PC %06X: nmi_enable = %02x\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE8_HANDLER( irq_enable_w )
+WRITE8_MEMBER(igs017_state::irq_enable_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	state->m_irq_enable = data & 1;
+	m_irq_enable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: irq_enable = %02x\n",cpu_get_pc(&space->device()),data);
+		logerror("PC %06X: irq_enable = %02x\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE8_HANDLER( input_select_w )
+WRITE8_MEMBER(igs017_state::input_select_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	state->m_input_select = data;
+	m_input_select = data;
 }
 
-static READ8_HANDLER( input_r )
+READ8_MEMBER(igs017_state::input_r)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	switch (state->m_input_select)
+	switch (m_input_select)
 	{
-		case 0x00:	return input_port_read(space->machine(), "PLAYER1");
-		case 0x01:	return input_port_read(space->machine(), "PLAYER2");
-		case 0x02:	return input_port_read(space->machine(), "COINS");
+		case 0x00:	return input_port_read(machine(), "PLAYER1");
+		case 0x01:	return input_port_read(machine(), "PLAYER2");
+		case 0x02:	return input_port_read(machine(), "COINS");
 
 		case 0x03:	return 01;
 
@@ -1155,7 +1173,7 @@ static READ8_HANDLER( input_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("PC %06X: input %02x read\n",cpu_get_pc(&space->device()),state->m_input_select);
+			logerror("PC %06X: input %02x read\n",cpu_get_pc(&space.device()),m_input_select);
 			return 0xff;
 	}
 }
@@ -1170,16 +1188,16 @@ static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
 //  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
 
 	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD_LEGACY("ppi8255", ppi8255_r)
-	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE_LEGACY(video_disable_w )
+	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE(video_disable_w )
 
-	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE_LEGACY(nmi_enable_w )
-	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE_LEGACY(irq_enable_w )
+	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE(nmi_enable_w )
+	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE(irq_enable_w )
 
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE_LEGACY(fg_w ) AM_BASE(m_fg_videoram )
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE_LEGACY(bg_w ) AM_BASE(m_bg_videoram )
+	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE(fg_w ) AM_BASE(m_fg_videoram )
+	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE(bg_w ) AM_BASE(m_bg_videoram )
 
-	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE_LEGACY(input_select_w )
-	AM_RANGE( 0x8001, 0x8001 ) AM_READ_LEGACY(input_r )
+	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE(input_select_w )
+	AM_RANGE( 0x8001, 0x8001 ) AM_READ(input_r )
 
 	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
@@ -1192,30 +1210,29 @@ ADDRESS_MAP_END
 // mgcs
 
 
-static WRITE16_HANDLER( mgcs_magic_w )
+WRITE16_MEMBER(igs017_state::mgcs_magic_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	COMBINE_DATA(&state->m_igs_magic[offset]);
+	COMBINE_DATA(&m_igs_magic[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(state->m_igs_magic[0])
+	switch(m_igs_magic[0])
 	{
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
 			{
-				state->m_input_select = data & 0xff;
+				m_input_select = data & 0xff;
 			}
 
-			if ( state->m_input_select & ~0xf8 )
-				logerror("%06x: warning, unknown bits written in input_select = %02x\n", cpu_get_pc(&space->device()), state->m_input_select);
+			if ( m_input_select & ~0xf8 )
+				logerror("%06x: warning, unknown bits written in input_select = %02x\n", cpu_get_pc(&space.device()), m_input_select);
 			break;
 
 		case 0x01:
 			if (ACCESSING_BITS_0_7)
 			{
-				state->m_scramble_data = data & 0xff;
+				m_scramble_data = data & 0xff;
 			}
 			break;
 
@@ -1223,20 +1240,19 @@ static WRITE16_HANDLER( mgcs_magic_w )
 		// case 0x03: ?
 
 		default:
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(&space->device()), state->m_igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(&space.device()), m_igs_magic[0], data);
 	}
 }
 
-static READ16_HANDLER( mgcs_magic_r )
+READ16_MEMBER(igs017_state::mgcs_magic_r)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	switch(state->m_igs_magic[0])
+	switch(m_igs_magic[0])
 	{
 		case 0x01:
-			return BITSWAP8(state->m_scramble_data, 4,5,6,7, 0,1,2,3);
+			return BITSWAP8(m_scramble_data, 4,5,6,7, 0,1,2,3);
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(&space->device()), state->m_igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(&space.device()), m_igs_magic[0]);
 			break;
 	}
 
@@ -1256,51 +1272,49 @@ static READ8_DEVICE_HANDLER( mgcs_keys_r )
 	return 0xff;
 }
 
-static WRITE16_HANDLER( irq1_enable_w )
+WRITE16_MEMBER(igs017_state::irq1_enable_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_irq1_enable = data & 1;
+		m_irq1_enable = data & 1;
 
 	if (data != 0 && data != 0xff)
-		logerror("PC %06X: irq1_enable = %04x\n",cpu_get_pc(&space->device()),data);
+		logerror("PC %06X: irq1_enable = %04x\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE16_HANDLER( irq2_enable_w )
+WRITE16_MEMBER(igs017_state::irq2_enable_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_irq2_enable = data & 1;
+		m_irq2_enable = data & 1;
 
 	if (data != 0 && data != 0xff)
-		logerror("PC %06X: irq2_enable = %04x\n",cpu_get_pc(&space->device()),data);
+		logerror("PC %06X: irq2_enable = %04x\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE16_HANDLER( mgcs_paletteram_w )
+WRITE16_MEMBER(igs017_state::mgcs_paletteram_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
 
-	int bgr = ((space->machine().generic.paletteram.u16[offset/2*2+0] & 0xff) << 8) | (space->machine().generic.paletteram.u16[offset/2*2+1] & 0xff);
+	int bgr = ((machine().generic.paletteram.u16[offset/2*2+0] & 0xff) << 8) | (machine().generic.paletteram.u16[offset/2*2+1] & 0xff);
 
 	// bitswap
 	bgr = BITSWAP16(bgr, 7,8,9,2,14,3,13,15,12,11,10,0,1,4,5,6);
 
-	palette_set_color_rgb(space->machine(), offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
+	palette_set_color_rgb(machine(), offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
 }
 
 static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x300000, 0x303fff ) AM_RAM
-	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE_LEGACY(mgcs_magic_w )
-	AM_RANGE( 0x49c002, 0x49c003 ) AM_READ_LEGACY(mgcs_magic_r )
-	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE_LEGACY(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
-	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE_LEGACY(mgcs_paletteram_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE(mgcs_magic_w )
+	AM_RANGE( 0x49c002, 0x49c003 ) AM_READ(mgcs_magic_r )
+	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE(mgcs_paletteram_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
-	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE_LEGACY(video_disable_lsb_w )
-	AM_RANGE( 0xa04028, 0xa04029 ) AM_WRITE_LEGACY(irq2_enable_w )
-	AM_RANGE( 0xa0402a, 0xa0402b ) AM_WRITE_LEGACY(irq1_enable_w )
-	AM_RANGE( 0xa08000, 0xa0bfff ) AM_READWRITE_LEGACY(fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram )
-	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE_LEGACY(bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram )
+	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE(video_disable_lsb_w )
+	AM_RANGE( 0xa04028, 0xa04029 ) AM_WRITE(irq2_enable_w )
+	AM_RANGE( 0xa0402a, 0xa0402b ) AM_WRITE(irq1_enable_w )
+	AM_RANGE( 0xa08000, 0xa0bfff ) AM_READWRITE(fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram )
+	AM_RANGE( 0xa0c000, 0xa0ffff ) AM_READWRITE(bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram )
 	AM_RANGE( 0xa12000, 0xa12001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	// oki banking through protection (code at $1a350)?
 ADDRESS_MAP_END
@@ -1308,81 +1322,78 @@ ADDRESS_MAP_END
 
 // sdmg2
 
-static WRITE16_HANDLER( sdmg2_paletteram_w )
+WRITE16_MEMBER(igs017_state::sdmg2_paletteram_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
 
-	int bgr = ((space->machine().generic.paletteram.u16[offset/2*2+1] & 0xff) << 8) | (space->machine().generic.paletteram.u16[offset/2*2+0] & 0xff);
+	int bgr = ((machine().generic.paletteram.u16[offset/2*2+1] & 0xff) << 8) | (machine().generic.paletteram.u16[offset/2*2+0] & 0xff);
 
-	palette_set_color_rgb(space->machine(), offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
+	palette_set_color_rgb(machine(), offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
 }
 
-static READ8_HANDLER( sdmg2_keys_r )
+READ8_MEMBER(igs017_state::sdmg2_keys_r)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	if (~state->m_input_select & 0x01)	return input_port_read(space->machine(), "KEY0");
-	if (~state->m_input_select & 0x02)	return input_port_read(space->machine(), "KEY1");
-	if (~state->m_input_select & 0x04)	return input_port_read(space->machine(), "KEY2");
-	if (~state->m_input_select & 0x08)	return input_port_read(space->machine(), "KEY3");
-	if (~state->m_input_select & 0x10)	return input_port_read(space->machine(), "KEY4");
+	if (~m_input_select & 0x01)	return input_port_read(machine(), "KEY0");
+	if (~m_input_select & 0x02)	return input_port_read(machine(), "KEY1");
+	if (~m_input_select & 0x04)	return input_port_read(machine(), "KEY2");
+	if (~m_input_select & 0x08)	return input_port_read(machine(), "KEY3");
+	if (~m_input_select & 0x10)	return input_port_read(machine(), "KEY4");
 
-	if (state->m_input_select == 0x1f)	return input_port_read(space->machine(), "KEY0");	// in joystick mode
+	if (m_input_select == 0x1f)	return input_port_read(machine(), "KEY0");	// in joystick mode
 
-	logerror("%s: warning, reading key with input_select = %02x\n", space->machine().describe_context(), state->m_input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 	return 0xff;
 }
 
-static WRITE16_HANDLER( sdmg2_magic_w )
+WRITE16_MEMBER(igs017_state::sdmg2_magic_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	COMBINE_DATA(&state->m_igs_magic[offset]);
+	COMBINE_DATA(&m_igs_magic[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(state->m_igs_magic[0])
+	switch(m_igs_magic[0])
 	{
 		// case 0x00: ? 0x80
 
 		case 0x01:
 			if (ACCESSING_BITS_0_7)
 			{
-				state->m_input_select	=	data & 0x1f;
-				coin_counter_w(space->machine(), 0,	data & 0x20);
+				m_input_select	=	data & 0x1f;
+				coin_counter_w(machine(), 0,	data & 0x20);
 				//  coin out        data & 0x40
-				state->m_hopper			=	data & 0x80;
+				m_hopper			=	data & 0x80;
 			}
 			break;
 
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki = space->machine().device<okim6295_device>("oki");
+				okim6295_device *oki = machine().device<okim6295_device>("oki");
 				oki->set_bank_base((data & 0x80) ? 0x40000 : 0);
 			}
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(&space->device()), state->m_igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(&space.device()), m_igs_magic[0], data);
 	}
 }
 
-static READ16_HANDLER( sdmg2_magic_r )
+READ16_MEMBER(igs017_state::sdmg2_magic_r)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	switch(state->m_igs_magic[0])
+	switch(m_igs_magic[0])
 	{
 		case 0x00:
 		{
-			UINT16 hopper_bit = (state->m_hopper && ((space->machine().primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
-			return input_port_read(space->machine(), "COINS") | hopper_bit;
+			UINT16 hopper_bit = (m_hopper && ((machine().primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			return input_port_read(machine(), "COINS") | hopper_bit;
 		}
 
 		case 0x02:
 			return sdmg2_keys_r(space, 0);
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(&space->device()), state->m_igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(&space.device()), m_igs_magic[0]);
 			break;
 	}
 
@@ -1392,68 +1403,66 @@ static READ16_HANDLER( sdmg2_magic_r )
 static ADDRESS_MAP_START( sdmg2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
-	AM_RANGE(0x202000, 0x202fff) AM_READWRITE_LEGACY(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
-	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE_LEGACY(sdmg2_paletteram_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x202000, 0x202fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0x204020, 0x204027) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
-	AM_RANGE(0x204024, 0x204025) AM_WRITE_LEGACY(video_disable_lsb_w )
-	AM_RANGE(0x204028, 0x204029) AM_WRITE_LEGACY(irq2_enable_w )
-	AM_RANGE(0x20402a, 0x20402b) AM_WRITE_LEGACY(irq1_enable_w )
-	AM_RANGE(0x208000, 0x20bfff) AM_READWRITE_LEGACY(fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram )
-	AM_RANGE(0x20c000, 0x20ffff) AM_READWRITE_LEGACY(bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram )
+	AM_RANGE(0x204024, 0x204025) AM_WRITE(video_disable_lsb_w )
+	AM_RANGE(0x204028, 0x204029) AM_WRITE(irq2_enable_w )
+	AM_RANGE(0x20402a, 0x20402b) AM_WRITE(irq1_enable_w )
+	AM_RANGE(0x208000, 0x20bfff) AM_READWRITE(fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram )
+	AM_RANGE(0x20c000, 0x20ffff) AM_READWRITE(bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram )
 	AM_RANGE(0x210000, 0x210001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE(0x300000, 0x300003) AM_WRITE_LEGACY(sdmg2_magic_w )
-	AM_RANGE(0x300002, 0x300003) AM_READ_LEGACY(sdmg2_magic_r )
+	AM_RANGE(0x300000, 0x300003) AM_WRITE(sdmg2_magic_w )
+	AM_RANGE(0x300002, 0x300003) AM_READ(sdmg2_magic_r )
 ADDRESS_MAP_END
 
 
 // mgdh, mgdha
 
-static READ8_HANDLER( mgdh_keys_r )
+READ8_MEMBER(igs017_state::mgdh_keys_r)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	if (~state->m_input_select & 0x04)	return input_port_read(space->machine(), "KEY0");
-	if (~state->m_input_select & 0x08)	return input_port_read(space->machine(), "KEY1");
-	if (~state->m_input_select & 0x10)	return input_port_read(space->machine(), "KEY2");
-	if (~state->m_input_select & 0x20)	return input_port_read(space->machine(), "KEY3");
-	if (~state->m_input_select & 0x40)	return input_port_read(space->machine(), "KEY4");
+	if (~m_input_select & 0x04)	return input_port_read(machine(), "KEY0");
+	if (~m_input_select & 0x08)	return input_port_read(machine(), "KEY1");
+	if (~m_input_select & 0x10)	return input_port_read(machine(), "KEY2");
+	if (~m_input_select & 0x20)	return input_port_read(machine(), "KEY3");
+	if (~m_input_select & 0x40)	return input_port_read(machine(), "KEY4");
 
-	if ((state->m_input_select & 0xfc) == 0xfc)	return input_port_read(space->machine(), "DSW1");
+	if ((m_input_select & 0xfc) == 0xfc)	return input_port_read(machine(), "DSW1");
 
-	logerror("%s: warning, reading key with input_select = %02x\n", space->machine().describe_context(), state->m_input_select);
+	logerror("%s: warning, reading key with input_select = %02x\n", machine().describe_context(), m_input_select);
 	return 0xff;
 }
 
-static WRITE16_HANDLER( mgdha_magic_w )
+WRITE16_MEMBER(igs017_state::mgdha_magic_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	COMBINE_DATA(&state->m_igs_magic[offset]);
+	COMBINE_DATA(&m_igs_magic[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(state->m_igs_magic[0])
+	switch(m_igs_magic[0])
 	{
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
 			{
 				//  coin out     data & 0x40
-				coin_counter_w(space->machine(), 0, data & 0x80);
+				coin_counter_w(machine(), 0, data & 0x80);
 			}
 
 			if ( data & ~0xc0 )
-				logerror("%06x: warning, unknown bits written to igs_magic 00 = %02x\n", cpu_get_pc(&space->device()), data);
+				logerror("%06x: warning, unknown bits written to igs_magic 00 = %02x\n", cpu_get_pc(&space.device()), data);
 
 			break;
 
 		case 0x01:
 			if (ACCESSING_BITS_0_7)
 			{
-				state->m_input_select = data & 0xff;
-				state->m_hopper = data & 0x01;
+				m_input_select = data & 0xff;
+				m_hopper = data & 0x01;
 			}
 
-			if ( state->m_input_select & ~0xfd )
-				logerror("%06x: warning, unknown bits written in input_select = %02x\n", cpu_get_pc(&space->device()), state->m_input_select);
+			if ( m_input_select & ~0xfd )
+				logerror("%06x: warning, unknown bits written in input_select = %02x\n", cpu_get_pc(&space.device()), m_input_select);
 
 			break;
 
@@ -1461,7 +1470,7 @@ static WRITE16_HANDLER( mgdha_magic_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				// bit 7?
-				okim6295_device *oki = space->machine().device<okim6295_device>("oki");
+				okim6295_device *oki = machine().device<okim6295_device>("oki");
 				oki->set_bank_base((data & 0x40) ? 0x40000 : 0);
 			}
 			break;
@@ -1478,32 +1487,31 @@ static WRITE16_HANDLER( mgdha_magic_w )
             04ac10: warning, writing to igs_magic 06 = ff
             04ac20: warning, writing to igs_magic 07 = 3f
 */
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(&space->device()), state->m_igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(&space.device()), m_igs_magic[0], data);
 	}
 }
 
-static READ16_HANDLER( mgdha_magic_r )
+READ16_MEMBER(igs017_state::mgdha_magic_r)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	switch(state->m_igs_magic[0])
+	switch(m_igs_magic[0])
 	{
 		case 0x00:
 			return mgdh_keys_r(space, 0);
 
 		case 0x01:
-			return input_port_read(space->machine(), "BUTTONS");
+			return input_port_read(machine(), "BUTTONS");
 
 		case 0x02:
-			return BITSWAP8(input_port_read(space->machine(), "DSW2"), 0,1,2,3,4,5,6,7);
+			return BITSWAP8(input_port_read(machine(), "DSW2"), 0,1,2,3,4,5,6,7);
 
 		case 0x03:
 		{
-			UINT16 hopper_bit = (state->m_hopper && ((space->machine().primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
-			return input_port_read(space->machine(), "COINS") | hopper_bit;
+			UINT16 hopper_bit = (m_hopper && ((machine().primary_screen->frame_number()/10)&1)) ? 0x0000 : 0x0001;
+			return input_port_read(machine(), "COINS") | hopper_bit;
 		}
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(&space->device()), state->m_igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(&space.device()), m_igs_magic[0]);
 			break;
 	}
 
@@ -1513,90 +1521,88 @@ static READ16_HANDLER( mgdha_magic_r )
 static ADDRESS_MAP_START( mgdha_map, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
-	AM_RANGE(0x876000, 0x876003) AM_WRITE_LEGACY(mgdha_magic_w )
-	AM_RANGE(0x876002, 0x876003) AM_READ_LEGACY(mgdha_magic_r )
-	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE_LEGACY(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
-	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE_LEGACY(sdmg2_paletteram_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x876000, 0x876003) AM_WRITE(mgdha_magic_w )
+	AM_RANGE(0x876002, 0x876003) AM_READ(mgdha_magic_r )
+	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
+	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_BASE_GENERIC( paletteram )
 //  AM_RANGE(0xa04014, 0xa04015) // written with FF at boot
 	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
-	AM_RANGE(0xa04024, 0xa04025) AM_WRITE_LEGACY(video_disable_lsb_w )
-	AM_RANGE(0xa04028, 0xa04029) AM_WRITE_LEGACY(irq2_enable_w )
-	AM_RANGE(0xa0402a, 0xa0402b) AM_WRITE_LEGACY(irq1_enable_w )
-	AM_RANGE(0xa08000, 0xa0bfff) AM_READWRITE_LEGACY(fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram )
-	AM_RANGE(0xa0c000, 0xa0ffff) AM_READWRITE_LEGACY(bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram )
+	AM_RANGE(0xa04024, 0xa04025) AM_WRITE(video_disable_lsb_w )
+	AM_RANGE(0xa04028, 0xa04029) AM_WRITE(irq2_enable_w )
+	AM_RANGE(0xa0402a, 0xa0402b) AM_WRITE(irq1_enable_w )
+	AM_RANGE(0xa08000, 0xa0bfff) AM_READWRITE(fg_lsb_r, fg_lsb_w ) AM_BASE(m_fg_videoram )
+	AM_RANGE(0xa0c000, 0xa0ffff) AM_READWRITE(bg_lsb_r, bg_lsb_w ) AM_BASE(m_bg_videoram )
 	AM_RANGE(0xa10000, 0xa10001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 ADDRESS_MAP_END
 
 
 // tjsb
 
-static WRITE8_HANDLER( tjsb_paletteram_w )
+WRITE8_MEMBER(igs017_state::tjsb_paletteram_w)
 {
-	space->machine().generic.paletteram.u8[offset] = data;
-	int bgr = (space->machine().generic.paletteram.u8[offset/2*2+1] << 8) | space->machine().generic.paletteram.u8[offset/2*2+0];
+	machine().generic.paletteram.u8[offset] = data;
+	int bgr = (machine().generic.paletteram.u8[offset/2*2+1] << 8) | machine().generic.paletteram.u8[offset/2*2+0];
 
 	// bitswap
 	bgr = BITSWAP16(bgr, 15, 12,3,6,10,5, 4,2,9,13,8, 7,11,1,0,14);
 
-	palette_set_color_rgb(space->machine(), offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
+	palette_set_color_rgb(machine(), offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
 }
 
-static WRITE8_HANDLER( tjsb_output_w )
+WRITE8_MEMBER(igs017_state::tjsb_output_w)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	switch(state->m_input_select)
+	switch(m_input_select)
 	{
 		case 0x00:
-			coin_counter_w(space->machine(), 0,	data & 0x80);	// coin in
+			coin_counter_w(machine(), 0,	data & 0x80);	// coin in
 			if (!(data & ~0x80))
 				return;
 			break;
 
 		case 0x01:
-			coin_counter_w(space->machine(), 1,	data & 0x01);	// coin out
+			coin_counter_w(machine(), 1,	data & 0x01);	// coin out
 			if (!(data & ~0x01))
 				return;
 			break;
 
 		case 0x02:
-			space->machine().device<okim6295_device>("oki")->set_bank_base((data & 0x10) ? 0x40000 : 0);	// oki bank (0x20/0x30)
+			machine().device<okim6295_device>("oki")->set_bank_base((data & 0x10) ? 0x40000 : 0);	// oki bank (0x20/0x30)
 			if (!(data & ~0x30))
 				return;
 			break;
 
 		case 0x03:
-			state->m_hopper = data & 0x40;
+			m_hopper = data & 0x40;
 			if (!(data & ~0x40))
 				return;
 			break;
 	}
-	logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(&space->device()), state->m_input_select, data);
+	logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(&space.device()), m_input_select, data);
 }
 
-static READ8_HANDLER( tjsb_input_r )
+READ8_MEMBER(igs017_state::tjsb_input_r)
 {
-	igs017_state *state = space->machine().driver_data<igs017_state>();
-	switch (state->m_input_select)
+	switch (m_input_select)
 	{
-		case 0x00:	return input_port_read(space->machine(), "PLAYER1");
-		case 0x01:	return input_port_read(space->machine(), "PLAYER2");
-		case 0x02:	return input_port_read(space->machine(), "COINS");
+		case 0x00:	return input_port_read(machine(), "PLAYER1");
+		case 0x01:	return input_port_read(machine(), "PLAYER2");
+		case 0x02:	return input_port_read(machine(), "COINS");
 		case 0x03:
 		{
-			UINT8 hopper_bit = (state->m_hopper && ((space->machine().primary_screen->frame_number()/10)&1)) ? 0x00 : 0x20;
-			return input_port_read(space->machine(), "HOPPER") | hopper_bit;
+			UINT8 hopper_bit = (m_hopper && ((machine().primary_screen->frame_number()/10)&1)) ? 0x00 : 0x20;
+			return input_port_read(machine(), "HOPPER") | hopper_bit;
 		}
 
 		default:
-			logerror("PC %06X: input %02x read\n",cpu_get_pc(&space->device()),state->m_input_select);
+			logerror("PC %06X: input %02x read\n",cpu_get_pc(&space.device()),m_input_select);
 			return 0xff;
 	}
 }
 
 static ADDRESS_MAP_START( tjsb_map, AS_PROGRAM, 8, igs017_state )
 	AM_RANGE( 0x00000, 0x0dfff ) AM_ROM
-	AM_RANGE( 0x0e000, 0x0e000 ) AM_WRITE_LEGACY(input_select_w )
-	AM_RANGE( 0x0e001, 0x0e001 ) AM_READWRITE_LEGACY(tjsb_input_r, tjsb_output_w )
+	AM_RANGE( 0x0e000, 0x0e000 ) AM_WRITE(input_select_w )
+	AM_RANGE( 0x0e001, 0x0e001 ) AM_READWRITE(tjsb_input_r, tjsb_output_w )
 	AM_RANGE( 0x0e002, 0x0efff ) AM_RAM
 	AM_RANGE( 0x0f000, 0x0ffff ) AM_RAM
 	AM_RANGE( 0x10000, 0x3ffff ) AM_ROM
@@ -1606,19 +1612,19 @@ static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE_LEGACY(tjsb_paletteram_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(tjsb_paletteram_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
 
 //  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
 
 	AM_RANGE( 0x2010, 0x2013 ) AM_DEVREAD_LEGACY("ppi8255", ppi8255_r)
-	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE_LEGACY(video_disable_w )
+	AM_RANGE( 0x2012, 0x2012 ) AM_WRITE(video_disable_w )
 
-	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE_LEGACY(nmi_enable_w )
-	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE_LEGACY(irq_enable_w )
+	AM_RANGE( 0x2014, 0x2014 ) AM_WRITE(nmi_enable_w )
+	AM_RANGE( 0x2015, 0x2015 ) AM_WRITE(irq_enable_w )
 
-	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE_LEGACY(fg_w ) AM_BASE(m_fg_videoram )
-	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE_LEGACY(bg_w ) AM_BASE(m_bg_videoram )
+	AM_RANGE( 0x4000, 0x5fff ) AM_RAM_WRITE(fg_w ) AM_BASE(m_fg_videoram )
+	AM_RANGE( 0x6000, 0x7fff ) AM_RAM_WRITE(bg_w ) AM_BASE(m_bg_videoram )
 
 	AM_RANGE( 0x9000, 0x9000 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 

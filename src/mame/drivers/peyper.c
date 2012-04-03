@@ -12,19 +12,24 @@ public:
 
     UINT8 display_block;
     UINT8 display[16];
+	DECLARE_READ8_MEMBER(sw_r);
+	DECLARE_WRITE8_MEMBER(col_w);
+	DECLARE_WRITE8_MEMBER(disp_w);
+	DECLARE_WRITE8_MEMBER(lamp_w);
+	DECLARE_WRITE8_MEMBER(lamp7_w);
+	DECLARE_WRITE8_MEMBER(sol_w);
 };
 
 
-static READ8_HANDLER(sw_r)
+READ8_MEMBER(peyper_state::sw_r)
 {
     return 0xff;
 }
 
-static WRITE8_HANDLER(col_w)
+WRITE8_MEMBER(peyper_state::col_w)
 {
-    peyper_state *state = space->machine().driver_data<peyper_state>();
 
-    if (data==0x90) state->display_block = 0;
+    if (data==0x90) display_block = 0;
 }
 
 static const UINT8 hex_to_7seg[16] =
@@ -34,10 +39,9 @@ static const UINT8 hex_to_7seg[16] =
      0x00, 0x00, 0x00, 0x00 };
 
 /* seems to only work correctly for 'solarwap', 'poleposn' and 'sonstwar' (look at how high-scores are displayed for example) - or shall layout be changed ? */
-static WRITE8_HANDLER(disp_w)
+WRITE8_MEMBER(peyper_state::disp_w)
 {
-    peyper_state *state = space->machine().driver_data<peyper_state>();
-    state->display[state->display_block] = data;
+    display[display_block] = data;
 
     UINT8 a = data & 0x0f;
     UINT8 b = data >> 4;
@@ -53,7 +57,7 @@ static WRITE8_HANDLER(disp_w)
 6 -> DPL19,DPL1
 7 -> DPL30,DPL33
 */
-    switch(state->display_block) {
+    switch(display_block) {
         case 0 :
                 output_set_indexed_value("dpl_",25,hex_a);
                 output_set_indexed_value("dpl_",27,hex_b);
@@ -141,22 +145,22 @@ static WRITE8_HANDLER(disp_w)
                 break;
     }
 
-    state->display_block++;
-    state->display_block&=0x0f;
+    display_block++;
+    display_block&=0x0f;
 }
 
-static WRITE8_HANDLER(lamp_w)
+WRITE8_MEMBER(peyper_state::lamp_w)
 {
     //logerror("lamp_w %02x\n",data);
     //logerror("[%d]= %02x\n",4+offset/4,data);
 }
 
-static WRITE8_HANDLER(lamp7_w)
+WRITE8_MEMBER(peyper_state::lamp7_w)
 {
     //logerror("[7]= %02x\n",data);
 }
 
-static WRITE8_HANDLER(sol_w)
+WRITE8_MEMBER(peyper_state::sol_w)
 {
     //logerror("sol_w %02x\n",data);
 }
@@ -190,18 +194,18 @@ static ADDRESS_MAP_START( peyper_io, AS_IO, 8, peyper_state )
 //  AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(sw_r,disp_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(col_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(sw_r,disp_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(col_w)
 //  AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ay8910_0", ay8910_address_w)
 //  AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("ay8910_0", ay8910_data_w)
 //  AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("ay8910_1", ay8910_address_w)
 //  AM_RANGE(0x0a, 0x0a) AM_DEVWRITE_LEGACY("ay8910_1", ay8910_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(sol_w)
-	AM_RANGE(0x10, 0x18) AM_WRITE_LEGACY(lamp_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(sol_w)
+	AM_RANGE(0x10, 0x18) AM_WRITE(lamp_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
 	AM_RANGE(0x24, 0x24) AM_READ_PORT("DSW1")
 	AM_RANGE(0x28, 0x28) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2c, 0x2c) AM_WRITE_LEGACY(lamp7_w)
+	AM_RANGE(0x2c, 0x2c) AM_WRITE(lamp7_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pbsonic_generic )

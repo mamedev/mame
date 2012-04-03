@@ -367,6 +367,8 @@ public:
 	UINT8 m_flipscreen;
 	UINT8 m_madsel_delay;
 	UINT16 m_madsel_lastpc;
+	DECLARE_WRITE8_MEMBER(missile_w);
+	DECLARE_READ8_MEMBER(missile_r);
 };
 
 
@@ -707,14 +709,13 @@ static SCREEN_UPDATE_IND16( missile )
  *
  *************************************/
 
-static WRITE8_HANDLER( missile_w )
+WRITE8_MEMBER(missile_state::missile_w)
 {
-	missile_state *state = space->machine().driver_data<missile_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	/* if we're in MADSEL mode, write to video RAM */
-	if (get_madsel(space))
+	if (get_madsel(&space))
 	{
-		write_vram(space, offset, data);
+		write_vram(&space, offset, data);
 		return;
 	}
 
@@ -727,53 +728,52 @@ static WRITE8_HANDLER( missile_w )
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		pokey_w(space->machine().device("pokey"), offset & 0x0f, data);
+		pokey_w(machine().device("pokey"), offset & 0x0f, data);
 
 	/* OUT0 */
 	else if (offset < 0x4900)
 	{
-		state->m_flipscreen = ~data & 0x40;
-		coin_counter_w(space->machine(), 0, data & 0x20);
-		coin_counter_w(space->machine(), 1, data & 0x10);
-		coin_counter_w(space->machine(), 2, data & 0x08);
-		set_led_status(space->machine(), 1, ~data & 0x04);
-		set_led_status(space->machine(), 0, ~data & 0x02);
-		state->m_ctrld = data & 1;
+		m_flipscreen = ~data & 0x40;
+		coin_counter_w(machine(), 0, data & 0x20);
+		coin_counter_w(machine(), 1, data & 0x10);
+		coin_counter_w(machine(), 2, data & 0x08);
+		set_led_status(machine(), 1, ~data & 0x04);
+		set_led_status(machine(), 0, ~data & 0x02);
+		m_ctrld = data & 1;
 	}
 
 	/* color RAM */
 	else if (offset >= 0x4b00 && offset < 0x4c00)
-		palette_set_color_rgb(space->machine(), offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
+		palette_set_color_rgb(machine(), offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
 
 	/* watchdog */
 	else if (offset >= 0x4c00 && offset < 0x4d00)
-		watchdog_reset(space->machine());
+		watchdog_reset(machine());
 
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)
 	{
-		if (state->m_irq_state)
+		if (m_irq_state)
 		{
-			cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-			state->m_irq_state = 0;
+			cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+			m_irq_state = 0;
 		}
 	}
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown write to %04X = %02X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%04X:Unknown write to %04X = %02X\n", cpu_get_pc(&space.device()), offset, data);
 }
 
 
-static READ8_HANDLER( missile_r )
+READ8_MEMBER(missile_state::missile_r)
 {
-	missile_state *state = space->machine().driver_data<missile_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	UINT8 result = 0xff;
 
 	/* if we're in MADSEL mode, read from video RAM */
-	if (get_madsel(space))
-		return read_vram(space, offset);
+	if (get_madsel(&space))
+		return read_vram(&space, offset);
 
 	/* otherwise, strip A15 and handle manually */
 	offset &= 0x7fff;
@@ -784,37 +784,37 @@ static READ8_HANDLER( missile_r )
 
 	/* ROM */
 	else if (offset >= 0x5000)
-		result = space->machine().region("maincpu")->base()[offset];
+		result = machine().region("maincpu")->base()[offset];
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		result = pokey_r(space->machine().device("pokey"), offset & 0x0f);
+		result = pokey_r(machine().device("pokey"), offset & 0x0f);
 
 	/* IN0 */
 	else if (offset < 0x4900)
 	{
-		if (state->m_ctrld)	/* trackball */
+		if (m_ctrld)	/* trackball */
 		{
-			if (!state->m_flipscreen)
-			    result = ((input_port_read(space->machine(), "TRACK0_Y") << 4) & 0xf0) | (input_port_read(space->machine(), "TRACK0_X") & 0x0f);
+			if (!m_flipscreen)
+			    result = ((input_port_read(machine(), "TRACK0_Y") << 4) & 0xf0) | (input_port_read(machine(), "TRACK0_X") & 0x0f);
 			else
-			    result = ((input_port_read(space->machine(), "TRACK1_Y") << 4) & 0xf0) | (input_port_read(space->machine(), "TRACK1_X") & 0x0f);
+			    result = ((input_port_read(machine(), "TRACK1_Y") << 4) & 0xf0) | (input_port_read(machine(), "TRACK1_X") & 0x0f);
 		}
 		else	/* buttons */
-			result = input_port_read(space->machine(), "IN0");
+			result = input_port_read(machine(), "IN0");
 	}
 
 	/* IN1 */
 	else if (offset < 0x4a00)
-		result = input_port_read(space->machine(), "IN1");
+		result = input_port_read(machine(), "IN1");
 
 	/* IN2 */
 	else if (offset < 0x4b00)
-		result = input_port_read(space->machine(), "R10");
+		result = input_port_read(machine(), "R10");
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown read from %04X\n", cpu_get_pc(&space->device()), offset);
+		logerror("%04X:Unknown read from %04X\n", cpu_get_pc(&space.device()), offset);
 	return result;
 }
 
@@ -828,7 +828,7 @@ static READ8_HANDLER( missile_r )
 
 /* complete memory map derived from schematics (implemented above) */
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, missile_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(missile_r, missile_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(missile_r, missile_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 

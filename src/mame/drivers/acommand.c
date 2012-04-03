@@ -78,6 +78,13 @@ public:
 	UINT16 m_ufo_sw2;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE16_MEMBER(ac_bgvram_w);
+	DECLARE_WRITE16_MEMBER(ac_txvram_w);
+	DECLARE_WRITE16_MEMBER(ac_bgscroll_w);
+	DECLARE_WRITE16_MEMBER(ac_txscroll_w);
+	DECLARE_READ16_MEMBER(ac_devices_r);
+	DECLARE_WRITE16_MEMBER(ac_devices_w);
+	DECLARE_WRITE16_MEMBER(ac_unk2_w);
 };
 
 
@@ -257,38 +264,34 @@ static SCREEN_UPDATE_IND16( acommand )
 }
 
 
-static WRITE16_HANDLER( ac_bgvram_w )
+WRITE16_MEMBER(acommand_state::ac_bgvram_w)
 {
-	acommand_state *state = space->machine().driver_data<acommand_state>();
-	COMBINE_DATA(&state->m_ac_bgvram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_ac_bgvram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( ac_txvram_w )
+WRITE16_MEMBER(acommand_state::ac_txvram_w)
 {
-	acommand_state *state = space->machine().driver_data<acommand_state>();
-	COMBINE_DATA(&state->m_ac_txvram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_ac_txvram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER(ac_bgscroll_w)
+WRITE16_MEMBER(acommand_state::ac_bgscroll_w)
 {
-	acommand_state *state = space->machine().driver_data<acommand_state>();
 	switch(offset)
 	{
-		case 0: state->m_bg_tilemap->set_scrollx(0,data); break;
-		case 1: state->m_bg_tilemap->set_scrolly(0,data); break;
+		case 0: m_bg_tilemap->set_scrollx(0,data); break;
+		case 1: m_bg_tilemap->set_scrolly(0,data); break;
 		case 2: /*BG_TILEMAP priority?*/ break;
 	}
 }
 
-static WRITE16_HANDLER(ac_txscroll_w)
+WRITE16_MEMBER(acommand_state::ac_txscroll_w)
 {
-	acommand_state *state = space->machine().driver_data<acommand_state>();
 	switch(offset)
 	{
-		case 0: state->m_tx_tilemap->set_scrollx(0,data); break;
-		case 1: state->m_tx_tilemap->set_scrolly(0,data); break;
+		case 0: m_tx_tilemap->set_scrollx(0,data); break;
+		case 1: m_tx_tilemap->set_scrolly(0,data); break;
 		case 2: /*TX_TILEMAP priority?*/ break;
 	}
 }
@@ -296,10 +299,9 @@ static WRITE16_HANDLER(ac_txscroll_w)
 /******************************************************************************************/
 
 
-static READ16_HANDLER(ac_devices_r)
+READ16_MEMBER(acommand_state::ac_devices_r)
 {
-	acommand_state *state = space->machine().driver_data<acommand_state>();
-	logerror("(PC=%06x) read at %04x\n",cpu_get_pc(&space->device()),offset*2);
+	logerror("(PC=%06x) read at %04x\n",cpu_get_pc(&space.device()),offset*2);
 
 	switch(offset)
 	{
@@ -316,13 +318,13 @@ static READ16_HANDLER(ac_devices_r)
                 ---- ---- ---- --x- (Activate Test)
                 ---- ---- ---- ---x (Advance through Tests)
             */
-			return input_port_read(space->machine(), "IN0");
+			return input_port_read(machine(), "IN0");
 		case 0x0014/2:
 		case 0x0016/2:
-			return space->machine().device<okim6295_device>("oki1")->read(*space,0);
+			return machine().device<okim6295_device>("oki1")->read(*&space,0);
 		case 0x0018/2:
 		case 0x001a/2:
-			return space->machine().device<okim6295_device>("oki2")->read(*space,0);
+			return machine().device<okim6295_device>("oki2")->read(*&space,0);
 		case 0x0040/2:
 			/*
                 "Upper switch / Under Switch"
@@ -340,26 +342,26 @@ static READ16_HANDLER(ac_devices_r)
             */
         //22dc8
 		{
-			state->m_ufo_sw1 = state->m_ac_devram[offset] & 3;
-			if(state->m_ac_devram[offset] & 0x10)
-				state->m_ufo_sw1|= 0x10;
-			if(state->m_ac_devram[offset] & 0x40)
-				state->m_ufo_sw1|= 0x20;
-			if(state->m_ac_devram[offset] & 0x100)
-				state->m_ufo_sw1|=0x100;
-			if(state->m_ac_devram[offset] & 0x400)
-				state->m_ufo_sw1|=0x200;
-			if(state->m_ac_devram[offset] & 0x1000)
-				state->m_ufo_sw1|=0x1000;
-			if(state->m_ac_devram[offset] & 0x4000)
-				state->m_ufo_sw1|=0x2000;
-//          if(state->m_ac_devram[0x0048/2] & 0x0001)
-//              state->m_ufo_sw1|=0x0040;
-//          if(state->m_ac_devram[0x0048/2] & 0x0004)
-//              state->m_ufo_sw1|=0x0400;
-//          if(state->m_ac_devram[0x0048/2] & 0x0100)
-//              state->m_ufo_sw1|=0x4000;
-			return state->m_ufo_sw1;
+			m_ufo_sw1 = m_ac_devram[offset] & 3;
+			if(m_ac_devram[offset] & 0x10)
+				m_ufo_sw1|= 0x10;
+			if(m_ac_devram[offset] & 0x40)
+				m_ufo_sw1|= 0x20;
+			if(m_ac_devram[offset] & 0x100)
+				m_ufo_sw1|=0x100;
+			if(m_ac_devram[offset] & 0x400)
+				m_ufo_sw1|=0x200;
+			if(m_ac_devram[offset] & 0x1000)
+				m_ufo_sw1|=0x1000;
+			if(m_ac_devram[offset] & 0x4000)
+				m_ufo_sw1|=0x2000;
+//          if(m_ac_devram[0x0048/2] & 0x0001)
+//              m_ufo_sw1|=0x0040;
+//          if(m_ac_devram[0x0048/2] & 0x0004)
+//              m_ufo_sw1|=0x0400;
+//          if(m_ac_devram[0x0048/2] & 0x0100)
+//              m_ufo_sw1|=0x4000;
+			return m_ufo_sw1;
 		}
 		case 0x0044/2:
 			/*
@@ -369,40 +371,39 @@ static READ16_HANDLER(ac_devices_r)
                 ---- ---- ---- ---x Upper Switch - 4 (active low)
             */
 		{
-			state->m_ufo_sw2 = 0;
-			if(state->m_ac_devram[offset] & 0x01)
-				state->m_ufo_sw2|= 1;
-			if(state->m_ac_devram[offset] & 0x04)
-				state->m_ufo_sw2|= 2;
-			if(state->m_ac_devram[offset] & 0x10)
-				state->m_ufo_sw2|=0x10;
-			if(state->m_ac_devram[offset] & 0x40)
-				state->m_ufo_sw2|=0x20;
-			return state->m_ufo_sw2;
+			m_ufo_sw2 = 0;
+			if(m_ac_devram[offset] & 0x01)
+				m_ufo_sw2|= 1;
+			if(m_ac_devram[offset] & 0x04)
+				m_ufo_sw2|= 2;
+			if(m_ac_devram[offset] & 0x10)
+				m_ufo_sw2|=0x10;
+			if(m_ac_devram[offset] & 0x40)
+				m_ufo_sw2|=0x20;
+			return m_ufo_sw2;
 		}
 		case 0x0048/2:
-			return state->m_ac_devram[offset];
+			return m_ac_devram[offset];
 		case 0x005c/2:
 			/*
                 xxxx xxxx ---- ---- DIPSW4
                 ---- ---- xxxx xxxx DIPSW3
             */
-			return input_port_read(space->machine(), "IN1");
+			return input_port_read(machine(), "IN1");
 	}
-	return state->m_ac_devram[offset];
+	return m_ac_devram[offset];
 }
 
-static WRITE16_HANDLER(ac_devices_w)
+WRITE16_MEMBER(acommand_state::ac_devices_w)
 {
-	acommand_state *state = space->machine().driver_data<acommand_state>();
-	COMBINE_DATA(&state->m_ac_devram[offset]);
+	COMBINE_DATA(&m_ac_devram[offset]);
 	switch(offset)
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki1 = space->machine().device<okim6295_device>("oki1");
-				okim6295_device *oki2 = space->machine().device<okim6295_device>("oki2");
+				okim6295_device *oki1 = machine().device<okim6295_device>("oki1");
+				okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
 				oki1->set_bank_base(0x40000 * (data & 0x3));
 				oki2->set_bank_base(0x40000 * (data & 0x30) >> 4);
 			}
@@ -411,16 +412,16 @@ static WRITE16_HANDLER(ac_devices_w)
 		case 0x16/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki1 = space->machine().device<okim6295_device>("oki1");
-				oki1->write(*space,0,data);
+				okim6295_device *oki1 = machine().device<okim6295_device>("oki1");
+				oki1->write(*&space,0,data);
 			}
 			break;
 		case 0x18/2:
 		case 0x1a/2:
 			if(ACCESSING_BITS_0_7)
 			{
-				okim6295_device *oki2 = space->machine().device<okim6295_device>("oki2");
-				oki2->write(*space,0,data);
+				okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
+				oki2->write(*&space,0,data);
 			}
 			break;
 		case 0x1c/2:
@@ -433,18 +434,18 @@ static WRITE16_HANDLER(ac_devices_w)
 		case 0x48/2:
 			break;
 		case 0x50/2:
-			state->m_led0 = state->m_ac_devram[offset];
-			//popmessage("%04x",state->m_led0);
+			m_led0 = m_ac_devram[offset];
+			//popmessage("%04x",m_led0);
 			break;
 		case 0x54/2:
-			state->m_led1 = state->m_ac_devram[offset];
-			//popmessage("%04x",state->m_led0);
+			m_led1 = m_ac_devram[offset];
+			//popmessage("%04x",m_led0);
 			break;
 	}
 }
 
 /*This is always zero ATM*/
-static WRITE16_HANDLER(ac_unk2_w)
+WRITE16_MEMBER(acommand_state::ac_unk2_w)
 {
 	if(data)
 		popmessage("UNK-2 enabled %04x",data);
@@ -452,16 +453,16 @@ static WRITE16_HANDLER(ac_unk2_w)
 
 static ADDRESS_MAP_START( acommand_map, AS_PROGRAM, 16, acommand_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x082000, 0x082005) AM_WRITE_LEGACY(ac_bgscroll_w)
-	AM_RANGE(0x082100, 0x082105) AM_WRITE_LEGACY(ac_txscroll_w)
-	AM_RANGE(0x082208, 0x082209) AM_WRITE_LEGACY(ac_unk2_w)
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE_LEGACY(ac_bgvram_w) AM_BASE(m_ac_bgvram)
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE_LEGACY(ac_txvram_w) AM_BASE(m_ac_txvram)
+	AM_RANGE(0x082000, 0x082005) AM_WRITE(ac_bgscroll_w)
+	AM_RANGE(0x082100, 0x082105) AM_WRITE(ac_txscroll_w)
+	AM_RANGE(0x082208, 0x082209) AM_WRITE(ac_unk2_w)
+	AM_RANGE(0x0a0000, 0x0a3fff) AM_RAM_WRITE(ac_bgvram_w) AM_BASE(m_ac_bgvram)
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(ac_txvram_w) AM_BASE(m_ac_txvram)
 	AM_RANGE(0x0b8000, 0x0bffff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0f0000, 0x0f7fff) AM_RAM
 	AM_RANGE(0x0f8000, 0x0f8fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x0f9000, 0x0fffff) AM_RAM
-	AM_RANGE(0x100000, 0x1000ff) AM_READ_LEGACY(ac_devices_r) AM_WRITE_LEGACY(ac_devices_w) AM_BASE(m_ac_devram)
+	AM_RANGE(0x100000, 0x1000ff) AM_READ(ac_devices_r) AM_WRITE(ac_devices_w) AM_BASE(m_ac_devram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acommand )

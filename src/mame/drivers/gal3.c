@@ -147,6 +147,16 @@ public:
 	UINT16 *m_rsoSharedRAM;
 	UINT32 m_led_mst;
 	UINT32 m_led_slv;
+	DECLARE_READ32_MEMBER(led_mst_r);
+	DECLARE_WRITE32_MEMBER(led_mst_w);
+	DECLARE_READ32_MEMBER(led_slv_r);
+	DECLARE_WRITE32_MEMBER(led_slv_w);
+	DECLARE_READ32_MEMBER(paletteram32_r);
+	DECLARE_WRITE32_MEMBER(paletteram32_w);
+	DECLARE_READ32_MEMBER(namcos21_video_enable_r);
+	DECLARE_WRITE32_MEMBER(namcos21_video_enable_w);
+	DECLARE_READ32_MEMBER(rso_r);
+	DECLARE_WRITE32_MEMBER(rso_w);
 };
 
 
@@ -270,83 +280,75 @@ static NVRAM_HANDLER( gal3 )
 
 /***************************************************************************************/
 
-static READ32_HANDLER( led_mst_r )
+READ32_MEMBER(gal3_state::led_mst_r)
 {
-	gal3_state *state = space->machine().driver_data<gal3_state>();
-	return state->m_led_mst;
+	return m_led_mst;
 }
 
-static WRITE32_HANDLER( led_mst_w )
+WRITE32_MEMBER(gal3_state::led_mst_w)
 {
-	gal3_state *state = space->machine().driver_data<gal3_state>();
-	COMBINE_DATA(&state->m_led_mst);
+	COMBINE_DATA(&m_led_mst);
 }
 
-static READ32_HANDLER( led_slv_r )
+READ32_MEMBER(gal3_state::led_slv_r)
 {
-	gal3_state *state = space->machine().driver_data<gal3_state>();
-	return state->m_led_slv;
+	return m_led_slv;
 }
 
-static WRITE32_HANDLER( led_slv_w )
+WRITE32_MEMBER(gal3_state::led_slv_w)
 {
-	gal3_state *state = space->machine().driver_data<gal3_state>();
-	COMBINE_DATA(&state->m_led_slv);
+	COMBINE_DATA(&m_led_slv);
 }
 
 /* palette memory handlers */
 
-static READ32_HANDLER( paletteram32_r )
+READ32_MEMBER(gal3_state::paletteram32_r)
 {
 	offset *= 2;
-	return (space->machine().generic.paletteram.u16[offset]<<16)|space->machine().generic.paletteram.u16[offset+1];
+	return (machine().generic.paletteram.u16[offset]<<16)|machine().generic.paletteram.u16[offset+1];
 }
 
-static WRITE32_HANDLER( paletteram32_w )
+WRITE32_MEMBER(gal3_state::paletteram32_w)
 {
 	UINT32 v;
 	offset *= 2;
-	v = (space->machine().generic.paletteram.u16[offset]<<16)|space->machine().generic.paletteram.u16[offset+1];
+	v = (machine().generic.paletteram.u16[offset]<<16)|machine().generic.paletteram.u16[offset+1];
 	COMBINE_DATA( &v );
-	space->machine().generic.paletteram.u16[offset+0] = v>>16;
-	space->machine().generic.paletteram.u16[offset+1] = v&0xffff;
+	machine().generic.paletteram.u16[offset+0] = v>>16;
+	machine().generic.paletteram.u16[offset+1] = v&0xffff;
 }
 
-static READ32_HANDLER(namcos21_video_enable_r)
+READ32_MEMBER(gal3_state::namcos21_video_enable_r)
 {
-	gal3_state *state = space->machine().driver_data<gal3_state>();
-	return state->m_namcos21_video_enable<<16;
+	return m_namcos21_video_enable<<16;
 }
 
-static WRITE32_HANDLER(namcos21_video_enable_w)
+WRITE32_MEMBER(gal3_state::namcos21_video_enable_w)
 {
-	gal3_state *state = space->machine().driver_data<gal3_state>();
 	UINT32 v;
-	v = state->m_namcos21_video_enable<<16;
+	v = m_namcos21_video_enable<<16;
 	COMBINE_DATA( &v ); // 0xff53, instead of 0x40 in namcos21
-	state->m_namcos21_video_enable = v>>16;
+	m_namcos21_video_enable = v>>16;
 }
 
-static READ32_HANDLER(rso_r)
+READ32_MEMBER(gal3_state::rso_r)
 {
-	gal3_state *state = space->machine().driver_data<gal3_state>();
 	/*store $5555 @$0046, and readback @$0000
     read @$0144 and store at A6_21e & A4_5c
     Check @$009a==1 to start DEMO
     HACK*/
 	offset *= 2;
-	return (state->m_rsoSharedRAM[offset]<<16)|state->m_rsoSharedRAM[offset+1];
+	return (m_rsoSharedRAM[offset]<<16)|m_rsoSharedRAM[offset+1];
 }
 
-static WRITE32_HANDLER(rso_w)
+WRITE32_MEMBER(gal3_state::rso_w)
 {
-	gal3_state *state = space->machine().driver_data<gal3_state>();
 	UINT32 v;
 	offset *= 2;
-	v = (state->m_rsoSharedRAM[offset]<<16)|state->m_rsoSharedRAM[offset+1];
+	v = (m_rsoSharedRAM[offset]<<16)|m_rsoSharedRAM[offset+1];
 	COMBINE_DATA( &v );
-	state->m_rsoSharedRAM[offset+0] = v>>16;
-	state->m_rsoSharedRAM[offset+1] = v&0xffff;
+	m_rsoSharedRAM[offset+0] = v>>16;
+	m_rsoSharedRAM[offset+1] = v&0xffff;
 }
 
 
@@ -355,7 +357,7 @@ static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32, gal3_state )
 	AM_RANGE(0x20000000, 0x20001fff) AM_RAM AM_BASE(m_nvmem) AM_SIZE(m_nvmem_size)	//NVRAM
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE_LEGACY() //
 	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_mst"	)
-	AM_RANGE(0x44800000, 0x44800003) AM_READ_LEGACY(led_mst_r) AM_WRITE_LEGACY(led_mst_w)	//LEDs
+	AM_RANGE(0x44800000, 0x44800003) AM_READ(led_mst_r) AM_WRITE(led_mst_w)	//LEDs
 	AM_RANGE(0x48000000, 0x48000003) AM_READNOP	//irq1 v-blank ack
 	AM_RANGE(0x4c000000, 0x4c000003) AM_READNOP	//irq3 ack
 	AM_RANGE(0x60000000, 0x60007fff) AM_RAM AM_SHARE("share1")	//CRAM
@@ -364,14 +366,14 @@ static ADDRESS_MAP_START( cpu_mst_map, AS_PROGRAM, 32, gal3_state )
 /// AM_RANGE(0xc0000000, 0xc000000b) AM_WRITENOP    //upload?
 	AM_RANGE(0xc000000c, 0xc000000f) AM_READNOP	//irq2 ack
 /// AM_RANGE(0xd8000000, 0xd800000f) AM_RAM // protection or 68681?
-	AM_RANGE(0xf2800000, 0xf2800fff) AM_READWRITE_LEGACY(rso_r, rso_w)	//RSO PCB
+	AM_RANGE(0xf2800000, 0xf2800fff) AM_READWRITE(rso_r, rso_w)	//RSO PCB
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32, gal3_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 /// AM_RANGE(0x40000000, 0x4000ffff) AM_WRITE_LEGACY() //
 	AM_RANGE(0x44000000, 0x44000003) AM_READ_PORT("DSW_CPU_slv"	)
-	AM_RANGE(0x44800000, 0x44800003) AM_READ_LEGACY(led_slv_r) AM_WRITE_LEGACY(led_slv_w)	//LEDs
+	AM_RANGE(0x44800000, 0x44800003) AM_READ(led_slv_r) AM_WRITE(led_slv_w)	//LEDs
 	AM_RANGE(0x48000000, 0x48000003) AM_READNOP	//irq1 ack
 /// AM_RANGE(0x50000000, 0x50000003) AM_READ_LEGACY() AM_WRITE_LEGACY()
 /// AM_RANGE(0x54000000, 0x54000003) AM_READ_LEGACY() AM_WRITE_LEGACY()
@@ -386,14 +388,14 @@ static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32, gal3_state )
 /// AM_RANGE(0xf1480000, 0xf14807ff) AM_READWRITE_LEGACY(namcos21_depthcue_r,namcos21_depthcue_w)
 	AM_RANGE(0xf1700000, 0xf170ffff) AM_READWRITE_LEGACY(namco_obj32_r,namco_obj32_w)
 	AM_RANGE(0xf1720000, 0xf1720007) AM_READWRITE_LEGACY(namco_spritepos32_r,namco_spritepos32_w)
-	AM_RANGE(0xf1740000, 0xf175ffff) AM_READWRITE_LEGACY(paletteram32_r,paletteram32_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf1760000, 0xf1760003) AM_READWRITE_LEGACY(namcos21_video_enable_r,namcos21_video_enable_w)
+	AM_RANGE(0xf1740000, 0xf175ffff) AM_READWRITE(paletteram32_r,paletteram32_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf1760000, 0xf1760003) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 
 	AM_RANGE(0xf2200000, 0xf220ffff) AM_RAM
 	AM_RANGE(0xf2700000, 0xf270ffff) AM_RAM	//AM_READWRITE_LEGACY(namco_obj16_r,namco_obj16_w)
 	AM_RANGE(0xf2720000, 0xf2720007) AM_RAM	//AM_READWRITE_LEGACY(namco_spritepos16_r,namco_spritepos16_w)
 	AM_RANGE(0xf2740000, 0xf275ffff) AM_RAM	//AM_READWRITE_LEGACY(paletteram16_r,paletteram16_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf2760000, 0xf2760003) AM_RAM	//AM_READWRITE_LEGACY(namcos21_video_enable_r,namcos21_video_enable_w)
+	AM_RANGE(0xf2760000, 0xf2760003) AM_RAM	//AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rs_cpu_map, AS_PROGRAM, 16, gal3_state )

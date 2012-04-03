@@ -75,6 +75,12 @@ public:
 	int m_which;
 
 	UINT16 m_sprites_buffer[0x800];
+	DECLARE_WRITE16_MEMBER(bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(mlow_videoram_w);
+	DECLARE_WRITE16_MEMBER(mhigh_videoram_w);
+	DECLARE_WRITE16_MEMBER(tx_videoram_w);
+	DECLARE_WRITE16_MEMBER(sprites_commands_w);
+	DECLARE_WRITE16_MEMBER(mwarr_brightness_w);
 };
 
 
@@ -84,36 +90,32 @@ public:
  *
  *************************************/
 
-static WRITE16_HANDLER( bg_videoram_w )
+WRITE16_MEMBER(mwarr_state::bg_videoram_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( mlow_videoram_w )
+WRITE16_MEMBER(mwarr_state::mlow_videoram_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
-	COMBINE_DATA(&state->m_mlow_videoram[offset]);
-	state->m_mlow_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_mlow_videoram[offset]);
+	m_mlow_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( mhigh_videoram_w )
+WRITE16_MEMBER(mwarr_state::mhigh_videoram_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
-	COMBINE_DATA(&state->m_mhigh_videoram[offset]);
-	state->m_mhigh_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_mhigh_videoram[offset]);
+	m_mhigh_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( tx_videoram_w )
+WRITE16_MEMBER(mwarr_state::tx_videoram_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
-	COMBINE_DATA(&state->m_tx_videoram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tx_videoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_DEVICE_HANDLER( oki1_bank_w )
@@ -121,11 +123,10 @@ static WRITE16_DEVICE_HANDLER( oki1_bank_w )
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 3));
 }
 
-static WRITE16_HANDLER( sprites_commands_w )
+WRITE16_MEMBER(mwarr_state::sprites_commands_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
-	if (state->m_which)
+	if (m_which)
 	{
 		int i;
 
@@ -135,9 +136,9 @@ static WRITE16_HANDLER( sprites_commands_w )
 			/* clear sprites on screen */
 			for (i = 0; i < 0x800; i++)
 			{
-				state->m_sprites_buffer[i] = 0;
+				m_sprites_buffer[i] = 0;
 			}
-			state->m_which = 0;
+			m_which = 0;
 			break;
 
 		default:
@@ -146,7 +147,7 @@ static WRITE16_HANDLER( sprites_commands_w )
 			/* refresh sprites on screen */
 			for (i = 0; i < 0x800; i++)
 			{
-				state->m_sprites_buffer[i] = state->m_spriteram[i];
+				m_sprites_buffer[i] = m_spriteram[i];
 			}
 			break;
 
@@ -156,21 +157,20 @@ static WRITE16_HANDLER( sprites_commands_w )
 		}
 	}
 
-	state->m_which ^= 1;
+	m_which ^= 1;
 }
 
-static WRITE16_HANDLER( mwarr_brightness_w )
+WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 	int i;
 	double brightness;
 
-	COMBINE_DATA(&state->m_mwarr_ram[0x14 / 2]);
+	COMBINE_DATA(&m_mwarr_ram[0x14 / 2]);
 
 	brightness = (double)(data & 0xff);
 	for (i = 0; i < 0x800; i++)
 	{
-		palette_set_pen_contrast(space->machine(), i, brightness/255);
+		palette_set_pen_contrast(machine(), i, brightness/255);
 	}
 }
 
@@ -183,10 +183,10 @@ static WRITE16_HANDLER( mwarr_brightness_w )
 
 static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE_LEGACY(bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE_LEGACY(mlow_videoram_w) AM_BASE(m_mlow_videoram)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE_LEGACY(mhigh_videoram_w) AM_BASE(m_mhigh_videoram)
-	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE_LEGACY(tx_videoram_w) AM_BASE(m_tx_videoram)
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_BASE(m_mlow_videoram)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(mhigh_videoram_w) AM_BASE(m_mhigh_videoram)
+	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(tx_videoram_w) AM_BASE(m_tx_videoram)
 	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_BASE(m_bg_scrollram)
 	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_BASE(m_mlow_scrollram)
 	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_BASE(m_mhigh_scrollram)
@@ -197,8 +197,8 @@ static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x110004, 0x110005) AM_READ_PORT("DSW")
 	AM_RANGE(0x110010, 0x110011) AM_DEVWRITE_LEGACY("oki2", oki1_bank_w)
-	AM_RANGE(0x110014, 0x110015) AM_WRITE_LEGACY(mwarr_brightness_w)
-	AM_RANGE(0x110016, 0x110017) AM_WRITE_LEGACY(sprites_commands_w)
+	AM_RANGE(0x110014, 0x110015) AM_WRITE(mwarr_brightness_w)
+	AM_RANGE(0x110016, 0x110017) AM_WRITE(sprites_commands_w)
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_BASE(m_mwarr_ram)
 	AM_RANGE(0x180000, 0x180001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x190000, 0x190001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)

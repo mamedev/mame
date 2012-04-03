@@ -40,6 +40,20 @@ public:
 	UINT8 m_tdr;
 	UINT8 m_tcr;
 	timer_device *m_mcu_timer;
+	DECLARE_READ8_MEMBER(mcu_portA_r);
+	DECLARE_WRITE8_MEMBER(mcu_portA_w);
+	DECLARE_READ8_MEMBER(mcu_portB_r);
+	DECLARE_WRITE8_MEMBER(mcu_portB_w);
+	DECLARE_READ8_MEMBER(mcu_portC_r);
+	DECLARE_WRITE8_MEMBER(mcu_portC_w);
+	DECLARE_READ8_MEMBER(mcu_ddr_r);
+	DECLARE_WRITE8_MEMBER(mcu_portA_ddr_w);
+	DECLARE_WRITE8_MEMBER(mcu_portB_ddr_w);
+	DECLARE_WRITE8_MEMBER(mcu_portC_ddr_w);
+	DECLARE_READ8_MEMBER(mcu_tdr_r);
+	DECLARE_WRITE8_MEMBER(mcu_tdr_w);
+	DECLARE_READ8_MEMBER(mcu_tcr_r);
+	DECLARE_WRITE8_MEMBER(mcu_tcr_w);
 };
 
 
@@ -58,18 +72,16 @@ public:
     7   (out) AUDIO
 */
 
-static READ8_HANDLER( mcu_portA_r )
+READ8_MEMBER(maxaflex_state::mcu_portA_r)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->m_portA_in = input_port_read(space->machine(), "dsw") | (input_port_read(space->machine(), "coin") << 4) | (input_port_read(space->machine(), "console") << 5);
-	return (state->m_portA_in & ~state->m_ddrA) | (state->m_portA_out & state->m_ddrA);
+	m_portA_in = input_port_read(machine(), "dsw") | (input_port_read(machine(), "coin") << 4) | (input_port_read(machine(), "console") << 5);
+	return (m_portA_in & ~m_ddrA) | (m_portA_out & m_ddrA);
 }
 
-static WRITE8_HANDLER( mcu_portA_w )
+WRITE8_MEMBER(maxaflex_state::mcu_portA_w)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->m_portA_out = data;
-	speaker_level_w(space->machine().device("speaker"), data >> 7);
+	m_portA_out = data;
+	speaker_level_w(machine().device("speaker"), data >> 7);
 }
 
 /* Port B:
@@ -83,36 +95,34 @@ static WRITE8_HANDLER( mcu_portA_w )
     7   (out)   TOFF - enables/disables user controls
 */
 
-static READ8_HANDLER( mcu_portB_r )
+READ8_MEMBER(maxaflex_state::mcu_portB_r)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	return (state->m_portB_in & ~state->m_ddrB) | (state->m_portB_out & state->m_ddrB);
+	return (m_portB_in & ~m_ddrB) | (m_portB_out & m_ddrB);
 }
 
-static WRITE8_HANDLER( mcu_portB_w )
+WRITE8_MEMBER(maxaflex_state::mcu_portB_w)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	UINT8 diff = data ^ state->m_portB_out;
-	state->m_portB_out = data;
+	UINT8 diff = data ^ m_portB_out;
+	m_portB_out = data;
 
 	/* clear coin interrupt */
 	if (data & 0x04)
-		cputag_set_input_line(space->machine(), "mcu", M6805_IRQ_LINE, CLEAR_LINE );
+		cputag_set_input_line(machine(), "mcu", M6805_IRQ_LINE, CLEAR_LINE );
 
 	/* AUDMUTE */
-	space->machine().sound().system_enable((data >> 5) & 1);
+	machine().sound().system_enable((data >> 5) & 1);
 
 	/* RES600 */
 	if (diff & 0x10)
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* latch for lamps */
 	if ((diff & 0x40) && !(data & 0x40))
 	{
-		output_set_lamp_value(0, (state->m_portC_out >> 0) & 1);
-		output_set_lamp_value(1, (state->m_portC_out >> 1) & 1);
-		output_set_lamp_value(2, (state->m_portC_out >> 2) & 1);
-		output_set_lamp_value(3, (state->m_portC_out >> 3) & 1);
+		output_set_lamp_value(0, (m_portC_out >> 0) & 1);
+		output_set_lamp_value(1, (m_portC_out >> 1) & 1);
+		output_set_lamp_value(2, (m_portC_out >> 2) & 1);
+		output_set_lamp_value(3, (m_portC_out >> 3) & 1);
 	}
 }
 
@@ -122,52 +132,47 @@ static WRITE8_HANDLER( mcu_portB_w )
     2   (out)   lamp START
     3   (out)   lamp OVER */
 
-static READ8_HANDLER( mcu_portC_r )
+READ8_MEMBER(maxaflex_state::mcu_portC_r)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	return (state->m_portC_in & ~state->m_ddrC) | (state->m_portC_out & state->m_ddrC);
+	return (m_portC_in & ~m_ddrC) | (m_portC_out & m_ddrC);
 }
 
-static WRITE8_HANDLER( mcu_portC_w )
+WRITE8_MEMBER(maxaflex_state::mcu_portC_w)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
 	/* uses a 7447A, which is equivalent to an LS47/48 */
 	static const UINT8 ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-	state->m_portC_out = data & 0x0f;
+	m_portC_out = data & 0x0f;
 
 	/* displays */
-	switch( state->m_portB_out & 0x3 )
+	switch( m_portB_out & 0x3 )
 	{
-		case 0x0: output_set_digit_value(0, ls48_map[state->m_portC_out]); break;
-		case 0x1: output_set_digit_value(1, ls48_map[state->m_portC_out]); break;
-		case 0x2: output_set_digit_value(2, ls48_map[state->m_portC_out]); break;
+		case 0x0: output_set_digit_value(0, ls48_map[m_portC_out]); break;
+		case 0x1: output_set_digit_value(1, ls48_map[m_portC_out]); break;
+		case 0x2: output_set_digit_value(2, ls48_map[m_portC_out]); break;
 		case 0x3: break;
 	}
 }
 
-static READ8_HANDLER( mcu_ddr_r )
+READ8_MEMBER(maxaflex_state::mcu_ddr_r)
 {
 	return 0xff;
 }
 
-static WRITE8_HANDLER( mcu_portA_ddr_w )
+WRITE8_MEMBER(maxaflex_state::mcu_portA_ddr_w)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->m_ddrA = data;
+	m_ddrA = data;
 }
 
-static WRITE8_HANDLER( mcu_portB_ddr_w )
+WRITE8_MEMBER(maxaflex_state::mcu_portB_ddr_w)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->m_ddrB = data;
+	m_ddrB = data;
 }
 
-static WRITE8_HANDLER( mcu_portC_ddr_w )
+WRITE8_MEMBER(maxaflex_state::mcu_portC_ddr_w)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->m_ddrC = data;
+	m_ddrC = data;
 }
 
 static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
@@ -184,35 +189,31 @@ static TIMER_DEVICE_CALLBACK( mcu_timer_proc )
 }
 
 /* Timer Data Reg */
-static READ8_HANDLER( mcu_tdr_r )
+READ8_MEMBER(maxaflex_state::mcu_tdr_r)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	return state->m_tdr;
+	return m_tdr;
 }
 
-static WRITE8_HANDLER( mcu_tdr_w )
+WRITE8_MEMBER(maxaflex_state::mcu_tdr_w)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->m_tdr = data;
+	m_tdr = data;
 }
 
 /* Timer control reg */
-static READ8_HANDLER( mcu_tcr_r )
+READ8_MEMBER(maxaflex_state::mcu_tcr_r)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	return state->m_tcr & ~0x08;
+	return m_tcr & ~0x08;
 }
 
-static WRITE8_HANDLER( mcu_tcr_w )
+WRITE8_MEMBER(maxaflex_state::mcu_tcr_w)
 {
-	maxaflex_state *state = space->machine().driver_data<maxaflex_state>();
-	state->m_tcr = data;
-	if ( (state->m_tcr & 0x40) == 0 )
+	m_tcr = data;
+	if ( (m_tcr & 0x40) == 0 )
 	{
 		int divider;
 		attotime period;
 
-		if ( !(state->m_tcr & 0x20) )
+		if ( !(m_tcr & 0x20) )
 		{
 			/* internal clock / 4*/
 			divider = 4;
@@ -223,14 +224,14 @@ static WRITE8_HANDLER( mcu_tcr_w )
 			divider = 1;
 		}
 
-		if ( state->m_tcr & 0x07 )
+		if ( m_tcr & 0x07 )
 		{
 			/* use prescaler */
-			divider = divider * (1 << (state->m_tcr & 0x7));
+			divider = divider * (1 << (m_tcr & 0x7));
 		}
 
 		period = attotime::from_hz(3579545) * divider;
-		state->m_mcu_timer->adjust(period, 0, period);
+		m_mcu_timer->adjust(period, 0, period);
 	}
 }
 
@@ -282,14 +283,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_mem, AS_PROGRAM, 8, maxaflex_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ_LEGACY(mcu_portA_r ) AM_WRITE_LEGACY(mcu_portA_w )
-	AM_RANGE(0x0001, 0x0001) AM_READ_LEGACY(mcu_portB_r ) AM_WRITE_LEGACY(mcu_portB_w )
-	AM_RANGE(0x0002, 0x0002) AM_READ_LEGACY(mcu_portC_r ) AM_WRITE_LEGACY(mcu_portC_w )
-	AM_RANGE(0x0004, 0x0004) AM_READ_LEGACY(mcu_ddr_r ) AM_WRITE_LEGACY(mcu_portA_ddr_w )
-	AM_RANGE(0x0005, 0x0005) AM_READ_LEGACY(mcu_ddr_r ) AM_WRITE_LEGACY(mcu_portB_ddr_w )
-	AM_RANGE(0x0006, 0x0006) AM_READ_LEGACY(mcu_ddr_r ) AM_WRITE_LEGACY(mcu_portC_ddr_w )
-	AM_RANGE(0x0008, 0x0008) AM_READ_LEGACY(mcu_tdr_r ) AM_WRITE_LEGACY(mcu_tdr_w )
-	AM_RANGE(0x0009, 0x0009) AM_READ_LEGACY(mcu_tcr_r ) AM_WRITE_LEGACY(mcu_tcr_w )
+	AM_RANGE(0x0000, 0x0000) AM_READ(mcu_portA_r ) AM_WRITE(mcu_portA_w )
+	AM_RANGE(0x0001, 0x0001) AM_READ(mcu_portB_r ) AM_WRITE(mcu_portB_w )
+	AM_RANGE(0x0002, 0x0002) AM_READ(mcu_portC_r ) AM_WRITE(mcu_portC_w )
+	AM_RANGE(0x0004, 0x0004) AM_READ(mcu_ddr_r ) AM_WRITE(mcu_portA_ddr_w )
+	AM_RANGE(0x0005, 0x0005) AM_READ(mcu_ddr_r ) AM_WRITE(mcu_portB_ddr_w )
+	AM_RANGE(0x0006, 0x0006) AM_READ(mcu_ddr_r ) AM_WRITE(mcu_portC_ddr_w )
+	AM_RANGE(0x0008, 0x0008) AM_READ(mcu_tdr_r ) AM_WRITE(mcu_tdr_w )
+	AM_RANGE(0x0009, 0x0009) AM_READ(mcu_tcr_r ) AM_WRITE(mcu_tcr_w )
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

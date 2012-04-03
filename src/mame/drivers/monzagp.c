@@ -47,6 +47,12 @@ public:
 	UINT8 *m_vram;
 	int m_screenw;
 	int m_bank;
+	DECLARE_READ8_MEMBER(rng_r);
+	DECLARE_WRITE8_MEMBER(port_w);
+	DECLARE_WRITE8_MEMBER(port0_w);
+	DECLARE_WRITE8_MEMBER(port1_w);
+	DECLARE_WRITE8_MEMBER(port2_w);
+	DECLARE_WRITE8_MEMBER(port3_w);
 };
 
 
@@ -115,22 +121,21 @@ static ADDRESS_MAP_START( monzagp_map, AS_PROGRAM, 8, monzagp_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static READ8_HANDLER(rng_r)
+READ8_MEMBER(monzagp_state::rng_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static WRITE8_HANDLER(port_w)
+WRITE8_MEMBER(monzagp_state::port_w)
 {
-	monzagp_state *state = space->machine().driver_data<monzagp_state>();
-	state->m_coordx=offset;//-0xc0;
-	//state->m_vram[state->m_coordy*state->m_screenw+state->m_coordx]=data;
+	m_coordx=offset;//-0xc0;
+	//m_vram[m_coordy*m_screenw+m_coordx]=data;
 	//if(output==0xfe)
 	{
 	//  if(data>='A' && data <='Z')
-	//      printf("%.2x %.2x %c %c\n",state->m_coordy, offset,data, znaki[data-'A']);
-		//state->m_vram[state->m_coordy*state->m_screenw+state->m_coordx]=data;
-		state->m_vram[(state->m_coordx*256+state->m_coordy)&0x7ff]=data;
+	//      printf("%.2x %.2x %c %c\n",m_coordy, offset,data, znaki[data-'A']);
+		//m_vram[m_coordy*m_screenw+m_coordx]=data;
+		m_vram[(m_coordx*256+m_coordy)&0x7ff]=data;
 	}
 }
 /*
@@ -172,25 +177,24 @@ static WRITE8_HANDLER(port_w)
 
 
 
-static WRITE8_HANDLER(port0_w)
+WRITE8_MEMBER(monzagp_state::port0_w)
 {
-//  printf("P0 %x = %x\n",cpu_get_pc(&space->device()),data);
+//  printf("P0 %x = %x\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE8_HANDLER(port1_w)
+WRITE8_MEMBER(monzagp_state::port1_w)
 {
-//  printf("P1 %x = %x\n",cpu_get_pc(&space->device()),data);
+//  printf("P1 %x = %x\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE8_HANDLER(port2_w)
+WRITE8_MEMBER(monzagp_state::port2_w)
 {
-	monzagp_state *state = space->machine().driver_data<monzagp_state>();
-//  printf("P2 %x = %x\n",cpu_get_pc(&space->device()),data);
-	state->m_coordy=data;
+//  printf("P2 %x = %x\n",cpu_get_pc(&space.device()),data);
+	m_coordy=data;
 }
 
 #if 0
-static WRITE8_HANDLER(port3_w)
+WRITE8_MEMBER(monzagp_state::port3_w)
 {
 	output=data;
 }
@@ -212,11 +216,11 @@ static WRITE8_HANDLER(port3_w)
 */
 
 static ADDRESS_MAP_START( monzagp_io, AS_IO, 8, monzagp_state )
-	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(rng_r,port_w)
-	AM_RANGE(0x100, 0x100) AM_WRITE_LEGACY(port0_w)
-	AM_RANGE(0x101, 0x101) AM_WRITE_LEGACY(port1_w)
-	AM_RANGE(0x102, 0x102) AM_WRITE_LEGACY(port2_w)
-	AM_RANGE(0x104, 0x104) AM_READ_LEGACY(rng_r)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(rng_r,port_w)
+	AM_RANGE(0x100, 0x100) AM_WRITE(port0_w)
+	AM_RANGE(0x101, 0x101) AM_WRITE(port1_w)
+	AM_RANGE(0x102, 0x102) AM_WRITE(port2_w)
+	AM_RANGE(0x104, 0x104) AM_READ(rng_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( monzagp )

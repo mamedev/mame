@@ -42,6 +42,16 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(flyball_input_r);
+	DECLARE_READ8_MEMBER(flyball_scanline_r);
+	DECLARE_READ8_MEMBER(flyball_potsense_r);
+	DECLARE_WRITE8_MEMBER(flyball_potmask_w);
+	DECLARE_WRITE8_MEMBER(flyball_pitcher_pic_w);
+	DECLARE_WRITE8_MEMBER(flyball_ball_vert_w);
+	DECLARE_WRITE8_MEMBER(flyball_ball_horz_w);
+	DECLARE_WRITE8_MEMBER(flyball_pitcher_vert_w);
+	DECLARE_WRITE8_MEMBER(flyball_pitcher_horz_w);
+	DECLARE_WRITE8_MEMBER(flyball_misc_w);
 };
 
 
@@ -159,66 +169,59 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
  *************************************/
 
 /* two physical buttons (start game and stop runner) share the same port bit */
-static READ8_HANDLER( flyball_input_r )
+READ8_MEMBER(flyball_state::flyball_input_r)
 {
-	return input_port_read(space->machine(), "IN0") & input_port_read(space->machine(), "IN1");
+	return input_port_read(machine(), "IN0") & input_port_read(machine(), "IN1");
 }
 
-static READ8_HANDLER( flyball_scanline_r )
+READ8_MEMBER(flyball_state::flyball_scanline_r)
 {
-	return space->machine().primary_screen->vpos() & 0x3f;
+	return machine().primary_screen->vpos() & 0x3f;
 }
 
-static READ8_HANDLER( flyball_potsense_r )
+READ8_MEMBER(flyball_state::flyball_potsense_r)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	return state->m_potsense & ~state->m_potmask;
+	return m_potsense & ~m_potmask;
 }
 
-static WRITE8_HANDLER( flyball_potmask_w )
+WRITE8_MEMBER(flyball_state::flyball_potmask_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_potmask |= data & 0xf;
+	m_potmask |= data & 0xf;
 }
 
-static WRITE8_HANDLER( flyball_pitcher_pic_w )
+WRITE8_MEMBER(flyball_state::flyball_pitcher_pic_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_pitcher_pic = data & 0xf;
+	m_pitcher_pic = data & 0xf;
 }
 
-static WRITE8_HANDLER( flyball_ball_vert_w )
+WRITE8_MEMBER(flyball_state::flyball_ball_vert_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_ball_vert = data;
+	m_ball_vert = data;
 }
 
-static WRITE8_HANDLER( flyball_ball_horz_w )
+WRITE8_MEMBER(flyball_state::flyball_ball_horz_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_ball_horz = data;
+	m_ball_horz = data;
 }
 
-static WRITE8_HANDLER( flyball_pitcher_vert_w )
+WRITE8_MEMBER(flyball_state::flyball_pitcher_vert_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_pitcher_vert = data;
+	m_pitcher_vert = data;
 }
 
-static WRITE8_HANDLER( flyball_pitcher_horz_w )
+WRITE8_MEMBER(flyball_state::flyball_pitcher_horz_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_pitcher_horz = data;
+	m_pitcher_horz = data;
 }
 
-static WRITE8_HANDLER( flyball_misc_w )
+WRITE8_MEMBER(flyball_state::flyball_misc_w)
 {
 	int bit = ~data & 1;
 
 	switch (offset)
 	{
 	case 0:
-		set_led_status(space->machine(), 0, bit);
+		set_led_status(machine(), 0, bit);
 		break;
 	case 1:
 		/* crowd very loud */
@@ -249,16 +252,16 @@ static ADDRESS_MAP_START( flyball_map, AS_PROGRAM, 8, flyball_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_NOP
-	AM_RANGE(0x0801, 0x0801) AM_WRITE_LEGACY(flyball_pitcher_pic_w)
-	AM_RANGE(0x0802, 0x0802) AM_READ_LEGACY(flyball_scanline_r)
-	AM_RANGE(0x0803, 0x0803) AM_READ_LEGACY(flyball_potsense_r)
-	AM_RANGE(0x0804, 0x0804) AM_WRITE_LEGACY(flyball_ball_vert_w)
-	AM_RANGE(0x0805, 0x0805) AM_WRITE_LEGACY(flyball_ball_horz_w)
-	AM_RANGE(0x0806, 0x0806) AM_WRITE_LEGACY(flyball_pitcher_vert_w)
-	AM_RANGE(0x0807, 0x0807) AM_WRITE_LEGACY(flyball_pitcher_horz_w)
-	AM_RANGE(0x0900, 0x0900) AM_WRITE_LEGACY(flyball_potmask_w)
-	AM_RANGE(0x0a00, 0x0a07) AM_WRITE_LEGACY(flyball_misc_w)
-	AM_RANGE(0x0b00, 0x0b00) AM_READ_LEGACY(flyball_input_r)
+	AM_RANGE(0x0801, 0x0801) AM_WRITE(flyball_pitcher_pic_w)
+	AM_RANGE(0x0802, 0x0802) AM_READ(flyball_scanline_r)
+	AM_RANGE(0x0803, 0x0803) AM_READ(flyball_potsense_r)
+	AM_RANGE(0x0804, 0x0804) AM_WRITE(flyball_ball_vert_w)
+	AM_RANGE(0x0805, 0x0805) AM_WRITE(flyball_ball_horz_w)
+	AM_RANGE(0x0806, 0x0806) AM_WRITE(flyball_pitcher_vert_w)
+	AM_RANGE(0x0807, 0x0807) AM_WRITE(flyball_pitcher_horz_w)
+	AM_RANGE(0x0900, 0x0900) AM_WRITE(flyball_potmask_w)
+	AM_RANGE(0x0a00, 0x0a07) AM_WRITE(flyball_misc_w)
+	AM_RANGE(0x0b00, 0x0b00) AM_READ(flyball_input_r)
 	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_BASE(m_playfield_ram)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE(m_rombase) /* program */
 ADDRESS_MAP_END

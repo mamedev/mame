@@ -70,6 +70,12 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_WRITE8_MEMBER(m14_vram_w);
+	DECLARE_WRITE8_MEMBER(m14_cram_w);
+	DECLARE_READ8_MEMBER(m14_rng_r);
+	DECLARE_READ8_MEMBER(input_buttons_r);
+	DECLARE_WRITE8_MEMBER(test_w);
+	DECLARE_WRITE8_MEMBER(hopper_w);
 };
 
 
@@ -129,20 +135,18 @@ static SCREEN_UPDATE_IND16( m14 )
 }
 
 
-static WRITE8_HANDLER( m14_vram_w )
+WRITE8_MEMBER(m14_state::m14_vram_w)
 {
-	m14_state *state = space->machine().driver_data<m14_state>();
 
-	state->m_video_ram[offset] = data;
-	state->m_m14_tilemap->mark_tile_dirty(offset);
+	m_video_ram[offset] = data;
+	m_m14_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( m14_cram_w )
+WRITE8_MEMBER(m14_state::m14_cram_w)
 {
-	m14_state *state = space->machine().driver_data<m14_state>();
 
-	state->m_color_ram[offset] = data;
-	state->m_m14_tilemap->mark_tile_dirty(offset);
+	m_color_ram[offset] = data;
+	m_m14_tilemap->mark_tile_dirty(offset);
 }
 
 /*************************************
@@ -151,28 +155,27 @@ static WRITE8_HANDLER( m14_cram_w )
  *
  *************************************/
 
-static READ8_HANDLER( m14_rng_r )
+READ8_MEMBER(m14_state::m14_rng_r)
 {
 	/* graphic artifacts happens if this doesn't return random values. */
-	return (space->machine().rand() & 0x0f) | 0xf0; /* | (input_port_read(space->machine(), "IN1") & 0x80)*/;
+	return (machine().rand() & 0x0f) | 0xf0; /* | (input_port_read(machine(), "IN1") & 0x80)*/;
 }
 
 /* Here routes the hopper & the inputs */
-static READ8_HANDLER( input_buttons_r )
+READ8_MEMBER(m14_state::input_buttons_r)
 {
-	m14_state *state = space->machine().driver_data<m14_state>();
 
-	if (state->m_hop_mux)
+	if (m_hop_mux)
 	{
-		state->m_hop_mux = 0;
+		m_hop_mux = 0;
 		return 0; //0x43 status bits
 	}
 	else
-		return input_port_read(space->machine(), "IN0");
+		return input_port_read(machine(), "IN0");
 }
 
 #if 0
-static WRITE8_HANDLER( test_w )
+WRITE8_MEMBER(m14_state::test_w)
 {
 	static UINT8 x[5];
 
@@ -182,13 +185,12 @@ static WRITE8_HANDLER( test_w )
 }
 #endif
 
-static WRITE8_HANDLER( hopper_w )
+WRITE8_MEMBER(m14_state::hopper_w)
 {
-	m14_state *state = space->machine().driver_data<m14_state>();
 
 	/* ---- x--- coin out */
 	/* ---- --x- hopper/input mux? */
-	state->m_hop_mux = data & 2;
+	m_hop_mux = data & 2;
 	//popmessage("%02x",data);
 }
 
@@ -201,16 +203,16 @@ static WRITE8_HANDLER( hopper_w )
 static ADDRESS_MAP_START( m14_map, AS_PROGRAM, 8, m14_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(m14_vram_w) AM_BASE(m_video_ram)
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(m14_cram_w) AM_BASE(m_color_ram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(m14_vram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(m14_cram_w) AM_BASE(m_color_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m14_io_map, AS_IO, 8, m14_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("AN_PADDLE") AM_WRITENOP
-	AM_RANGE(0xf9, 0xf9) AM_READ_LEGACY(input_buttons_r) AM_WRITENOP
-	AM_RANGE(0xfa, 0xfa) AM_READ_LEGACY(m14_rng_r) AM_WRITENOP
-	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE_LEGACY(hopper_w)
+	AM_RANGE(0xf9, 0xf9) AM_READ(input_buttons_r) AM_WRITENOP
+	AM_RANGE(0xfa, 0xfa) AM_READ(m14_rng_r) AM_WRITENOP
+	AM_RANGE(0xfb, 0xfb) AM_READ_PORT("DSW") AM_WRITE(hopper_w)
 	AM_RANGE(0xf8, 0xfc) AM_WRITENOP
 ADDRESS_MAP_END
 

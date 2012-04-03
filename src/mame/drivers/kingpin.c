@@ -33,10 +33,11 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_code_base;
+	DECLARE_READ8_MEMBER(io_read_missing_dips);
 };
 
 
-static READ8_HANDLER( io_read_missing_dips )
+READ8_MEMBER(kingpin_state::io_read_missing_dips)
 {
 	return 0x00;
 }
@@ -106,9 +107,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kingpin_io_map, AS_IO, 8, kingpin_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(io_read_missing_dips)
+	AM_RANGE(0x00, 0x00) AM_READ(io_read_missing_dips)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW")
-/*  AM_RANGE(0x02, 0x02) AM_READ_LEGACY(io_read_missing_dips) */
+/*  AM_RANGE(0x02, 0x02) AM_READ(io_read_missing_dips) */
 /*  AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(NO IDEA) */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")

@@ -41,6 +41,9 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_x;
+	DECLARE_READ16_MEMBER(bingoc_rand_r);
+	DECLARE_READ8_MEMBER(sound_test_r);
+	DECLARE_WRITE16_MEMBER(main_sound_latch_w);
 };
 
 
@@ -56,7 +59,7 @@ static SCREEN_UPDATE_IND16(bingoc)
 	return 0;
 }
 
-static READ16_HANDLER( bingoc_rand_r )
+READ16_MEMBER(bingoc_state::bingoc_rand_r)
 {
 	return 0xffff;
 }
@@ -68,27 +71,26 @@ static READ16_HANDLER( bingoc_rand_r )
 0x80-0x85 ym2151 bgm
 0x90-0x9b ym2151 sfx
 */
-static READ8_HANDLER( sound_test_r )
+READ8_MEMBER(bingoc_state::sound_test_r)
 {
-	bingoc_state *state = space->machine().driver_data<bingoc_state>();
 
-	if(space->machine().input().code_pressed_once(KEYCODE_Z))
-		state->m_x++;
+	if(machine().input().code_pressed_once(KEYCODE_Z))
+		m_x++;
 
-	if(space->machine().input().code_pressed_once(KEYCODE_X))
-		state->m_x--;
+	if(machine().input().code_pressed_once(KEYCODE_X))
+		m_x--;
 
-	if(space->machine().input().code_pressed_once(KEYCODE_A))
+	if(machine().input().code_pressed_once(KEYCODE_A))
 		return 0xff;
 
-	popmessage("%02x",state->m_x);
-	return state->m_x;
+	popmessage("%02x",m_x);
+	return m_x;
 }
 #else
-static WRITE16_HANDLER( main_sound_latch_w )
+WRITE16_MEMBER(bingoc_state::main_sound_latch_w)
 {
 	soundlatch_w(space,0,data&0xff);
-	cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 #endif
 
@@ -106,10 +108,10 @@ static WRITE8_DEVICE_HANDLER( bingoc_play_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, bingoc_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10007f) AM_READ_LEGACY(bingoc_rand_r) //comms? lamps?
-	AM_RANGE(0x180000, 0x18007f) AM_READ_LEGACY(bingoc_rand_r) //comms? lamps?
+	AM_RANGE(0x100000, 0x10007f) AM_READ(bingoc_rand_r) //comms? lamps?
+	AM_RANGE(0x180000, 0x18007f) AM_READ(bingoc_rand_r) //comms? lamps?
 #if !SOUND_TEST
-	AM_RANGE(0x180010, 0x180011) AM_WRITE_LEGACY(main_sound_latch_w) //WRONG there...
+	AM_RANGE(0x180010, 0x180011) AM_WRITE(main_sound_latch_w) //WRONG there...
 #endif
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -127,7 +129,7 @@ static ADDRESS_MAP_START( sound_io, AS_IO, 8, bingoc_state )
 #if !SOUND_TEST
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(soundlatch_r) //soundlatch
 #else
-	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(sound_test_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(sound_test_r)
 #endif
 ADDRESS_MAP_END
 

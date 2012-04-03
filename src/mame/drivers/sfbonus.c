@@ -301,6 +301,18 @@ public:
 	UINT8* m_3000_regs;
 	UINT8* m_2801_regs;
 	UINT8* m_2c01_regs;
+	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
+	DECLARE_READ8_MEMBER(sfbonus_2800_r);
+	DECLARE_READ8_MEMBER(sfbonus_2801_r);
+	DECLARE_READ8_MEMBER(sfbonus_2c00_r);
+	DECLARE_READ8_MEMBER(sfbonus_2c01_r);
+	DECLARE_READ8_MEMBER(sfbonus_3800_r);
+	DECLARE_WRITE8_MEMBER(sfbonus_1800_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_3800_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_3000_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_2801_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_2c01_w);
 };
 
 
@@ -702,48 +714,47 @@ static TILE_GET_INFO( get_sfbonus_reel4_tile_info )
 }
 
 
-static WRITE8_HANDLER( sfbonus_videoram_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_videoram_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
 	if (offset<0x4000) /* 0x0000 - 0x3fff */
 	{
-		state->m_tilemap_ram[offset] = data;
-		state->m_tilemap->mark_tile_dirty(offset/2);
+		m_tilemap_ram[offset] = data;
+		m_tilemap->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x4800) /* 0x4000 - 0x47ff */
 	{
 		offset-=0x4000;
 
-		state->m_reel_ram[offset] = data;
-		state->m_reel_tilemap->mark_tile_dirty(offset/2);
+		m_reel_ram[offset] = data;
+		m_reel_tilemap->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x5000)  /* 0x4800 - 0x4fff */
 	{
 		offset-=0x4800;
 
-		state->m_reel2_ram[offset] = data;
-		state->m_reel2_tilemap->mark_tile_dirty(offset/2);
+		m_reel2_ram[offset] = data;
+		m_reel2_tilemap->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x5800) /* 0x5000 - 0x57ff */
 	{
 		offset-=0x5000;
 
-		state->m_reel3_ram[offset] = data;
-		state->m_reel3_tilemap->mark_tile_dirty(offset/2);
+		m_reel3_ram[offset] = data;
+		m_reel3_tilemap->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x6000) /* 0x5800 - 0x5fff */
 	{
 		offset-=0x5800;
 
-		state->m_reel4_ram[offset] = data;
-		state->m_reel4_tilemap->mark_tile_dirty(offset/2);
+		m_reel4_ram[offset] = data;
+		m_reel4_tilemap->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x8000)
 	{
 		offset -=0x6000;
 		// scroll regs etc.
 		//logerror("access vram at [%04x] <- %02x\n",offset,data);
-		state->m_videoram[offset] = data;
+		m_videoram[offset] = data;
 	}
 	else
 	{
@@ -1057,77 +1068,72 @@ static SCREEN_UPDATE_IND16(sfbonus)
 
 
 static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8, sfbonus_state )
-	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(sfbonus_videoram_w)
+	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_nvram) AM_SIZE(m_nvram_size)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( sfbonus_bank_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = machine().region("maincpu")->base();
 	UINT8 bank;
 
 	bank = data & 7;
 
-	memory_set_bankptr(space->machine(), "bank1", &ROM[bank * 0x10000]);
+	memory_set_bankptr(machine(), "bank1", &ROM[bank * 0x10000]);
 }
 
 
 
-static READ8_HANDLER( sfbonus_2800_r )
+READ8_MEMBER(sfbonus_state::sfbonus_2800_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ8_HANDLER( sfbonus_2801_r )
+READ8_MEMBER(sfbonus_state::sfbonus_2801_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ8_HANDLER( sfbonus_2c00_r )
+READ8_MEMBER(sfbonus_state::sfbonus_2c00_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ8_HANDLER( sfbonus_2c01_r )
+READ8_MEMBER(sfbonus_state::sfbonus_2c01_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ8_HANDLER( sfbonus_3800_r )
+READ8_MEMBER(sfbonus_state::sfbonus_3800_r)
 {
 	return 0xff;
 }
 
 
 // lamps and coin counters
-static WRITE8_HANDLER( sfbonus_1800_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_1800_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
-	state->m_1800_regs[offset] = data;
+	m_1800_regs[offset] = data;
 }
 
-static WRITE8_HANDLER( sfbonus_3800_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_3800_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
-	state->m_3800_regs[offset] = data;
+	m_3800_regs[offset] = data;
 }
 
-static WRITE8_HANDLER( sfbonus_3000_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_3000_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
-	state->m_3000_regs[offset] = data;
+	m_3000_regs[offset] = data;
 }
 
-static WRITE8_HANDLER( sfbonus_2801_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_2801_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
-	state->m_2801_regs[offset] = data;
+	m_2801_regs[offset] = data;
 }
 
-static WRITE8_HANDLER( sfbonus_2c01_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_2c01_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
-	state->m_2c01_regs[offset] = data;
+	m_2c01_regs[offset] = data;
 }
 
 
@@ -1148,21 +1154,21 @@ static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8, sfbonus_state )
 	AM_RANGE(0x0c01, 0x0c01) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
 	AM_RANGE(0x0c02, 0x0c02) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
-	AM_RANGE(0x1800, 0x1807) AM_WRITE_LEGACY(sfbonus_1800_w) AM_BASE(m_1800_regs) // lamps and coin counters
+	AM_RANGE(0x1800, 0x1807) AM_WRITE(sfbonus_1800_w) AM_BASE(m_1800_regs) // lamps and coin counters
 
 	AM_RANGE(0x2400, 0x241f) AM_RAM AM_BASE(m_vregs)
 
-	AM_RANGE(0x2800, 0x2800) AM_READ_LEGACY(sfbonus_2800_r)
-	AM_RANGE(0x2801, 0x2801) AM_READ_LEGACY(sfbonus_2801_r) AM_WRITE_LEGACY(sfbonus_2801_w) AM_BASE(m_2801_regs)
+	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_2800_r)
+	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(sfbonus_2801_w) AM_BASE(m_2801_regs)
 
-	AM_RANGE(0x2c00, 0x2c00) AM_READ_LEGACY(sfbonus_2c00_r)
-	AM_RANGE(0x2c01, 0x2c01) AM_READ_LEGACY(sfbonus_2c01_r) AM_WRITE_LEGACY(sfbonus_2c01_w) AM_BASE(m_2c01_regs)
+	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_2c00_r)
+	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(sfbonus_2c01_w) AM_BASE(m_2c01_regs)
 
-	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(sfbonus_3000_w) AM_BASE(m_3000_regs)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(sfbonus_bank_w)
-	AM_RANGE(0x3800, 0x3800) AM_READ_LEGACY(sfbonus_3800_r)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(sfbonus_3000_w) AM_BASE(m_3000_regs)
+	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
+	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_3800_r)
 
-	AM_RANGE(0x3800, 0x3807) AM_WRITE_LEGACY(sfbonus_3800_w) AM_BASE(m_3800_regs)
+	AM_RANGE(0x3800, 0x3807) AM_WRITE(sfbonus_3800_w) AM_BASE(m_3800_regs)
 ADDRESS_MAP_END
 
 

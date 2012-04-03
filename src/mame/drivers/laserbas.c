@@ -49,6 +49,12 @@ public:
 	UINT8    m_vram1[0x8000];
 	UINT8    m_vram2[0x8000];
 	UINT8    *m_protram;
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(read_unk);
+	DECLARE_WRITE8_MEMBER(vrambank_w);
+	DECLARE_READ8_MEMBER(protram_r);
+	DECLARE_WRITE8_MEMBER(protram_w);
 };
 
 
@@ -81,65 +87,59 @@ static SCREEN_UPDATE_IND16(laserbas)
 	return 0;
 }
 
-static READ8_HANDLER(vram_r)
+READ8_MEMBER(laserbas_state::vram_r)
 {
-	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
-	if(!state->m_vrambank)
-		return state->m_vram1[offset];
+	if(!m_vrambank)
+		return m_vram1[offset];
 	else
-		return state->m_vram2[offset];
+		return m_vram2[offset];
 }
 
-static WRITE8_HANDLER(vram_w)
+WRITE8_MEMBER(laserbas_state::vram_w)
 {
-	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
-	if(!state->m_vrambank)
-		state->m_vram1[offset] = data;
+	if(!m_vrambank)
+		m_vram1[offset] = data;
 	else
-		state->m_vram2[offset] = data;
+		m_vram2[offset] = data;
 }
 
 #if 0
-static READ8_HANDLER( read_unk )
+READ8_MEMBER(laserbas_state::read_unk)
 {
-	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
-	state->m_count ^= 0x80;
-	return state->m_count | 0x7f;
+	m_count ^= 0x80;
+	return m_count | 0x7f;
 }
 #endif
 
-static WRITE8_HANDLER(vrambank_w)
+WRITE8_MEMBER(laserbas_state::vrambank_w)
 {
-	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
 	/* either bit 2 or 3 controls flip screen */
 
-	state->m_vrambank = data & 0x40;
+	m_vrambank = data & 0x40;
 }
 
-static READ8_HANDLER( protram_r )
+READ8_MEMBER(laserbas_state::protram_r)
 {
-	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
-	return state->m_protram[offset];
+	return m_protram[offset];
 }
 
-static WRITE8_HANDLER( protram_w )
+WRITE8_MEMBER(laserbas_state::protram_w)
 {
-	laserbas_state *state = space->machine().driver_data<laserbas_state>();
 
-	state->m_protram[offset] = data;
+	m_protram[offset] = data;
 }
 
 static ADDRESS_MAP_START( laserbas_memory, AS_PROGRAM, 8, laserbas_state )
 	//ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0xbfff) AM_READWRITE_LEGACY(vram_r, vram_w)
+	AM_RANGE(0x4000, 0xbfff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0xc000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(protram_r, protram_w) AM_BASE(m_protram) /* protection device */
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(protram_r, protram_w) AM_BASE(m_protram) /* protection device */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -147,7 +147,7 @@ static ADDRESS_MAP_START( laserbas_io, AS_IO, 8, laserbas_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(vrambank_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(vrambank_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("IN1") // DSW + something else?
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
 	AM_RANGE(0x22, 0x22) AM_READ_PORT("IN2")

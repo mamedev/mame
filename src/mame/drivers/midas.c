@@ -66,6 +66,13 @@ public:
 	UINT16 *m_gfxram;
 	UINT16 *m_gfxregs;
 	tilemap_t *m_tmap;
+	DECLARE_READ16_MEMBER(ret_ffff);
+	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);
+	DECLARE_WRITE16_MEMBER(livequiz_coin_w);
+	DECLARE_READ16_MEMBER(hammer_sensor_r);
+	DECLARE_WRITE16_MEMBER(hammer_coin_w);
+	DECLARE_WRITE16_MEMBER(hammer_motor_w);
+	DECLARE_WRITE16_MEMBER(hammer_led_w);
 };
 
 
@@ -214,25 +221,24 @@ static WRITE16_DEVICE_HANDLER( midas_eeprom_w )
 	}
 }
 
-static READ16_HANDLER( ret_ffff )
+READ16_MEMBER(midas_state::ret_ffff)
 {
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( midas_gfxregs_w )
+WRITE16_MEMBER(midas_state::midas_gfxregs_w)
 {
-	midas_state *state = space->machine().driver_data<midas_state>();
-	COMBINE_DATA( state->m_gfxregs + offset );
+	COMBINE_DATA( m_gfxregs + offset );
 
 	switch( offset )
 	{
 		case 1:
 		{
-			UINT16 addr = state->m_gfxregs[0];
-			state->m_gfxram[addr] = data;
-			state->m_gfxregs[0] += state->m_gfxregs[2];
+			UINT16 addr = m_gfxregs[0];
+			m_gfxram[addr] = data;
+			m_gfxregs[0] += m_gfxregs[2];
 
-			if ( addr >= 0x7000 && addr <= 0x7fff )	state->m_tmap->mark_tile_dirty(addr - 0x7000);
+			if ( addr >= 0x7000 && addr <= 0x7fff )	m_tmap->mark_tile_dirty(addr - 0x7000);
 
 			break;
 		}
@@ -243,11 +249,11 @@ static WRITE16_HANDLER( midas_gfxregs_w )
                                        Live Quiz Show
 ***************************************************************************************/
 
-static WRITE16_HANDLER( livequiz_coin_w )
+WRITE16_MEMBER(midas_state::livequiz_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0001);
+		coin_counter_w(machine(), 0, data & 0x0001);
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
@@ -262,19 +268,19 @@ static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("PLAYER2")
 	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("START")
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE_LEGACY(livequiz_coin_w )
+	AM_RANGE(0x980000, 0x980001) AM_WRITE(livequiz_coin_w )
 
 	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE_LEGACY("eeprom", midas_eeprom_w )
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE_LEGACY(midas_gfxregs_w ) AM_BASE(m_gfxregs )
+	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_BASE(m_gfxregs )
 
 	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE_LEGACY(paletteram16_xrgb_word_be_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ_LEGACY(ret_ffff )
-	AM_RANGE(0xb20000, 0xb20001) AM_READ_LEGACY(ret_ffff )
-	AM_RANGE(0xb40000, 0xb40001) AM_READ_LEGACY(ret_ffff )
-	AM_RANGE(0xb60000, 0xb60001) AM_READ_LEGACY(ret_ffff )
+	AM_RANGE(0xb00000, 0xb00001) AM_READ(ret_ffff )
+	AM_RANGE(0xb20000, 0xb20001) AM_READ(ret_ffff )
+	AM_RANGE(0xb40000, 0xb40001) AM_READ(ret_ffff )
+	AM_RANGE(0xb60000, 0xb60001) AM_READ(ret_ffff )
 
 	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff )
 
@@ -290,33 +296,33 @@ ADDRESS_MAP_END
                                           Hammer
 ***************************************************************************************/
 
-static READ16_HANDLER( hammer_sensor_r )
+READ16_MEMBER(midas_state::hammer_sensor_r)
 {
-	if (input_port_read(space->machine(), "HAMMER") & 0x80)
+	if (input_port_read(machine(), "HAMMER") & 0x80)
 		return 0xffff;
 
-	return (input_port_read(space->machine(), "SENSORY") << 8) | input_port_read(space->machine(), "SENSORX");
+	return (input_port_read(machine(), "SENSORY") << 8) | input_port_read(machine(), "SENSORX");
 }
 
-static WRITE16_HANDLER( hammer_coin_w )
+WRITE16_MEMBER(midas_state::hammer_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0001);
-		coin_counter_w(space->machine(), 1, data & 0x0002);
+		coin_counter_w(machine(), 0, data & 0x0001);
+		coin_counter_w(machine(), 1, data & 0x0002);
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
 #endif
 }
 
-static WRITE16_HANDLER( hammer_motor_w )
+WRITE16_MEMBER(midas_state::hammer_motor_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		ticket_dispenser_w(space->machine().device("prize1"), 0, (data & 0x0001) << 7);
-		ticket_dispenser_w(space->machine().device("prize2"), 0, (data & 0x0002) << 6);
-		ticket_dispenser_w(space->machine().device("ticket"), 0, (data & 0x0010) << 3);
+		ticket_dispenser_w(machine().device("prize1"), 0, (data & 0x0001) << 7);
+		ticket_dispenser_w(machine().device("prize2"), 0, (data & 0x0002) << 6);
+		ticket_dispenser_w(machine().device("ticket"), 0, (data & 0x0010) << 3);
 		// data & 0x0080 ?
 	}
 #ifdef MAME_DEBUG
@@ -324,7 +330,7 @@ static WRITE16_HANDLER( hammer_motor_w )
 #endif
 }
 
-static WRITE16_HANDLER( hammer_led_w )
+WRITE16_MEMBER(midas_state::hammer_led_w)
 {
 #ifdef MAME_DEBUG
 //  popmessage("led %04X", data);
@@ -339,30 +345,30 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("IN0")
 	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("TILT")
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE_LEGACY(hammer_coin_w )
+	AM_RANGE(0x980000, 0x980001) AM_WRITE(hammer_coin_w )
 	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP	// IRQ Ack
-	AM_RANGE(0x9c000e, 0x9c000f) AM_WRITE_LEGACY(hammer_led_w )
+	AM_RANGE(0x9c000e, 0x9c000f) AM_WRITE(hammer_led_w )
 
 	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE_LEGACY("eeprom", midas_eeprom_w )
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE_LEGACY(midas_gfxregs_w ) AM_BASE(m_gfxregs )
+	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_BASE(m_gfxregs )
 
 	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE_LEGACY(paletteram16_xrgb_word_be_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ_LEGACY(ret_ffff )
-	AM_RANGE(0xb20000, 0xb20001) AM_READ_LEGACY(ret_ffff )
-	AM_RANGE(0xb40000, 0xb40001) AM_READ_LEGACY(ret_ffff )
-	AM_RANGE(0xb60000, 0xb60001) AM_READ_LEGACY(ret_ffff )
+	AM_RANGE(0xb00000, 0xb00001) AM_READ(ret_ffff )
+	AM_RANGE(0xb20000, 0xb20001) AM_READ(ret_ffff )
+	AM_RANGE(0xb40000, 0xb40001) AM_READ(ret_ffff )
+	AM_RANGE(0xb60000, 0xb60001) AM_READ(ret_ffff )
 
 	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff )
 
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("IN1")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("HAMMER")
 
-	AM_RANGE(0xbc0002, 0xbc0003) AM_WRITE_LEGACY(hammer_motor_w )
+	AM_RANGE(0xbc0002, 0xbc0003) AM_WRITE(hammer_motor_w )
 
-	AM_RANGE(0xbc0004, 0xbc0005) AM_READ_LEGACY(hammer_sensor_r )
+	AM_RANGE(0xbc0004, 0xbc0005) AM_READ(hammer_sensor_r )
 
 	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM	// zoom table?
 

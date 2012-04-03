@@ -67,51 +67,51 @@ public:
 
 	UINT16 m_sengokumj_mux_data;
 	UINT8 m_hopper_io;
+	DECLARE_READ16_MEMBER(mahjong_panel_r);
+	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
+	DECLARE_WRITE16_MEMBER(sengokmj_out_w);
+	DECLARE_READ16_MEMBER(sengokmj_system_r);
 };
 
 
 
 /* Multiplexer device for the mahjong panel */
-static READ16_HANDLER( mahjong_panel_r )
+READ16_MEMBER(sengokmj_state::mahjong_panel_r)
 {
-	sengokmj_state *state = space->machine().driver_data<sengokmj_state>();
-	switch(state->m_sengokumj_mux_data)
+	switch(m_sengokumj_mux_data)
 	{
-		case 0x0100: return input_port_read(space->machine(), "KEY0");
-		case 0x0200: return input_port_read(space->machine(), "KEY1");
-		case 0x0400: return input_port_read(space->machine(), "KEY2");
-		case 0x0800: return input_port_read(space->machine(), "KEY3");
-		case 0x1000: return input_port_read(space->machine(), "KEY4");
-		case 0x2000: return input_port_read(space->machine(), "UNUSED");
+		case 0x0100: return input_port_read(machine(), "KEY0");
+		case 0x0200: return input_port_read(machine(), "KEY1");
+		case 0x0400: return input_port_read(machine(), "KEY2");
+		case 0x0800: return input_port_read(machine(), "KEY3");
+		case 0x1000: return input_port_read(machine(), "KEY4");
+		case 0x2000: return input_port_read(machine(), "UNUSED");
 	}
 
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( mahjong_panel_w )
+WRITE16_MEMBER(sengokmj_state::mahjong_panel_w)
 {
-	sengokmj_state *state = space->machine().driver_data<sengokmj_state>();
-	state->m_sengokumj_mux_data = data;
+	m_sengokumj_mux_data = data;
 }
 
-static WRITE16_HANDLER( sengokmj_out_w )
+WRITE16_MEMBER(sengokmj_state::sengokmj_out_w)
 {
-	sengokmj_state *state = space->machine().driver_data<sengokmj_state>();
 	/* ---- ---- ---x ---- J.P. Signal (?)*/
 	/* ---- ---- ---- -x-- Coin counter (done AFTER that you press start)*/
 	/* ---- ---- ---- --x- Cash enable (lockout)*/
 	/* ---- ---- ---- ---x Hopper 10 */
-	coin_lockout_w(space->machine(), 0,~data & 2);
-	coin_lockout_w(space->machine(), 1,~data & 2);
-	coin_counter_w(space->machine(), 0,data & 4);
-	state->m_hopper_io = ((data & 1)<<6);
-//  popmessage("%02x",state->m_hopper_io);
+	coin_lockout_w(machine(), 0,~data & 2);
+	coin_lockout_w(machine(), 1,~data & 2);
+	coin_counter_w(machine(), 0,data & 4);
+	m_hopper_io = ((data & 1)<<6);
+//  popmessage("%02x",m_hopper_io);
 }
 
-static READ16_HANDLER( sengokmj_system_r )
+READ16_MEMBER(sengokmj_state::sengokmj_system_r)
 {
-	sengokmj_state *state = space->machine().driver_data<sengokmj_state>();
-	return (input_port_read(space->machine(), "SYSTEM") & 0xffbf) | state->m_hopper_io;
+	return (input_port_read(machine(), "SYSTEM") & 0xffbf) | m_hopper_io;
 }
 
 static ADDRESS_MAP_START( sengokmj_map, AS_PROGRAM, 16, sengokmj_state )
@@ -134,11 +134,11 @@ static ADDRESS_MAP_START( sengokmj_io_map, AS_IO, 16, sengokmj_state )
 //  AM_RANGE(0x8080, 0x8081) CRTC extra register?
 //  AM_RANGE(0x80c0, 0x80c1) CRTC extra register?
 //  AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
-	AM_RANGE(0x8180, 0x8181) AM_WRITE_LEGACY(sengokmj_out_w)
-	AM_RANGE(0x8140, 0x8141) AM_WRITE_LEGACY(mahjong_panel_w)
+	AM_RANGE(0x8180, 0x8181) AM_WRITE(sengokmj_out_w)
+	AM_RANGE(0x8140, 0x8141) AM_WRITE(mahjong_panel_w)
 	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc002, 0xc003) AM_READ_LEGACY(mahjong_panel_r)
-	AM_RANGE(0xc004, 0xc005) AM_READ_LEGACY(sengokmj_system_r) //switches
+	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
+	AM_RANGE(0xc004, 0xc005) AM_READ(sengokmj_system_r) //switches
 ADDRESS_MAP_END
 
 

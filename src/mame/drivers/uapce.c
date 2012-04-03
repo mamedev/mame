@@ -106,6 +106,9 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_jamma_if_control_latch;
+	DECLARE_WRITE8_MEMBER(jamma_if_control_latch_w);
+	DECLARE_READ8_MEMBER(jamma_if_control_latch_r);
+	DECLARE_READ8_MEMBER(jamma_if_read_dsw);
 };
 
 #define UAPCE_SOUND_EN	NODE_10
@@ -118,22 +121,21 @@ static DISCRETE_SOUND_START(uapce)
 DISCRETE_SOUND_END
 
 
-static WRITE8_HANDLER( jamma_if_control_latch_w )
+WRITE8_MEMBER(uapce_state::jamma_if_control_latch_w)
 {
-	uapce_state *state = space->machine().driver_data<uapce_state>();
-	UINT8 diff = data ^ state->m_jamma_if_control_latch;
-	state->m_jamma_if_control_latch = data;
+	UINT8 diff = data ^ m_jamma_if_control_latch;
+	m_jamma_if_control_latch = data;
 
 /*  D7 : Controls relay which connects the PCE R-AUDIO output to the common audio path.
     (1= Relay closed, 0= Relay open) */
-	space->machine().sound().system_enable( (data >> 7) & 1 );
+	machine().sound().system_enable( (data >> 7) & 1 );
 
 /* D6 : Output to JAMMA connector KEY pin. Connected to /RESET on the PCE backplane connector.
     (1= /RESET not asserted, 0= /RESET asserted) */
 
 	if ( diff & 0x40 )
 	{
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 /* D5 : Connected to a TIP31 which may control the coin meter:
@@ -143,7 +145,7 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
 
    Pin 'z' is a normally ground connection, but on this board it is isolated from ground.
    The wiring harness also has the corresponding wire separate from the others. */
-	coin_counter_w(space->machine(), 0, BIT(data,5));
+	coin_counter_w(machine(), 0, BIT(data,5));
 
 /* D4 : Connects the START1 switch input from the JAMMA connector to the
     "RUN" key input of the control pad multiplexer.
@@ -153,7 +155,7 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
       752 Hz (D-3) square wave to be output on the common audio path.
       (1= Tone output ON, 0= Tone output OFF) */
 
-	discrete_sound_w(space->machine().device("discrete"), UAPCE_SOUND_EN, BIT(data,3));
+	discrete_sound_w(machine().device("discrete"), UAPCE_SOUND_EN, BIT(data,3));
 
 /* D2 : Not latched, though software writes to this bit like it is. */
 
@@ -162,17 +164,16 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
 /* D0 : Not latched. */
 }
 
-static READ8_HANDLER( jamma_if_control_latch_r )
+READ8_MEMBER(uapce_state::jamma_if_control_latch_r)
 {
-	uapce_state *state = space->machine().driver_data<uapce_state>();
-	return state->m_jamma_if_control_latch & 0x08;
+	return m_jamma_if_control_latch & 0x08;
 }
 
-static READ8_HANDLER( jamma_if_read_dsw )
+READ8_MEMBER(uapce_state::jamma_if_read_dsw)
 {
 	UINT8 dsw_val;
 
-	dsw_val = input_port_read(space->machine(),  "DSW" );
+	dsw_val = input_port_read(machine(),  "DSW" );
 
 	if ( BIT( offset, 7 ) == 0 )
 	{
@@ -233,10 +234,10 @@ static MACHINE_RESET( uapce )
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, uapce_state )
 	AM_RANGE( 0x0000, 0x07FF) AM_ROM
 	AM_RANGE( 0x0800, 0x0FFF) AM_RAM
-	AM_RANGE( 0x1000, 0x17FF) AM_WRITE_LEGACY(jamma_if_control_latch_w )
-	AM_RANGE( 0x1800, 0x1FFF) AM_READ_LEGACY(jamma_if_read_dsw )
+	AM_RANGE( 0x1000, 0x17FF) AM_WRITE(jamma_if_control_latch_w )
+	AM_RANGE( 0x1800, 0x1FFF) AM_READ(jamma_if_read_dsw )
 	AM_RANGE( 0x2000, 0x27FF) AM_READ_PORT( "COIN" )
-	AM_RANGE( 0x2800, 0x2FFF) AM_READ_LEGACY(jamma_if_control_latch_r )
+	AM_RANGE( 0x2800, 0x2FFF) AM_READ(jamma_if_control_latch_r )
 ADDRESS_MAP_END
 
 

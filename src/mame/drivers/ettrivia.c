@@ -47,104 +47,104 @@ public:
 	UINT8 *m_fg_videoram;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
+	DECLARE_WRITE8_MEMBER(ettrivia_fg_w);
+	DECLARE_WRITE8_MEMBER(ettrivia_bg_w);
+	DECLARE_WRITE8_MEMBER(ettrivia_control_w);
+	DECLARE_READ8_MEMBER(ettrivia_question_r);
+	DECLARE_WRITE8_MEMBER(b000_w);
+	DECLARE_READ8_MEMBER(b000_r);
+	DECLARE_WRITE8_MEMBER(b800_w);
 };
 
 
-static WRITE8_HANDLER( ettrivia_fg_w )
+WRITE8_MEMBER(ettrivia_state::ettrivia_fg_w)
 {
-	ettrivia_state *state = space->machine().driver_data<ettrivia_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( ettrivia_bg_w )
+WRITE8_MEMBER(ettrivia_state::ettrivia_bg_w)
 {
-	ettrivia_state *state = space->machine().driver_data<ettrivia_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( ettrivia_control_w )
+WRITE8_MEMBER(ettrivia_state::ettrivia_control_w)
 {
-	ettrivia_state *state = space->machine().driver_data<ettrivia_state>();
-	space->machine().tilemap().mark_all_dirty();
+	machine().tilemap().mark_all_dirty();
 
-	state->m_palreg  = (data >> 1) & 3;
-	state->m_gfx_bank = (data >> 2) & 1;
+	m_palreg  = (data >> 1) & 3;
+	m_gfx_bank = (data >> 2) & 1;
 
-	state->m_question_bank = (data >> 3) & 3;
+	m_question_bank = (data >> 3) & 3;
 
-	coin_counter_w(space->machine(), 0, data & 0x80);
+	coin_counter_w(machine(), 0, data & 0x80);
 
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(machine(), data & 1);
 }
 
-static READ8_HANDLER( ettrivia_question_r )
+READ8_MEMBER(ettrivia_state::ettrivia_question_r)
 {
-	ettrivia_state *state = space->machine().driver_data<ettrivia_state>();
-	UINT8 *QUESTIONS = space->machine().region("user1")->base();
-	return QUESTIONS[offset + 0x10000 * state->m_question_bank];
+	UINT8 *QUESTIONS = machine().region("user1")->base();
+	return QUESTIONS[offset + 0x10000 * m_question_bank];
 }
 
-static WRITE8_HANDLER( b000_w )
+WRITE8_MEMBER(ettrivia_state::b000_w)
 {
-	ettrivia_state *state = space->machine().driver_data<ettrivia_state>();
-	state->m_b000_val = data;
+	m_b000_val = data;
 }
 
-static READ8_HANDLER( b000_r )
+READ8_MEMBER(ettrivia_state::b000_r)
 {
-	ettrivia_state *state = space->machine().driver_data<ettrivia_state>();
-	if(state->m_b800_prev)
-		return state->m_b000_ret;
+	if(m_b800_prev)
+		return m_b000_ret;
 	else
-		return state->m_b000_val;
+		return m_b000_val;
 }
 
-static WRITE8_HANDLER( b800_w )
+WRITE8_MEMBER(ettrivia_state::b800_w)
 {
-	ettrivia_state *state = space->machine().driver_data<ettrivia_state>();
 	switch(data)
 	{
 		/* special case to return the value written to 0xb000 */
 		/* does it reset the chips too ? */
 		case 0:	break;
-		case 0xc4: state->m_b000_ret = ay8910_r(space->machine().device("ay1"), 0);	break;
-		case 0x94: state->m_b000_ret = ay8910_r(space->machine().device("ay2"), 0);	break;
-		case 0x86: state->m_b000_ret = ay8910_r(space->machine().device("ay3"), 0);	break;
+		case 0xc4: m_b000_ret = ay8910_r(machine().device("ay1"), 0);	break;
+		case 0x94: m_b000_ret = ay8910_r(machine().device("ay2"), 0);	break;
+		case 0x86: m_b000_ret = ay8910_r(machine().device("ay3"), 0);	break;
 
 		case 0x80:
-			switch(state->m_b800_prev)
+			switch(m_b800_prev)
 			{
-				case 0xe0: ay8910_address_w(space->machine().device("ay1"),0,state->m_b000_val);	break;
-				case 0x98: ay8910_address_w(space->machine().device("ay2"),0,state->m_b000_val);	break;
-				case 0x83: ay8910_address_w(space->machine().device("ay3"),0,state->m_b000_val);	break;
+				case 0xe0: ay8910_address_w(machine().device("ay1"),0,m_b000_val);	break;
+				case 0x98: ay8910_address_w(machine().device("ay2"),0,m_b000_val);	break;
+				case 0x83: ay8910_address_w(machine().device("ay3"),0,m_b000_val);	break;
 
-				case 0xa0: ay8910_data_w(space->machine().device("ay1"),0,state->m_b000_val);	break;
-				case 0x88: ay8910_data_w(space->machine().device("ay2"),0,state->m_b000_val);	break;
-				case 0x81: ay8910_data_w(space->machine().device("ay3"),0,state->m_b000_val);	break;
+				case 0xa0: ay8910_data_w(machine().device("ay1"),0,m_b000_val);	break;
+				case 0x88: ay8910_data_w(machine().device("ay2"),0,m_b000_val);	break;
+				case 0x81: ay8910_data_w(machine().device("ay3"),0,m_b000_val);	break;
 
 			}
 		break;
 	}
 
-	state->m_b800_prev = data;
+	m_b800_prev = data;
 }
 
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, ettrivia_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(ettrivia_control_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(ettrivia_control_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITENOP
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
-	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(b000_r) AM_WRITE_LEGACY(b000_w)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE_LEGACY(b800_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(ettrivia_fg_w) AM_BASE(m_fg_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(ettrivia_bg_w) AM_BASE(m_bg_videoram)
+	AM_RANGE(0xb000, 0xb000) AM_READ(b000_r) AM_WRITE(b000_w)
+	AM_RANGE(0xb800, 0xb800) AM_WRITE(b800_w)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ettrivia_fg_w) AM_BASE(m_fg_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ettrivia_bg_w) AM_BASE(m_bg_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, ettrivia_state )
-	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(ettrivia_question_r)
+	AM_RANGE(0x0000, 0xffff) AM_READ(ettrivia_question_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ettrivia )

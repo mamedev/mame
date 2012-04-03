@@ -90,6 +90,8 @@ public:
 	UINT16 *m_vram;
 	UINT16 *m_spr;
 	required_device<cpu_device> m_maincpu;
+	DECLARE_READ8_MEMBER(popo_620000_r);
+	DECLARE_WRITE8_MEMBER(popobear_irq_ack_w);
 };
 
 VIDEO_START(popobear)
@@ -267,20 +269,19 @@ SCREEN_UPDATE_IND16( popobear )
 }
 
 /* ??? */
-static READ8_HANDLER( popo_620000_r )
+READ8_MEMBER(popobear_state::popo_620000_r)
 {
 	return 9;
 }
 
-static WRITE8_HANDLER( popobear_irq_ack_w )
+WRITE8_MEMBER(popobear_state::popobear_irq_ack_w)
 {
-	popobear_state *state = space->machine().driver_data<popobear_state>();
 	int i;
 
 	for(i=0;i<8;i++)
 	{
 		if(data & 1 << i)
-			device_set_input_line(state->m_maincpu, i, CLEAR_LINE);
+			device_set_input_line(m_maincpu, i, CLEAR_LINE);
 	}
 }
 
@@ -298,7 +299,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 //  AM_RANGE(0x480020, 0x480021) AM_NOP //AM_READ_LEGACY(popo_480020_r) AM_WRITE_LEGACY(popo_480020_w)
 //  AM_RANGE(0x480028, 0x480029) AM_NOP //AM_WRITE_LEGACY(popo_480028_w)
 //  AM_RANGE(0x48002c, 0x48002d) AM_NOP //AM_WRITE_LEGACY(popo_48002c_w)
-	AM_RANGE(0x480030, 0x480031) AM_WRITE8_LEGACY(popobear_irq_ack_w, 0x00ff)
+	AM_RANGE(0x480030, 0x480031) AM_WRITE8(popobear_irq_ack_w, 0x00ff)
 	AM_RANGE(0x480034, 0x480035) AM_RAM // coin counter or coin lockout
 	AM_RANGE(0x48003a, 0x48003b) AM_RAM //AM_READ_LEGACY(popo_48003a_r) AM_WRITE_LEGACY(popo_48003a_w)
 
@@ -310,7 +311,7 @@ static ADDRESS_MAP_START( popobear_mem, AS_PROGRAM, 16, popobear_state )
 	AM_RANGE(0x550000, 0x550003) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff )
 
 	AM_RANGE(0x600000, 0x600001) AM_WRITENOP
-	AM_RANGE(0x620000, 0x620001) AM_READ8_LEGACY(popo_620000_r,0xff00) AM_WRITENOP
+	AM_RANGE(0x620000, 0x620001) AM_READ8(popo_620000_r,0xff00) AM_WRITENOP
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("gfx1", 0) // u5 & u6
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("gfx2", 0) // u7 & u8
 ADDRESS_MAP_END

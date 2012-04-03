@@ -99,6 +99,12 @@ public:
 	optional_device<phillips_22vp932_device> m_22vp932;
 	UINT8 m_last_misc;
 	UINT8 m_laserdisc_data;
+	DECLARE_WRITE8_MEMBER(misc_w);
+	DECLARE_WRITE8_MEMBER(dleuro_misc_w);
+	DECLARE_WRITE8_MEMBER(led_den1_w);
+	DECLARE_WRITE8_MEMBER(led_den2_w);
+	DECLARE_READ8_MEMBER(laserdisc_r);
+	DECLARE_WRITE8_MEMBER(laserdisc_w);
 };
 
 
@@ -285,9 +291,8 @@ static INTERRUPT_GEN( vblank_callback )
  *
  *************************************/
 
-static WRITE8_HANDLER( misc_w )
+WRITE8_MEMBER(dlair_state::misc_w)
 {
-	dlair_state *state = space->machine().driver_data<dlair_state>();
 	/*
         D0-D3 = B0-B3
            D4 = coin counter
@@ -295,23 +300,22 @@ static WRITE8_HANDLER( misc_w )
            D6 = ENTER
            D7 = INT/EXT
     */
-	UINT8 diff = data ^ state->m_last_misc;
-	state->m_last_misc = data;
+	UINT8 diff = data ^ m_last_misc;
+	m_last_misc = data;
 
-	coin_counter_w(space->machine(), 0, (~data >> 4) & 1);
+	coin_counter_w(machine(), 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
-		state->laserdisc_data_w(state->m_laserdisc_data);
+		laserdisc_data_w(m_laserdisc_data);
 
 	/* on bit 6 going low, we need to signal enter */
-	state->laserdisc_enter_w((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	laserdisc_enter_w((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-static WRITE8_HANDLER( dleuro_misc_w )
+WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 {
-	dlair_state *state = space->machine().driver_data<dlair_state>();
 	/*
            D0 = CHAR GEN ON+
            D1 = KILL VIDEO+
@@ -322,28 +326,28 @@ static WRITE8_HANDLER( dleuro_misc_w )
            D6 = ENTER
            D7 = INT/EXT
     */
-	UINT8 diff = data ^ state->m_last_misc;
-	state->m_last_misc = data;
+	UINT8 diff = data ^ m_last_misc;
+	m_last_misc = data;
 
-	coin_counter_w(space->machine(), 1, (~data >> 3) & 1);
-	coin_counter_w(space->machine(), 0, (~data >> 4) & 1);
+	coin_counter_w(machine(), 1, (~data >> 3) & 1);
+	coin_counter_w(machine(), 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
-		state->laserdisc_data_w(state->m_laserdisc_data);
+		laserdisc_data_w(m_laserdisc_data);
 
 	/* on bit 6 going low, we need to signal enter */
-	state->laserdisc_enter_w((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	laserdisc_enter_w((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-static WRITE8_HANDLER( led_den1_w )
+WRITE8_MEMBER(dlair_state::led_den1_w)
 {
 	output_set_digit_value(0 + (offset & 7), led_map[data & 0x0f]);
 }
 
 
-static WRITE8_HANDLER( led_den2_w )
+WRITE8_MEMBER(dlair_state::led_den2_w)
 {
 	output_set_digit_value(8 + (offset & 7), led_map[data & 0x0f]);
 }
@@ -370,19 +374,17 @@ static CUSTOM_INPUT( laserdisc_command_r )
 }
 
 
-static READ8_HANDLER( laserdisc_r )
+READ8_MEMBER(dlair_state::laserdisc_r)
 {
-	dlair_state *state = space->machine().driver_data<dlair_state>();
-	UINT8 result = state->laserdisc_data_r();
+	UINT8 result = laserdisc_data_r();
 	mame_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
 
 
-static WRITE8_HANDLER( laserdisc_w )
+WRITE8_MEMBER(dlair_state::laserdisc_w)
 {
-	dlair_state *state = space->machine().driver_data<dlair_state>();
-	state->m_laserdisc_data = data;
+	m_laserdisc_data = data;
 }
 
 
@@ -400,13 +402,13 @@ static ADDRESS_MAP_START( dlus_map, AS_PROGRAM, 8, dlair_state )
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc7) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x1fc7) AM_READ_PORT("CONTROLS")
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x1fc7) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x1fc7) AM_READ_LEGACY(laserdisc_r)
+	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x1fc7) AM_READ(laserdisc_r)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fc7) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
-	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1fc7) AM_WRITE_LEGACY(misc_w)
+	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1fc7) AM_WRITE(misc_w)
 	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1fc7) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
-	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1fc7) AM_WRITE_LEGACY(laserdisc_w)
-	AM_RANGE(0xe030, 0xe037) AM_MIRROR(0x1fc0) AM_WRITE_LEGACY(led_den2_w)
-	AM_RANGE(0xe038, 0xe03f) AM_MIRROR(0x1fc0) AM_WRITE_LEGACY(led_den1_w)
+	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1fc7) AM_WRITE(laserdisc_w)
+	AM_RANGE(0xe030, 0xe037) AM_MIRROR(0x1fc0) AM_WRITE(led_den2_w)
+	AM_RANGE(0xe038, 0xe03f) AM_MIRROR(0x1fc0) AM_WRITE(led_den1_w)
 ADDRESS_MAP_END
 
 
@@ -424,16 +426,16 @@ static ADDRESS_MAP_START( dleuro_map, AS_PROGRAM, 8, dlair_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1f47) // WT LED 1
 	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1f47) // WT LED 2
-	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1f47) AM_WRITE_LEGACY(led_den1_w)			// WT EXT LED 1
-	AM_RANGE(0xe018, 0xe018) AM_MIRROR(0x1f47) AM_WRITE_LEGACY(led_den2_w)			// WT EXT LED 2
-	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1f47) AM_WRITE_LEGACY(laserdisc_w)		// DISC WT
-	AM_RANGE(0xe028, 0xe028) AM_MIRROR(0x1f47) AM_WRITE_LEGACY(dleuro_misc_w)		// WT MISC
+	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1f47) AM_WRITE(led_den1_w)			// WT EXT LED 1
+	AM_RANGE(0xe018, 0xe018) AM_MIRROR(0x1f47) AM_WRITE(led_den2_w)			// WT EXT LED 2
+	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1f47) AM_WRITE(laserdisc_w)		// DISC WT
+	AM_RANGE(0xe028, 0xe028) AM_MIRROR(0x1f47) AM_WRITE(dleuro_misc_w)		// WT MISC
 	AM_RANGE(0xe030, 0xe030) AM_MIRROR(0x1f47) AM_WRITE_LEGACY(watchdog_reset_w)	// CLR WDOG
 	AM_RANGE(0xe080, 0xe080) AM_MIRROR(0x1f47) AM_READ_PORT("P1")			// CP A
 	AM_RANGE(0xe088, 0xe088) AM_MIRROR(0x1f47) AM_READ_PORT("SYSTEM")		// CP B
 	AM_RANGE(0xe090, 0xe090) AM_MIRROR(0x1f47) AM_READ_PORT("DSW1")			// OPT SW A
 	AM_RANGE(0xe098, 0xe098) AM_MIRROR(0x1f47) AM_READ_PORT("DSW2")			// OPT SW B
-	AM_RANGE(0xe0a0, 0xe0a0) AM_MIRROR(0x1f47) AM_READ_LEGACY(laserdisc_r)			// RD DISC DATA
+	AM_RANGE(0xe0a0, 0xe0a0) AM_MIRROR(0x1f47) AM_READ(laserdisc_r)			// RD DISC DATA
 ADDRESS_MAP_END
 
 

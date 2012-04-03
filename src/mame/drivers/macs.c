@@ -71,6 +71,10 @@ public:
 	UINT8 m_rev;
 	UINT8 *m_ram1;
 	UINT8 *m_ram2;
+	DECLARE_WRITE8_MEMBER(rambank_w);
+	DECLARE_READ8_MEMBER(macs_input_r);
+	DECLARE_WRITE8_MEMBER(macs_rom_bank_w);
+	DECLARE_WRITE8_MEMBER(macs_output_w);
 };
 
 
@@ -91,57 +95,54 @@ static ADDRESS_MAP_START( macs_mem, AS_PROGRAM, 8, macs_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAMBANK("bank2") /* common /backup ram ?*/
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER(rambank_w)
+WRITE8_MEMBER(macs_state::rambank_w)
 {
-	macs_state *state = space->machine().driver_data<macs_state>();
-	memory_set_bankptr(space->machine(),  "bank3", &state->m_ram1[0x10000+(data&1)*0x800] );
+	memory_set_bankptr(machine(),  "bank3", &m_ram1[0x10000+(data&1)*0x800] );
 }
 
-static READ8_HANDLER( macs_input_r )
+READ8_MEMBER(macs_state::macs_input_r)
 {
-	macs_state *state = space->machine().driver_data<macs_state>();
 	switch(offset)
 	{
 		case 0:
 		{
 			/*It's bit-wise*/
-			switch(state->m_mux_data&0x0f)
+			switch(m_mux_data&0x0f)
 			{
-				case 0x00: return input_port_read(space->machine(), "IN0");
-				case 0x01: return input_port_read(space->machine(), "IN1");
-				case 0x02: return input_port_read(space->machine(), "IN2");
-				case 0x04: return input_port_read(space->machine(), "IN3");
-				case 0x08: return input_port_read(space->machine(), "IN4");
+				case 0x00: return input_port_read(machine(), "IN0");
+				case 0x01: return input_port_read(machine(), "IN1");
+				case 0x02: return input_port_read(machine(), "IN2");
+				case 0x04: return input_port_read(machine(), "IN3");
+				case 0x08: return input_port_read(machine(), "IN4");
 				default:
-				logerror("Unmapped mahjong panel mux data %02x\n",state->m_mux_data);
+				logerror("Unmapped mahjong panel mux data %02x\n",m_mux_data);
 				return 0xff;
 			}
 		}
-		case 1: return input_port_read(space->machine(), "SYS0");
-		case 2: return input_port_read(space->machine(), "DSW0");
-		case 3: return input_port_read(space->machine(), "DSW1");
-		case 4: return input_port_read(space->machine(), "DSW2");
-		case 5: return input_port_read(space->machine(), "DSW3");
-		case 6: return input_port_read(space->machine(), "DSW4");
-		case 7: return input_port_read(space->machine(), "SYS1");
-		default:	popmessage("Unmapped I/O read at PC = %06x offset = %02x",cpu_get_pc(&space->device()),offset+0xc0);
+		case 1: return input_port_read(machine(), "SYS0");
+		case 2: return input_port_read(machine(), "DSW0");
+		case 3: return input_port_read(machine(), "DSW1");
+		case 4: return input_port_read(machine(), "DSW2");
+		case 5: return input_port_read(machine(), "DSW3");
+		case 6: return input_port_read(machine(), "DSW4");
+		case 7: return input_port_read(machine(), "SYS1");
+		default:	popmessage("Unmapped I/O read at PC = %06x offset = %02x",cpu_get_pc(&space.device()),offset+0xc0);
 	}
 
 	return 0xff;
 }
 
 
-static WRITE8_HANDLER( macs_rom_bank_w )
+WRITE8_MEMBER(macs_state::macs_rom_bank_w)
 {
-	memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
+	memory_set_bankptr(machine(),  "bank1", machine().region("maincpu")->base() + (data* 0x4000) + 0x10000 + macs_cart_slot*0x400000 );
 
 	st0016_rom_bank=data;
 }
 
-static WRITE8_HANDLER( macs_output_w )
+WRITE8_MEMBER(macs_state::macs_output_w)
 {
-	macs_state *state = space->machine().driver_data<macs_state>();
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = machine().region("maincpu")->base();
 
 	switch(offset)
 	{
@@ -152,20 +153,20 @@ static WRITE8_HANDLER( macs_output_w )
         ---- --x- Cassette A slot
         */
 
-		if(state->m_rev == 1)
+		if(m_rev == 1)
 		{
 			/* FIXME: dunno if this RAM bank is right, DASM tracking made on the POST screens indicates that there's just one RAM bank,
                       but then MACS2 games locks up. */
-			memory_set_bankptr(space->machine(),  "bank3", &state->m_ram1[((data&0x20)>>5)*0x1000+0x000] );
+			memory_set_bankptr(machine(),  "bank3", &m_ram1[((data&0x20)>>5)*0x1000+0x000] );
 
 			macs_cart_slot = (data & 0xc) >> 2;
 
-			memory_set_bankptr(space->machine(),  "bank4", &ROM[macs_cart_slot*0x400000+0x10000] );
+			memory_set_bankptr(machine(),  "bank4", &ROM[macs_cart_slot*0x400000+0x10000] );
 		}
 
-		memory_set_bankptr(space->machine(),  "bank2", &state->m_ram1[((data&0x20)>>5)*0x1000+0x800] );
+		memory_set_bankptr(machine(),  "bank2", &m_ram1[((data&0x20)>>5)*0x1000+0x800] );
 		break;
-		case 2: state->m_mux_data = data; break;
+		case 2: m_mux_data = data; break;
 
 	}
 }
@@ -173,13 +174,13 @@ static WRITE8_HANDLER( macs_output_w )
 static ADDRESS_MAP_START( macs_io, AS_IO, 8, macs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ_LEGACY(st0016_vregs_r) AM_WRITE_LEGACY(st0016_vregs_w) /* video/crt regs ? */
-	AM_RANGE(0xc0, 0xc7) AM_READWRITE_LEGACY(macs_input_r,macs_output_w)
+	AM_RANGE(0xc0, 0xc7) AM_READWRITE(macs_input_r,macs_output_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* renju = $40, neratte = 0 */
-	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(macs_rom_bank_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(macs_rom_bank_w)
 	AM_RANGE(0xe2, 0xe2) AM_WRITE_LEGACY(st0016_sprite_bank_w)
 	AM_RANGE(0xe3, 0xe4) AM_WRITE_LEGACY(st0016_character_bank_w)
 	AM_RANGE(0xe5, 0xe5) AM_WRITE_LEGACY(st0016_palette_bank_w)
-	AM_RANGE(0xe6, 0xe6) AM_WRITE_LEGACY(rambank_w) /* banking ? ram bank ? shared rambank ? */
+	AM_RANGE(0xe6, 0xe6) AM_WRITE(rambank_w) /* banking ? ram bank ? shared rambank ? */
 	AM_RANGE(0xe7, 0xe7) AM_WRITENOP /* watchdog */
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(st0016_dma_r)
 ADDRESS_MAP_END

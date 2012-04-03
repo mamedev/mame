@@ -27,6 +27,7 @@ public:
 	/* memory pointers */
 	required_device<e132xn_device>	m_maincpu;
 	UINT32 *  m_videoram;
+	DECLARE_READ32_MEMBER(f32_input_port_1_r);
 };
 
 
@@ -59,15 +60,15 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32, mosaicf2_state )
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static READ32_HANDLER( f32_input_port_1_r )
+READ32_MEMBER(mosaicf2_state::f32_input_port_1_r)
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	mosaicf2_state *state = space->machine().driver_data<mosaicf2_state>();
-	offs_t pc = state->m_maincpu->pc();
+
+	offs_t pc = m_maincpu->pc();
 	if ((pc == 0x000379de) || (pc == 0x000379cc) )
-		state->m_maincpu->eat_cycles(100);
+		m_maincpu->eat_cycles(100);
 	//else printf("PC %08x\n", pc );
-	return input_port_read(space->machine(), "SYSTEM_P2");
+	return input_port_read(machine(), "SYSTEM_P2");
 }
 
 
@@ -75,7 +76,7 @@ static ADDRESS_MAP_START( mosaicf2_io, AS_IO, 32, mosaicf2_state )
 	AM_RANGE(0x4000, 0x4003) AM_DEVREAD8("oki", okim6295_device, read, 0x000000ff)
 	AM_RANGE(0x4810, 0x4813) AM_DEVREAD8_LEGACY("ymsnd", ym2151_status_port_r, 0x000000ff)
 	AM_RANGE(0x5000, 0x5003) AM_READ_PORT("P1")
-	AM_RANGE(0x5200, 0x5203) AM_READ_LEGACY(f32_input_port_1_r)
+	AM_RANGE(0x5200, 0x5203) AM_READ(f32_input_port_1_r)
 	AM_RANGE(0x5400, 0x5403) AM_READ_PORT("EEPROMIN")
 	AM_RANGE(0x6000, 0x6003) AM_DEVWRITE8("oki", okim6295_device, write, 0x000000ff)
 	AM_RANGE(0x6800, 0x6803) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_data_port_w, 0x000000ff)

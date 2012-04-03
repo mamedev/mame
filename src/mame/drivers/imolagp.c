@@ -113,23 +113,34 @@ public:
 	UINT8  m_videoram[3][0x4000];
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(transmit_data_w);
+	DECLARE_READ8_MEMBER(trigger_slave_nmi_r);
+	DECLARE_READ8_MEMBER(receive_data_r);
+	DECLARE_WRITE8_MEMBER(imola_ledram_w);
+	DECLARE_READ8_MEMBER(steerlatch_r);
+	DECLARE_WRITE8_MEMBER(screenram_w);
+	DECLARE_READ8_MEMBER(imola_slave_port05r);
+	DECLARE_READ8_MEMBER(imola_slave_port06r);
+	DECLARE_READ8_MEMBER(imola_slave_port81r);
+	DECLARE_READ8_MEMBER(imola_slave_port82r);
+	DECLARE_WRITE8_MEMBER(vreg_control_w);
+	DECLARE_WRITE8_MEMBER(vreg_data_w);
 };
 
 
 #ifdef HLE_COM
 
-static WRITE8_HANDLER( transmit_data_w )
+WRITE8_MEMBER(imolagp_state::transmit_data_w)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	state->m_mComData[state->m_mComCount++] = data;
+	m_mComData[m_mComCount++] = data;
 }
 
-static READ8_HANDLER( trigger_slave_nmi_r )
+READ8_MEMBER(imolagp_state::trigger_slave_nmi_r)
 {
 	return 0;
 }
 
-static READ8_HANDLER( receive_data_r )
+READ8_MEMBER(imolagp_state::receive_data_r)
 {
 	return 0;
 }
@@ -138,22 +149,19 @@ static READ8_HANDLER( receive_data_r )
 /* the master cpu transmits data to the slave CPU one word at a time using a rapid sequence of triggered NMIs
  * the slave cpu pauses as it enters its irq, awaiting this burst of data
  */
-static WRITE8_HANDLER( transmit_data_w )
+WRITE8_MEMBER(imolagp_state::transmit_data_w)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	state->m_mLatchedData[offset] = data;
+	m_mLatchedData[offset] = data;
 }
-static READ8_HANDLER( trigger_slave_nmi_r )
+READ8_MEMBER(imolagp_state::trigger_slave_nmi_r)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	device_set_input_line(state->m_slave, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_slave, INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 
-static READ8_HANDLER( receive_data_r )
+READ8_MEMBER(imolagp_state::receive_data_r)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	return state->m_mLatchedData[offset];
+	return m_mLatchedData[offset];
 }
 #endif
 
@@ -229,7 +237,7 @@ static SCREEN_UPDATE_IND16( imolagp )
 	return 0;
 }
 
-static WRITE8_HANDLER( imola_ledram_w )
+WRITE8_MEMBER(imolagp_state::imola_ledram_w)
 {
 	data &= 0xf;
 
@@ -276,110 +284,102 @@ static WRITE8_HANDLER( imola_ledram_w )
 	}
 }
 
-static READ8_HANDLER( steerlatch_r )
+READ8_MEMBER(imolagp_state::steerlatch_r)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	return state->m_steerlatch;
+	return m_steerlatch;
 }
 
-static WRITE8_HANDLER( screenram_w )
+WRITE8_MEMBER(imolagp_state::screenram_w)
 { /* ?! */
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	switch (state->m_draw_mode)
+	switch (m_draw_mode)
 	{
 	case 0x82:
 	case 0x81:
 	case 0x05:
-		state->m_videoram[1][offset] = data;
+		m_videoram[1][offset] = data;
 		break;
 	case 0x06:
-		state->m_videoram[0][offset] = data;
+		m_videoram[0][offset] = data;
 		break;
 	default:
 		break;
 	}
 }
 
-static READ8_HANDLER( imola_slave_port05r )
+READ8_MEMBER(imolagp_state::imola_slave_port05r)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	memcpy(state->m_videoram[2], state->m_videoram[1], 0x4000); /* hack! capture before sprite plane is erased */
-	state->m_draw_mode = 0x05;
+	memcpy(m_videoram[2], m_videoram[1], 0x4000); /* hack! capture before sprite plane is erased */
+	m_draw_mode = 0x05;
 	return 0;
 }
 
-static READ8_HANDLER( imola_slave_port06r )
+READ8_MEMBER(imolagp_state::imola_slave_port06r)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	state->m_draw_mode = 0x06;
+	m_draw_mode = 0x06;
 	return 0;
 }
 
-static READ8_HANDLER( imola_slave_port81r )
+READ8_MEMBER(imolagp_state::imola_slave_port81r)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	state->m_draw_mode = 0x81;
-	memcpy(state->m_videoram[2], state->m_videoram[1], 0x4000); /* hack! capture before sprite plane is erased */
+	m_draw_mode = 0x81;
+	memcpy(m_videoram[2], m_videoram[1], 0x4000); /* hack! capture before sprite plane is erased */
 	return 0;
 }
 
-static READ8_HANDLER( imola_slave_port82r )
+READ8_MEMBER(imolagp_state::imola_slave_port82r)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	state->m_draw_mode = 0x82;
+	m_draw_mode = 0x82;
 	return 0;
 }
 
-static WRITE8_HANDLER( vreg_control_w )
+WRITE8_MEMBER(imolagp_state::vreg_control_w)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	state->m_control = data;
+	m_control = data;
 }
 
-static WRITE8_HANDLER( vreg_data_w )
+WRITE8_MEMBER(imolagp_state::vreg_data_w)
 {
-	imolagp_state *state = space->machine().driver_data<imolagp_state>();
-	switch (state->m_control)
+	switch (m_control)
 	{
 	case 0x0e:
-		state->m_scroll = data;
+		m_scroll = data;
 		break;
 	case 0x07: /* always 0xff? */
 	case 0x0f: /* 0xff or 0x00 */
 	default:
-		logerror("vreg[0x%02x]:=0x%02x\n", state->m_control, data);
+		logerror("vreg[0x%02x]:=0x%02x\n", m_control, data);
 		break;
 	}
 }
 
 static ADDRESS_MAP_START( readport_master, AS_IO, 8, imolagp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(trigger_slave_nmi_r)
+	AM_RANGE(0x00, 0x00) AM_READ(trigger_slave_nmi_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imolagp_master, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")	/* gas */
-	AM_RANGE(0x2802, 0x2802) AM_READ_LEGACY(steerlatch_r) AM_WRITENOP
+	AM_RANGE(0x2802, 0x2802) AM_READ(steerlatch_r) AM_WRITENOP
 	/*  AM_RANGE(0x2803, 0x2803) ? */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(vreg_control_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(vreg_control_w)
 	AM_RANGE(0x37f0, 0x37f0) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	/*  AM_RANGE(0x37f7, 0x37f7) ? */
-	AM_RANGE(0x3800, 0x3800) AM_WRITE_LEGACY(vreg_data_w)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(vreg_data_w)
 	AM_RANGE(0x3810, 0x3810) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSWA")	/* DSWA */
-	AM_RANGE(0x5000, 0x50ff) AM_WRITE_LEGACY(imola_ledram_w)
-	AM_RANGE(0x47ff, 0x4800) AM_WRITE_LEGACY(transmit_data_w)
+	AM_RANGE(0x5000, 0x50ff) AM_WRITE(imola_ledram_w)
+	AM_RANGE(0x47ff, 0x4800) AM_WRITE(transmit_data_w)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSWB")	/* DSWB */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_slave, AS_IO, 8, imolagp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x05,0x05) AM_READ_LEGACY(imola_slave_port05r)
-	AM_RANGE(0x06,0x06) AM_READ_LEGACY(imola_slave_port06r)
-	AM_RANGE(0x81,0x81) AM_READ_LEGACY(imola_slave_port81r)
-	AM_RANGE(0x82,0x82) AM_READ_LEGACY(imola_slave_port82r)
+	AM_RANGE(0x05,0x05) AM_READ(imola_slave_port05r)
+	AM_RANGE(0x06,0x06) AM_READ(imola_slave_port06r)
+	AM_RANGE(0x81,0x81) AM_READ(imola_slave_port81r)
+	AM_RANGE(0x82,0x82) AM_READ(imola_slave_port82r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imolagp_slave, AS_PROGRAM, 8, imolagp_state )
@@ -388,8 +388,8 @@ static ADDRESS_MAP_START( imolagp_slave, AS_PROGRAM, 8, imolagp_state )
 	AM_RANGE(0x1000, 0x13ff) AM_ROM
 	AM_RANGE(0x1c00, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE(m_slave_workram)
-	AM_RANGE(0x9fff, 0xa000) AM_READ_LEGACY(receive_data_r)
-	AM_RANGE(0xc000, 0xffff) AM_WRITE_LEGACY(screenram_w)
+	AM_RANGE(0x9fff, 0xa000) AM_READ(receive_data_r)
+	AM_RANGE(0xc000, 0xffff) AM_WRITE(screenram_w)
 ADDRESS_MAP_END
 
 

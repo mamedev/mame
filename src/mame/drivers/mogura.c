@@ -22,6 +22,9 @@ public:
 	device_t *m_maincpu;
 	device_t *m_dac1;
 	device_t *m_dac2;
+	DECLARE_WRITE8_MEMBER(mogura_tileram_w);
+	DECLARE_WRITE8_MEMBER(mogura_dac_w);
+	DECLARE_WRITE8_MEMBER(mogura_gfxram_w);
 };
 
 
@@ -97,35 +100,32 @@ static SCREEN_UPDATE_IND16( mogura )
 	return 0;
 }
 
-static WRITE8_HANDLER( mogura_tileram_w )
+WRITE8_MEMBER(mogura_state::mogura_tileram_w)
 {
-	mogura_state *state = space->machine().driver_data<mogura_state>();
-	state->m_tileram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_tileram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-static WRITE8_HANDLER(mogura_dac_w)
+WRITE8_MEMBER(mogura_state::mogura_dac_w)
 {
-	mogura_state *state = space->machine().driver_data<mogura_state>();
-	dac_data_w(state->m_dac1, data & 0xf0);	/* left */
-	dac_data_w(state->m_dac2, (data & 0x0f) << 4);	/* right */
+	dac_data_w(m_dac1, data & 0xf0);	/* left */
+	dac_data_w(m_dac2, (data & 0x0f) << 4);	/* right */
 }
 
 
-static WRITE8_HANDLER ( mogura_gfxram_w )
+WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
 {
-	mogura_state *state = space->machine().driver_data<mogura_state>();
-	state->m_gfxram[offset] = data ;
+	m_gfxram[offset] = data ;
 
-	gfx_element_mark_dirty(space->machine().gfx[0], offset / 16);
+	gfx_element_mark_dirty(machine().gfx[0], offset / 16);
 }
 
 
 static ADDRESS_MAP_START( mogura_map, AS_PROGRAM, 8, mogura_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // main ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(mogura_gfxram_w) AM_BASE(m_gfxram) // ram based characters
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE_LEGACY(mogura_tileram_w) AM_BASE(m_tileram) // tilemap
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_BASE(m_gfxram) // ram based characters
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_BASE(m_tileram) // tilemap
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mogura_io_map, AS_IO, 8, mogura_state )
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( mogura_io_map, AS_IO, 8, mogura_state )
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("P3")
 	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("P4")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(mogura_dac_w)	/* 4 bit DAC x 2. MSB = left, LSB = right */
+	AM_RANGE(0x14, 0x14) AM_WRITE(mogura_dac_w)	/* 4 bit DAC x 2. MSB = left, LSB = right */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mogura )

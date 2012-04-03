@@ -90,6 +90,20 @@ public:
 	UINT8 m_codec_data[256];
 	UINT8 m_sys85_data_line_r;
 	UINT8 m_sys85_data_line_t;
+	DECLARE_WRITE8_MEMBER(watchdog_w);
+	DECLARE_READ8_MEMBER(irqlatch_r);
+	DECLARE_WRITE8_MEMBER(reel12_w);
+	DECLARE_WRITE8_MEMBER(reel34_w);
+	DECLARE_WRITE8_MEMBER(mmtr_w);
+	DECLARE_READ8_MEMBER(mmtr_r);
+	DECLARE_WRITE8_MEMBER(vfd_w);
+	DECLARE_WRITE8_MEMBER(mux_ctrl_w);
+	DECLARE_READ8_MEMBER(mux_ctrl_r);
+	DECLARE_WRITE8_MEMBER(mux_data_w);
+	DECLARE_READ8_MEMBER(mux_data_r);
+	DECLARE_WRITE8_MEMBER(mux_enable_w);
+	DECLARE_WRITE8_MEMBER(triac_w);
+	DECLARE_READ8_MEMBER(triac_r);
 };
 
 
@@ -160,7 +174,7 @@ static MACHINE_RESET( bfm_sys85 )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( watchdog_w )
+WRITE8_MEMBER(bfmsys85_state::watchdog_w)
 {
 }
 
@@ -178,44 +192,41 @@ static INTERRUPT_GEN( timer_irq )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( irqlatch_r )
+READ8_MEMBER(bfmsys85_state::irqlatch_r)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
-	int result = state->m_irq_status | 0x02;
+	int result = m_irq_status | 0x02;
 
-	state->m_irq_status = 0;
+	m_irq_status = 0;
 
 	return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( reel12_w )
+WRITE8_MEMBER(bfmsys85_state::reel12_w)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
-	if ( stepper_update(0, (data>>4)&0x0f) ) state->m_reel_changed |= 0x01;
-	if ( stepper_update(1, data&0x0f   ) ) state->m_reel_changed |= 0x02;
+	if ( stepper_update(0, (data>>4)&0x0f) ) m_reel_changed |= 0x01;
+	if ( stepper_update(1, data&0x0f   ) ) m_reel_changed |= 0x02;
 
-	if ( stepper_optic_state(0) ) state->m_optic_pattern |=  0x01;
-	else                          state->m_optic_pattern &= ~0x01;
-	if ( stepper_optic_state(1) ) state->m_optic_pattern |=  0x02;
-	else                          state->m_optic_pattern &= ~0x02;
+	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
+	else                          m_optic_pattern &= ~0x01;
+	if ( stepper_optic_state(1) ) m_optic_pattern |=  0x02;
+	else                          m_optic_pattern &= ~0x02;
 	awp_draw_reel(0);
 	awp_draw_reel(1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( reel34_w )
+WRITE8_MEMBER(bfmsys85_state::reel34_w)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
-	if ( stepper_update(2, (data>>4)&0x0f) ) state->m_reel_changed |= 0x04;
-	if ( stepper_update(3, data&0x0f   ) ) state->m_reel_changed |= 0x08;
+	if ( stepper_update(2, (data>>4)&0x0f) ) m_reel_changed |= 0x04;
+	if ( stepper_update(3, data&0x0f   ) ) m_reel_changed |= 0x08;
 
-	if ( stepper_optic_state(2) ) state->m_optic_pattern |=  0x04;
-	else                          state->m_optic_pattern &= ~0x04;
-	if ( stepper_optic_state(3) ) state->m_optic_pattern |=  0x08;
-	else                          state->m_optic_pattern &= ~0x08;
+	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
+	else                          m_optic_pattern &= ~0x04;
+	if ( stepper_optic_state(3) ) m_optic_pattern |=  0x08;
+	else                          m_optic_pattern &= ~0x08;
 	awp_draw_reel(2);
 	awp_draw_reel(3);
 }
@@ -224,34 +235,31 @@ static WRITE8_HANDLER( reel34_w )
 // mechanical meters //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( mmtr_w )
+WRITE8_MEMBER(bfmsys85_state::mmtr_w)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	int i;
-	int  changed = state->m_mmtr_latch ^ data;
+	int  changed = m_mmtr_latch ^ data;
 
-	state->m_mmtr_latch = data;
+	m_mmtr_latch = data;
 
 	for (i=0; i<8; i++)
 	if ( changed & (1 << i) )	MechMtr_update(i, data & (1 << i) );
 
-	if ( data ) generic_pulse_irq_line(space->machine().device("maincpu"), M6809_FIRQ_LINE, 1);
+	if ( data ) generic_pulse_irq_line(machine().device("maincpu"), M6809_FIRQ_LINE, 1);
 }
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( mmtr_r )
+READ8_MEMBER(bfmsys85_state::mmtr_r)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
-	return state->m_mmtr_latch;
+	return m_mmtr_latch;
 }
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( vfd_w )
+WRITE8_MEMBER(bfmsys85_state::vfd_w)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
-	int changed = state->m_vfd_latch ^ data;
+	int changed = m_vfd_latch ^ data;
 
-	state->m_vfd_latch = data;
+	m_vfd_latch = data;
 
 	if ( changed )
 	{
@@ -280,9 +288,8 @@ static WRITE8_HANDLER( vfd_w )
 // input / output multiplexers ///////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( mux_ctrl_w )
+WRITE8_MEMBER(bfmsys85_state::mux_ctrl_w)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	switch ( data & 0xF0 )
 	{
 		case 0x10:
@@ -295,15 +302,15 @@ static WRITE8_HANDLER( mux_ctrl_w )
 
 		case 0x40:
 		//logerror(" sys85 mux: read strobe");
-		state->m_mux_input_strobe = data & 0x07;
+		m_mux_input_strobe = data & 0x07;
 
-		if ( state->m_mux_input_strobe == 5 ) state->m_Inputs[5] = 0xFF ^ state->m_optic_pattern;
+		if ( m_mux_input_strobe == 5 ) m_Inputs[5] = 0xFF ^ m_optic_pattern;
 
-		state->m_mux_input = ~state->m_Inputs[state->m_mux_input_strobe];
+		m_mux_input = ~m_Inputs[m_mux_input_strobe];
 		break;
 
 		case 0x80:
-		state->m_mux_output_strobe = data & 0x0F;
+		m_mux_output_strobe = data & 0x0F;
 		break;
 
 		case 0xC0:
@@ -316,18 +323,17 @@ static WRITE8_HANDLER( mux_ctrl_w )
 	}
 }
 
-static READ8_HANDLER( mux_ctrl_r )
+READ8_MEMBER(bfmsys85_state::mux_ctrl_r)
 {
   // software waits for bit7 to become low
 
   return 0;
 }
 
-static WRITE8_HANDLER( mux_data_w )
+WRITE8_MEMBER(bfmsys85_state::mux_data_w)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
 	int pattern = 0x01, i,
-	off = state->m_mux_output_strobe<<4;
+	off = m_mux_output_strobe<<4;
 
 	for ( i = 0; i < 8; i++ )
 	{
@@ -337,15 +343,14 @@ static WRITE8_HANDLER( mux_data_w )
 	}
 }
 
-static READ8_HANDLER( mux_data_r )
+READ8_MEMBER(bfmsys85_state::mux_data_r)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
-	return state->m_mux_input;
+	return m_mux_input;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( mux_enable_w )
+WRITE8_MEMBER(bfmsys85_state::mux_enable_w)
 {
 }
 
@@ -353,18 +358,16 @@ static WRITE8_HANDLER( mux_enable_w )
 // payslide triacs ////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( triac_w )
+WRITE8_MEMBER(bfmsys85_state::triac_w)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
-	state->m_triac_latch = data;
+	m_triac_latch = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( triac_r )
+READ8_MEMBER(bfmsys85_state::triac_r)
 {
-	bfmsys85_state *state = space->machine().driver_data<bfmsys85_state>();
-	return state->m_triac_latch;
+	return m_triac_latch;
 }
 
 // machine start (called only once) ////////////////////////////////////////
@@ -387,17 +390,17 @@ static MACHINE_START( bfm_sys85 )
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, bfmsys85_state )
 
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k RAM
-	AM_RANGE(0x2000, 0x21FF) AM_WRITE_LEGACY(reel34_w)			// reel 3+4 latch
-	AM_RANGE(0x2200, 0x23FF) AM_WRITE_LEGACY(reel12_w)			// reel 1+2 latch
-	AM_RANGE(0x2400, 0x25FF) AM_WRITE_LEGACY(vfd_w)			// vfd latch
+	AM_RANGE(0x2000, 0x21FF) AM_WRITE(reel34_w)			// reel 3+4 latch
+	AM_RANGE(0x2200, 0x23FF) AM_WRITE(reel12_w)			// reel 1+2 latch
+	AM_RANGE(0x2400, 0x25FF) AM_WRITE(vfd_w)			// vfd latch
 
-	AM_RANGE(0x2600, 0x27FF) AM_READWRITE_LEGACY(mmtr_r,mmtr_w)// mechanical meter latch
-	AM_RANGE(0x2800, 0x2800) AM_READ_LEGACY(triac_r)			// payslide triacs
-	AM_RANGE(0x2800, 0x29FF) AM_WRITE_LEGACY(triac_w)			// triacs
+	AM_RANGE(0x2600, 0x27FF) AM_READWRITE(mmtr_r,mmtr_w)// mechanical meter latch
+	AM_RANGE(0x2800, 0x2800) AM_READ(triac_r)			// payslide triacs
+	AM_RANGE(0x2800, 0x29FF) AM_WRITE(triac_w)			// triacs
 
-	AM_RANGE(0x2A00, 0x2A00) AM_READWRITE_LEGACY(mux_data_r,mux_data_w)// mux
-	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE_LEGACY(mux_ctrl_r,mux_ctrl_w)// mux status register
-	AM_RANGE(0x2E00, 0x2E00) AM_READ_LEGACY(irqlatch_r)		// irq latch ( MC6850 / timer )
+	AM_RANGE(0x2A00, 0x2A00) AM_READWRITE(mux_data_r,mux_data_w)// mux
+	AM_RANGE(0x2A01, 0x2A01) AM_READWRITE(mux_ctrl_r,mux_ctrl_w)// mux status register
+	AM_RANGE(0x2E00, 0x2E00) AM_READ(irqlatch_r)		// irq latch ( MC6850 / timer )
 
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x3001, 0x3001) AM_READNOP //sound latch
@@ -409,10 +412,10 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, bfmsys85_state )
 	AM_RANGE(0x3406, 0x3406) AM_DEVREAD("acia6850_0", acia6850_device, status_read)
 	AM_RANGE(0x3407, 0x3407) AM_DEVREAD("acia6850_0", acia6850_device, data_read)
 
-	AM_RANGE(0x3600, 0x3600) AM_WRITE_LEGACY(mux_enable_w)		// mux enable
+	AM_RANGE(0x3600, 0x3600) AM_WRITE(mux_enable_w)		// mux enable
 
 	AM_RANGE(0x4000, 0xffff) AM_ROM						// 48K ROM
-	AM_RANGE(0x8000, 0xFFFF) AM_WRITE_LEGACY(watchdog_w)		// kick watchdog
+	AM_RANGE(0x8000, 0xFFFF) AM_WRITE(watchdog_w)		// kick watchdog
 
 ADDRESS_MAP_END
 

@@ -230,6 +230,13 @@ public:
 	UINT8 m_communication_port_status;
 	bitmap_ind16 m_bitmap;
 	UINT8 m_vid_regs[7];
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ8_MEMBER(link_r);
+	DECLARE_WRITE8_MEMBER(link_w);
+	DECLARE_READ8_MEMBER(z80_8088_r);
+	DECLARE_READ8_MEMBER(p03_r);
+	DECLARE_WRITE8_MEMBER(p03_w);
+	DECLARE_WRITE8_MEMBER(video_w);
 };
 
 
@@ -239,9 +246,9 @@ public:
  *
  *************************************/
 
-static WRITE8_HANDLER(bankswitch_w)
+WRITE8_MEMBER(smsmfg_state::bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data);
+	memory_set_bank(machine(), "bank1", data);
 }
 
 /*************************************
@@ -250,72 +257,67 @@ static WRITE8_HANDLER(bankswitch_w)
  *
  *************************************/
 
-static READ8_HANDLER(link_r)
+READ8_MEMBER(smsmfg_state::link_r)
 {
-	smsmfg_state *state = space->machine().driver_data<smsmfg_state>();
 	switch(offset)
 	{
 		case 0:
-			state->m_communication_port_status &= ~0x01;
-			return state->m_communication_port[0];
+			m_communication_port_status &= ~0x01;
+			return m_communication_port[0];
 		case 1:
-			state->m_communication_port_status &= ~0x02;
-			return state->m_communication_port[1];
+			m_communication_port_status &= ~0x02;
+			return m_communication_port[1];
 		case 2:
-			return state->m_communication_port_status;
+			return m_communication_port_status;
 	}
 	return 0;
 };
 
-static WRITE8_HANDLER(link_w)
+WRITE8_MEMBER(smsmfg_state::link_w)
 {
-	smsmfg_state *state = space->machine().driver_data<smsmfg_state>();
 	switch(offset)
 	{
 		case 0:
-			state->m_communication_port_status |= 0x08;
-			state->m_communication_port[3] = data;
+			m_communication_port_status |= 0x08;
+			m_communication_port[3] = data;
 			break;
 		case 1:
-			state->m_communication_port_status |= 0x04;
-			state->m_communication_port[2] = data;
+			m_communication_port_status |= 0x04;
+			m_communication_port[2] = data;
 			break;
 	}
 }
 
-static READ8_HANDLER(z80_8088_r)
+READ8_MEMBER(smsmfg_state::z80_8088_r)
 {
-	smsmfg_state *state = space->machine().driver_data<smsmfg_state>();
-	return state->m_communication_port_status;
+	return m_communication_port_status;
 }
 
-static READ8_HANDLER(p03_r)
+READ8_MEMBER(smsmfg_state::p03_r)
 {
-	smsmfg_state *state = space->machine().driver_data<smsmfg_state>();
 	switch(offset)
 	{
 		case 0:
-			state->m_communication_port_status &= ~0x08;
-			return state->m_communication_port[3];
+			m_communication_port_status &= ~0x08;
+			return m_communication_port[3];
 		case 1:
-			state->m_communication_port_status &= ~0x04;
-			return state->m_communication_port[2];
+			m_communication_port_status &= ~0x04;
+			return m_communication_port[2];
 	}
 	return 0;
 }
 
-static WRITE8_HANDLER(p03_w)
+WRITE8_MEMBER(smsmfg_state::p03_w)
 {
-	smsmfg_state *state = space->machine().driver_data<smsmfg_state>();
 	switch(offset)
 	{
 		case 0:
-			state->m_communication_port_status |= 0x01;
-			state->m_communication_port[0] = data;
+			m_communication_port_status |= 0x01;
+			m_communication_port[0] = data;
 			break;
 		case 1:
-			state->m_communication_port_status |= 0x02;
-			state->m_communication_port[1] = data;
+			m_communication_port_status |= 0x02;
+			m_communication_port[1] = data;
 			break;
 	}
 }
@@ -432,18 +434,17 @@ static const ppi8255_interface ppi8255_intf[2] =
  *
  *************************************/
 
-static WRITE8_HANDLER(video_w)
+WRITE8_MEMBER(smsmfg_state::video_w)
 {
-	smsmfg_state *state = space->machine().driver_data<smsmfg_state>();
-	state->m_vid_regs[offset] = data;
+	m_vid_regs[offset] = data;
 	if ( offset == 5 )
 	{
 		int x,y;
-		int xstart = state->m_vid_regs[0] + state->m_vid_regs[1]*256;
-		int width = state->m_vid_regs[2];
-		int ystart = state->m_vid_regs[3];
-		int height = state->m_vid_regs[4];
-		int color = state->m_vid_regs[5];
+		int xstart = m_vid_regs[0] + m_vid_regs[1]*256;
+		int width = m_vid_regs[2];
+		int ystart = m_vid_regs[3];
+		int height = m_vid_regs[4];
+		int color = m_vid_regs[5];
 
 		if ( height == 0 )
 			height = 256;
@@ -456,7 +457,7 @@ static WRITE8_HANDLER(video_w)
 			for ( x = xstart; x < xstart + width; x++ )
 			{
 				if ( y < 256 )
-				state->m_bitmap.pix16(y, x) = color;
+				m_bitmap.pix16(y, x) = color;
 			}
 		}
 	}
@@ -497,19 +498,19 @@ static PALETTE_INIT( sms )
 static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x00800, 0x00803) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x01000, 0x01007) AM_WRITE_LEGACY(video_w)
-	AM_RANGE(0x01800, 0x01803) AM_READWRITE_LEGACY(link_r, link_w)
+	AM_RANGE(0x01000, 0x01007) AM_WRITE(video_w)
+	AM_RANGE(0x01800, 0x01803) AM_READWRITE(link_r, link_w)
 	AM_RANGE(0x04000, 0x07fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x04000, 0x04000) AM_WRITE_LEGACY(bankswitch_w)
+	AM_RANGE(0x04000, 0x04000) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x08000, 0x0ffff) AM_ROM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sureshot_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0x00000, 0x007ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x02000, 0x02007) AM_WRITE_LEGACY(video_w)
+	AM_RANGE(0x02000, 0x02007) AM_WRITE(video_w)
 	AM_RANGE(0x03000, 0x03003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x03800, 0x03803) AM_READWRITE_LEGACY(link_r, link_w)
+	AM_RANGE(0x03800, 0x03803) AM_READWRITE(link_r, link_w)
 	AM_RANGE(0x08000, 0x0ffff) AM_ROM
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM // mirror for vectors
 ADDRESS_MAP_END
@@ -519,8 +520,8 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, smsmfg_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x3100, 0x3103) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x3381, 0x3382) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x3400, 0x3400) AM_READ_LEGACY(z80_8088_r)
-	AM_RANGE(0x3500, 0x3501) AM_READWRITE_LEGACY(p03_r, p03_w)
+	AM_RANGE(0x3400, 0x3400) AM_READ(z80_8088_r)
+	AM_RANGE(0x3500, 0x3501) AM_READWRITE(p03_r, p03_w)
 ADDRESS_MAP_END
 
 /*************************************

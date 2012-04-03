@@ -25,6 +25,10 @@ public:
 	UINT8 *  m_spriteram2;
 	UINT8 *  m_spriteram3;
 	UINT8 m_flip_bit;
+	DECLARE_WRITE8_MEMBER(hanaroku_out_0_w);
+	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
+	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
+	DECLARE_WRITE8_MEMBER(albazc_vregs_w);
 };
 
 
@@ -84,7 +88,7 @@ static SCREEN_UPDATE_IND16(hanaroku)
 	return 0;
 }
 
-static WRITE8_HANDLER( hanaroku_out_0_w )
+WRITE8_MEMBER(albazc_state::hanaroku_out_0_w)
 {
 	/*
         bit     description
@@ -99,14 +103,14 @@ static WRITE8_HANDLER( hanaroku_out_0_w )
          7      meter5 (start)
     */
 
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
-	coin_counter_w(space->machine(), 2, data & 0x04);
-	coin_counter_w(space->machine(), 3, data & 0x08);
-	coin_counter_w(space->machine(), 4, data & 0x80);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 2, data & 0x04);
+	coin_counter_w(machine(), 3, data & 0x08);
+	coin_counter_w(machine(), 4, data & 0x80);
 }
 
-static WRITE8_HANDLER( hanaroku_out_1_w )
+WRITE8_MEMBER(albazc_state::hanaroku_out_1_w)
 {
 	/*
         bit     description
@@ -122,14 +126,13 @@ static WRITE8_HANDLER( hanaroku_out_1_w )
     */
 }
 
-static WRITE8_HANDLER( hanaroku_out_2_w )
+WRITE8_MEMBER(albazc_state::hanaroku_out_2_w)
 {
 	// unused
 }
 
-static WRITE8_HANDLER( albazc_vregs_w )
+WRITE8_MEMBER(albazc_state::albazc_vregs_w)
 {
-	albazc_state *state = space->machine().driver_data<albazc_state>();
 
 	#ifdef UNUSED_FUNCTION
 	{
@@ -142,8 +145,8 @@ static WRITE8_HANDLER( albazc_vregs_w )
 	if(offset == 0)
 	{
 		/* core bug with this? */
-		//flip_screen_set(space->machine(), (data & 0x40) >> 6);
-		state->m_flip_bit = (data & 0x40) >> 6;
+		//flip_screen_set(machine(), (data & 0x40) >> 6);
+		m_flip_bit = (data & 0x40) >> 6;
 	}
 }
 
@@ -155,16 +158,16 @@ static ADDRESS_MAP_START( hanaroku_map, AS_PROGRAM, 8, albazc_state )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM AM_BASE(m_spriteram3)
 	AM_RANGE(0xa200, 0xa2ff) AM_WRITENOP	// ??? written once during P.O.S.T.
-	AM_RANGE(0xa300, 0xa304) AM_WRITE_LEGACY(albazc_vregs_w)	// ???
+	AM_RANGE(0xa300, 0xa304) AM_WRITE(albazc_vregs_w)	// ???
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// ??? always 0x40
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM			// main ram
 	AM_RANGE(0xc400, 0xc4ff) AM_RAM			// ???
 	AM_RANGE(0xd000, 0xd000) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE_LEGACY(hanaroku_out_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN0") AM_WRITE(hanaroku_out_0_w)
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("IN1")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN2") AM_WRITE_LEGACY(hanaroku_out_1_w)
-	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW3") AM_WRITE_LEGACY(hanaroku_out_2_w)
+	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN2") AM_WRITE(hanaroku_out_1_w)
+	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW3") AM_WRITE(hanaroku_out_2_w)
 ADDRESS_MAP_END
 
 

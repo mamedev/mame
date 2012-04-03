@@ -90,6 +90,10 @@ public:
 	UINT8 m_p2_hopper;
 	UINT8 m_mux_data;
 	UINT8 *m_spriteram;
+	DECLARE_WRITE8_MEMBER(sc0_vram_w);
+	DECLARE_WRITE8_MEMBER(sc0_attr_w);
+	DECLARE_WRITE8_MEMBER(led_array_w);
+	DECLARE_WRITE8_MEMBER(kingdrbb_lamps_w);
 };
 
 
@@ -233,22 +237,20 @@ static SCREEN_UPDATE_IND16(kingdrby)
 	return 0;
 }
 
-static WRITE8_HANDLER( sc0_vram_w )
+WRITE8_MEMBER(kingdrby_state::sc0_vram_w)
 {
-	kingdrby_state *state = space->machine().driver_data<kingdrby_state>();
-	state->m_vram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
-	state->m_sc0w_tilemap->mark_tile_dirty(offset);
-	state->m_sc1_tilemap->mark_tile_dirty(offset);
+	m_vram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
+	m_sc0w_tilemap->mark_tile_dirty(offset);
+	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( sc0_attr_w )
+WRITE8_MEMBER(kingdrby_state::sc0_attr_w)
 {
-	kingdrby_state *state = space->machine().driver_data<kingdrby_state>();
-	state->m_attr[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
-	state->m_sc0w_tilemap->mark_tile_dirty(offset);
-	state->m_sc1_tilemap->mark_tile_dirty(offset);
+	m_attr[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
+	m_sc0w_tilemap->mark_tile_dirty(offset);
+	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
 /*************************************
@@ -361,7 +363,7 @@ static READ8_DEVICE_HANDLER( sound_cmd_r )
 static const UINT8 led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
-static WRITE8_HANDLER( led_array_w )
+WRITE8_MEMBER(kingdrby_state::led_array_w)
 {
 	/*
     offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
@@ -384,8 +386,8 @@ static WRITE8_HANDLER( led_array_w )
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_MIRROR(0xc00) AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(sc0_vram_w) AM_BASE(m_vram)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE_LEGACY(sc0_attr_w) AM_BASE(m_attr)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(m_vram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(sc0_attr_w) AM_BASE(m_attr)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_io_map, AS_IO, 8, kingdrby_state )
@@ -403,12 +405,12 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x7801, 0x780f) AM_WRITE_LEGACY(led_array_w)
+	AM_RANGE(0x7801, 0x780f) AM_WRITE(led_array_w)
 	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( kingdrbb_lamps_w )
+WRITE8_MEMBER(kingdrby_state::kingdrbb_lamps_w)
 {
 	// (same as the inputs but active high)
 }
@@ -427,7 +429,7 @@ static ADDRESS_MAP_START( slave_1986_map, AS_PROGRAM, 8, kingdrby_state )
     AM_RANGE(0x7801, 0x7801) AM_READ_PORT("KEY1")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("KEY2")
 	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("KEY3")
-	AM_RANGE(0x7800, 0x7803) AM_WRITE_LEGACY(kingdrbb_lamps_w)
+	AM_RANGE(0x7800, 0x7803) AM_WRITE(kingdrbb_lamps_w)
 	AM_RANGE(0x7a00, 0x7a00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END

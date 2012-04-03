@@ -50,14 +50,15 @@ public:
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
+	DECLARE_WRITE16_MEMBER(fg_tilemapram_w);
+	DECLARE_WRITE16_MEMBER(bg_tilemapram_w);
 };
 
 
-static WRITE16_HANDLER( fg_tilemapram_w )
+WRITE16_MEMBER(good_state::fg_tilemapram_w)
 {
-	good_state *state = space->machine().driver_data<good_state>();
-	COMBINE_DATA(&state->m_fg_tilemapram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_fg_tilemapram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -68,11 +69,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0, tileno, attr, 0);
 }
 
-static WRITE16_HANDLER( bg_tilemapram_w )
+WRITE16_MEMBER(good_state::bg_tilemapram_w)
 {
-	good_state *state = space->machine().driver_data<good_state>();
-	COMBINE_DATA(&state->m_bg_tilemapram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_bg_tilemapram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -113,8 +113,8 @@ static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16, good_state )
 
 	AM_RANGE(0x800000, 0x8007ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE_LEGACY(fg_tilemapram_w) AM_BASE(m_fg_tilemapram)
-	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE_LEGACY(bg_tilemapram_w) AM_BASE(m_bg_tilemapram)
+	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_BASE(m_fg_tilemapram)
+	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_BASE(m_bg_tilemapram)
 
 	AM_RANGE(0xff0000, 0xffefff) AM_RAM
 ADDRESS_MAP_END

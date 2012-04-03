@@ -27,6 +27,15 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_sound_flag;
 	UINT8 m_tile_bank;
+	DECLARE_WRITE8_MEMBER(bgram_w);
+	DECLARE_WRITE8_MEMBER(player_mux_w);
+	DECLARE_WRITE8_MEMBER(tile_banking_w);
+	DECLARE_WRITE8_MEMBER(wink_coin_counter_w);
+	DECLARE_READ8_MEMBER(analog_port_r);
+	DECLARE_READ8_MEMBER(player_inputs_r);
+	DECLARE_WRITE8_MEMBER(sound_irq_w);
+	DECLARE_READ8_MEMBER(prot_r);
+	DECLARE_WRITE8_MEMBER(prot_w);
 };
 
 
@@ -59,58 +68,56 @@ static SCREEN_UPDATE_IND16( wink )
 	return 0;
 }
 
-static WRITE8_HANDLER( bgram_w )
+WRITE8_MEMBER(wink_state::bgram_w)
 {
-	wink_state *state = space->machine().driver_data<wink_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( player_mux_w )
+WRITE8_MEMBER(wink_state::player_mux_w)
 {
 	//player_mux = data & 1;
 	//no mux / cocktail mode in the real pcb? strange...
 }
 
-static WRITE8_HANDLER( tile_banking_w )
+WRITE8_MEMBER(wink_state::tile_banking_w)
 {
-	wink_state *state = space->machine().driver_data<wink_state>();
-	state->m_tile_bank = data & 1;
-	state->m_bg_tilemap->mark_all_dirty();
+	m_tile_bank = data & 1;
+	m_bg_tilemap->mark_all_dirty();
 }
 
-static WRITE8_HANDLER( wink_coin_counter_w )
+WRITE8_MEMBER(wink_state::wink_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset,data & 1);
+	coin_counter_w(machine(), offset,data & 1);
 }
 
-static READ8_HANDLER( analog_port_r )
+READ8_MEMBER(wink_state::analog_port_r)
 {
-	return input_port_read(space->machine(), /* player_mux ? "DIAL2" : */ "DIAL1");
+	return input_port_read(machine(), /* player_mux ? "DIAL2" : */ "DIAL1");
 }
 
-static READ8_HANDLER( player_inputs_r )
+READ8_MEMBER(wink_state::player_inputs_r)
 {
-	return input_port_read(space->machine(), /* player_mux ? "INPUTS2" : */ "INPUTS1");
+	return input_port_read(machine(), /* player_mux ? "INPUTS2" : */ "INPUTS1");
 }
 
-static WRITE8_HANDLER( sound_irq_w )
+WRITE8_MEMBER(wink_state::sound_irq_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
-	//space->machine().scheduler().synchronize();
+	//machine().scheduler().synchronize();
 }
 
 static ADDRESS_MAP_START( wink_map, AS_PROGRAM, 8, wink_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(bgram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( prot_r )
+READ8_MEMBER(wink_state::prot_r)
 {
 	//take a0-a7 and do some math using the variable created from the upper address-lines,
 	//put the result onto the databus.
@@ -130,7 +137,7 @@ the 8bit result is placed on the databus.
 	return 0x20; //hack to pass the jump calculated using this value
 }
 
-static WRITE8_HANDLER( prot_w )
+WRITE8_MEMBER(wink_state::prot_w)
 {
 	//take a9-a15 and stuff them in a variable for later use.
 }
@@ -139,23 +146,23 @@ static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE_GENERIC(paletteram) //0x10-0x1f is likely to be something else
 //  AM_RANGE(0x20, 0x20) AM_WRITENOP                //??? seems unused..
-	AM_RANGE(0x21, 0x21) AM_WRITE_LEGACY(player_mux_w)		//??? no mux on the pcb.
-	AM_RANGE(0x22, 0x22) AM_WRITE_LEGACY(tile_banking_w)
+	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)		//??? no mux on the pcb.
+	AM_RANGE(0x22, 0x22) AM_WRITE(tile_banking_w)
 //  AM_RANGE(0x23, 0x23) AM_WRITENOP                //?
 //  AM_RANGE(0x24, 0x24) AM_WRITENOP                //cab Knocker like in q-bert!
-	AM_RANGE(0x25, 0x27) AM_WRITE_LEGACY(wink_coin_counter_w)
+	AM_RANGE(0x25, 0x27) AM_WRITE(wink_coin_counter_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(sound_irq_w)
-	AM_RANGE(0x80, 0x80) AM_READ_LEGACY(analog_port_r)
-	AM_RANGE(0xa0, 0xa0) AM_READ_LEGACY(player_inputs_r)
+	AM_RANGE(0x60, 0x60) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x80, 0x80) AM_READ(analog_port_r)
+	AM_RANGE(0xa0, 0xa0) AM_READ(player_inputs_r)
 	AM_RANGE(0xa4, 0xa4) AM_READ_PORT("DSW1")	//dipswitch bank2
 	AM_RANGE(0xa8, 0xa8) AM_READ_PORT("DSW2")	//dipswitch bank1
 //  AM_RANGE(0xac, 0xac) AM_WRITENOP            //protection - loads video xor unit (written only once at startup)
 	AM_RANGE(0xb0, 0xb0) AM_READ_PORT("DSW3")	//unused inputs
 	AM_RANGE(0xb4, 0xb4) AM_READ_PORT("DSW4")	//dipswitch bank3
-	AM_RANGE(0xc0, 0xdf) AM_WRITE_LEGACY(prot_w)		//load load protection-buffer from upper address bus
+	AM_RANGE(0xc0, 0xdf) AM_WRITE(prot_w)		//load load protection-buffer from upper address bus
 	AM_RANGE(0xc3, 0xc3) AM_READNOP				//watchdog?
-	AM_RANGE(0xe0, 0xff) AM_READ_LEGACY(prot_r)		//load math unit from buffer & lower address-bus
+	AM_RANGE(0xe0, 0xff) AM_READ(prot_r)		//load math unit from buffer & lower address-bus
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wink_sound_map, AS_PROGRAM, 8, wink_state )

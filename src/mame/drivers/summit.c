@@ -27,6 +27,7 @@ public:
 
 	UINT8 *m_vram;
 	UINT8 *m_attr;
+	DECLARE_WRITE8_MEMBER(out_w);
 };
 
 
@@ -56,9 +57,8 @@ static SCREEN_UPDATE_IND16(summit)
 	return 0;
 }
 
-static WRITE8_HANDLER( out_w )
+WRITE8_MEMBER(summit_state::out_w)
 {
-
 }
 
 
@@ -69,10 +69,10 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, summit_state )
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE(m_vram)
 
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
-//  AM_RANGE(0x3880, 0x3880) AM_WRITE_LEGACY(out_w)
-	AM_RANGE(0x3900, 0x3900) AM_READ_PORT("IN1") AM_WRITE_LEGACY(out_w) // lamps
-//  AM_RANGE(0x3980, 0x3980) AM_WRITE_LEGACY(out_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("IN2") //AM_WRITE_LEGACY(out_w)
+//  AM_RANGE(0x3880, 0x3880) AM_WRITE(out_w)
+	AM_RANGE(0x3900, 0x3900) AM_READ_PORT("IN1") AM_WRITE(out_w) // lamps
+//  AM_RANGE(0x3980, 0x3980) AM_WRITE(out_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("IN2") //AM_WRITE(out_w)
 	AM_RANGE(0x3b00, 0x3b00) AM_READ_PORT("IN3")
 
 	AM_RANGE(0x7000, 0x71ff) AM_RAM

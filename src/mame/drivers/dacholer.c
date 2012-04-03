@@ -69,6 +69,18 @@ public:
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	DECLARE_WRITE8_MEMBER(bg_scroll_x_w);
+	DECLARE_WRITE8_MEMBER(bg_scroll_y_w);
+	DECLARE_WRITE8_MEMBER(background_w);
+	DECLARE_WRITE8_MEMBER(foreground_w);
+	DECLARE_WRITE8_MEMBER(bg_bank_w);
+	DECLARE_WRITE8_MEMBER(coins_w);
+	DECLARE_WRITE8_MEMBER(snd_w);
+	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(adpcm_w);
+	DECLARE_WRITE8_MEMBER(snd_ack_w);
+	DECLARE_WRITE8_MEMBER(snd_irq_w);
+	DECLARE_WRITE8_MEMBER(music_irq_w);
 };
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -92,16 +104,14 @@ static VIDEO_START( dacholer )
 	state->m_fg_tilemap->set_transparent_pen(0);
 }
 
-static WRITE8_HANDLER( bg_scroll_x_w )
+WRITE8_MEMBER(dacholer_state::bg_scroll_x_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
-	state->m_scroll_x = data;
+	m_scroll_x = data;
 }
 
-static WRITE8_HANDLER( bg_scroll_y_w )
+WRITE8_MEMBER(dacholer_state::bg_scroll_y_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
-	state->m_scroll_y = data;
+	m_scroll_y = data;
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
@@ -157,61 +167,56 @@ static SCREEN_UPDATE_IND16(dacholer)
 	return 0;
 }
 
-static WRITE8_HANDLER( background_w )
+WRITE8_MEMBER(dacholer_state::background_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( foreground_w )
+WRITE8_MEMBER(dacholer_state::foreground_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( bg_bank_w )
+WRITE8_MEMBER(dacholer_state::bg_bank_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
-	if ((data & 3) != state->m_bg_bank)
+	if ((data & 3) != m_bg_bank)
 	{
-		state->m_bg_bank = data & 3;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_bank = data & 3;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	flip_screen_set(space->machine(), data & 0xc); // probably one bit for flipx and one for flipy
+	flip_screen_set(machine(), data & 0xc); // probably one bit for flipx and one for flipy
 
 }
 
-static WRITE8_HANDLER( coins_w )
+WRITE8_MEMBER(dacholer_state::coins_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 
-	set_led_status(space->machine(), 0, data & 4);
-	set_led_status(space->machine(), 1, data & 8);
+	set_led_status(machine(), 0, data & 4);
+	set_led_status(machine(), 1, data & 8);
 }
 
-static WRITE8_HANDLER(snd_w)
+WRITE8_MEMBER(dacholer_state::snd_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( main_irq_ack_w )
+WRITE8_MEMBER(dacholer_state::main_irq_ack_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dacholer_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
-	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(background_w) AM_BASE(m_bgvideoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(foreground_w) AM_BASE(m_fgvideoram)
+	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x400) AM_RAM_WRITE(background_w) AM_BASE(m_bgvideoram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(foreground_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
@@ -229,12 +234,12 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, dacholer_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWA")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWB")
 	AM_RANGE(0x05, 0x05) AM_READNOP // watchdog in itaten
-	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(coins_w)
-	AM_RANGE(0x21, 0x21) AM_WRITE_LEGACY(bg_bank_w)
-	AM_RANGE(0x22, 0x22) AM_WRITE_LEGACY(bg_scroll_x_w)
-	AM_RANGE(0x23, 0x23) AM_WRITE_LEGACY(bg_scroll_y_w)
-	AM_RANGE(0x24, 0x24) AM_WRITE_LEGACY(main_irq_ack_w)
-	AM_RANGE(0x27, 0x27) AM_WRITE_LEGACY(snd_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(coins_w)
+	AM_RANGE(0x21, 0x21) AM_WRITE(bg_bank_w)
+	AM_RANGE(0x22, 0x22) AM_WRITE(bg_scroll_x_w)
+	AM_RANGE(0x23, 0x23) AM_WRITE(bg_scroll_y_w)
+	AM_RANGE(0x24, 0x24) AM_WRITE(main_irq_ack_w)
+	AM_RANGE(0x27, 0x27) AM_WRITE(snd_w)
 ADDRESS_MAP_END
 
 
@@ -250,17 +255,15 @@ static ADDRESS_MAP_START( itaten_snd_map, AS_PROGRAM, 8, dacholer_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( adpcm_w )
+WRITE8_MEMBER(dacholer_state::adpcm_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
-	state->m_msm_data = data;
-	state->m_msm_toggle = 0;
+	m_msm_data = data;
+	m_msm_toggle = 0;
 }
 
-static WRITE8_HANDLER( snd_ack_w )
+WRITE8_MEMBER(dacholer_state::snd_ack_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
-	state->m_snd_ack = data;
+	m_snd_ack = data;
 }
 
 static CUSTOM_INPUT( snd_ack_r )
@@ -269,25 +272,23 @@ static CUSTOM_INPUT( snd_ack_r )
 	return state->m_snd_ack;		//guess ...
 }
 
-static WRITE8_HANDLER( snd_irq_w )
+WRITE8_MEMBER(dacholer_state::snd_irq_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
-	state->m_snd_interrupt_enable = data;
+	m_snd_interrupt_enable = data;
 }
 
-static WRITE8_HANDLER( music_irq_w )
+WRITE8_MEMBER(dacholer_state::music_irq_w)
 {
-	dacholer_state *state = space->machine().driver_data<dacholer_state>();
-	state->m_music_interrupt_enable = data;
+	m_music_interrupt_enable = data;
 }
 
 static ADDRESS_MAP_START( snd_io_map, AS_IO, 8, dacholer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(soundlatch_r, soundlatch_clear_w )
-	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(music_irq_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(snd_irq_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(snd_ack_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(adpcm_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(music_irq_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(snd_irq_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(snd_ack_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(adpcm_w)
 	AM_RANGE(0x86, 0x87) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x8a, 0x8b) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)

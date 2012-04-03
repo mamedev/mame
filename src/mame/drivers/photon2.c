@@ -28,6 +28,10 @@ public:
 	UINT8 m_nmi_enable;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(photon2_membank_w);
+	DECLARE_READ8_MEMBER(photon2_fe_r);
+	DECLARE_WRITE8_MEMBER(photon2_fe_w);
+	DECLARE_WRITE8_MEMBER(photon2_misc_w);
 };
 
 
@@ -174,7 +178,7 @@ static SCREEN_UPDATE_IND16( spectrum )
  *
  *************************************/
 
-static WRITE8_HANDLER(photon2_membank_w)
+WRITE8_MEMBER(photon2_state::photon2_membank_w)
 {
 	int bank = 0;
 	if (data == 0)
@@ -194,27 +198,25 @@ static WRITE8_HANDLER(photon2_membank_w)
 		logerror( "Unknown banking write: %02X\n", data);
 	}
 
-	memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x4000*bank );
+	memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x4000*bank );
 }
 
-static READ8_HANDLER(photon2_fe_r)
+READ8_MEMBER(photon2_state::photon2_fe_r)
 {
 	return 0xff;
 }
 
-static WRITE8_HANDLER(photon2_fe_w)
+WRITE8_MEMBER(photon2_state::photon2_fe_w)
 {
-	photon2_state *state = space->machine().driver_data<photon2_state>();
-	device_t *speaker = space->machine().device("speaker");
-	state->m_spectrum_port_fe = data;
+	device_t *speaker = machine().device("speaker");
+	m_spectrum_port_fe = data;
 
 	speaker_level_w(speaker, BIT(data,4));
 }
 
-static WRITE8_HANDLER(photon2_misc_w)
+WRITE8_MEMBER(photon2_state::photon2_misc_w)
 {
-	photon2_state *state = space->machine().driver_data<photon2_state>();
-	state->m_nmi_enable = !BIT(data,5);
+	m_nmi_enable = !BIT(data,5);
 }
 
 /*************************************
@@ -232,11 +234,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START (spectrum_io, AS_IO, 8, photon2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x1f, 0x1f) AM_READ_PORT("JOY")
-	AM_RANGE(0x5b, 0x5b) AM_READ_PORT("COIN") AM_WRITE_LEGACY(photon2_misc_w)
-	AM_RANGE(0x7a, 0x7a) AM_WRITE_LEGACY(photon2_membank_w)
+	AM_RANGE(0x5b, 0x5b) AM_READ_PORT("COIN") AM_WRITE(photon2_misc_w)
+	AM_RANGE(0x7a, 0x7a) AM_WRITE(photon2_membank_w)
 	AM_RANGE(0x7b, 0x7b) AM_WRITENOP // unknown write
-	AM_RANGE(0x7e, 0x7e) AM_WRITE_LEGACY(photon2_membank_w)
-	AM_RANGE(0xfe, 0xfe) AM_READWRITE_LEGACY(photon2_fe_r, photon2_fe_w)
+	AM_RANGE(0x7e, 0x7e) AM_WRITE(photon2_membank_w)
+	AM_RANGE(0xfe, 0xfe) AM_READWRITE(photon2_fe_r, photon2_fe_w)
 ADDRESS_MAP_END
 
 /*************************************

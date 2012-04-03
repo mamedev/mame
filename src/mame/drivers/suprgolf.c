@@ -47,6 +47,13 @@ public:
 	UINT8 m_palette_switch;
 	UINT8 m_bg_vreg_test;
 	UINT8 m_toggle;
+	DECLARE_READ8_MEMBER(suprgolf_videoram_r);
+	DECLARE_WRITE8_MEMBER(suprgolf_videoram_w);
+	DECLARE_READ8_MEMBER(suprgolf_bg_vram_r);
+	DECLARE_WRITE8_MEMBER(suprgolf_bg_vram_w);
+	DECLARE_WRITE8_MEMBER(suprgolf_pen_w);
+	DECLARE_WRITE8_MEMBER(adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(rom2_bank_select_w);
 };
 
 static TILE_GET_INFO( get_tile_info )
@@ -120,37 +127,35 @@ static SCREEN_UPDATE_IND16( suprgolf )
 	return 0;
 }
 
-static READ8_HANDLER( suprgolf_videoram_r )
+READ8_MEMBER(suprgolf_state::suprgolf_videoram_r)
 {
-	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	if (state->m_palette_switch)
-		return state->m_paletteram[offset];
+	if (m_palette_switch)
+		return m_paletteram[offset];
 	else
-		return state->m_videoram[offset];
+		return m_videoram[offset];
 }
 
-static WRITE8_HANDLER( suprgolf_videoram_w )
+WRITE8_MEMBER(suprgolf_state::suprgolf_videoram_w)
 {
-	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	if(state->m_palette_switch)
+	if(m_palette_switch)
 	{
 		int r,g,b,datax;
-		state->m_paletteram[offset] = data;
+		m_paletteram[offset] = data;
 		offset>>=1;
-		datax = state->m_paletteram[offset*2] + 256*state->m_paletteram[offset*2 + 1];
+		datax = m_paletteram[offset*2] + 256*m_paletteram[offset*2 + 1];
 
 		b = (datax & 0x8000) ? 0 : ((datax)&0x001f)>>0;
 		g = (datax & 0x8000) ? 0 : ((datax)&0x03e0)>>5;
 		r = (datax & 0x8000) ? 0 : ((datax)&0x7c00)>>10;
 
-		palette_set_color_rgb(space->machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine(), offset, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 	else
 	{
-		state->m_videoram[offset] = data;
-		state->m_tilemap->mark_tile_dirty((offset & 0x7fe) >> 1);
+		m_videoram[offset] = data;
+		m_tilemap->mark_tile_dirty((offset & 0x7fe) >> 1);
 	}
 }
 
@@ -178,16 +183,14 @@ static WRITE8_DEVICE_HANDLER( suprgolf_vregs_w )
 	//  printf("Video regs with data %02x activated\n",data);
 }
 
-static READ8_HANDLER( suprgolf_bg_vram_r )
+READ8_MEMBER(suprgolf_state::suprgolf_bg_vram_r)
 {
-	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	return state->m_bg_vram[offset+state->m_bg_bank*0x2000];
+	return m_bg_vram[offset+m_bg_bank*0x2000];
 }
 
-static WRITE8_HANDLER( suprgolf_bg_vram_w )
+WRITE8_MEMBER(suprgolf_state::suprgolf_bg_vram_w)
 {
-	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 	UINT8 hi_nibble,lo_nibble;
 	UINT8 hi_dirty_dot,lo_dirty_dot; // helpers
 
@@ -198,51 +201,49 @@ static WRITE8_HANDLER( suprgolf_bg_vram_w )
 
 	if(hi_nibble == 0xf0)
 	{
-		hi_nibble = state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0xf0;
-		if(!(state->m_vreg_pen & 0x80) && (!(state->m_bg_bank & 0x10)))
+		hi_nibble = m_bg_vram[offset+m_bg_bank*0x2000] & 0xf0;
+		if(!(m_vreg_pen & 0x80) && (!(m_bg_bank & 0x10)))
 			hi_dirty_dot = 0;
 	}
 
 	if(lo_nibble == 0x0f)
 	{
-		lo_nibble = state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0x0f;
-		if(!(state->m_vreg_pen & 0x80) && (!(state->m_bg_bank & 0x10)))
+		lo_nibble = m_bg_vram[offset+m_bg_bank*0x2000] & 0x0f;
+		if(!(m_vreg_pen & 0x80) && (!(m_bg_bank & 0x10)))
 			lo_dirty_dot = 0;
 	}
 
-	if(state->m_vreg_pen & 0x80 || state->m_bg_bank & 0x10)
-		state->m_bg_vram[offset+state->m_bg_bank*0x2000] = data;
+	if(m_vreg_pen & 0x80 || m_bg_bank & 0x10)
+		m_bg_vram[offset+m_bg_bank*0x2000] = data;
 	else
-		state->m_bg_vram[offset+state->m_bg_bank*0x2000] = hi_nibble|lo_nibble;
+		m_bg_vram[offset+m_bg_bank*0x2000] = hi_nibble|lo_nibble;
 
-	if(state->m_bg_bank & 0x10)
+	if(m_bg_bank & 0x10)
 	{
 		if(hi_dirty_dot)
-			state->m_fg_fb[(offset+(state->m_bg_bank & 0x0f)*0x2000)*2+1] = (state->m_vreg_pen & 0x7f)<<4 | ((state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0xf0)>>4);
+			m_fg_fb[(offset+(m_bg_bank & 0x0f)*0x2000)*2+1] = (m_vreg_pen & 0x7f)<<4 | ((m_bg_vram[offset+m_bg_bank*0x2000] & 0xf0)>>4);
 		if(lo_dirty_dot)
-			state->m_fg_fb[(offset+(state->m_bg_bank & 0x0f)*0x2000)*2+0] = (state->m_vreg_pen & 0x7f)<<4 | ((state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0x0f)>>0);
+			m_fg_fb[(offset+(m_bg_bank & 0x0f)*0x2000)*2+0] = (m_vreg_pen & 0x7f)<<4 | ((m_bg_vram[offset+m_bg_bank*0x2000] & 0x0f)>>0);
 	}
 	else
 	{
 		if(hi_dirty_dot)
-			state->m_bg_fb[(offset+(state->m_bg_bank & 0x0f)*0x2000)*2+1] = (state->m_vreg_pen & 0x7f)<<4 | ((state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0xf0)>>4);
+			m_bg_fb[(offset+(m_bg_bank & 0x0f)*0x2000)*2+1] = (m_vreg_pen & 0x7f)<<4 | ((m_bg_vram[offset+m_bg_bank*0x2000] & 0xf0)>>4);
 		if(lo_dirty_dot)
-			state->m_bg_fb[(offset+(state->m_bg_bank & 0x0f)*0x2000)*2+0] = (state->m_vreg_pen & 0x7f)<<4 | ((state->m_bg_vram[offset+state->m_bg_bank*0x2000] & 0x0f)>>0);
+			m_bg_fb[(offset+(m_bg_bank & 0x0f)*0x2000)*2+0] = (m_vreg_pen & 0x7f)<<4 | ((m_bg_vram[offset+m_bg_bank*0x2000] & 0x0f)>>0);
 	}
 }
 
-static WRITE8_HANDLER( suprgolf_pen_w )
+WRITE8_MEMBER(suprgolf_state::suprgolf_pen_w)
 {
-	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	state->m_vreg_pen = data;
+	m_vreg_pen = data;
 }
 
-static WRITE8_HANDLER( adpcm_data_w )
+WRITE8_MEMBER(suprgolf_state::adpcm_data_w)
 {
-	suprgolf_state *state = space->machine().driver_data<suprgolf_state>();
 
-	state->m_msm5205next = data;
+	m_msm5205next = data;
 }
 
 static READ8_DEVICE_HANDLER( rom_bank_select_r )
@@ -268,12 +269,12 @@ static WRITE8_DEVICE_HANDLER( rom_bank_select_w )
 	flip_screen_set(device->machine(), data & 0x80);
 }
 
-static WRITE8_HANDLER( rom2_bank_select_w )
+WRITE8_MEMBER(suprgolf_state::rom2_bank_select_w)
 {
-	UINT8 *region_base = space->machine().region("user2")->base();
-//  mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(&space->device()));
+	UINT8 *region_base = machine().region("user2")->base();
+//  mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(&space.device()));
 
-	memory_set_bankptr(space->machine(), "bank1", region_base + (data&0x0f) * 0x4000);
+	memory_set_bankptr(machine(), "bank1", region_base + (data&0x0f) * 0x4000);
 
 	if(data & 0xf0)
 		printf("Rom bank select 2 with data %02x activated\n",data);
@@ -302,11 +303,11 @@ static READ8_DEVICE_HANDLER( p2_r )
 static ADDRESS_MAP_START( suprgolf_map, AS_PROGRAM, 8, suprgolf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(rom2_bank_select_w )
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(rom2_bank_select_w )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
-	AM_RANGE(0xe000, 0xefff) AM_READWRITE_LEGACY(suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE(m_videoram) //foreground vram + paletteram
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(suprgolf_pen_w )
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(suprgolf_bg_vram_r, suprgolf_bg_vram_w ) // banked background vram
+	AM_RANGE(0xe000, 0xefff) AM_READWRITE(suprgolf_videoram_r, suprgolf_videoram_w ) AM_BASE(m_videoram) //foreground vram + paletteram
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(suprgolf_pen_w )
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -315,7 +316,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, suprgolf_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x08, 0x09) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(adpcm_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(adpcm_data_w)
  ADDRESS_MAP_END
 
 static INPUT_PORTS_START( suprgolf )

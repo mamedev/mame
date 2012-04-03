@@ -189,6 +189,14 @@ public:
 	int m_ccu_vctl;
 	UINT32 *m_workram;
 	UINT32 *m_sharc_dataram;
+	DECLARE_WRITE32_MEMBER(paletteram32_w);
+	DECLARE_READ8_MEMBER(sysreg_r);
+	DECLARE_WRITE8_MEMBER(sysreg_w);
+	DECLARE_READ32_MEMBER(ccu_r);
+	DECLARE_WRITE32_MEMBER(ccu_w);
+	DECLARE_WRITE32_MEMBER(jetwave_palette_w);
+	DECLARE_READ32_MEMBER(dsp_dataram_r);
+	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
 };
 
 
@@ -223,12 +231,12 @@ static SCREEN_UPDATE_RGB32( jetwave )
 
 /*****************************************************************************/
 
-static WRITE32_HANDLER( paletteram32_w )
+WRITE32_MEMBER(zr107_state::paletteram32_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	data = space->machine().generic.paletteram.u32[offset];
-	palette_set_color_rgb(space->machine(), (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
-	palette_set_color_rgb(space->machine(), (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	data = machine().generic.paletteram.u32[offset];
+	palette_set_color_rgb(machine(), (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
+	palette_set_color_rgb(machine(), (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 #define NUM_LAYERS	2
@@ -274,7 +282,7 @@ static SCREEN_UPDATE_RGB32( zr107 )
 
 /******************************************************************/
 
-static READ8_HANDLER( sysreg_r )
+READ8_MEMBER(zr107_state::sysreg_r)
 {
 	UINT32 r = 0;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4" };
@@ -286,7 +294,7 @@ static READ8_HANDLER( sysreg_r )
 		case 2:	/* I/O port 2 */
 		case 3:	/* System Port 0 */
 		case 4:	/* System Port 1 */
-			r = input_port_read(space->machine(), portnames[offset]);
+			r = input_port_read(machine(), portnames[offset]);
 			break;
 
 		case 5:	/* Parallel data port */
@@ -295,17 +303,16 @@ static READ8_HANDLER( sysreg_r )
 	return r;
 }
 
-static WRITE8_HANDLER( sysreg_w )
+WRITE8_MEMBER(zr107_state::sysreg_w)
 {
-	zr107_state *state = space->machine().driver_data<zr107_state>();
 	switch (offset)
 	{
 		case 0:	/* LED Register 0 */
-			state->m_led_reg0 = data;
+			m_led_reg0 = data;
 			break;
 
 		case 1:	/* LED Register 1 */
-			state->m_led_reg1 = data;
+			m_led_reg1 = data;
 			break;
 
 		case 2: /* Parallel data register */
@@ -323,8 +330,8 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = EEPCLK
                 0x01 = EEPDI
             */
-			input_port_write(space->machine(), "EEPROMOUT", data & 0x07, 0xff);
-			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			input_port_write(machine(), "EEPROMOUT", data & 0x07, 0xff);
+			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -340,11 +347,11 @@ static WRITE8_HANDLER( sysreg_w )
                 0x01 = ADDSCLK (ADC SCLK)
             */
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
-			input_port_write(space->machine(), "OUT4", data, 0xff);
+			input_port_write(machine(), "OUT4", data, 0xff);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -353,15 +360,14 @@ static WRITE8_HANDLER( sysreg_w )
                 0x01 = AFE
             */
 			if (data & 0x01)
-				watchdog_reset(space->machine());
+				watchdog_reset(machine());
 			break;
 
 	}
 }
 
-static READ32_HANDLER( ccu_r )
+READ32_MEMBER(zr107_state::ccu_r)
 {
-	zr107_state *state = space->machine().driver_data<zr107_state>();
 	UINT32 r = 0;
 	switch (offset)
 	{
@@ -370,14 +376,14 @@ static READ32_HANDLER( ccu_r )
 			// Midnight Run polls the vertical counter in vblank
 			if (ACCESSING_BITS_24_31)
 			{
-				state->m_ccu_vcth ^= 0xff;
-				r |= state->m_ccu_vcth << 24;
+				m_ccu_vcth ^= 0xff;
+				r |= m_ccu_vcth << 24;
 			}
 			if (ACCESSING_BITS_8_15)
 			{
-				state->m_ccu_vctl++;
-				state->m_ccu_vctl &= 0x1ff;
-				r |= (state->m_ccu_vctl >> 2) << 8;
+				m_ccu_vctl++;
+				m_ccu_vctl &= 0x1ff;
+				r |= (m_ccu_vctl >> 2) << 8;
 			}
 		}
 	}
@@ -385,9 +391,8 @@ static READ32_HANDLER( ccu_r )
 	return r;
 }
 
-static WRITE32_HANDLER( ccu_w )
+WRITE32_MEMBER(zr107_state::ccu_w)
 {
-
 }
 
 /******************************************************************/
@@ -406,14 +411,14 @@ static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM	AM_BASE(m_workram)	/* Work RAM */
 	AM_RANGE(0x74000000, 0x74003fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)
 	AM_RANGE(0x74020000, 0x7402003f) AM_DEVREADWRITE_LEGACY("k056832", k056832_long_r, k056832_long_w)
-	AM_RANGE(0x74060000, 0x7406003f) AM_READWRITE_LEGACY(ccu_r, ccu_w)
-	AM_RANGE(0x74080000, 0x74081fff) AM_RAM_WRITE_LEGACY(paletteram32_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x74060000, 0x7406003f) AM_READWRITE(ccu_r, ccu_w)
+	AM_RANGE(0x74080000, 0x74081fff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x740a0000, 0x740a3fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_long_r)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)		/* 21N 21K 23N 23K */
 	AM_RANGE(0x78010000, 0x7801ffff) AM_WRITE_LEGACY(cgboard_dsp_shared_w_ppc)
 	AM_RANGE(0x78040000, 0x7804000f) AM_READWRITE_LEGACY(K001006_0_r, K001006_0_w)
 	AM_RANGE(0x780c0000, 0x780c0007) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8_LEGACY(sysreg_r, sysreg_w, 0xffffffff)
+	AM_RANGE(0x7e000000, 0x7e003fff) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_DEVREADWRITE8_LEGACY("k056230", k056230_r, k056230_w, 0xffffffff)				/* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_DEVREADWRITE_LEGACY("k056230", lanc_ram_r, lanc_ram_w)		/* LANC Buffer RAM (27E) */
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_DEVWRITE_LEGACY("k056800", k056800_host_w)
@@ -423,17 +428,17 @@ static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 ADDRESS_MAP_END
 
 
-static WRITE32_HANDLER( jetwave_palette_w )
+WRITE32_MEMBER(zr107_state::jetwave_palette_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	data = space->machine().generic.paletteram.u32[offset];
-	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	data = machine().generic.paletteram.u32[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0x80000000) AM_RAM		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_reg_r, k001604_reg_w)
-	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE_LEGACY(jetwave_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(jetwave_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_tile_r, k001604_tile_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_char_r, k001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)		/* 21N 21K 23N 23K */
@@ -441,7 +446,7 @@ static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x78040000, 0x7804000f) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(K001006_0_r, K001006_0_w)
 	AM_RANGE(0x78080000, 0x7808000f) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(K001006_1_r, K001006_1_w)
 	AM_RANGE(0x780c0000, 0x780c0007) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
-	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8_LEGACY(sysreg_r, sysreg_w, 0xffffffff)
+	AM_RANGE(0x7e000000, 0x7e003fff) AM_MIRROR(0x80000000) AM_READWRITE8(sysreg_r, sysreg_w, 0xffffffff)
 	AM_RANGE(0x7e008000, 0x7e009fff) AM_MIRROR(0x80000000) AM_DEVREADWRITE8_LEGACY("k056230", k056230_r, k056230_w, 0xffffffff)				/* LANC registers */
 	AM_RANGE(0x7e00a000, 0x7e00bfff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k056230", lanc_ram_r, lanc_ram_w)	/* LANC Buffer RAM (27E) */
 	AM_RANGE(0x7e00c000, 0x7e00c007) AM_MIRROR(0x80000000) AM_DEVWRITE_LEGACY("k056800", k056800_host_w)
@@ -473,21 +478,19 @@ static const k054539_interface k054539_config =
 /*****************************************************************************/
 
 
-static READ32_HANDLER( dsp_dataram_r )
+READ32_MEMBER(zr107_state::dsp_dataram_r)
 {
-	zr107_state *state = space->machine().driver_data<zr107_state>();
-	return state->m_sharc_dataram[offset] & 0xffff;
+	return m_sharc_dataram[offset] & 0xffff;
 }
 
-static WRITE32_HANDLER( dsp_dataram_w )
+WRITE32_MEMBER(zr107_state::dsp_dataram_w)
 {
-	zr107_state *state = space->machine().driver_data<zr107_state>();
-	state->m_sharc_dataram[offset] = data;
+	m_sharc_dataram[offset] = data;
 }
 
 static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, zr107_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE_LEGACY(dsp_dataram_r, dsp_dataram_w)
+	AM_RANGE(0x500000, 0x5fffff) AM_READWRITE(dsp_dataram_r, dsp_dataram_w)
 	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(K001005_r, K001005_w)
 	AM_RANGE(0x700000, 0x7000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
 ADDRESS_MAP_END

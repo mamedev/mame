@@ -197,6 +197,20 @@ public:
 	UINT8 m_hopper;
 
 	UINT8 m_vid[multfish_VIDRAM_SIZE];
+	DECLARE_WRITE8_MEMBER(multfish_vid_w);
+	DECLARE_WRITE8_MEMBER(multfish_bank_w);
+	DECLARE_READ8_MEMBER(bankedram_r);
+	DECLARE_WRITE8_MEMBER(bankedram_w);
+	DECLARE_WRITE8_MEMBER(multfish_rambank_w);
+	DECLARE_READ8_MEMBER(ray_r);
+	DECLARE_WRITE8_MEMBER(multfish_hopper_w);
+	DECLARE_WRITE8_MEMBER(rollfr_hopper_w);
+	DECLARE_WRITE8_MEMBER(multfish_lamps1_w);
+	DECLARE_WRITE8_MEMBER(multfish_lamps2_w);
+	DECLARE_WRITE8_MEMBER(multfish_lamps3_w);
+	DECLARE_WRITE8_MEMBER(multfish_counters_w);
+	DECLARE_WRITE8_MEMBER(multfish_f3_w);
+	DECLARE_WRITE8_MEMBER(multfish_dispenable_w);
 };
 
 static TILE_GET_INFO( get_multfish_tile_info )
@@ -267,39 +281,38 @@ static SCREEN_UPDATE_IND16(multfish)
 	return 0;
 }
 
-static WRITE8_HANDLER( multfish_vid_w )
+WRITE8_MEMBER(multfish_state::multfish_vid_w)
 {
-	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	state->m_vid[offset]=data;
+	m_vid[offset]=data;
 
 	// 0x0000 - 0x1fff is normal tilemap
 	if (offset < 0x2000)
 	{
-		state->m_tilemap->mark_tile_dirty((offset&0xfff)/2);
+		m_tilemap->mark_tile_dirty((offset&0xfff)/2);
 
 	}
 	// 0x2000 - 0x2fff is for the reels
 	else if (offset < 0x4000)
 	{
-		state->m_reel_tilemap->mark_tile_dirty((offset&0x1fff)/2);
+		m_reel_tilemap->mark_tile_dirty((offset&0x1fff)/2);
 	}
 	else if (offset < 0x6000)
 	{
 		int r,g,b;
 		int coldat;
 
-		coldat = state->m_vid[(offset&0xfffe)] | (state->m_vid[(offset&0xfffe)^1] << 8);
+		coldat = m_vid[(offset&0xfffe)] | (m_vid[(offset&0xfffe)^1] << 8);
 
 		/* xor and bitswap palette */
-		switch (state->m_xor_paltype) {
+		switch (m_xor_paltype) {
 			case 1:
-				coldat ^= state->m_xor_palette;
+				coldat ^= m_xor_palette;
 				coldat ^= ((coldat&0x2) >>1) | ((coldat&0x80) >>3) ;
 				coldat = BITSWAP16(coldat,10,15,5,13,8,12,11,2,0,4,7,14,9,3,1,6);
 				break;
 			case 2:
-	                        coldat ^= state->m_xor_palette;
+	                        coldat ^= m_xor_palette;
         	                coldat ^= ((coldat&0x0001) <<1) ^ ((coldat&0x0010) <<1) ^ ((coldat&0x0010) <<2) ^ ((coldat&0x0020) <<1) ^ ((coldat&0x0080) >>1);
                 	        coldat = BITSWAP16(coldat,4,10,13,14,8,11,15,12,2,6,5,0,7,3,1,9);
 				break;
@@ -309,7 +322,7 @@ static WRITE8_HANDLER( multfish_vid_w )
 		b = ( (coldat &0x00e0)>> (5));
 		b|= ( (coldat &0xe000)>> (8+5-3));
 
-		palette_set_color_rgb(space->machine(), (offset-0x4000)/2, r<<3, g<<3, b<<2);
+		palette_set_color_rgb(machine(), (offset-0x4000)/2, r<<3, g<<3, b<<2);
 	}
 	else
 	{
@@ -317,9 +330,9 @@ static WRITE8_HANDLER( multfish_vid_w )
 	}
 }
 
-static WRITE8_HANDLER( multfish_bank_w )
+WRITE8_MEMBER(multfish_state::multfish_bank_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
 static READ8_DEVICE_HANDLER( multfish_timekeeper_r )
@@ -332,48 +345,45 @@ static WRITE8_DEVICE_HANDLER( multfish_timekeeper_w )
 	timekeeper_w(device, offset + 0x6000, data);
 }
 
-static READ8_HANDLER( bankedram_r )
+READ8_MEMBER(multfish_state::bankedram_r)
 {
-	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	if ((state->m_rambk & 0x80) == 0x00)
+	if ((m_rambk & 0x80) == 0x00)
 	{
-		return timekeeper_r(space->machine().device("m48t35"), offset + 0x2000*(state->m_rambk & 0x03));
+		return timekeeper_r(machine().device("m48t35"), offset + 0x2000*(m_rambk & 0x03));
 	}
 	else
 	{
-		return state->m_vid[offset+0x2000*(state->m_rambk & 0x03)];
+		return m_vid[offset+0x2000*(m_rambk & 0x03)];
 	}
 
 }
 
-static WRITE8_HANDLER( bankedram_w )
+WRITE8_MEMBER(multfish_state::bankedram_w)
 {
-	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	if ((state->m_rambk & 0x80) == 0x00)
+	if ((m_rambk & 0x80) == 0x00)
 	{
-		timekeeper_w(space->machine().device("m48t35"), offset + 0x2000*(state->m_rambk & 0x03), data);
+		timekeeper_w(machine().device("m48t35"), offset + 0x2000*(m_rambk & 0x03), data);
 	}
 	else
 	{
-		multfish_vid_w(space, offset+0x2000*(state->m_rambk & 0x03), data);
+		multfish_vid_w(space, offset+0x2000*(m_rambk & 0x03), data);
 	}
 }
 
-static WRITE8_HANDLER( multfish_rambank_w )
+WRITE8_MEMBER(multfish_state::multfish_rambank_w)
 {
-	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	state->m_rambk = data;
+	m_rambk = data;
 }
 
 
-static READ8_HANDLER( ray_r )
+READ8_MEMBER(multfish_state::ray_r)
 {
 	// the games read the raster beam position as part of the hardware checks..
 	// with a 6mhz clock and 640x480 resolution this seems to give the right results.
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 static CUSTOM_INPUT( multfish_hopper_r )
@@ -391,7 +401,7 @@ static CUSTOM_INPUT( multfish_hopper_r )
 	}
 }
 
-static WRITE8_HANDLER( multfish_hopper_w )
+WRITE8_MEMBER(multfish_state::multfish_hopper_w)
 {
 /*  Port 0x33
 
@@ -400,35 +410,35 @@ static WRITE8_HANDLER( multfish_hopper_w )
     ---- -X-- Bill Acceptor Lock 24B
     ---X ---- Hopper Motor 33B
 */
-	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	state->m_hopper_motor = data & 0x10;
-        coin_lockout_w(space->machine(), 0, data & 0x01);
-        coin_lockout_w(space->machine(), 1, data & 0x01);
-        coin_lockout_w(space->machine(), 2, data & 0x01);
-        coin_lockout_w(space->machine(), 3, data & 0x01);
-        coin_lockout_w(space->machine(), 4, data & 0x04);
-        coin_lockout_w(space->machine(), 5, data & 0x04);
-        coin_lockout_w(space->machine(), 6, data & 0x04);
-        coin_lockout_w(space->machine(), 7, data & 0x04);
+
+	m_hopper_motor = data & 0x10;
+        coin_lockout_w(machine(), 0, data & 0x01);
+        coin_lockout_w(machine(), 1, data & 0x01);
+        coin_lockout_w(machine(), 2, data & 0x01);
+        coin_lockout_w(machine(), 3, data & 0x01);
+        coin_lockout_w(machine(), 4, data & 0x04);
+        coin_lockout_w(machine(), 5, data & 0x04);
+        coin_lockout_w(machine(), 6, data & 0x04);
+        coin_lockout_w(machine(), 7, data & 0x04);
 }
 
-static WRITE8_HANDLER( rollfr_hopper_w )
+WRITE8_MEMBER(multfish_state::rollfr_hopper_w)
 {
 /*
     By default RollFruit use inverted coinlock bit.
 */
-	multfish_state *state = space->machine().driver_data<multfish_state>();
 
-	state->m_hopper_motor = data & 0x10;
-        coin_lockout_w(space->machine(), 0, !data & 0x01);
-        coin_lockout_w(space->machine(), 1, !data & 0x01);
-        coin_lockout_w(space->machine(), 2, !data & 0x01);
-        coin_lockout_w(space->machine(), 3, !data & 0x01);
-        coin_lockout_w(space->machine(), 4, data & 0x04);
-        coin_lockout_w(space->machine(), 5, data & 0x04);
-        coin_lockout_w(space->machine(), 6, data & 0x04);
-        coin_lockout_w(space->machine(), 7, data & 0x04);
+
+	m_hopper_motor = data & 0x10;
+        coin_lockout_w(machine(), 0, !data & 0x01);
+        coin_lockout_w(machine(), 1, !data & 0x01);
+        coin_lockout_w(machine(), 2, !data & 0x01);
+        coin_lockout_w(machine(), 3, !data & 0x01);
+        coin_lockout_w(machine(), 4, data & 0x04);
+        coin_lockout_w(machine(), 5, data & 0x04);
+        coin_lockout_w(machine(), 6, data & 0x04);
+        coin_lockout_w(machine(), 7, data & 0x04);
 }
 
 DRIVER_INIT( customl )
@@ -669,10 +679,10 @@ DRIVER_INIT( lhauntent )
 }
 
 static ADDRESS_MAP_START( multfish_map, AS_PROGRAM, 8, multfish_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITE_LEGACY(multfish_vid_w)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITE(multfish_vid_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_DEVREADWRITE_LEGACY("m48t35", multfish_timekeeper_r, multfish_timekeeper_w)
-	AM_RANGE(0xe000, 0xffff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bankedram_r, bankedram_w)
 ADDRESS_MAP_END
 
 // According to control panel the user buttons are arranged as
@@ -820,7 +830,7 @@ static INPUT_PORTS_START( rollfr )
 INPUT_PORTS_END
 
 
-static WRITE8_HANDLER( multfish_lamps1_w )
+WRITE8_MEMBER(multfish_state::multfish_lamps1_w)
 {
 /*  Port 0x30
 
@@ -844,7 +854,7 @@ static WRITE8_HANDLER( multfish_lamps1_w )
 	output_set_lamp_value(0, ((data >> 7) & 1)); /* Bet/Double Lamp */
 }
 
-static WRITE8_HANDLER( multfish_lamps2_w )
+WRITE8_MEMBER(multfish_state::multfish_lamps2_w)
 {
 /*  Port 0x34
 
@@ -860,7 +870,7 @@ static WRITE8_HANDLER( multfish_lamps2_w )
 	output_set_lamp_value(10, ((data >> 4) & 1)); /* Upper Lamp Green */
 }
 
-static WRITE8_HANDLER( multfish_lamps3_w )
+WRITE8_MEMBER(multfish_state::multfish_lamps3_w)
 {
 /*  Port 0x35
 
@@ -870,7 +880,7 @@ static WRITE8_HANDLER( multfish_lamps3_w )
 	output_set_lamp_value(11, ((data >> 1) & 1)); /* Upper Lamp Red */
 }
 
-static WRITE8_HANDLER( multfish_counters_w )
+WRITE8_MEMBER(multfish_state::multfish_counters_w)
 {
 /*  Port 0x31
 
@@ -882,24 +892,23 @@ static WRITE8_HANDLER( multfish_counters_w )
     -X-- ---- Key Out Counter 27A
     X--- ---- Total Bet Counter 28B
 */
-        coin_counter_w(space->machine(), 0, data & 0x01);
-        coin_counter_w(space->machine(), 1, data & 0x02);
-        coin_counter_w(space->machine(), 2, data & 0x04);
-        coin_counter_w(space->machine(), 3, data & 0x10);
-        coin_counter_w(space->machine(), 4, data & 0x40);
-        coin_counter_w(space->machine(), 5, data & 0x80);
+        coin_counter_w(machine(), 0, data & 0x01);
+        coin_counter_w(machine(), 1, data & 0x02);
+        coin_counter_w(machine(), 2, data & 0x04);
+        coin_counter_w(machine(), 3, data & 0x10);
+        coin_counter_w(machine(), 4, data & 0x40);
+        coin_counter_w(machine(), 5, data & 0x80);
 }
 
-static WRITE8_HANDLER( multfish_f3_w )
+WRITE8_MEMBER(multfish_state::multfish_f3_w)
 {
 	//popmessage("multfish_f3_w %02x",data);
 }
 
-static WRITE8_HANDLER( multfish_dispenable_w )
+WRITE8_MEMBER(multfish_state::multfish_dispenable_w)
 {
-	multfish_state *state = space->machine().driver_data<multfish_state>();
 	//popmessage("multfish_f4_w %02x",data); // display enable?
-	state->m_disp_enable = data;
+	m_disp_enable = data;
 }
 
 static ADDRESS_MAP_START( multfish_portmap, AS_IO, 8, multfish_state )
@@ -914,52 +923,52 @@ static ADDRESS_MAP_START( multfish_portmap, AS_IO, 8, multfish_state )
 	AM_RANGE(0x17, 0x17) AM_READ_PORT("IN7")
 
 	/* Write ports not hooked up yet */
-	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(multfish_lamps1_w)
-        AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(multfish_counters_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(multfish_lamps1_w)
+        AM_RANGE(0x31, 0x31) AM_WRITE(multfish_counters_w)
 //  AM_RANGE(0x32, 0x32) AM_WRITE_LEGACY(multfish_port32_w)
-	AM_RANGE(0x33, 0x33) AM_WRITE_LEGACY(multfish_hopper_w)
-	AM_RANGE(0x34, 0x34) AM_WRITE_LEGACY(multfish_lamps2_w)
-	AM_RANGE(0x35, 0x35) AM_WRITE_LEGACY(multfish_lamps3_w)
+	AM_RANGE(0x33, 0x33) AM_WRITE(multfish_hopper_w)
+	AM_RANGE(0x34, 0x34) AM_WRITE(multfish_lamps2_w)
+	AM_RANGE(0x35, 0x35) AM_WRITE(multfish_lamps3_w)
 //  AM_RANGE(0x36, 0x36) AM_WRITE_LEGACY(multfish_port36_w)
 	AM_RANGE(0x37, 0x37) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x38, 0x38) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0x39, 0x39) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x3a, 0x3a) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(multfish_dispenable_w) // display enable mirror for lottery sets
+	AM_RANGE(0x60, 0x60) AM_WRITE(multfish_dispenable_w) // display enable mirror for lottery sets
 
-	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(ray_r)
+	AM_RANGE(0x90, 0x90) AM_READ(ray_r)
 
-	AM_RANGE(0xa0, 0xa0)  AM_WRITE_LEGACY(multfish_bank_w) // Crazy Monkey 2 banking
-	AM_RANGE(0xb0, 0xb0)  AM_WRITE_LEGACY(multfish_bank_w) // Fruit Cocktail 2 lottery banking
-	AM_RANGE(0xb1, 0xb1)  AM_WRITE_LEGACY(multfish_bank_w) // Crazy Monkey Ent banking
-	AM_RANGE(0xb2, 0xb2)  AM_WRITE_LEGACY(multfish_bank_w) // Lacky Haunter Ent banking
-	AM_RANGE(0xb6, 0xb6)  AM_WRITE_LEGACY(multfish_bank_w) // Resident Ent banking
-	AM_RANGE(0xbf, 0xbf)  AM_WRITE_LEGACY(multfish_bank_w) // Gnome Ent banking
-	AM_RANGE(0xc7, 0xc7)  AM_WRITE_LEGACY(multfish_bank_w) // Resident lottery banking
-	AM_RANGE(0xca, 0xca)  AM_WRITE_LEGACY(multfish_bank_w) // Gnome lottery banking
-	AM_RANGE(0xcb, 0xcb)  AM_WRITE_LEGACY(multfish_bank_w) // Keks lottery banking
-	AM_RANGE(0xcc, 0xcc)  AM_WRITE_LEGACY(multfish_bank_w) // Sweet Life 2 lottery banking
-	AM_RANGE(0xcd, 0xcd)  AM_WRITE_LEGACY(multfish_bank_w) // Island 2 lottery banking
-	AM_RANGE(0xce, 0xce)  AM_WRITE_LEGACY(multfish_bank_w) // Pirate 2 lottery banking
-	AM_RANGE(0xd0, 0xd0)  AM_WRITE_LEGACY(multfish_bank_w) // rollfr_4 banking
-	AM_RANGE(0xe1, 0xe1)  AM_WRITE_LEGACY(multfish_bank_w) // Island 2 banking
-	AM_RANGE(0xe5, 0xe5)  AM_WRITE_LEGACY(multfish_bank_w) // Gnome banking
-	AM_RANGE(0xe8, 0xe8)  AM_WRITE_LEGACY(multfish_bank_w) // Sweet Life 2 banking
-	AM_RANGE(0xea, 0xea)  AM_WRITE_LEGACY(multfish_bank_w) // Fruit Cocktail 2 banking
-	AM_RANGE(0xec, 0xec)  AM_WRITE_LEGACY(multfish_bank_w) // Crazy Monkey lottery banking
+	AM_RANGE(0xa0, 0xa0)  AM_WRITE(multfish_bank_w) // Crazy Monkey 2 banking
+	AM_RANGE(0xb0, 0xb0)  AM_WRITE(multfish_bank_w) // Fruit Cocktail 2 lottery banking
+	AM_RANGE(0xb1, 0xb1)  AM_WRITE(multfish_bank_w) // Crazy Monkey Ent banking
+	AM_RANGE(0xb2, 0xb2)  AM_WRITE(multfish_bank_w) // Lacky Haunter Ent banking
+	AM_RANGE(0xb6, 0xb6)  AM_WRITE(multfish_bank_w) // Resident Ent banking
+	AM_RANGE(0xbf, 0xbf)  AM_WRITE(multfish_bank_w) // Gnome Ent banking
+	AM_RANGE(0xc7, 0xc7)  AM_WRITE(multfish_bank_w) // Resident lottery banking
+	AM_RANGE(0xca, 0xca)  AM_WRITE(multfish_bank_w) // Gnome lottery banking
+	AM_RANGE(0xcb, 0xcb)  AM_WRITE(multfish_bank_w) // Keks lottery banking
+	AM_RANGE(0xcc, 0xcc)  AM_WRITE(multfish_bank_w) // Sweet Life 2 lottery banking
+	AM_RANGE(0xcd, 0xcd)  AM_WRITE(multfish_bank_w) // Island 2 lottery banking
+	AM_RANGE(0xce, 0xce)  AM_WRITE(multfish_bank_w) // Pirate 2 lottery banking
+	AM_RANGE(0xd0, 0xd0)  AM_WRITE(multfish_bank_w) // rollfr_4 banking
+	AM_RANGE(0xe1, 0xe1)  AM_WRITE(multfish_bank_w) // Island 2 banking
+	AM_RANGE(0xe5, 0xe5)  AM_WRITE(multfish_bank_w) // Gnome banking
+	AM_RANGE(0xe8, 0xe8)  AM_WRITE(multfish_bank_w) // Sweet Life 2 banking
+	AM_RANGE(0xea, 0xea)  AM_WRITE(multfish_bank_w) // Fruit Cocktail 2 banking
+	AM_RANGE(0xec, 0xec)  AM_WRITE(multfish_bank_w) // Crazy Monkey lottery banking
 
-	AM_RANGE(0xf0, 0xf0)  AM_WRITE_LEGACY(multfish_bank_w) // Gold Fish banking
-	AM_RANGE(0xf1, 0xf1)  AM_WRITE_LEGACY(multfish_rambank_w)
-	AM_RANGE(0xf3, 0xf3)  AM_WRITE_LEGACY(multfish_f3_w) // from 00->01 at startup, irq enable maybe?
-	AM_RANGE(0xf4, 0xf4)  AM_WRITE_LEGACY(multfish_dispenable_w) // display enable
+	AM_RANGE(0xf0, 0xf0)  AM_WRITE(multfish_bank_w) // Gold Fish banking
+	AM_RANGE(0xf1, 0xf1)  AM_WRITE(multfish_rambank_w)
+	AM_RANGE(0xf3, 0xf3)  AM_WRITE(multfish_f3_w) // from 00->01 at startup, irq enable maybe?
+	AM_RANGE(0xf4, 0xf4)  AM_WRITE(multfish_dispenable_w) // display enable
 
 	/* mirrors of the rom banking */
-	AM_RANGE(0xf8, 0xfd)  AM_WRITE_LEGACY(multfish_bank_w)
+	AM_RANGE(0xf8, 0xfd)  AM_WRITE(multfish_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rollfr_portmap, AS_IO, 8, multfish_state )
-	AM_RANGE(0x33, 0x33) AM_WRITE_LEGACY(rollfr_hopper_w)
+	AM_RANGE(0x33, 0x33) AM_WRITE(rollfr_hopper_w)
 	AM_IMPORT_FROM(multfish_portmap)
 ADDRESS_MAP_END
 

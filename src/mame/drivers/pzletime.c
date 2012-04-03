@@ -40,6 +40,10 @@ public:
 
 	/* misc */
 	int            m_ticket;
+	DECLARE_WRITE16_MEMBER(mid_videoram_w);
+	DECLARE_WRITE16_MEMBER(txt_videoram_w);
+	DECLARE_WRITE16_MEMBER(ticket_w);
+	DECLARE_WRITE16_MEMBER(video_regs_w);
 };
 
 
@@ -134,18 +138,16 @@ static SCREEN_UPDATE_IND16( pzletime )
 	return 0;
 }
 
-static WRITE16_HANDLER( mid_videoram_w )
+WRITE16_MEMBER(pzletime_state::mid_videoram_w)
 {
-	pzletime_state *state = space->machine().driver_data<pzletime_state>();
-	COMBINE_DATA(&state->m_mid_videoram[offset]);
-	state->m_mid_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_mid_videoram[offset]);
+	m_mid_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( txt_videoram_w )
+WRITE16_MEMBER(pzletime_state::txt_videoram_w)
 {
-	pzletime_state *state = space->machine().driver_data<pzletime_state>();
-	COMBINE_DATA(&state->m_txt_videoram[offset]);
-	state->m_txt_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_txt_videoram[offset]);
+	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_DEVICE_HANDLER( eeprom_w )
@@ -159,38 +161,36 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 	}
 }
 
-static WRITE16_HANDLER( ticket_w )
+WRITE16_MEMBER(pzletime_state::ticket_w)
 {
-	pzletime_state *state = space->machine().driver_data<pzletime_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_ticket = data & 1;
+		m_ticket = data & 1;
 }
 
-static WRITE16_HANDLER( video_regs_w )
+WRITE16_MEMBER(pzletime_state::video_regs_w)
 {
-	pzletime_state *state = space->machine().driver_data<pzletime_state>();
 	int i;
 
-	COMBINE_DATA(&state->m_video_regs[offset]);
+	COMBINE_DATA(&m_video_regs[offset]);
 
 	if (offset == 0)
 	{
-		if (state->m_video_regs[0] > 0)
+		if (m_video_regs[0] > 0)
 		{
 			for (i = 0; i < 0x300; i++)
 			{
-				palette_set_pen_contrast(space->machine(), i, (double)0x8000/(double)state->m_video_regs[0]);
+				palette_set_pen_contrast(machine(), i, (double)0x8000/(double)m_video_regs[0]);
 			}
 		}
 	}
 	else if (offset == 1)
 	{
-		if (state->m_video_regs[1] > 0)
+		if (m_video_regs[1] > 0)
 		{
 			for (i = 0x300; i < 32768 + 0x300; i++)
 			{
-				palette_set_pen_contrast(space->machine(), i, (double)0x8000/(double)state->m_video_regs[1]);
+				palette_set_pen_contrast(machine(), i, (double)0x8000/(double)m_video_regs[1]);
 			}
 		}
 	}
@@ -209,16 +209,16 @@ static CUSTOM_INPUT( ticket_status_r )
 
 static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16, pzletime_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE_LEGACY(video_regs_w) AM_BASE(m_video_regs)
+	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_BASE(m_video_regs)
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x900000, 0x9005ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa00000, 0xa00007) AM_RAM AM_BASE(m_tilemap_regs)
 	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE(m_bg_videoram)
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE_LEGACY(mid_videoram_w) AM_BASE(m_mid_videoram)
-	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE_LEGACY(txt_videoram_w) AM_BASE(m_txt_videoram)
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_BASE(m_mid_videoram)
+	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(txt_videoram_w) AM_BASE(m_txt_videoram)
 	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("INPUT") AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
-	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(ticket_w)
+	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("SYSTEM") AM_WRITE(ticket_w)
 	AM_RANGE(0xe00004, 0xe00005) AM_DEVWRITE_LEGACY("oki", oki_bank_w)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END

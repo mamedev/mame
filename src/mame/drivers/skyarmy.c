@@ -41,16 +41,21 @@ public:
 	UINT8 *m_scrollram;
 	tilemap_t* m_tilemap;
 	int m_nmi;
+	DECLARE_WRITE8_MEMBER(skyarmy_flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(skyarmy_flip_screen_y_w);
+	DECLARE_WRITE8_MEMBER(skyarmy_videoram_w);
+	DECLARE_WRITE8_MEMBER(skyarmy_colorram_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 };
 
-static WRITE8_HANDLER( skyarmy_flip_screen_x_w )
+WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_x_w)
 {
-	flip_screen_x_set(space->machine(), data & 0x01);
+	flip_screen_x_set(machine(), data & 0x01);
 }
 
-static WRITE8_HANDLER( skyarmy_flip_screen_y_w )
+WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_y_w)
 {
-	flip_screen_y_set(space->machine(), data & 0x01);
+	flip_screen_y_set(machine(), data & 0x01);
 }
 
 static TILE_GET_INFO( get_skyarmy_tile_info )
@@ -62,20 +67,18 @@ static TILE_GET_INFO( get_skyarmy_tile_info )
 	SET_TILE_INFO( 0, code, attr, 0);
 }
 
-static WRITE8_HANDLER( skyarmy_videoram_w )
+WRITE8_MEMBER(skyarmy_state::skyarmy_videoram_w)
 {
-	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( skyarmy_colorram_w )
+WRITE8_MEMBER(skyarmy_state::skyarmy_colorram_w)
 {
-	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 static PALETTE_INIT( skyarmy )
@@ -154,28 +157,27 @@ static INTERRUPT_GEN( skyarmy_nmi_source )
 }
 
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(skyarmy_state::nmi_enable_w)
 {
-	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
-	state->m_nmi=data & 1;
+	m_nmi=data & 1;
 }
 
 
 static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8, skyarmy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(skyarmy_videoram_w) AM_BASE(m_videoram) /* Video RAM */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(skyarmy_colorram_w) AM_BASE(m_colorram) /* Color RAM */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skyarmy_videoram_w) AM_BASE(m_videoram) /* Video RAM */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(skyarmy_colorram_w) AM_BASE(m_colorram) /* Color RAM */
 	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE(m_spriteram) /* Sprites */
 	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE(m_scrollram)  /* Scroll RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("P2")
 	AM_RANGE(0xa003, 0xa003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(nmi_enable_w) // ???
-	AM_RANGE(0xa005, 0xa005) AM_WRITE_LEGACY(skyarmy_flip_screen_x_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITE_LEGACY(skyarmy_flip_screen_y_w)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(nmi_enable_w) // ???
+	AM_RANGE(0xa005, 0xa005) AM_WRITE(skyarmy_flip_screen_x_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(skyarmy_flip_screen_y_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP
 ADDRESS_MAP_END
 

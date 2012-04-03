@@ -111,21 +111,36 @@ public:
 	UINT8* m_reel4_attr;
 	int m_palette_count;
 	UINT8 m_palette_ram[0x10000];
+	DECLARE_WRITE8_MEMBER(luckgrln_reel1_ram_w);
+	DECLARE_WRITE8_MEMBER(luckgrln_reel1_attr_w);
+	DECLARE_WRITE8_MEMBER(luckgrln_reel2_ram_w);
+	DECLARE_WRITE8_MEMBER(luckgrln_reel2_attr_w);
+	DECLARE_WRITE8_MEMBER(luckgrln_reel3_ram_w);
+	DECLARE_WRITE8_MEMBER(luckgrln_reel3_attr_w);
+	DECLARE_WRITE8_MEMBER(luckgrln_reel4_ram_w);
+	DECLARE_WRITE8_MEMBER(luckgrln_reel4_attr_w);
+	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_WRITE8_MEMBER(palette_offset_low_w);
+	DECLARE_WRITE8_MEMBER(palette_offset_high_w);
+	DECLARE_WRITE8_MEMBER(palette_w);
+	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_WRITE8_MEMBER(lamps_a_w);
+	DECLARE_WRITE8_MEMBER(lamps_b_w);
+	DECLARE_WRITE8_MEMBER(counters_w);
+	DECLARE_READ8_MEMBER(test_r);
 };
 
 
-static WRITE8_HANDLER( luckgrln_reel1_ram_w )
+WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_ram_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_reel1_ram[offset] = data;
-	state->m_reel1_tilemap->mark_tile_dirty(offset);
+	m_reel1_ram[offset] = data;
+	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( luckgrln_reel1_attr_w )
+WRITE8_MEMBER(luckgrln_state::luckgrln_reel1_attr_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_reel1_attr[offset] = data;
-	state->m_reel1_tilemap->mark_tile_dirty(offset);
+	m_reel1_attr[offset] = data;
+	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -148,18 +163,16 @@ static TILE_GET_INFO( get_luckgrln_reel1_tile_info )
 }
 
 
-static WRITE8_HANDLER( luckgrln_reel2_ram_w )
+WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_ram_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_reel2_ram[offset] = data;
-	state->m_reel2_tilemap->mark_tile_dirty(offset);
+	m_reel2_ram[offset] = data;
+	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( luckgrln_reel2_attr_w )
+WRITE8_MEMBER(luckgrln_state::luckgrln_reel2_attr_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_reel2_attr[offset] = data;
-	state->m_reel2_tilemap->mark_tile_dirty(offset);
+	m_reel2_attr[offset] = data;
+	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -180,18 +193,16 @@ static TILE_GET_INFO( get_luckgrln_reel2_tile_info )
 			0);
 }
 
-static WRITE8_HANDLER( luckgrln_reel3_ram_w )
+WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_ram_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_reel3_ram[offset] = data;
-	state->m_reel3_tilemap->mark_tile_dirty(offset);
+	m_reel3_ram[offset] = data;
+	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( luckgrln_reel3_attr_w )
+WRITE8_MEMBER(luckgrln_state::luckgrln_reel3_attr_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_reel3_attr[offset] = data;
-	state->m_reel3_tilemap->mark_tile_dirty(offset);
+	m_reel3_attr[offset] = data;
+	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -211,18 +222,16 @@ static TILE_GET_INFO( get_luckgrln_reel3_tile_info )
 			0);
 }
 
-static WRITE8_HANDLER( luckgrln_reel4_ram_w )
+WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_ram_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_reel4_ram[offset] = data;
-	state->m_reel4_tilemap->mark_tile_dirty(offset);
+	m_reel4_ram[offset] = data;
+	m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( luckgrln_reel4_attr_w )
+WRITE8_MEMBER(luckgrln_state::luckgrln_reel4_attr_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_reel4_attr[offset] = data;
-	state->m_reel4_tilemap->mark_tile_dirty(offset);
+	m_reel4_attr[offset] = data;
+	m_reel4_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -363,20 +372,20 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, luckgrln_state )
 	AM_RANGE(0x10000, 0x1ffff) AM_ROM AM_REGION("rom_data",0x10000)
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM AM_REGION("rom_data",0x00000)
 
-	AM_RANGE(0x0c000, 0x0c1ff) AM_RAM_WRITE_LEGACY(luckgrln_reel1_ram_w)  AM_BASE(m_reel1_ram) // only written to half way
-	AM_RANGE(0x0c800, 0x0c9ff) AM_RAM_WRITE_LEGACY(luckgrln_reel1_attr_w) AM_BASE(m_reel1_attr)
+	AM_RANGE(0x0c000, 0x0c1ff) AM_RAM_WRITE(luckgrln_reel1_ram_w)  AM_BASE(m_reel1_ram) // only written to half way
+	AM_RANGE(0x0c800, 0x0c9ff) AM_RAM_WRITE(luckgrln_reel1_attr_w) AM_BASE(m_reel1_attr)
 	AM_RANGE(0x0d000, 0x0d03f) AM_RAM AM_BASE(m_reel1_scroll) AM_MIRROR(0x000c0)
 
-	AM_RANGE(0x0c200, 0x0c3ff) AM_RAM_WRITE_LEGACY(luckgrln_reel2_ram_w)  AM_BASE(m_reel2_ram)
-	AM_RANGE(0x0ca00, 0x0cbff) AM_RAM_WRITE_LEGACY(luckgrln_reel2_attr_w) AM_BASE(m_reel2_attr)
+	AM_RANGE(0x0c200, 0x0c3ff) AM_RAM_WRITE(luckgrln_reel2_ram_w)  AM_BASE(m_reel2_ram)
+	AM_RANGE(0x0ca00, 0x0cbff) AM_RAM_WRITE(luckgrln_reel2_attr_w) AM_BASE(m_reel2_attr)
 	AM_RANGE(0x0d200, 0x0d23f) AM_RAM AM_BASE(m_reel2_scroll) AM_MIRROR(0x000c0)
 
-	AM_RANGE(0x0c400, 0x0c5ff) AM_RAM_WRITE_LEGACY(luckgrln_reel3_ram_w ) AM_BASE(m_reel3_ram)
-	AM_RANGE(0x0cc00, 0x0cdff) AM_RAM_WRITE_LEGACY(luckgrln_reel3_attr_w) AM_BASE(m_reel3_attr)
+	AM_RANGE(0x0c400, 0x0c5ff) AM_RAM_WRITE(luckgrln_reel3_ram_w ) AM_BASE(m_reel3_ram)
+	AM_RANGE(0x0cc00, 0x0cdff) AM_RAM_WRITE(luckgrln_reel3_attr_w) AM_BASE(m_reel3_attr)
 	AM_RANGE(0x0d400, 0x0d43f) AM_RAM AM_BASE(m_reel3_scroll) AM_MIRROR(0x000c0)
 
-	AM_RANGE(0x0c600, 0x0c7ff) AM_RAM_WRITE_LEGACY(luckgrln_reel4_ram_w ) AM_BASE(m_reel4_ram)
-	AM_RANGE(0x0ce00, 0x0cfff) AM_RAM_WRITE_LEGACY(luckgrln_reel4_attr_w) AM_BASE(m_reel4_attr)
+	AM_RANGE(0x0c600, 0x0c7ff) AM_RAM_WRITE(luckgrln_reel4_ram_w ) AM_BASE(m_reel4_ram)
+	AM_RANGE(0x0ce00, 0x0cfff) AM_RAM_WRITE(luckgrln_reel4_attr_w) AM_BASE(m_reel4_attr)
 	AM_RANGE(0x0d600, 0x0d63f) AM_RAM AM_BASE(m_reel4_scroll)
 
 //  AM_RANGE(0x0d200, 0x0d2ff) AM_RAM
@@ -400,62 +409,58 @@ static ADDRESS_MAP_START( _7smash_map, AS_PROGRAM, 8, luckgrln_state )
 	AM_RANGE(0xf0000, 0xfffff) AM_UNMAP
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( output_w )
+WRITE8_MEMBER(luckgrln_state::output_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
 	/* correct? */
 	if (data==0x84)
-		state->m_nmi_enable = 0;
+		m_nmi_enable = 0;
 	else if (data==0x85)
-		state->m_nmi_enable = 1;
+		m_nmi_enable = 1;
 	else
 		printf("output_w unk data %02x\n",data);
 }
 
 
 
-static WRITE8_HANDLER( palette_offset_low_w )
+WRITE8_MEMBER(luckgrln_state::palette_offset_low_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_palette_count = data<<1;
+	m_palette_count = data<<1;
 }
-static WRITE8_HANDLER( palette_offset_high_w )
+WRITE8_MEMBER(luckgrln_state::palette_offset_high_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_palette_count = state->m_palette_count | data<<9;
+	m_palette_count = m_palette_count | data<<9;
 }
 
 
-static WRITE8_HANDLER( palette_w )
+WRITE8_MEMBER(luckgrln_state::palette_w)
 {
-	luckgrln_state *state = space->machine().driver_data<luckgrln_state>();
-	state->m_palette_ram[state->m_palette_count] = data;
+	m_palette_ram[m_palette_count] = data;
 
 
 	{
 		int r,g,b;
 		int offs;
 		UINT16 dat;
-		offs = state->m_palette_count&~0x1;
-		dat = state->m_palette_ram[offs] | state->m_palette_ram[offs+1]<<8;
+		offs = m_palette_count&~0x1;
+		dat = m_palette_ram[offs] | m_palette_ram[offs+1]<<8;
 
 		r = (dat >> 0) & 0x1f;
 		g = (dat >> 5) & 0x1f;
 		b = (dat >> 10) & 0x1f;
 
-		palette_set_color_rgb(space->machine(), offs/2, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine(), offs/2, pal5bit(r), pal5bit(g), pal5bit(b));
 
 	}
 
-	state->m_palette_count++;
+	m_palette_count++;
 
 }
 
 // Oki M62X428 is a 4-bit RTC, doesn't seem to be millennium bug proof ...
-static READ8_HANDLER( rtc_r )
+READ8_MEMBER(luckgrln_state::rtc_r)
 {
 	system_time systime;
-	space->machine().base_datetime(systime);
+	machine().base_datetime(systime);
 
 	switch(offset)
 	{
@@ -479,7 +484,7 @@ static READ8_HANDLER( rtc_r )
 }
 
 /* Analizing the lamps, the game should has a 12-buttons control layout */
-static WRITE8_HANDLER(lamps_a_w)
+WRITE8_MEMBER(luckgrln_state::lamps_a_w)
 {
 /*  LAMPS A:
 
@@ -504,7 +509,7 @@ static WRITE8_HANDLER(lamps_a_w)
 	output_set_lamp_value(7, (data >> 7) & 1);		/* TAKE */
 }
 
-static WRITE8_HANDLER(lamps_b_w)
+WRITE8_MEMBER(luckgrln_state::lamps_b_w)
 {
 /*  LAMPS B:
 
@@ -523,7 +528,7 @@ static WRITE8_HANDLER(lamps_b_w)
 	output_set_lamp_value(11, (data >> 3) & 1);		/* CANCEL */
 }
 
-static WRITE8_HANDLER(counters_w)
+WRITE8_MEMBER(luckgrln_state::counters_w)
 {
 /*  COUNTERS:
 
@@ -535,10 +540,10 @@ static WRITE8_HANDLER(counters_w)
     xxxx ----  unused
 
 */
-	coin_counter_w(space->machine(), 0, data & 0x01);	/* COIN 1 */
-	coin_counter_w(space->machine(), 1, data & 0x04);	/* COIN 2 */
-	coin_counter_w(space->machine(), 2, data & 0x08);	/* COIN 3 */
-	coin_counter_w(space->machine(), 3, data & 0x02);	/* KEY IN */
+	coin_counter_w(machine(), 0, data & 0x01);	/* COIN 1 */
+	coin_counter_w(machine(), 1, data & 0x04);	/* COIN 2 */
+	coin_counter_w(machine(), 2, data & 0x08);	/* COIN 3 */
+	coin_counter_w(machine(), 3, data & 0x02);	/* KEY IN */
 }
 
 
@@ -546,21 +551,21 @@ static WRITE8_HANDLER(counters_w)
 static ADDRESS_MAP_START( portmap, AS_IO, 8, luckgrln_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0x003f) AM_RAM // Z180 internal regs
-	AM_RANGE(0x0060, 0x0060) AM_WRITE_LEGACY(output_w)
+	AM_RANGE(0x0060, 0x0060) AM_WRITE(output_w)
 
-	AM_RANGE(0x0090, 0x009f) AM_READ_LEGACY(rtc_r) //AM_WRITENOP
+	AM_RANGE(0x0090, 0x009f) AM_READ(rtc_r) //AM_WRITENOP
 
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE_LEGACY(palette_offset_low_w)
-	AM_RANGE(0x00a1, 0x00a1) AM_WRITE_LEGACY(palette_offset_high_w)
-	AM_RANGE(0x00a2, 0x00a2) AM_WRITE_LEGACY(palette_w)
+	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(palette_offset_low_w)
+	AM_RANGE(0x00a1, 0x00a1) AM_WRITE(palette_offset_high_w)
+	AM_RANGE(0x00a2, 0x00a2) AM_WRITE(palette_w)
 
 	AM_RANGE(0x00b0, 0x00b0) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x00b1, 0x00b1) AM_DEVWRITE("crtc", mc6845_device, register_w)
 
 	AM_RANGE(0x00b8, 0x00b8) AM_READ_PORT("IN0")
-	AM_RANGE(0x00b9, 0x00b9) AM_READ_PORT("IN1") AM_WRITE_LEGACY(counters_w)
-	AM_RANGE(0x00ba, 0x00ba) AM_READ_PORT("IN2") AM_WRITE_LEGACY(lamps_a_w)
-	AM_RANGE(0x00bb, 0x00bb) AM_READ_PORT("IN3") AM_WRITE_LEGACY(lamps_b_w)
+	AM_RANGE(0x00b9, 0x00b9) AM_READ_PORT("IN1") AM_WRITE(counters_w)
+	AM_RANGE(0x00ba, 0x00ba) AM_READ_PORT("IN2") AM_WRITE(lamps_a_w)
+	AM_RANGE(0x00bb, 0x00bb) AM_READ_PORT("IN3") AM_WRITE(lamps_b_w)
 	AM_RANGE(0x00bc, 0x00bc) AM_READ_PORT("DSW1")
 
 	AM_RANGE(0x00c0, 0x00c3) AM_WRITENOP
@@ -598,13 +603,13 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8, luckgrln_state )
 ADDRESS_MAP_END
 
 /* reads a bit 1 status there after every round played */
-static READ8_HANDLER( test_r )
+READ8_MEMBER(luckgrln_state::test_r)
 {
 	return 0xff;
 }
 
 static ADDRESS_MAP_START( _7smash_io, AS_IO, 8, luckgrln_state )
-	AM_RANGE(0x66, 0x66) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x66, 0x66) AM_READ(test_r)
 	AM_IMPORT_FROM( portmap )
 ADDRESS_MAP_END
 

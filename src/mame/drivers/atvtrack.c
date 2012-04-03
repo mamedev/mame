@@ -72,6 +72,16 @@ public:
 	atvtrack_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ64_MEMBER(area1_r);
+	DECLARE_WRITE64_MEMBER(area1_w);
+	DECLARE_READ64_MEMBER(area2_r);
+	DECLARE_WRITE64_MEMBER(area2_w);
+	DECLARE_READ64_MEMBER(area3_r);
+	DECLARE_WRITE64_MEMBER(area3_w);
+	DECLARE_READ64_MEMBER(area4_r);
+	DECLARE_WRITE64_MEMBER(area4_w);
+	DECLARE_READ64_MEMBER(ioport_r);
+	DECLARE_WRITE64_MEMBER(ioport_w);
 };
 
 static void logbinary(UINT32 data,int high=31,int low=0)
@@ -104,7 +114,7 @@ static inline UINT32 decode64_32(offs_t offset64, UINT64 data, UINT64 mem_mask, 
 	return 0;
 }
 
-static READ64_HANDLER( area1_r )
+READ64_MEMBER(atvtrack_state::area1_r)
 {
 	UINT32 addr;
 
@@ -117,7 +127,7 @@ static READ64_HANDLER( area1_r )
 	return -1;
 }
 
-static WRITE64_HANDLER( area1_w )
+WRITE64_MEMBER(atvtrack_state::area1_w)
 {
 	UINT32 addr, dat; //, old;
 
@@ -127,7 +137,7 @@ static WRITE64_HANDLER( area1_w )
 	area1_data[addr] = dat;
 	if (addr == (0x00020000-0x00020000)/4) {
 		if (data & 4) {
-			device_execute_interface *exec = dynamic_cast<device_execute_interface *>(space->machine().device("subcpu"));
+			device_execute_interface *exec = dynamic_cast<device_execute_interface *>(machine().device("subcpu"));
 			exec->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 		}
 	}
@@ -136,7 +146,7 @@ static WRITE64_HANDLER( area1_w )
 	logerror("\n");
 }
 
-static READ64_HANDLER( area2_r )
+READ64_MEMBER(atvtrack_state::area2_r)
 {
 	UINT32 addr, dat;
 	int c;
@@ -159,7 +169,7 @@ static READ64_HANDLER( area2_r )
 	return 0;
 }
 
-static WRITE64_HANDLER( area2_w )
+WRITE64_MEMBER(atvtrack_state::area2_w)
 {
 //  UINT32 addr, dat;
 
@@ -171,7 +181,7 @@ static WRITE64_HANDLER( area2_w )
 //      ;
 }
 
-static READ64_HANDLER( area3_r )
+READ64_MEMBER(atvtrack_state::area3_r)
 {
 //  UINT32 addr, dat;
 
@@ -184,7 +194,7 @@ static READ64_HANDLER( area3_r )
 	return 0;
 }
 
-static WRITE64_HANDLER( area3_w )
+WRITE64_MEMBER(atvtrack_state::area3_w)
 {
 	UINT32 addr; //, dat;
 	int c;
@@ -217,7 +227,7 @@ static WRITE64_HANDLER( area3_w )
 		;
 }
 
-static READ64_HANDLER( area4_r )
+READ64_MEMBER(atvtrack_state::area4_r)
 {
 //  UINT32 addr, dat;
 
@@ -230,7 +240,7 @@ static READ64_HANDLER( area4_r )
 	return 0;
 }
 
-static WRITE64_HANDLER( area4_w )
+WRITE64_MEMBER(atvtrack_state::area4_w)
 {
 	UINT32 addr; //, dat;
 	int c;
@@ -253,11 +263,11 @@ static WRITE64_HANDLER( area4_w )
 		;
 }
 
-static READ64_HANDLER( ioport_r )
+READ64_MEMBER(atvtrack_state::ioport_r)
 {
 	if (offset == SH4_IOPORT_16/8) {
 		// much simplified way
-		if (strcmp(space->device().tag(), ":maincpu") == 0)
+		if (strcmp(space.device().tag(), ":maincpu") == 0)
 #ifndef SPECIALMODE
 			return -1; // normal
 #else
@@ -269,7 +279,7 @@ static READ64_HANDLER( ioport_r )
 	return 0;
 }
 
-static WRITE64_HANDLER( ioport_w )
+WRITE64_MEMBER(atvtrack_state::ioport_w)
 {
 #ifdef SPECIALMODE
 	UINT64 d;
@@ -293,9 +303,9 @@ static WRITE64_HANDLER( ioport_w )
 		else
 			d=0x11223344;
 		if (cnt == 0)
-			sh4_dma_data(space->cpu,&dm);
+			sh4_dma_data(cpu,&dm);
 		else
-			sh4_dma_data(space->cpu,&dm);
+			sh4_dma_data(cpu,&dm);
 		cnt++;
 	}
 #endif
@@ -343,15 +353,15 @@ static MACHINE_RESET(atvtrack)
 
 static ADDRESS_MAP_START( atvtrack_main_map, AS_PROGRAM, 64, atvtrack_state )
 	AM_RANGE(0x00000000, 0x000003ff) AM_RAM AM_SHARE("sharedmem")
-	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE_LEGACY(area1_r, area1_w)
-	AM_RANGE(0x14000000, 0x14000007) AM_READWRITE_LEGACY(area2_r, area2_w) // data
-	AM_RANGE(0x14100000, 0x14100007) AM_READWRITE_LEGACY(area3_r, area3_w) // command
-	AM_RANGE(0x14200000, 0x14200007) AM_READWRITE_LEGACY(area4_r, area4_w) // address
+	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(area1_r, area1_w)
+	AM_RANGE(0x14000000, 0x14000007) AM_READWRITE(area2_r, area2_w) // data
+	AM_RANGE(0x14100000, 0x14100007) AM_READWRITE(area3_r, area3_w) // command
+	AM_RANGE(0x14200000, 0x14200007) AM_READWRITE(area4_r, area4_w) // address
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atvtrack_main_port, AS_IO, 64, atvtrack_state )
-	AM_RANGE(0x00, 0x1f) AM_READWRITE_LEGACY(ioport_r, ioport_w)
+	AM_RANGE(0x00, 0x1f) AM_READWRITE(ioport_r, ioport_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atvtrack_sub_map, AS_PROGRAM, 64, atvtrack_state )
@@ -360,7 +370,7 @@ static ADDRESS_MAP_START( atvtrack_sub_map, AS_PROGRAM, 64, atvtrack_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atvtrack_sub_port, AS_IO, 64, atvtrack_state )
-	/*AM_RANGE(0x00, 0x1f) AM_READWRITE_LEGACY(ioport_r, ioport_w) */
+	/*AM_RANGE(0x00, 0x1f) AM_READWRITE(ioport_r, ioport_w) */
 ADDRESS_MAP_END
 
 

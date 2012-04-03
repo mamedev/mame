@@ -438,6 +438,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
+	DECLARE_WRITE8_MEMBER(debug_w);
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -581,7 +582,7 @@ static PALETTE_INIT( avt )
 *            Read / Write Handlers            *
 **********************************************/
 
-//static WRITE8_HANDLER( debug_w )
+//WRITE8_MEMBER(avt_state::debug_w)
 //{
 //  popmessage("written : %02X", data);
 //}

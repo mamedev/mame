@@ -57,6 +57,8 @@ public:
 	quantum_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ16_MEMBER(trackball_r);
+	DECLARE_WRITE16_MEMBER(led_w);
 };
 
 
@@ -70,9 +72,9 @@ public:
  *
  *************************************/
 
-static READ16_HANDLER( trackball_r )
+READ16_MEMBER(quantum_state::trackball_r)
 {
-	return (input_port_read(space->machine(), "TRACKY") << 4) | input_port_read(space->machine(), "TRACKX");
+	return (input_port_read(machine(), "TRACKY") << 4) | input_port_read(machine(), "TRACKX");
 }
 
 
@@ -95,19 +97,19 @@ static READ8_DEVICE_HANDLER( input_2_r )
  *
  *************************************/
 
-static WRITE16_HANDLER( led_w )
+WRITE16_MEMBER(quantum_state::led_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0 and 1 are coin counters */
-		coin_counter_w(space->machine(), 0, data & 2);
-		coin_counter_w(space->machine(), 1, data & 1);
+		coin_counter_w(machine(), 0, data & 2);
+		coin_counter_w(machine(), 1, data & 1);
 
 		/* bit 3 = select second trackball for cocktail mode? */
 
 		/* bits 4 and 5 are LED controls */
-		set_led_status(space->machine(), 0, data & 0x10);
-		set_led_status(space->machine(), 1, data & 0x20);
+		set_led_status(machine(), 0, data & 0x10);
+		set_led_status(machine(), 1, data & 0x20);
 
 		/* bits 6 and 7 flip screen */
 		avg_set_flip_x (data & 0x40);
@@ -130,10 +132,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, quantum_state )
 	AM_RANGE(0x840000, 0x84001f) AM_DEVREADWRITE8_LEGACY("pokey1", pokey_r, pokey_w, 0x00ff)
 	AM_RANGE(0x840020, 0x84003f) AM_DEVREADWRITE8_LEGACY("pokey2", pokey_r, pokey_w, 0x00ff)
 	AM_RANGE(0x900000, 0x9001ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x940000, 0x940001) AM_READ_LEGACY(trackball_r) /* trackball */
+	AM_RANGE(0x940000, 0x940001) AM_READ(trackball_r) /* trackball */
 	AM_RANGE(0x948000, 0x948001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x950000, 0x95001f) AM_WRITEONLY AM_BASE_LEGACY((UINT16**)&avgdvg_colorram)
-	AM_RANGE(0x958000, 0x958001) AM_WRITE_LEGACY(led_w)
+	AM_RANGE(0x958000, 0x958001) AM_WRITE(led_w)
 	AM_RANGE(0x960000, 0x960001) AM_WRITENOP
 	AM_RANGE(0x968000, 0x968001) AM_WRITE_LEGACY(avgdvg_reset_word_w)
     AM_RANGE(0x970000, 0x970001) AM_WRITE_LEGACY(avgdvg_go_word_w)

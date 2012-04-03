@@ -35,6 +35,9 @@ public:
 	UINT8 *m_videoram_1;
 	UINT8 *m_videoram_2;
 	size_t m_videoram_size;
+	DECLARE_WRITE8_MEMBER(lights_1_w);
+	DECLARE_WRITE8_MEMBER(lights_2_w);
+	DECLARE_WRITE8_MEMBER(counter_w);
 };
 
 
@@ -110,21 +113,21 @@ static SCREEN_UPDATE_RGB32( wldarrow )
  *
  *************************************/
 
-static WRITE8_HANDLER( lights_1_w )
+WRITE8_MEMBER(wldarrow_state::lights_1_w)
 {
 	/* not sure how it is hooked up */
 }
 
 
-static WRITE8_HANDLER( lights_2_w )
+WRITE8_MEMBER(wldarrow_state::lights_2_w)
 {
 	/* not sure how it is hooked up */
 }
 
 
-static WRITE8_HANDLER( counter_w )
+WRITE8_MEMBER(wldarrow_state::counter_w)
 {
-	coin_counter_w(space->machine(), 0, data);
+	coin_counter_w(machine(), 0, data);
 }
 
 
@@ -179,9 +182,9 @@ static ADDRESS_MAP_START( wldarrow_map, AS_PROGRAM, 8, wldarrow_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(m_videoram_2)
 	AM_RANGE(0xcd00, 0xcdff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BITSW") AM_DEVWRITE_LEGACY("dac", wldarrow_dac_1_w)
-	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1") AM_WRITE_LEGACY(lights_1_w)
-	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("IN2") AM_WRITE_LEGACY(lights_2_w)
-	AM_RANGE(0xf008, 0xf008) AM_WRITE_LEGACY(counter_w)
+	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1") AM_WRITE(lights_1_w)
+	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("IN2") AM_WRITE(lights_2_w)
+	AM_RANGE(0xf008, 0xf008) AM_WRITE(counter_w)
 	AM_RANGE(0xf00f, 0xf00f) AM_DEVWRITE_LEGACY("dac", wldarrow_dac_2_w)
 	AM_RANGE(0xf0f0, 0xf0f0) AM_DEVWRITE_LEGACY("dac", wldarrow_dac_3_w)
 	AM_RANGE(0xf0ff, 0xf0ff) AM_DEVWRITE_LEGACY("dac", wldarrow_dac_4_w)

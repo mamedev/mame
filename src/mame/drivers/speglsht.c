@@ -121,6 +121,12 @@ public:
 	UINT32 m_videoreg;
 	bitmap_ind16 *m_bitmap;
 	UINT32 *m_cop_ram;
+	DECLARE_READ32_MEMBER(shared_r);
+	DECLARE_WRITE32_MEMBER(shared_w);
+	DECLARE_WRITE32_MEMBER(videoreg_w);
+	DECLARE_WRITE32_MEMBER(cop_w);
+	DECLARE_READ32_MEMBER(cop_r);
+	DECLARE_READ32_MEMBER(irq_ack_clear);
 };
 
 
@@ -149,41 +155,36 @@ static ADDRESS_MAP_START( st0016_io, AS_IO, 8, speglsht_state )
 	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(st0016_dma_r)
 ADDRESS_MAP_END
 
-static READ32_HANDLER(shared_r)
+READ32_MEMBER(speglsht_state::shared_r)
 {
-	speglsht_state *state = space->machine().driver_data<speglsht_state>();
-	return state->m_shared[offset];
+	return m_shared[offset];
 }
 
-static WRITE32_HANDLER(shared_w)
+WRITE32_MEMBER(speglsht_state::shared_w)
 {
-	speglsht_state *state = space->machine().driver_data<speglsht_state>();
-	state->m_shared[offset]=data&0xff;
+	m_shared[offset]=data&0xff;
 }
 
-static WRITE32_HANDLER(videoreg_w)
+WRITE32_MEMBER(speglsht_state::videoreg_w)
 {
-	speglsht_state *state = space->machine().driver_data<speglsht_state>();
-	COMBINE_DATA(&state->m_videoreg);
+	COMBINE_DATA(&m_videoreg);
 }
 
 
-static WRITE32_HANDLER(cop_w)
+WRITE32_MEMBER(speglsht_state::cop_w)
 {
-	speglsht_state *state = space->machine().driver_data<speglsht_state>();
-	COMBINE_DATA(&state->m_cop_ram[offset]);
+	COMBINE_DATA(&m_cop_ram[offset]);
 
-	if(state->m_cop_ram[offset]&0x8000) //fix (sign)
+	if(m_cop_ram[offset]&0x8000) //fix (sign)
 	{
-		state->m_cop_ram[offset]|=0xffff0000;
+		m_cop_ram[offset]|=0xffff0000;
 	}
 }
 
 //matrix * vector
-static READ32_HANDLER(cop_r)
+READ32_MEMBER(speglsht_state::cop_r)
 {
-	speglsht_state *state = space->machine().driver_data<speglsht_state>();
-	INT32 *cop=(INT32*)&state->m_cop_ram[0];
+	INT32 *cop=(INT32*)&m_cop_ram[0];
 
 	union
 	{
@@ -215,25 +216,25 @@ static READ32_HANDLER(cop_r)
 	return 0;
 }
 
-static READ32_HANDLER(irq_ack_clear)
+READ32_MEMBER(speglsht_state::irq_ack_clear)
 {
-	cputag_set_input_line(space->machine(), "sub", R3000_IRQ4, CLEAR_LINE);
+	cputag_set_input_line(machine(), "sub", R3000_IRQ4, CLEAR_LINE);
 	return 0;
 }
 
 static ADDRESS_MAP_START( speglsht_mem, AS_PROGRAM, 32, speglsht_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x01007fff) AM_RAM //tested - STATIC RAM
-	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE_LEGACY(cop_r, cop_w) AM_BASE(m_cop_ram)
-	AM_RANGE(0x01800200, 0x01800203) AM_WRITE_LEGACY(videoreg_w)
+	AM_RANGE(0x01600000, 0x0160004f) AM_READWRITE(cop_r, cop_w) AM_BASE(m_cop_ram)
+	AM_RANGE(0x01800200, 0x01800203) AM_WRITE(videoreg_w)
 	AM_RANGE(0x01800300, 0x01800303) AM_READ_PORT("IN0")
 	AM_RANGE(0x01800400, 0x01800403) AM_READ_PORT("IN1")
 	AM_RANGE(0x01a00000, 0x01afffff) AM_RAM AM_BASE(m_framebuffer)
 	AM_RANGE(0x01b00000, 0x01b07fff) AM_RAM //cleared ...  video related ?
 	AM_RANGE(0x01c00000, 0x01dfffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x0a000000, 0x0a003fff) AM_READWRITE_LEGACY(shared_r, shared_w)
+	AM_RANGE(0x0a000000, 0x0a003fff) AM_READWRITE(shared_r, shared_w)
 	AM_RANGE(0x1eff0000, 0x1eff001f) AM_RAM
-	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ_LEGACY(irq_ack_clear)
+	AM_RANGE(0x1eff003c, 0x1eff003f) AM_READ(irq_ack_clear)
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x2fc00000, 0x2fdfffff) AM_ROM AM_REGION("user1", 0) // mirror for interrupts
 ADDRESS_MAP_END

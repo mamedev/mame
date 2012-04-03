@@ -71,13 +71,16 @@ public:
 	/* misc */
 	UINT8 m_lut_gun1[0x100];
 	UINT8 m_lut_gun2[0x100];
+	DECLARE_WRITE8_MEMBER(ramtek_videoram_w);
+	DECLARE_READ8_MEMBER(gray5bit_controller0_r);
+	DECLARE_READ8_MEMBER(gray5bit_controller1_r);
+	DECLARE_WRITE8_MEMBER(m79amb_8002_w);
 };
 
 
-static WRITE8_HANDLER( ramtek_videoram_w )
+WRITE8_MEMBER(m79amb_state::ramtek_videoram_w)
 {
-	m79amb_state *state = space->machine().driver_data<m79amb_state>();
-	state->m_videoram[offset] = data & ~*state->m_mask;
+	m_videoram[offset] = data & ~*m_mask;
 }
 
 static SCREEN_UPDATE_RGB32( ramtek )
@@ -107,25 +110,23 @@ static SCREEN_UPDATE_RGB32( ramtek )
 }
 
 
-static READ8_HANDLER( gray5bit_controller0_r )
+READ8_MEMBER(m79amb_state::gray5bit_controller0_r)
 {
-	m79amb_state *state = space->machine().driver_data<m79amb_state>();
-	UINT8 port_data = input_port_read(space->machine(), "8004");
-	UINT8 gun_pos = input_port_read(space->machine(), "GUN1");
+	UINT8 port_data = input_port_read(machine(), "8004");
+	UINT8 gun_pos = input_port_read(machine(), "GUN1");
 
-	return (port_data & 0xe0) | state->m_lut_gun1[gun_pos];
+	return (port_data & 0xe0) | m_lut_gun1[gun_pos];
 }
 
-static READ8_HANDLER( gray5bit_controller1_r )
+READ8_MEMBER(m79amb_state::gray5bit_controller1_r)
 {
-	m79amb_state *state = space->machine().driver_data<m79amb_state>();
-	UINT8 port_data = input_port_read(space->machine(), "8005");
-	UINT8 gun_pos = input_port_read(space->machine(), "GUN2");
+	UINT8 port_data = input_port_read(machine(), "8005");
+	UINT8 gun_pos = input_port_read(machine(), "GUN2");
 
-	return (port_data & 0xe0) | state->m_lut_gun2[gun_pos];
+	return (port_data & 0xe0) | m_lut_gun2[gun_pos];
 }
 
-static WRITE8_HANDLER( m79amb_8002_w )
+WRITE8_MEMBER(m79amb_state::m79amb_8002_w)
 {
 	/* D1 may also be watchdog reset */
 	/* port goes to 0x7f to turn on explosion lamp */
@@ -134,14 +135,14 @@ static WRITE8_HANDLER( m79amb_8002_w )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m79amb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE_LEGACY(ramtek_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(ramtek_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x6000, 0x63ff) AM_RAM					/* ?? */
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("8000") AM_DEVWRITE_LEGACY("discrete", m79amb_8000_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITEONLY AM_BASE(m_mask)
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("8002") AM_WRITE_LEGACY(m79amb_8002_w)
+	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("8002") AM_WRITE(m79amb_8002_w)
 	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE_LEGACY("discrete", m79amb_8003_w)
-	AM_RANGE(0x8004, 0x8004) AM_READ_LEGACY(gray5bit_controller0_r)
-	AM_RANGE(0x8005, 0x8005) AM_READ_LEGACY(gray5bit_controller1_r)
+	AM_RANGE(0x8004, 0x8004) AM_READ(gray5bit_controller0_r)
+	AM_RANGE(0x8005, 0x8005) AM_READ(gray5bit_controller1_r)
 	AM_RANGE(0xc000, 0xc07f) AM_RAM					/* ?? */
 	AM_RANGE(0xc200, 0xc27f) AM_RAM					/* ?? */
 ADDRESS_MAP_END

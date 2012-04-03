@@ -218,6 +218,13 @@ public:
 	device_t *m_audiocpu;
 
 	required_device<v9938_device> m_v9938;
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE8_MEMBER(sound_comm_w);
+	DECLARE_WRITE8_MEMBER(int_ack_w);
+	DECLARE_WRITE8_MEMBER(led_mux_data_w);
+	DECLARE_WRITE8_MEMBER(led_mux_select_w);
 };
 
 #define VDP_MEM             0x40000
@@ -267,7 +274,7 @@ static MACHINE_RESET(kas89)
 *  Input Ports Demux & Common Routines  *
 ****************************************/
 
-static WRITE8_HANDLER( mux_w )
+WRITE8_MEMBER(kas89_state::mux_w)
 {
 /*  - bits -
     7654 3210
@@ -275,32 +282,31 @@ static WRITE8_HANDLER( mux_w )
 
     Writes: 1-2-4-8-10-20-40-3f. Only 80 (for DSW) at very begining...
 */
-	kas89_state *state = space->machine().driver_data<kas89_state>();
-	state->m_mux_data = data;
+
+	m_mux_data = data;
 }
 
-static READ8_HANDLER( mux_r )
+READ8_MEMBER(kas89_state::mux_r)
 {
-	kas89_state *state = space->machine().driver_data<kas89_state>();
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(space->machine(), "PL1");
-		case 0x02: return input_port_read(space->machine(), "PL2");
-		case 0x04: return input_port_read(space->machine(), "PL3");
-		case 0x08: return input_port_read(space->machine(), "PL4");
-		case 0x10: return input_port_read(space->machine(), "PL5");
-		case 0x20: return input_port_read(space->machine(), "PL6");
+		case 0x01: return input_port_read(machine(), "PL1");
+		case 0x02: return input_port_read(machine(), "PL2");
+		case 0x04: return input_port_read(machine(), "PL3");
+		case 0x08: return input_port_read(machine(), "PL4");
+		case 0x10: return input_port_read(machine(), "PL5");
+		case 0x20: return input_port_read(machine(), "PL6");
 		case 0x40:
 		{
-			output_set_lamp_value(37, 1 - ((input_port_read(space->machine(), "SVC") >> 5) & 1));	/* Operator Key LAMP */
-			return input_port_read(space->machine(), "SVC");
+			output_set_lamp_value(37, 1 - ((input_port_read(machine(), "SVC") >> 5) & 1));	/* Operator Key LAMP */
+			return input_port_read(machine(), "SVC");
 		}
-		case 0x80: return input_port_read(space->machine(), "DSW");	/* Polled at $162a through NMI routine */
-		case 0x3f: return input_port_read(space->machine(), "UNK");
+		case 0x80: return input_port_read(machine(), "DSW");	/* Polled at $162a through NMI routine */
+		case 0x3f: return input_port_read(machine(), "UNK");
 	}
 
-	logerror("Mux_data %02X\n", state->m_mux_data);
-	return state->m_mux_data;
+	logerror("Mux_data %02X\n", m_mux_data);
+	return m_mux_data;
 }
 
 static TIMER_DEVICE_CALLBACK ( kas89_nmi_cb )
@@ -319,7 +325,7 @@ static TIMER_DEVICE_CALLBACK ( kas89_sound_nmi_cb )
 }
 
 
-static WRITE8_HANDLER( control_w )
+WRITE8_MEMBER(kas89_state::control_w)
 {
 /*  - bits -
     7654 3210
@@ -329,14 +335,14 @@ static WRITE8_HANDLER( control_w )
     -x-- ----   NMI enable. Active high.
     x-xx x---   Unused.
 */
-	kas89_state *state = space->machine().driver_data<kas89_state>();
-	state->m_main_nmi_enable = data & 0x40;
 
-	coin_counter_w(space->machine(), 0, (data ^ 0xff) & 0x01);	/* Credits In counter */
-	coin_counter_w(space->machine(), 1, (data ^ 0xff) & 0x02);	/* Credits Out counter */
+	m_main_nmi_enable = data & 0x40;
+
+	coin_counter_w(machine(), 0, (data ^ 0xff) & 0x01);	/* Credits In counter */
+	coin_counter_w(machine(), 1, (data ^ 0xff) & 0x02);	/* Credits Out counter */
 }
 
-static WRITE8_HANDLER( sound_comm_w )
+WRITE8_MEMBER(kas89_state::sound_comm_w)
 {
 /*  This port is used mainly for sound latch, but bit6 activates a
     sort of output port (maybe for a sign?)
@@ -351,13 +357,13 @@ static WRITE8_HANDLER( sound_comm_w )
     is written to the outport... (maybe to clear the possible sign).
 
 */
-	kas89_state *state = space->machine().driver_data<kas89_state>();
+
 
 	if (data & 0x40)
 	{
-		state->m_outdata = (data ^ 0x40);	/* Pure data. Without the activator bit */
+		m_outdata = (data ^ 0x40);	/* Pure data. Without the activator bit */
 
-		if (state->m_outdata == 0x3f)
+		if (m_outdata == 0x3f)
 		{
 			UINT8 i;
 			for ( i = 0; i < 37; i++ )
@@ -366,20 +372,19 @@ static WRITE8_HANDLER( sound_comm_w )
 			}
 		}
 
-		logerror("Outdata: Write %02x\n", state->m_outdata);
+		logerror("Outdata: Write %02x\n", m_outdata);
 	}
 
 	else
 	{
 		soundlatch_w(space, 0, data);
-		device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE );
+		device_set_input_line(m_audiocpu, 0, ASSERT_LINE );
 	}
 }
 
-static WRITE8_HANDLER( int_ack_w )
+WRITE8_MEMBER(kas89_state::int_ack_w)
 {
-	kas89_state *state = space->machine().driver_data<kas89_state>();
-	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE );
+	device_set_input_line(m_audiocpu, 0, CLEAR_LINE );
 }
 
 
@@ -387,24 +392,24 @@ static WRITE8_HANDLER( int_ack_w )
 *   Output Ports Demux & LEDs Support   *
 ****************************************/
 
-static WRITE8_HANDLER( led_mux_data_w )
+WRITE8_MEMBER(kas89_state::led_mux_data_w)
 {
 /*  - bits -
     7654 3210
     xxxx xxxx   LEDs data.
 */
-	kas89_state *state = space->machine().driver_data<kas89_state>();
-	state->m_leds_mux_data = data;
+
+	m_leds_mux_data = data;
 }
 
-static WRITE8_HANDLER( led_mux_select_w )
+WRITE8_MEMBER(kas89_state::led_mux_select_w)
 {
 /*  - bits -
     7654 3210
     ---x xxxx   LEDs Set selector.
 */
-	kas89_state *state = space->machine().driver_data<kas89_state>();
-	state->m_leds_mux_selector = data;
+
+	m_leds_mux_selector = data;
 
 	UINT8 i;
 	for ( i = 0; i < 37; i++ )
@@ -424,63 +429,63 @@ static WRITE8_HANDLER( led_mux_select_w )
 
 		case 0x01:
 		{
-			output_set_lamp_value(11, (state->m_leds_mux_data >> 0) & 1);	/* Number 11 LED */
-			output_set_lamp_value(36, (state->m_leds_mux_data >> 1) & 1);	/* Number 36 LED */
-			output_set_lamp_value(13, (state->m_leds_mux_data >> 2) & 1);	/* Number 13 LED */
-			output_set_lamp_value(27, (state->m_leds_mux_data >> 3) & 1);	/* Number 27 LED */
-			output_set_lamp_value(06, (state->m_leds_mux_data >> 4) & 1);	/* Number  6 LED */
-			output_set_lamp_value(34, (state->m_leds_mux_data >> 5) & 1);	/* Number 34 LED */
-			output_set_lamp_value(17, (state->m_leds_mux_data >> 6) & 1);	/* Number 17 LED */
-			output_set_lamp_value(25, (state->m_leds_mux_data >> 7) & 1);	/* Number 25 LED */
+			output_set_lamp_value(11, (m_leds_mux_data >> 0) & 1);	/* Number 11 LED */
+			output_set_lamp_value(36, (m_leds_mux_data >> 1) & 1);	/* Number 36 LED */
+			output_set_lamp_value(13, (m_leds_mux_data >> 2) & 1);	/* Number 13 LED */
+			output_set_lamp_value(27, (m_leds_mux_data >> 3) & 1);	/* Number 27 LED */
+			output_set_lamp_value(06, (m_leds_mux_data >> 4) & 1);	/* Number  6 LED */
+			output_set_lamp_value(34, (m_leds_mux_data >> 5) & 1);	/* Number 34 LED */
+			output_set_lamp_value(17, (m_leds_mux_data >> 6) & 1);	/* Number 17 LED */
+			output_set_lamp_value(25, (m_leds_mux_data >> 7) & 1);	/* Number 25 LED */
 			break;
 		}
 
 		case 0x02:
 		{
-			output_set_lamp_value( 2, (state->m_leds_mux_data >> 0) & 1);	/* Number  2 LED */
-			output_set_lamp_value(21, (state->m_leds_mux_data >> 1) & 1);	/* Number 21 LED */
-			output_set_lamp_value( 4, (state->m_leds_mux_data >> 2) & 1);	/* Number  4 LED */
-			output_set_lamp_value(19, (state->m_leds_mux_data >> 3) & 1);	/* Number 19 LED */
-			output_set_lamp_value(15, (state->m_leds_mux_data >> 4) & 1);	/* Number 15 LED */
-			output_set_lamp_value(32, (state->m_leds_mux_data >> 5) & 1);	/* Number 32 LED */
-			output_set_lamp_value( 0, (state->m_leds_mux_data >> 6) & 1);	/* Number  0 LED */
-			output_set_lamp_value(26, (state->m_leds_mux_data >> 7) & 1);	/* Number 26 LED */
+			output_set_lamp_value( 2, (m_leds_mux_data >> 0) & 1);	/* Number  2 LED */
+			output_set_lamp_value(21, (m_leds_mux_data >> 1) & 1);	/* Number 21 LED */
+			output_set_lamp_value( 4, (m_leds_mux_data >> 2) & 1);	/* Number  4 LED */
+			output_set_lamp_value(19, (m_leds_mux_data >> 3) & 1);	/* Number 19 LED */
+			output_set_lamp_value(15, (m_leds_mux_data >> 4) & 1);	/* Number 15 LED */
+			output_set_lamp_value(32, (m_leds_mux_data >> 5) & 1);	/* Number 32 LED */
+			output_set_lamp_value( 0, (m_leds_mux_data >> 6) & 1);	/* Number  0 LED */
+			output_set_lamp_value(26, (m_leds_mux_data >> 7) & 1);	/* Number 26 LED */
 			break;
 		}
 
 		case 0x04:
 		{
-			output_set_lamp_value( 3, (state->m_leds_mux_data >> 0) & 1);	/* Number  3 LED */
-			output_set_lamp_value(35, (state->m_leds_mux_data >> 1) & 1);	/* Number 35 LED */
-			output_set_lamp_value(12, (state->m_leds_mux_data >> 2) & 1);	/* Number 12 LED */
-			output_set_lamp_value(28, (state->m_leds_mux_data >> 3) & 1);	/* Number 28 LED */
-			output_set_lamp_value( 7, (state->m_leds_mux_data >> 4) & 1);	/* Number  7 LED */
-			output_set_lamp_value(29, (state->m_leds_mux_data >> 5) & 1);	/* Number 29 LED */
-			output_set_lamp_value(18, (state->m_leds_mux_data >> 6) & 1);	/* Number 18 LED */
+			output_set_lamp_value( 3, (m_leds_mux_data >> 0) & 1);	/* Number  3 LED */
+			output_set_lamp_value(35, (m_leds_mux_data >> 1) & 1);	/* Number 35 LED */
+			output_set_lamp_value(12, (m_leds_mux_data >> 2) & 1);	/* Number 12 LED */
+			output_set_lamp_value(28, (m_leds_mux_data >> 3) & 1);	/* Number 28 LED */
+			output_set_lamp_value( 7, (m_leds_mux_data >> 4) & 1);	/* Number  7 LED */
+			output_set_lamp_value(29, (m_leds_mux_data >> 5) & 1);	/* Number 29 LED */
+			output_set_lamp_value(18, (m_leds_mux_data >> 6) & 1);	/* Number 18 LED */
 			break;
 		}
 
 		case 0x08:
 		{
-			output_set_lamp_value(22, (state->m_leds_mux_data >> 0) & 1);	/* Number 22 LED */
-			output_set_lamp_value( 9, (state->m_leds_mux_data >> 1) & 1);	/* Number  9 LED */
-			output_set_lamp_value(31, (state->m_leds_mux_data >> 2) & 1);	/* Number 31 LED */
-			output_set_lamp_value(14, (state->m_leds_mux_data >> 3) & 1);	/* Number 14 LED */
-			output_set_lamp_value(20, (state->m_leds_mux_data >> 4) & 1);	/* Number 20 LED */
-			output_set_lamp_value( 1, (state->m_leds_mux_data >> 5) & 1);	/* Number  1 LED */
-			output_set_lamp_value(33, (state->m_leds_mux_data >> 6) & 1);	/* Number 33 LED */
+			output_set_lamp_value(22, (m_leds_mux_data >> 0) & 1);	/* Number 22 LED */
+			output_set_lamp_value( 9, (m_leds_mux_data >> 1) & 1);	/* Number  9 LED */
+			output_set_lamp_value(31, (m_leds_mux_data >> 2) & 1);	/* Number 31 LED */
+			output_set_lamp_value(14, (m_leds_mux_data >> 3) & 1);	/* Number 14 LED */
+			output_set_lamp_value(20, (m_leds_mux_data >> 4) & 1);	/* Number 20 LED */
+			output_set_lamp_value( 1, (m_leds_mux_data >> 5) & 1);	/* Number  1 LED */
+			output_set_lamp_value(33, (m_leds_mux_data >> 6) & 1);	/* Number 33 LED */
 			break;
 		}
 
 		case 0x10:
 		{
-			output_set_lamp_value(16, (state->m_leds_mux_data >> 0) & 1);	/* Number 16 LED */
-			output_set_lamp_value(24, (state->m_leds_mux_data >> 1) & 1);	/* Number 24 LED */
-			output_set_lamp_value( 5, (state->m_leds_mux_data >> 2) & 1);	/* Number  5 LED */
-			output_set_lamp_value(10, (state->m_leds_mux_data >> 3) & 1);	/* Number 10 LED */
-			output_set_lamp_value(23, (state->m_leds_mux_data >> 4) & 1);	/* Number 23 LED */
-			output_set_lamp_value( 8, (state->m_leds_mux_data >> 5) & 1);	/* Number  8 LED */
-			output_set_lamp_value(30, (state->m_leds_mux_data >> 6) & 1);	/* Number 30 LED */
+			output_set_lamp_value(16, (m_leds_mux_data >> 0) & 1);	/* Number 16 LED */
+			output_set_lamp_value(24, (m_leds_mux_data >> 1) & 1);	/* Number 24 LED */
+			output_set_lamp_value( 5, (m_leds_mux_data >> 2) & 1);	/* Number  5 LED */
+			output_set_lamp_value(10, (m_leds_mux_data >> 3) & 1);	/* Number 10 LED */
+			output_set_lamp_value(23, (m_leds_mux_data >> 4) & 1);	/* Number 23 LED */
+			output_set_lamp_value( 8, (m_leds_mux_data >> 5) & 1);	/* Number  8 LED */
+			output_set_lamp_value(30, (m_leds_mux_data >> 6) & 1);	/* Number 30 LED */
 			break;
 		}
 
@@ -517,12 +522,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kas89_io, AS_IO, 8, kas89_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE("v9938", v9938_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(mux_w)
-	AM_RANGE(0x81, 0x81) AM_READ_LEGACY(mux_r)
-	AM_RANGE(0x82, 0x82) AM_WRITE_LEGACY(control_w)	/* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
-	AM_RANGE(0x83, 0x83) AM_WRITE_LEGACY(led_mux_data_w)
-	AM_RANGE(0x84, 0x84) AM_WRITE_LEGACY(led_mux_select_w)
-	AM_RANGE(0x85, 0x85) AM_WRITE_LEGACY(sound_comm_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(mux_w)
+	AM_RANGE(0x81, 0x81) AM_READ(mux_r)
+	AM_RANGE(0x82, 0x82) AM_WRITE(control_w)	/* Bit6 trigger the 138Hz osc. tied to main Z80's NMI.*/
+	AM_RANGE(0x83, 0x83) AM_WRITE(led_mux_data_w)
+	AM_RANGE(0x84, 0x84) AM_WRITE(led_mux_select_w)
+	AM_RANGE(0x85, 0x85) AM_WRITE(sound_comm_w)
 ADDRESS_MAP_END
 
 /*
@@ -570,7 +575,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io, AS_IO, 8, kas89_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(int_ack_w)	// comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
+	AM_RANGE(0x00, 0x00) AM_WRITE(int_ack_w)	// comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
 	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)

@@ -62,6 +62,19 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_subcpu;
+	DECLARE_WRITE8_MEMBER(zerotrgt_vregs_w);
+	DECLARE_WRITE8_MEMBER(cntsteer_vregs_w);
+	DECLARE_WRITE8_MEMBER(cntsteer_foreground_vram_w);
+	DECLARE_WRITE8_MEMBER(cntsteer_foreground_attr_w);
+	DECLARE_WRITE8_MEMBER(cntsteer_background_w);
+	DECLARE_WRITE8_MEMBER(gekitsui_sub_irq_ack);
+	DECLARE_WRITE8_MEMBER(cntsteer_sound_w);
+	DECLARE_WRITE8_MEMBER(zerotrgt_ctrl_w);
+	DECLARE_WRITE8_MEMBER(cntsteer_sub_irq_w);
+	DECLARE_WRITE8_MEMBER(cntsteer_sub_nmi_w);
+	DECLARE_WRITE8_MEMBER(cntsteer_main_irq_w);
+	DECLARE_READ8_MEMBER(cntsteer_adx_r);
+	DECLARE_WRITE8_MEMBER(nmimask_w);
 };
 
 
@@ -365,9 +378,8 @@ static SCREEN_UPDATE_IND16( cntsteer )
       ---- ---x rotation sign (landscape should be turning right (0) == / , turning left (1) == \)
 [4] = xxxx xxxx rotation factor?
 */
-static WRITE8_HANDLER(zerotrgt_vregs_w)
+WRITE8_MEMBER(cntsteer_state::zerotrgt_vregs_w)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
 //  static UINT8 test[5];
 
 //  test[offset] = data;
@@ -375,25 +387,24 @@ static WRITE8_HANDLER(zerotrgt_vregs_w)
 
 	switch (offset)
 	{
-		case 0:	state->m_scrolly = data; break;
-		case 1:	state->m_scrollx = data; break;
-		case 2:	state->m_bg_bank = (data & 0x30) << 4;
-				state->m_bg_color_bank = (data & 7);
-				state->m_disable_roz = (data & 0x40);
-				state->m_bg_tilemap->mark_all_dirty();
+		case 0:	m_scrolly = data; break;
+		case 1:	m_scrollx = data; break;
+		case 2:	m_bg_bank = (data & 0x30) << 4;
+				m_bg_color_bank = (data & 7);
+				m_disable_roz = (data & 0x40);
+				m_bg_tilemap->mark_all_dirty();
 				break;
-		case 3:	state->m_rotation_sign = (data & 1);
-				flip_screen_set(space->machine(), !(data & 4));
-				state->m_scrolly_hi = (data & 0x30) << 4;
-				state->m_scrollx_hi = (data & 0xc0) << 2;
+		case 3:	m_rotation_sign = (data & 1);
+				flip_screen_set(machine(), !(data & 4));
+				m_scrolly_hi = (data & 0x30) << 4;
+				m_scrollx_hi = (data & 0xc0) << 2;
 				break;
-		case 4:	state->m_rotation_x = data; break;
+		case 4:	m_rotation_x = data; break;
 	}
 }
 
-static WRITE8_HANDLER(cntsteer_vregs_w)
+WRITE8_MEMBER(cntsteer_state::cntsteer_vregs_w)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
 //  static UINT8 test[5];
 
 //  test[offset] = data;
@@ -401,40 +412,37 @@ static WRITE8_HANDLER(cntsteer_vregs_w)
 
 	switch(offset)
 	{
-		case 0:	state->m_scrolly = data; break;
-		case 1:	state->m_scrollx = data; break;
-		case 2:	state->m_bg_bank = (data & 0x01) << 8;
-				state->m_bg_color_bank = (data & 6) >> 1;
-				state->m_bg_tilemap->mark_all_dirty();
+		case 0:	m_scrolly = data; break;
+		case 1:	m_scrollx = data; break;
+		case 2:	m_bg_bank = (data & 0x01) << 8;
+				m_bg_color_bank = (data & 6) >> 1;
+				m_bg_tilemap->mark_all_dirty();
 				break;
-		case 3:	state->m_rotation_sign = (data & 7);
-				state->m_disable_roz = (~data & 0x08);
-				state->m_scrolly_hi = (data & 0x30) << 4;
-				state->m_scrollx_hi = (data & 0xc0) << 2;
+		case 3:	m_rotation_sign = (data & 7);
+				m_disable_roz = (~data & 0x08);
+				m_scrolly_hi = (data & 0x30) << 4;
+				m_scrollx_hi = (data & 0xc0) << 2;
 				break;
-		case 4:	state->m_rotation_x = data; break;
+		case 4:	m_rotation_x = data; break;
 	}
 }
 
-static WRITE8_HANDLER( cntsteer_foreground_vram_w )
+WRITE8_MEMBER(cntsteer_state::cntsteer_foreground_vram_w)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( cntsteer_foreground_attr_w )
+WRITE8_MEMBER(cntsteer_state::cntsteer_foreground_attr_w)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( cntsteer_background_w )
+WRITE8_MEMBER(cntsteer_state::cntsteer_background_w)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	state->m_videoram2[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /*************************************
@@ -443,56 +451,51 @@ static WRITE8_HANDLER( cntsteer_background_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( gekitsui_sub_irq_ack )
+WRITE8_MEMBER(cntsteer_state::gekitsui_sub_irq_ack)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+	device_set_input_line(m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( cntsteer_sound_w )
+WRITE8_MEMBER(cntsteer_state::cntsteer_sound_w)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( zerotrgt_ctrl_w )
+WRITE8_MEMBER(cntsteer_state::zerotrgt_ctrl_w)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
 	/*TODO: check this.*/
-	logerror("CTRL: %04x: %04x: %04x\n", cpu_get_pc(&space->device()), offset, data);
-//  if (offset == 0) device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+	logerror("CTRL: %04x: %04x: %04x\n", cpu_get_pc(&space.device()), offset, data);
+//  if (offset == 0) device_set_input_line(m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
-	if (offset == 1) device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
-//  if (offset == 2) device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+	if (offset == 1) device_set_input_line(m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+//  if (offset == 2) device_set_input_line(m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( cntsteer_sub_irq_w )
+WRITE8_MEMBER(cntsteer_state::cntsteer_sub_irq_w)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+	device_set_input_line(m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 //  printf("%02x IRQ\n", data);
 }
 
-static WRITE8_HANDLER( cntsteer_sub_nmi_w )
+WRITE8_MEMBER(cntsteer_state::cntsteer_sub_nmi_w)
 {
 //  if (data)
-//  device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
+//  device_set_input_line(m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
 //  popmessage("%02x", data);
 }
 
-static WRITE8_HANDLER( cntsteer_main_irq_w )
+WRITE8_MEMBER(cntsteer_state::cntsteer_main_irq_w)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /* Convert weird input handling with MAME standards.*/
-static READ8_HANDLER( cntsteer_adx_r )
+READ8_MEMBER(cntsteer_state::cntsteer_adx_r)
 {
 	UINT8 res = 0, adx_val;
-	adx_val = input_port_read(space->machine(), "AN_STEERING");
+	adx_val = input_port_read(machine(), "AN_STEERING");
 
 	if (adx_val >= 0x70 && adx_val <= 0x90)
 		res = 0xff;
@@ -528,57 +531,56 @@ static ADDRESS_MAP_START( gekitsui_cpu1_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x1200, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(cntsteer_foreground_vram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(cntsteer_foreground_attr_w) AM_BASE(m_colorram)
-	AM_RANGE(0x3000, 0x3003) AM_WRITE_LEGACY(zerotrgt_ctrl_w)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE(m_colorram)
+	AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekitsui_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(cntsteer_background_w) AM_BASE(m_videoram2)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(m_videoram2)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("COINS")
-	AM_RANGE(0x3000, 0x3004) AM_WRITE_LEGACY(zerotrgt_vregs_w)
-	AM_RANGE(0x3005, 0x3005) AM_WRITE_LEGACY(gekitsui_sub_irq_ack)
-	AM_RANGE(0x3007, 0x3007) AM_WRITE_LEGACY(cntsteer_sound_w)
+	AM_RANGE(0x3000, 0x3004) AM_WRITE(zerotrgt_vregs_w)
+	AM_RANGE(0x3005, 0x3005) AM_WRITE(gekitsui_sub_irq_ack)
+	AM_RANGE(0x3007, 0x3007) AM_WRITE(cntsteer_sound_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu1_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x11ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE_LEGACY(cntsteer_foreground_vram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE_LEGACY(cntsteer_foreground_attr_w) AM_BASE(m_colorram)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(cntsteer_sub_nmi_w)
-	AM_RANGE(0x3001, 0x3001) AM_WRITE_LEGACY(cntsteer_sub_irq_w)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(cntsteer_foreground_vram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_attr_w) AM_BASE(m_colorram)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(cntsteer_sub_nmi_w)
+	AM_RANGE(0x3001, 0x3001) AM_WRITE(cntsteer_sub_irq_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cntsteer_cpu2_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(cntsteer_background_w) AM_BASE(m_videoram2) AM_SHARE("share3")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE_LEGACY(cntsteer_background_w) AM_SHARE("share3")
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(cntsteer_background_w) AM_BASE(m_videoram2) AM_SHARE("share3")
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(cntsteer_background_w) AM_SHARE("share3")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW0")
-	AM_RANGE(0x3001, 0x3001) AM_READ_LEGACY(cntsteer_adx_r)
+	AM_RANGE(0x3001, 0x3001) AM_READ(cntsteer_adx_r)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("COINS")
-	AM_RANGE(0x3000, 0x3004) AM_WRITE_LEGACY(cntsteer_vregs_w)
-	AM_RANGE(0x3005, 0x3005) AM_WRITE_LEGACY(gekitsui_sub_irq_ack)
-	AM_RANGE(0x3006, 0x3006) AM_WRITE_LEGACY(cntsteer_main_irq_w)
-	AM_RANGE(0x3007, 0x3007) AM_WRITE_LEGACY(cntsteer_sound_w)
+	AM_RANGE(0x3000, 0x3004) AM_WRITE(cntsteer_vregs_w)
+	AM_RANGE(0x3005, 0x3005) AM_WRITE(gekitsui_sub_irq_ack)
+	AM_RANGE(0x3006, 0x3006) AM_WRITE(cntsteer_main_irq_w)
+	AM_RANGE(0x3007, 0x3007) AM_WRITE(cntsteer_sound_w)
 	AM_RANGE(0x3007, 0x3007) AM_READNOP //m6809 bug.
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /***************************************************************************/
 
-static WRITE8_HANDLER( nmimask_w )
+WRITE8_MEMBER(cntsteer_state::nmimask_w)
 {
-	cntsteer_state *state = space->machine().driver_data<cntsteer_state>();
-	state->m_nmimask = data & 0x80;
+	m_nmimask = data & 0x80;
 }
 
 static INTERRUPT_GEN ( sound_interrupt )
@@ -596,7 +598,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cntsteer_state )
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(nmimask_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(nmimask_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

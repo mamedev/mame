@@ -22,6 +22,9 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_WRITE8_MEMBER(cball_vram_w);
+	DECLARE_READ8_MEMBER(cball_wram_r);
+	DECLARE_WRITE8_MEMBER(cball_wram_w);
 };
 
 
@@ -34,12 +37,11 @@ static TILE_GET_INFO( get_tile_info )
 }
 
 
-static WRITE8_HANDLER( cball_vram_w )
+WRITE8_MEMBER(cball_state::cball_vram_w)
 {
-	cball_state *state = space->machine().driver_data<cball_state>();
 
-	state->m_video_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_video_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -107,19 +109,17 @@ static PALETTE_INIT( cball )
 }
 
 
-static READ8_HANDLER( cball_wram_r )
+READ8_MEMBER(cball_state::cball_wram_r)
 {
-	cball_state *state = space->machine().driver_data<cball_state>();
 
-	return state->m_video_ram[0x380 + offset];
+	return m_video_ram[0x380 + offset];
 }
 
 
-static WRITE8_HANDLER( cball_wram_w )
+WRITE8_MEMBER(cball_state::cball_wram_w)
 {
-	cball_state *state = space->machine().driver_data<cball_state>();
 
-	state->m_video_ram[0x380 + offset] = data;
+	m_video_ram[0x380 + offset] = data;
 }
 
 
@@ -127,7 +127,7 @@ static WRITE8_HANDLER( cball_wram_w )
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, cball_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 
-	AM_RANGE(0x0000, 0x03ff) AM_READ_LEGACY(cball_wram_r) AM_MASK(0x7f)
+	AM_RANGE(0x0000, 0x03ff) AM_READ(cball_wram_r) AM_MASK(0x7f)
 	AM_RANGE(0x0400, 0x07ff) AM_READONLY
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("1001")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("1003")
@@ -137,8 +137,8 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, cball_state )
 	AM_RANGE(0x2000, 0x2001) AM_NOP
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("2800")
 
-	AM_RANGE(0x0000, 0x03ff) AM_WRITE_LEGACY(cball_wram_w) AM_MASK(0x7f)
-	AM_RANGE(0x0400, 0x07ff) AM_WRITE_LEGACY(cball_vram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x0000, 0x03ff) AM_WRITE(cball_wram_w) AM_MASK(0x7f)
+	AM_RANGE(0x0400, 0x07ff) AM_WRITE(cball_vram_w) AM_BASE(m_video_ram)
 	AM_RANGE(0x1800, 0x1800) AM_NOP /* watchdog? */
 	AM_RANGE(0x1810, 0x1811) AM_NOP
 	AM_RANGE(0x1820, 0x1821) AM_NOP

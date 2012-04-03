@@ -226,6 +226,26 @@ public:
 	int m_cde_qchannel_offset;
 	cdrom_toc m_cde_toc;
 	CDE_DMA m_cde_dma[2];
+	DECLARE_READ64_MEMBER(irq_enable_r);
+	DECLARE_WRITE64_MEMBER(irq_enable_w);
+	DECLARE_READ64_MEMBER(irq_active_r);
+	DECLARE_READ64_MEMBER(unk1_r);
+	DECLARE_READ64_MEMBER(unk2_r);
+	DECLARE_READ64_MEMBER(unk3_r);
+	DECLARE_READ64_MEMBER(unk4_r);
+	DECLARE_WRITE64_MEMBER(unk4_w);
+	DECLARE_READ64_MEMBER(unk30000_r);
+	DECLARE_READ64_MEMBER(unk30030_r);
+	DECLARE_WRITE64_MEMBER(video_w);
+	DECLARE_WRITE64_MEMBER(video_irq_ack_w);
+	DECLARE_READ64_MEMBER(unk4000280_r);
+	DECLARE_WRITE64_MEMBER(unk4000010_w);
+	DECLARE_WRITE64_MEMBER(unk4000418_w);
+	DECLARE_WRITE64_MEMBER(reset_w);
+	DECLARE_READ64_MEMBER(cde_r);
+	DECLARE_WRITE64_MEMBER(cde_w);
+	DECLARE_READ64_MEMBER(device2_r);
+	DECLARE_READ64_MEMBER(cpu_r);
 };
 
 
@@ -264,36 +284,33 @@ static SCREEN_UPDATE_IND16( m2 )
 	return 0;
 }
 
-static READ64_HANDLER(irq_enable_r)
+READ64_MEMBER(konamim2_state::irq_enable_r)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(state->m_irq_enable) << 32;
+		r |= (UINT64)(m_irq_enable) << 32;
 	}
 
 	return r;
 }
 
-static WRITE64_HANDLER(irq_enable_w)
+WRITE64_MEMBER(konamim2_state::irq_enable_w)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	if (ACCESSING_BITS_32_63)
 	{
-		state->m_irq_enable |= (UINT32)(data >> 32);
+		m_irq_enable |= (UINT32)(data >> 32);
 	}
 }
 
-static READ64_HANDLER(irq_active_r)
+READ64_MEMBER(konamim2_state::irq_active_r)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r |= (UINT64)(state->m_irq_active) << 32;
+		r |= (UINT64)(m_irq_active) << 32;
 	}
 
 	return r;
@@ -301,14 +318,14 @@ static READ64_HANDLER(irq_active_r)
 
 
 
-static READ64_HANDLER(unk1_r)
+READ64_MEMBER(konamim2_state::unk1_r)
 {
 	return U64(0xffffffffffffffff);
 	//return 0;
 }
 
 #ifdef UNUSED_FUNCTION
-static READ64_HANDLER(unk2_r)
+READ64_MEMBER(konamim2_state::unk2_r)
 {
 	if (ACCESSING_BITS_32_63)
 	{
@@ -318,18 +335,16 @@ static READ64_HANDLER(unk2_r)
 }
 #endif
 
-static READ64_HANDLER(unk3_r)
+READ64_MEMBER(konamim2_state::unk3_r)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	//return U64(0xffffffffffffffff);
-	return state->m_unk3;
+	return m_unk3;
 }
 
-static READ64_HANDLER(unk4_r)
+READ64_MEMBER(konamim2_state::unk4_r)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	UINT64 r = 0;
-//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(&space->device()));
+//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(&space.device()));
 
 	if (ACCESSING_BITS_32_63)
 	{
@@ -338,38 +353,36 @@ static READ64_HANDLER(unk4_r)
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		r |= state->m_unk20004 & ~0x800000;
+		r |= m_unk20004 & ~0x800000;
 	}
 	return r;
 }
 
-static WRITE64_HANDLER(unk4_w)
+WRITE64_MEMBER(konamim2_state::unk4_w)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 //  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data),
-//      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(&space->device()));
+//      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(&space.device()));
 
 	if (ACCESSING_BITS_0_31)
 	{
 		if (data & 0x800000)
 		{
-//          mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", space->device().tag(), cpu_get_pc(&space->device()));
-			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
+//          mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", device().tag(), cpu_get_pc(&space.device()));
+			cputag_set_input_line(machine(), "sub", INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
-		state->m_unk20004 = (UINT32)(data);
+		m_unk20004 = (UINT32)(data);
 		return;
 	}
 }
 
-static READ64_HANDLER(unk30000_r)
+READ64_MEMBER(konamim2_state::unk30000_r)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
-	state->m_counter1++;
-	return (UINT64)(state->m_counter1 & 0x7f) << 32;
+	m_counter1++;
+	return (UINT64)(m_counter1 & 0x7f) << 32;
 }
 
-static READ64_HANDLER(unk30030_r)
+READ64_MEMBER(konamim2_state::unk30030_r)
 {
 	if (ACCESSING_BITS_0_31)
 	{
@@ -378,34 +391,32 @@ static READ64_HANDLER(unk30030_r)
 	return 0;
 }
 
-static WRITE64_HANDLER(video_w)
+WRITE64_MEMBER(konamim2_state::video_w)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	if (ACCESSING_BITS_32_63)
 	{
-		state->m_vdl0_address = (UINT32)(data >> 32);
+		m_vdl0_address = (UINT32)(data >> 32);
 	}
 	if (ACCESSING_BITS_0_31)
 	{
-		state->m_vdl1_address = (UINT32)(data);
+		m_vdl1_address = (UINT32)(data);
 	}
 }
 
-static WRITE64_HANDLER(video_irq_ack_w)
+WRITE64_MEMBER(konamim2_state::video_irq_ack_w)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	if (ACCESSING_BITS_32_63)
 	{
 		if ((data >> 32) & 0x8000)
 		{
-			state->m_irq_active &= ~0x800000;
+			m_irq_active &= ~0x800000;
 		}
 	}
 }
 
 
 
-static READ64_HANDLER(unk4000280_r)
+READ64_MEMBER(konamim2_state::unk4000280_r)
 {
 	// SysCfg
 
@@ -429,7 +440,7 @@ static READ64_HANDLER(unk4000280_r)
 
 }
 
-static WRITE64_HANDLER(unk4000010_w)
+WRITE64_MEMBER(konamim2_state::unk4000010_w)
 {
 	if ((data & 0xff) == 0xd)
 	{
@@ -441,19 +452,18 @@ static WRITE64_HANDLER(unk4000010_w)
 	}
 }
 
-static WRITE64_HANDLER(unk4000418_w)
+WRITE64_MEMBER(konamim2_state::unk4000418_w)
 {
 }
 
-static WRITE64_HANDLER(reset_w)
+WRITE64_MEMBER(konamim2_state::reset_w)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	if (ACCESSING_BITS_32_63)
 	{
 		if (data & U64(0x100000000))
 		{
-			cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
-			state->m_unk3 = 0;
+			cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+			m_unk3 = 0;
 		}
 	}
 }
@@ -832,9 +842,8 @@ static void cde_dma_transfer(address_space *space, int channel, int next)
 	}
 }
 
-static READ64_HANDLER(cde_r)
+READ64_MEMBER(konamim2_state::cde_r)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	UINT32 r = 0;
 	int reg = offset * 2;
 
@@ -852,36 +861,36 @@ static READ64_HANDLER(cde_r)
 		{
 			r = 0x100038;
 
-			r |= state->m_cde_dma[0].dma_done ? 0x400 : 0;
-			r |= state->m_cde_dma[1].dma_done ? 0x800 : 0;
+			r |= m_cde_dma[0].dma_done ? 0x400 : 0;
+			r |= m_cde_dma[1].dma_done ? 0x800 : 0;
 			break;
 		}
 		case 0x02c/4:
 		{
-			r = state->m_cde_status_bytes[state->m_cde_status_byte_ptr++];
+			r = m_cde_status_bytes[m_cde_status_byte_ptr++];
 
-			if (state->m_cde_status_byte_ptr <= state->m_cde_num_status_bytes)
+			if (m_cde_status_byte_ptr <= m_cde_num_status_bytes)
 			{
 				r |= 0x100;
 			}
 			else
 			{
 				//if (cde_enable_reports &&
-				//  !state->m_cde_response &&
-				//  state->m_cde_command_bytes[0] != ((cde_report_type >> 8) & 0xff))
+				//  !m_cde_response &&
+				//  m_cde_command_bytes[0] != ((cde_report_type >> 8) & 0xff))
 
-				if (!state->m_cde_response)
+				if (!m_cde_response)
 				{
-					cde_handle_reports(space->machine());
+					cde_handle_reports(machine());
 
-			//      state->m_cde_command_byte_ptr = 0;
-			//      state->m_cde_command_bytes[state->m_cde_command_byte_ptr++] = 0x1c;
+			//      m_cde_command_byte_ptr = 0;
+			//      m_cde_command_bytes[m_cde_command_byte_ptr++] = 0x1c;
 
-			//      state->m_cde_response = 1;
+			//      m_cde_response = 1;
 				}
 			}
 
-	//      printf("status byte %d\n", state->m_cde_status_byte_ptr);
+	//      printf("status byte %d\n", m_cde_status_byte_ptr);
 			break;
 		}
 
@@ -893,7 +902,7 @@ static READ64_HANDLER(cde_r)
 
 		default:
 		{
-//                      mame_printf_debug("cde_r: %08X at %08X\n", reg*4, cpu_get_pc(&space->device()));
+//                      mame_printf_debug("cde_r: %08X at %08X\n", reg*4, cpu_get_pc(&space.device()));
 			break;
 		}
 	}
@@ -908,9 +917,8 @@ static READ64_HANDLER(cde_r)
 	}
 }
 
-static WRITE64_HANDLER(cde_w)
+WRITE64_MEMBER(konamim2_state::cde_w)
 {
-	konamim2_state *state = space->machine().driver_data<konamim2_state>();
 	int reg = offset * 2;
 	UINT32 d;
 
@@ -928,32 +936,32 @@ static WRITE64_HANDLER(cde_w)
 	{
 		case 0x028/4:		// Command write
 		{
-			//printf("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(&space->device()));
+			//printf("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(&space.device()));
 
 			if (d == 0x0180)
 			{
-				if (state->m_cde_response)
+				if (m_cde_response)
 				{
-					cde_handle_command(space->machine());
+					cde_handle_command(machine());
 
-					state->m_cde_response = 0;
+					m_cde_response = 0;
 				}
 
-				state->m_cde_command_byte_ptr = 0;
+				m_cde_command_byte_ptr = 0;
 			}
-			else if (state->m_cde_command_byte_ptr == 0)
+			else if (m_cde_command_byte_ptr == 0)
 			{
-				state->m_cde_num_status_bytes = 1;
+				m_cde_num_status_bytes = 1;
 
-				state->m_cde_status_bytes[0] = d & 0xff;
-				state->m_cde_status_byte_ptr = 0;
+				m_cde_status_bytes[0] = d & 0xff;
+				m_cde_status_byte_ptr = 0;
 
-				state->m_cde_response = 1;
+				m_cde_response = 1;
 			}
 
 			if (d != 0x180)
 			{
-				state->m_cde_command_bytes[state->m_cde_command_byte_ptr++] = d;
+				m_cde_command_bytes[m_cde_command_byte_ptr++] = d;
 			}
 
 			break;
@@ -965,15 +973,15 @@ static WRITE64_HANDLER(cde_w)
 
 			if (d & 0x20)
 			{
-				state->m_cde_dma[0].dma_done = 1;
+				m_cde_dma[0].dma_done = 1;
 
-				cde_dma_transfer(space, 0, 0);
+				cde_dma_transfer(&space, 0, 0);
 			}
 			if (d & 0x40)
 			{
-				state->m_cde_dma[0].dma_done = 1;
+				m_cde_dma[0].dma_done = 1;
 
-				cde_dma_transfer(space, 0, 1);
+				cde_dma_transfer(&space, 0, 1);
 			}
 			break;
 		}
@@ -981,28 +989,28 @@ static WRITE64_HANDLER(cde_w)
 		{
 //          mame_printf_debug("CDE: DMA0 dst addr %08X\n", d);
 
-			state->m_cde_dma[0].dst_addr = d;
+			m_cde_dma[0].dst_addr = d;
 			break;
 		}
 		case 0x30c/4:		// DMA Channel 0 length?
 		{
 //          mame_printf_debug("CDE: DMA0 length %08X\n", d);
 
-			state->m_cde_dma[0].length = d;
+			m_cde_dma[0].length = d;
 			break;
 		}
 		case 0x318/4:		// DMA Channel 0 next destination address
 		{
 //          mame_printf_debug("CDE: DMA0 next dst addr %08X\n", d);
 
-			state->m_cde_dma[0].next_dst_addr = d;
+			m_cde_dma[0].next_dst_addr = d;
 			break;
 		}
 		case 0x31c/4:		// DMA Channel 0 next length?
 		{
 //          mame_printf_debug("CDE: DMA0 next length %08X\n", d);
 
-			state->m_cde_dma[0].next_length = d;
+			m_cde_dma[0].next_length = d;
 			break;
 		}
 
@@ -1015,28 +1023,28 @@ static WRITE64_HANDLER(cde_w)
 		{
 //          mame_printf_debug("CDE: DMA1 dst addr %08X\n", d);
 
-			state->m_cde_dma[1].dst_addr = d;
+			m_cde_dma[1].dst_addr = d;
 			break;
 		}
 		case 0x32c/4:		// DMA Channel 1 length?
 		{
 //          mame_printf_debug("CDE: DMA1 length %08X\n", d);
 
-			state->m_cde_dma[1].length = d;
+			m_cde_dma[1].length = d;
 			break;
 		}
 		case 0x338/4:		// DMA Channel 1 next destination address
 		{
 //          mame_printf_debug("CDE: DMA1 next dst addr %08X\n", d);
 
-			state->m_cde_dma[1].next_dst_addr = d;
+			m_cde_dma[1].next_dst_addr = d;
 			break;
 		}
 		case 0x33c/4:		// DMA Channel 1 next length?
 		{
 //          mame_printf_debug("CDE: DMA1 next length %08X\n", d);
 
-			state->m_cde_dma[1].next_length = d;
+			m_cde_dma[1].next_length = d;
 			break;
 		}
 
@@ -1044,25 +1052,25 @@ static WRITE64_HANDLER(cde_w)
 		{
 			if (d & 0x80000000)
 			{
-				state->m_irq_active &= ~0x8;
+				m_irq_active &= ~0x8;
 			}
 			if (d & 0x60000000)
 			{
-				state->m_cde_dma[0].dma_done = 0;
-				state->m_cde_dma[1].dma_done = 0;
+				m_cde_dma[0].dma_done = 0;
+				m_cde_dma[1].dma_done = 0;
 			}
 			break;
 		}
 
 		default:
 		{
-//                      mame_printf_debug("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(&space->device()));
+//                      mame_printf_debug("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(&space.device()));
 			break;
 		}
 	}
 }
 
-static READ64_HANDLER(device2_r)
+READ64_MEMBER(konamim2_state::device2_r)
 {
 	UINT32 r = 0;
 	int reg = offset * 2;
@@ -1093,13 +1101,13 @@ static READ64_HANDLER(device2_r)
 	}
 }
 
-static READ64_HANDLER(cpu_r)
+READ64_MEMBER(konamim2_state::cpu_r)
 {
 	UINT64 r = 0;
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (UINT64)((&space->device() != space->machine().device("maincpu")) ? 0x80000000 : 0);
+		r = (UINT64)((&space.device() != machine().device("maincpu")) ? 0x80000000 : 0);
 		//r |= 0x40000000;  // sets Video-LowRes !?
 		return r << 32;
 	}
@@ -1108,22 +1116,22 @@ static READ64_HANDLER(cpu_r)
 }
 
 static ADDRESS_MAP_START( m2_main, AS_PROGRAM, 64, konamim2_state )
-	AM_RANGE(0x00010040, 0x00010047) AM_READWRITE_LEGACY(irq_enable_r, irq_enable_w)
-	AM_RANGE(0x00010050, 0x00010057) AM_READ_LEGACY(irq_active_r)
-	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE_LEGACY(unk4_r, unk4_w)
-	AM_RANGE(0x00030000, 0x00030007) AM_READ_LEGACY(unk30000_r)
-	AM_RANGE(0x00030010, 0x00030017) AM_WRITE_LEGACY(video_w)
-	AM_RANGE(0x00030030, 0x00030037) AM_READ_LEGACY(unk30030_r)
-	AM_RANGE(0x00030400, 0x00030407) AM_WRITE_LEGACY(video_irq_ack_w)
-	AM_RANGE(0x01000000, 0x01000fff) AM_READWRITE_LEGACY(cde_r, cde_w)
-	AM_RANGE(0x02000000, 0x02000fff) AM_READ_LEGACY(device2_r)
-	AM_RANGE(0x04000010, 0x04000017) AM_WRITE_LEGACY(unk4000010_w)
-	AM_RANGE(0x04000018, 0x0400001f) AM_READ_LEGACY(unk1_r)
-	AM_RANGE(0x04000020, 0x04000027) AM_WRITE_LEGACY(reset_w)
-	AM_RANGE(0x04000418, 0x0400041f) AM_WRITE_LEGACY(unk4000418_w)
-	AM_RANGE(0x04000208, 0x0400020f) AM_READ_LEGACY(unk3_r)
-	AM_RANGE(0x04000280, 0x04000287) AM_READ_LEGACY(unk4000280_r)
-	AM_RANGE(0x10000000, 0x10000007) AM_READ_LEGACY(cpu_r)
+	AM_RANGE(0x00010040, 0x00010047) AM_READWRITE(irq_enable_r, irq_enable_w)
+	AM_RANGE(0x00010050, 0x00010057) AM_READ(irq_active_r)
+	AM_RANGE(0x00020000, 0x00020007) AM_READWRITE(unk4_r, unk4_w)
+	AM_RANGE(0x00030000, 0x00030007) AM_READ(unk30000_r)
+	AM_RANGE(0x00030010, 0x00030017) AM_WRITE(video_w)
+	AM_RANGE(0x00030030, 0x00030037) AM_READ(unk30030_r)
+	AM_RANGE(0x00030400, 0x00030407) AM_WRITE(video_irq_ack_w)
+	AM_RANGE(0x01000000, 0x01000fff) AM_READWRITE(cde_r, cde_w)
+	AM_RANGE(0x02000000, 0x02000fff) AM_READ(device2_r)
+	AM_RANGE(0x04000010, 0x04000017) AM_WRITE(unk4000010_w)
+	AM_RANGE(0x04000018, 0x0400001f) AM_READ(unk1_r)
+	AM_RANGE(0x04000020, 0x04000027) AM_WRITE(reset_w)
+	AM_RANGE(0x04000418, 0x0400041f) AM_WRITE(unk4000418_w)
+	AM_RANGE(0x04000208, 0x0400020f) AM_READ(unk3_r)
+	AM_RANGE(0x04000280, 0x04000287) AM_READ(unk4000280_r)
+	AM_RANGE(0x10000000, 0x10000007) AM_READ(cpu_r)
 	AM_RANGE(0x10000008, 0x10001007) AM_NOP		// ???
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share2")
 	AM_RANGE(0x40000000, 0x407fffff) AM_RAM AM_SHARE("share3") AM_BASE(m_main_ram)

@@ -75,12 +75,17 @@ public:
 	UINT8 *m_gfxram;
 	UINT8 *m_tileram;
 	int m_old_data;
+	DECLARE_WRITE8_MEMBER(trvmadns_banking_w);
+	DECLARE_WRITE8_MEMBER(trvmadns_gfxram_w);
+	DECLARE_WRITE8_MEMBER(trvmadns_palette_w);
+	DECLARE_WRITE8_MEMBER(w2);
+	DECLARE_WRITE8_MEMBER(w3);
+	DECLARE_WRITE8_MEMBER(trvmadns_tileram_w);
 };
 
 
-static WRITE8_HANDLER( trvmadns_banking_w )
+WRITE8_MEMBER(trvmadns_state::trvmadns_banking_w)
 {
-	trvmadns_state *state = space->machine().driver_data<trvmadns_state>();
 
 	UINT8 *rom;
 	int address = 0;
@@ -91,7 +96,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 	}
 	else if((data & 0xf0) == 0x80 || (data & 0xf0) == 0x90)
 	{
-		rom = space->machine().region("user2")->base();
+		rom = machine().region("user2")->base();
 
 		switch(data & 0xf)
 		{
@@ -107,19 +112,19 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 		address |= (data & 0x10) ? 0x10000 : 0;
 
-		memory_set_bankptr(space->machine(), "bank1", &rom[address]);
-		memory_set_bankptr(space->machine(), "bank2", &rom[address + 0x1000]);
+		memory_set_bankptr(machine(), "bank1", &rom[address]);
+		memory_set_bankptr(machine(), "bank2", &rom[address + 0x1000]);
 	}
 	else
 	{
-			if(data != state->m_old_data)
+			if(data != m_old_data)
 			{
-				state->m_old_data = data;
+				m_old_data = data;
 				logerror("port80 = %02X\n",data);
 				//logerror("port80 = %02X\n",data);
 			}
 
-		rom = space->machine().region("user1")->base();
+		rom = machine().region("user1")->base();
 
 		/*
         7
@@ -147,33 +152,32 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 //      logerror("add = %X\n",address);
 
-		memory_set_bankptr(space->machine(), "bank1", &rom[address]);
+		memory_set_bankptr(machine(), "bank1", &rom[address]);
 	}
 }
 
-static WRITE8_HANDLER( trvmadns_gfxram_w )
+WRITE8_MEMBER(trvmadns_state::trvmadns_gfxram_w)
 {
-	trvmadns_state *state = space->machine().driver_data<trvmadns_state>();
-	state->m_gfxram[offset] = data;
-	gfx_element_mark_dirty(space->machine().gfx[0], offset/16);
+	m_gfxram[offset] = data;
+	gfx_element_mark_dirty(machine().gfx[0], offset/16);
 }
 
-static WRITE8_HANDLER( trvmadns_palette_w )
+WRITE8_MEMBER(trvmadns_state::trvmadns_palette_w)
 {
 	int r,g,b,datax;
-	space->machine().generic.paletteram.u8[offset] = data;
+	machine().generic.paletteram.u8[offset] = data;
 	offset>>=1;
-	datax=space->machine().generic.paletteram.u8[offset*2+1]+256*space->machine().generic.paletteram.u8[offset*2];
+	datax=machine().generic.paletteram.u8[offset*2+1]+256*machine().generic.paletteram.u8[offset*2];
 
 	b = (((datax & 0x0007)>>0) | ((datax & 0x0200)>>6)) ^ 0xf;
 	r = (((datax & 0x0038)>>3) | ((datax & 0x0400)>>7)) ^ 0xf;
 	g = (((datax & 0x01c0)>>6) | ((datax & 0x0800)>>8)) ^ 0xf;
 
-	palette_set_color_rgb(space->machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(machine(), offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 
-static WRITE8_HANDLER( w2 )
+WRITE8_MEMBER(trvmadns_state::w2)
 {
 /*  static int old = -1;
     if(data!=old)
@@ -181,7 +185,7 @@ static WRITE8_HANDLER( w2 )
 */
 }
 
-static WRITE8_HANDLER( w3 )
+WRITE8_MEMBER(trvmadns_state::w3)
 {
 /*  static int old = -1;
     if(data!=old)
@@ -189,22 +193,21 @@ static WRITE8_HANDLER( w3 )
 */
 }
 
-static WRITE8_HANDLER( trvmadns_tileram_w )
+WRITE8_MEMBER(trvmadns_state::trvmadns_tileram_w)
 {
-	trvmadns_state *state = space->machine().driver_data<trvmadns_state>();
 	if(offset==0)
 	{
-		if(cpu_get_previouspc(&space->device())==0x29e9)// || cpu_get_previouspc(&space->device())==0x1b3f) //29f5
+		if(cpu_get_previouspc(&space.device())==0x29e9)// || cpu_get_previouspc(&space.device())==0x1b3f) //29f5
 		{
-			cputag_set_input_line(space->machine(), "maincpu", 0, HOLD_LINE);
+			cputag_set_input_line(machine(), "maincpu", 0, HOLD_LINE);
 		}
 //      else
-//          logerror("%x \n", cpu_get_previouspc(&space->device()));
+//          logerror("%x \n", cpu_get_previouspc(&space.device()));
 
 	}
 
-	state->m_tileram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+	m_tileram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 
@@ -212,19 +215,19 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, trvmadns_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x7000, 0x7fff) AM_ROMBANK("bank2")
-	AM_RANGE(0x6000, 0x7fff) AM_WRITE_LEGACY(trvmadns_gfxram_w) AM_BASE(m_gfxram)
+	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_BASE(m_gfxram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE_LEGACY(trvmadns_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE_LEGACY(trvmadns_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(w2)//NOP
-	AM_RANGE(0xe004, 0xe004) AM_WRITE_LEGACY(w3)//NOP
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(trvmadns_tileram_w) AM_BASE(m_tileram)
+	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(trvmadns_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(w2)//NOP
+	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, trvmadns_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(trvmadns_banking_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(trvmadns_banking_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( trvmadns )

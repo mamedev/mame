@@ -289,6 +289,9 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_player_select;
+	DECLARE_WRITE8_MEMBER(wdclr_w);
+	DECLARE_WRITE8_MEMBER(tempest_led_w);
+	DECLARE_WRITE8_MEMBER(tempest_coin_w);
 };
 
 
@@ -314,10 +317,10 @@ static MACHINE_START( tempest )
  *
  *************************************/
 
-static WRITE8_HANDLER( wdclr_w )
+WRITE8_MEMBER(tempest_state::wdclr_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-	watchdog_reset(space->machine());
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	watchdog_reset(machine());
 }
 
 /*************************************
@@ -367,21 +370,20 @@ static READ8_DEVICE_HANDLER( input_port_2_bit_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( tempest_led_w )
+WRITE8_MEMBER(tempest_state::tempest_led_w)
 {
-	tempest_state *state = space->machine().driver_data<tempest_state>();
-	set_led_status(space->machine(), 0, ~data & 0x02);
-	set_led_status(space->machine(), 1, ~data & 0x01);
+	set_led_status(machine(), 0, ~data & 0x02);
+	set_led_status(machine(), 1, ~data & 0x01);
 	/* FLIP is bit 0x04 */
-	state->m_player_select = data & 0x04;
+	m_player_select = data & 0x04;
 }
 
 
-static WRITE8_HANDLER( tempest_coin_w )
+WRITE8_MEMBER(tempest_state::tempest_coin_w)
 {
-	coin_counter_w(space->machine(), 0, (data & 0x01));
-	coin_counter_w(space->machine(), 1, (data & 0x02));
-	coin_counter_w(space->machine(), 2, (data & 0x04));
+	coin_counter_w(machine(), 0, (data & 0x01));
+	coin_counter_w(machine(), 1, (data & 0x02));
+	coin_counter_w(machine(), 2, (data & 0x04));
 	avg_set_flip_x(data & 0x08);
 	avg_set_flip_y(data & 0x10);
 }
@@ -402,9 +404,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(tempest_coin_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(tempest_coin_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE_LEGACY(avgdvg_go_w)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(wdclr_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(wdclr_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE_LEGACY(avgdvg_reset_w)
 	AM_RANGE(0x6000, 0x603f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x6040, 0x6040) AM_DEVREAD_LEGACY("mathbox", mathbox_status_r) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
@@ -414,7 +416,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x6080, 0x609f) AM_DEVWRITE_LEGACY("mathbox", mathbox_go_w)
 	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x60e0, 0x60e0) AM_WRITE_LEGACY(tempest_led_w)
+	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
 	AM_RANGE(0x9000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END

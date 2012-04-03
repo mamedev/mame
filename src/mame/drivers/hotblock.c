@@ -60,72 +60,75 @@ public:
 
 	/* memory */
 	UINT8    m_pal[0x10000];
+	DECLARE_READ8_MEMBER(hotblock_video_read);
+	DECLARE_READ8_MEMBER(hotblock_port4_r);
+	DECLARE_WRITE8_MEMBER(hotblock_port4_w);
+	DECLARE_WRITE8_MEMBER(hotblock_port0_w);
+	DECLARE_WRITE8_MEMBER(hotblock_video_write);
 };
 
 
 
-static READ8_HANDLER( hotblock_video_read )
+READ8_MEMBER(hotblock_state::hotblock_video_read)
 {
-	hotblock_state *state = space->machine().driver_data<hotblock_state>();
 	/* right?, anything else?? */
-	if (state->m_port0 & 0x20) // port 0 = a8 e8 -- palette
+	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
 	{
-		return state->m_pal[offset];
+		return m_pal[offset];
 	}
 	else // port 0 = 88 c8
 	{
-		return state->m_vram[offset];
+		return m_vram[offset];
 	}
 }
 
 /* port 4 is some kind of eeprom / storage .. used to store the scores */
-static READ8_HANDLER( hotblock_port4_r )
+READ8_MEMBER(hotblock_state::hotblock_port4_r)
 {
 //  mame_printf_debug("port4_r\n");
 	return 0x00;
 }
 
 
-static WRITE8_HANDLER( hotblock_port4_w )
+WRITE8_MEMBER(hotblock_state::hotblock_port4_w)
 {
-//  mame_printf_debug("port4_w: pc = %06x : data %04x\n", cpu_get_pc(&space->device()), data);
-//  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(&space->device()), data);
-	hotblock_state *state = space->machine().driver_data<hotblock_state>();
-	state->m_port4 = data;
+//  mame_printf_debug("port4_w: pc = %06x : data %04x\n", cpu_get_pc(&space.device()), data);
+//  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(&space.device()), data);
+
+	m_port4 = data;
 }
 
 
 
-static WRITE8_HANDLER( hotblock_port0_w )
+WRITE8_MEMBER(hotblock_state::hotblock_port0_w)
 {
-//  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(&space->device()), data);
-	hotblock_state *state = space->machine().driver_data<hotblock_state>();
-	state->m_port0 = data;
+//  popmessage("port4_w: pc = %06x : data %04x", cpu_get_pc(&space.device()), data);
+
+	m_port0 = data;
 }
 
-static WRITE8_HANDLER( hotblock_video_write )
+WRITE8_MEMBER(hotblock_state::hotblock_video_write)
 {
-	hotblock_state *state = space->machine().driver_data<hotblock_state>();
 	/* right?, anything else?? */
-	if (state->m_port0 & 0x20) // port 0 = a8 e8 -- palette
+	if (m_port0 & 0x20) // port 0 = a8 e8 -- palette
 	{
-		state->m_pal[offset] = data;
+		m_pal[offset] = data;
 	}
 	else // port 0 = 88 c8
 	{
-		state->m_vram[offset] = data;
+		m_vram[offset] = data;
 	}
 }
 
 static ADDRESS_MAP_START( hotblock_map, AS_PROGRAM, 8, hotblock_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE_LEGACY(hotblock_video_read, hotblock_video_write) AM_BASE(m_vram)
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(hotblock_video_read, hotblock_video_write) AM_BASE(m_vram)
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotblock_io, AS_IO, 8, hotblock_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY(hotblock_port0_w)
-	AM_RANGE(0x0004, 0x0004) AM_READWRITE_LEGACY(hotblock_port4_r, hotblock_port4_w)
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(hotblock_port0_w)
+	AM_RANGE(0x0004, 0x0004) AM_READWRITE(hotblock_port4_r, hotblock_port4_w)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END

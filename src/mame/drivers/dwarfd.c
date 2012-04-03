@@ -333,6 +333,15 @@ public:
 	UINT8    m_videobuf[0x8000];
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(i8275_preg_w);
+	DECLARE_READ8_MEMBER(i8275_preg_r);
+	DECLARE_WRITE8_MEMBER(i8275_creg_w);
+	DECLARE_READ8_MEMBER(i8275_sreg_r);
+	DECLARE_READ8_MEMBER(dwarfd_ram_r);
+	DECLARE_WRITE8_MEMBER(dwarfd_ram_w);
+	DECLARE_WRITE8_MEMBER(output1_w);
+	DECLARE_WRITE8_MEMBER(output2_w);
+	DECLARE_READ8_MEMBER(qc_b8_r);
 };
 
 
@@ -373,76 +382,75 @@ enum
 };
 
 
-static WRITE8_HANDLER (i8275_preg_w) //param reg
+WRITE8_MEMBER(dwarfd_state::i8275_preg_w)//param reg
 {
-	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
 
-	switch (state->m_i8275Command)
+	switch (m_i8275Command)
 	{
 		case I8275_COMMAND_RESET:
 		{
-			switch (state->m_i8275CommandSeqCnt)
+			switch (m_i8275CommandSeqCnt)
 			{
 				case 4:
 				{
 					//screen byte comp byte 1
-					state->m_i8275SpacedRows = data >> 7;
-					state->m_i8275HorizontalCharactersRow = (data & 0x7f) + 1;
-					if (state->m_i8275HorizontalCharactersRow > 80)
+					m_i8275SpacedRows = data >> 7;
+					m_i8275HorizontalCharactersRow = (data & 0x7f) + 1;
+					if (m_i8275HorizontalCharactersRow > 80)
 					{
-						logerror("i8275 Undefined num of characters/Row! = %d\n", state->m_i8275HorizontalCharactersRow);
-						state->m_i8275HorizontalCharactersRow = CHARACTERS_UNDEFINED;
+						logerror("i8275 Undefined num of characters/Row! = %d\n", m_i8275HorizontalCharactersRow);
+						m_i8275HorizontalCharactersRow = CHARACTERS_UNDEFINED;
 					}
 					else
 					{
-						logerror("i8275 %d characters/row\n", state->m_i8275HorizontalCharactersRow);
+						logerror("i8275 %d characters/row\n", m_i8275HorizontalCharactersRow);
 					}
-					if (state->m_i8275SpacedRows & 1)
+					if (m_i8275SpacedRows & 1)
 					{
-						logerror("i8275 spaced rows\n");
+						logerror("i8275 &spaced rows\n");
 					}
 					else
 					{
 						logerror("i8275 normal rows\n");
 					}
-					state->m_i8275CommandSeqCnt--;
+					m_i8275CommandSeqCnt--;
 				}
 				break;
 
 				case 3:
 				{
 					//screen byte comp byte 2
-					state->m_i8275VerticalRows = (data & 0x3f) + 1;
-					state->m_i8275VerticalRetraceRows = (data >> 6) + 1;
+					m_i8275VerticalRows = (data & 0x3f) + 1;
+					m_i8275VerticalRetraceRows = (data >> 6) + 1;
 
-					logerror("i8275 %d rows\n", state->m_i8275VerticalRows);
-					logerror("i8275 %d vertical retrace rows\n", state->m_i8275VerticalRetraceRows);
+					logerror("i8275 %d rows\n", m_i8275VerticalRows);
+					logerror("i8275 %d vertical retrace rows\n", m_i8275VerticalRetraceRows);
 
-					state->m_i8275CommandSeqCnt--;
+					m_i8275CommandSeqCnt--;
 				}
 				break;
 
 				case 2:
 				{
 					//screen byte comp byte 3
-					state->m_i8275Underline = (data >> 4) + 1;
-					state->m_i8275Lines = (data & 0xf) + 1;
-					logerror("i8275 underline placement: %d\n", state->m_i8275Underline);
-					logerror("i8275 %d lines/row\n", state->m_i8275Lines);
+					m_i8275Underline = (data >> 4) + 1;
+					m_i8275Lines = (data & 0xf) + 1;
+					logerror("i8275 underline placement: %d\n", m_i8275Underline);
+					logerror("i8275 %d lines/row\n", m_i8275Lines);
 
-					state->m_i8275CommandSeqCnt--;
+					m_i8275CommandSeqCnt--;
 				}
 				break;
 
 				case 1:
 				{
 					//screen byte comp byte 4
-					state->m_i8275LineCounterMode = data >> 7;
-					state->m_i8275FieldAttributeMode = (data >> 6) & 1;
-					state->m_i8275CursorFormat = (data >> 4) & 3;
-					state->m_i8275HorizontalRetrace = ((data & 0xf) + 1) << 1;
-					logerror("i8275 line counter mode: %d\n", state->m_i8275LineCounterMode);
-					if (state->m_i8275FieldAttributeMode)
+					m_i8275LineCounterMode = data >> 7;
+					m_i8275FieldAttributeMode = (data >> 6) & 1;
+					m_i8275CursorFormat = (data >> 4) & 3;
+					m_i8275HorizontalRetrace = ((data & 0xf) + 1) << 1;
+					logerror("i8275 line counter mode: %d\n", m_i8275LineCounterMode);
+					if (m_i8275FieldAttributeMode)
 					{
 						logerror("i8275 field attribute mode non-transparent\n");
 					}
@@ -451,7 +459,7 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 						logerror("i8275 field attribute mode transparent\n");
 					}
 
-					switch (state->m_i8275CursorFormat)
+					switch (m_i8275CursorFormat)
 					{
 						case 0:	{logerror("i8275 cursor format - blinking reverse video block\n");}	break;
 						case 1:	{logerror("i8275 cursor format - blinking underline\n");}break;
@@ -459,8 +467,8 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 						case 3:	{logerror("i8275 cursor format - nonblinking underline\n");}break;
 					}
 
-					logerror("i8275 %d chars for horizontal retrace\n",state->m_i8275HorizontalRetrace );
-					state->m_i8275CommandSeqCnt--;
+					logerror("i8275 %d chars for horizontal retrace\n",m_i8275HorizontalRetrace );
+					m_i8275CommandSeqCnt--;
 				}
 				break;
 
@@ -489,79 +497,76 @@ static WRITE8_HANDLER (i8275_preg_w) //param reg
 
 }
 
-static READ8_HANDLER (i8275_preg_r) //param reg
+READ8_MEMBER(dwarfd_state::i8275_preg_r)//param reg
 {
 	return 0;
 }
 
-static WRITE8_HANDLER (i8275_creg_w) //comand reg
+WRITE8_MEMBER(dwarfd_state::i8275_creg_w)//comand reg
 {
-	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
 
 	switch (data>>5)
 	{
 		case 0:
 		{
 			/* reset */
-			state->m_i8275Command = I8275_COMMAND_RESET;
-			state->m_i8275CommandSeqCnt = I8275_COMMAND_RESET_LENGTH;
+			m_i8275Command = I8275_COMMAND_RESET;
+			m_i8275CommandSeqCnt = I8275_COMMAND_RESET_LENGTH;
 		}
 		break;
 
 		case 5:
 		{
 			/* enable interrupt */
-			state->m_i8275Command = I8275_COMMAND_EI;
-			state->m_i8275CommandSeqCnt = I8275_COMMAND_EI_LENGTH;
+			m_i8275Command = I8275_COMMAND_EI;
+			m_i8275CommandSeqCnt = I8275_COMMAND_EI_LENGTH;
 		}
 		break;
 
 		case 6:
 		{
 			/* disable interrupt */
-			state->m_i8275Command = I8275_COMMAND_DI;
-			state->m_i8275CommandSeqCnt = I8275_COMMAND_DI_LENGTH;
+			m_i8275Command = I8275_COMMAND_DI;
+			m_i8275CommandSeqCnt = I8275_COMMAND_DI_LENGTH;
 		}
 		break;
 
 		case 7:
 		{
 			/* preset counters */
-			state->m_i8275CommandSeqCnt = I8275_COMMAND_PRESET_LENGTH;
+			m_i8275CommandSeqCnt = I8275_COMMAND_PRESET_LENGTH;
 
 		}
 		break;
 	}
 }
 
-static READ8_HANDLER (i8275_sreg_r) //status
+READ8_MEMBER(dwarfd_state::i8275_sreg_r)//status
 {
 	return 0;
 }
 
-static READ8_HANDLER(dwarfd_ram_r)
+READ8_MEMBER(dwarfd_state::dwarfd_ram_r)
 {
-	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
 
-	if (state->m_crt_access == 0)
+	if (m_crt_access == 0)
 	{
-		return state->m_dw_ram[offset];
+		return m_dw_ram[offset];
 	}
 	else
 	{
-		state->m_videobuf[state->m_line * 256 + state->m_idx] = state->m_dw_ram[offset];
-		state->m_idx++;
-		return state->m_dw_ram[offset];
+		m_videobuf[m_line * 256 + m_idx] = m_dw_ram[offset];
+		m_idx++;
+		return m_dw_ram[offset];
 	}
 }
 
-static WRITE8_HANDLER(dwarfd_ram_w)
+WRITE8_MEMBER(dwarfd_state::dwarfd_ram_w)
 {
-	dwarfd_state *state = space->machine().driver_data<dwarfd_state>();
-	state->m_dw_ram[offset] = data;
+	m_dw_ram[offset] = data;
 }
 
-static WRITE8_HANDLER(output1_w)
+WRITE8_MEMBER(dwarfd_state::output1_w)
 {
 /*
  bits:
@@ -576,7 +581,7 @@ static WRITE8_HANDLER(output1_w)
 */
 }
 
-static WRITE8_HANDLER(output2_w)
+WRITE8_MEMBER(dwarfd_state::output2_w)
 {
 /*
  bits:
@@ -592,14 +597,14 @@ static WRITE8_HANDLER(output2_w)
 }
 
 
-static READ8_HANDLER(qc_b8_r)
+READ8_MEMBER(dwarfd_state::qc_b8_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 8, dwarfd_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_READWRITE_LEGACY(dwarfd_ram_r, dwarfd_ram_w)
+	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, dwarfd_state )
@@ -607,24 +612,24 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, dwarfd_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 
-	AM_RANGE(0x20, 0x20) AM_READWRITE_LEGACY(i8275_preg_r, i8275_preg_w)
-	AM_RANGE(0x21, 0x21) AM_READWRITE_LEGACY(i8275_sreg_r, i8275_creg_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(i8275_preg_r, i8275_preg_w)
+	AM_RANGE(0x21, 0x21) AM_READWRITE(i8275_sreg_r, i8275_creg_w)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP // unknown
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(output1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(output2_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(output1_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(output2_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc1, 0xc1) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qc_map, AS_PROGRAM, 8, dwarfd_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(dwarfd_ram_r, dwarfd_ram_w)
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(dwarfd_ram_r, dwarfd_ram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qc_io_map, AS_IO, 8, dwarfd_state )
 	AM_IMPORT_FROM( io_map )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xb8, 0xb8) AM_READ_LEGACY(qc_b8_r)
+	AM_RANGE(0xb8, 0xb8) AM_READ(qc_b8_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dwarfd )

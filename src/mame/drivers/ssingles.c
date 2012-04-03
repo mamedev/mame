@@ -163,6 +163,13 @@ public:
 	pen_t m_pens[NUM_PENS];
 
 	UINT8 m_atamanot_prot_state;
+	DECLARE_WRITE8_MEMBER(ssingles_videoram_w);
+	DECLARE_WRITE8_MEMBER(ssingles_colorram_w);
+	DECLARE_READ8_MEMBER(c000_r);
+	DECLARE_READ8_MEMBER(c001_r);
+	DECLARE_WRITE8_MEMBER(c001_w);
+	DECLARE_READ8_MEMBER(atamanot_prot_r);
+	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
 };
 
 //fake palette
@@ -283,20 +290,18 @@ static const mc6845_interface atamanot_mc6845_intf =
 };
 
 
-static WRITE8_HANDLER(ssingles_videoram_w)
+WRITE8_MEMBER(ssingles_state::ssingles_videoram_w)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
-	UINT8 *vram = space->machine().region("vram")->base();
+	UINT8 *vram = machine().region("vram")->base();
 	vram[offset] = data;
-	state->m_videoram[offset]=data;
+	m_videoram[offset]=data;
 }
 
-static WRITE8_HANDLER(ssingles_colorram_w)
+WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
-	UINT8 *cram = space->machine().region("cram")->base();
+	UINT8 *cram = machine().region("cram")->base();
 	cram[offset] = data;
-	state->m_colorram[offset]=data;
+	m_colorram[offset]=data;
 }
 
 
@@ -314,26 +319,23 @@ static VIDEO_START(ssingles)
 }
 
 
-static READ8_HANDLER(c000_r)
+READ8_MEMBER(ssingles_state::c000_r)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
-	return state->m_prot_data;
+	return m_prot_data;
 }
 
-static READ8_HANDLER(c001_r)
+READ8_MEMBER(ssingles_state::c001_r)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
-	state->m_prot_data=0xc4;
+	m_prot_data=0xc4;
 	return 0;
 }
 
-static WRITE8_HANDLER(c001_w)
+WRITE8_MEMBER(ssingles_state::c001_w)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
-	state->m_prot_data^=data^0x11;
+	m_prot_data^=data^0x11;
 }
 
 static CUSTOM_INPUT(controls_r)
@@ -354,24 +356,23 @@ static CUSTOM_INPUT(controls_r)
 }
 
 static ADDRESS_MAP_START( ssingles_map, AS_PROGRAM, 8, ssingles_state )
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE_LEGACY(ssingles_videoram_w)
-	AM_RANGE(0x0800, 0x08ff) AM_WRITE_LEGACY(ssingles_colorram_w)
+	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
+	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(c000_r )
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE_LEGACY(c001_r, c001_w )
+	AM_RANGE(0xc000, 0xc000) AM_READ(c000_r )
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( atamanot_prot_r )
+READ8_MEMBER(ssingles_state::atamanot_prot_r)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 	static const char prot_id[] = { "PROGRAM BY KOYAMA" };
 
-	logerror("%04x %02x\n",offset,state->m_atamanot_prot_state);
+	logerror("%04x %02x\n",offset,m_atamanot_prot_state);
 
-	switch(state->m_atamanot_prot_state)
+	switch(m_atamanot_prot_state)
 	{
 		case 0x20:
 		case 0x21:
@@ -386,25 +387,24 @@ static READ8_HANDLER( atamanot_prot_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( atamanot_prot_w )
+WRITE8_MEMBER(ssingles_state::atamanot_prot_w)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
-	state->m_atamanot_prot_state = data;
+	m_atamanot_prot_state = data;
 }
 
 
 static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8, ssingles_state )
-	AM_RANGE(0x0000, 0x00ff) AM_WRITE_LEGACY(ssingles_videoram_w)
-	AM_RANGE(0x0800, 0x08ff) AM_WRITE_LEGACY(ssingles_colorram_w)
+	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
+	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x6000, 0x60ff) AM_RAM //kanji tilemap?
 //  AM_RANGE(0x6000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_READ_LEGACY(atamanot_prot_r)
+	AM_RANGE(0x8000, 0x83ff) AM_READ(atamanot_prot_r)
 //  AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
-//  AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(c000_r )
-//  AM_RANGE(0xc001, 0xc001) AM_READWRITE_LEGACY(c001_r, c001_w )
+//  AM_RANGE(0xc000, 0xc000) AM_READ(c000_r )
+//  AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8, ssingles_state )
@@ -430,7 +430,7 @@ static ADDRESS_MAP_START( atamanot_io_map, AS_IO, 8, ssingles_state )
 	AM_RANGE(0x08, 0x08) AM_READNOP
 	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
-	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(atamanot_prot_w)
+	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1") AM_WRITE(atamanot_prot_w)
 	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
 //  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
 	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE("crtc", mc6845_device, address_w)

@@ -65,32 +65,38 @@ public:
 	int m_old_vbuf;
 	UINT32 m_flash_cmd;
 	INT32 m_first_offset;
+	DECLARE_READ32_MEMBER(flash_r);
+	DECLARE_WRITE32_MEMBER(flash_w);
+	DECLARE_WRITE32_MEMBER(vram_w);
+	DECLARE_READ32_MEMBER(vram_r);
+	DECLARE_WRITE32_MEMBER(vbuffer_w);
+	DECLARE_WRITE32_MEMBER(coin_w);
+	DECLARE_READ32_MEMBER(vblank_r);
 };
 
 
-static READ32_HANDLER( flash_r )
+READ32_MEMBER(dgpix_state::flash_r)
 {
-	dgpix_state *state = space->machine().driver_data<dgpix_state>();
-	UINT32 *ROM = (UINT32 *)space->machine().region("user1")->base();
+	UINT32 *ROM = (UINT32 *)machine().region("user1")->base();
 
-	if(offset >= (0x2000000 - state->m_flash_roms * 0x400000) / 4)
+	if(offset >= (0x2000000 - m_flash_roms * 0x400000) / 4)
 	{
-		if(state->m_flash_cmd == 0x90900000)
+		if(m_flash_cmd == 0x90900000)
 		{
 			//read maker ID and chip ID
 			return 0x00890014;
 		}
-		else if(state->m_flash_cmd == 0x00700000)
+		else if(m_flash_cmd == 0x00700000)
 		{
 			//read status
 			return 0x80<<16;
 		}
-		else if(state->m_flash_cmd == 0x70700000)
+		else if(m_flash_cmd == 0x70700000)
 		{
 			//read status and ?
 			return 0x82<<16;
 		}
-		else if(state->m_flash_cmd == 0xe8e80000)
+		else if(m_flash_cmd == 0xe8e80000)
 		{
 			//read status ?
 			return 0x80<<16;
@@ -100,34 +106,33 @@ static READ32_HANDLER( flash_r )
 	return ROM[offset];
 }
 
-static WRITE32_HANDLER( flash_w )
+WRITE32_MEMBER(dgpix_state::flash_w)
 {
-	dgpix_state *state = space->machine().driver_data<dgpix_state>();
-	if(state->m_flash_cmd == 0x20200000)
+	if(m_flash_cmd == 0x20200000)
 	{
 		// erase game settings
 		if(data == 0xd0d00000)
 		{
 			// point to game settings
-			UINT8 *rom = (UINT8 *)space->machine().region("user1")->base() + offset*4;
+			UINT8 *rom = (UINT8 *)machine().region("user1")->base() + offset*4;
 
 			// erase one block
 			memset(rom, 0xff, 0x10000);
 
-			state->m_flash_cmd = 0;
+			m_flash_cmd = 0;
 		}
 	}
-	else if(state->m_flash_cmd == 0x0f0f0000)
+	else if(m_flash_cmd == 0x0f0f0000)
 	{
-		if(data == 0xd0d00000 && offset == state->m_first_offset)
+		if(data == 0xd0d00000 && offset == m_first_offset)
 		{
 			// finished
-			state->m_flash_cmd = 0;
-			state->m_first_offset = -1;
+			m_flash_cmd = 0;
+			m_first_offset = -1;
 		}
 		else
 		{
-			UINT16 *rom = (UINT16 *)space->machine().region("user1")->base();
+			UINT16 *rom = (UINT16 *)machine().region("user1")->base();
 
 			// write game settings
 
@@ -139,19 +144,18 @@ static WRITE32_HANDLER( flash_w )
 	}
 	else
 	{
-		state->m_flash_cmd = data;
+		m_flash_cmd = data;
 
-		if(state->m_flash_cmd == 0x0f0f0000 && state->m_first_offset == -1)
+		if(m_flash_cmd == 0x0f0f0000 && m_first_offset == -1)
 		{
-			state->m_first_offset = offset;
+			m_first_offset = offset;
 		}
 	}
 }
 
-static WRITE32_HANDLER( vram_w )
+WRITE32_MEMBER(dgpix_state::vram_w)
 {
-	dgpix_state *state = space->machine().driver_data<dgpix_state>();
-	UINT32 *dest = &state->m_vram[offset+(0x40000/4)*state->m_vbuffer];
+	UINT32 *dest = &m_vram[offset+(0x40000/4)*m_vbuffer];
 
 	if (mem_mask == 0xffffffff)
 	{
@@ -166,49 +170,47 @@ static WRITE32_HANDLER( vram_w )
 		COMBINE_DATA(dest);
 }
 
-static READ32_HANDLER( vram_r )
+READ32_MEMBER(dgpix_state::vram_r)
 {
-	dgpix_state *state = space->machine().driver_data<dgpix_state>();
-	return state->m_vram[offset+(0x40000/4)*state->m_vbuffer];
+	return m_vram[offset+(0x40000/4)*m_vbuffer];
 }
 
-static WRITE32_HANDLER( vbuffer_w )
+WRITE32_MEMBER(dgpix_state::vbuffer_w)
 {
-	dgpix_state *state = space->machine().driver_data<dgpix_state>();
-	if(state->m_old_vbuf == 3 && (data & 3) == 2)
+	if(m_old_vbuf == 3 && (data & 3) == 2)
 	{
-		state->m_vbuffer ^= 1;
+		m_vbuffer ^= 1;
 	}
 
-	state->m_old_vbuf = data & 3;
+	m_old_vbuf = data & 3;
 }
 
-static WRITE32_HANDLER( coin_w )
+WRITE32_MEMBER(dgpix_state::coin_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 }
 
-static READ32_HANDLER( vblank_r )
+READ32_MEMBER(dgpix_state::vblank_r)
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	device_eat_cycles(&space->device(), 100);
-	return input_port_read(space->machine(), "VBLANK");
+	device_eat_cycles(&space.device(), 100);
+	return input_port_read(machine(), "VBLANK");
 }
 
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, dgpix_state )
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4003ffff) AM_READWRITE_LEGACY(vram_r, vram_w)
-	AM_RANGE(0xe0000000, 0xe1ffffff) AM_READWRITE_LEGACY(flash_r, flash_w)
-	AM_RANGE(0xe2000000, 0xe3ffffff) AM_READWRITE_LEGACY(flash_r, flash_w)
+	AM_RANGE(0x40000000, 0x4003ffff) AM_READWRITE(vram_r, vram_w)
+	AM_RANGE(0xe0000000, 0xe1ffffff) AM_READWRITE(flash_r, flash_w)
+	AM_RANGE(0xe2000000, 0xe3ffffff) AM_READWRITE(flash_r, flash_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1", 0x1c00000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 32, dgpix_state )
 	AM_RANGE(0x0200, 0x0203) AM_READNOP // used to sync with the protecion PIC? tested bits 0 and 1
-	AM_RANGE(0x0400, 0x0403) AM_READWRITE_LEGACY(vblank_r, vbuffer_w)
+	AM_RANGE(0x0400, 0x0403) AM_READWRITE(vblank_r, vbuffer_w)
 	AM_RANGE(0x0a10, 0x0a13) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x0200, 0x0203) AM_WRITE_LEGACY(coin_w)
+	AM_RANGE(0x0200, 0x0203) AM_WRITE(coin_w)
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITENOP // writes only: 1, 0, 1 at startup
 	AM_RANGE(0x0c80, 0x0c83) AM_WRITENOP // sound commands / latches
 	AM_RANGE(0x0c80, 0x0c83) AM_READNOP //read at startup -> cmp 0xFE

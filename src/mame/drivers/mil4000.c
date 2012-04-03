@@ -107,6 +107,12 @@ public:
 	tilemap_t *m_sc3_tilemap;
 	UINT16 m_vblank;
 	UINT16 m_hblank;
+	DECLARE_READ16_MEMBER(hvretrace_r);
+	DECLARE_WRITE16_MEMBER(sc0_vram_w);
+	DECLARE_WRITE16_MEMBER(sc1_vram_w);
+	DECLARE_WRITE16_MEMBER(sc2_vram_w);
+	DECLARE_WRITE16_MEMBER(sc3_vram_w);
+	DECLARE_WRITE16_MEMBER(output_w);
 };
 
 
@@ -190,54 +196,49 @@ static SCREEN_UPDATE_IND16(mil4000)
 }
 
 /*TODO*/
-static READ16_HANDLER( hvretrace_r )
+READ16_MEMBER(mil4000_state::hvretrace_r)
 {
-	mil4000_state *state = space->machine().driver_data<mil4000_state>();
 	UINT16 res;
 
 	res = 0;
 
-	state->m_vblank^=1;
-	state->m_hblank^=1;
+	m_vblank^=1;
+	m_hblank^=1;
 
 	/*V-Blank*/
-	if (state->m_vblank)
+	if (m_vblank)
 		res|= 0x80;
 
 	/*H-Blank*/
-	if (state->m_hblank)
+	if (m_hblank)
 		res|= 0x40;
 
 	return res;
 }
 
 
-static WRITE16_HANDLER( sc0_vram_w )
+WRITE16_MEMBER(mil4000_state::sc0_vram_w)
 {
-	mil4000_state *state = space->machine().driver_data<mil4000_state>();
-	state->m_sc0_vram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset/2);
+	m_sc0_vram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
-static WRITE16_HANDLER( sc1_vram_w )
+WRITE16_MEMBER(mil4000_state::sc1_vram_w)
 {
-	mil4000_state *state = space->machine().driver_data<mil4000_state>();
-	state->m_sc1_vram[offset] = data;
-	state->m_sc1_tilemap->mark_tile_dirty(offset/2);
+	m_sc1_vram[offset] = data;
+	m_sc1_tilemap->mark_tile_dirty(offset/2);
 }
 
-static WRITE16_HANDLER( sc2_vram_w )
+WRITE16_MEMBER(mil4000_state::sc2_vram_w)
 {
-	mil4000_state *state = space->machine().driver_data<mil4000_state>();
-	state->m_sc2_vram[offset] = data;
-	state->m_sc2_tilemap->mark_tile_dirty(offset/2);
+	m_sc2_vram[offset] = data;
+	m_sc2_tilemap->mark_tile_dirty(offset/2);
 }
 
-static WRITE16_HANDLER( sc3_vram_w )
+WRITE16_MEMBER(mil4000_state::sc3_vram_w)
 {
-	mil4000_state *state = space->machine().driver_data<mil4000_state>();
-	state->m_sc3_vram[offset] = data;
-	state->m_sc3_tilemap->mark_tile_dirty(offset/2);
+	m_sc3_vram[offset] = data;
+	m_sc3_tilemap->mark_tile_dirty(offset/2);
 }
 
 /*end of video stuff*/
@@ -252,12 +253,12 @@ static WRITE16_HANDLER( sc3_vram_w )
     ---- ---- ---- --x- Hold 2
     ---- ---- ---- ---x Hold 1
 */
-static WRITE16_HANDLER( output_w )
+WRITE16_MEMBER(mil4000_state::output_w)
 {
 	int i;
 
 	for(i=0;i<3;i++)
-		coin_counter_w(space->machine(), i, data & 0x2000);
+		coin_counter_w(machine(), i, data & 0x2000);
 
 	output_set_lamp_value(0, (data) & 1);		/* HOLD1 */
 	output_set_lamp_value(1, (data >> 1) & 1);	/* HOLD2 */
@@ -272,16 +273,16 @@ static WRITE16_HANDLER( output_w )
 
 static ADDRESS_MAP_START( mil4000_map, AS_PROGRAM, 16, mil4000_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE_LEGACY(sc0_vram_w) AM_BASE(m_sc0_vram)	// CY62256L-70, U77
-	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE_LEGACY(sc1_vram_w) AM_BASE(m_sc1_vram)	// CY62256L-70, U77
-	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE_LEGACY(sc2_vram_w) AM_BASE(m_sc2_vram)	// CY62256L-70, U78
-	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE_LEGACY(sc3_vram_w) AM_BASE(m_sc3_vram)	// CY62256L-70, U78
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(m_sc0_vram)	// CY62256L-70, U77
+	AM_RANGE(0x504000, 0x507fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE(m_sc1_vram)	// CY62256L-70, U77
+	AM_RANGE(0x508000, 0x50bfff) AM_RAM_WRITE(sc2_vram_w) AM_BASE(m_sc2_vram)	// CY62256L-70, U78
+	AM_RANGE(0x50c000, 0x50ffff) AM_RAM_WRITE(sc3_vram_w) AM_BASE(m_sc3_vram)	// CY62256L-70, U78
 
 	AM_RANGE(0x708000, 0x708001) AM_READ_PORT("IN0")
 	AM_RANGE(0x708002, 0x708003) AM_READ_PORT("IN1")
-	AM_RANGE(0x708004, 0x708005) AM_READ_LEGACY(hvretrace_r)
+	AM_RANGE(0x708004, 0x708005) AM_READ(hvretrace_r)
 	AM_RANGE(0x708006, 0x708007) AM_READ_PORT("IN2")
-	AM_RANGE(0x708008, 0x708009) AM_WRITE_LEGACY(output_w)
+	AM_RANGE(0x708008, 0x708009) AM_WRITE(output_w)
 	AM_RANGE(0x708010, 0x708011) AM_NOP //touch screen
 	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 

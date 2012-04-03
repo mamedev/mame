@@ -64,6 +64,9 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT16 m_mux_data;
+	DECLARE_WRITE16_MEMBER(goodejan_gfxbank_w);
+	DECLARE_READ16_MEMBER(mahjong_panel_r);
+	DECLARE_WRITE16_MEMBER(mahjong_panel_w);
 };
 
 
@@ -72,34 +75,32 @@ public:
 #define GOODEJAN_MHZ3 12000000
 
 
-static WRITE16_HANDLER( goodejan_gfxbank_w )
+WRITE16_MEMBER(goodejan_state::goodejan_gfxbank_w)
 {
 	seibucrtc_sc0bank_w((data & 0x100)>>8);// = (data & 0x100)>>8;
 }
 
 /* Multiplexer device for the mahjong panel */
-static READ16_HANDLER( mahjong_panel_r )
+READ16_MEMBER(goodejan_state::mahjong_panel_r)
 {
-	goodejan_state *state = space->machine().driver_data<goodejan_state>();
 	UINT16 ret;
 	ret = 0xffff;
 
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 1:    ret = input_port_read(space->machine(), "KEY0"); break;
-		case 2:    ret = input_port_read(space->machine(), "KEY1"); break;
-		case 4:    ret = input_port_read(space->machine(), "KEY2"); break;
-		case 8:    ret = input_port_read(space->machine(), "KEY3"); break;
-		case 0x10: ret = input_port_read(space->machine(), "KEY4"); break;
+		case 1:    ret = input_port_read(machine(), "KEY0"); break;
+		case 2:    ret = input_port_read(machine(), "KEY1"); break;
+		case 4:    ret = input_port_read(machine(), "KEY2"); break;
+		case 8:    ret = input_port_read(machine(), "KEY3"); break;
+		case 0x10: ret = input_port_read(machine(), "KEY4"); break;
 	}
 
 	return ret;
 }
 
-static WRITE16_HANDLER( mahjong_panel_w )
+WRITE16_MEMBER(goodejan_state::mahjong_panel_w)
 {
-	goodejan_state *state = space->machine().driver_data<goodejan_state>();
-	state->m_mux_data = data;
+	m_mux_data = data;
 }
 
 static ADDRESS_MAP_START( goodejan_map, AS_PROGRAM, 16, goodejan_state )
@@ -116,12 +117,12 @@ ADDRESS_MAP_END
 
 /*totmejan CRT is at 8000-804f,goodejan is at 8040-807f(808f but not tested)*/
 static ADDRESS_MAP_START( common_io_map, AS_IO, 16, goodejan_state )
-	AM_RANGE(0x9000, 0x9001) AM_WRITE_LEGACY(goodejan_gfxbank_w)
+	AM_RANGE(0x9000, 0x9001) AM_WRITE(goodejan_gfxbank_w)
 	AM_RANGE(0xb000, 0xb003) AM_WRITENOP
-	AM_RANGE(0xb004, 0xb005) AM_WRITE_LEGACY(mahjong_panel_w)
+	AM_RANGE(0xb004, 0xb005) AM_WRITE(mahjong_panel_w)
 
 	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc002, 0xc003) AM_READ_LEGACY(mahjong_panel_r)
+	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
 	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2") // switches
 	AM_RANGE(0xd000, 0xd00f) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 ADDRESS_MAP_END

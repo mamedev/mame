@@ -45,6 +45,15 @@ public:
 	int m_blink_state;
 	int m_category_enable;
 	int m_tape_head_pos;
+	DECLARE_WRITE8_MEMBER(quizshow_lamps1_w);
+	DECLARE_WRITE8_MEMBER(quizshow_lamps2_w);
+	DECLARE_WRITE8_MEMBER(quizshow_lamps3_w);
+	DECLARE_WRITE8_MEMBER(quizshow_tape_control_w);
+	DECLARE_WRITE8_MEMBER(quizshow_audio_w);
+	DECLARE_WRITE8_MEMBER(quizshow_video_disable_w);
+	DECLARE_READ8_MEMBER(quizshow_timing_r);
+	DECLARE_READ8_MEMBER(quizshow_tape_signal_r);
+	DECLARE_WRITE8_MEMBER(quizshow_main_ram_w);
 };
 
 
@@ -104,7 +113,7 @@ SCREEN_UPDATE_IND16( quizshow )
 
 ***************************************************************************/
 
-static WRITE8_HANDLER(quizshow_lamps1_w)
+WRITE8_MEMBER(quizshow_state::quizshow_lamps1_w)
 {
 	// d0-d3: P1 answer button lamps
 	for (int i = 0; i < 4; i++)
@@ -113,7 +122,7 @@ static WRITE8_HANDLER(quizshow_lamps1_w)
 	// d4-d7: N/C
 }
 
-static WRITE8_HANDLER(quizshow_lamps2_w)
+WRITE8_MEMBER(quizshow_state::quizshow_lamps2_w)
 {
 	// d0-d3: P2 answer button lamps
 	for (int i = 0; i < 4; i++)
@@ -122,7 +131,7 @@ static WRITE8_HANDLER(quizshow_lamps2_w)
 	// d4-d7: N/C
 }
 
-static WRITE8_HANDLER(quizshow_lamps3_w)
+WRITE8_MEMBER(quizshow_state::quizshow_lamps3_w)
 {
 	// d0-d1: start button lamps
 	output_set_lamp_value(8, data >> 0 & 1);
@@ -132,13 +141,12 @@ static WRITE8_HANDLER(quizshow_lamps3_w)
 	// d4-d7: N/C
 }
 
-static WRITE8_HANDLER(quizshow_tape_control_w)
+WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 {
-	quizshow_state *state = space->machine().driver_data<quizshow_state>();
 
 	// d2: enable user category select (changes tape head position)
 	output_set_lamp_value(10, data >> 2 & 1);
-	state->m_category_enable = (data & 0xc) == 0xc;
+	m_category_enable = (data & 0xc) == 0xc;
 
 	// d3: tape motor
 	// TODO
@@ -147,7 +155,7 @@ static WRITE8_HANDLER(quizshow_tape_control_w)
 	// d4-d7: N/C
 }
 
-static WRITE8_HANDLER(quizshow_audio_w)
+WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
 {
 	// d1: audio beep on/off
 	// TODO
@@ -155,69 +163,67 @@ static WRITE8_HANDLER(quizshow_audio_w)
 	// d0, d2-d7: N/C
 }
 
-static WRITE8_HANDLER(quizshow_video_disable_w)
+WRITE8_MEMBER(quizshow_state::quizshow_video_disable_w)
 {
 	// d0: video disable (looked glitchy when I implemented it, maybe there's more to it)
 	// d1-d7: N/C
 }
 
-static READ8_HANDLER(quizshow_timing_r)
+READ8_MEMBER(quizshow_state::quizshow_timing_r)
 {
-	quizshow_state *state = space->machine().driver_data<quizshow_state>();
 	UINT8 ret = 0x80;
 
 	// d0-d3: 1R-8R (16-line counter)
-	ret |= state->m_clocks >> 1 & 0xf;
+	ret |= m_clocks >> 1 & 0xf;
 
 	// d4: 8VAC?, use 8V instead
-	ret |= state->m_clocks << 4 & 0x10;
+	ret |= m_clocks << 4 & 0x10;
 
 	// d5-d6: 4F-8F
-	ret |= state->m_clocks >> 2 & 0x60;
+	ret |= m_clocks >> 2 & 0x60;
 
 	// d7: display busy/idle, during in-between tilerows(?) and blanking
-	if (space->machine().primary_screen->vpos() >= VBSTART || (space->machine().primary_screen->vpos() + 4) & 8)
+	if (machine().primary_screen->vpos() >= VBSTART || (machine().primary_screen->vpos() + 4) & 8)
 		ret &= 0x7f;
 
 	return ret;
 }
 
-static READ8_HANDLER(quizshow_tape_signal_r)
+READ8_MEMBER(quizshow_state::quizshow_tape_signal_r)
 {
 	// TODO (for now, hold INS to fastforward and it'll show garbage questions where D is always(?) the right answer)
-	return space->machine().rand() & 0x80;
+	return machine().rand() & 0x80;
 }
 
-static WRITE8_HANDLER(quizshow_main_ram_w)
+WRITE8_MEMBER(quizshow_state::quizshow_main_ram_w)
 {
-	quizshow_state *state = space->machine().driver_data<quizshow_state>();
-	state->m_main_ram[offset]=data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_main_ram[offset]=data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 
 static ADDRESS_MAP_START( quizshow_mem_map, AS_PROGRAM, 8, quizshow_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x1802, 0x1802) AM_WRITE_LEGACY(quizshow_audio_w)
-	AM_RANGE(0x1804, 0x1804) AM_WRITE_LEGACY(quizshow_lamps1_w)
-	AM_RANGE(0x1808, 0x1808) AM_WRITE_LEGACY(quizshow_lamps2_w)
-	AM_RANGE(0x1810, 0x1810) AM_WRITE_LEGACY(quizshow_lamps3_w)
-	AM_RANGE(0x1820, 0x1820) AM_WRITE_LEGACY(quizshow_tape_control_w)
-	AM_RANGE(0x1840, 0x1840) AM_WRITE_LEGACY(quizshow_video_disable_w)
+	AM_RANGE(0x1802, 0x1802) AM_WRITE(quizshow_audio_w)
+	AM_RANGE(0x1804, 0x1804) AM_WRITE(quizshow_lamps1_w)
+	AM_RANGE(0x1808, 0x1808) AM_WRITE(quizshow_lamps2_w)
+	AM_RANGE(0x1810, 0x1810) AM_WRITE(quizshow_lamps3_w)
+	AM_RANGE(0x1820, 0x1820) AM_WRITE(quizshow_tape_control_w)
+	AM_RANGE(0x1840, 0x1840) AM_WRITE(quizshow_video_disable_w)
 	AM_RANGE(0x1881, 0x1881) AM_READ_PORT("IN0")
 	AM_RANGE(0x1882, 0x1882) AM_READ_PORT("IN1")
 	AM_RANGE(0x1884, 0x1884) AM_READ_PORT("IN2")
 	AM_RANGE(0x1888, 0x1888) AM_READ_PORT("IN3")
-	AM_RANGE(0x1900, 0x1900) AM_READ_LEGACY(quizshow_timing_r)
-	AM_RANGE(0x1e00, 0x1fff) AM_RAM_WRITE_LEGACY(quizshow_main_ram_w) AM_BASE(m_main_ram)
+	AM_RANGE(0x1900, 0x1900) AM_READ(quizshow_timing_r)
+	AM_RANGE(0x1e00, 0x1fff) AM_RAM_WRITE(quizshow_main_ram_w) AM_BASE(m_main_ram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizshow_io_map, AS_IO, 8, quizshow_state )
 	ADDRESS_MAP_UNMAP_HIGH
 //	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_NOP // unused
 //	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_NOP // unused
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_LEGACY(quizshow_tape_signal_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(quizshow_tape_signal_r)
 	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE(m_fo_state)
 ADDRESS_MAP_END
 

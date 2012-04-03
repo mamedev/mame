@@ -41,6 +41,8 @@ public:
 	UINT8 *m_ram_video;
 	UINT8 *m_ram_palette;
 	UINT8 *m_backup_ram;
+	DECLARE_READ8_MEMBER(palette_r);
+	DECLARE_WRITE8_MEMBER(palette_w);
 };
 
 
@@ -54,25 +56,23 @@ public:
 
 */
 
-static READ8_HANDLER( palette_r )
+READ8_MEMBER(slotcarn_state::palette_r)
 {
-	slotcarn_state *state = space->machine().driver_data<slotcarn_state>();
 	int co;
 
-	co = ((state->m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
-	return state->m_ram_palette[co];
+	co = ((m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	return m_ram_palette[co];
 }
 
-static WRITE8_HANDLER( palette_w )
+WRITE8_MEMBER(slotcarn_state::palette_w)
 {
-	slotcarn_state *state = space->machine().driver_data<slotcarn_state>();
 	int co;
 
-	space->machine().primary_screen->update_now();
+	machine().primary_screen->update_now();
 	data &= 0x0f;
 
-	co = ((state->m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
-	state->m_ram_palette[co] = data;
+	co = ((m_ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	m_ram_palette[co] = data;
 
 }
 
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( slotcarn_map, AS_PROGRAM, 8, slotcarn_state )
 
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(m_ram_video)
-	AM_RANGE(0xf800, 0xfbff) AM_READWRITE_LEGACY(palette_r, palette_w)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 // spielbud - is the ay mirrored, or are there now 2?

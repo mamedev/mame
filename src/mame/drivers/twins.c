@@ -62,32 +62,36 @@ public:
 	UINT16 *m_videoram;
 	UINT16 *m_pal;
 	UINT16 m_paloff;
+	DECLARE_READ16_MEMBER(twins_port4_r);
+	DECLARE_WRITE16_MEMBER(twins_port4_w);
+	DECLARE_WRITE16_MEMBER(port6_pal0_w);
+	DECLARE_WRITE16_MEMBER(porte_paloff0_w);
+	DECLARE_WRITE16_MEMBER(twinsa_port4_w);
+	DECLARE_READ16_MEMBER(twinsa_unk_r);
 };
 
 
 
 /* port 4 is eeprom */
-static READ16_HANDLER( twins_port4_r )
+READ16_MEMBER(twins_state::twins_port4_r)
 {
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( twins_port4_w )
+WRITE16_MEMBER(twins_state::twins_port4_w)
 {
 }
 
-static WRITE16_HANDLER( port6_pal0_w )
+WRITE16_MEMBER(twins_state::port6_pal0_w)
 {
-	twins_state *state = space->machine().driver_data<twins_state>();
-	COMBINE_DATA(&state->m_pal[state->m_paloff]);
-	state->m_paloff = (state->m_paloff + 1) & 0xff;
+	COMBINE_DATA(&m_pal[m_paloff]);
+	m_paloff = (m_paloff + 1) & 0xff;
 }
 
 /* ??? weird ..*/
-static WRITE16_HANDLER( porte_paloff0_w )
+WRITE16_MEMBER(twins_state::porte_paloff0_w)
 {
-	twins_state *state = space->machine().driver_data<twins_state>();
-	state->m_paloff = 0;
+	m_paloff = 0;
 }
 
 static ADDRESS_MAP_START( twins_map, AS_PROGRAM, 16, twins_state )
@@ -99,9 +103,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( twins_io, AS_IO, 16, twins_state )
 	AM_RANGE(0x0000, 0x0003) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x0002, 0x0003) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
-	AM_RANGE(0x0004, 0x0005) AM_READWRITE_LEGACY(twins_port4_r, twins_port4_w)
-	AM_RANGE(0x0006, 0x0007) AM_WRITE_LEGACY(port6_pal0_w)
-	AM_RANGE(0x000e, 0x000f) AM_WRITE_LEGACY(porte_paloff0_w)
+	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
+	AM_RANGE(0x0006, 0x0007) AM_WRITE(port6_pal0_w)
+	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
 ADDRESS_MAP_END
 
 static VIDEO_START(twins)
@@ -247,26 +251,25 @@ static SCREEN_UPDATE_IND16(twinsa)
 	return 0;
 }
 
-static WRITE16_HANDLER( twinsa_port4_w )
+WRITE16_MEMBER(twins_state::twinsa_port4_w)
 {
-	twins_state *state = space->machine().driver_data<twins_state>();
-	state->m_pal[state->m_paloff&0xfff] = data;
-	state->m_paloff++;
-//  printf("paloff %04x\n",state->m_paloff);
+	m_pal[m_paloff&0xfff] = data;
+	m_paloff++;
+//  printf("paloff %04x\n",m_paloff);
 }
 
-static READ16_HANDLER( twinsa_unk_r )
+READ16_MEMBER(twins_state::twinsa_unk_r)
 {
 	return 0xffff;
 }
 
 static ADDRESS_MAP_START( twinsa_io, AS_IO, 16, twins_state )
-	AM_RANGE(0x0000, 0x0001) AM_READWRITE_LEGACY(twinsa_unk_r, porte_paloff0_w)
-	AM_RANGE(0x0002, 0x0003) AM_WRITE_LEGACY(porte_paloff0_w)
-	AM_RANGE(0x0004, 0x0005) AM_WRITE_LEGACY(twinsa_port4_w) // palette on this set
+	AM_RANGE(0x0000, 0x0001) AM_READWRITE(twinsa_unk_r, porte_paloff0_w)
+	AM_RANGE(0x0002, 0x0003) AM_WRITE(porte_paloff0_w)
+	AM_RANGE(0x0004, 0x0005) AM_WRITE(twinsa_port4_w) // palette on this set
 	AM_RANGE(0x0008, 0x0009) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_w, 0x00ff)
 	AM_RANGE(0x0010, 0x0011) AM_DEVREADWRITE8_LEGACY("aysnd", ay8910_r, ay8910_data_w, 0x00ff)
-	AM_RANGE(0x0018, 0x0019) AM_READ_LEGACY(twins_port4_r) AM_WRITE_LEGACY(twins_port4_w)
+	AM_RANGE(0x0018, 0x0019) AM_READ(twins_port4_r) AM_WRITE(twins_port4_w)
 ADDRESS_MAP_END
 
 

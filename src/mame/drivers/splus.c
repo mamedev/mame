@@ -84,6 +84,17 @@ public:
 	INT16 m_stepper_pos[5];
 	UINT8 m_stop_pos[5];
 
+	DECLARE_WRITE8_MEMBER(splus_io_w);
+	DECLARE_WRITE8_MEMBER(splus_load_pulse_w);
+	DECLARE_WRITE8_MEMBER(splus_serial_w);
+	DECLARE_WRITE8_MEMBER(splus_7seg_w);
+	DECLARE_WRITE8_MEMBER(splus_duart_w);
+	DECLARE_READ8_MEMBER(splus_serial_r);
+	DECLARE_READ8_MEMBER(splus_m_reel_ram_r);
+	DECLARE_READ8_MEMBER(splus_io_r);
+	DECLARE_READ8_MEMBER(splus_duart_r);
+	DECLARE_READ8_MEMBER(splus_watchdog_r);
+	DECLARE_READ8_MEMBER(splus_registers_r);
 };
 
 /* Static Variables */
@@ -120,9 +131,8 @@ static const i2cmem_interface i2cmem_interface =
 * Write Handlers *
 ******************/
 
-static WRITE8_HANDLER( splus_io_w )
+WRITE8_MEMBER(splus_state::splus_io_w)
 {
-	splus_state *state = space->machine().driver_data<splus_state>();
 
     // P1.0 = Reel 1 Controller
     // P1.1 = Reel 2 Controller
@@ -138,97 +148,95 @@ static WRITE8_HANDLER( splus_io_w )
     if (offset == 1 && ((data & 0x1f) != 0x00)) {
 
         // Unknown Bit 7
-        state->m_p1_unknown = (~data & 0x80);
+        m_p1_unknown = (~data & 0x80);
 
         // Stepper Motor Engaged
-        if (((state->m_bank40 >> 0) & 1) == 0x01) {
+        if (((m_bank40 >> 0) & 1) == 0x01) {
             // Reel Controllers Only
-            state->m_p1_reels = (data & 0x1f);
+            m_p1_reels = (data & 0x1f);
 
             // Loop through Reel Controllers
             for (x = 0; x < 5; x++) {
                 // Test Reel Controller
-                if (((state->m_p1_reels >> x) & 1) == 0x01) {
+                if (((m_p1_reels >> x) & 1) == 0x01) {
                     // Forward Direction
-                    if (((state->m_bank10 >> 5) & 1) == 0x01) {
-                        state->m_stepper_pos[x]++;
-                        if (state->m_stepper_pos[x] == MAX_STEPPER)
-                            state->m_stepper_pos[x] = 0;
+                    if (((m_bank10 >> 5) & 1) == 0x01) {
+                        m_stepper_pos[x]++;
+                        if (m_stepper_pos[x] == MAX_STEPPER)
+                            m_stepper_pos[x] = 0;
                     } else {
-                        state->m_stepper_pos[x]--;
-                        if (state->m_stepper_pos[x] < 0)
-                            state->m_stepper_pos[x] = MAX_STEPPER - 1;
+                        m_stepper_pos[x]--;
+                        if (m_stepper_pos[x] < 0)
+                            m_stepper_pos[x] = MAX_STEPPER - 1;
                     }
-					state->m_stop_pos[x] = (int)(state->m_stepper_pos[x] / STEPPER_DIVISOR);
+					m_stop_pos[x] = (int)(m_stepper_pos[x] / STEPPER_DIVISOR);
 				}
             }
         }
 #if DEBUG_OUTPUT
         if ((data & 0x1f) == 0x01)
-			mame_printf_info("Steppers %02X-%02X-%02X-%02X-%02X Motor=%02X Dir=%02X reels=%02X unk=%02X\n", state->m_stop_pos[0],state->m_stop_pos[1],state->m_stop_pos[2],state->m_stop_pos[3],state->m_stop_pos[4],((state->m_bank40 >> 0) & 1),((state->m_bank10 >> 5) & 1),(data & 0x1f), state->m_p1_unknown);
+			mame_printf_info("Steppers %02X-%02X-%02X-%02X-%02X Motor=%02X Dir=%02X reels=%02X unk=%02X\n", m_stop_pos[0],m_stop_pos[1],m_stop_pos[2],m_stop_pos[3],m_stop_pos[4],((m_bank40 >> 0) & 1),((m_bank10 >> 5) & 1),(data & 0x1f), m_p1_unknown);
 #endif
 	}
 
-	state->m_io_port[offset] = data;
+	m_io_port[offset] = data;
 }
 
-static WRITE8_HANDLER( splus_load_pulse_w )
+WRITE8_MEMBER(splus_state::splus_load_pulse_w)
 {
-//  splus_state *state = space->machine().driver_data<splus_state>();
 
 //  UINT8 out = 0;
-//    out = ((~state->m_io_port[1] & 0xf0)>>4); // Output Bank
+//    out = ((~m_io_port[1] & 0xf0)>>4); // Output Bank
 }
 
-static WRITE8_HANDLER( splus_serial_w )
+WRITE8_MEMBER(splus_state::splus_serial_w)
 {
-	splus_state *state = space->machine().driver_data<splus_state>();
 
     UINT8 out = 0;
-    out = ((~state->m_io_port[1] & 0xe0)>>5); // Output Bank
+    out = ((~m_io_port[1] & 0xe0)>>5); // Output Bank
 
 	switch (out)
 	{
 		case 0x00: // Bank 10
-            if (((state->m_bank10 >> 0) & 1) != ((data >> 0) & 1)) {
+            if (((m_bank10 >> 0) & 1) != ((data >> 0) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Coin Drop Meter =%02X\n",(data >> 0) & 1);
 #endif
             }
-            if (((state->m_bank10 >> 1) & 1) != ((data >> 1) & 1)) {
+            if (((m_bank10 >> 1) & 1) != ((data >> 1) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Coin Out Meter =%02X\n",(data >> 1) & 1);
 #endif
             }
-            if (((state->m_bank10 >> 2) & 1) != ((data >> 2) & 1)) {
+            if (((m_bank10 >> 2) & 1) != ((data >> 2) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Coin In Meter =%02X\n",(data >> 2) & 1);
 #endif
             }
-            if (((state->m_bank10 >> 3) & 1) != ((data >> 3) & 1)) {
+            if (((m_bank10 >> 3) & 1) != ((data >> 3) & 1)) {
                 //mame_printf_info("B Switch for SDS =%02X\n",(data >> 3) & 1);
             }
-            if (((state->m_bank10 >> 4) & 1) != ((data >> 4) & 1)) {
+            if (((m_bank10 >> 4) & 1) != ((data >> 4) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Hopper Drive 2 =%02X\n",(data >> 4) & 1);
 #endif
             }
-            if (((state->m_bank10 >> 5) & 1) != ((data >> 5) & 1)) {
+            if (((m_bank10 >> 5) & 1) != ((data >> 5) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Stepper Motor Direction =%02X\n",(data >> 5) & 1);
 #endif
             }
-            if (((state->m_bank10 >> 6) & 1) != ((data >> 6) & 1)) {
+            if (((m_bank10 >> 6) & 1) != ((data >> 6) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Mechanical Bell =%02X\n",(data >> 6) & 1);
 #endif
             }
-            if (((state->m_bank10 >> 7) & 1) != ((data >> 7) & 1)) {
+            if (((m_bank10 >> 7) & 1) != ((data >> 7) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Cancelled Credits Meter =%02X\n",(data >> 7) & 1);
 #endif
             }
-            state->m_bank10 = data;
+            m_bank10 = data;
 
 	        output_set_value("s_bnk10",(data >> 0) & 1); // Coin Drop Meter
 	        output_set_value("s_bnk11",(data >> 1) & 1); // Coin Out Meter
@@ -240,22 +248,22 @@ static WRITE8_HANDLER( splus_serial_w )
 	        output_set_value("s_bnk17",(data >> 7) & 1); // Cancelled Credits Meter
 			break;
 		case 0x01: // Bank 20
-            if (((state->m_bank20 >> 5) & 1) != ((data >> 5) & 1)) {
+            if (((m_bank20 >> 5) & 1) != ((data >> 5) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Games Played Meter =%02X\n",(data >> 5) & 1);
 #endif
             }
-            if (((state->m_bank20 >> 6) & 1) != ((data >> 6) & 1)) {
+            if (((m_bank20 >> 6) & 1) != ((data >> 6) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Bill Acceptor Enable =%02X\n",(data >> 6) & 1);
 #endif
             }
-            if (((state->m_bank20 >> 7) & 1) != ((data >> 7) & 1)) {
+            if (((m_bank20 >> 7) & 1) != ((data >> 7) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Jackpots Meter =%02X\n",(data >> 7) & 1);
 #endif
             }
-            state->m_bank20 = data;
+            m_bank20 = data;
 
 	        output_set_value("s_bnk20",(data >> 0) & 1); // Payline Lamp 3
 	        output_set_value("s_bnk21",(data >> 1) & 1); // Payline Lamp 4
@@ -267,27 +275,27 @@ static WRITE8_HANDLER( splus_serial_w )
 	        output_set_value("s_bnk27",(data >> 7) & 1); // Jackpots Meter
 			break;
 		case 0x02: // Bank 30
-            if (((state->m_bank30 >> 2) & 1) != ((data >> 2) & 1)) {
+            if (((m_bank30 >> 2) & 1) != ((data >> 2) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Handle Release =%02X\n",(data >> 2) & 1);
 #endif
             }
-            if (((state->m_bank30 >> 3) & 1) != ((data >> 3) & 1)) {
+            if (((m_bank30 >> 3) & 1) != ((data >> 3) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Diverter =%02X\n",(data >> 3) & 1);
 #endif
             }
-            if (((state->m_bank30 >> 4) & 1) != ((data >> 4) & 1)) {
+            if (((m_bank30 >> 4) & 1) != ((data >> 4) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Coin Lockout =%02X\n",(data >> 4) & 1);
 #endif
             }
-            if (((state->m_bank30 >> 5) & 1) != ((data >> 5) & 1)) {
+            if (((m_bank30 >> 5) & 1) != ((data >> 5) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Hopper Drive 1 =%02X\n",(data >> 5) & 1);
 #endif
             }
-            state->m_bank30 = data;
+            m_bank30 = data;
 
 	        output_set_value("s_bnk30",(data >> 0) & 1); // Change Candle Lamp Bottom
 	        output_set_value("s_bnk31",(data >> 1) & 1); // Change Candle Lamp Top
@@ -299,17 +307,17 @@ static WRITE8_HANDLER( splus_serial_w )
 	        output_set_value("s_bnk37",(data >> 7) & 1); // Payline Lamp 2
             break;
 		case 0x04: // Bank 40
-            if (((state->m_bank40 >> 0) & 1) != ((data >> 0) & 1)) {
+            if (((m_bank40 >> 0) & 1) != ((data >> 0) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Stepper Motor Power Supply =%02X\n",(data >> 0) & 1);
 #endif
             }
-            if (((state->m_bank40 >> 3) & 1) != ((data >> 3) & 1)) {
+            if (((m_bank40 >> 3) & 1) != ((data >> 3) & 1)) {
 #if DEBUG_OUTPUT
                 mame_printf_info("Jackpot/Hand Pay Lamp =%02X\n",(data >> 3) & 1);
 #endif
             }
-            state->m_bank40 = data;
+            m_bank40 = data;
 
 	        output_set_value("s_bnk40",(data >> 0) & 1); // Stepper Motor Power Supply
 	        output_set_value("s_bnk41",(data >> 1) & 1); // Insert Coin Lamp
@@ -323,9 +331,8 @@ static WRITE8_HANDLER( splus_serial_w )
 	}
 }
 
-static WRITE8_HANDLER( splus_7seg_w )
+WRITE8_MEMBER(splus_state::splus_7seg_w)
 {
-	splus_state *state = space->machine().driver_data<splus_state>();
 
     static const UINT8 ls48_map[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
@@ -335,12 +342,12 @@ static WRITE8_HANDLER( splus_7seg_w )
     seg = ((~data & 0xf0)>>4); // Segment Number
     val = (~data & 0x0f); // Digit Value
 
-    // Need to add ~state->m_io_port[1]-1 to seg value
-    if (seg < 0x0a && (state->m_io_port[1] & 0xe0) == 0xe0)
+    // Need to add ~m_io_port[1]-1 to seg value
+    if (seg < 0x0a && (m_io_port[1] & 0xe0) == 0xe0)
         output_set_digit_value(seg, ls48_map[val]);
 }
 
-static WRITE8_HANDLER( splus_duart_w )
+WRITE8_MEMBER(splus_state::splus_duart_w)
 {
 	// Used for Slot Accounting System Communication
 }
@@ -357,18 +364,17 @@ static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
 * Read Handlers *
 ****************/
 
-static READ8_HANDLER( splus_serial_r )
+READ8_MEMBER(splus_state::splus_serial_r)
 {
-	splus_state *state = space->machine().driver_data<splus_state>();
 
     UINT8 coin_out = 0x00;
     UINT8 coin_optics = 0x00;
     UINT8 door_optics = 0x00;
-    UINT32 curr_cycles = space->machine().firstcpu->total_cycles();
+    UINT32 curr_cycles = machine().firstcpu->total_cycles();
 
     UINT8 in = 0x00;
     UINT8 val = 0x00;
-    in = ((~state->m_io_port[1] & 0xe0)>>5); // Input Bank
+    in = ((~m_io_port[1] & 0xe0)>>5); // Input Bank
 
 	switch (in)
 	{
@@ -385,27 +391,27 @@ static READ8_HANDLER( splus_serial_r )
 			break;
 		case 0x01: // Bank 10
             // Test for Coin-In
-	        if ((input_port_read_safe(space->machine(),"SENSOR",0x00) & 0x01) == 0x01 && state->m_coin_state == 0) {
-		        state->m_coin_state = 1; // Start Coin Cycle
-		        state->m_last_cycles = space->machine().firstcpu->total_cycles();
+	        if ((input_port_read_safe(machine(),"SENSOR",0x00) & 0x01) == 0x01 && m_coin_state == 0) {
+		        m_coin_state = 1; // Start Coin Cycle
+		        m_last_cycles = machine().firstcpu->total_cycles();
 #if DEBUG_OUTPUT
-                mame_printf_info("coin=%02X\n", state->m_coin_state);
+                mame_printf_info("coin=%02X\n", m_coin_state);
 #endif
 	        } else {
 		        /* Process Next Coin Optic State */
-		        if (curr_cycles - state->m_last_cycles > 10000 && state->m_coin_state != 0) {
-			        state->m_coin_state++;
-			        if (state->m_coin_state > 5)
-				        state->m_coin_state = 0;
-			        state->m_last_cycles = space->machine().firstcpu->total_cycles();
+		        if (curr_cycles - m_last_cycles > 10000 && m_coin_state != 0) {
+			        m_coin_state++;
+			        if (m_coin_state > 5)
+				        m_coin_state = 0;
+			        m_last_cycles = machine().firstcpu->total_cycles();
 #if DEBUG_OUTPUT
-                    mame_printf_info("coin=%02X\n", state->m_coin_state);
+                    mame_printf_info("coin=%02X\n", m_coin_state);
 #endif
 		        }
 	        }
 
             // Set Coin State
-	        switch (state->m_coin_state)
+	        switch (m_coin_state)
 	        {
 		        case 0x00: // No Coin
 			        coin_optics = 0x00;
@@ -428,32 +434,32 @@ static READ8_HANDLER( splus_serial_r )
 	        }
 
             // Determine Door Optics
-            if ((input_port_read_safe(space->machine(),"I10",0x08) & 0x08) == 0x08)
+            if ((input_port_read_safe(machine(),"I10",0x08) & 0x08) == 0x08)
                 door_optics = 0x08;
             else
-                door_optics = (((state->m_bank20 >> 4) & 1) << 3); // Use Door Optics Transmitter
+                door_optics = (((m_bank20 >> 4) & 1) << 3); // Use Door Optics Transmitter
 
             // Test if Hopper 1 and Hopper 2 Motors On
-            if (((state->m_bank10 >> 4) & 1) || ((state->m_bank30 >> 5) & 1)) {
-                if (state->m_coin_out_state == 0)
-                    state->m_coin_out_state = 3;
+            if (((m_bank10 >> 4) & 1) || ((m_bank30 >> 5) & 1)) {
+                if (m_coin_out_state == 0)
+                    m_coin_out_state = 3;
             } else {
-                state->m_coin_out_state = 0;
+                m_coin_out_state = 0;
             }
 
             // Process Coin Out
-	        if (curr_cycles - state->m_last_coin_out > 700000 && state->m_coin_out_state != 0) {
-		        if (state->m_coin_out_state != 2) {
-                    state->m_coin_out_state = 2; // Coin-Out Off
+	        if (curr_cycles - m_last_coin_out > 700000 && m_coin_out_state != 0) {
+		        if (m_coin_out_state != 2) {
+                    m_coin_out_state = 2; // Coin-Out Off
                 } else {
-                    state->m_coin_out_state = 3; // Coin-Out On
+                    m_coin_out_state = 3; // Coin-Out On
                 }
 
-		        state->m_last_coin_out = space->machine().firstcpu->total_cycles();
+		        m_last_coin_out = machine().firstcpu->total_cycles();
 	        }
 
             // Set Coin Out State
-            switch (state->m_coin_out_state)
+            switch (m_coin_out_state)
             {
                 case 0x00: // No Coin-Out
 	                coin_out = 0x00;
@@ -473,22 +479,22 @@ static READ8_HANDLER( splus_serial_r )
             val = val | door_optics; // Door Optics Receiver
             val = val | coin_out; // Hopper Coin OutR
             val = val | 0x00; // Hopper Full
-            val = val | (input_port_read_safe(space->machine(),"I10",0x40) & 0x40); // Handle/Spin Button
-            val = val | (input_port_read_safe(space->machine(),"I10",0x80) & 0x80); // Jackpot Reset Key
+            val = val | (input_port_read_safe(machine(),"I10",0x40) & 0x40); // Handle/Spin Button
+            val = val | (input_port_read_safe(machine(),"I10",0x80) & 0x80); // Jackpot Reset Key
 			break;
 		case 0x02: // Bank 20
-            val = val | (input_port_read_safe(space->machine(),"I20",0x01) & 0x01); // Bet One Credit
-            val = val | (input_port_read_safe(space->machine(),"I20",0x02) & 0x02); // Play Max Credits
-            val = val | (input_port_read_safe(space->machine(),"I20",0x04) & 0x04); // Cash Out
-            val = val | (input_port_read_safe(space->machine(),"I20",0x08) & 0x08); // Change Request
+            val = val | (input_port_read_safe(machine(),"I20",0x01) & 0x01); // Bet One Credit
+            val = val | (input_port_read_safe(machine(),"I20",0x02) & 0x02); // Play Max Credits
+            val = val | (input_port_read_safe(machine(),"I20",0x04) & 0x04); // Cash Out
+            val = val | (input_port_read_safe(machine(),"I20",0x08) & 0x08); // Change Request
             val = val | 0x00; // Reel Mechanism
-            val = val | (input_port_read_safe(space->machine(),"I20",0x20) & 0x20); // Self Test Button
+            val = val | (input_port_read_safe(machine(),"I20",0x20) & 0x20); // Self Test Button
             val = val | 0x40; // Card Cage
             val = val | 0x80; // Bill Acceptor
 			break;
 		case 0x04: // Bank 30
             // Reserved
-            val = val | (input_port_read_safe(space->machine(),"I30",0x02) & 0x02); // Drop Door
+            val = val | (input_port_read_safe(machine(),"I30",0x02) & 0x02); // Drop Door
             // Jackpot to Credit Key
             // Reserved
             // Reserved
@@ -500,34 +506,32 @@ static READ8_HANDLER( splus_serial_r )
 	return val;
 }
 
-static READ8_HANDLER( splus_m_reel_ram_r )
+READ8_MEMBER(splus_state::splus_m_reel_ram_r)
 {
-	splus_state *state = space->machine().driver_data<splus_state>();
-	return state->m_reel_ram[offset];
+	return m_reel_ram[offset];
 }
 
-static READ8_HANDLER( splus_io_r )
+READ8_MEMBER(splus_state::splus_io_r)
 {
-	splus_state *state = space->machine().driver_data<splus_state>();
 
     if (offset == 3)
-        return state->m_io_port[offset] & 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
+        return m_io_port[offset] & 0xf3; // Ignore Int0 and Int1, or machine will loop forever waiting
     else
-    	return state->m_io_port[offset];
+    	return m_io_port[offset];
 }
 
-static READ8_HANDLER( splus_duart_r )
+READ8_MEMBER(splus_state::splus_duart_r)
 {
 	// Used for Slot Accounting System Communication
 	return 0x00;
 }
 
-static READ8_HANDLER( splus_watchdog_r )
+READ8_MEMBER(splus_state::splus_watchdog_r)
 {
 	return 0x00; // Watchdog
 }
 
-static READ8_HANDLER( splus_registers_r )
+READ8_MEMBER(splus_state::splus_registers_r)
 {
 	return 0xff; // Reset Registers in Real Time Clock
 }
@@ -587,16 +591,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
 	// Serial I/O
-    AM_RANGE(0x0000, 0x0000) AM_READ_LEGACY(splus_serial_r) AM_WRITE_LEGACY(splus_serial_w)
+    AM_RANGE(0x0000, 0x0000) AM_READ(splus_serial_r) AM_WRITE(splus_serial_w)
 
     // Battery-backed RAM (Lower 4K) 0x1500-0x16ff eeprom staging area
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("cmosl")
 
     // Watchdog, 7-segment Display
-    AM_RANGE(0x2000, 0x2000) AM_READWRITE_LEGACY(splus_watchdog_r, splus_7seg_w)
+    AM_RANGE(0x2000, 0x2000) AM_READWRITE(splus_watchdog_r, splus_7seg_w)
 
     // DUART
-    AM_RANGE(0x3000, 0x300f) AM_READWRITE_LEGACY(splus_duart_r, splus_duart_w)
+    AM_RANGE(0x3000, 0x300f) AM_READWRITE(splus_duart_r, splus_duart_w)
 
 	// Dip Switches, Sound
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("SW1") AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
@@ -606,16 +610,16 @@ static ADDRESS_MAP_START( splus_iomap, AS_IO, 8, splus_state )
     AM_RANGE(0x5000, 0x5000) AM_DEVREAD_LEGACY("i2cmem", splus_reel_optics_r) AM_DEVWRITE_LEGACY("i2cmem", i2c_nvram_w)
 
 	// Reset Registers in Realtime Clock, Serial I/O Load Pulse
-	AM_RANGE(0x6000, 0x6000) AM_READWRITE_LEGACY(splus_registers_r, splus_load_pulse_w)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(splus_registers_r, splus_load_pulse_w)
 
     // Battery-backed RAM (Upper 4K)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("cmosh")
 
     // SSxxxx Reel Chip
-    AM_RANGE(0x8000, 0x9fff) AM_READ_LEGACY(splus_m_reel_ram_r) AM_BASE(m_reel_ram)
+    AM_RANGE(0x8000, 0x9fff) AM_READ(splus_m_reel_ram_r) AM_BASE(m_reel_ram)
 
 	// Ports start here
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ_LEGACY(splus_io_r) AM_WRITE_LEGACY(splus_io_w) AM_BASE(m_io_port)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(splus_io_r) AM_WRITE(splus_io_w) AM_BASE(m_io_port)
 ADDRESS_MAP_END
 
 /*************************

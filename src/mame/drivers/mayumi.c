@@ -30,6 +30,10 @@ public:
 	/* misc */
 	int m_int_enable;
 	int m_input_sel;
+	DECLARE_WRITE8_MEMBER(mayumi_videoram_w);
+	DECLARE_WRITE8_MEMBER(bank_sel_w);
+	DECLARE_WRITE8_MEMBER(input_sel_w);
+	DECLARE_READ8_MEMBER(key_matrix_r);
 };
 
 
@@ -54,11 +58,10 @@ static VIDEO_START( mayumi )
 	state->m_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 }
 
-static WRITE8_HANDLER( mayumi_videoram_w )
+WRITE8_MEMBER(mayumi_state::mayumi_videoram_w)
 {
-	mayumi_state *state = space->machine().driver_data<mayumi_state>();
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 static SCREEN_UPDATE_IND16( mayumi )
@@ -88,27 +91,24 @@ static INTERRUPT_GEN( mayumi_interrupt )
  *
  *************************************/
 
-static WRITE8_HANDLER( bank_sel_w )
+WRITE8_MEMBER(mayumi_state::bank_sel_w)
 {
-	mayumi_state *state = space->machine().driver_data<mayumi_state>();
 	int bank = BIT(data, 7) | (BIT(data, 6) << 1);
 
-	memory_set_bank(space->machine(), "bank1", bank);
+	memory_set_bank(machine(), "bank1", bank);
 
-	state->m_int_enable = data & 1;
+	m_int_enable = data & 1;
 
-	flip_screen_set(space->machine(), data & 2);
+	flip_screen_set(machine(), data & 2);
 }
 
-static WRITE8_HANDLER( input_sel_w )
+WRITE8_MEMBER(mayumi_state::input_sel_w)
 {
-	mayumi_state *state = space->machine().driver_data<mayumi_state>();
-	state->m_input_sel = data;
+	m_input_sel = data;
 }
 
-static READ8_HANDLER( key_matrix_r )
+READ8_MEMBER(mayumi_state::key_matrix_r)
 {
-	mayumi_state *state = space->machine().driver_data<mayumi_state>();
 	int p, i, ret;
 	static const char *const keynames[2][5] =
 			{
@@ -118,12 +118,12 @@ static READ8_HANDLER( key_matrix_r )
 
 	ret = 0xff;
 
-	p = ~state->m_input_sel & 0x1f;
+	p = ~m_input_sel & 0x1f;
 
 	for (i = 0; i < 5; i++)
 	{
 		if (BIT(p, i))
-			ret &= input_port_read(space->machine(), keynames[offset][i]);
+			ret &= input_port_read(machine(), keynames[offset][i]);
 	}
 
 	return ret;
@@ -139,15 +139,15 @@ static ADDRESS_MAP_START( mayumi_map, AS_PROGRAM, 8, mayumi_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE_LEGACY(mayumi_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mayumi_videoram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mayumi_io_map, AS_IO, 8, mayumi_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0") AM_WRITE_LEGACY(bank_sel_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(input_sel_w)
-	AM_RANGE(0xc1, 0xc2) AM_READ_LEGACY(key_matrix_r)	// 0xc0-c3 8255ppi
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0") AM_WRITE(bank_sel_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(input_sel_w)
+	AM_RANGE(0xc1, 0xc2) AM_READ(key_matrix_r)	// 0xc0-c3 8255ppi
 	AM_RANGE(0xc3, 0xc3) AM_WRITENOP		// 0xc0-c3 8255ppi
 	AM_RANGE(0xd0, 0xd1) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END

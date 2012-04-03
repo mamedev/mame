@@ -62,6 +62,12 @@ public:
 	device_t *m_ppi8255_0;
 	device_t *m_ppi8255_1;
 	samples_device *m_samples;
+	DECLARE_WRITE8_MEMBER(color_latch_w);
+	DECLARE_WRITE8_MEMBER(spaceint_videoram_w);
+	DECLARE_READ8_MEMBER(kamikaze_ppi_r);
+	DECLARE_WRITE8_MEMBER(kamikaze_ppi_w);
+	DECLARE_WRITE8_MEMBER(spaceint_sound1_w);
+	DECLARE_WRITE8_MEMBER(spaceint_sound2_w);
 };
 
 
@@ -112,18 +118,16 @@ static VIDEO_START( spaceint )
 }
 
 
-static WRITE8_HANDLER( color_latch_w )
+WRITE8_MEMBER(astinvad_state::color_latch_w)
 {
-	astinvad_state *state = space->machine().driver_data<astinvad_state>();
-	state->m_color_latch = data & 0x0f;
+	m_color_latch = data & 0x0f;
 }
 
 
-static WRITE8_HANDLER( spaceint_videoram_w )
+WRITE8_MEMBER(astinvad_state::spaceint_videoram_w)
 {
-	astinvad_state *state = space->machine().driver_data<astinvad_state>();
-	state->m_videoram[offset] = data;
-	state->m_colorram[offset] = state->m_color_latch;
+	m_videoram[offset] = data;
+	m_colorram[offset] = m_color_latch;
 }
 
 
@@ -288,29 +292,27 @@ static INPUT_CHANGED( spaceint_coin_inserted )
  *
  *************************************/
 
-static READ8_HANDLER( kamikaze_ppi_r )
+READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
 {
-	astinvad_state *state = space->machine().driver_data<astinvad_state>();
 	UINT8 result = 0xff;
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= ppi8255_r(state->m_ppi8255_0, offset);
+		result &= ppi8255_r(m_ppi8255_0, offset);
 	if (!(offset & 8))
-		result &= ppi8255_r(state->m_ppi8255_1, offset);
+		result &= ppi8255_r(m_ppi8255_1, offset);
 	return result;
 }
 
 
-static WRITE8_HANDLER( kamikaze_ppi_w )
+WRITE8_MEMBER(astinvad_state::kamikaze_ppi_w)
 {
-	astinvad_state *state = space->machine().driver_data<astinvad_state>();
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		ppi8255_w(state->m_ppi8255_0, offset, data);
+		ppi8255_w(m_ppi8255_0, offset, data);
 	if (!(offset & 8))
-		ppi8255_w(state->m_ppi8255_1, offset, data);
+		ppi8255_w(m_ppi8255_1, offset, data);
 }
 
 
@@ -354,36 +356,34 @@ static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 }
 
 
-static WRITE8_HANDLER( spaceint_sound1_w )
+WRITE8_MEMBER(astinvad_state::spaceint_sound1_w)
 {
-	astinvad_state *state = space->machine().driver_data<astinvad_state>();
-	int bits_gone_hi = data & ~state->m_sound_state[0];
-	state->m_sound_state[0] = data;
+	int bits_gone_hi = data & ~m_sound_state[0];
+	m_sound_state[0] = data;
 
-	if (bits_gone_hi & 0x01) state->m_samples->start(1, SND_SHOT);
-	if (bits_gone_hi & 0x02) state->m_samples->start(2, SND_BASEHIT);
-	if (bits_gone_hi & 0x04) state->m_samples->start(4, SND_UFOHIT);
-	if (bits_gone_hi & 0x08) state->m_samples->start(0, SND_UFO, true);
-	if (!(data & 0x08))      state->m_samples->stop(0);
+	if (bits_gone_hi & 0x01) m_samples->start(1, SND_SHOT);
+	if (bits_gone_hi & 0x02) m_samples->start(2, SND_BASEHIT);
+	if (bits_gone_hi & 0x04) m_samples->start(4, SND_UFOHIT);
+	if (bits_gone_hi & 0x08) m_samples->start(0, SND_UFO, true);
+	if (!(data & 0x08))      m_samples->stop(0);
 
-	if (bits_gone_hi & 0x10) state->m_samples->start(5, SND_FLEET1);
-	if (bits_gone_hi & 0x20) state->m_samples->start(5, SND_FLEET2);
-	if (bits_gone_hi & 0x40) state->m_samples->start(5, SND_FLEET3);
-	if (bits_gone_hi & 0x80) state->m_samples->start(5, SND_FLEET4);
+	if (bits_gone_hi & 0x10) m_samples->start(5, SND_FLEET1);
+	if (bits_gone_hi & 0x20) m_samples->start(5, SND_FLEET2);
+	if (bits_gone_hi & 0x40) m_samples->start(5, SND_FLEET3);
+	if (bits_gone_hi & 0x80) m_samples->start(5, SND_FLEET4);
 }
 
 
-static WRITE8_HANDLER( spaceint_sound2_w )
+WRITE8_MEMBER(astinvad_state::spaceint_sound2_w)
 {
-	astinvad_state *state = space->machine().driver_data<astinvad_state>();
-	int bits_gone_hi = data & ~state->m_sound_state[1];
-	state->m_sound_state[1] = data;
+	int bits_gone_hi = data & ~m_sound_state[1];
+	m_sound_state[1] = data;
 
-	space->machine().sound().system_enable(data & 0x02);
+	machine().sound().system_enable(data & 0x02);
 
-	if (bits_gone_hi & 0x04) state->m_samples->start(3, SND_INVADERHIT);
+	if (bits_gone_hi & 0x04) m_samples->start(3, SND_INVADERHIT);
 
-	state->m_screen_flip = (input_port_read(space->machine(), "CABINET") & data & 0x80) ? 0xff : 0x00;
+	m_screen_flip = (input_port_read(machine(), "CABINET") & data & 0x80) ? 0xff : 0x00;
 }
 
 
@@ -405,13 +405,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spaceint_map, AS_PROGRAM, 8, astinvad_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE_LEGACY(spaceint_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(spaceint_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( kamikaze_portmap, AS_IO, 8, astinvad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(kamikaze_ppi_r, kamikaze_ppi_w)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(kamikaze_ppi_r, kamikaze_ppi_w)
 ADDRESS_MAP_END
 
 
@@ -419,9 +419,9 @@ static ADDRESS_MAP_START( spaceint_portmap, AS_IO, 8, astinvad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(spaceint_sound1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(color_latch_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(spaceint_sound2_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(spaceint_sound1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(color_latch_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(spaceint_sound2_w)
 ADDRESS_MAP_END
 
 

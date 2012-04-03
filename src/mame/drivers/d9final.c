@@ -34,6 +34,11 @@ public:
 	UINT8 *m_hi_vram;
 	UINT8 *m_cram;
 	tilemap_t *m_sc0_tilemap;
+	DECLARE_WRITE8_MEMBER(sc0_lovram);
+	DECLARE_WRITE8_MEMBER(sc0_hivram);
+	DECLARE_WRITE8_MEMBER(sc0_cram);
+	DECLARE_WRITE8_MEMBER(d9final_bank_w);
+	DECLARE_READ8_MEMBER(prot_latch_r);
 };
 
 
@@ -64,40 +69,37 @@ static SCREEN_UPDATE_IND16(d9final)
 	return 0;
 }
 
-static WRITE8_HANDLER( sc0_lovram )
+WRITE8_MEMBER(d9final_state::sc0_lovram)
 {
-	d9final_state *state = space->machine().driver_data<d9final_state>();
-	state->m_lo_vram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
+	m_lo_vram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( sc0_hivram )
+WRITE8_MEMBER(d9final_state::sc0_hivram)
 {
-	d9final_state *state = space->machine().driver_data<d9final_state>();
-	state->m_hi_vram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
+	m_hi_vram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( sc0_cram )
+WRITE8_MEMBER(d9final_state::sc0_cram)
 {
-	d9final_state *state = space->machine().driver_data<d9final_state>();
-	state->m_cram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
+	m_cram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( d9final_bank_w )
+WRITE8_MEMBER(d9final_state::d9final_bank_w)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = machine().region("maincpu")->base();
 	UINT32 bankaddress;
 
 	bankaddress = 0x10000+(0x4000 * (data & 0x7));
-	memory_set_bankptr(space->machine(), "bank1", &ROM[bankaddress]);
+	memory_set_bankptr(machine(), "bank1", &ROM[bankaddress]);
 }
 
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
-static READ8_HANDLER( prot_latch_r )
+READ8_MEMBER(d9final_state::prot_latch_r)
 {
-//  printf("PC=%06x\n",cpu_get_pc(&space->device()));
+//  printf("PC=%06x\n",cpu_get_pc(&space.device()));
 
 	return 0x04;
 }
@@ -109,10 +111,10 @@ static ADDRESS_MAP_START( d9final_map, AS_PROGRAM, 8, d9final_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(sc0_lovram) AM_BASE(m_lo_vram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE_LEGACY(sc0_hivram) AM_BASE(m_hi_vram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(sc0_cram) AM_BASE(m_cram)
-	AM_RANGE(0xf000, 0xf000) AM_READ_LEGACY(prot_latch_r)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_BASE(m_lo_vram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_BASE(m_hi_vram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_BASE(m_cram)
+	AM_RANGE(0xf000, 0xf000) AM_READ(prot_latch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( d9final_io, AS_IO, 8, d9final_state )
@@ -124,7 +126,7 @@ static ADDRESS_MAP_START( d9final_io, AS_IO, 8, d9final_state )
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ymsnd",ym2413_w)
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("DSWD")
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")
-	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN1") AM_WRITE_LEGACY(d9final_bank_w)
+	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN1") AM_WRITE(d9final_bank_w)
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 

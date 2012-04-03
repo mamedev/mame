@@ -53,6 +53,12 @@ public:
 
 	UINT8 *m_videoram;
 	UINT8 m_irq_mask;
+	DECLARE_READ8_MEMBER(cmmb_charram_r);
+	DECLARE_WRITE8_MEMBER(cmmb_charram_w);
+	DECLARE_WRITE8_MEMBER(cmmb_paletteram_w);
+	DECLARE_READ8_MEMBER(cmmb_input_r);
+	DECLARE_WRITE8_MEMBER(cmmb_output_w);
+	DECLARE_READ8_MEMBER(kludge_r);
 };
 
 
@@ -86,42 +92,42 @@ static SCREEN_UPDATE_IND16( cmmb )
 	return 0;
 }
 
-static READ8_HANDLER( cmmb_charram_r )
+READ8_MEMBER(cmmb_state::cmmb_charram_r)
 {
-	UINT8 *GFX = space->machine().region("gfx")->base();
+	UINT8 *GFX = machine().region("gfx")->base();
 
 	return GFX[offset];
 }
 
-static WRITE8_HANDLER( cmmb_charram_w )
+WRITE8_MEMBER(cmmb_state::cmmb_charram_w)
 {
-	UINT8 *GFX = space->machine().region("gfx")->base();
+	UINT8 *GFX = machine().region("gfx")->base();
 
 	GFX[offset] = data;
 
 	offset&=0xfff;
 
 	/* dirty char */
-	gfx_element_mark_dirty(space->machine().gfx[0], offset >> 4);
-    gfx_element_mark_dirty(space->machine().gfx[1], offset >> 5);
+	gfx_element_mark_dirty(machine().gfx[0], offset >> 4);
+    gfx_element_mark_dirty(machine().gfx[1], offset >> 5);
 }
 
 
-static WRITE8_HANDLER( cmmb_paletteram_w )
+WRITE8_MEMBER(cmmb_state::cmmb_paletteram_w)
 {
     /* RGB output is inverted */
     paletteram_RRRGGGBB_w(space,offset,~data);
 }
 
-static READ8_HANDLER( cmmb_input_r )
+READ8_MEMBER(cmmb_state::cmmb_input_r)
 {
 	//printf("%02x R\n",offset);
 	switch(offset)
 	{
-		case 0x00: return input_port_read(space->machine(), "IN2");
+		case 0x00: return input_port_read(machine(), "IN2");
 		case 0x03: return 4; //eeprom?
-		case 0x0e: return input_port_read(space->machine(), "IN0");
-		case 0x0f: return input_port_read(space->machine(), "IN1");
+		case 0x0e: return input_port_read(machine(), "IN0");
+		case 0x0f: return input_port_read(machine(), "IN1");
 	}
 
 	return 0xff;
@@ -138,32 +144,31 @@ static READ8_HANDLER( cmmb_input_r )
     }
 */
 
-static WRITE8_HANDLER( cmmb_output_w )
+WRITE8_MEMBER(cmmb_state::cmmb_output_w)
 {
-	cmmb_state *state = space->machine().driver_data<cmmb_state>();
 	//printf("%02x -> [%02x] W\n",data,offset);
 	switch(offset)
 	{
 		case 0x01:
 			{
-				UINT8 *ROM = space->machine().region("maincpu")->base();
+				UINT8 *ROM = machine().region("maincpu")->base();
 				UINT32 bankaddress;
 
 				bankaddress = 0x1c000 + (0x10000 * (data & 0x03));
-				memory_set_bankptr(space->machine(), "bank1", &ROM[bankaddress]);
+				memory_set_bankptr(machine(), "bank1", &ROM[bankaddress]);
 			}
 			break;
 		case 0x03:
-			state->m_irq_mask = data & 0x80;
+			m_irq_mask = data & 0x80;
 			break;
 		case 0x07:
 			break;
 	}
 }
 
-static READ8_HANDLER( kludge_r )
+READ8_MEMBER(cmmb_state::kludge_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 /* overlap empty addresses */
@@ -172,13 +177,13 @@ static ADDRESS_MAP_START( cmmb_map, AS_PROGRAM, 8, cmmb_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(m_videoram)
-	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE_LEGACY(cmmb_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x4000, 0x400f) AM_READWRITE_LEGACY(cmmb_input_r,cmmb_output_w) //i/o
-	AM_RANGE(0x4900, 0x4900) AM_READ_LEGACY(kludge_r)
+	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
+	AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xafff) AM_RAM
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE_LEGACY(cmmb_charram_r,cmmb_charram_w)
-	AM_RANGE(0xc000, 0xc00f) AM_READWRITE_LEGACY(cmmb_input_r,cmmb_output_w) //i/o
+	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(cmmb_charram_r,cmmb_charram_w)
+	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

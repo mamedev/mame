@@ -19,6 +19,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_vram;
+	DECLARE_READ8_MEMBER(test_r);
 };
 
 
@@ -50,9 +51,9 @@ static SCREEN_UPDATE_IND16(buster)
 }
 
 #if 0
-static READ8_HANDLER( test_r )
+READ8_MEMBER(buster_state::test_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 #endif
 
@@ -71,7 +72,7 @@ static ADDRESS_MAP_START( mainmap, AS_PROGRAM, 8, buster_state )
 	AM_RANGE(0x7c8c, 0x7c8c) AM_READ_PORT("IN6")
 	AM_RANGE(0x7c8e, 0x7c8e) AM_READ_PORT("IN7")
 	AM_RANGE(0x7c00, 0x7cff) AM_RAM // ???
-	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("wram")//AM_READ_LEGACY(test_r) // ???
+	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_SHARE("wram")//AM_READ(test_r) // ???
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM // nvram?
 ADDRESS_MAP_END
 
