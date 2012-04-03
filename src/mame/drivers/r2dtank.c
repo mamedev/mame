@@ -61,6 +61,10 @@ public:
 	UINT32 m_ttl74123_output;
 	UINT8 m_AY8910_selected;
 	pen_t m_pens[NUM_PENS];
+	DECLARE_READ8_MEMBER(audio_command_r);
+	DECLARE_WRITE8_MEMBER(audio_command_w);
+	DECLARE_READ8_MEMBER(audio_answer_r);
+	DECLARE_WRITE8_MEMBER(audio_answer_w);
 };
 
 
@@ -99,44 +103,44 @@ static WRITE_LINE_DEVICE_HANDLER( main_cpu_irq )
  *
  *************************************/
 
-static READ8_HANDLER( audio_command_r )
+READ8_MEMBER(r2dtank_state::audio_command_r)
 {
 	UINT8 ret = soundlatch_r(space, 0);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", cpu_get_pc(&space->device()), ret);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", cpu_get_pc(&space.device()), ret);
 
 	return ret;
 }
 
 
-static WRITE8_HANDLER( audio_command_w )
+WRITE8_MEMBER(r2dtank_state::audio_command_w)
 {
 	soundlatch_w(space, 0, ~data);
-	cputag_set_input_line(space->machine(), "audiocpu", M6800_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", M6800_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", cpu_get_pc(&space->device()), data^0xff);
+if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", cpu_get_pc(&space.device()), data^0xff);
 }
 
 
-static READ8_HANDLER( audio_answer_r )
+READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
 	UINT8 ret = soundlatch2_r(space, 0);
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", cpu_get_pc(&space->device()), ret);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", cpu_get_pc(&space.device()), ret);
 
 	return ret;
 }
 
 
-static WRITE8_HANDLER( audio_answer_w )
+WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 {
 	/* HACK - prevents lock-up, but causes game to end some in-between sreens prematurely */
-	if (cpu_get_pc(&space->device()) == 0xfb12)
+	if (cpu_get_pc(&space.device()) == 0xfb12)
 		data = 0x00;
 
 	soundlatch2_w(space, 0, data);
-	cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 
-if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", cpu_get_pc(&space->device()), data);
+if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", cpu_get_pc(&space.device()), data);
 }
 
 
@@ -416,7 +420,7 @@ static ADDRESS_MAP_START( r2dtank_main_map, AS_PROGRAM, 8, r2dtank_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_colorram)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x8003) AM_DEVREAD("pia_main", pia6821_device, read) AM_DEVWRITE_LEGACY("pia_main", pia_comp_w)
-	AM_RANGE(0x8004, 0x8004) AM_READWRITE_LEGACY(audio_answer_r, audio_command_w)
+	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xc000, 0xc007) AM_RAM AM_SHARE("nvram")
@@ -427,7 +431,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( r2dtank_audio_map, AS_PROGRAM, 8, r2dtank_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE("pia_audio", pia6821_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE_LEGACY(audio_command_r, audio_answer_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(audio_command_r, audio_answer_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

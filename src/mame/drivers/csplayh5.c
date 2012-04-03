@@ -40,6 +40,34 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<v9958_device> m_v9958;
+	DECLARE_READ16_MEMBER(csplayh5_mux_r);
+	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
+	DECLARE_WRITE16_MEMBER(csplayh5_sound_w);
+	DECLARE_READ16_MEMBER(test_r);
+	DECLARE_READ8_MEMBER(csplayh5_sound_r);
+	DECLARE_WRITE8_MEMBER(csplayh5_soundclr_w);
+	DECLARE_READ8_MEMBER(tmpz84c011_pio_r);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_pio_w);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_pa_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_pb_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_pc_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_pd_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_pe_r);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pa_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pb_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pc_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pd_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pe_w);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pa_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pb_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pc_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pd_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pe_r);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pa_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pb_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pc_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pd_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pe_w);
 };
 
 
@@ -60,28 +88,26 @@ static void csplayh5_vdp0_interrupt(device_t *, v99x8_device &device, int i)
        interrupts seem to be fired quite randomly */
 }
 
-static READ16_HANDLER( csplayh5_mux_r )
+READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(space->machine(), "KEY0");
-		case 0x02: return input_port_read(space->machine(), "KEY1");
-		case 0x04: return input_port_read(space->machine(), "KEY2");
-		case 0x08: return input_port_read(space->machine(), "KEY3");
-		case 0x10: return input_port_read(space->machine(), "KEY4");
+		case 0x01: return input_port_read(machine(), "KEY0");
+		case 0x02: return input_port_read(machine(), "KEY1");
+		case 0x04: return input_port_read(machine(), "KEY2");
+		case 0x08: return input_port_read(machine(), "KEY3");
+		case 0x10: return input_port_read(machine(), "KEY4");
 	}
 
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( csplayh5_mux_w )
+WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_mux_data = (~data & 0x1f);
+	m_mux_data = (~data & 0x1f);
 }
 
-static WRITE16_HANDLER( csplayh5_sound_w )
+WRITE16_MEMBER(csplayh5_state::csplayh5_sound_w)
 {
 	soundlatch_w(space, 0, ((data >> 8) & 0xff));
 }
@@ -90,8 +116,8 @@ static WRITE16_HANDLER( csplayh5_sound_w )
 static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_WRITE_LEGACY(csplayh5_sound_w)
-	AM_RANGE(0x200200, 0x200201) AM_READWRITE_LEGACY(csplayh5_mux_r,csplayh5_mux_w)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_WRITE(csplayh5_sound_w)
+	AM_RANGE(0x200200, 0x200201) AM_READWRITE(csplayh5_mux_r,csplayh5_mux_w)
 	AM_RANGE(0x200400, 0x200401) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0x200600, 0x200607) AM_DEVREADWRITE8("v9958", v9958_device, read, write, 0x00ff)
@@ -104,16 +130,16 @@ static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 ADDRESS_MAP_END
 
 #if USE_H8
-static READ16_HANDLER( test_r )
+READ16_MEMBER(csplayh5_state::test_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
-	AM_RANGE(0x04002a, 0x04002b) AM_READ_LEGACY(test_r)
-	AM_RANGE(0x040036, 0x040037) AM_READ_LEGACY(test_r)
+	AM_RANGE(0x04002a, 0x04002b) AM_READ(test_r)
+	AM_RANGE(0x040036, 0x040037) AM_READ(test_r)
 
 	AM_RANGE(0x078000, 0x07ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x080000, 0x0fffff) AM_RAM
@@ -146,17 +172,17 @@ static void csplayh5_soundbank_w(running_machine &machine, int data)
 	memory_set_bankptr(machine, "bank1", &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
-static READ8_HANDLER( csplayh5_sound_r )
+READ8_MEMBER(csplayh5_state::csplayh5_sound_r)
 {
 	return soundlatch_r(space, 0);
 }
 
-static WRITE8_HANDLER( csplayh5_soundclr_w )
+WRITE8_MEMBER(csplayh5_state::csplayh5_soundclr_w)
 {
 	soundlatch_clear_w(space, 0, 0);
 }
 
-static READ8_HANDLER( tmpz84c011_pio_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_pio_r)
 {
 	int portdata;
 
@@ -179,7 +205,7 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 			break;
 
 		default:
-			logerror("%s: TMPZ84C011_PIO Unknown Port Read %02X\n", space->machine().describe_context(), offset);
+			logerror("%s: TMPZ84C011_PIO Unknown Port Read %02X\n", machine().describe_context(), offset);
 			portdata = 0xff;
 			break;
 	}
@@ -187,18 +213,18 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 	return portdata;
 }
 
-static WRITE8_HANDLER( tmpz84c011_pio_w)
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_pio_w)
 {
 	switch (offset)
 	{
 		case 0:			/* PA_0 */
-			csplayh5_soundbank_w(space->machine(), data & 0x03);
+			csplayh5_soundbank_w(machine(), data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_WRITE(space->machine().device("dac2"), 0, data);
+			DAC_WRITE(machine().device("dac2"), 0, data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_WRITE(space->machine().device("dac1"), 0, data);
+			DAC_WRITE(machine().device("dac1"), 0, data);
 			break;
 		case 3:			/* PD_0 */
 			break;
@@ -207,138 +233,118 @@ static WRITE8_HANDLER( tmpz84c011_pio_w)
 			break;
 
 		default:
-			logerror("%s: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", space->machine().describe_context(), offset, data);
+			logerror("%s: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
 
 
 /* CPU interface */
-static READ8_HANDLER( tmpz84c011_0_pa_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_pa_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,0) & ~state->m_pio_dir[0]) | (state->m_pio_latch[0] & state->m_pio_dir[0]);
+	return (tmpz84c011_pio_r(space,0) & ~m_pio_dir[0]) | (m_pio_latch[0] & m_pio_dir[0]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pb_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_pb_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,1) & ~state->m_pio_dir[1]) | (state->m_pio_latch[1] & state->m_pio_dir[1]);
+	return (tmpz84c011_pio_r(space,1) & ~m_pio_dir[1]) | (m_pio_latch[1] & m_pio_dir[1]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pc_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_pc_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,2) & ~state->m_pio_dir[2]) | (state->m_pio_latch[2] & state->m_pio_dir[2]);
+	return (tmpz84c011_pio_r(space,2) & ~m_pio_dir[2]) | (m_pio_latch[2] & m_pio_dir[2]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pd_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_pd_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,3) & ~state->m_pio_dir[3]) | (state->m_pio_latch[3] & state->m_pio_dir[3]);
+	return (tmpz84c011_pio_r(space,3) & ~m_pio_dir[3]) | (m_pio_latch[3] & m_pio_dir[3]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pe_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_pe_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,4) & ~state->m_pio_dir[4]) | (state->m_pio_latch[4] & state->m_pio_dir[4]);
+	return (tmpz84c011_pio_r(space,4) & ~m_pio_dir[4]) | (m_pio_latch[4] & m_pio_dir[4]);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pa_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pa_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_latch[0] = data;
+	m_pio_latch[0] = data;
 	tmpz84c011_pio_w(space, 0, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pb_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pb_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_latch[1] = data;
+	m_pio_latch[1] = data;
 	tmpz84c011_pio_w(space, 1, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pc_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pc_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_latch[2] = data;
+	m_pio_latch[2] = data;
 	tmpz84c011_pio_w(space, 2, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pd_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pd_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_latch[3] = data;
+	m_pio_latch[3] = data;
 	tmpz84c011_pio_w(space, 3, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pe_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pe_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_latch[4] = data;
+	m_pio_latch[4] = data;
 	tmpz84c011_pio_w(space, 4, data);
 }
 
 
-static READ8_HANDLER( tmpz84c011_0_dir_pa_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pa_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->m_pio_dir[0];
+	return m_pio_dir[0];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pb_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pb_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->m_pio_dir[1];
+	return m_pio_dir[1];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pc_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pc_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->m_pio_dir[2];
+	return m_pio_dir[2];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pd_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pd_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->m_pio_dir[3];
+	return m_pio_dir[3];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pe_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pe_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->m_pio_dir[4];
+	return m_pio_dir[4];
 }
 
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pa_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pa_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_dir[0] = data;
+	m_pio_dir[0] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pb_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pb_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_dir[1] = data;
+	m_pio_dir[1] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pc_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pc_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_dir[2] = data;
+	m_pio_dir[2] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pd_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pd_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_dir[3] = data;
+	m_pio_dir[3] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pe_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_dir[4] = data;
+	m_pio_dir[4] = data;
 }
 
 
@@ -351,16 +357,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( csplayh5_sound_io_map, AS_IO, 8, csplayh5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x50, 0x50) AM_READWRITE_LEGACY(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
-	AM_RANGE(0x51, 0x51) AM_READWRITE_LEGACY(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
-	AM_RANGE(0x52, 0x52) AM_READWRITE_LEGACY(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
-	AM_RANGE(0x30, 0x30) AM_READWRITE_LEGACY(tmpz84c011_0_pd_r, tmpz84c011_0_pd_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE_LEGACY(tmpz84c011_0_pe_r, tmpz84c011_0_pe_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pa_r, tmpz84c011_0_dir_pa_w)
-	AM_RANGE(0x55, 0x55) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pb_r, tmpz84c011_0_dir_pb_w)
-	AM_RANGE(0x56, 0x56) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
-	AM_RANGE(0x34, 0x34) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
-	AM_RANGE(0x44, 0x44) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
+	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
+	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
+	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
+	AM_RANGE(0x30, 0x30) AM_READWRITE(tmpz84c011_0_pd_r, tmpz84c011_0_pd_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(tmpz84c011_0_pe_r, tmpz84c011_0_pe_w)
+	AM_RANGE(0x54, 0x54) AM_READWRITE(tmpz84c011_0_dir_pa_r, tmpz84c011_0_dir_pa_w)
+	AM_RANGE(0x55, 0x55) AM_READWRITE(tmpz84c011_0_dir_pb_r, tmpz84c011_0_dir_pb_w)
+	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
+	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
+	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 ADDRESS_MAP_END
 
@@ -576,7 +582,7 @@ static MACHINE_RESET( csplayh5 )
 	for (i = 0; i < 5; i++)
 	{
 		state->m_pio_dir[i] = state->m_pio_latch[i] = 0;
-		tmpz84c011_pio_w(space, i, 0);
+		state->tmpz84c011_pio_w(*space, i, 0);
 	}
 }
 

@@ -222,6 +222,9 @@ public:
 
 	UINT8 *m_videoram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
+	//DECLARE_WRITE8_MEMBER(debug_w);
+	DECLARE_READ8_MEMBER(unk_r);
 };
 
 
@@ -229,11 +232,10 @@ public:
 *     Video Hardware     *
 *************************/
 
-static WRITE8_HANDLER( tmspoker_videoram_w )
+WRITE8_MEMBER(tmspoker_state::tmspoker_videoram_w)
 {
-	tmspoker_state *state = space->machine().driver_data<tmspoker_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -273,7 +275,7 @@ static PALETTE_INIT( tmspoker )
 *  Read / Write Handlers  *
 **************************/
 
-//static WRITE8_HANDLER( debug_w )
+//WRITE8_MEMBER(tmspoker_state::debug_w)
 //{
 //  popmessage("written : %02X", data);
 //}
@@ -314,20 +316,20 @@ static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8, tmspoker_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE_LEGACY(tmspoker_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE(tmspoker_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM //NVRAM?
 	AM_RANGE(0x2000, 0x20ff) AM_RAM //color RAM?
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER(unk_r)
+READ8_MEMBER(tmspoker_state::unk_r)
 {
 	printf("%x\n",offset);
-	return 0;//0xff;//mame_rand(space->machine);
+	return 0;//0xff;//mame_rand(machine);
 }
 
 static ADDRESS_MAP_START( tmspoker_cru_map, AS_IO, 8, tmspoker_state )
-	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(unk_r)
+	AM_RANGE(0x0000, 0xffff) AM_READ(unk_r)
 ADDRESS_MAP_END
 
 /* I/O byte R/W

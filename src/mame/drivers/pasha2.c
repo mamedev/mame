@@ -93,12 +93,19 @@ public:
 	/* memory */
 	UINT16       m_bitmap0[0x40000/2];
 	UINT16       m_bitmap1[0x40000/2];
+	DECLARE_WRITE16_MEMBER(pasha2_misc_w);
+	DECLARE_WRITE16_MEMBER(pasha2_palette_w);
+	DECLARE_WRITE16_MEMBER(vbuffer_set_w);
+	DECLARE_WRITE16_MEMBER(vbuffer_clear_w);
+	DECLARE_WRITE16_MEMBER(bitmap_0_w);
+	DECLARE_WRITE16_MEMBER(bitmap_1_w);
+	DECLARE_WRITE16_MEMBER(pasha2_lamps_w);
+	DECLARE_READ16_MEMBER(pasha2_speedup_r);
 };
 
 
-static WRITE16_HANDLER( pasha2_misc_w )
+WRITE16_MEMBER(pasha2_state::pasha2_misc_w)
 {
-	pasha2_state *state = space->machine().driver_data<pasha2_state>();
 
 	if (offset)
 	{
@@ -106,9 +113,9 @@ static WRITE16_HANDLER( pasha2_misc_w )
 		{
 			int bank = data & 0xf000;
 
-			if (bank != state->m_old_bank)
+			if (bank != m_old_bank)
 			{
-				state->m_old_bank = bank;
+				m_old_bank = bank;
 
 				switch (bank)
 				{
@@ -118,50 +125,45 @@ static WRITE16_HANDLER( pasha2_misc_w )
 					case 0xb000:
 					case 0xc000:
 					case 0xd000:
-						memory_set_bankptr(space->machine(), "bank1", space->machine().region("user2")->base() + 0x400 * (bank - 0x8000)); break;
+						memory_set_bankptr(machine(), "bank1", machine().region("user2")->base() + 0x400 * (bank - 0x8000)); break;
 				}
 			}
 		}
 	}
 }
 
-static WRITE16_HANDLER( pasha2_palette_w )
+WRITE16_MEMBER(pasha2_state::pasha2_palette_w)
 {
-	pasha2_state *state = space->machine().driver_data<pasha2_state>();
 	int color;
 
-	COMBINE_DATA(&state->m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 
 	offset &= 0xff;
 
-	color = (state->m_paletteram[offset] >> 8) | (state->m_paletteram[offset + 0x100] & 0xff00);
-	palette_set_color_rgb(space->machine(), offset * 2 + 0, pal5bit(color), pal5bit(color >> 5), pal5bit(color >> 10));
+	color = (m_paletteram[offset] >> 8) | (m_paletteram[offset + 0x100] & 0xff00);
+	palette_set_color_rgb(machine(), offset * 2 + 0, pal5bit(color), pal5bit(color >> 5), pal5bit(color >> 10));
 
-	color = (state->m_paletteram[offset] & 0xff) | ((state->m_paletteram[offset + 0x100] & 0xff) << 8);
-	palette_set_color_rgb(space->machine(), offset * 2 + 1, pal5bit(color), pal5bit(color >> 5), pal5bit(color >> 10));
+	color = (m_paletteram[offset] & 0xff) | ((m_paletteram[offset + 0x100] & 0xff) << 8);
+	palette_set_color_rgb(machine(), offset * 2 + 1, pal5bit(color), pal5bit(color >> 5), pal5bit(color >> 10));
 }
 
-static WRITE16_HANDLER( vbuffer_set_w )
+WRITE16_MEMBER(pasha2_state::vbuffer_set_w)
 {
-	pasha2_state *state = space->machine().driver_data<pasha2_state>();
-	state->m_vbuffer = 1;
+	m_vbuffer = 1;
 }
 
-static WRITE16_HANDLER( vbuffer_clear_w )
+WRITE16_MEMBER(pasha2_state::vbuffer_clear_w)
 {
-	pasha2_state *state = space->machine().driver_data<pasha2_state>();
-	state->m_vbuffer = 0;
+	m_vbuffer = 0;
 }
 
-static WRITE16_HANDLER( bitmap_0_w )
+WRITE16_MEMBER(pasha2_state::bitmap_0_w)
 {
-	pasha2_state *state = space->machine().driver_data<pasha2_state>();
-	COMBINE_DATA(&state->m_bitmap0[offset + state->m_vbuffer * 0x20000 / 2]);
+	COMBINE_DATA(&m_bitmap0[offset + m_vbuffer * 0x20000 / 2]);
 }
 
-static WRITE16_HANDLER( bitmap_1_w )
+WRITE16_MEMBER(pasha2_state::bitmap_1_w)
 {
-	pasha2_state *state = space->machine().driver_data<pasha2_state>();
 
 	// handle overlapping pixels without writing them
 	switch (mem_mask)
@@ -182,7 +184,7 @@ static WRITE16_HANDLER( bitmap_1_w )
 		break;
 	}
 
-	COMBINE_DATA(&state->m_bitmap1[offset + state->m_vbuffer * 0x20000 / 2]);
+	COMBINE_DATA(&m_bitmap1[offset + m_vbuffer * 0x20000 / 2]);
 }
 
 static WRITE16_DEVICE_HANDLER( oki_bank_w )
@@ -191,7 +193,7 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 		downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 }
 
-static WRITE16_HANDLER( pasha2_lamps_w )
+WRITE16_MEMBER(pasha2_state::pasha2_lamps_w)
 {
 	if (data)
 		popmessage("1P: %c%c%c 2P: %c%c%c 3P: %c%c%c",
@@ -208,29 +210,29 @@ static WRITE16_HANDLER( pasha2_lamps_w )
 
 static ADDRESS_MAP_START( pasha2_map, AS_PROGRAM, 16, pasha2_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_wram)
-	AM_RANGE(0x40000000, 0x4001ffff) AM_RAM_WRITE_LEGACY(bitmap_0_w)
-	AM_RANGE(0x40020000, 0x4003ffff) AM_RAM_WRITE_LEGACY(bitmap_1_w)
+	AM_RANGE(0x40000000, 0x4001ffff) AM_RAM_WRITE(bitmap_0_w)
+	AM_RANGE(0x40020000, 0x4003ffff) AM_RAM_WRITE(bitmap_1_w)
 	AM_RANGE(0x40060000, 0x40060001) AM_WRITENOP
 	AM_RANGE(0x40064000, 0x40064001) AM_WRITENOP
 	AM_RANGE(0x40068000, 0x40068001) AM_WRITENOP
 	AM_RANGE(0x4006c000, 0x4006c001) AM_WRITENOP
-	AM_RANGE(0x40070000, 0x40070001) AM_WRITE_LEGACY(vbuffer_clear_w)
-	AM_RANGE(0x40074000, 0x40074001) AM_WRITE_LEGACY(vbuffer_set_w)
+	AM_RANGE(0x40070000, 0x40070001) AM_WRITE(vbuffer_clear_w)
+	AM_RANGE(0x40074000, 0x40074001) AM_WRITE(vbuffer_set_w)
 	AM_RANGE(0x40078000, 0x40078001) AM_WRITENOP //once at startup -> to disable the eeprom?
 	AM_RANGE(0x80000000, 0x803fffff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM_WRITE_LEGACY(pasha2_palette_w) AM_BASE(m_paletteram) //tilemap? palette?
+	AM_RANGE(0xe0000000, 0xe00003ff) AM_RAM_WRITE(pasha2_palette_w) AM_BASE(m_paletteram) //tilemap? palette?
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pasha2_io, AS_IO, 16, pasha2_state )
 	AM_RANGE(0x08, 0x0b) AM_READNOP //sound status?
 	AM_RANGE(0x18, 0x1b) AM_READNOP //sound status?
-	AM_RANGE(0x20, 0x23) AM_WRITE_LEGACY(pasha2_lamps_w)
+	AM_RANGE(0x20, 0x23) AM_WRITE(pasha2_lamps_w)
 	AM_RANGE(0x40, 0x43) AM_READ_PORT("COINS")
 	AM_RANGE(0x60, 0x63) AM_READ_PORT("DSW")
 	AM_RANGE(0x80, 0x83) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa0, 0xa3) AM_WRITENOP //soundlatch?
-	AM_RANGE(0xc0, 0xc3) AM_WRITE_LEGACY(pasha2_misc_w)
+	AM_RANGE(0xc0, 0xc3) AM_WRITE(pasha2_misc_w)
 	AM_RANGE(0xe2, 0xe3) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xe6, 0xe7) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xe8, 0xeb) AM_DEVWRITE_LEGACY("oki1", oki_bank_w)
@@ -458,19 +460,19 @@ ROM_START( pasha2 )
 	ROM_LOAD( "pp2.um53",     0x00000, 0x80000, CRC(8a29ad03) SHA1(3e9b0c86d8e3bb0b7691f68ad45431f6f9e8edbd) )
 ROM_END
 
-static READ16_HANDLER( pasha2_speedup_r )
+READ16_MEMBER(pasha2_state::pasha2_speedup_r)
 {
-	pasha2_state *state = space->machine().driver_data<pasha2_state>();
 
-	if(cpu_get_pc(&space->device()) == 0x8302)
-		device_spin_until_interrupt(&space->device());
+	if(cpu_get_pc(&space.device()) == 0x8302)
+		device_spin_until_interrupt(&space.device());
 
-	return state->m_wram[(0x95744 / 2) + offset];
+	return m_wram[(0x95744 / 2) + offset];
 }
 
 static DRIVER_INIT( pasha2 )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x95744, 0x95747, FUNC(pasha2_speedup_r) );
+	pasha2_state *state = machine.driver_data<pasha2_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x95744, 0x95747, read16_delegate(FUNC(pasha2_state::pasha2_speedup_r), state));
 
 	memory_set_bankptr(machine, "bank1", machine.region("user2")->base());
 }

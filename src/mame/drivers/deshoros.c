@@ -25,6 +25,9 @@ public:
 	UINT8 *m_io_ram;
 	char m_led_array[21];
 	UINT8 m_bank;
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
+	void update_led_array(UINT8 new_data);
 };
 
 
@@ -47,14 +50,14 @@ static SCREEN_UPDATE_IND16( deshoros )
 }
 
 /*I don't know it this is 100% correct,might be different...*/
-static void update_led_array(deshoros_state *state, UINT8 new_data)
+void deshoros_state::update_led_array(UINT8 new_data)
 {
 	UINT8 i;
 	/*scroll the data*/
 	for(i=0;i<19;i++)
-		state->m_led_array[i] = state->m_led_array[i+1];
+		m_led_array[i] = m_led_array[i+1];
 	/*update the data*/
-	state->m_led_array[19] = new_data;
+	m_led_array[19] = new_data;
 }
 
 
@@ -72,44 +75,42 @@ static void answer_bankswitch(running_machine &machine,UINT8 new_bank)
 	}
 }
 
-static READ8_HANDLER( io_r )
+READ8_MEMBER(deshoros_state::io_r)
 {
-	deshoros_state *state = space->machine().driver_data<deshoros_state>();
 	switch(offset)
 	{
 		case 0x00: return 0xff; //printer read
-		case 0x03: return input_port_read(space->machine(), "KEY0" );
-		case 0x04: return input_port_read(space->machine(), "KEY1" );
-		case 0x05: return input_port_read(space->machine(), "SYSTEM" );
-		case 0x0a: return state->m_io_ram[offset]; //"buzzer" 0 read
-		case 0x0b: return state->m_io_ram[offset]; //"buzzer" 1 read
+		case 0x03: return input_port_read(machine(), "KEY0" );
+		case 0x04: return input_port_read(machine(), "KEY1" );
+		case 0x05: return input_port_read(machine(), "SYSTEM" );
+		case 0x0a: return m_io_ram[offset]; //"buzzer" 0 read
+		case 0x0b: return m_io_ram[offset]; //"buzzer" 1 read
 	}
 //  printf("R -> [%02x]\n",offset);
 
-	return state->m_io_ram[offset];
+	return m_io_ram[offset];
 }
 
-static WRITE8_HANDLER( io_w )
+WRITE8_MEMBER(deshoros_state::io_w)
 {
-	deshoros_state *state = space->machine().driver_data<deshoros_state>();
 	switch(offset)
 	{
 		case 0x00: /*Printer data*/						return;
-		case 0x02: update_led_array(state, data);              return;
-		case 0x05: coin_lockout_w(space->machine(), 0,state->m_io_ram[offset] & 1);return;
+		case 0x02: update_led_array(data);              return;
+		case 0x05: coin_lockout_w(machine(), 0,m_io_ram[offset] & 1);return;
 		case 0x06: /*Printer IRQ enable*/   		    return;
 //      case 0x0a: "buzzer" 0 write
 //      case 0x0b: "buzzer" 1 write
-		case 0x0c: answer_bankswitch(space->machine(),data&0x03); return; //data & 0x10 enabled too,dunno if it is worth to shift the data...
+		case 0x0c: answer_bankswitch(machine(),data&0x03); return; //data & 0x10 enabled too,dunno if it is worth to shift the data...
 	}
-	state->m_io_ram[offset] = data;
+	m_io_ram[offset] = data;
 //  printf("%02x -> [%02x]\n",data,offset);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, deshoros_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x900f) AM_READWRITE_LEGACY(io_r,io_w) AM_BASE(m_io_ram) //i/o area
+	AM_RANGE(0x9000, 0x900f) AM_READWRITE(io_r,io_w) AM_BASE(m_io_ram) //i/o area
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

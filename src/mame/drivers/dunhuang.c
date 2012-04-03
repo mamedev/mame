@@ -93,6 +93,29 @@ public:
 	UINT8	       m_colorram[0x40 * 0x20];
 	UINT8          m_colorram2[0x40 * 0x8];
 	UINT8          m_paldata[3 * 256];
+	DECLARE_WRITE8_MEMBER(dunhuang_pos_x_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_pos_y_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_tile_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_tile2_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_clear_y_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_horiz_clear_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_vert_clear_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_block_dest_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_block_x_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_block_y_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_block_w_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_block_c_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_block_addr_lo_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_block_addr_hi_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_block_h_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_paloffs_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_paldata_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_layers_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_input_w);
+	DECLARE_READ8_MEMBER(dunhuang_service_r);
+	DECLARE_READ8_MEMBER(dunhuang_input_r);
+	DECLARE_WRITE8_MEMBER(dunhuang_rombank_w);
+	DECLARE_WRITE8_MEMBER(dunhuang_82_w);
 };
 
 
@@ -170,112 +193,105 @@ if (screen.machine().input().code_pressed(KEYCODE_Z))
 
 // Tilemaps access
 
-static WRITE8_HANDLER( dunhuang_pos_x_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_pos_x_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_pos_x = data & 0x3f;
-	state->m_written = 0;
-	state->m_written2 = 0;
+	m_pos_x = data & 0x3f;
+	m_written = 0;
+	m_written2 = 0;
 }
 
-static WRITE8_HANDLER( dunhuang_pos_y_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_pos_y_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_pos_y = data;
-	state->m_written = 0;
-	state->m_written2 = 0;
+	m_pos_y = data;
+	m_written = 0;
+	m_written2 = 0;
 }
 
-static WRITE8_HANDLER( dunhuang_tile_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_tile_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
 	int addr;
 
-	if (state->m_written & (1 << offset))
+	if (m_written & (1 << offset))
 	{
-		state->m_written = 0;
-		state->m_pos_x++;
-		if (state->m_pos_x == 0x40)
+		m_written = 0;
+		m_pos_x++;
+		if (m_pos_x == 0x40)
 		{
-			state->m_pos_x = 0;
-			state->m_pos_y++;
+			m_pos_x = 0;
+			m_pos_y++;
 		}
 	}
-	state->m_written |= 1 << offset;
+	m_written |= 1 << offset;
 
-	addr = (state->m_pos_x & 0x3f) + (state->m_pos_y & 0x1f) * 0x40;
+	addr = (m_pos_x & 0x3f) + (m_pos_y & 0x1f) * 0x40;
 	switch (offset)
 	{
-		case 0:	state->m_videoram[addr] = (state->m_videoram[addr] & 0xff00) | data;		break;
-		case 1:	state->m_videoram[addr] = (state->m_videoram[addr] & 0x00ff) | (data<<8);	break;
-		case 2:	state->m_colorram[addr] = data;												break;
+		case 0:	m_videoram[addr] = (m_videoram[addr] & 0xff00) | data;		break;
+		case 1:	m_videoram[addr] = (m_videoram[addr] & 0x00ff) | (data<<8);	break;
+		case 2:	m_colorram[addr] = data;												break;
 	}
-	state->m_tmap->mark_tile_dirty(addr);
+	m_tmap->mark_tile_dirty(addr);
 }
 
-static WRITE8_HANDLER( dunhuang_tile2_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_tile2_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
 	int addr;
 
-	if (state->m_written2 & (1 << offset))
+	if (m_written2 & (1 << offset))
 	{
-		state->m_written2 = 0;
-		state->m_pos_x++;
-		if (state->m_pos_x == 0x40)
+		m_written2 = 0;
+		m_pos_x++;
+		if (m_pos_x == 0x40)
 		{
-			state->m_pos_x = 0;
-			state->m_pos_y++;
+			m_pos_x = 0;
+			m_pos_y++;
 		}
 	}
-	state->m_written2 |= 1 << offset;
+	m_written2 |= 1 << offset;
 
-	addr = (state->m_pos_x & 0x3f) + (state->m_pos_y & 0x07) * 0x40;
+	addr = (m_pos_x & 0x3f) + (m_pos_y & 0x07) * 0x40;
 	switch (offset)
 	{
-		case 0:	state->m_videoram2[addr] = (state->m_videoram2[addr] & 0xff00) | data;		break;
-		case 1:	state->m_videoram2[addr] = (state->m_videoram2[addr] & 0x00ff) | (data<<8);	break;
-		case 2:	state->m_colorram2[addr] = data;											break;
+		case 0:	m_videoram2[addr] = (m_videoram2[addr] & 0xff00) | data;		break;
+		case 1:	m_videoram2[addr] = (m_videoram2[addr] & 0x00ff) | (data<<8);	break;
+		case 2:	m_colorram2[addr] = data;											break;
 	}
-	state->m_tmap2->mark_tile_dirty(addr);
+	m_tmap2->mark_tile_dirty(addr);
 }
 
 // Clear a row of tiles (videoram)
 
-static WRITE8_HANDLER( dunhuang_clear_y_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_clear_y_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_clear_y = data;
+	m_clear_y = data;
 }
-static WRITE8_HANDLER( dunhuang_horiz_clear_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_horiz_clear_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
 	int i;
-//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", cpu_get_pc(&space->device()), state->m_clear_y,data);
+//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", cpu_get_pc(&space.device()), m_clear_y,data);
 	for (i = 0; i < 0x40; i++)
 	{
-		int addr = state->m_clear_y * 0x40 + i;
+		int addr = m_clear_y * 0x40 + i;
 
-		state->m_videoram[addr] = 0;
-		state->m_colorram[addr] = 0;
-		state->m_tmap->mark_tile_dirty(addr);
+		m_videoram[addr] = 0;
+		m_colorram[addr] = 0;
+		m_tmap->mark_tile_dirty(addr);
 	}
 }
 
 // Clear a column of tiles (videoram2)
 
-static WRITE8_HANDLER( dunhuang_vert_clear_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_vert_clear_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
 	int i;
-//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", cpu_get_pc(&space->device()), state->m_pos_x,state->m_pos_y,data);
+//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", cpu_get_pc(&space.device()), m_pos_x,m_pos_y,data);
 	for (i = 0; i < 0x08; i++)
 	{
-		int addr = (state->m_pos_x & 0x3f) + (i & 0x07) * 0x40;
+		int addr = (m_pos_x & 0x3f) + (i & 0x07) * 0x40;
 
-		state->m_videoram2[addr] = 1;
-		state->m_colorram2[addr] = 0;
-		state->m_tmap2->mark_tile_dirty(addr);
+		m_videoram2[addr] = 1;
+		m_colorram2[addr] = 0;
+		m_tmap2->mark_tile_dirty(addr);
 	}
 }
 
@@ -285,127 +301,116 @@ static WRITE8_HANDLER( dunhuang_vert_clear_w )
 // The tiles codes are read from the graphics roms too!
 //
 
-static WRITE8_HANDLER( dunhuang_block_dest_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_block_dest_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_block_dest = data;
+	m_block_dest = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_x_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_block_x_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_block_x = data;
+	m_block_x = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_y_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_block_y_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_block_y = data;
+	m_block_y = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_w_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_block_w_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_block_w = data;
+	m_block_w = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_c_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_block_c_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_block_c = data;
+	m_block_c = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_addr_lo_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_block_addr_lo_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_block_addr_lo = data;
+	m_block_addr_lo = data;
 }
 
-static WRITE8_HANDLER( dunhuang_block_addr_hi_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_block_addr_hi_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_block_addr_hi = data;
+	m_block_addr_hi = data;
 }
 
 
-static WRITE8_HANDLER( dunhuang_block_h_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_block_h_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
 	int i,j, addr;
 	UINT8 *tile_addr;
 
-//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", cpu_get_pc(&space->device()), state->m_block_dest, (state->m_block_addr_hi << 8) + state->m_block_addr_lo, state->m_block_x,state->m_block_y,state->m_block_w+1,state->m_block_h+1,state->m_block_c);
+//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", cpu_get_pc(&space.device()), m_block_dest, (m_block_addr_hi << 8) + m_block_addr_lo, m_block_x,m_block_y,m_block_w+1,m_block_h+1,m_block_c);
 
-	state->m_block_h = data;
+	m_block_h = data;
 
-	tile_addr = space->machine().region("gfx2")->base() + ((state->m_block_addr_hi << 8) + state->m_block_addr_lo) * 4;
+	tile_addr = machine().region("gfx2")->base() + ((m_block_addr_hi << 8) + m_block_addr_lo) * 4;
 
-	switch (state->m_block_dest)
+	switch (m_block_dest)
 	{
 		case 0x04:	// write to videoram
-			for (j = 0; j <= state->m_block_h; j++)
+			for (j = 0; j <= m_block_h; j++)
 			{
-				for (i = 0; i <= state->m_block_w; i++)
+				for (i = 0; i <= m_block_w; i++)
 				{
-					addr = ((state->m_block_x + i)& 0x3f) + ((state->m_block_y + j) & 0x1f) * 0x40;
+					addr = ((m_block_x + i)& 0x3f) + ((m_block_y + j) & 0x1f) * 0x40;
 
-					state->m_videoram[addr] = (tile_addr[1] << 8) | tile_addr[0];
-					state->m_colorram[addr] = state->m_block_c;
-					state->m_tmap->mark_tile_dirty(addr);
+					m_videoram[addr] = (tile_addr[1] << 8) | tile_addr[0];
+					m_colorram[addr] = m_block_c;
+					m_tmap->mark_tile_dirty(addr);
 					tile_addr += 4;
 				}
 			}
 			break;
 
 		case 0x08:	// write to videoram2
-			for (j = 0; j <= state->m_block_h; j++)
+			for (j = 0; j <= m_block_h; j++)
 			{
-				for (i = 0; i <= state->m_block_w; i++)
+				for (i = 0; i <= m_block_w; i++)
 				{
-					addr = ((state->m_block_x + i)& 0x3f) + ((state->m_block_y + j) & 0x7) * 0x40;
+					addr = ((m_block_x + i)& 0x3f) + ((m_block_y + j) & 0x7) * 0x40;
 
-					state->m_videoram2[addr] = (tile_addr[1] << 8) | tile_addr[0];
-					state->m_colorram2[addr] = state->m_block_c;
-					state->m_tmap2->mark_tile_dirty(addr);
+					m_videoram2[addr] = (tile_addr[1] << 8) | tile_addr[0];
+					m_colorram2[addr] = m_block_c;
+					m_tmap2->mark_tile_dirty(addr);
 					tile_addr += 4;
 				}
 			}
 			break;
 
 		default:
-			popmessage("%06x: block dst=%x", cpu_get_pc(&space->device()), state->m_block_dest);
+			popmessage("%06x: block dst=%x", cpu_get_pc(&space.device()), m_block_dest);
 	}
 }
 
 // Palette: HMC HM86171 VGA 256 colour RAMDAC
 
-static WRITE8_HANDLER( dunhuang_paloffs_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_paloffs_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_paloffs = data * 3;
+	m_paloffs = data * 3;
 }
 
-static WRITE8_HANDLER( dunhuang_paldata_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_paldata_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_paldata[state->m_paloffs] = data;
+	m_paldata[m_paloffs] = data;
 
-	palette_set_color_rgb( space->machine(), state->m_paloffs/3,
-		pal6bit(state->m_paldata[(state->m_paloffs/3)*3+0]),
-		pal6bit(state->m_paldata[(state->m_paloffs/3)*3+1]),
-		pal6bit(state->m_paldata[(state->m_paloffs/3)*3+2])
+	palette_set_color_rgb( machine(), m_paloffs/3,
+		pal6bit(m_paldata[(m_paloffs/3)*3+0]),
+		pal6bit(m_paldata[(m_paloffs/3)*3+1]),
+		pal6bit(m_paldata[(m_paloffs/3)*3+2])
 	);
 
-	state->m_paloffs = (state->m_paloffs + 1) % (3*256);
+	m_paloffs = (m_paloffs + 1) % (3*256);
 }
 
 // Layers control (not understood)
 
-static WRITE8_HANDLER( dunhuang_layers_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_layers_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
 //  popmessage("layers %02x",data);
-	state->m_layers = data;
+	m_layers = data;
 }
 
 /***************************************************************************
@@ -420,17 +425,15 @@ ADDRESS_MAP_END
 
 // Inputs
 
-static WRITE8_HANDLER( dunhuang_input_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_input_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	state->m_input = data;
+	m_input = data;
 }
 
-static READ8_HANDLER( dunhuang_service_r )
+READ8_MEMBER(dunhuang_state::dunhuang_service_r)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	return input_port_read(space->machine(), "SERVICE")
-	 | ((state->m_hopper && !(space->machine().primary_screen->frame_number() % 10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
+	return input_port_read(machine(), "SERVICE")
+	 | ((m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
 	 | 0x80																// bit 7 low -> tiles block transferrer busy
 	;
 }
@@ -446,77 +449,75 @@ static READ8_DEVICE_HANDLER( dunhuang_dsw_r )
 	logerror("%s: warning, unknown dsw bits read, input = %02x\n", device->machine().describe_context(), state->m_input);
 	return 0xff;
 }
-static READ8_HANDLER( dunhuang_input_r )
+READ8_MEMBER(dunhuang_state::dunhuang_input_r)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
-	if (!(state->m_input & 0x01))	return input_port_read(space->machine(), "IN0");
-	if (!(state->m_input & 0x02))	return input_port_read(space->machine(), "IN1");
-	if (!(state->m_input & 0x04))	return input_port_read(space->machine(), "IN2");
-	if (!(state->m_input & 0x08))	return input_port_read(space->machine(), "IN3");
-	if (!(state->m_input & 0x10))	return input_port_read(space->machine(), "IN4");
-	logerror("%s: warning, unknown input bits read, input = %02x\n", space->machine().describe_context(), state->m_input);
+	if (!(m_input & 0x01))	return input_port_read(machine(), "IN0");
+	if (!(m_input & 0x02))	return input_port_read(machine(), "IN1");
+	if (!(m_input & 0x04))	return input_port_read(machine(), "IN2");
+	if (!(m_input & 0x08))	return input_port_read(machine(), "IN3");
+	if (!(m_input & 0x10))	return input_port_read(machine(), "IN4");
+	logerror("%s: warning, unknown input bits read, input = %02x\n", machine().describe_context(), m_input);
 	return 0xff;
 }
 
-static WRITE8_HANDLER( dunhuang_rombank_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_rombank_w)
 {
-	dunhuang_state *state = space->machine().driver_data<dunhuang_state>();
 
 	// ?                data & 0x01
 	// ?                data & 0x02
 
-	memory_set_bank(space->machine(), "bank1", ((data >> 2) & 0x7));
+	memory_set_bank(machine(), "bank1", ((data >> 2) & 0x7));
 
 	// COIN OUT:        data & 0x20
-	coin_counter_w(space->machine(), 0,	data & 0x40);
-	state->m_hopper = data & 0x80;
+	coin_counter_w(machine(), 0,	data & 0x40);
+	m_hopper = data & 0x80;
 }
 
 
 #ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( dunhuang_82_w )
+WRITE8_MEMBER(dunhuang_state::dunhuang_82_w)
 {
 //  popmessage("82 = %02x",dunhuang_82);
 }
 #endif
 
 static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
-	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE_LEGACY(dunhuang_pos_x_w )
-	AM_RANGE( 0x0001, 0x0001 ) AM_WRITE_LEGACY(dunhuang_pos_y_w )
-	AM_RANGE( 0x0002, 0x0004 ) AM_WRITE_LEGACY(dunhuang_tile_w )
-	AM_RANGE( 0x0005, 0x0007 ) AM_WRITE_LEGACY(dunhuang_tile2_w )
+	AM_RANGE( 0x0000, 0x0000 ) AM_WRITE(dunhuang_pos_x_w )
+	AM_RANGE( 0x0001, 0x0001 ) AM_WRITE(dunhuang_pos_y_w )
+	AM_RANGE( 0x0002, 0x0004 ) AM_WRITE(dunhuang_tile_w )
+	AM_RANGE( 0x0005, 0x0007 ) AM_WRITE(dunhuang_tile2_w )
 
-	AM_RANGE( 0x0008, 0x0008 ) AM_WRITE_LEGACY(dunhuang_vert_clear_w )
+	AM_RANGE( 0x0008, 0x0008 ) AM_WRITE(dunhuang_vert_clear_w )
 
 	AM_RANGE( 0x000c, 0x000c ) AM_READ_LEGACY(watchdog_reset_r )
 
-	AM_RANGE( 0x000f, 0x000f ) AM_WRITE_LEGACY(dunhuang_block_addr_lo_w )
-	AM_RANGE( 0x0010, 0x0010 ) AM_WRITE_LEGACY(dunhuang_block_addr_hi_w )
+	AM_RANGE( 0x000f, 0x000f ) AM_WRITE(dunhuang_block_addr_lo_w )
+	AM_RANGE( 0x0010, 0x0010 ) AM_WRITE(dunhuang_block_addr_hi_w )
 //  AM_RANGE( 0x0011, 0x0011 ) ?
-	AM_RANGE( 0x0012, 0x0012 ) AM_WRITE_LEGACY(dunhuang_block_c_w )
-	AM_RANGE( 0x0015, 0x0015 ) AM_WRITE_LEGACY(dunhuang_block_x_w )
-	AM_RANGE( 0x0016, 0x0016 ) AM_WRITE_LEGACY(dunhuang_block_y_w )
-	AM_RANGE( 0x0017, 0x0017 ) AM_WRITE_LEGACY(dunhuang_block_w_w )
-	AM_RANGE( 0x0018, 0x0018 ) AM_WRITE_LEGACY(dunhuang_block_h_w )
+	AM_RANGE( 0x0012, 0x0012 ) AM_WRITE(dunhuang_block_c_w )
+	AM_RANGE( 0x0015, 0x0015 ) AM_WRITE(dunhuang_block_x_w )
+	AM_RANGE( 0x0016, 0x0016 ) AM_WRITE(dunhuang_block_y_w )
+	AM_RANGE( 0x0017, 0x0017 ) AM_WRITE(dunhuang_block_w_w )
+	AM_RANGE( 0x0018, 0x0018 ) AM_WRITE(dunhuang_block_h_w )
 
-	AM_RANGE( 0x0019, 0x0019 ) AM_WRITE_LEGACY(dunhuang_clear_y_w )
-	AM_RANGE( 0x001a, 0x001a ) AM_WRITE_LEGACY(dunhuang_horiz_clear_w )
+	AM_RANGE( 0x0019, 0x0019 ) AM_WRITE(dunhuang_clear_y_w )
+	AM_RANGE( 0x001a, 0x001a ) AM_WRITE(dunhuang_horiz_clear_w )
 
-	AM_RANGE( 0x001b, 0x001b ) AM_WRITE_LEGACY(dunhuang_block_dest_w )
+	AM_RANGE( 0x001b, 0x001b ) AM_WRITE(dunhuang_block_dest_w )
 
 	AM_RANGE( 0x0081, 0x0081 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w	)
 	AM_RANGE( 0x0089, 0x0089 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w		)
 
-//  AM_RANGE( 0x0082, 0x0082 ) AM_WRITE_LEGACY(dunhuang_82_w )
+//  AM_RANGE( 0x0082, 0x0082 ) AM_WRITE(dunhuang_82_w )
 
-	AM_RANGE( 0x0083, 0x0083 ) AM_WRITE_LEGACY(dunhuang_paloffs_w )
-	AM_RANGE( 0x008b, 0x008b ) AM_WRITE_LEGACY(dunhuang_paldata_w )
+	AM_RANGE( 0x0083, 0x0083 ) AM_WRITE(dunhuang_paloffs_w )
+	AM_RANGE( 0x008b, 0x008b ) AM_WRITE(dunhuang_paldata_w )
 
-	AM_RANGE( 0x0084, 0x0084 ) AM_READ_LEGACY(dunhuang_service_r )
-	AM_RANGE( 0x0085, 0x0085 ) AM_READ_LEGACY(dunhuang_input_r )
+	AM_RANGE( 0x0084, 0x0084 ) AM_READ(dunhuang_service_r )
+	AM_RANGE( 0x0085, 0x0085 ) AM_READ(dunhuang_input_r )
 
-	AM_RANGE( 0x0086, 0x0086 ) AM_WRITE_LEGACY(dunhuang_rombank_w )
-	AM_RANGE( 0x0087, 0x0087 ) AM_WRITE_LEGACY(dunhuang_layers_w )
+	AM_RANGE( 0x0086, 0x0086 ) AM_WRITE(dunhuang_rombank_w )
+	AM_RANGE( 0x0087, 0x0087 ) AM_WRITE(dunhuang_layers_w )
 
 	AM_RANGE( 0x0088, 0x0088 ) AM_DEVREAD_LEGACY("ay8910", ay8910_r )
 	AM_RANGE( 0x0090, 0x0090 ) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w )
@@ -757,7 +758,7 @@ static const ay8910_interface dunhuang_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	//  A                   B
 	DEVCB_NULL,							DEVCB_HANDLER(dunhuang_dsw_r),	// R
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, dunhuang_input_w),	DEVCB_NULL						// W
+	DEVCB_DRIVER_MEMBER(dunhuang_state, dunhuang_input_w),	DEVCB_NULL						// W
 };
 
 

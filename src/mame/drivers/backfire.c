@@ -52,6 +52,22 @@ public:
 	UINT16    m_pf2_rowscroll[0x0800/2];
 	UINT16    m_pf3_rowscroll[0x0800/2];
 	UINT16    m_pf4_rowscroll[0x0800/2];
+	DECLARE_READ32_MEMBER(backfire_control2_r);
+	DECLARE_READ32_MEMBER(backfire_control3_r);
+	DECLARE_WRITE32_MEMBER(backfire_nonbuffered_palette_w);
+	DECLARE_READ32_MEMBER(backfire_pf1_rowscroll_r);
+	DECLARE_READ32_MEMBER(backfire_pf2_rowscroll_r);
+	DECLARE_READ32_MEMBER(backfire_pf3_rowscroll_r);
+	DECLARE_READ32_MEMBER(backfire_pf4_rowscroll_r);
+	DECLARE_WRITE32_MEMBER(backfire_pf1_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(backfire_pf2_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(backfire_pf3_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(backfire_pf4_rowscroll_w);
+	DECLARE_READ32_MEMBER(backfire_spriteram1_r);
+	DECLARE_WRITE32_MEMBER(backfire_spriteram1_w);
+	DECLARE_READ32_MEMBER(backfire_spriteram2_r);
+	DECLARE_WRITE32_MEMBER(backfire_spriteram2_w);
+	DECLARE_READ32_MEMBER(backfire_speedup_r);
 };
 
 //UINT32 *backfire_180010, *backfire_188010;
@@ -160,21 +176,19 @@ static READ32_DEVICE_HANDLER( backfire_eeprom_r )
 			| ((input_port_read(device->machine(), "IN3") & 0x40) << 16)) ^ (backfire_screen << 26) ;
 }
 
-static READ32_HANDLER( backfire_control2_r )
+READ32_MEMBER(backfire_state::backfire_control2_r)
 {
-	backfire_state *state = space->machine().driver_data<backfire_state>();
 
-//  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space->device()), offset << 1, mem_mask);
-	return (state->m_eeprom->read_bit() << 24) | input_port_read(space->machine(), "IN1") | (input_port_read(space->machine(), "IN1") << 16);
+//  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space.device()), offset << 1, mem_mask);
+	return (m_eeprom->read_bit() << 24) | input_port_read(machine(), "IN1") | (input_port_read(machine(), "IN1") << 16);
 }
 
 #ifdef UNUSED_FUNCTION
-static READ32_HANDLER(backfire_control3_r)
+READ32_MEMBER(backfire_state::backfire_control3_r)
 {
-	backfire_state *state = space->machine().driver_data<backfire_state>();
 
-//  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space->device()), offset << 1, mem_mask);
-	return (state->m_eeprom->read_bit() << 24) | input_port_read(space->machine(), "IN2") | (input_port_read(space->machine(), "IN2") << 16);
+//  logerror("%08x:Read eprom %08x (%08x)\n", cpu_get_pc(&space.device()), offset << 1, mem_mask);
+	return (m_eeprom->read_bit() << 24) | input_port_read(machine(), "IN2") | (input_port_read(machine(), "IN2") << 16);
 }
 #endif
 
@@ -192,22 +206,22 @@ static WRITE32_DEVICE_HANDLER(backfire_eeprom_w)
 }
 
 
-static WRITE32_HANDLER(backfire_nonbuffered_palette_w)
+WRITE32_MEMBER(backfire_state::backfire_nonbuffered_palette_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	palette_set_color_rgb(space->machine(),offset,pal5bit(space->machine().generic.paletteram.u32[offset] >> 0),pal5bit(space->machine().generic.paletteram.u32[offset] >> 5),pal5bit(space->machine().generic.paletteram.u32[offset] >> 10));
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	palette_set_color_rgb(machine(),offset,pal5bit(machine().generic.paletteram.u32[offset] >> 0),pal5bit(machine().generic.paletteram.u32[offset] >> 5),pal5bit(machine().generic.paletteram.u32[offset] >> 10));
 }
 
 /* map 32-bit writes to 16-bit */
 
-static READ32_HANDLER( backfire_pf1_rowscroll_r ) { backfire_state *state = space->machine().driver_data<backfire_state>(); return state->m_pf1_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( backfire_pf2_rowscroll_r ) { backfire_state *state = space->machine().driver_data<backfire_state>(); return state->m_pf2_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( backfire_pf3_rowscroll_r ) { backfire_state *state = space->machine().driver_data<backfire_state>(); return state->m_pf3_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( backfire_pf4_rowscroll_r ) { backfire_state *state = space->machine().driver_data<backfire_state>(); return state->m_pf4_rowscroll[offset] ^ 0xffff0000; }
-static WRITE32_HANDLER( backfire_pf1_rowscroll_w ) { backfire_state *state = space->machine().driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->m_pf1_rowscroll[offset]); }
-static WRITE32_HANDLER( backfire_pf2_rowscroll_w ) { backfire_state *state = space->machine().driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->m_pf2_rowscroll[offset]); }
-static WRITE32_HANDLER( backfire_pf3_rowscroll_w ) { backfire_state *state = space->machine().driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->m_pf3_rowscroll[offset]); }
-static WRITE32_HANDLER( backfire_pf4_rowscroll_w ) { backfire_state *state = space->machine().driver_data<backfire_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->m_pf4_rowscroll[offset]); }
+READ32_MEMBER(backfire_state::backfire_pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
+READ32_MEMBER(backfire_state::backfire_pf2_rowscroll_r){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
+READ32_MEMBER(backfire_state::backfire_pf3_rowscroll_r){ return m_pf3_rowscroll[offset] ^ 0xffff0000; }
+READ32_MEMBER(backfire_state::backfire_pf4_rowscroll_r){ return m_pf4_rowscroll[offset] ^ 0xffff0000; }
+WRITE32_MEMBER(backfire_state::backfire_pf1_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
+WRITE32_MEMBER(backfire_state::backfire_pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
+WRITE32_MEMBER(backfire_state::backfire_pf3_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf3_rowscroll[offset]); }
+WRITE32_MEMBER(backfire_state::backfire_pf4_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf4_rowscroll[offset]); }
 
 
 #ifdef UNUSED_FUNCTION
@@ -228,34 +242,30 @@ READ32_HANDLER( backfire_wheel2_r )
 #endif
 
 
-static READ32_HANDLER( backfire_spriteram1_r )
+READ32_MEMBER(backfire_state::backfire_spriteram1_r)
 {
-	backfire_state *state = space->machine().driver_data<backfire_state>();
-	return state->m_spriteram_1[offset] ^ 0xffff0000;
+	return m_spriteram_1[offset] ^ 0xffff0000;
 }
 
-static WRITE32_HANDLER( backfire_spriteram1_w )
+WRITE32_MEMBER(backfire_state::backfire_spriteram1_w)
 {
-	backfire_state *state = space->machine().driver_data<backfire_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
-	COMBINE_DATA(&state->m_spriteram_1[offset]);
+	COMBINE_DATA(&m_spriteram_1[offset]);
 }
 
-static READ32_HANDLER( backfire_spriteram2_r )
+READ32_MEMBER(backfire_state::backfire_spriteram2_r)
 {
-	backfire_state *state = space->machine().driver_data<backfire_state>();
-	return state->m_spriteram_2[offset] ^ 0xffff0000;
+	return m_spriteram_2[offset] ^ 0xffff0000;
 }
 
-static WRITE32_HANDLER( backfire_spriteram2_w )
+WRITE32_MEMBER(backfire_state::backfire_spriteram2_w)
 {
-	backfire_state *state = space->machine().driver_data<backfire_state>();
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
-	COMBINE_DATA(&state->m_spriteram_2[offset]);
+	COMBINE_DATA(&m_spriteram_2[offset]);
 }
 
 
@@ -265,23 +275,23 @@ static ADDRESS_MAP_START( backfire_map, AS_PROGRAM, 32, backfire_state )
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
 	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
-	AM_RANGE(0x120000, 0x120fff) AM_READWRITE_LEGACY(backfire_pf1_rowscroll_r, backfire_pf1_rowscroll_w)
-	AM_RANGE(0x124000, 0x124fff) AM_READWRITE_LEGACY(backfire_pf2_rowscroll_r, backfire_pf2_rowscroll_w)
+	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(backfire_pf1_rowscroll_r, backfire_pf1_rowscroll_w)
+	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(backfire_pf2_rowscroll_r, backfire_pf2_rowscroll_w)
 	AM_RANGE(0x130000, 0x13001f) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 	AM_RANGE(0x140000, 0x141fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
 	AM_RANGE(0x144000, 0x145fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
-	AM_RANGE(0x150000, 0x150fff) AM_READWRITE_LEGACY(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
-	AM_RANGE(0x154000, 0x154fff) AM_READWRITE_LEGACY(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
-	AM_RANGE(0x160000, 0x161fff) AM_WRITE_LEGACY(backfire_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x150000, 0x150fff) AM_READWRITE(backfire_pf3_rowscroll_r, backfire_pf3_rowscroll_w)
+	AM_RANGE(0x154000, 0x154fff) AM_READWRITE(backfire_pf4_rowscroll_r, backfire_pf4_rowscroll_w)
+	AM_RANGE(0x160000, 0x161fff) AM_WRITE(backfire_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x170000, 0x177fff) AM_RAM AM_BASE(m_mainram)// main ram
 
 //  AM_RANGE(0x180010, 0x180013) AM_RAM AM_BASE_LEGACY(&backfire_180010) // always 180010 ?
 //  AM_RANGE(0x188010, 0x188013) AM_RAM AM_BASE_LEGACY(&backfire_188010) // always 188010 ?
 
-	AM_RANGE(0x184000, 0x185fff) AM_READWRITE_LEGACY(backfire_spriteram1_r, backfire_spriteram1_w)
-	AM_RANGE(0x18c000, 0x18dfff) AM_READWRITE_LEGACY(backfire_spriteram2_r, backfire_spriteram2_w)
+	AM_RANGE(0x184000, 0x185fff) AM_READWRITE(backfire_spriteram1_r, backfire_spriteram1_w)
+	AM_RANGE(0x18c000, 0x18dfff) AM_READWRITE(backfire_spriteram2_r, backfire_spriteram2_w)
 	AM_RANGE(0x190000, 0x190003) AM_DEVREAD_LEGACY("eeprom", backfire_eeprom_r)
-	AM_RANGE(0x194000, 0x194003) AM_READ_LEGACY(backfire_control2_r)
+	AM_RANGE(0x194000, 0x194003) AM_READ(backfire_control2_r)
 	AM_RANGE(0x1a4000, 0x1a4003) AM_DEVWRITE_LEGACY("eeprom", backfire_eeprom_w)
 
 	AM_RANGE(0x1a8000, 0x1a8003) AM_RAM AM_BASE(m_left_priority)
@@ -675,16 +685,15 @@ static void descramble_sound( running_machine &machine )
 	auto_free(machine, buf1);
 }
 
-static READ32_HANDLER( backfire_speedup_r )
+READ32_MEMBER(backfire_state::backfire_speedup_r)
 {
-	backfire_state *state = space->machine().driver_data<backfire_state>();
 
-	//mame_printf_debug( "%08x\n",cpu_get_pc(&space->device()));
+	//mame_printf_debug( "%08x\n",cpu_get_pc(&space.device()));
 
-	if (cpu_get_pc(&space->device() )== 0xce44)  device_spin_until_time(&space->device(), attotime::from_usec(400)); // backfire
-	if (cpu_get_pc(&space->device()) == 0xcee4)  device_spin_until_time(&space->device(), attotime::from_usec(400)); // backfirea
+	if (cpu_get_pc(&space.device() )== 0xce44)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfire
+	if (cpu_get_pc(&space.device()) == 0xcee4)  device_spin_until_time(&space.device(), attotime::from_usec(400)); // backfirea
 
-	return state->m_mainram[0x18/4];
+	return m_mainram[0x18/4];
 }
 
 
@@ -695,7 +704,8 @@ static DRIVER_INIT( backfire )
 	deco156_decrypt(machine);
 	machine.device("maincpu")->set_clock_scale(4.0f); /* core timings aren't accurate */
 	descramble_sound(machine);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x0170018, 0x017001b, FUNC(backfire_speedup_r) );
+	backfire_state *state = machine.driver_data<backfire_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x0170018, 0x017001b, read32_delegate(FUNC(backfire_state::backfire_speedup_r), state));
 }
 
 GAME( 1995, backfire,  0,        backfire,   backfire, backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", GAME_SUPPORTS_SAVE )

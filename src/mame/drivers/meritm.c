@@ -147,6 +147,14 @@ public:
 	required_device<v9938_device> m_v9938_0;
 	required_device<v9938_device> m_v9938_1;
 	required_device<microtouch_device> m_microtouch;
+	DECLARE_WRITE8_MEMBER(meritm_crt250_bank_w);
+	DECLARE_WRITE8_MEMBER(meritm_psd_a15_w);
+	DECLARE_WRITE8_MEMBER(meritm_bank_w);
+	DECLARE_WRITE8_MEMBER(meritm_crt250_questions_lo_w);
+	DECLARE_WRITE8_MEMBER(meritm_crt250_questions_hi_w);
+	DECLARE_WRITE8_MEMBER(meritm_crt250_questions_bank_w);
+	DECLARE_WRITE8_MEMBER(meritm_ds1644_w);
+	DECLARE_READ8_MEMBER(meritm_ds1644_r);
 };
 
 
@@ -414,9 +422,9 @@ static void meritm_crt250_switch_banks( running_machine &machine )
 	memory_set_bank(machine, "bank1", rombank );
 };
 
-static WRITE8_HANDLER(meritm_crt250_bank_w)
+WRITE8_MEMBER(meritm_state::meritm_crt250_bank_w)
 {
-	meritm_crt250_switch_banks(space->machine());
+	meritm_crt250_switch_banks(machine());
 };
 
 static void meritm_switch_banks( running_machine &machine )
@@ -434,17 +442,16 @@ static void meritm_switch_banks( running_machine &machine )
 	memory_set_bank(machine, "bank3", rambank);
 };
 
-static WRITE8_HANDLER(meritm_psd_a15_w)
+WRITE8_MEMBER(meritm_state::meritm_psd_a15_w)
 {
-	meritm_state *state = space->machine().driver_data<meritm_state>();
-	state->m_psd_a15 = data;
-	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, cpu_get_pc(&space->device()) );
-	meritm_switch_banks(space->machine());
+	m_psd_a15 = data;
+	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, cpu_get_pc(&space.device()) );
+	meritm_switch_banks(machine());
 };
 
-static WRITE8_HANDLER(meritm_bank_w)
+WRITE8_MEMBER(meritm_state::meritm_bank_w)
 {
-	meritm_switch_banks(space->machine());
+	meritm_switch_banks(machine());
 };
 
 /*************************************
@@ -454,33 +461,30 @@ static WRITE8_HANDLER(meritm_bank_w)
  *************************************/
 
 
-static WRITE8_HANDLER(meritm_crt250_questions_lo_w)
+WRITE8_MEMBER(meritm_state::meritm_crt250_questions_lo_w)
 {
-	meritm_state *state = space->machine().driver_data<meritm_state>();
-	state->m_questions_loword_address &= 0xff00;
-	state->m_questions_loword_address |= data;
+	m_questions_loword_address &= 0xff00;
+	m_questions_loword_address |= data;
 };
 
-static WRITE8_HANDLER(meritm_crt250_questions_hi_w)
+WRITE8_MEMBER(meritm_state::meritm_crt250_questions_hi_w)
 {
-	meritm_state *state = space->machine().driver_data<meritm_state>();
-	state->m_questions_loword_address &= 0x00ff;
-	state->m_questions_loword_address |= (data << 8);
+	m_questions_loword_address &= 0x00ff;
+	m_questions_loword_address |= (data << 8);
 };
 
-static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
+WRITE8_MEMBER(meritm_state::meritm_crt250_questions_bank_w)
 {
-	meritm_state *state = space->machine().driver_data<meritm_state>();
 	UINT32 questions_address;
 	UINT8 *dst;
 
-	if ((state->m_bank & 0x07) != 0)
+	if ((m_bank & 0x07) != 0)
 	{
-		logerror("meritm_crt250_questions_bank_w: bank is %d\n", state->m_bank);
+		logerror("meritm_crt250_questions_bank_w: bank is %d\n", m_bank);
 		return;
 	}
 
-	dst = space->machine().region("maincpu")->base() + 0x70000 + 2;
+	dst = machine().region("maincpu")->base() + 0x70000 + 2;
 
 	if (data == 0)
 	{
@@ -508,8 +512,8 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 			case 0x3f: questions_address = 0xb0000; break;
 			default: logerror( "meritm_crt250_questions_bank_w: unknown data = %02x\n", data ); return;
 		}
-		logerror( "Reading question byte at %06X\n", questions_address | state->m_questions_loword_address);
-		*dst = space->machine().region("extra")->base()[questions_address | state->m_questions_loword_address];
+		logerror( "Reading question byte at %06X\n", questions_address | m_questions_loword_address);
+		*dst = machine().region("extra")->base()[questions_address | m_questions_loword_address];
 	}
 };
 
@@ -520,19 +524,18 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
  *
  *************************************/
 
-static WRITE8_HANDLER(meritm_ds1644_w)
+WRITE8_MEMBER(meritm_state::meritm_ds1644_w)
 {
-	meritm_state *state = space->machine().driver_data<meritm_state>();
-	int rambank = (state->m_psd_a15 >> 2) & 0x3;
+	int rambank = (m_psd_a15 >> 2) & 0x3;
 	if (rambank < 3)
 	{
-		state->m_ram[rambank*0x2000 + 0x1ff8 + offset] = data;
+		m_ram[rambank*0x2000 + 0x1ff8 + offset] = data;
 	}
 	else
 	{
 		if (offset == 0)
 		{
-			state->m_ram[0x7ff8] = data;
+			m_ram[0x7ff8] = data;
 		}
 		//logerror( "Writing RTC, reg = %d, data = %x\n", offset, data);
 	}
@@ -545,25 +548,24 @@ static UINT8 binary_to_BCD(UINT8 data)
 	return ((data / 10) << 4) | (data %10);
 }
 
-static READ8_HANDLER(meritm_ds1644_r)
+READ8_MEMBER(meritm_state::meritm_ds1644_r)
 {
-	meritm_state *state = space->machine().driver_data<meritm_state>();
 	system_time systime;
-	int rambank = (state->m_psd_a15 >> 2) & 0x3;
+	int rambank = (m_psd_a15 >> 2) & 0x3;
 	if (rambank == 3)
 	{
 		//logerror( "Reading RTC, reg = %x\n", offset);
 
-		space->machine().current_datetime(systime);
-		state->m_ram[0x7ff9] = binary_to_BCD(systime.local_time.second);
-		state->m_ram[0x7ffa] = binary_to_BCD(systime.local_time.minute);
-		state->m_ram[0x7ffb] = binary_to_BCD(systime.local_time.hour);
-		state->m_ram[0x7ffc] = binary_to_BCD(systime.local_time.weekday+1);
-		state->m_ram[0x7ffd] = binary_to_BCD(systime.local_time.mday);
-		state->m_ram[0x7ffe] = binary_to_BCD(systime.local_time.month+1);
-		state->m_ram[0x7fff] = binary_to_BCD(systime.local_time.year % 100);
+		machine().current_datetime(systime);
+		m_ram[0x7ff9] = binary_to_BCD(systime.local_time.second);
+		m_ram[0x7ffa] = binary_to_BCD(systime.local_time.minute);
+		m_ram[0x7ffb] = binary_to_BCD(systime.local_time.hour);
+		m_ram[0x7ffc] = binary_to_BCD(systime.local_time.weekday+1);
+		m_ram[0x7ffd] = binary_to_BCD(systime.local_time.mday);
+		m_ram[0x7ffe] = binary_to_BCD(systime.local_time.month+1);
+		m_ram[0x7fff] = binary_to_BCD(systime.local_time.year % 100);
 	}
-	return state->m_ram[rambank*0x2000 + 0x1ff8 + offset];
+	return m_ram[rambank*0x2000 + 0x1ff8 + offset];
 };
 
 /*************************************
@@ -579,9 +581,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritm_crt250_questions_map, AS_PROGRAM, 8, meritm_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY(meritm_crt250_questions_lo_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE_LEGACY(meritm_crt250_questions_hi_w)
-	AM_RANGE(0x0002, 0x0002) AM_WRITE_LEGACY(meritm_crt250_questions_bank_w)
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(meritm_crt250_questions_lo_w)
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(meritm_crt250_questions_hi_w)
+	AM_RANGE(0x0002, 0x0002) AM_WRITE(meritm_crt250_questions_bank_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
@@ -594,7 +596,7 @@ static ADDRESS_MAP_START( meritm_crt250_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x50, 0x53) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE_LEGACY(meritm_crt250_bank_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
@@ -607,7 +609,7 @@ static ADDRESS_MAP_START( meritm_crt250_crt258_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc16552d_0_r,pc16552d_0_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE_LEGACY(meritm_crt250_bank_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_crt250_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritm_map, AS_PROGRAM, 8, meritm_state )
@@ -618,7 +620,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8, meritm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(meritm_psd_a15_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(meritm_psd_a15_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
@@ -628,7 +630,7 @@ static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8, meritm_state )
 	AM_RANGE(0x60, 0x67) AM_READWRITE_LEGACY(pc16552d_0_r,pc16552d_0_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE_LEGACY(meritm_bank_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(meritm_bank_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -1876,8 +1878,9 @@ static DRIVER_INIT(megat3te)
 		{ 0x99, 0x53, 0xfc, 0x29, 0x3a, 0x95, 0x8b, 0x58, 0xca, 0xca, 0x00, 0xc2, 0x30, 0x62, 0x0b, 0x96 };
 
 	ds1204_init(machine, megat3_ds1204_key, megat3_ds1204_nvram);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfff8, 0xffff, FUNC(meritm_ds1644_r), FUNC(meritm_ds1644_w) );
+	
+	meritm_state *state = machine.driver_data<meritm_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), state), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), state));
 
 };
 
@@ -1907,7 +1910,8 @@ static DRIVER_INIT(megat4te)
 
 	ds1204_init(machine, 0, megat4te_ds1204_nvram);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfff8, 0xffff, FUNC(meritm_ds1644_r), FUNC(meritm_ds1644_w) );
+	meritm_state *state = machine.driver_data<meritm_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), state), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), state));
 
 };
 
@@ -1918,7 +1922,8 @@ static DRIVER_INIT(megat4st)
 
 	ds1204_init(machine, 0, megat4te_ds1204_nvram);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfff8, 0xffff, FUNC(meritm_ds1644_r), FUNC(meritm_ds1644_w) );
+	meritm_state *state = machine.driver_data<meritm_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), state), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), state));
 
 };
 
@@ -1938,7 +1943,8 @@ static DRIVER_INIT(megat5t)
 
 	ds1204_init(machine, 0, megat5_ds1204_nvram);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xfff8, 0xffff, FUNC(meritm_ds1644_r), FUNC(meritm_ds1644_w) );
+	meritm_state *state = machine.driver_data<meritm_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xfff8, 0xffff, read8_delegate(FUNC(meritm_state::meritm_ds1644_r), state), write8_delegate(FUNC(meritm_state::meritm_ds1644_w), state));
 
 }
 

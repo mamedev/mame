@@ -38,6 +38,11 @@ public:
 
 	UINT8* m_flash_region;
 
+	DECLARE_READ32_MEMBER(nexus3d_unk_r);
+//	DECLARE_READ32_MEMBER(nexus3d_unk2_r);
+//	DECLARE_READ32_MEMBER(nexus3d_unk3_r);
+//	DECLARE_WRITE32_MEMBER(nexus3d_unk2_w);
+//	DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
 };
 
 
@@ -120,27 +125,27 @@ WRITE8_HANDLER( n3d_flash_addr_w )
 
 }
 
-static READ32_HANDLER( nexus3d_unk_r )
+READ32_MEMBER(nexus3d_state::nexus3d_unk_r)
 {
-	return space->machine().rand() ^ (space->machine().rand() << 16);
+	return machine().rand() ^ (machine().rand() << 16);
 }
 
-//static READ32_HANDLER( nexus3d_unk2_r )
+//READ32_MEMBER(nexus3d_state::nexus3d_unk2_r)
 //{
-//  return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
+//  return 0x00000000;//machine().rand() ^ (machine().rand() << 16);
 //}
 //
-//static READ32_HANDLER( nexus3d_unk3_r )
+//READ32_MEMBER(nexus3d_state::nexus3d_unk3_r)
 //{
-//  return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
+//  return 0x00000000;//machine().rand() ^ (machine().rand() << 16);
 //}
 //
-//static WRITE32_HANDLER( nexus3d_unk2_w )
+//WRITE32_MEMBER(nexus3d_state::nexus3d_unk2_w)
 //{
 //
 //}
 //
-//static WRITE32_HANDLER( nexus3d_unk3_w )
+//WRITE32_MEMBER(nexus3d_state::nexus3d_unk3_w)
 //{
 //
 //}
@@ -156,10 +161,10 @@ static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32, nexus3d_state )
 	AM_RANGE(0x9C000018, 0x9C00001b) AM_WRITE8_LEGACY(n3d_flash_addr_w, 0xffffffff)
 
 	// lots of accesses in this range
-//  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE_LEGACY(nexus3d_unk2_r, nexus3d_unk2_w ) // often
-//  AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE_LEGACY(nexus3d_unk3_r, nexus3d_unk3_w ) // often
+//  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE(nexus3d_unk2_r, nexus3d_unk2_w ) // often
+//  AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE(nexus3d_unk3_r, nexus3d_unk3_w ) // often
 
-	AM_RANGE(0xE0000014, 0xE0000017) AM_READ_LEGACY(nexus3d_unk_r ) // sits waiting for this
+	AM_RANGE(0xE0000014, 0xE0000017) AM_READ(nexus3d_unk_r ) // sits waiting for this
 
 
 ADDRESS_MAP_END

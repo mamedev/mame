@@ -282,6 +282,20 @@ public:
 	int m_insnote;
 	int m_cashcade_c;
 	int m_printer_motor;
+	DECLARE_READ8_MEMBER(ldsw);
+	DECLARE_READ8_MEMBER(cgdrr);
+	DECLARE_WRITE8_MEMBER(cgdrw);
+	DECLARE_WRITE8_MEMBER(u3_p0);
+	DECLARE_READ8_MEMBER(u3_p2);
+	DECLARE_READ8_MEMBER(u3_p3);
+	DECLARE_READ8_MEMBER(bv_p0);
+	DECLARE_READ8_MEMBER(bv_p1);
+	DECLARE_READ8_MEMBER(mkiv_pia_ina);
+	DECLARE_WRITE8_MEMBER(mkiv_pia_outa);
+	DECLARE_WRITE8_MEMBER(mlamps);
+	DECLARE_READ8_MEMBER(cashcade_r);
+	DECLARE_WRITE8_MEMBER(mk4_printer_w);
+	DECLARE_READ8_MEMBER(mk4_printer_r);
 };
 
 /* Partial Cashcade protocol */
@@ -362,88 +376,82 @@ static SCREEN_UPDATE_IND16(aristmk4)
 	return 0;
 }
 
-static READ8_HANDLER(ldsw)
+READ8_MEMBER(aristmk4_state::ldsw)
 {
-	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-	int U3_p2_ret= input_port_read(space->machine(), "5002");
+	int U3_p2_ret= input_port_read(machine(), "5002");
 	if(U3_p2_ret & 0x1)
 	{
 	return 0;
 	}
-	return state->m_cgdrsw = input_port_read(space->machine(), "5005");
+	return m_cgdrsw = input_port_read(machine(), "5005");
 }
 
-static READ8_HANDLER(cgdrr)
+READ8_MEMBER(aristmk4_state::cgdrr)
 {
-	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-	if(state->m_cgdrsw) // is the LC closed
+	if(m_cgdrsw) // is the LC closed
 	{
-	return state->m_ripple; // return a positive value from the ripple counter
+	return m_ripple; // return a positive value from the ripple counter
 	}
 	return 0x0; // otherwise the counter outputs are set low.
 }
 
-static WRITE8_HANDLER(cgdrw)
+WRITE8_MEMBER(aristmk4_state::cgdrw)
 {
-	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-	state->m_ripple = data;
+	m_ripple = data;
 }
 
-static WRITE8_HANDLER(u3_p0)
+WRITE8_MEMBER(aristmk4_state::u3_p0)
 {
-	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-	state->m_u3_p0_w = data;
+	m_u3_p0_w = data;
 
 	if ((data&0x80)==0) //Printer Motor Off
 	{
-		state->m_printer_motor = 1; // Set this so the next read of u3_p3 returns PTRHOM as OFF.
+		m_printer_motor = 1; // Set this so the next read of u3_p3 returns PTRHOM as OFF.
 	}
 
-	//logerror("u3_p0_w: %02X\n",state->m_u3_p0_w);
+	//logerror("u3_p0_w: %02X\n",m_u3_p0_w);
 }
 
-static READ8_HANDLER(u3_p2)
+READ8_MEMBER(aristmk4_state::u3_p2)
 {
-	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-	int u3_p2_ret= input_port_read(space->machine(), "5002");
-	int u3_p3_ret= input_port_read(space->machine(), "5003");
+	int u3_p2_ret= input_port_read(machine(), "5002");
+	int u3_p3_ret= input_port_read(machine(), "5003");
 
 	output_set_lamp_value(19, (u3_p2_ret >> 4) & 1); //auditkey light
 	output_set_lamp_value(20, (u3_p3_ret >> 2) & 1); //jackpotkey light
 
-	if (state->m_u3_p0_w&0x20) // DOPTE on
+	if (m_u3_p0_w&0x20) // DOPTE on
 	{
 	if (u3_p3_ret&0x02) // door closed
 		u3_p2_ret = u3_p2_ret^0x08; // DOPTI on
 	}
 
-	if (state->m_inscrd==0)
+	if (m_inscrd==0)
 	{
-		state->m_inscrd=input_port_read(space->machine(), "insertcoin");
+		m_inscrd=input_port_read(machine(), "insertcoin");
 	}
 
-	if (state->m_inscrd==1)
+	if (m_inscrd==1)
 		u3_p2_ret=u3_p2_ret^0x02;
 
 	return u3_p2_ret;
 }
 
-static READ8_HANDLER(u3_p3)
+READ8_MEMBER(aristmk4_state::u3_p3)
 {
-    aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
-    int u3_p3_ret= input_port_read(space->machine(), "5003");
+    int u3_p3_ret= input_port_read(machine(), "5003");
 
-    if ((state->m_printer_motor)==1) // Printer Motor Off
+    if ((m_printer_motor)==1) // Printer Motor Off
 
     {
         u3_p3_ret = u3_p3_ret^0x80; // Printer Home Off
-	  state->m_printer_motor=0;
+	  m_printer_motor=0;
 
     }
 
@@ -457,22 +465,21 @@ static TIMER_CALLBACK(note_input_reset)
 	state->m_insnote=0; //reset note input after 150msec
 }
 
-static READ8_HANDLER(bv_p0)
+READ8_MEMBER(aristmk4_state::bv_p0)
 {
-	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
 	int bv_p0_ret=0x00;
 
-	switch(state->m_insnote)
+	switch(m_insnote)
 	{
 	case 0x01:
-		bv_p0_ret=input_port_read(space->machine(), "NS")+0x81; //check note selector
-		state->m_insnote++;
+		bv_p0_ret=input_port_read(machine(), "NS")+0x81; //check note selector
+		m_insnote++;
 		break;
 	case 0x02:
 		bv_p0_ret=0x89;
-		state->m_insnote++;
-		space->machine().scheduler().timer_set(attotime::from_msec(150), FUNC(note_input_reset));
+		m_insnote++;
+		machine().scheduler().timer_set(attotime::from_msec(150), FUNC(note_input_reset));
 		break;
 	default:
 		break; //timer will reset the input
@@ -482,19 +489,18 @@ static READ8_HANDLER(bv_p0)
 
 }
 
-static READ8_HANDLER(bv_p1)
+READ8_MEMBER(aristmk4_state::bv_p1)
 {
-	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 
 	int bv_p1_ret=0x00;
 
-	if (state->m_insnote==0)
-		state->m_insnote=input_port_read(space->machine(), "insertnote");
+	if (m_insnote==0)
+		m_insnote=input_port_read(machine(), "insertnote");
 
-	if (state->m_insnote==1)
+	if (m_insnote==1)
 			bv_p1_ret=0x08;
 
-	if (state->m_insnote==2)
+	if (m_insnote==2)
 			bv_p1_ret=0x08;
 
 	return bv_p1_ret;
@@ -516,27 +522,26 @@ PORTB - MECHANICAL METERS
 ******************************************************************************/
 
 //input a
-static READ8_HANDLER(mkiv_pia_ina)
+READ8_MEMBER(aristmk4_state::mkiv_pia_ina)
 {
 	/* uncomment this code once RTC is fixed */
 
-	//return space->machine().device<mc146818_device>("rtc")->read(*space,1);
+	//return machine().device<mc146818_device>("rtc")->read(*&space,1);
 	return 0;	// OK for now, the aussie version has no RTC on the MB so this is valid.
 }
 
 //output a
-static WRITE8_HANDLER(mkiv_pia_outa)
+WRITE8_MEMBER(aristmk4_state::mkiv_pia_outa)
 {
-	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
-	mc146818_device *mc = space->machine().device<mc146818_device>("rtc");
-	if(state->m_rtc_data_strobe)
+	mc146818_device *mc = machine().device<mc146818_device>("rtc");
+	if(m_rtc_data_strobe)
 	{
-		mc->write(*space,1,data);
+		mc->write(*&space,1,data);
 		//logerror("rtc protocol write data: %02X\n",data);
 	}
 	else
 	{
-		mc->write(*space,0,data);
+		mc->write(*&space,0,data);
 		//logerror("rtc protocol write address: %02X\n",data);
 	}
 }
@@ -832,7 +837,7 @@ static WRITE8_DEVICE_HANDLER(pbltlp_out)
 	//logerror("Lights port B: %02X\n",data);
 }
 
-static WRITE8_HANDLER(mlamps)
+WRITE8_MEMBER(aristmk4_state::mlamps)
 {
 	/* TAKE WIN AND GAMBLE LAMPS */
 	output_set_lamp_value(18, (data >> 5) & 1);
@@ -847,19 +852,18 @@ static WRITE8_DEVICE_HANDLER(zn434_w)
 }
 
 
-static READ8_HANDLER(cashcade_r)
+READ8_MEMBER(aristmk4_state::cashcade_r)
 {
-	aristmk4_state *state = space->machine().driver_data<aristmk4_state>();
 	/* work around for cashcade games */
-	return cashcade_p[(state->m_cashcade_c++)%15];
+	return cashcade_p[(m_cashcade_c++)%15];
 }
 
-static WRITE8_HANDLER(mk4_printer_w)
+WRITE8_MEMBER(aristmk4_state::mk4_printer_w)
 {
 	//logerror("Printer: %c %d\n",data,data);
 }
 
-static READ8_HANDLER(mk4_printer_r)
+READ8_MEMBER(aristmk4_state::mk4_printer_r)
 {
 	return 0;
 }
@@ -875,28 +879,28 @@ static ADDRESS_MAP_START( aristmk4_map, AS_PROGRAM, 8, aristmk4_state )
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1c00, 0x1cff) AM_WRITE_LEGACY(mk4_printer_w)
-	AM_RANGE(0x1900, 0x19ff) AM_READ_LEGACY(mk4_printer_r)
+	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
+	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM  // graphics rom map
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_SHARE("nvram")
 
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(u3_p0)
-	AM_RANGE(0x5002, 0x5002) AM_READ_LEGACY(u3_p2)
-	AM_RANGE(0x5003, 0x5003) AM_READ_LEGACY(u3_p3)
-	AM_RANGE(0x5005, 0x5005) AM_READ_LEGACY(ldsw)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
+	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
+	AM_RANGE(0x5003, 0x5003) AM_READ(u3_p3)
+	AM_RANGE(0x5005, 0x5005) AM_READ(ldsw)
 	AM_RANGE(0x500d, 0x500d) AM_READ_PORT("500d")
 	AM_RANGE(0x500e, 0x500e) AM_READ_PORT("500e")
 	AM_RANGE(0x500f, 0x500f) AM_READ_PORT("500f")
 	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE("via6522_0",via6522_device,read,write)
-	AM_RANGE(0x5200, 0x5200) AM_READ_LEGACY(cashcade_r)
+	AM_RANGE(0x5200, 0x5200) AM_READ(cashcade_r)
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
-	AM_RANGE(0x52c0, 0x52c0) AM_READ_LEGACY(bv_p0)
-	AM_RANGE(0x52c1, 0x52c1) AM_READ_LEGACY(bv_p1)
+	AM_RANGE(0x52c0, 0x52c0) AM_READ(bv_p0)
+	AM_RANGE(0x52c1, 0x52c1) AM_READ(bv_p1)
 	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
 	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
-	AM_RANGE(0x5440, 0x5440) AM_WRITE_LEGACY(mlamps) // take win and gamble lamps
-	AM_RANGE(0x5468, 0x5468) AM_READWRITE_LEGACY(cgdrr,cgdrw) // 4020 ripple counter outputs
+	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
+	AM_RANGE(0x5468, 0x5468) AM_READWRITE(cgdrr,cgdrw) // 4020 ripple counter outputs
 	AM_RANGE(0x6000, 0xffff) AM_ROM  // game roms
 ADDRESS_MAP_END
 
@@ -919,27 +923,27 @@ static ADDRESS_MAP_START( aristmk4_poker_map, AS_PROGRAM, 8, aristmk4_state )
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1c00, 0x1cff) AM_WRITE_LEGACY(mk4_printer_w)
-	AM_RANGE(0x1900, 0x19ff) AM_READ_LEGACY(mk4_printer_r)
+	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
+	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_SHARE("nvram")
 
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(u3_p0)
-	AM_RANGE(0x5002, 0x5002) AM_READ_LEGACY(u3_p2)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
+	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
 	AM_RANGE(0x5003, 0x5003) AM_READ_PORT("5003")
-	AM_RANGE(0x5005, 0x5005) AM_READ_LEGACY(ldsw)
+	AM_RANGE(0x5005, 0x5005) AM_READ(ldsw)
 	AM_RANGE(0x500d, 0x500d) AM_READ_PORT("500d")
 	AM_RANGE(0x500e, 0x500e) AM_READ_PORT("500e")
 	AM_RANGE(0x500f, 0x500f) AM_READ_PORT("500f")
 	AM_RANGE(0x5010, 0x501f) AM_DEVREADWRITE("via6522_0",via6522_device,read,write)
-	AM_RANGE(0x5200, 0x5200) AM_READ_LEGACY(cashcade_r)
+	AM_RANGE(0x5200, 0x5200) AM_READ(cashcade_r)
 	AM_RANGE(0x5201, 0x5201) AM_READ_PORT("5201")
-	AM_RANGE(0x52c0, 0x52c0) AM_READ_LEGACY(bv_p0)
-	AM_RANGE(0x52c1, 0x52c1) AM_READ_LEGACY(bv_p1)
+	AM_RANGE(0x52c0, 0x52c0) AM_READ(bv_p0)
+	AM_RANGE(0x52c1, 0x52c1) AM_READ(bv_p1)
 	AM_RANGE(0x527f, 0x5281) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x5300, 0x5300) AM_READ_PORT("5300")
 	AM_RANGE(0x5380, 0x5383) AM_DEVREADWRITE("pia6821_0", pia6821_device, read, write)  // RTC data - PORT A , mechanical meters - PORTB ??
-	AM_RANGE(0x5440, 0x5440) AM_WRITE_LEGACY(mlamps) // take win and gamble lamps
-	AM_RANGE(0x5468, 0x5468) AM_READWRITE_LEGACY(cgdrr,cgdrw) // 4020 ripple counter outputs
+	AM_RANGE(0x5440, 0x5440) AM_WRITE(mlamps) // take win and gamble lamps
+	AM_RANGE(0x5468, 0x5468) AM_READWRITE(cgdrr,cgdrw) // 4020 ripple counter outputs
 	AM_RANGE(0x6000, 0x7fff) AM_ROM  // graphics rom map
 	AM_RANGE(0x8000, 0xffff) AM_ROM  // game roms
 ADDRESS_MAP_END
@@ -1521,13 +1525,13 @@ static const via6522_interface via_interface =
 
 static const pia6821_interface aristmk4_pia1_intf =
 {
-	DEVCB_MEMORY_HANDLER("maincpu",PROGRAM,mkiv_pia_ina),	// port A in
+	DEVCB_DRIVER_MEMBER(aristmk4_state, mkiv_pia_ina),	// port A in
 	DEVCB_NULL,	// port B in
 	DEVCB_NULL,	// line CA1 in
 	DEVCB_NULL,	// line CB1 in
 	DEVCB_NULL,	// line CA2 in
 	DEVCB_NULL,	// line CB2 in
-	DEVCB_MEMORY_HANDLER("maincpu",PROGRAM,mkiv_pia_outa),	// port A out
+	DEVCB_DRIVER_MEMBER(aristmk4_state, mkiv_pia_outa),	// port A out
 	DEVCB_HANDLER(mkiv_pia_outb),	// port B out
 	DEVCB_HANDLER(mkiv_pia_ca2),	// line CA2 out
 	DEVCB_HANDLER(mkiv_pia_cb2),	// port CB2 out

@@ -62,6 +62,9 @@ public:
 	UINT8       m_port_last2;
 	int         m_enabled_sound;
 	int         m_sound3_counter;
+	DECLARE_WRITE8_MEMBER(dai3wksi_audio_1_w);
+	DECLARE_WRITE8_MEMBER(dai3wksi_audio_2_w);
+	DECLARE_WRITE8_MEMBER(dai3wksi_audio_3_w);
 };
 
 
@@ -194,62 +197,59 @@ static SCREEN_UPDATE_RGB32( dai3wksi )
 
 
 #if (USE_SAMPLES)
-static WRITE8_HANDLER( dai3wksi_audio_1_w )
+WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_1_w)
 {
-	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
-	samples_device *samples = space->machine().device<samples_device>("samples");
-	UINT8 rising_bits = data & ~state->m_port_last1;
+	samples_device *samples = machine().device<samples_device>("samples");
+	UINT8 rising_bits = data & ~m_port_last1;
 
-	state->m_enabled_sound = data & 0x80;
+	m_enabled_sound = data & 0x80;
 
-	if ((rising_bits & 0x20) && state->m_enabled_sound)
+	if ((rising_bits & 0x20) && m_enabled_sound)
 	{
 		if (data & 0x04)
 			samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5);
 		else
 			samples->start(CHANNEL_SOUND5, SAMPLE_SOUND5, true);
 	}
-	if (!(data & 0x20) && (state->m_port_last1 & 0x20))
+	if (!(data & 0x20) && (m_port_last1 & 0x20))
 		samples->stop(CHANNEL_SOUND5);
 
-	state->m_port_last1 = data;
+	m_port_last1 = data;
 }
 
-static WRITE8_HANDLER( dai3wksi_audio_2_w )
+WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_2_w)
 {
-	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
-	samples_device *samples = space->machine().device<samples_device>("samples");
-	UINT8 rising_bits = data & ~state->m_port_last2;
+	samples_device *samples = machine().device<samples_device>("samples");
+	UINT8 rising_bits = data & ~m_port_last2;
 
-	state->m_dai3wksi_flipscreen = data & 0x10;
-	state->m_dai3wksi_redscreen  = ~data & 0x20;
-	state->m_dai3wksi_redterop   = data & 0x40;
+	m_dai3wksi_flipscreen = data & 0x10;
+	m_dai3wksi_redscreen  = ~data & 0x20;
+	m_dai3wksi_redterop   = data & 0x40;
 
-	if (state->m_enabled_sound)
+	if (m_enabled_sound)
 	{
 		if (rising_bits & 0x01) samples->start(CHANNEL_SOUND1, SAMPLE_SOUND1);
 		if (rising_bits & 0x02) samples->start(CHANNEL_SOUND2, SAMPLE_SOUND2);
 		if (rising_bits & 0x08) samples->start(CHANNEL_SOUND4, SAMPLE_SOUND4);
 		if (rising_bits & 0x04)
 		{
-			if (!state->m_sound3_counter)
+			if (!m_sound3_counter)
 				samples->start(CHANNEL_SOUND3, SAMPLE_SOUND3_1);
 			else
 				samples->start(CHANNEL_SOUND3, SAMPLE_SOUND3_2);
 
-			state->m_sound3_counter ^= 1;
+			m_sound3_counter ^= 1;
 		}
 	}
 
-	state->m_port_last2 = data;
+	m_port_last2 = data;
 }
 
-static WRITE8_HANDLER( dai3wksi_audio_3_w )
+WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_3_w)
 {
-	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
-	samples_device *samples = space->machine().device<samples_device>("samples");
+	samples_device *samples = machine().device<samples_device>("samples");
 
-	if (state->m_enabled_sound)
+	if (m_enabled_sound)
 	{
 		if (data & 0x40)
 			samples->start(CHANNEL_SOUND6, SAMPLE_SOUND6_1);
@@ -282,27 +282,26 @@ static const samples_interface dai3wksi_samples_interface =
 
 #else
 
-static WRITE8_HANDLER( dai3wksi_audio_1_w )
+WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_1_w)
 {
-	device_t *ic79 = space->machine().device("ic79");
+	device_t *ic79 = machine().device("ic79");
 
-	space->machine().sound().system_enable(data & 0x80);
+	machine().sound().system_enable(data & 0x80);
 
 	sn76477_enable_w(ic79, (~data >> 5) & 0x01);		/* invader movement enable */
 	sn76477_envelope_1_w(ic79, (~data >> 2) & 0x01);	/* invader movement envelope control*/
 }
 
-static WRITE8_HANDLER( dai3wksi_audio_2_w )
+WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_2_w)
 {
 
-	dai3wksi_state *state = space->machine().driver_data<dai3wksi_state>();
-	device_t *ic77 = space->machine().device("ic77");
-	device_t *ic78 = space->machine().device("ic78");
-	device_t *ic80 = space->machine().device("ic80");
+	device_t *ic77 = machine().device("ic77");
+	device_t *ic78 = machine().device("ic78");
+	device_t *ic80 = machine().device("ic80");
 
-	state->m_dai3wksi_flipscreen =  data & 0x10;
-	state->m_dai3wksi_redscreen  = ~data & 0x20;
-	state->m_dai3wksi_redterop   =  data & 0x40;
+	m_dai3wksi_flipscreen =  data & 0x10;
+	m_dai3wksi_redscreen  = ~data & 0x20;
+	m_dai3wksi_redterop   =  data & 0x40;
 
 	sn76477_enable_w(ic77, (~data >> 0) & 0x01);	/* ship movement */
 	sn76477_enable_w(ic78, (~data >> 1) & 0x01);	/* danger text */
@@ -310,9 +309,9 @@ static WRITE8_HANDLER( dai3wksi_audio_2_w )
 	sn76477_enable_w(ic80, (~data >> 3) & 0x01);	/* planet explosion */
 }
 
-static WRITE8_HANDLER( dai3wksi_audio_3_w )
+WRITE8_MEMBER(dai3wksi_state::dai3wksi_audio_3_w)
 {
-	device_t *ic81 = space->machine().device("ic81");
+	device_t *ic81 = machine().device("ic81");
 
 	sn76477_enable_w(ic81, (~data >> 2) & 0x01);	/* player shoot enable */
 	sn76477_vco_w(ic81, (~data >> 3) & 0x01);		/* player shoot vco control */
@@ -507,9 +506,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dai3wksi_state )
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x2400, 0x24ff) AM_MIRROR(0x100) AM_READ_PORT("IN0")
 	AM_RANGE(0x2800, 0x28ff) AM_MIRROR(0x100) AM_READ_PORT("IN1")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(dai3wksi_audio_1_w)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(dai3wksi_audio_2_w)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE_LEGACY(dai3wksi_audio_3_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(dai3wksi_audio_1_w)
+	AM_RANGE(0x3400, 0x3400) AM_WRITE(dai3wksi_audio_2_w)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(dai3wksi_audio_3_w)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_SIZE(m_dai3wksi_videoram, m_dai3wksi_videoram_size)
 ADDRESS_MAP_END
 

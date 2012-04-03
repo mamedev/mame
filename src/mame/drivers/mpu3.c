@@ -152,6 +152,10 @@ int m_prot_col;
 int m_optic_pattern;
 
 emu_timer *m_ic21_timer;
+	DECLARE_WRITE8_MEMBER(characteriser_w);
+	DECLARE_READ8_MEMBER(characteriser_r);
+	DECLARE_WRITE8_MEMBER(mpu3ptm_w);
+	DECLARE_READ8_MEMBER(mpu3ptm_r);
 };
 
 #define DISPLAY_PORT 0
@@ -790,28 +794,27 @@ The MPU3 characteriser is surprisingly simple to simulate, as it operates a call
 address of the PAL in memory varies between games. Once found, the memory location of the data table is easily found from the X register of the CPU.
 */
 
-static WRITE8_HANDLER( characteriser_w )
+WRITE8_MEMBER(mpu3_state::characteriser_w)
 {
-	mpu3_state *state = space->machine().driver_data<mpu3_state>();
 	int x;
 	int call=data;
-	if (!state->m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+	if (!m_current_chr_table)
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space.device()));
 
 	if (offset == 0)
 	{
 		{
 			if (call == 0)
 			{
-				state->m_prot_col = 0;
+				m_prot_col = 0;
 			}
 			else
 			{
-				for (x = state->m_prot_col; x < 64; x++)
+				for (x = m_prot_col; x < 64; x++)
 				{
-					if	(state->m_current_chr_table[(x)].call == call)
+					if	(m_current_chr_table[(x)].call == call)
 					{
-						state->m_prot_col = x;
+						m_prot_col = x;
 						break;
 					}
 				}
@@ -821,15 +824,14 @@ static WRITE8_HANDLER( characteriser_w )
 }
 
 
-static READ8_HANDLER( characteriser_r )
+READ8_MEMBER(mpu3_state::characteriser_r)
 {
-	mpu3_state *state = space->machine().driver_data<mpu3_state>();
-	if (!state->m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+	if (!m_current_chr_table)
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space.device()));
 
 	if (offset == 0)
 	{
-		return state->m_current_chr_table[state->m_prot_col].response;
+		return m_current_chr_table[m_prot_col].response;
 	}
 	return 0;
 }
@@ -857,23 +859,23 @@ static TIMER_DEVICE_CALLBACK( ic10_callback )
 	timer.machine().device<pia6821_device>("pia_ic4")->ca1_w(state->m_ic10_output);
 
 }
-static WRITE8_HANDLER( mpu3ptm_w )
+WRITE8_MEMBER(mpu3_state::mpu3ptm_w)
 {
-	ptm6840_device *ptm2 = space->machine().device<ptm6840_device>("ptm_ic2");
+	ptm6840_device *ptm2 = machine().device<ptm6840_device>("ptm_ic2");
 
 	ptm2->write(offset >>2,data);//((offset & 0x1f) >>2),data);
 }
 
-static READ8_HANDLER( mpu3ptm_r )
+READ8_MEMBER(mpu3_state::mpu3ptm_r)
 {
-	ptm6840_device *ptm2 = space->machine().device<ptm6840_device>("ptm_ic2");
+	ptm6840_device *ptm2 = machine().device<ptm6840_device>("ptm_ic2");
 
 	return ptm2->read(offset >>2);
 }
 
 static ADDRESS_MAP_START( mpu3_basemap, AS_PROGRAM, 8, mpu3_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8800, 0x881f) AM_READWRITE_LEGACY(mpu3ptm_r, mpu3ptm_w)/* PTM6840 IC2 */
+	AM_RANGE(0x8800, 0x881f) AM_READWRITE(mpu3ptm_r, mpu3ptm_w)/* PTM6840 IC2 */
 	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
 	AM_RANGE(0x9800, 0x9803) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
@@ -923,7 +925,7 @@ static DRIVER_INIT (m3hprvpr)
 
 	state->m_disp_func=METER_PORT;
 	state->m_current_chr_table = hprvpr_data;
-	space->install_legacy_readwrite_handler(0xc000, 0xc000 , FUNC(characteriser_r),FUNC(characteriser_w));
+	space->install_readwrite_handler(0xc000, 0xc000 , read8_delegate(FUNC(mpu3_state::characteriser_r), state),write8_delegate(FUNC(mpu3_state::characteriser_w), state));
 
 }
 

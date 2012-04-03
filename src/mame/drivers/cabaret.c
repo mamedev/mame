@@ -40,6 +40,12 @@ public:
 	tilemap_t *m_fg_tilemap;
 	int m_nmi_enable;
 	UINT8 m_out[3];
+	DECLARE_WRITE8_MEMBER(bg_scroll_w);
+	DECLARE_WRITE8_MEMBER(bg_tile_w);
+	DECLARE_WRITE8_MEMBER(fg_tile_w);
+	DECLARE_WRITE8_MEMBER(fg_color_w);
+	DECLARE_WRITE8_MEMBER(cabaret_nmi_and_coins_w);
+	void show_out();
 };
 
 
@@ -51,18 +57,16 @@ public:
 
 
 
-static WRITE8_HANDLER( bg_scroll_w )
+WRITE8_MEMBER(cabaret_state::bg_scroll_w)
 {
-	cabaret_state *state = space->machine().driver_data<cabaret_state>();
-	state->m_bg_scroll[offset] = data;
-	state->m_bg_tilemap->set_scrolly(offset,data);
+	m_bg_scroll[offset] = data;
+	m_bg_tilemap->set_scrolly(offset,data);
 }
 
-static WRITE8_HANDLER( bg_tile_w )
+WRITE8_MEMBER(cabaret_state::bg_tile_w)
 {
-	cabaret_state *state = space->machine().driver_data<cabaret_state>();
-	state->m_bg_tile_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tile_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -80,18 +84,16 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
-static WRITE8_HANDLER( fg_tile_w )
+WRITE8_MEMBER(cabaret_state::fg_tile_w)
 {
-	cabaret_state *state = space->machine().driver_data<cabaret_state>();
-	state->m_fg_tile_ram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_tile_ram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( fg_color_w )
+WRITE8_MEMBER(cabaret_state::fg_color_w)
 {
-	cabaret_state *state = space->machine().driver_data<cabaret_state>();
-	state->m_fg_color_ram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_color_ram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static VIDEO_START(cabaret)
@@ -122,33 +124,32 @@ static SCREEN_UPDATE_IND16(cabaret)
 
 
 
-static void show_out(cabaret_state *state)
+void cabaret_state::show_out()
 {
 #ifdef MAME_DEBUG
-	popmessage("%02x %02x %02x", state->m_out[0], state->m_out[1], state->m_out[2]);
+	popmessage("%02x %02x %02x",m_out[0], m_out[1], m_out[2]);
 #endif
 }
 
-static WRITE8_HANDLER( cabaret_nmi_and_coins_w )
+WRITE8_MEMBER(cabaret_state::cabaret_nmi_and_coins_w)
 {
-	cabaret_state *state = space->machine().driver_data<cabaret_state>();
-	if ((state->m_nmi_enable ^ data) & (~0xdd))
+	if ((m_nmi_enable ^ data) & (~0xdd))
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(&space->device()),data);
+		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(&space.device()),data);
 //      popmessage("%02x",data);
 	}
 
-	coin_counter_w(space->machine(), 0,		data & 0x01);	// coin_a
-	coin_counter_w(space->machine(), 1,		data & 0x04);	// coin_c
-	coin_counter_w(space->machine(), 2,		data & 0x08);	// key in
-	coin_counter_w(space->machine(), 3,		data & 0x10);	// coin state->m_out mech
+	coin_counter_w(machine(), 0,		data & 0x01);	// coin_a
+	coin_counter_w(machine(), 1,		data & 0x04);	// coin_c
+	coin_counter_w(machine(), 2,		data & 0x08);	// key in
+	coin_counter_w(machine(), 3,		data & 0x10);	// coin m_out mech
 
-	set_led_status(space->machine(), 6,		data & 0x40);	// led for coin state->m_out / hopper active
+	set_led_status(machine(), 6,		data & 0x40);	// led for coin m_out / hopper active
 
-	state->m_nmi_enable = data;	//  data & 0x80     // nmi enable?
+	m_nmi_enable = data;	//  data & 0x80     // nmi enable?
 
-	state->m_out[0] = data;
-	show_out(state);
+	m_out[0] = data;
+	show_out();
 }
 
 
@@ -165,7 +166,7 @@ static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 	AM_RANGE( 0x0081, 0x0081 ) AM_READ_PORT( "SERVICE" )
 	AM_RANGE( 0x0082, 0x0082 ) AM_READ_PORT( "COINS" )
 	AM_RANGE( 0x0090, 0x0090 ) AM_READ_PORT( "BUTTONS1" )
-	AM_RANGE( 0x00a0, 0x00a0 ) AM_WRITE_LEGACY(cabaret_nmi_and_coins_w )
+	AM_RANGE( 0x00a0, 0x00a0 ) AM_WRITE(cabaret_nmi_and_coins_w )
 
 	AM_RANGE( 0x00a1, 0x00a1 ) AM_READ_PORT("DSW1")			/* DSW1 */
 	AM_RANGE( 0x00a2, 0x00a2 ) AM_READ_PORT("DSW2")			/* DSW2 */
@@ -173,15 +174,15 @@ static ADDRESS_MAP_START( cabaret_portmap, AS_IO, 8, cabaret_state )
 
 	AM_RANGE( 0x00e0, 0x00e1 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 
-	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE_LEGACY(fg_tile_w )  AM_BASE(m_fg_tile_ram )
-	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE_LEGACY(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE(fg_tile_w )  AM_BASE(m_fg_tile_ram )
+	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE(fg_color_w ) AM_BASE(m_fg_color_ram )
 
 	AM_RANGE( 0x3000, 0x37ff ) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x3800, 0x3fff ) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
 
-	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE_LEGACY(bg_scroll_w ) AM_BASE(m_bg_scroll )
+	AM_RANGE( 0x1000, 0x103f ) AM_RAM_WRITE(bg_scroll_w ) AM_BASE(m_bg_scroll )
 
-	AM_RANGE( 0x1800, 0x19ff ) AM_RAM_WRITE_LEGACY(bg_tile_w )  AM_BASE(m_bg_tile_ram )
+	AM_RANGE( 0x1800, 0x19ff ) AM_RAM_WRITE(bg_tile_w )  AM_BASE(m_bg_tile_ram )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROM AM_REGION("gfx3", 0)
 ADDRESS_MAP_END
 

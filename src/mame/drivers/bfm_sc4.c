@@ -65,6 +65,8 @@ public:
 	UINT16* m_mainram;
 	// devices
 	required_device<cpu_device> m_maincpu;
+	DECLARE_READ16_MEMBER(sc4_mem_r);
+	DECLARE_WRITE16_MEMBER(sc4_mem_w);
 };
 
 class sc4_adder4_state : public sc4_state
@@ -79,19 +81,18 @@ public:
 	required_device<cpu_device> m_adder4cpu;
 };
 
-static READ16_HANDLER( sc4_mem_r )
+READ16_MEMBER(sc4_state::sc4_mem_r)
 {
-	sc4_state *state = space->machine().driver_data<sc4_state>();
-	int pc = cpu_get_pc(&space->device());
-	int cs = m68307_get_cs(state->m_maincpu, offset * 2);
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68307_get_cs(m_maincpu, offset * 2);
 	int base = 0, end = 0;
-//	if (!(space->debugger_access())) printf("cs is %d\n", cs);
+//	if (!(debugger_access())) printf("cs is %d\n", cs);
 
 	switch ( cs )
 	{
 		case 1:
 			if (offset<0x100000/2)
-				return state->m_cpuregion[offset];
+				return m_cpuregion[offset];
 			else
 				logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, cs);
 			break;
@@ -103,7 +104,7 @@ static READ16_HANDLER( sc4_mem_r )
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
-				return(state->m_mainram[offset]);
+				return(m_mainram[offset]);
 			}
 			else
 			{
@@ -129,11 +130,10 @@ static READ16_HANDLER( sc4_mem_r )
 	return 0x0000;
 }
 
-static WRITE16_HANDLER( sc4_mem_w )
+WRITE16_MEMBER(sc4_state::sc4_mem_w)
 {
-	sc4_state *state = space->machine().driver_data<sc4_state>();
-	int pc = cpu_get_pc(&space->device());
-	int cs = m68307_get_cs(state->m_maincpu, offset * 2);
+	int pc = cpu_get_pc(&space.device());
+	int cs = m68307_get_cs(m_maincpu, offset * 2);
 	int base = 0, end = 0;
 
 	switch ( cs )
@@ -153,7 +153,7 @@ static WRITE16_HANDLER( sc4_mem_w )
 			if ((offset>=base) && (offset<end))
 			{
 				offset-=base;
-				COMBINE_DATA(&state->m_mainram[offset]);
+				COMBINE_DATA(&m_mainram[offset]);
 			}
 			else
 			{
@@ -174,8 +174,8 @@ static WRITE16_HANDLER( sc4_mem_w )
 	}
 }
 
-static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16, sc4_adder4_state )
-	AM_RANGE(0x000000000, 0xffffffff) AM_READWRITE_LEGACY(sc4_mem_r, sc4_mem_w) 
+static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16, sc4_state )
+	AM_RANGE(0x000000000, 0xffffffff) AM_READWRITE(sc4_mem_r, sc4_mem_w) 
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sc4_adder4_map, AS_PROGRAM, 32, sc4_adder4_state )

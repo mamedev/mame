@@ -113,6 +113,23 @@ public:
 	UINT8		m_sound[8];
 
 	int		m_last;
+	DECLARE_WRITE8_MEMBER(flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_y_w);
+	DECLARE_WRITE8_MEMBER(looping_videoram_w);
+	DECLARE_WRITE8_MEMBER(looping_colorram_w);
+	DECLARE_WRITE8_MEMBER(level2_irq_set);
+	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(looping_souint_clr);
+	DECLARE_WRITE8_MEMBER(looping_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(ballon_enable_w);
+	DECLARE_WRITE8_MEMBER(out_0_w);
+	DECLARE_WRITE8_MEMBER(out_2_w);
+	DECLARE_READ8_MEMBER(adc_r);
+	DECLARE_WRITE8_MEMBER(adc_w);
+	DECLARE_WRITE8_MEMBER(plr2_w);
+	DECLARE_READ8_MEMBER(cop_io_r);
+	DECLARE_WRITE8_MEMBER(cop_io_w);
+	DECLARE_READ8_MEMBER(protection_r);
 };
 
 
@@ -195,36 +212,32 @@ static VIDEO_START( looping )
  *
  *************************************/
 
-static WRITE8_HANDLER( flip_screen_x_w )
+WRITE8_MEMBER(looping_state::flip_screen_x_w)
 {
-	looping_state *state = space->machine().driver_data<looping_state>();
-	flip_screen_x_set(space->machine(), ~data & 0x01);
-	state->m_bg_tilemap->set_scrollx(0, flip_screen_get(space->machine()) ? 128 : 0);
+	flip_screen_x_set(machine(), ~data & 0x01);
+	m_bg_tilemap->set_scrollx(0, flip_screen_get(machine()) ? 128 : 0);
 }
 
 
-static WRITE8_HANDLER( flip_screen_y_w )
+WRITE8_MEMBER(looping_state::flip_screen_y_w)
 {
-	looping_state *state = space->machine().driver_data<looping_state>();
-	flip_screen_y_set(space->machine(), ~data & 0x01);
-	state->m_bg_tilemap->set_scrollx(0, flip_screen_get(space->machine()) ? 128 : 0);
+	flip_screen_y_set(machine(), ~data & 0x01);
+	m_bg_tilemap->set_scrollx(0, flip_screen_get(machine()) ? 128 : 0);
 }
 
 
-static WRITE8_HANDLER( looping_videoram_w )
+WRITE8_MEMBER(looping_state::looping_videoram_w)
 {
-	looping_state *state = space->machine().driver_data<looping_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-static WRITE8_HANDLER( looping_colorram_w )
+WRITE8_MEMBER(looping_state::looping_colorram_w)
 {
-	looping_state *state = space->machine().driver_data<looping_state>();
 	int i;
 
-	state->m_colorram[offset] = data;
+	m_colorram[offset] = data;
 
 	/* odd bytes are column color attribute */
 	if (offset & 1)
@@ -232,12 +245,12 @@ static WRITE8_HANDLER( looping_colorram_w )
 		/* mark the whole column dirty */
 		offs_t offs = (offset/2);
 		for (i = 0; i < 0x20; i++)
-			state->m_bg_tilemap->mark_tile_dirty(i * 0x20 + offs);
+			m_bg_tilemap->mark_tile_dirty(i * 0x20 + offs);
 	}
 
 	/* even bytes are column scroll */
 	else
-		state->m_bg_tilemap->set_scrolly(offset/2, data);
+		m_bg_tilemap->set_scrolly(offset/2, data);
 }
 
 
@@ -316,24 +329,24 @@ static INTERRUPT_GEN( looping_interrupt )
 }
 
 
-static WRITE8_HANDLER( level2_irq_set )
+WRITE8_MEMBER(looping_state::level2_irq_set)
 {
 	if (!(data & 1))
-		cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, ASSERT_LINE, 4);
+		cputag_set_input_line_and_vector(machine(), "maincpu", 0, ASSERT_LINE, 4);
 }
 
 
-static WRITE8_HANDLER( main_irq_ack_w )
+WRITE8_MEMBER(looping_state::main_irq_ack_w)
 {
 	if (data == 0)
-		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( looping_souint_clr )
+WRITE8_MEMBER(looping_state::looping_souint_clr)
 {
 	if (data == 0)
-		cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 
@@ -343,10 +356,10 @@ static WRITE_LINE_DEVICE_HANDLER( looping_spcint )
 }
 
 
-static WRITE8_HANDLER( looping_soundlatch_w )
+WRITE8_MEMBER(looping_state::looping_soundlatch_w)
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line_and_vector(space->machine(), "audiocpu", 0, ASSERT_LINE, 4);
+	cputag_set_input_line_and_vector(machine(), "audiocpu", 0, ASSERT_LINE, 4);
 }
 
 
@@ -402,12 +415,11 @@ static WRITE8_DEVICE_HANDLER( speech_enable_w )
 }
 
 
-static WRITE8_HANDLER( ballon_enable_w )
+WRITE8_MEMBER(looping_state::ballon_enable_w)
 {
-	looping_state *state = space->machine().driver_data<looping_state>();
-	if (state->m_last != data)
+	if (m_last != data)
 		mame_printf_debug("ballon_enable_w = %d\n", data);
-	state->m_last = data;
+	m_last = data;
 }
 
 
@@ -418,13 +430,13 @@ static WRITE8_HANDLER( ballon_enable_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( out_0_w ) { mame_printf_debug("out0 = %02X\n", data); }
-static WRITE8_HANDLER( out_2_w ) { mame_printf_debug("out2 = %02X\n", data); }
+WRITE8_MEMBER(looping_state::out_0_w){ mame_printf_debug("out0 = %02X\n", data); }
+WRITE8_MEMBER(looping_state::out_2_w){ mame_printf_debug("out2 = %02X\n", data); }
 
-static READ8_HANDLER( adc_r )  { mame_printf_debug("%04X:ADC read\n", cpu_get_pc(&space->device())); return 0xff; }
-static WRITE8_HANDLER( adc_w ) { mame_printf_debug("%04X:ADC write = %02X\n", cpu_get_pc(&space->device()), data); }
+READ8_MEMBER(looping_state::adc_r){ mame_printf_debug("%04X:ADC read\n", cpu_get_pc(&space.device())); return 0xff; }
+WRITE8_MEMBER(looping_state::adc_w){ mame_printf_debug("%04X:ADC write = %02X\n", cpu_get_pc(&space.device()), data); }
 
-static WRITE8_HANDLER( plr2_w )
+WRITE8_MEMBER(looping_state::plr2_w)
 {
 	/* set to 1 after IDLE, cleared to 0 during processing */
 	/* is this an LED on the PCB? */
@@ -438,23 +450,20 @@ static WRITE8_HANDLER( plr2_w )
  *
  *************************************/
 
-static READ8_HANDLER( cop_io_r )
+READ8_MEMBER(looping_state::cop_io_r)
 {
-	//looping_state *state = space->machine().driver_data<looping_state>();
-	// if (offset == 1) return space->machine().rand() & 0x01;
-	return 1; // state->m_cop_io[offset];
+	// if (offset == 1) return machine().rand() & 0x01;
+	return 1; // m_cop_io[offset];
 }
 
-static WRITE8_HANDLER( cop_io_w )
+WRITE8_MEMBER(looping_state::cop_io_w)
 {
-	looping_state *state = space->machine().driver_data<looping_state>();
-	state->m_cop_io[offset] = data;
+	m_cop_io[offset] = data;
 if (offset == 0) logerror("%02x  ",data);
 }
 
-static READ8_HANDLER( protection_r )
+READ8_MEMBER(looping_state::protection_r)
 {
-	looping_state *state = space->machine().driver_data<looping_state>();
 //        The code reads ($7002) ($7004) alternately
 //        The result must change at least once every 10 reads
 //        A read from ($34b0 + result) must == $01
@@ -473,7 +482,7 @@ static READ8_HANDLER( protection_r )
 //        cop write randomly fc (unfortunatly) but 61,67,b7,bf,db,e1,f3,fd,ff too and only these values
 
 	// missing something
-	if(state->m_cop_io[0] != 0xfc) return state->m_cop_io[0];
+	if(m_cop_io[0] != 0xfc) return m_cop_io[0];
 	return 0xff;
 }
 
@@ -487,31 +496,31 @@ static READ8_HANDLER( protection_r )
 static ADDRESS_MAP_START( looping_map, AS_PROGRAM, 8, looping_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(looping_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(looping_videoram_w) AM_BASE(m_videoram)
 
-	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM_WRITE_LEGACY(looping_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM_WRITE(looping_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x9840, 0x987f) AM_MIRROR(0x0700) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x9880, 0x98ff) AM_MIRROR(0x0700) AM_RAM
 
-	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(level2_irq_set)
-	AM_RANGE(0xb006, 0xb006) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(flip_screen_x_w)
-	AM_RANGE(0xb007, 0xb007) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(flip_screen_y_w)
+	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x07f8) AM_WRITE(level2_irq_set)
+	AM_RANGE(0xb006, 0xb006) AM_MIRROR(0x07f8) AM_WRITE(flip_screen_x_w)
+	AM_RANGE(0xb007, 0xb007) AM_MIRROR(0x07f8) AM_WRITE(flip_screen_y_w)
 
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03fc) AM_READ_PORT("P1") AM_WRITE_LEGACY(out_0_w)					/* /OUT0 */
-	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x03fc) AM_READ_PORT("P2") AM_WRITE_LEGACY(looping_soundlatch_w)	/* /OUT1 */
-	AM_RANGE(0xf802, 0xf802) AM_MIRROR(0x03fc) AM_READ_PORT("DSW") AM_WRITE_LEGACY(out_2_w)				/* /OUT2 */
-	AM_RANGE(0xf803, 0xf803) AM_MIRROR(0x03fc) AM_READWRITE_LEGACY(adc_r, adc_w)
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x03fc) AM_READ_PORT("P1") AM_WRITE(out_0_w)					/* /OUT0 */
+	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x03fc) AM_READ_PORT("P2") AM_WRITE(looping_soundlatch_w)	/* /OUT1 */
+	AM_RANGE(0xf802, 0xf802) AM_MIRROR(0x03fc) AM_READ_PORT("DSW") AM_WRITE(out_2_w)				/* /OUT2 */
+	AM_RANGE(0xf803, 0xf803) AM_MIRROR(0x03fc) AM_READWRITE(adc_r, adc_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_io_map, AS_IO, 8, looping_state )
 	/* 400 = A16 */
 	/* 401 = A17 */
 	/* 402 = COLOR 9 */
-	AM_RANGE(0x403, 0x403) AM_WRITE_LEGACY(plr2_w)
+	AM_RANGE(0x403, 0x403) AM_WRITE(plr2_w)
 	/* 404 = C0 */
 	/* 405 = C1 */
-	AM_RANGE(0x406, 0x406) AM_WRITE_LEGACY(main_irq_ack_w)
+	AM_RANGE(0x406, 0x406) AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x407, 0x407) AM_WRITE_LEGACY(watchdog_reset_w)
 
 	AM_RANGE(0x10000, 0x10000) AM_NOP		/* external IDLE signal -- we can ignore it */
@@ -532,11 +541,11 @@ static ADDRESS_MAP_START( looping_sound_map, AS_PROGRAM, 8, looping_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_sound_io_map, AS_IO, 8, looping_state )
-	AM_RANGE(0x000, 0x000) AM_WRITE_LEGACY(looping_souint_clr)
+	AM_RANGE(0x000, 0x000) AM_WRITE(looping_souint_clr)
 	AM_RANGE(0x001, 0x007) AM_DEVWRITE_LEGACY("dac", looping_sound_sw)
 	AM_RANGE(0x008, 0x008) AM_DEVWRITE_LEGACY("aysnd", ay_enable_w)
 	AM_RANGE(0x009, 0x009) AM_DEVWRITE_LEGACY("tms", speech_enable_w)
-	AM_RANGE(0x00a, 0x00a) AM_WRITE_LEGACY(ballon_enable_w)
+	AM_RANGE(0x00a, 0x00a) AM_WRITE(ballon_enable_w)
 	AM_RANGE(0x00b, 0x00f) AM_NOP
 ADDRESS_MAP_END
 
@@ -551,7 +560,7 @@ static ADDRESS_MAP_START( looping_cop_data_map, AS_DATA, 8, looping_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( looping_cop_io_map, AS_IO, 8, looping_state )
-	AM_RANGE(0x0100, 0x0107) AM_READWRITE_LEGACY(cop_io_r, cop_io_w)
+	AM_RANGE(0x0100, 0x0107) AM_READWRITE(cop_io_r, cop_io_w)
 ADDRESS_MAP_END
 
 
@@ -898,7 +907,7 @@ static DRIVER_INIT( looping )
 		rom[i] = BITSWAP8(rom[i], 0,1,2,3,4,5,6,7);
 
 	/* install protection handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7000, 0x7007, FUNC(protection_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7000, 0x7007, read8_delegate(FUNC(looping_state::protection_r), state));
 }
 
 

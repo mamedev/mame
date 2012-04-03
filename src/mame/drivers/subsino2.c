@@ -96,6 +96,57 @@ public:
 	UINT8 *m_am188em_regs;
 	UINT16 m_bishjan_sel;
 	UINT16 m_bishjan_input;
+	DECLARE_WRITE8_MEMBER(ss9601_byte_lo_w);
+	DECLARE_WRITE8_MEMBER(ss9601_byte_lo2_w);
+	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_w);
+	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_lo_w);
+	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_lo_w);
+	DECLARE_WRITE8_MEMBER(ss9601_videoram_0_hi_lo2_w);
+	DECLARE_READ8_MEMBER(ss9601_videoram_0_hi_r);
+	DECLARE_READ8_MEMBER(ss9601_videoram_0_lo_r);
+	DECLARE_WRITE8_MEMBER(ss9601_videoram_1_hi_w);
+	DECLARE_WRITE8_MEMBER(ss9601_videoram_1_lo_w);
+	DECLARE_WRITE8_MEMBER(ss9601_videoram_1_hi_lo_w);
+	DECLARE_WRITE8_MEMBER(ss9601_videoram_1_hi_lo2_w);
+	DECLARE_READ8_MEMBER(ss9601_videoram_1_hi_r);
+	DECLARE_READ8_MEMBER(ss9601_videoram_1_lo_r);
+	DECLARE_WRITE8_MEMBER(ss9601_reelram_hi_lo_w);
+	DECLARE_READ8_MEMBER(ss9601_reelram_hi_r);
+	DECLARE_READ8_MEMBER(ss9601_reelram_lo_r);
+	DECLARE_WRITE8_MEMBER(ss9601_scrollctrl_w);
+	DECLARE_WRITE8_MEMBER(ss9601_tilesize_w);
+	DECLARE_WRITE8_MEMBER(ss9601_scroll_w);
+	DECLARE_WRITE8_MEMBER(ss9601_scrollram_0_hi_w);
+	DECLARE_WRITE8_MEMBER(ss9601_scrollram_0_lo_w);
+	DECLARE_WRITE8_MEMBER(ss9601_scrollram_0_hi_lo_w);
+	DECLARE_READ8_MEMBER(ss9601_scrollram_0_hi_r);
+	DECLARE_READ8_MEMBER(ss9601_scrollram_0_lo_r);
+	DECLARE_WRITE8_MEMBER(ss9601_scrollram_1_hi_w);
+	DECLARE_WRITE8_MEMBER(ss9601_scrollram_1_lo_w);
+	DECLARE_WRITE8_MEMBER(ss9601_scrollram_1_hi_lo_w);
+	DECLARE_READ8_MEMBER(ss9601_scrollram_1_hi_r);
+	DECLARE_READ8_MEMBER(ss9601_scrollram_1_lo_r);
+	DECLARE_WRITE8_MEMBER(ss9601_disable_w);
+	DECLARE_WRITE8_MEMBER(hm86171_colorram_w);
+	DECLARE_WRITE8_MEMBER(dsw_mask_w);
+	DECLARE_READ8_MEMBER(dsw_r);
+	DECLARE_READ8_MEMBER(vblank_bit2_r);
+	DECLARE_READ8_MEMBER(vblank_bit6_r);
+	DECLARE_READ8_MEMBER(am188em_regs_r);
+	DECLARE_WRITE8_MEMBER(am188em_regs_w);
+	DECLARE_WRITE16_MEMBER(bishjan_sel_w);
+	DECLARE_READ16_MEMBER(bishjan_serial_r);
+	DECLARE_WRITE16_MEMBER(bishjan_input_w);
+	DECLARE_READ16_MEMBER(bishjan_input_r);
+	DECLARE_WRITE16_MEMBER(bishjan_outputs_w);
+	DECLARE_WRITE8_MEMBER(expcard_outputs_w);
+	DECLARE_WRITE8_MEMBER(mtrain_outputs_w);
+	DECLARE_WRITE8_MEMBER(mtrain_videoram_w);
+	DECLARE_WRITE8_MEMBER(mtrain_tilesize_w);
+	DECLARE_READ8_MEMBER(mtrain_prot_r);
+	DECLARE_WRITE8_MEMBER(saklove_outputs_w);
+	DECLARE_WRITE8_MEMBER(xplan_outputs_w);
+	DECLARE_WRITE8_MEMBER(xtrain_outputs_w);
 };
 
 
@@ -133,15 +184,13 @@ static TILE_GET_INFO( ss9601_get_tile_info_1 )
 }
 
 
-static WRITE8_HANDLER( ss9601_byte_lo_w )
+WRITE8_MEMBER(subsino2_state::ss9601_byte_lo_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_ss9601_byte_lo = data;
+	m_ss9601_byte_lo = data;
 }
-static WRITE8_HANDLER( ss9601_byte_lo2_w )
+WRITE8_MEMBER(subsino2_state::ss9601_byte_lo2_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_ss9601_byte_lo2 = data;
+	m_ss9601_byte_lo2 = data;
 }
 
 
@@ -172,100 +221,85 @@ INLINE void ss9601_videoram_w(layer_t *l, vram_t vram, address_space *space, off
 }
 
 // Layer 0
-static WRITE8_HANDLER( ss9601_videoram_0_hi_w )
+WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_hi_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	ss9601_videoram_w(&state->m_layers[0], VRAM_HI, space, offset, data);
+	ss9601_videoram_w(&m_layers[0], VRAM_HI, &space, offset, data);
 }
 
-static WRITE8_HANDLER( ss9601_videoram_0_lo_w )
+WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_lo_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	ss9601_videoram_w(&state->m_layers[0], VRAM_LO, space, offset, data);
+	ss9601_videoram_w(&m_layers[0], VRAM_LO, &space, offset, data);
 }
 
-static WRITE8_HANDLER( ss9601_videoram_0_hi_lo_w )
+WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_hi_lo_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	ss9601_videoram_w(&state->m_layers[0], VRAM_HI, space, offset, data);
-	ss9601_videoram_w(&state->m_layers[0], VRAM_LO, space, offset, state->m_ss9601_byte_lo);
+	ss9601_videoram_w(&m_layers[0], VRAM_HI, &space, offset, data);
+	ss9601_videoram_w(&m_layers[0], VRAM_LO, &space, offset, m_ss9601_byte_lo);
 }
 
-static WRITE8_HANDLER( ss9601_videoram_0_hi_lo2_w )
+WRITE8_MEMBER(subsino2_state::ss9601_videoram_0_hi_lo2_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	ss9601_videoram_w(&state->m_layers[0], VRAM_HI, space, offset, data);
-	ss9601_videoram_w(&state->m_layers[0], VRAM_LO, space, offset, state->m_ss9601_byte_lo2);
+	ss9601_videoram_w(&m_layers[0], VRAM_HI, &space, offset, data);
+	ss9601_videoram_w(&m_layers[0], VRAM_LO, &space, offset, m_ss9601_byte_lo2);
 }
 
-static READ8_HANDLER( ss9601_videoram_0_hi_r )
+READ8_MEMBER(subsino2_state::ss9601_videoram_0_hi_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_layers[0].videorams[VRAM_HI][offset];
+	return m_layers[0].videorams[VRAM_HI][offset];
 }
 
-static READ8_HANDLER( ss9601_videoram_0_lo_r )
+READ8_MEMBER(subsino2_state::ss9601_videoram_0_lo_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_layers[0].videorams[VRAM_LO][offset];
+	return m_layers[0].videorams[VRAM_LO][offset];
 }
 
 // Layer 1
-static WRITE8_HANDLER( ss9601_videoram_1_hi_w )
+WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_hi_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	ss9601_videoram_w(&state->m_layers[1], VRAM_HI, space, offset, data);
+	ss9601_videoram_w(&m_layers[1], VRAM_HI, &space, offset, data);
 }
 
-static WRITE8_HANDLER( ss9601_videoram_1_lo_w )
+WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_lo_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	ss9601_videoram_w(&state->m_layers[1], VRAM_LO, space, offset, data);
+	ss9601_videoram_w(&m_layers[1], VRAM_LO, &space, offset, data);
 }
 
-static WRITE8_HANDLER( ss9601_videoram_1_hi_lo_w )
+WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_hi_lo_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	ss9601_videoram_w(&state->m_layers[1], VRAM_HI, space, offset, data);
-	ss9601_videoram_w(&state->m_layers[1], VRAM_LO, space, offset, state->m_ss9601_byte_lo);
+	ss9601_videoram_w(&m_layers[1], VRAM_HI, &space, offset, data);
+	ss9601_videoram_w(&m_layers[1], VRAM_LO, &space, offset, m_ss9601_byte_lo);
 }
 
-static WRITE8_HANDLER( ss9601_videoram_1_hi_lo2_w )
+WRITE8_MEMBER(subsino2_state::ss9601_videoram_1_hi_lo2_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	ss9601_videoram_w(&state->m_layers[1], VRAM_HI, space, offset, data);
-	ss9601_videoram_w(&state->m_layers[1], VRAM_LO, space, offset, state->m_ss9601_byte_lo2);
+	ss9601_videoram_w(&m_layers[1], VRAM_HI, &space, offset, data);
+	ss9601_videoram_w(&m_layers[1], VRAM_LO, &space, offset, m_ss9601_byte_lo2);
 }
 
-static READ8_HANDLER( ss9601_videoram_1_hi_r )
+READ8_MEMBER(subsino2_state::ss9601_videoram_1_hi_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_layers[1].videorams[VRAM_HI][offset];
+	return m_layers[1].videorams[VRAM_HI][offset];
 }
 
-static READ8_HANDLER( ss9601_videoram_1_lo_r )
+READ8_MEMBER(subsino2_state::ss9601_videoram_1_lo_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_layers[1].videorams[VRAM_LO][offset];
+	return m_layers[1].videorams[VRAM_LO][offset];
 }
 
 // Layer 0 Reels
 
-static WRITE8_HANDLER( ss9601_reelram_hi_lo_w )
+WRITE8_MEMBER(subsino2_state::ss9601_reelram_hi_lo_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_ss9601_reelrams[VRAM_HI][offset] = data;
-	state->m_ss9601_reelrams[VRAM_LO][offset] = state->m_ss9601_byte_lo;
+	m_ss9601_reelrams[VRAM_HI][offset] = data;
+	m_ss9601_reelrams[VRAM_LO][offset] = m_ss9601_byte_lo;
 }
-static READ8_HANDLER( ss9601_reelram_hi_r )
+READ8_MEMBER(subsino2_state::ss9601_reelram_hi_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_ss9601_reelrams[VRAM_HI][offset];
+	return m_ss9601_reelrams[VRAM_HI][offset];
 }
-static READ8_HANDLER( ss9601_reelram_lo_r )
+READ8_MEMBER(subsino2_state::ss9601_reelram_lo_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_ss9601_reelrams[VRAM_LO][offset];
+	return m_ss9601_reelrams[VRAM_LO][offset];
 }
 
 
@@ -374,16 +408,14 @@ wtrnymph                xplan
 
 // These are written in sequence
 
-static WRITE8_HANDLER( ss9601_scrollctrl_w )
+WRITE8_MEMBER(subsino2_state::ss9601_scrollctrl_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_ss9601_scrollctrl = data;
+	m_ss9601_scrollctrl = data;
 }
 
-static WRITE8_HANDLER( ss9601_tilesize_w )
+WRITE8_MEMBER(subsino2_state::ss9601_tilesize_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_ss9601_tilesize = data;
+	m_ss9601_tilesize = data;
 
 	tilesize_t sizes[2];
 	switch (data)
@@ -407,14 +439,14 @@ static WRITE8_HANDLER( ss9601_tilesize_w )
 			sizes[0] = TILE_8x8;
 			sizes[1] = TILE_8x8;
 
-			logerror("%s: warning, unknown tilesize = %02x\n", space->machine().describe_context(), data);
+			logerror("%s: warning, unknown tilesize = %02x\n", machine().describe_context(), data);
 			popmessage("UNKNOWN TILESIZE %02X", data);
 			break;
 	}
 
 	for (int i = 0; i < 2; i++)
 	{
-		layer_t *l = &state->m_layers[i];
+		layer_t *l = &m_layers[i];
 
 		if (l->tilesize != sizes[i])
 		{
@@ -428,10 +460,9 @@ static WRITE8_HANDLER( ss9601_tilesize_w )
                               Tilemaps Scroll
 ***************************************************************************/
 
-static WRITE8_HANDLER( ss9601_scroll_w )
+WRITE8_MEMBER(subsino2_state::ss9601_scroll_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	layer_t *layers = state->m_layers;
+	layer_t *layers = m_layers;
 	switch ( offset )
 	{
 		// Layer 0
@@ -449,67 +480,57 @@ static WRITE8_HANDLER( ss9601_scroll_w )
 }
 
 // Layer 0
-static WRITE8_HANDLER( ss9601_scrollram_0_hi_w )
+WRITE8_MEMBER(subsino2_state::ss9601_scrollram_0_hi_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_layers[0].scrollrams[VRAM_HI][offset] = data;
+	m_layers[0].scrollrams[VRAM_HI][offset] = data;
 }
 
-static WRITE8_HANDLER( ss9601_scrollram_0_lo_w )
+WRITE8_MEMBER(subsino2_state::ss9601_scrollram_0_lo_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_layers[0].scrollrams[VRAM_LO][offset] = data;
+	m_layers[0].scrollrams[VRAM_LO][offset] = data;
 }
 
-static WRITE8_HANDLER( ss9601_scrollram_0_hi_lo_w )
+WRITE8_MEMBER(subsino2_state::ss9601_scrollram_0_hi_lo_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_layers[0].scrollrams[VRAM_HI][offset] = data;
-	state->m_layers[0].scrollrams[VRAM_LO][offset] = state->m_ss9601_byte_lo;
+	m_layers[0].scrollrams[VRAM_HI][offset] = data;
+	m_layers[0].scrollrams[VRAM_LO][offset] = m_ss9601_byte_lo;
 }
 
-static READ8_HANDLER ( ss9601_scrollram_0_hi_r )
+READ8_MEMBER(subsino2_state::ss9601_scrollram_0_hi_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_layers[0].scrollrams[VRAM_HI][offset];
+	return m_layers[0].scrollrams[VRAM_HI][offset];
 }
 
-static READ8_HANDLER ( ss9601_scrollram_0_lo_r )
+READ8_MEMBER(subsino2_state::ss9601_scrollram_0_lo_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_layers[0].scrollrams[VRAM_LO][offset];
+	return m_layers[0].scrollrams[VRAM_LO][offset];
 }
 
 // Layer 1
-static WRITE8_HANDLER( ss9601_scrollram_1_hi_w )
+WRITE8_MEMBER(subsino2_state::ss9601_scrollram_1_hi_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_layers[1].scrollrams[VRAM_HI][offset] = data;
+	m_layers[1].scrollrams[VRAM_HI][offset] = data;
 }
 
-static WRITE8_HANDLER( ss9601_scrollram_1_lo_w )
+WRITE8_MEMBER(subsino2_state::ss9601_scrollram_1_lo_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_layers[1].scrollrams[VRAM_LO][offset] = data;
+	m_layers[1].scrollrams[VRAM_LO][offset] = data;
 }
 
-static WRITE8_HANDLER( ss9601_scrollram_1_hi_lo_w )
+WRITE8_MEMBER(subsino2_state::ss9601_scrollram_1_hi_lo_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_layers[1].scrollrams[VRAM_HI][offset] = data;
-	state->m_layers[1].scrollrams[VRAM_LO][offset] = state->m_ss9601_byte_lo;
+	m_layers[1].scrollrams[VRAM_HI][offset] = data;
+	m_layers[1].scrollrams[VRAM_LO][offset] = m_ss9601_byte_lo;
 }
 
-static READ8_HANDLER ( ss9601_scrollram_1_hi_r )
+READ8_MEMBER(subsino2_state::ss9601_scrollram_1_hi_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_layers[1].scrollrams[VRAM_HI][offset];
+	return m_layers[1].scrollrams[VRAM_HI][offset];
 }
 
-static READ8_HANDLER ( ss9601_scrollram_1_lo_r )
+READ8_MEMBER(subsino2_state::ss9601_scrollram_1_lo_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_layers[1].scrollrams[VRAM_LO][offset];
+	return m_layers[1].scrollrams[VRAM_LO][offset];
 }
 
 
@@ -517,10 +538,9 @@ static READ8_HANDLER ( ss9601_scrollram_1_lo_r )
                               Tilemaps Disable
 ***************************************************************************/
 
-static WRITE8_HANDLER( ss9601_disable_w )
+WRITE8_MEMBER(subsino2_state::ss9601_disable_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_ss9601_disable = data;
+	m_ss9601_disable = data;
 }
 
 
@@ -724,23 +744,22 @@ static SCREEN_UPDATE_IND16( subsino2 )
 ***************************************************************************/
 
 
-static WRITE8_HANDLER( hm86171_colorram_w )
+WRITE8_MEMBER(subsino2_state::hm86171_colorram_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
 	switch (offset)
 	{
 		case 0:
-			state->m_hm86171_offs = data * 3;
+			m_hm86171_offs = data * 3;
 			break;
 
 		case 1:
-			state->m_hm86171_colorram[state->m_hm86171_offs] = data;
-			palette_set_color_rgb(space->machine(), state->m_hm86171_offs/3,
-				pal6bit(state->m_hm86171_colorram[(state->m_hm86171_offs/3)*3+0]),
-				pal6bit(state->m_hm86171_colorram[(state->m_hm86171_offs/3)*3+1]),
-				pal6bit(state->m_hm86171_colorram[(state->m_hm86171_offs/3)*3+2])
+			m_hm86171_colorram[m_hm86171_offs] = data;
+			palette_set_color_rgb(machine(), m_hm86171_offs/3,
+				pal6bit(m_hm86171_colorram[(m_hm86171_offs/3)*3+0]),
+				pal6bit(m_hm86171_colorram[(m_hm86171_offs/3)*3+1]),
+				pal6bit(m_hm86171_colorram[(m_hm86171_offs/3)*3+2])
 			);
-			state->m_hm86171_offs = (state->m_hm86171_offs+1) % (256*3);
+			m_hm86171_offs = (m_hm86171_offs+1) % (256*3);
 			break;
 
 		case 2:
@@ -757,29 +776,27 @@ static WRITE8_HANDLER( hm86171_colorram_w )
                                 Input / Output
 ***************************************************************************/
 
-static WRITE8_HANDLER( dsw_mask_w )
+WRITE8_MEMBER(subsino2_state::dsw_mask_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_dsw_mask = data;
+	m_dsw_mask = data;
 }
 
-static READ8_HANDLER( dsw_r )
+READ8_MEMBER(subsino2_state::dsw_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return	( (input_port_read(space->machine(), "DSW1") & state->m_dsw_mask) ? 0x01 : 0 ) |
-			( (input_port_read(space->machine(), "DSW2") & state->m_dsw_mask) ? 0x02 : 0 ) |
-			( (input_port_read(space->machine(), "DSW3") & state->m_dsw_mask) ? 0x04 : 0 ) |
-			( (input_port_read(space->machine(), "DSW4") & state->m_dsw_mask) ? 0x08 : 0 ) ;
+	return	( (input_port_read(machine(), "DSW1") & m_dsw_mask) ? 0x01 : 0 ) |
+			( (input_port_read(machine(), "DSW2") & m_dsw_mask) ? 0x02 : 0 ) |
+			( (input_port_read(machine(), "DSW3") & m_dsw_mask) ? 0x04 : 0 ) |
+			( (input_port_read(machine(), "DSW4") & m_dsw_mask) ? 0x08 : 0 ) ;
 }
 
 
-static READ8_HANDLER( vblank_bit2_r )
+READ8_MEMBER(subsino2_state::vblank_bit2_r)
 {
-		return space->machine().primary_screen->vblank() ? 0x04 : 0x00;
+	return machine().primary_screen->vblank() ? 0x04 : 0x00;
 }
-static READ8_HANDLER( vblank_bit6_r )
+READ8_MEMBER(subsino2_state::vblank_bit6_r)
 {
-	return space->machine().primary_screen->vblank() ? 0x40 : 0x00;
+	return machine().primary_screen->vblank() ? 0x40 : 0x00;
 }
 
 static WRITE8_DEVICE_HANDLER( oki_bank_bit0_w )
@@ -810,16 +827,14 @@ enum
 	AM188EM_I0CON = 0x38
 };
 
-static READ8_HANDLER( am188em_regs_r )
+READ8_MEMBER(subsino2_state::am188em_regs_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	return state->m_am188em_regs[offset];
+	return m_am188em_regs[offset];
 }
 
-static WRITE8_HANDLER( am188em_regs_w )
+WRITE8_MEMBER(subsino2_state::am188em_regs_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_am188em_regs[offset] = data;
+	m_am188em_regs[offset] = data;
 }
 
 static MACHINE_RESET( am188em )
@@ -867,52 +882,47 @@ static TIMER_DEVICE_CALLBACK( h8_timer_irq )
 ***************************************************************************/
 
 
-static WRITE16_HANDLER( bishjan_sel_w )
+WRITE16_MEMBER(subsino2_state::bishjan_sel_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
 	if (ACCESSING_BITS_8_15)
-		state->m_bishjan_sel = data >> 8;
+		m_bishjan_sel = data >> 8;
 }
 
-static READ16_HANDLER( bishjan_serial_r )
+READ16_MEMBER(subsino2_state::bishjan_serial_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
 	return
-		(space->machine().rand() & 0x9800)	|	// bit 7 - serial communication
-		(((state->m_bishjan_sel==0x12) ? 0x40:0x00) << 8) |
+		(machine().rand() & 0x9800)	|	// bit 7 - serial communication
+		(((m_bishjan_sel==0x12) ? 0x40:0x00) << 8) |
 //      (machine.rand() & 0xff);
-//      (((space->machine().primary_screen->frame_number()%60)==0)?0x18:0x00);
+//      (((machine().primary_screen->frame_number()%60)==0)?0x18:0x00);
 		0x18;
 }
 
-static WRITE16_HANDLER( bishjan_input_w )
+WRITE16_MEMBER(subsino2_state::bishjan_input_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
 	if (ACCESSING_BITS_8_15)
-		state->m_bishjan_input = data >> 8;
+		m_bishjan_input = data >> 8;
 }
 
-static READ16_HANDLER( bishjan_input_r )
+READ16_MEMBER(subsino2_state::bishjan_input_r)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
 	int i;
 	UINT16 res = 0xff;
 	static const char *const port[] = { "KEYB_0", "KEYB_1", "KEYB_2", "KEYB_3", "KEYB_4" };
 
 	for (i = 0; i < 5; i++)
-		if (state->m_bishjan_input & (1 << i))
-			res = input_port_read(space->machine(), port[i]);
+		if (m_bishjan_input & (1 << i))
+			res = input_port_read(machine(), port[i]);
 
 	return	(res << 8) |									// high byte
-			input_port_read(space->machine(), "SYSTEM") |		// low byte
-			(ticket_dispenser_r(space->machine().device("hopper"), 0) ? 0x00 : 0x04)	// bit 2: hopper sensor
+			input_port_read(machine(), "SYSTEM") |		// low byte
+			(ticket_dispenser_r(machine().device("hopper"), 0) ? 0x00 : 0x04)	// bit 2: hopper sensor
 	;
 }
 
-static WRITE16_HANDLER( bishjan_outputs_w )
+WRITE16_MEMBER(subsino2_state::bishjan_outputs_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_outputs16[offset] = data;
+	m_outputs16[offset] = data;
 
 	switch (offset)
 	{
@@ -920,13 +930,13 @@ static WRITE16_HANDLER( bishjan_outputs_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				// coin out         data & 0x01;
-				ticket_dispenser_w(space->machine().device("hopper"), 0, (data & 0x0002) ? 0x80 : 0);	// hopper
-				coin_counter_w(space->machine(), 0,	data & 0x0010 );
+				ticket_dispenser_w(machine().device("hopper"), 0, (data & 0x0002) ? 0x80 : 0);	// hopper
+				coin_counter_w(machine(), 0,	data & 0x0010 );
 			}
 			break;
 	}
 
-//  popmessage("0: %04x", state->m_outputs16[0]);
+//  popmessage("0: %04x", m_outputs16[0]);
 }
 
 
@@ -939,53 +949,52 @@ static ADDRESS_MAP_START( bishjan_map, AS_PROGRAM, 16, subsino2_state )
 	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_SHARE("nvram")	// battery
 
 	// read lo (L1)   (only half tilemap?)
-	AM_RANGE( 0x412000, 0x412fff ) AM_READ8_LEGACY(ss9601_videoram_1_lo_r, 0xffff )
-	AM_RANGE( 0x413000, 0x4131ff ) AM_READWRITE8_LEGACY(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w, 0xffff )
+	AM_RANGE( 0x412000, 0x412fff ) AM_READ8(ss9601_videoram_1_lo_r, 0xffff )
+	AM_RANGE( 0x413000, 0x4131ff ) AM_READWRITE8(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w, 0xffff )
 	// read lo (REEL)
-	AM_RANGE( 0x416000, 0x416fff ) AM_READ8_LEGACY(ss9601_reelram_lo_r, 0xffff )
-	AM_RANGE( 0x417000, 0x4171ff ) AM_READWRITE8_LEGACY(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w, 0xffff )
+	AM_RANGE( 0x416000, 0x416fff ) AM_READ8(ss9601_reelram_lo_r, 0xffff )
+	AM_RANGE( 0x417000, 0x4171ff ) AM_READWRITE8(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w, 0xffff )
 
 	// read hi (L1)
-	AM_RANGE( 0x422000, 0x422fff ) AM_READ8_LEGACY(ss9601_videoram_1_hi_r, 0xffff )
-	AM_RANGE( 0x423000, 0x4231ff ) AM_READWRITE8_LEGACY(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w, 0xffff )
+	AM_RANGE( 0x422000, 0x422fff ) AM_READ8(ss9601_videoram_1_hi_r, 0xffff )
+	AM_RANGE( 0x423000, 0x4231ff ) AM_READWRITE8(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w, 0xffff )
 	// read hi (REEL)
-	AM_RANGE( 0x426000, 0x426fff ) AM_READ8_LEGACY(ss9601_reelram_hi_r, 0xffff )
-	AM_RANGE( 0x427000, 0x4271ff ) AM_READWRITE8_LEGACY(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w, 0xffff )
+	AM_RANGE( 0x426000, 0x426fff ) AM_READ8(ss9601_reelram_hi_r, 0xffff )
+	AM_RANGE( 0x427000, 0x4271ff ) AM_READWRITE8(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w, 0xffff )
 
 	// write both (L1)
-	AM_RANGE( 0x430000, 0x431fff ) AM_WRITE8_LEGACY(ss9601_videoram_1_hi_lo_w, 0xffff )
-	AM_RANGE( 0x432000, 0x432fff ) AM_WRITE8_LEGACY(ss9601_videoram_1_hi_lo_w, 0xffff )
-	AM_RANGE( 0x433000, 0x4331ff ) AM_WRITE8_LEGACY(ss9601_scrollram_1_hi_lo_w, 0xffff )
+	AM_RANGE( 0x430000, 0x431fff ) AM_WRITE8(ss9601_videoram_1_hi_lo_w, 0xffff )
+	AM_RANGE( 0x432000, 0x432fff ) AM_WRITE8(ss9601_videoram_1_hi_lo_w, 0xffff )
+	AM_RANGE( 0x433000, 0x4331ff ) AM_WRITE8(ss9601_scrollram_1_hi_lo_w, 0xffff )
 	// write both (L0 & REEL)
-	AM_RANGE( 0x434000, 0x435fff ) AM_WRITE8_LEGACY(ss9601_videoram_0_hi_lo_w, 0xffff )
-	AM_RANGE( 0x436000, 0x436fff ) AM_WRITE8_LEGACY(ss9601_reelram_hi_lo_w, 0xffff )
-	AM_RANGE( 0x437000, 0x4371ff ) AM_WRITE8_LEGACY(ss9601_scrollram_0_hi_lo_w, 0xffff )
+	AM_RANGE( 0x434000, 0x435fff ) AM_WRITE8(ss9601_videoram_0_hi_lo_w, 0xffff )
+	AM_RANGE( 0x436000, 0x436fff ) AM_WRITE8(ss9601_reelram_hi_lo_w, 0xffff )
+	AM_RANGE( 0x437000, 0x4371ff ) AM_WRITE8(ss9601_scrollram_0_hi_lo_w, 0xffff )
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE_LEGACY(bishjan_sel_w )
-	AM_RANGE( 0x600040, 0x600041 ) AM_WRITE8_LEGACY(ss9601_scrollctrl_w, 0xff00 )
-	AM_RANGE( 0x600060, 0x600063 ) AM_WRITE8_LEGACY(hm86171_colorram_w, 0xffff )
-	AM_RANGE( 0x600080, 0x600081 ) AM_WRITE8_LEGACY(ss9601_tilesize_w, 0xff00 )
-	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE8_LEGACY(ss9601_byte_lo_w, 0xff00 )
+	AM_RANGE( 0x600000, 0x600001 ) AM_READNOP AM_WRITE(bishjan_sel_w )
+	AM_RANGE( 0x600040, 0x600041 ) AM_WRITE8(ss9601_scrollctrl_w, 0xff00 )
+	AM_RANGE( 0x600060, 0x600063 ) AM_WRITE8(hm86171_colorram_w, 0xffff )
+	AM_RANGE( 0x600080, 0x600081 ) AM_WRITE8(ss9601_tilesize_w, 0xff00 )
+	AM_RANGE( 0x6000a0, 0x6000a1 ) AM_WRITE8(ss9601_byte_lo_w, 0xff00 )
 
-	AM_RANGE( 0xa0001e, 0xa0001f ) AM_WRITE8_LEGACY(ss9601_disable_w, 0x00ff )
+	AM_RANGE( 0xa0001e, 0xa0001f ) AM_WRITE8(ss9601_disable_w, 0x00ff )
 
-	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE8_LEGACY(ss9601_scroll_w, 0xffff )
+	AM_RANGE( 0xa00020, 0xa00025 ) AM_WRITE8(ss9601_scroll_w, 0xffff )
 
 	AM_RANGE( 0xc00000, 0xc00001 ) AM_READ_PORT("DSW")								// SW1
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_PORT("JOY") AM_WRITE_LEGACY(bishjan_input_w )	// IN C
-	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ_LEGACY(bishjan_input_r )						// IN A & B
-	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ_LEGACY(bishjan_serial_r )						// IN D
-	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE_LEGACY(bishjan_outputs_w ) AM_BASE(m_outputs16 )
+	AM_RANGE( 0xc00002, 0xc00003 ) AM_READ_PORT("JOY") AM_WRITE(bishjan_input_w )	// IN C
+	AM_RANGE( 0xc00004, 0xc00005 ) AM_READ(bishjan_input_r )						// IN A & B
+	AM_RANGE( 0xc00006, 0xc00007 ) AM_READ(bishjan_serial_r )						// IN D
+	AM_RANGE( 0xc00008, 0xc00009 ) AM_READ_PORT("RESET") AM_WRITE(bishjan_outputs_w ) AM_BASE(m_outputs16 )
 ADDRESS_MAP_END
 
 /***************************************************************************
                        Express Card / Top Card
 ***************************************************************************/
 
-static WRITE8_HANDLER( expcard_outputs_w )
+WRITE8_MEMBER(subsino2_state::expcard_outputs_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_outputs[offset] = data;
+	m_outputs[offset] = data;
 
 	switch (offset)
 	{
@@ -994,51 +1003,50 @@ static WRITE8_HANDLER( expcard_outputs_w )
 			break;
 
 		case 1:	// C
-			set_led_status(space->machine(), 0,	data & 0x02);	// raise
+			set_led_status(machine(), 0,	data & 0x02);	// raise
 			break;
 
 		case 2:	// B
-			set_led_status(space->machine(), 1,	data & 0x04);	// hold 4 / small & hold 5 / big ?
-			set_led_status(space->machine(), 2,	data & 0x08);	// hold 1 / bet
-			set_led_status(space->machine(), 3,	data & 0x10);	// hold 2 / take ?
-			set_led_status(space->machine(), 4,	data & 0x20);	// hold 3 / double up ?
+			set_led_status(machine(), 1,	data & 0x04);	// hold 4 / small & hold 5 / big ?
+			set_led_status(machine(), 2,	data & 0x08);	// hold 1 / bet
+			set_led_status(machine(), 3,	data & 0x10);	// hold 2 / take ?
+			set_led_status(machine(), 4,	data & 0x20);	// hold 3 / double up ?
 			break;
 
 		case 3:	// A
-			coin_counter_w(space->machine(), 0,	data & 0x01 );	// coin in
-			coin_counter_w(space->machine(), 1,	data & 0x02 );	// key in
+			coin_counter_w(machine(), 0,	data & 0x01 );	// coin in
+			coin_counter_w(machine(), 1,	data & 0x02 );	// key in
 
-			set_led_status(space->machine(), 5,	data & 0x10);	// start
+			set_led_status(machine(), 5,	data & 0x10);	// start
 			break;
 	}
 
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", state->m_outputs[0], state->m_outputs[1], state->m_outputs[2], state->m_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
 /***************************************************************************
                                 Magic Train
 ***************************************************************************/
 
-static WRITE8_HANDLER( mtrain_outputs_w )
+WRITE8_MEMBER(subsino2_state::mtrain_outputs_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_outputs[offset] = data;
+	m_outputs[offset] = data;
 
 	switch (offset)
 	{
 		case 0:
-			coin_counter_w(space->machine(), 0,	data & 0x01 );	// key in
-			coin_counter_w(space->machine(), 1,	data & 0x02 );	// coin in
-			coin_counter_w(space->machine(), 2,	data & 0x10 );	// pay out
-//          coin_counter_w(space->machine(), 3,   data & 0x20 );  // hopper motor
+			coin_counter_w(machine(), 0,	data & 0x01 );	// key in
+			coin_counter_w(machine(), 1,	data & 0x02 );	// coin in
+			coin_counter_w(machine(), 2,	data & 0x10 );	// pay out
+//          coin_counter_w(machine(), 3,   data & 0x20 );  // hopper motor
 			break;
 
 		case 1:
-			set_led_status(space->machine(), 0,	data & 0x01);	// stop reel?
-			set_led_status(space->machine(), 1,	data & 0x02);	// stop reel? (double or take)
-			set_led_status(space->machine(), 2,	data & 0x04);	// start all
-			set_led_status(space->machine(), 3,	data & 0x08);	// bet / stop all
-			set_led_status(space->machine(), 4,	data & 0x20);	// stop reel? (double or take)
+			set_led_status(machine(), 0,	data & 0x01);	// stop reel?
+			set_led_status(machine(), 1,	data & 0x02);	// stop reel? (double or take)
+			set_led_status(machine(), 2,	data & 0x04);	// start all
+			set_led_status(machine(), 3,	data & 0x08);	// bet / stop all
+			set_led_status(machine(), 4,	data & 0x20);	// stop reel? (double or take)
 			break;
 
 		case 2:
@@ -1048,29 +1056,27 @@ static WRITE8_HANDLER( mtrain_outputs_w )
 			break;
 	}
 
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", state->m_outputs[0], state->m_outputs[1], state->m_outputs[2], state->m_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
-static WRITE8_HANDLER( mtrain_videoram_w )
+WRITE8_MEMBER(subsino2_state::mtrain_videoram_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	vram_t vram = (state->m_ss9601_byte_lo & 0x08) ? VRAM_HI : VRAM_LO;
-	switch (state->m_ss9601_byte_lo & (~0x08))
+	vram_t vram = (m_ss9601_byte_lo & 0x08) ? VRAM_HI : VRAM_LO;
+	switch (m_ss9601_byte_lo & (~0x08))
 	{
-		case 0x00:	ss9601_videoram_w(&state->m_layers[1], vram, space, offset,        data);
-					ss9601_videoram_w(&state->m_layers[1], vram, space, offset+0x1000, data);	break;
+		case 0x00:	ss9601_videoram_w(&m_layers[1], vram, &space, offset,        data);
+					ss9601_videoram_w(&m_layers[1], vram, &space, offset+0x1000, data);	break;
 
-		case 0x04:	ss9601_videoram_w(&state->m_layers[0], vram, space, offset,        data);
-					ss9601_videoram_w(&state->m_layers[0], vram, space, offset+0x1000, data);	break;
+		case 0x04:	ss9601_videoram_w(&m_layers[0], vram, &space, offset,        data);
+					ss9601_videoram_w(&m_layers[0], vram, &space, offset+0x1000, data);	break;
 
-		case 0x06:	state->m_ss9601_reelrams[vram][offset] = data;	break;
+		case 0x06:	m_ss9601_reelrams[vram][offset] = data;	break;
 	}
 }
 
-static WRITE8_HANDLER( mtrain_tilesize_w )
+WRITE8_MEMBER(subsino2_state::mtrain_tilesize_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_ss9601_tilesize = data;
+	m_ss9601_tilesize = data;
 
 	tilesize_t sizes[2];
 	switch (data)
@@ -1089,14 +1095,14 @@ static WRITE8_HANDLER( mtrain_tilesize_w )
 			sizes[0] = TILE_8x8;
 			sizes[1] = TILE_8x8;
 
-			logerror("%s: warning, unknown tilesize = %02x\n", space->machine().describe_context(), data);
+			logerror("%s: warning, unknown tilesize = %02x\n", machine().describe_context(), data);
 			popmessage("UNKNOWN TILESIZE %02X", data);
 			break;
 	}
 
 	for (int i = 0; i < 2; i++)
 	{
-		layer_t *l = &state->m_layers[i];
+		layer_t *l = &m_layers[i];
 
 		if (l->tilesize != sizes[i])
 		{
@@ -1106,7 +1112,7 @@ static WRITE8_HANDLER( mtrain_tilesize_w )
 	}
 }
 
-static READ8_HANDLER( mtrain_prot_r )
+READ8_MEMBER(subsino2_state::mtrain_prot_r)
 {
 	return "SUBSION"[offset];
 }
@@ -1116,28 +1122,28 @@ static ADDRESS_MAP_START( mtrain_map, AS_PROGRAM, 8, subsino2_state )
 
 	AM_RANGE( 0x07800, 0x07fff ) AM_RAM AM_SHARE("nvram")	// battery
 
-	AM_RANGE( 0x08000, 0x08fff ) AM_WRITE_LEGACY(mtrain_videoram_w )
+	AM_RANGE( 0x08000, 0x08fff ) AM_WRITE(mtrain_videoram_w )
 
-	AM_RANGE( 0x0911f, 0x0911f ) AM_WRITE_LEGACY(ss9601_disable_w )
-	AM_RANGE( 0x09120, 0x09125 ) AM_WRITE_LEGACY(ss9601_scroll_w )
+	AM_RANGE( 0x0911f, 0x0911f ) AM_WRITE(ss9601_disable_w )
+	AM_RANGE( 0x09120, 0x09125 ) AM_WRITE(ss9601_scroll_w )
 
-	AM_RANGE( 0x0912f, 0x0912f ) AM_WRITE_LEGACY(ss9601_byte_lo_w )
+	AM_RANGE( 0x0912f, 0x0912f ) AM_WRITE(ss9601_byte_lo_w )
 
-	AM_RANGE( 0x09140, 0x09142 ) AM_WRITE_LEGACY(mtrain_outputs_w ) AM_BASE(m_outputs )
+	AM_RANGE( 0x09140, 0x09142 ) AM_WRITE(mtrain_outputs_w ) AM_BASE(m_outputs )
 	AM_RANGE( 0x09143, 0x09143 ) AM_READ_PORT( "IN D" )	// (not shown in system test) 0x40 serial out, 0x80 serial in
 	AM_RANGE( 0x09144, 0x09144 ) AM_READ_PORT( "IN A" )	// A
 	AM_RANGE( 0x09145, 0x09145 ) AM_READ_PORT( "IN B" )	// B
 	AM_RANGE( 0x09146, 0x09146 ) AM_READ_PORT( "IN C" )	// C
-	AM_RANGE( 0x09147, 0x09147 ) AM_READ_LEGACY(dsw_r )
-	AM_RANGE( 0x09148, 0x09148 ) AM_WRITE_LEGACY(dsw_mask_w )
+	AM_RANGE( 0x09147, 0x09147 ) AM_READ(dsw_r )
+	AM_RANGE( 0x09148, 0x09148 ) AM_WRITE(dsw_mask_w )
 
-	AM_RANGE( 0x09152, 0x09152 ) AM_WRITE_LEGACY(vblank_bit2_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit0_w )
+	AM_RANGE( 0x09152, 0x09152 ) AM_READ(vblank_bit2_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit0_w )
 
-	AM_RANGE( 0x09158, 0x0915e ) AM_READ_LEGACY(mtrain_prot_r )
+	AM_RANGE( 0x09158, 0x0915e ) AM_READ(mtrain_prot_r )
 
-	AM_RANGE( 0x09160, 0x09163 ) AM_WRITE_LEGACY(hm86171_colorram_w )
+	AM_RANGE( 0x09160, 0x09163 ) AM_WRITE(hm86171_colorram_w )
 	AM_RANGE( 0x09164, 0x09164 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE( 0x09168, 0x09168 ) AM_WRITE_LEGACY(mtrain_tilesize_w )
+	AM_RANGE( 0x09168, 0x09168 ) AM_WRITE(mtrain_tilesize_w )
 
 	AM_RANGE( 0x09800, 0x09fff ) AM_RAM
 
@@ -1152,16 +1158,15 @@ ADDRESS_MAP_END
                           Sakura Love - Ying Hua Lian
 ***************************************************************************/
 
-static WRITE8_HANDLER( saklove_outputs_w )
+WRITE8_MEMBER(subsino2_state::saklove_outputs_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_outputs[offset] = data;
+	m_outputs[offset] = data;
 
 	switch (offset)
 	{
 		case 0:
-			coin_counter_w(space->machine(), 0,	data & 0x01 );	// coin in
-			coin_counter_w(space->machine(), 1,	data & 0x02 );	// key in
+			coin_counter_w(machine(), 0,	data & 0x01 );	// coin in
+			coin_counter_w(machine(), 1,	data & 0x02 );	// key in
 			break;
 
 		case 1:
@@ -1175,70 +1180,69 @@ static WRITE8_HANDLER( saklove_outputs_w )
 			break;
 	}
 
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", state->m_outputs[0], state->m_outputs[1], state->m_outputs[2], state->m_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
 static ADDRESS_MAP_START( saklove_map, AS_PROGRAM, 8, subsino2_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram")	// battery
 
 	// read lo (L1)   (only half tilemap?)
-	AM_RANGE(0x12000, 0x12fff) AM_READWRITE_LEGACY(ss9601_videoram_1_lo_r,  ss9601_videoram_1_lo_w )
-	AM_RANGE(0x13000, 0x131ff) AM_READWRITE_LEGACY(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w )
+	AM_RANGE(0x12000, 0x12fff) AM_READWRITE(ss9601_videoram_1_lo_r,  ss9601_videoram_1_lo_w )
+	AM_RANGE(0x13000, 0x131ff) AM_READWRITE(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w )
 	// read lo (L0)
-	AM_RANGE(0x16000, 0x16fff) AM_READWRITE_LEGACY(ss9601_videoram_0_lo_r,  ss9601_videoram_0_lo_w )
-	AM_RANGE(0x17000, 0x171ff) AM_READWRITE_LEGACY(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w )
+	AM_RANGE(0x16000, 0x16fff) AM_READWRITE(ss9601_videoram_0_lo_r,  ss9601_videoram_0_lo_w )
+	AM_RANGE(0x17000, 0x171ff) AM_READWRITE(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w )
 
 	// read hi (L1)
-	AM_RANGE(0x22000, 0x22fff) AM_READWRITE_LEGACY(ss9601_videoram_1_hi_r,  ss9601_videoram_1_hi_w )
-	AM_RANGE(0x23000, 0x231ff) AM_READWRITE_LEGACY(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w )
+	AM_RANGE(0x22000, 0x22fff) AM_READWRITE(ss9601_videoram_1_hi_r,  ss9601_videoram_1_hi_w )
+	AM_RANGE(0x23000, 0x231ff) AM_READWRITE(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w )
 	// read hi (L0)
-	AM_RANGE(0x26000, 0x26fff) AM_READWRITE_LEGACY(ss9601_videoram_0_hi_r,  ss9601_videoram_0_hi_w )
-	AM_RANGE(0x27000, 0x271ff) AM_READWRITE_LEGACY(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w )
+	AM_RANGE(0x26000, 0x26fff) AM_READWRITE(ss9601_videoram_0_hi_r,  ss9601_videoram_0_hi_w )
+	AM_RANGE(0x27000, 0x271ff) AM_READWRITE(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w )
 
 	// write both (L1)
-	AM_RANGE(0x30000, 0x31fff) AM_READWRITE_LEGACY(ss9601_videoram_1_hi_r, ss9601_videoram_1_hi_lo_w )
+	AM_RANGE(0x30000, 0x31fff) AM_READWRITE(ss9601_videoram_1_hi_r, ss9601_videoram_1_hi_lo_w )
 	// write both (L0)
-	AM_RANGE(0x34000, 0x35fff) AM_READWRITE_LEGACY(ss9601_videoram_0_hi_r, ss9601_videoram_0_hi_lo_w )
+	AM_RANGE(0x34000, 0x35fff) AM_READWRITE(ss9601_videoram_0_hi_r, ss9601_videoram_0_hi_lo_w )
 
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( saklove_io, AS_IO, 8, subsino2_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY(ss9601_scrollctrl_w )
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(ss9601_scrollctrl_w )
 
 	AM_RANGE(0x0020, 0x0020) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x0040, 0x0041) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w )
 
-	AM_RANGE(0x0060, 0x0063) AM_WRITE_LEGACY(hm86171_colorram_w )
+	AM_RANGE(0x0060, 0x0063) AM_WRITE(hm86171_colorram_w )
 
-	AM_RANGE(0x0080, 0x0080) AM_WRITE_LEGACY(ss9601_tilesize_w )
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE_LEGACY(ss9601_byte_lo_w )
-	AM_RANGE(0x021f, 0x021f) AM_WRITE_LEGACY(ss9601_disable_w )
-	AM_RANGE(0x0220, 0x0225) AM_WRITE_LEGACY(ss9601_scroll_w )
+	AM_RANGE(0x0080, 0x0080) AM_WRITE(ss9601_tilesize_w )
+	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(ss9601_byte_lo_w )
+	AM_RANGE(0x021f, 0x021f) AM_WRITE(ss9601_disable_w )
+	AM_RANGE(0x0220, 0x0225) AM_WRITE(ss9601_scroll_w )
 
-	AM_RANGE(0x0300, 0x0303) AM_WRITE_LEGACY(saklove_outputs_w ) AM_BASE(m_outputs )
+	AM_RANGE(0x0300, 0x0303) AM_WRITE(saklove_outputs_w ) AM_BASE(m_outputs )
 	AM_RANGE(0x0303, 0x0303) AM_READ_PORT( "IN D" )	// 0x40 serial out, 0x80 serial in
 	AM_RANGE(0x0304, 0x0304) AM_READ_PORT( "IN A" )
 	AM_RANGE(0x0305, 0x0305) AM_READ_PORT( "IN B" )
 	AM_RANGE(0x0306, 0x0306) AM_READ_PORT( "IN C" )
 
-	AM_RANGE(0x0307, 0x0307) AM_READ_LEGACY(dsw_r )
-	AM_RANGE(0x0308, 0x0308) AM_WRITE_LEGACY(dsw_mask_w )
+	AM_RANGE(0x0307, 0x0307) AM_READ(dsw_r )
+	AM_RANGE(0x0308, 0x0308) AM_WRITE(dsw_mask_w )
 
-	AM_RANGE(0x0312, 0x0312) AM_READ_LEGACY(vblank_bit2_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit0_w )
+	AM_RANGE(0x0312, 0x0312) AM_READ(vblank_bit2_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit0_w )
 
 	// Peripheral Control Block
-	AM_RANGE(0xff00, 0xffff) AM_READWRITE_LEGACY(am188em_regs_r, am188em_regs_w ) AM_BASE(m_am188em_regs )
+	AM_RANGE(0xff00, 0xffff) AM_READWRITE(am188em_regs_r, am188em_regs_w ) AM_BASE(m_am188em_regs )
 ADDRESS_MAP_END
 
 /***************************************************************************
                                 X-Plan
 ***************************************************************************/
 
-static WRITE8_HANDLER( xplan_outputs_w )
+WRITE8_MEMBER(subsino2_state::xplan_outputs_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_outputs[offset] = data;
+	m_outputs[offset] = data;
 
 	switch (offset)
 	{
@@ -1247,58 +1251,58 @@ static WRITE8_HANDLER( xplan_outputs_w )
 			break;
 
 		case 1:
-			set_led_status(space->machine(), 0,	data & 0x02);	// raise
+			set_led_status(machine(), 0,	data & 0x02);	// raise
 			break;
 
 		case 2:	// B
-			set_led_status(space->machine(), 1,	data & 0x04);	// hold 1 / big ?
-			set_led_status(space->machine(), 2,	data & 0x08);	// hold 5 / bet
-			set_led_status(space->machine(), 3,	data & 0x10);	// hold 4 ?
-			set_led_status(space->machine(), 4,	data & 0x20);	// hold 2 / double up
-			set_led_status(space->machine(), 5,	data & 0x40);	// hold 3 / small ?
+			set_led_status(machine(), 1,	data & 0x04);	// hold 1 / big ?
+			set_led_status(machine(), 2,	data & 0x08);	// hold 5 / bet
+			set_led_status(machine(), 3,	data & 0x10);	// hold 4 ?
+			set_led_status(machine(), 4,	data & 0x20);	// hold 2 / double up
+			set_led_status(machine(), 5,	data & 0x40);	// hold 3 / small ?
 			break;
 
 		case 3:	// A
-			coin_counter_w(space->machine(), 0,	data & 0x01 );
-			coin_counter_w(space->machine(), 1,	data & 0x02 );
+			coin_counter_w(machine(), 0,	data & 0x01 );
+			coin_counter_w(machine(), 1,	data & 0x02 );
 
-			set_led_status(space->machine(), 6,	data & 0x10);	// start / take
+			set_led_status(machine(), 6,	data & 0x10);	// start / take
 			break;
 	}
 
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", state->m_outputs[0], state->m_outputs[1], state->m_outputs[2], state->m_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
 static ADDRESS_MAP_START( xplan_map, AS_PROGRAM, 8, subsino2_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram")	// battery
 
 	// write both (L1, byte_lo2)
-	AM_RANGE( 0x10000, 0x11fff ) AM_WRITE_LEGACY(ss9601_videoram_1_hi_lo2_w )
+	AM_RANGE( 0x10000, 0x11fff ) AM_WRITE(ss9601_videoram_1_hi_lo2_w )
 	// read lo (L1)   (only half tilemap?)
-	AM_RANGE( 0x12000, 0x12fff ) AM_READ_LEGACY(ss9601_videoram_1_lo_r )
-	AM_RANGE( 0x13000, 0x131ff ) AM_READWRITE_LEGACY(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w )
+	AM_RANGE( 0x12000, 0x12fff ) AM_READ(ss9601_videoram_1_lo_r )
+	AM_RANGE( 0x13000, 0x131ff ) AM_READWRITE(ss9601_scrollram_1_lo_r, ss9601_scrollram_1_lo_w )
 
 	// write both (L0, byte_lo2)
-	AM_RANGE( 0x14000, 0x15fff ) AM_WRITE_LEGACY(ss9601_videoram_0_hi_lo2_w )
+	AM_RANGE( 0x14000, 0x15fff ) AM_WRITE(ss9601_videoram_0_hi_lo2_w )
 	// read lo (REEL)
-	AM_RANGE( 0x16000, 0x16fff ) AM_READ_LEGACY(ss9601_reelram_lo_r )
-	AM_RANGE( 0x17000, 0x171ff ) AM_READWRITE_LEGACY(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w )
+	AM_RANGE( 0x16000, 0x16fff ) AM_READ(ss9601_reelram_lo_r )
+	AM_RANGE( 0x17000, 0x171ff ) AM_READWRITE(ss9601_scrollram_0_lo_r, ss9601_scrollram_0_lo_w )
 
 	// read hi (L1)
-	AM_RANGE( 0x22000, 0x22fff ) AM_READ_LEGACY(ss9601_videoram_1_hi_r )
-	AM_RANGE( 0x23000, 0x231ff ) AM_READWRITE_LEGACY(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w )
+	AM_RANGE( 0x22000, 0x22fff ) AM_READ(ss9601_videoram_1_hi_r )
+	AM_RANGE( 0x23000, 0x231ff ) AM_READWRITE(ss9601_scrollram_1_hi_r, ss9601_scrollram_1_hi_w )
 	// read hi (REEL)
-	AM_RANGE( 0x26000, 0x26fff ) AM_READ_LEGACY(ss9601_reelram_hi_r )
-	AM_RANGE( 0x27000, 0x271ff ) AM_READWRITE_LEGACY(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w )
+	AM_RANGE( 0x26000, 0x26fff ) AM_READ(ss9601_reelram_hi_r )
+	AM_RANGE( 0x27000, 0x271ff ) AM_READWRITE(ss9601_scrollram_0_hi_r, ss9601_scrollram_0_hi_w )
 
 	// write both (L1, byte_lo)
-	AM_RANGE( 0x30000, 0x31fff ) AM_WRITE_LEGACY(ss9601_videoram_1_hi_lo_w )
-	AM_RANGE( 0x32000, 0x32fff ) AM_WRITE_LEGACY(ss9601_videoram_1_hi_lo_w )
-	AM_RANGE( 0x33000, 0x331ff ) AM_WRITE_LEGACY(ss9601_scrollram_1_hi_lo_w )
+	AM_RANGE( 0x30000, 0x31fff ) AM_WRITE(ss9601_videoram_1_hi_lo_w )
+	AM_RANGE( 0x32000, 0x32fff ) AM_WRITE(ss9601_videoram_1_hi_lo_w )
+	AM_RANGE( 0x33000, 0x331ff ) AM_WRITE(ss9601_scrollram_1_hi_lo_w )
 	// write both (L0 & REEL, byte_lo)
-	AM_RANGE( 0x34000, 0x35fff ) AM_WRITE_LEGACY(ss9601_videoram_0_hi_lo_w )
-	AM_RANGE( 0x36000, 0x36fff ) AM_WRITE_LEGACY(ss9601_reelram_hi_lo_w )
-	AM_RANGE( 0x37000, 0x371ff ) AM_WRITE_LEGACY(ss9601_scrollram_0_hi_lo_w )
+	AM_RANGE( 0x34000, 0x35fff ) AM_WRITE(ss9601_videoram_0_hi_lo_w )
+	AM_RANGE( 0x36000, 0x36fff ) AM_WRITE(ss9601_reelram_hi_lo_w )
+	AM_RANGE( 0x37000, 0x371ff ) AM_WRITE(ss9601_scrollram_0_hi_lo_w )
 
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
@@ -1306,42 +1310,41 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( xplan_io, AS_IO, 8, subsino2_state )
 	AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE(0x0020, 0x0020) AM_WRITE_LEGACY(ss9601_byte_lo2_w )
+	AM_RANGE(0x0020, 0x0020) AM_WRITE(ss9601_byte_lo2_w )
 
-	AM_RANGE(0x0040, 0x0040) AM_WRITE_LEGACY(ss9601_scrollctrl_w )
+	AM_RANGE(0x0040, 0x0040) AM_WRITE(ss9601_scrollctrl_w )
 
-	AM_RANGE(0x0060, 0x0063) AM_WRITE_LEGACY(hm86171_colorram_w )
-	AM_RANGE(0x0080, 0x0080) AM_WRITE_LEGACY(ss9601_tilesize_w )
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE_LEGACY(ss9601_byte_lo_w )
+	AM_RANGE(0x0060, 0x0063) AM_WRITE(hm86171_colorram_w )
+	AM_RANGE(0x0080, 0x0080) AM_WRITE(ss9601_tilesize_w )
+	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(ss9601_byte_lo_w )
 
-	AM_RANGE(0x021f, 0x021f) AM_WRITE_LEGACY(ss9601_disable_w )
-	AM_RANGE(0x0220, 0x0225) AM_WRITE_LEGACY(ss9601_scroll_w )
+	AM_RANGE(0x021f, 0x021f) AM_WRITE(ss9601_disable_w )
+	AM_RANGE(0x0220, 0x0225) AM_WRITE(ss9601_scroll_w )
 
 	AM_RANGE(0x0235, 0x0235) AM_NOP	// INT0 Ack.?
 
-	AM_RANGE(0x0300, 0x0300) AM_READ_LEGACY(vblank_bit6_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit4_w )
-	AM_RANGE(0x0301, 0x0301) AM_WRITE_LEGACY(dsw_mask_w )
-	AM_RANGE(0x0302, 0x0302) AM_READ_LEGACY(dsw_r )
+	AM_RANGE(0x0300, 0x0300) AM_READ(vblank_bit6_r ) AM_DEVWRITE_LEGACY("oki", oki_bank_bit4_w )
+	AM_RANGE(0x0301, 0x0301) AM_WRITE(dsw_mask_w )
+	AM_RANGE(0x0302, 0x0302) AM_READ(dsw_r )
 	AM_RANGE(0x0303, 0x0303) AM_READ_PORT( "IN C" )
 	AM_RANGE(0x0304, 0x0304) AM_READ_PORT( "IN B" )
 	AM_RANGE(0x0305, 0x0305) AM_READ_PORT( "IN A" )
 	AM_RANGE(0x0306, 0x0306) AM_READ_PORT( "IN D" )	// 0x40 serial out, 0x80 serial in
 
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE_LEGACY(xplan_outputs_w ) AM_BASE(m_outputs )
+	AM_RANGE(0x0306, 0x0309) AM_WRITE(xplan_outputs_w ) AM_BASE(m_outputs )
 
 	// Peripheral Control Block
-	AM_RANGE(0xff00, 0xffff) AM_READWRITE_LEGACY(am188em_regs_r, am188em_regs_w ) AM_BASE(m_am188em_regs )
+	AM_RANGE(0xff00, 0xffff) AM_READWRITE(am188em_regs_r, am188em_regs_w ) AM_BASE(m_am188em_regs )
 ADDRESS_MAP_END
 
 /***************************************************************************
                                 X-Train
 ***************************************************************************/
 
-static WRITE8_HANDLER( xtrain_outputs_w )
+WRITE8_MEMBER(subsino2_state::xtrain_outputs_w)
 {
-	subsino2_state *state = space->machine().driver_data<subsino2_state>();
-	state->m_outputs[offset] = data;
+	m_outputs[offset] = data;
 
 	switch (offset)
 	{
@@ -1350,39 +1353,39 @@ static WRITE8_HANDLER( xtrain_outputs_w )
 			break;
 
 		case 1:	// C
-			set_led_status(space->machine(), 0,	data & 0x02);	// re-double
-			set_led_status(space->machine(), 1,	data & 0x04);	// half double
+			set_led_status(machine(), 0,	data & 0x02);	// re-double
+			set_led_status(machine(), 1,	data & 0x04);	// half double
 			break;
 
 		case 2:	// B
-			set_led_status(space->machine(), 2,	data & 0x02);	// hold 3 / small
-			set_led_status(space->machine(), 3,	data & 0x04);	// hold 2 / big
-			set_led_status(space->machine(), 4,	data & 0x08);	// bet
-			set_led_status(space->machine(), 5,	data & 0x10);	// hold1 / take
-			set_led_status(space->machine(), 6,	data & 0x20);	// double up
+			set_led_status(machine(), 2,	data & 0x02);	// hold 3 / small
+			set_led_status(machine(), 3,	data & 0x04);	// hold 2 / big
+			set_led_status(machine(), 4,	data & 0x08);	// bet
+			set_led_status(machine(), 5,	data & 0x10);	// hold1 / take
+			set_led_status(machine(), 6,	data & 0x20);	// double up
 			break;
 
 		case 3:	// A
-			coin_counter_w(space->machine(), 0,	data & 0x01 );	// coin in
-			coin_counter_w(space->machine(), 1,	data & 0x02 );	// key in
+			coin_counter_w(machine(), 0,	data & 0x01 );	// coin in
+			coin_counter_w(machine(), 1,	data & 0x02 );	// key in
 
-			set_led_status(space->machine(), 7,	data & 0x10);	// start
+			set_led_status(machine(), 7,	data & 0x10);	// start
 			break;
 	}
 
-//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", state->m_outputs[0], state->m_outputs[1], state->m_outputs[2], state->m_outputs[3]);
+//  popmessage("0: %02x - 1: %02x - 2: %02x - 3: %02x", m_outputs[0], m_outputs[1], m_outputs[2], m_outputs[3]);
 }
 
 static ADDRESS_MAP_START( expcard_io, AS_IO, 8, subsino2_state )
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE_LEGACY(expcard_outputs_w ) AM_BASE(m_outputs )
+	AM_RANGE(0x0306, 0x0309) AM_WRITE(expcard_outputs_w ) AM_BASE(m_outputs )
 
 	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xtrain_io, AS_IO, 8, subsino2_state )
 	// 306 = d, 307 = c, 308 = b, 309 = a
-	AM_RANGE(0x0306, 0x0309) AM_WRITE_LEGACY(xtrain_outputs_w ) AM_BASE(m_outputs )
+	AM_RANGE(0x0306, 0x0309) AM_WRITE(xtrain_outputs_w ) AM_BASE(m_outputs )
 
 	AM_IMPORT_FROM( xplan_io )
 ADDRESS_MAP_END

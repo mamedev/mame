@@ -86,6 +86,10 @@ public:
 	UINT8 *m_obj1_ram;
 	UINT8 *m_obj2_ram;
 	UINT8 *m_obj3_ram;
+	DECLARE_WRITE8_MEMBER(cyclemb_bankswitch_w);
+	DECLARE_READ8_MEMBER(mcu_status_r);
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(cyclemb_flip_w);
 };
 
 
@@ -215,36 +219,36 @@ static SCREEN_UPDATE_IND16( cyclemb )
 	return 0;
 }
 
-static WRITE8_HANDLER( cyclemb_bankswitch_w )
+WRITE8_MEMBER(cyclemb_state::cyclemb_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 3);
+	memory_set_bank(machine(), "bank1", data & 3);
 }
 
 #if 0
-static WRITE8_HANDLER( sound_cmd_w )
+WRITE8_MEMBER(cyclemb_state::sound_cmd_w)
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 #endif
 
 #if 0
-static READ8_HANDLER( mcu_status_r )
+READ8_MEMBER(cyclemb_state::mcu_status_r)
 {
 	return 1;
 }
 
 
-static WRITE8_HANDLER( sound_cmd_w ) //actually ciom
+WRITE8_MEMBER(cyclemb_state::sound_cmd_w)//actually ciom
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 #endif
 
-static WRITE8_HANDLER( cyclemb_flip_w )
+WRITE8_MEMBER(cyclemb_state::cyclemb_flip_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(machine(), data & 1);
 
 	// a bunch of other things are setted here
 }
@@ -262,9 +266,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclemb_io, AS_IO, 8, cyclemb_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(cyclemb_bankswitch_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(cyclemb_bankswitch_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE_LEGACY(cyclemb_8741_0_r, cyclemb_8741_0_w)
-	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE_LEGACY(cyclemb_flip_w) //flip screen
+	AM_RANGE(0xc0bf, 0xc0bf) AM_WRITE(cyclemb_flip_w) //flip screen
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cyclemb_sound_map, AS_PROGRAM, 8, cyclemb_state )

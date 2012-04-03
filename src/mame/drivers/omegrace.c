@@ -229,6 +229,10 @@ public:
 	omegrace_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
+	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
+	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
+	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
 };
 
 
@@ -253,9 +257,9 @@ static MACHINE_RESET( omegrace )
  *
  *************************************/
 
-static READ8_HANDLER( omegrace_vg_go_r )
+READ8_MEMBER(omegrace_state::omegrace_vg_go_r)
 {
-	avgdvg_go_w(space,0,0);
+	avgdvg_go_w(&space,0,0);
 	return 0;
 }
 
@@ -291,9 +295,9 @@ static const UINT8 spinnerTable[64] =
 };
 
 
-static READ8_HANDLER( omegrace_spinner1_r )
+READ8_MEMBER(omegrace_state::omegrace_spinner1_r)
 {
-	return (spinnerTable[input_port_read(space->machine(), "SPIN0") & 0x3f]);
+	return (spinnerTable[input_port_read(machine(), "SPIN0") & 0x3f]);
 }
 
 
@@ -304,26 +308,26 @@ static READ8_HANDLER( omegrace_spinner1_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( omegrace_leds_w )
+WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine(), 0,data & 0x01);
-	coin_counter_w(space->machine(), 1,data & 0x02);
+	coin_counter_w(machine(), 0,data & 0x01);
+	coin_counter_w(machine(), 1,data & 0x02);
 
 	/* bits 2 to 5 are the start leds (4 and 5 cocktail only) */
-	set_led_status(space->machine(), 0,~data & 0x04);
-	set_led_status(space->machine(), 1,~data & 0x08);
-	set_led_status(space->machine(), 2,~data & 0x10);
-	set_led_status(space->machine(), 3,~data & 0x20);
+	set_led_status(machine(), 0,~data & 0x04);
+	set_led_status(machine(), 1,~data & 0x08);
+	set_led_status(machine(), 2,~data & 0x10);
+	set_led_status(machine(), 3,~data & 0x20);
 
 	/* bit 6 flips screen (not supported) */
 }
 
 
-static WRITE8_HANDLER( omegrace_soundlatch_w )
+WRITE8_MEMBER(omegrace_state::omegrace_soundlatch_w)
 {
 	soundlatch_w (space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 
@@ -345,7 +349,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_READ_LEGACY(omegrace_vg_go_r)
+	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
 	AM_RANGE(0x09, 0x09) AM_READ_LEGACY(watchdog_reset_r)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(avgdvg_reset_w)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("AVGDVG")				/* vg_halt */
@@ -353,9 +357,9 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
 	AM_RANGE(0x17, 0x17) AM_READ_PORT("DSW2")				/* DIP SW C6 */
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")				/* Player 1 input */
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")				/* Player 2 input */
-	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(omegrace_leds_w)			/* coin counters, leds, flip screen */
-	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(omegrace_soundlatch_w)	/* Sound command */
-	AM_RANGE(0x15, 0x15) AM_READ_LEGACY(omegrace_spinner1_r)		/* 1st controller */
+	AM_RANGE(0x13, 0x13) AM_WRITE(omegrace_leds_w)			/* coin counters, leds, flip screen */
+	AM_RANGE(0x14, 0x14) AM_WRITE(omegrace_soundlatch_w)	/* Sound command */
+	AM_RANGE(0x15, 0x15) AM_READ(omegrace_spinner1_r)		/* 1st controller */
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("SPIN1")				/* 2nd controller (cocktail) */
 ADDRESS_MAP_END
 

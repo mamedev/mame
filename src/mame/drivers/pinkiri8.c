@@ -54,6 +54,15 @@ public:
 	UINT8 m_prot_read_index;
 	UINT8 m_prot_char[6];
 	UINT8 m_prot_index;
+	DECLARE_WRITE8_MEMBER(output_regs_w);
+	DECLARE_WRITE8_MEMBER(pinkiri8_vram_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_READ8_MEMBER(mux_p2_r);
+	DECLARE_READ8_MEMBER(mux_p1_r);
+	DECLARE_READ8_MEMBER(ronjan_prot_r);
+	DECLARE_WRITE8_MEMBER(ronjan_prot_w);
+	DECLARE_READ8_MEMBER(ronjan_prot_status_r);
+	DECLARE_READ8_MEMBER(ronjan_patched_prot_r);
 };
 
 
@@ -381,82 +390,78 @@ static ADDRESS_MAP_START( pinkiri8_map, AS_PROGRAM, 8, pinkiri8_state )
 	AM_RANGE(0x10000, 0x1ffff) AM_ROM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( output_regs_w )
+WRITE8_MEMBER(pinkiri8_state::output_regs_w)
 {
 	if(data & 0x40)
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	//data & 0x80 is probably NMI mask
 }
 
 
 #define LOG_VRAM 0
 
-static WRITE8_HANDLER( pinkiri8_vram_w )
+WRITE8_MEMBER(pinkiri8_state::pinkiri8_vram_w)
 {
-	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
 	switch(offset)
 	{
 		case 0:
-			state->m_vram_addr = (data << 0)  | (state->m_vram_addr&0xffff00);
-			if (LOG_VRAM) printf("\n prev writes was %04x\n\naddress set to %04x -\n", state->m_prev_writes, state->m_vram_addr );
-			state->m_prev_writes = 0;
+			m_vram_addr = (data << 0)  | (m_vram_addr&0xffff00);
+			if (LOG_VRAM) printf("\n prev writes was %04x\n\naddress set to %04x -\n", m_prev_writes, m_vram_addr );
+			m_prev_writes = 0;
 			break;
 
 		case 1:
-			state->m_vram_addr = (data << 8)  | (state->m_vram_addr & 0xff00ff);
-			if (LOG_VRAM)printf("\naddress set to %04x\n", state->m_vram_addr);
+			m_vram_addr = (data << 8)  | (m_vram_addr & 0xff00ff);
+			if (LOG_VRAM)printf("\naddress set to %04x\n", m_vram_addr);
 			break;
 
 		case 2:
-			state->m_vram_addr = (data << 16) | (state->m_vram_addr & 0x00ffff);
-			if (LOG_VRAM)printf("\naddress set to %04x\n", state->m_vram_addr);
+			m_vram_addr = (data << 16) | (m_vram_addr & 0x00ffff);
+			if (LOG_VRAM)printf("\naddress set to %04x\n", m_vram_addr);
 			break;
 
 		case 3:
 
-			address_space *vdp_space = space->machine().device<janshi_vdp_device>("janshivdp")->space();
+			address_space *vdp_space = machine().device<janshi_vdp_device>("janshivdp")->space();
 
 			if (LOG_VRAM) printf("%02x ", data);
-			state->m_prev_writes++;
-			state->m_vram_addr++;
+			m_prev_writes++;
+			m_vram_addr++;
 
-			vdp_space->write_byte(state->m_vram_addr, data);
+			vdp_space->write_byte(m_vram_addr, data);
 			break;
 	}
 }
 
 
-static WRITE8_HANDLER( mux_w )
+WRITE8_MEMBER(pinkiri8_state::mux_w)
 {
-	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
-	state->m_mux_data = data;
+	m_mux_data = data;
 }
 
-static READ8_HANDLER( mux_p2_r )
+READ8_MEMBER(pinkiri8_state::mux_p2_r)
 {
-	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(space->machine(), "PL2_01");
-		case 0x02: return input_port_read(space->machine(), "PL2_02");
-		case 0x04: return input_port_read(space->machine(), "PL2_03");
-		case 0x08: return input_port_read(space->machine(), "PL2_04");
-		case 0x10: return input_port_read(space->machine(), "PL2_05");
+		case 0x01: return input_port_read(machine(), "PL2_01");
+		case 0x02: return input_port_read(machine(), "PL2_02");
+		case 0x04: return input_port_read(machine(), "PL2_03");
+		case 0x08: return input_port_read(machine(), "PL2_04");
+		case 0x10: return input_port_read(machine(), "PL2_05");
 	}
 
 	return 0xff;
 }
 
-static READ8_HANDLER( mux_p1_r )
+READ8_MEMBER(pinkiri8_state::mux_p1_r)
 {
-	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(space->machine(), "PL1_01");
-		case 0x02: return input_port_read(space->machine(), "PL1_02");
-		case 0x04: return input_port_read(space->machine(), "PL1_03");
-		case 0x08: return input_port_read(space->machine(), "PL1_04");
-		case 0x10: return input_port_read(space->machine(), "PL1_05");
+		case 0x01: return input_port_read(machine(), "PL1_01");
+		case 0x02: return input_port_read(machine(), "PL1_02");
+		case 0x04: return input_port_read(machine(), "PL1_03");
+		case 0x08: return input_port_read(machine(), "PL1_04");
+		case 0x10: return input_port_read(machine(), "PL1_05");
 	}
 
 	return 0xff;
@@ -465,13 +470,13 @@ static READ8_HANDLER( mux_p1_r )
 static ADDRESS_MAP_START( pinkiri8_io, AS_IO, 8, pinkiri8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_RAM //Z180 internal I/O
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(output_regs_w)
-	AM_RANGE(0x80, 0x83) AM_WRITE_LEGACY(pinkiri8_vram_w)
+	AM_RANGE(0x60, 0x60) AM_WRITE(output_regs_w)
+	AM_RANGE(0x80, 0x83) AM_WRITE(pinkiri8_vram_w)
 
 	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("oki", okim6295_device, read, write) //correct?
-	AM_RANGE(0xb0, 0xb0) AM_WRITE_LEGACY(mux_w) //mux
-	AM_RANGE(0xb0, 0xb0) AM_READ_LEGACY(mux_p2_r) // mux inputs
-	AM_RANGE(0xb1, 0xb1) AM_READ_LEGACY(mux_p1_r) // mux inputs
+	AM_RANGE(0xb0, 0xb0) AM_WRITE(mux_w) //mux
+	AM_RANGE(0xb0, 0xb0) AM_READ(mux_p2_r) // mux inputs
+	AM_RANGE(0xb1, 0xb1) AM_READ(mux_p1_r) // mux inputs
 	AM_RANGE(0xb2, 0xb2) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf8, 0xf8) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf9, 0xf9) AM_READ_PORT("DSW2")
@@ -1173,52 +1178,51 @@ ROM_START( ronjan )
 ROM_END
 
 
-static READ8_HANDLER( ronjan_prot_r )
+READ8_MEMBER(pinkiri8_state::ronjan_prot_r)
 {
-	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
 	static const char wing_str[6] = { 'W', 'I', 'N', 'G', '8', '9' };
 
-	state->m_prot_read_index++;
+	m_prot_read_index++;
 
-	if(state->m_prot_read_index & 1)
+	if(m_prot_read_index & 1)
 		return 0xff; //value is discarded
 
-	return wing_str[(state->m_prot_read_index >> 1)-1];
+	return wing_str[(m_prot_read_index >> 1)-1];
 }
 
-static WRITE8_HANDLER( ronjan_prot_w )
+WRITE8_MEMBER(pinkiri8_state::ronjan_prot_w)
 {
-	pinkiri8_state *state = space->machine().driver_data<pinkiri8_state>();
 
 	if(data == 0)
 	{
-		state->m_prot_index = 0;
+		m_prot_index = 0;
 	}
 	else
 	{
-		state->m_prot_char[state->m_prot_index] = data;
-		state->m_prot_index++;
+		m_prot_char[m_prot_index] = data;
+		m_prot_index++;
 
-		if(state->m_prot_char[0] == 'E' && state->m_prot_char[1] == 'R' && state->m_prot_char[2] == 'R' && state->m_prot_char[3] == 'O' && state->m_prot_char[4] == 'R')
-			state->m_prot_read_index = 0;
+		if(m_prot_char[0] == 'E' && m_prot_char[1] == 'R' && m_prot_char[2] == 'R' && m_prot_char[3] == 'O' && m_prot_char[4] == 'R')
+			m_prot_read_index = 0;
 	}
 }
 
-static READ8_HANDLER( ronjan_prot_status_r )
+READ8_MEMBER(pinkiri8_state::ronjan_prot_status_r)
 {
 	return 0; //bit 0 seems a protection status bit
 }
 
-static READ8_HANDLER( ronjan_patched_prot_r )
+READ8_MEMBER(pinkiri8_state::ronjan_patched_prot_r)
 {
 	return 0; //value is read then discarded
 }
 
 static DRIVER_INIT( ronjan )
 {
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_readwrite_handler(0x90, 0x90, FUNC(ronjan_prot_r), FUNC(ronjan_prot_w));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x66, 0x66, FUNC(ronjan_prot_status_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x9f, 0x9f, FUNC(ronjan_patched_prot_r));
+	pinkiri8_state *state = machine.driver_data<pinkiri8_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_readwrite_handler(0x90, 0x90, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_r), state), write8_delegate(FUNC(pinkiri8_state::ronjan_prot_w), state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x66, 0x66, read8_delegate(FUNC(pinkiri8_state::ronjan_prot_status_r), state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x9f, 0x9f, read8_delegate(FUNC(pinkiri8_state::ronjan_patched_prot_r), state));
 }
 
 GAME( 1992,  janshi,    0,   pinkiri8, janshi,    0,      ROT0, "Eagle",         "Janshi",          GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

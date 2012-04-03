@@ -228,6 +228,53 @@ public:
 	int m_e2dummywrite;
 	int m_e2data_to_read;
 	UINT8 m_codec_data[256];
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(reel12_vid_w);
+	DECLARE_WRITE8_MEMBER(reel12_w);
+	DECLARE_WRITE8_MEMBER(reel34_w);
+	DECLARE_WRITE8_MEMBER(reel56_w);
+	DECLARE_WRITE8_MEMBER(mmtr_w);
+	DECLARE_WRITE8_MEMBER(mux_output_w);
+	DECLARE_READ8_MEMBER(mux_input_r);
+	DECLARE_WRITE8_MEMBER(unlock_w);
+	DECLARE_WRITE8_MEMBER(dimas_w);
+	DECLARE_WRITE8_MEMBER(dimcnt_w);
+	DECLARE_WRITE8_MEMBER(unknown_w);
+	DECLARE_WRITE8_MEMBER(volume_override_w);
+	DECLARE_READ8_MEMBER(vfd_status_hop_r);
+	DECLARE_WRITE8_MEMBER(expansion_latch_w);
+	DECLARE_READ8_MEMBER(expansion_latch_r);
+	DECLARE_WRITE8_MEMBER(muxena_w);
+	DECLARE_WRITE8_MEMBER(timerirq_w);
+	DECLARE_READ8_MEMBER(timerirqclr_r);
+	DECLARE_READ8_MEMBER(irqstatus_r);
+	DECLARE_WRITE8_MEMBER(coininhib_w);
+	DECLARE_READ8_MEMBER(coin_input_r);
+	DECLARE_WRITE8_MEMBER(payout_latch_w);
+	DECLARE_WRITE8_MEMBER(payout_triac_w);
+	DECLARE_WRITE8_MEMBER(payout_select_w);
+	DECLARE_WRITE8_MEMBER(vfd2_data_w);
+	DECLARE_WRITE8_MEMBER(vfd_reset_w);
+	DECLARE_READ8_MEMBER(uart1stat_r);
+	DECLARE_READ8_MEMBER(uart1data_r);
+	DECLARE_WRITE8_MEMBER(uart1ctrl_w);
+	DECLARE_WRITE8_MEMBER(uart1data_w);
+	DECLARE_READ8_MEMBER(uart2stat_r);
+	DECLARE_READ8_MEMBER(uart2data_r);
+	DECLARE_WRITE8_MEMBER(uart2ctrl_w);
+	DECLARE_WRITE8_MEMBER(uart2data_w);
+	DECLARE_WRITE8_MEMBER(vid_uart_tx_w);
+	DECLARE_WRITE8_MEMBER(vid_uart_ctrl_w);
+	DECLARE_READ8_MEMBER(vid_uart_rx_r);
+	DECLARE_READ8_MEMBER(vid_uart_ctrl_r);
+	DECLARE_READ8_MEMBER(key_r);
+	DECLARE_READ8_MEMBER(vfd_status_r);
+	DECLARE_WRITE8_MEMBER(vfd1_data_w);
+	DECLARE_WRITE8_MEMBER(e2ram_w);
+	DECLARE_READ8_MEMBER(direct_input_r);
+	DECLARE_READ8_MEMBER(sc3_expansion_r);
+	DECLARE_WRITE8_MEMBER(sc3_expansion_w);
+	int recdata(int changed, int data);
 };
 
 
@@ -427,9 +474,9 @@ static NVRAM_HANDLER( bfm_sc2 )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( bankswitch_w )
+WRITE8_MEMBER(bfm_sc2_state::bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1",data & 0x03);
+	memory_set_bank(machine(), "bank1",data & 0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -450,71 +497,68 @@ static INTERRUPT_GEN( timer_irq )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( reel12_vid_w )  // in a video cabinet this is used to drive a hopper
+WRITE8_MEMBER(bfm_sc2_state::reel12_vid_w)// in a video cabinet this is used to drive a hopper
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_reel12_latch = data;
+	m_reel12_latch = data;
 
-	if ( state->m_has_hopper )
+	if ( m_has_hopper )
 	{
-		int oldhop = state->m_hopper_running;
+		int oldhop = m_hopper_running;
 
 		if ( data & 0x01 )
 		{ // hopper power
 			if ( data & 0x02 )
 			{
-				state->m_hopper_running    = 1;
+				m_hopper_running    = 1;
 			}
 			else
 			{
-				state->m_hopper_running    = 0;
+				m_hopper_running    = 0;
 			}
 		}
 		else
 		{
-			//state->m_hopper_coin_sense = 0;
-			state->m_hopper_running    = 0;
+			//m_hopper_coin_sense = 0;
+			m_hopper_running    = 0;
 		}
 
-		if ( oldhop != state->m_hopper_running )
+		if ( oldhop != m_hopper_running )
 		{
-			state->m_hopper_coin_sense = 0;
-			oldhop = state->m_hopper_running;
+			m_hopper_coin_sense = 0;
+			oldhop = m_hopper_running;
 		}
 	}
 }
 
 
 /* Reels 1 and 2 */
-static WRITE8_HANDLER( reel12_w )
+WRITE8_MEMBER(bfm_sc2_state::reel12_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_reel12_latch = data;
+	m_reel12_latch = data;
 
-	if ( stepper_update(0, data&0x0f   ) ) state->m_reel_changed |= 0x01;
-	if ( stepper_update(1, (data>>4))&0x0f ) state->m_reel_changed |= 0x02;
+	if ( stepper_update(0, data&0x0f   ) ) m_reel_changed |= 0x01;
+	if ( stepper_update(1, (data>>4))&0x0f ) m_reel_changed |= 0x02;
 
-	if ( stepper_optic_state(0) ) state->m_optic_pattern |=  0x01;
-	else                          state->m_optic_pattern &= ~0x01;
-	if ( stepper_optic_state(1) ) state->m_optic_pattern |=  0x02;
-	else                          state->m_optic_pattern &= ~0x02;
+	if ( stepper_optic_state(0) ) m_optic_pattern |=  0x01;
+	else                          m_optic_pattern &= ~0x01;
+	if ( stepper_optic_state(1) ) m_optic_pattern |=  0x02;
+	else                          m_optic_pattern &= ~0x02;
 
 	awp_draw_reel(0);
 	awp_draw_reel(1);
 }
 
-static WRITE8_HANDLER( reel34_w )
+WRITE8_MEMBER(bfm_sc2_state::reel34_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_reel34_latch = data;
+	m_reel34_latch = data;
 
-	if ( stepper_update(2, data&0x0f ) ) state->m_reel_changed |= 0x04;
-	if ( stepper_update(3, (data>>4)&0x0f) ) state->m_reel_changed |= 0x08;
+	if ( stepper_update(2, data&0x0f ) ) m_reel_changed |= 0x04;
+	if ( stepper_update(3, (data>>4)&0x0f) ) m_reel_changed |= 0x08;
 
-	if ( stepper_optic_state(2) ) state->m_optic_pattern |=  0x04;
-	else                          state->m_optic_pattern &= ~0x04;
-	if ( stepper_optic_state(3) ) state->m_optic_pattern |=  0x08;
-	else                          state->m_optic_pattern &= ~0x08;
+	if ( stepper_optic_state(2) ) m_optic_pattern |=  0x04;
+	else                          m_optic_pattern &= ~0x04;
+	if ( stepper_optic_state(3) ) m_optic_pattern |=  0x08;
+	else                          m_optic_pattern &= ~0x08;
 
 	awp_draw_reel(2);
 	awp_draw_reel(3);
@@ -522,18 +566,17 @@ static WRITE8_HANDLER( reel34_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( reel56_w )
+WRITE8_MEMBER(bfm_sc2_state::reel56_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_reel56_latch = data;
+	m_reel56_latch = data;
 
-	if ( stepper_update(4, data&0x0f   ) ) state->m_reel_changed |= 0x10;
-	if ( stepper_update(5, (data>>4)&0x0f) ) state->m_reel_changed |= 0x20;
+	if ( stepper_update(4, data&0x0f   ) ) m_reel_changed |= 0x10;
+	if ( stepper_update(5, (data>>4)&0x0f) ) m_reel_changed |= 0x20;
 
-	if ( stepper_optic_state(4) ) state->m_optic_pattern |=  0x10;
-	else                          state->m_optic_pattern &= ~0x10;
-	if ( stepper_optic_state(5) ) state->m_optic_pattern |=  0x20;
-	else                          state->m_optic_pattern &= ~0x20;
+	if ( stepper_optic_state(4) ) m_optic_pattern |=  0x10;
+	else                          m_optic_pattern &= ~0x10;
+	if ( stepper_optic_state(5) ) m_optic_pattern |=  0x20;
+	else                          m_optic_pattern &= ~0x20;
 
 	awp_draw_reel(4);
 	awp_draw_reel(5);
@@ -545,13 +588,12 @@ static WRITE8_HANDLER( reel56_w )
 // mechanical meters //////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( mmtr_w )
+WRITE8_MEMBER(bfm_sc2_state::mmtr_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
 	int i;
-	int  changed = state->m_mmtr_latch ^ data;
+	int  changed = m_mmtr_latch ^ data;
 
-	state->m_mmtr_latch = data;
+	m_mmtr_latch = data;
 
 	for (i = 0; i<8; i++)
 	{
@@ -560,12 +602,12 @@ static WRITE8_HANDLER( mmtr_w )
 			MechMtr_update(i, data & (1 << i) );
 		}
 	}
-	if ( data & 0x1F ) cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );
+	if ( data & 0x1F ) cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( mux_output_w )
+WRITE8_MEMBER(bfm_sc2_state::mux_output_w)
 {
 	int i;
 	int off = offset<<3;
@@ -577,26 +619,25 @@ static WRITE8_HANDLER( mux_output_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( mux_input_r )
+READ8_MEMBER(bfm_sc2_state::mux_input_r)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
 	int result = 0xFF,t1,t2;
 	static const char *const port[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", "STROBE8", "STROBE9", "STROBE10", "STROBE11" };
 
 	if (offset < 8)
 	{
 		int idx = (offset & 4) ? 4 : 8;
-		t1 = state->m_input_override[offset];	// strobe 0-7 data 0-4
-		t2 = state->m_input_override[offset+idx];	// strobe 8-B data 0-4
+		t1 = m_input_override[offset];	// strobe 0-7 data 0-4
+		t2 = m_input_override[offset+idx];	// strobe 8-B data 0-4
 
-		t1 = (state->m_sc2_Inputs[offset]   & t1) | ( ( input_port_read(space->machine(), port[offset])   & ~t1) & 0x1F);
+		t1 = (m_sc2_Inputs[offset]   & t1) | ( ( input_port_read(machine(), port[offset])   & ~t1) & 0x1F);
 		if (idx == 8)
-			t2 = (state->m_sc2_Inputs[offset+8] & t2) | ( ( input_port_read(space->machine(), port[offset+8]) & ~t2) << 5);
+			t2 = (m_sc2_Inputs[offset+8] & t2) | ( ( input_port_read(machine(), port[offset+8]) & ~t2) << 5);
 		else
-			t2 =  (state->m_sc2_Inputs[offset+4] & t2) | ( ( ( input_port_read(space->machine(), port[offset+4]) & ~t2) << 2) & 0x60);
+			t2 =  (m_sc2_Inputs[offset+4] & t2) | ( ( ( input_port_read(machine(), port[offset+4]) & ~t2) << 2) & 0x60);
 
-		state->m_sc2_Inputs[offset]   = (state->m_sc2_Inputs[offset]   & ~0x1F) | t1;
-		state->m_sc2_Inputs[offset+idx] = (state->m_sc2_Inputs[offset+idx] & ~0x60) | t2;
+		m_sc2_Inputs[offset]   = (m_sc2_Inputs[offset]   & ~0x1F) | t1;
+		m_sc2_Inputs[offset+idx] = (m_sc2_Inputs[offset+idx] & ~0x60) | t2;
 		result = t1 | t2;
 	}
 
@@ -605,42 +646,41 @@ static READ8_HANDLER( mux_input_r )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( unlock_w )
+WRITE8_MEMBER(bfm_sc2_state::unlock_w)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( dimas_w )
+WRITE8_MEMBER(bfm_sc2_state::dimas_w)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( dimcnt_w )
+WRITE8_MEMBER(bfm_sc2_state::dimcnt_w)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( unknown_w )
+WRITE8_MEMBER(bfm_sc2_state::unknown_w)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( volume_override_w )
+WRITE8_MEMBER(bfm_sc2_state::volume_override_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	int old = state->m_volume_override;
+	int old = m_volume_override;
 
-	state->m_volume_override = data?1:0;
+	m_volume_override = data?1:0;
 
-	if ( old != state->m_volume_override )
+	if ( old != m_volume_override )
 	{
-		ym2413_device *ym = space->machine().device<ym2413_device>("ymsnd");
-		upd7759_device *upd = space->machine().device<upd7759_device>("upd");
-		float percent = state->m_volume_override? 1.0f : (32-state->m_global_volume)/32.0f;
+		ym2413_device *ym = machine().device<ym2413_device>("ymsnd");
+		upd7759_device *upd = machine().device<upd7759_device>("upd");
+		float percent = m_volume_override? 1.0f : (32-m_global_volume)/32.0f;
 
 		ym->set_output_gain(0, percent);
 		ym->set_output_gain(1, percent);
@@ -675,45 +715,43 @@ static WRITE8_DEVICE_HANDLER( nec_latch_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( vfd_status_hop_r )	// on video games, hopper inputs are connected to this
+READ8_MEMBER(bfm_sc2_state::vfd_status_hop_r)// on video games, hopper inputs are connected to this
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
 	// b7 = NEC busy
 	// b6 = alpha busy (also matrix board)
 	// b5 - b0 = reel optics
 
 	int result = 0;
 
-	if ( state->m_has_hopper )
+	if ( m_has_hopper )
 	{
 		result |= 0x04; // hopper high level
 		result |= 0x08; // hopper low  level
 
 		result |= 0x01|0x02;
 
-		if ( state->m_hopper_running )
+		if ( m_hopper_running )
 		{
 			result &= ~0x01;								  // set motor running input
 
-			if ( state->m_timercnt & 0x04 ) state->m_hopper_coin_sense ^= 1;	  // toggle coin seen
+			if ( m_timercnt & 0x04 ) m_hopper_coin_sense ^= 1;	  // toggle coin seen
 
-			if ( state->m_hopper_coin_sense ) result &= ~0x02;		  // update coin seen input
+			if ( m_hopper_coin_sense ) result &= ~0x02;		  // update coin seen input
 		}
 	}
 
-	if ( !upd7759_busy_r(space->machine().device("upd")) ) result |= 0x80;			  // update sound busy input
+	if ( !upd7759_busy_r(machine().device("upd")) ) result |= 0x80;			  // update sound busy input
 
 	return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( expansion_latch_w )
+WRITE8_MEMBER(bfm_sc2_state::expansion_latch_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	int changed = state->m_expansion_latch^data;
+	int changed = m_expansion_latch^data;
 
-	state->m_expansion_latch = data;
+	m_expansion_latch = data;
 
 	// bit0,  1 = lamp mux disabled, 0 = lamp mux enabled
 	// bit1,  ? used in Del's millions
@@ -730,17 +768,17 @@ static WRITE8_HANDLER( expansion_latch_w )
 		{ // changed from high to low,
 			if ( !(data & 0x08) )
 			{
-				if ( state->m_global_volume < 31 ) state->m_global_volume++; //0-31 expressed as 1-32
+				if ( m_global_volume < 31 ) m_global_volume++; //0-31 expressed as 1-32
 			}
 			else
 			{
-				if ( state->m_global_volume > 0  ) state->m_global_volume--;
+				if ( m_global_volume > 0  ) m_global_volume--;
 			}
 
 			{
-				ym2413_device *ym = space->machine().device<ym2413_device>("ymsnd");
-				upd7759_device *upd = space->machine().device<upd7759_device>("upd");
-				float percent = state->m_volume_override ? 1.0f : (32-state->m_global_volume)/32.0f;
+				ym2413_device *ym = machine().device<ym2413_device>("ymsnd");
+				upd7759_device *upd = machine().device<upd7759_device>("upd");
+				float percent = m_volume_override ? 1.0f : (32-m_global_volume)/32.0f;
 
 				ym->set_output_gain(0, percent);
 				ym->set_output_gain(1, percent);
@@ -752,56 +790,52 @@ static WRITE8_HANDLER( expansion_latch_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( expansion_latch_r )
+READ8_MEMBER(bfm_sc2_state::expansion_latch_r)
 {
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( muxena_w )
+WRITE8_MEMBER(bfm_sc2_state::muxena_w)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( timerirq_w )
+WRITE8_MEMBER(bfm_sc2_state::timerirq_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_is_timer_enabled = data & 1;
+	m_is_timer_enabled = data & 1;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( timerirqclr_r )
+READ8_MEMBER(bfm_sc2_state::timerirqclr_r)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_irq_timer_stat = 0;
-	state->m_irq_status     = 0;
+	m_irq_timer_stat = 0;
+	m_irq_status     = 0;
 
 	return 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( irqstatus_r )
+READ8_MEMBER(bfm_sc2_state::irqstatus_r)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	int result = state->m_irq_status | state->m_irq_timer_stat | 0x80;	// 0x80 = ~MUXERROR
+	int result = m_irq_status | m_irq_timer_stat | 0x80;	// 0x80 = ~MUXERROR
 
-	state->m_irq_timer_stat = 0;
+	m_irq_timer_stat = 0;
 
 	return result;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( coininhib_w )
+WRITE8_MEMBER(bfm_sc2_state::coininhib_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	int changed = state->m_coin_inhibits^data,i,p;
+	int changed = m_coin_inhibits^data,i,p;
 
-	state->m_coin_inhibits = data;
+	m_coin_inhibits = data;
 
 	p = 0x01;
 	i = 0;
@@ -810,7 +844,7 @@ static WRITE8_HANDLER( coininhib_w )
 	{
 		if ( changed & p )
 		{ // this inhibit line has changed
-			coin_lockout_w(space->machine(), i, (~data & p) ); // update lockouts
+			coin_lockout_w(machine(), i, (~data & p) ); // update lockouts
 			changed &= ~p;
 		}
 
@@ -821,29 +855,27 @@ static WRITE8_HANDLER( coininhib_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( coin_input_r )
+READ8_MEMBER(bfm_sc2_state::coin_input_r)
 {
-	return input_port_read(space->machine(), "COINS");
+	return input_port_read(machine(), "COINS");
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( payout_latch_w )
+WRITE8_MEMBER(bfm_sc2_state::payout_latch_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_pay_latch = data;
+	m_pay_latch = data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( payout_triac_w )
+WRITE8_MEMBER(bfm_sc2_state::payout_triac_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	if ( state->m_triac_select == 0x57 )
+	if ( m_triac_select == 0x57 )
 	{
 		int slide = 0;
 
-		switch ( state->m_pay_latch )
+		switch ( m_pay_latch )
 		{
 			case 0x01: slide = 1;
 				break;
@@ -868,28 +900,28 @@ static WRITE8_HANDLER( payout_triac_w )
 		{
 			if ( data == 0x4D )
 			{
-				if ( !state->m_slide_states[slide] )
+				if ( !m_slide_states[slide] )
 				{
-					if ( state->m_slide_pay_sensor[slide] )
+					if ( m_slide_pay_sensor[slide] )
 					{
-						int strobe = state->m_slide_pay_sensor[slide]>>4, data = state->m_slide_pay_sensor[slide]&0x0F;
+						int strobe = m_slide_pay_sensor[slide]>>4, data = m_slide_pay_sensor[slide]&0x0F;
 
-						Scorpion2_SetSwitchState(space->machine(), strobe, data, 0);
+						Scorpion2_SetSwitchState(machine(), strobe, data, 0);
 					}
-					state->m_slide_states[slide] = 1;
+					m_slide_states[slide] = 1;
 				}
 			}
 			else
 			{
-				if ( state->m_slide_states[slide] )
+				if ( m_slide_states[slide] )
 				{
-					if ( state->m_slide_pay_sensor[slide] )
+					if ( m_slide_pay_sensor[slide] )
 					{
-						int strobe = state->m_slide_pay_sensor[slide]>>4, data = state->m_slide_pay_sensor[slide]&0x0F;
+						int strobe = m_slide_pay_sensor[slide]>>4, data = m_slide_pay_sensor[slide]&0x0F;
 
-						Scorpion2_SetSwitchState(space->machine(), strobe, data, 1);
+						Scorpion2_SetSwitchState(machine(), strobe, data, 1);
 					}
-					state->m_slide_states[slide] = 0;
+					m_slide_states[slide] = 0;
 				}
 			}
 		}
@@ -898,27 +930,25 @@ static WRITE8_HANDLER( payout_triac_w )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( payout_select_w )
+WRITE8_MEMBER(bfm_sc2_state::payout_select_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_triac_select = data;
+	m_triac_select = data;
 }
 
 
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( vfd2_data_w )
+WRITE8_MEMBER(bfm_sc2_state::vfd2_data_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_vfd2_latch = data;
+	m_vfd2_latch = data;
 	BFM_BD1_newdata(1, data);
 	BFM_BD1_draw(1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( vfd_reset_w )
+WRITE8_MEMBER(bfm_sc2_state::vfd_reset_w)
 {
 	BFM_BD1_reset(0);	  // reset both VFD's
 	BFM_BD1_reset(1);
@@ -930,95 +960,89 @@ static WRITE8_HANDLER( vfd_reset_w )
 // serial port ////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( uart1stat_r )
+READ8_MEMBER(bfm_sc2_state::uart1stat_r)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
 	int status = 0x06;
 
-	if ( state->m_data_to_uart1  ) status |= 0x01;
-	if ( !state->m_data_to_uart2 ) status |= 0x02;
+	if ( m_data_to_uart1  ) status |= 0x01;
+	if ( !m_data_to_uart2 ) status |= 0x02;
 
 	return status;
 }
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( uart1data_r )
+READ8_MEMBER(bfm_sc2_state::uart1data_r)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	return state->m_uart1_data;
+	return m_uart1_data;
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( uart1ctrl_w )
+WRITE8_MEMBER(bfm_sc2_state::uart1ctrl_w)
 {
 	UART_LOG(("uart1ctrl:%x\n", data));
 }
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( uart1data_w )
+WRITE8_MEMBER(bfm_sc2_state::uart1data_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_data_to_uart2 = 1;
-	state->m_uart1_data    = data;
+	m_data_to_uart2 = 1;
+	m_uart1_data    = data;
 	UART_LOG(("uart1:%x\n", data));
 }
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( uart2stat_r )
+READ8_MEMBER(bfm_sc2_state::uart2stat_r)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
 	int status = 0x06;
 
-	if ( state->m_data_to_uart2  ) status |= 0x01;
-	if ( !state->m_data_to_uart1 ) status |= 0x02;
+	if ( m_data_to_uart2  ) status |= 0x01;
+	if ( !m_data_to_uart1 ) status |= 0x02;
 
 	return status;
 }
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( uart2data_r )
+READ8_MEMBER(bfm_sc2_state::uart2data_r)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	return state->m_uart2_data;
+	return m_uart2_data;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( uart2ctrl_w )
+WRITE8_MEMBER(bfm_sc2_state::uart2ctrl_w)
 {
 	UART_LOG(("uart2ctrl:%x\n", data));
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( uart2data_w )
+WRITE8_MEMBER(bfm_sc2_state::uart2data_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_data_to_uart1 = 1;
-	state->m_uart2_data    = data;
+	m_data_to_uart1 = 1;
+	m_uart2_data    = data;
 	UART_LOG(("uart2:%x\n", data));
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( vid_uart_tx_w )
+WRITE8_MEMBER(bfm_sc2_state::vid_uart_tx_w)
 {
 	adder2_send(data);
-	cputag_set_input_line(space->machine(), "adder2", M6809_IRQ_LINE, HOLD_LINE );
+	cputag_set_input_line(machine(), "adder2", M6809_IRQ_LINE, HOLD_LINE );
 
 	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static WRITE8_HANDLER( vid_uart_ctrl_w )
+WRITE8_MEMBER(bfm_sc2_state::vid_uart_ctrl_w)
 {
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( vid_uart_rx_r )
+READ8_MEMBER(bfm_sc2_state::vid_uart_rx_r)
 {
 	int data = adder2_receive();
 
@@ -1029,21 +1053,20 @@ static READ8_HANDLER( vid_uart_rx_r )
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( vid_uart_ctrl_r )
+READ8_MEMBER(bfm_sc2_state::vid_uart_ctrl_r)
 {
 	return adder2_status();
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static READ8_HANDLER( key_r )
+READ8_MEMBER(bfm_sc2_state::key_r)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	int result = state->m_key[ offset ];
+	int result = m_key[ offset ];
 
 	if ( offset == 7 )
 	{
-		result = (result & 0xFE) | read_e2ram(space->machine());
+		result = (result & 0xFE) | read_e2ram(machine());
 	}
 
 	return result;
@@ -1079,29 +1102,29 @@ static void e2ram_reset(running_machine &machine)
 	state->m_e2data_to_read = 0;
 }
 
-static int recdata(bfm_sc2_state *state, int changed, int data)
+int bfm_sc2_state::recdata(int changed, int data)
 {
 	int res = 1;
 
-	if ( state->m_e2cnt < 8 )
+	if ( m_e2cnt < 8 )
 	{
 		res = 0;
 
 		if ( (changed & SCL) && (data & SCL) )
 		{ // clocked in new data
-			int pattern = 1 << (7-state->m_e2cnt);
+			int pattern = 1 << (7-m_e2cnt);
 
-			if ( data & SDA ) state->m_e2data |=  pattern;
-			else              state->m_e2data &= ~pattern;
+			if ( data & SDA ) m_e2data |=  pattern;
+			else              m_e2data &= ~pattern;
 
-			state->m_e2data_pin = state->m_e2data_to_read & 0x80 ? 1 : 0;
+			m_e2data_pin = m_e2data_to_read & 0x80 ? 1 : 0;
 
-			state->m_e2data_to_read <<= 1;
+			m_e2data_to_read <<= 1;
 
-			LOG(("e2d pin= %d\n", state->m_e2data_pin));
+			LOG(("e2d pin= %d\n", m_e2data_pin));
 
-			state->m_e2cnt++;
-			if ( state->m_e2cnt >= 8 )
+			m_e2cnt++;
+			if ( m_e2cnt >= 8 )
 			{
 				res++;
 			}
@@ -1133,31 +1156,29 @@ static int recAck(int changed, int data)
 
 
 /* VFD Status */
-static READ8_HANDLER( vfd_status_r )
+READ8_MEMBER(bfm_sc2_state::vfd_status_r)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
 	/* b7 = NEC busy */
 	/* b6 = alpha busy (also matrix board) */
 	/* b5 - b0 = reel optics */
 
-	int result = state->m_optic_pattern;
+	int result = m_optic_pattern;
 
-	if ( !upd7759_busy_r(space->machine().device("upd")) ) result |= 0x80;
+	if ( !upd7759_busy_r(machine().device("upd")) ) result |= 0x80;
 
-	if (space->machine().device("matrix"))
+	if (machine().device("matrix"))
 		if ( BFM_dm01_busy() ) result |= 0x40;
 
 	return result;
 }
 
-static WRITE8_HANDLER( vfd1_data_w )
+WRITE8_MEMBER(bfm_sc2_state::vfd1_data_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>();
-	state->m_vfd1_latch = data;
+	m_vfd1_latch = data;
 
-	if (space->machine().device("matrix"))
+	if (machine().device("matrix"))
 	{
-		BFM_dm01_writedata(space->machine(),data);
+		BFM_dm01_writedata(machine(),data);
 	}
 	else
 	{
@@ -1168,17 +1189,16 @@ static WRITE8_HANDLER( vfd1_data_w )
 
 
 //
-static WRITE8_HANDLER( e2ram_w )
+WRITE8_MEMBER(bfm_sc2_state::e2ram_w)
 {
-	bfm_sc2_state *state = space->machine().driver_data<bfm_sc2_state>(); // b0 = clock b1 = data
 
 	int changed, ack;
 
 	data ^= (SDA|SCL);  // invert signals
 
-	changed  = (state->m_e2reg^data) & 0x03;
+	changed  = (m_e2reg^data) & 0x03;
 
-	state->m_e2reg = data;
+	m_e2reg = data;
 
 	if ( changed )
 	{
@@ -1188,13 +1208,13 @@ static WRITE8_HANDLER( e2ram_w )
 				( !(changed & SCL) && (data & SCL) )    // SCL=1 and not changed
 				)
 			{	// X24C08 Start condition (1->0 on SDA while SCL=1)
-				state->m_e2dummywrite = ( state->m_e2state == 5 );
+				m_e2dummywrite = ( m_e2state == 5 );
 
-				LOG(("e2ram:   c:%d d:%d Start condition dummywrite=%d\n", (data & SCL)?1:0, (data&SDA)?1:0, state->m_e2dummywrite ));
+				LOG(("e2ram:   c:%d d:%d Start condition dummywrite=%d\n", (data & SCL)?1:0, (data&SDA)?1:0, m_e2dummywrite ));
 
-				state->m_e2state = 1; // ready for commands
-				state->m_e2cnt   = 0;
-				state->m_e2data  = 0;
+				m_e2state = 1; // ready for commands
+				m_e2cnt   = 0;
+				m_e2data  = 0;
 				break;
 			}
 
@@ -1203,25 +1223,25 @@ static WRITE8_HANDLER( e2ram_w )
 				)
 			{	// X24C08 Stop condition (0->1 on SDA while SCL=1)
 				LOG(("e2ram:   c:%d d:%d Stop condition\n", (data & SCL)?1:0, (data&SDA)?1:0 ));
-				state->m_e2state = 0;
-				state->m_e2data  = 0;
+				m_e2state = 0;
+				m_e2data  = 0;
 				break;
 			}
 
-			switch ( state->m_e2state )
+			switch ( m_e2state )
 			{
 				case 1: // Receiving address + R/W bit
 
-					if ( recdata(state, changed, data) )
+					if ( recdata(changed, data) )
 					{
-						state->m_e2address = (state->m_e2address & 0x00FF) | ((state->m_e2data>>1) & 0x03) << 8;
-						state->m_e2cnt   = 0;
-						state->m_e2rw    = state->m_e2data & 1;
+						m_e2address = (m_e2address & 0x00FF) | ((m_e2data>>1) & 0x03) << 8;
+						m_e2cnt   = 0;
+						m_e2rw    = m_e2data & 1;
 
 						LOG(("e2ram: Slave address received !!  device id=%01X device adr=%01d high order adr %0X RW=%d) %02X\n",
-							state->m_e2data>>4, (state->m_e2data & 0x08)?1:0, (state->m_e2data>>1) & 0x03, state->m_e2rw , state->m_e2data ));
+							m_e2data>>4, (m_e2data & 0x08)?1:0, (m_e2data>>1) & 0x03, m_e2rw , m_e2data ));
 
-						state->m_e2state = 2;
+						m_e2state = 2;
 					}
 					break;
 
@@ -1230,59 +1250,59 @@ static WRITE8_HANDLER( e2ram_w )
 					ack = recAck(changed,data);
 					if ( ack )
 					{
-						state->m_e2data_pin = 0;
+						m_e2data_pin = 0;
 
 						if ( ack < 0 )
 						{
 							LOG(("ACK = 0\n"));
-							state->m_e2state = 0;
+							m_e2state = 0;
 						}
 						else
 						{
 							LOG(("ACK = 1\n"));
-							if ( state->m_e2dummywrite )
+							if ( m_e2dummywrite )
 							{
-								state->m_e2dummywrite = 0;
+								m_e2dummywrite = 0;
 
-								state->m_e2data_to_read = state->m_e2ram[state->m_e2address];
+								m_e2data_to_read = m_e2ram[m_e2address];
 
-								if ( state->m_e2rw & 1 ) state->m_e2state = 7; // read data
-								else		  state->m_e2state = 0; //?not sure
+								if ( m_e2rw & 1 ) m_e2state = 7; // read data
+								else		  m_e2state = 0; //?not sure
 							}
 							else
 							{
-								if ( state->m_e2rw & 1 ) state->m_e2state = 7; // reading
-								else            state->m_e2state = 3; // writing
+								if ( m_e2rw & 1 ) m_e2state = 7; // reading
+								else            m_e2state = 3; // writing
 							}
-							switch ( state->m_e2state )
+							switch ( m_e2state )
 							{
 								case 7:
-									LOG(("read address %04X\n",state->m_e2address));
-									state->m_e2data_to_read = state->m_e2ram[state->m_e2address];
+									LOG(("read address %04X\n",m_e2address));
+									m_e2data_to_read = m_e2ram[m_e2address];
 									break;
 								case 3:
 									LOG(("write, awaiting address\n"));
 									break;
 								default:
-									LOG(("?unknow action %04X\n",state->m_e2address));
+									LOG(("?unknow action %04X\n",m_e2address));
 									break;
 							}
 						}
-						state->m_e2data = 0;
+						m_e2data = 0;
 					}
 					break;
 
 				case 3: // writing data, receiving address
 
-					if ( recdata(state, changed, data) )
+					if ( recdata(changed, data) )
 					{
-						state->m_e2data_pin = 0;
-						state->m_e2address = (state->m_e2address & 0xFF00) | state->m_e2data;
+						m_e2data_pin = 0;
+						m_e2address = (m_e2address & 0xFF00) | m_e2data;
 
-						LOG(("write address = %04X waiting for ACK\n", state->m_e2address));
-						state->m_e2state = 4;
-						state->m_e2cnt   = 0;
-						state->m_e2data  = 0;
+						LOG(("write address = %04X waiting for ACK\n", m_e2address));
+						m_e2state = 4;
+						m_e2cnt   = 0;
+						m_e2data  = 0;
 					}
 					break;
 
@@ -1291,27 +1311,27 @@ static WRITE8_HANDLER( e2ram_w )
 					ack = recAck(changed,data);
 					if ( ack )
 					{
-						state->m_e2data_pin = 0;	// pin=0, no error !!
+						m_e2data_pin = 0;	// pin=0, no error !!
 
 						if ( ack < 0 )
 						{
-							state->m_e2state = 0;
+							m_e2state = 0;
 							LOG(("ACK = 0, cancel write\n" ));
 						}
 						else
 						{
-							state->m_e2state = 5;
+							m_e2state = 5;
 							LOG(("ACK = 1, awaiting data to write\n" ));
 						}
 					}
 					break;
 
 				case 5: // receive data to write
-					if ( recdata(state, changed, data) )
+					if ( recdata(changed, data) )
 					{
-						LOG(("write data = %02X received, awaiting ACK\n", state->m_e2data));
-						state->m_e2cnt   = 0;
-						state->m_e2state = 6;  // wait ack
+						LOG(("write data = %02X received, awaiting ACK\n", m_e2data));
+						m_e2cnt   = 0;
+						m_e2state = 6;  // wait ack
 					}
 					break;
 
@@ -1322,31 +1342,31 @@ static WRITE8_HANDLER( e2ram_w )
 					{
 						if ( ack < 0 )
 						{
-							state->m_e2state = 0;
+							m_e2state = 0;
 							LOG(("ACK=0, write canceled\n"));
 						}
 						else
 						{
-							LOG(("ACK=1, writing %02X to %04X\n", state->m_e2data, state->m_e2address));
+							LOG(("ACK=1, writing %02X to %04X\n", m_e2data, m_e2address));
 
-							state->m_e2ram[state->m_e2address] = state->m_e2data;
+							m_e2ram[m_e2address] = m_e2data;
 
-							state->m_e2address = (state->m_e2address & ~0x000F) | ((state->m_e2address+1)&0x0F);
+							m_e2address = (m_e2address & ~0x000F) | ((m_e2address+1)&0x0F);
 
-							state->m_e2state = 5; // write next address
+							m_e2state = 5; // write next address
 						}
 					}
 					break;
 
 				case 7: // receive address from read
 
-					if ( recdata(state, changed, data) )
+					if ( recdata(changed, data) )
 					{
-						//state->m_e2data_pin = 0;
+						//m_e2data_pin = 0;
 
-						LOG(("address read, data = %02X waiting for ACK\n", state->m_e2data ));
+						LOG(("address read, data = %02X waiting for ACK\n", m_e2data ));
 
-						state->m_e2state = 8;
+						m_e2state = 8;
 					}
 					break;
 
@@ -1354,16 +1374,16 @@ static WRITE8_HANDLER( e2ram_w )
 
 					if ( recAck(changed, data) )
 					{
-						state->m_e2state = 7;
+						m_e2state = 7;
 
-						state->m_e2address = (state->m_e2address & ~0x0F) | ((state->m_e2address+1)&0x0F); // lower 4 bits wrap around
+						m_e2address = (m_e2address & ~0x0F) | ((m_e2address+1)&0x0F); // lower 4 bits wrap around
 
-						state->m_e2data_to_read = state->m_e2ram[state->m_e2address];
+						m_e2data_to_read = m_e2ram[m_e2address];
 
-						LOG(("ready for next address %04X\n", state->m_e2address));
+						LOG(("ready for next address %04X\n", m_e2address));
 
-						state->m_e2cnt   = 0;
-						state->m_e2data  = 0;
+						m_e2cnt   = 0;
+						m_e2data  = 0;
 					}
 					break;
 
@@ -1413,7 +1433,7 @@ static SCREEN_UPDATE_IND16( addersc2 )
 }
 
 
-static READ8_HANDLER( direct_input_r )
+READ8_MEMBER(bfm_sc2_state::direct_input_r)
 {
 	return 0;
 }
@@ -1423,49 +1443,49 @@ static READ8_HANDLER( direct_input_r )
 
 static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") //8k
-	AM_RANGE(0x2000, 0x2000) AM_READ_LEGACY(vfd_status_r)
-	AM_RANGE(0x2000, 0x20FF) AM_WRITE_LEGACY(reel12_w)
-	AM_RANGE(0x2100, 0x21FF) AM_WRITE_LEGACY(reel34_w)
-	AM_RANGE(0x2200, 0x22FF) AM_WRITE_LEGACY(reel56_w)
+	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
+	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
+	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
+	AM_RANGE(0x2200, 0x22FF) AM_WRITE(reel56_w)
 
-	AM_RANGE(0x2300, 0x230B) AM_READ_LEGACY(mux_input_r)
-	AM_RANGE(0x2300, 0x231F) AM_WRITE_LEGACY(mux_output_w)
-	AM_RANGE(0x2320, 0x2323) AM_WRITE_LEGACY(dimas_w)				/* ?unknown dim related */
+	AM_RANGE(0x2300, 0x230B) AM_READ(mux_input_r)
+	AM_RANGE(0x2300, 0x231F) AM_WRITE(mux_output_w)
+	AM_RANGE(0x2320, 0x2323) AM_WRITE(dimas_w)				/* ?unknown dim related */
 
-	AM_RANGE(0x2324, 0x2324) AM_READWRITE_LEGACY(expansion_latch_r, expansion_latch_w)
-	AM_RANGE(0x2325, 0x2327) AM_WRITE_LEGACY(unknown_w)
-	AM_RANGE(0x2328, 0x2328) AM_WRITE_LEGACY(muxena_w)
-	AM_RANGE(0x2329, 0x2329) AM_READWRITE_LEGACY(timerirqclr_r, timerirq_w)
-	AM_RANGE(0x232A, 0x232D) AM_WRITE_LEGACY(unknown_w)
-	AM_RANGE(0x232E, 0x232E) AM_READ_LEGACY(irqstatus_r)
+	AM_RANGE(0x2324, 0x2324) AM_READWRITE(expansion_latch_r, expansion_latch_w)
+	AM_RANGE(0x2325, 0x2327) AM_WRITE(unknown_w)
+	AM_RANGE(0x2328, 0x2328) AM_WRITE(muxena_w)
+	AM_RANGE(0x2329, 0x2329) AM_READWRITE(timerirqclr_r, timerirq_w)
+	AM_RANGE(0x232A, 0x232D) AM_WRITE(unknown_w)
+	AM_RANGE(0x232E, 0x232E) AM_READ(irqstatus_r)
 
-	AM_RANGE(0x232F, 0x232F) AM_WRITE_LEGACY(coininhib_w)
-	AM_RANGE(0x2330, 0x2330) AM_WRITE_LEGACY(payout_latch_w)
-	AM_RANGE(0x2331, 0x2331) AM_WRITE_LEGACY(payout_triac_w)
+	AM_RANGE(0x232F, 0x232F) AM_WRITE(coininhib_w)
+	AM_RANGE(0x2330, 0x2330) AM_WRITE(payout_latch_w)
+	AM_RANGE(0x2331, 0x2331) AM_WRITE(payout_triac_w)
 	AM_RANGE(0x2332, 0x2332) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x2333, 0x2333) AM_WRITE_LEGACY(mmtr_w)
-	AM_RANGE(0x2334, 0x2335) AM_WRITE_LEGACY(unknown_w)
-	AM_RANGE(0x2336, 0x2336) AM_WRITE_LEGACY(dimcnt_w)
-	AM_RANGE(0x2337, 0x2337) AM_WRITE_LEGACY(volume_override_w)
-	AM_RANGE(0x2338, 0x2338) AM_WRITE_LEGACY(payout_select_w)
-	AM_RANGE(0x2339, 0x2339) AM_WRITE_LEGACY(unknown_w)
-	AM_RANGE(0x2400, 0x2400) AM_READWRITE_LEGACY(uart1stat_r, uart1ctrl_w)	/* mc6850 compatible uart */
-	AM_RANGE(0x2500, 0x2500) AM_READWRITE_LEGACY(uart1data_r, uart1data_w)
-	AM_RANGE(0x2600, 0x2600) AM_READWRITE_LEGACY(uart2stat_r, uart2ctrl_w)	/* mc6850 compatible uart */
-	AM_RANGE(0x2700, 0x2700) AM_READWRITE_LEGACY(uart2data_r, uart2data_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE_LEGACY(vfd1_data_w)					/* vfd1 data */
-	AM_RANGE(0x2900, 0x2900) AM_WRITE_LEGACY(vfd_reset_w)					/* vfd1+vfd2 reset line */
+	AM_RANGE(0x2333, 0x2333) AM_WRITE(mmtr_w)
+	AM_RANGE(0x2334, 0x2335) AM_WRITE(unknown_w)
+	AM_RANGE(0x2336, 0x2336) AM_WRITE(dimcnt_w)
+	AM_RANGE(0x2337, 0x2337) AM_WRITE(volume_override_w)
+	AM_RANGE(0x2338, 0x2338) AM_WRITE(payout_select_w)
+	AM_RANGE(0x2339, 0x2339) AM_WRITE(unknown_w)
+	AM_RANGE(0x2400, 0x2400) AM_READWRITE(uart1stat_r, uart1ctrl_w)	/* mc6850 compatible uart */
+	AM_RANGE(0x2500, 0x2500) AM_READWRITE(uart1data_r, uart1data_w)
+	AM_RANGE(0x2600, 0x2600) AM_READWRITE(uart2stat_r, uart2ctrl_w)	/* mc6850 compatible uart */
+	AM_RANGE(0x2700, 0x2700) AM_READWRITE(uart2data_r, uart2data_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)					/* vfd1 data */
+	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)					/* vfd1+vfd2 reset line */
 	AM_RANGE(0x2A00, 0x2AFF) AM_DEVWRITE_LEGACY("upd", nec_latch_w)
 	AM_RANGE(0x2B00, 0x2BFF) AM_DEVWRITE_LEGACY("upd", nec_reset_w)
-	AM_RANGE(0x2C00, 0x2C00) AM_WRITE_LEGACY(unlock_w)						/* custom chip unlock */
+	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)						/* custom chip unlock */
 	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x2E00, 0x2E00) AM_WRITE_LEGACY(bankswitch_w)					/* write bank (rom page select for 0x6000 - 0x7fff ) */
-	AM_RANGE(0x2F00, 0x2F00) AM_WRITE_LEGACY(vfd2_data_w)					/* vfd2 data */
+	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)					/* write bank (rom page select for 0x6000 - 0x7fff ) */
+	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)					/* vfd2 data */
 
-	AM_RANGE(0x3FFE, 0x3FFE) AM_READ_LEGACY(direct_input_r )
-	AM_RANGE(0x3FFF, 0x3FFF) AM_READ_LEGACY(coin_input_r)
+	AM_RANGE(0x3FFE, 0x3FFE) AM_READ(direct_input_r )
+	AM_RANGE(0x3FFF, 0x3FFF) AM_READ(coin_input_r)
 	AM_RANGE(0x4000, 0x5FFF) AM_ROM
-	AM_RANGE(0x4000, 0xFFFF) AM_WRITE_LEGACY(unknown_w)			// contains unknown I/O registers
+	AM_RANGE(0x4000, 0xFFFF) AM_WRITE(unknown_w)			// contains unknown I/O registers
 	AM_RANGE(0x6000, 0x7FFF) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xFFFF) AM_ROM
 ADDRESS_MAP_END
@@ -1475,16 +1495,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( memmap_vid, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_IMPORT_FROM( sc2_basemap )
 
-	AM_RANGE(0x2000, 0x2000) AM_READ_LEGACY(vfd_status_hop_r)		// vfd status register
-	AM_RANGE(0x2000, 0x20FF) AM_WRITE_LEGACY(reel12_vid_w)
+	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_hop_r)		// vfd status register
+	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_vid_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITENOP
 	AM_RANGE(0x2200, 0x22FF) AM_WRITENOP
 
-	AM_RANGE(0x3C00, 0x3C07) AM_READ_LEGACY(key_r   )
-	AM_RANGE(0x3C80, 0x3C80) AM_WRITE_LEGACY(e2ram_w )
+	AM_RANGE(0x3C00, 0x3C07) AM_READ(key_r   )
+	AM_RANGE(0x3C80, 0x3C80) AM_WRITE(e2ram_w )
 
-	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE_LEGACY(vid_uart_ctrl_r, vid_uart_ctrl_w)		// video uart control reg
-	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE_LEGACY(vid_uart_rx_r, vid_uart_tx_w)			// video uart data  reg
+	AM_RANGE(0x3E00, 0x3E00) AM_READWRITE(vid_uart_ctrl_r, vid_uart_ctrl_w)		// video uart control reg
+	AM_RANGE(0x3E01, 0x3E01) AM_READWRITE(vid_uart_rx_r, vid_uart_tx_w)			// video uart data  reg
 ADDRESS_MAP_END
 
 // input ports for pyramid ////////////////////////////////////////
@@ -2546,7 +2566,7 @@ ROM_END
 
 #ifdef UNUSED_FUNCTION
 /* Scorpion 3 expansion */
-static READ8_HANDLER( sc3_expansion_r )
+READ8_MEMBER(bfm_sc2_state::sc3_expansion_r)
 {
     int result = 0;
 
@@ -2561,7 +2581,7 @@ static READ8_HANDLER( sc3_expansion_r )
 }
 
 
-static WRITE8_HANDLER( sc3_expansion_w )
+WRITE8_MEMBER(bfm_sc2_state::sc3_expansion_w)
 {
     switch ( offset )
     {

@@ -157,6 +157,27 @@ public:
 	device_t *m_maincpu;
 	device_t *m_ds1302;
 	device_t *m_vr0video;
+	DECLARE_READ32_MEMBER(FlipCount_r);
+	DECLARE_WRITE32_MEMBER(FlipCount_w);
+	DECLARE_READ32_MEMBER(Input_r);
+	DECLARE_WRITE32_MEMBER(IntAck_w);
+	DECLARE_WRITE32_MEMBER(Banksw_w);
+	DECLARE_WRITE32_MEMBER(Timer0_w);
+	DECLARE_READ32_MEMBER(Timer0_r);
+	DECLARE_WRITE32_MEMBER(Timer1_w);
+	DECLARE_READ32_MEMBER(Timer1_r);
+	DECLARE_WRITE32_MEMBER(Timer2_w);
+	DECLARE_READ32_MEMBER(Timer2_r);
+	DECLARE_WRITE32_MEMBER(Timer3_w);
+	DECLARE_READ32_MEMBER(Timer3_r);
+	DECLARE_READ32_MEMBER(FlashCmd_r);
+	DECLARE_WRITE32_MEMBER(FlashCmd_w);
+	DECLARE_READ32_MEMBER(PIO_r);
+	DECLARE_WRITE32_MEMBER(PIO_w);
+	DECLARE_READ32_MEMBER(DMA0_r);
+	DECLARE_WRITE32_MEMBER(DMA0_w);
+	DECLARE_READ32_MEMBER(DMA1_r);
+	DECLARE_WRITE32_MEMBER(DMA1_w);
 };
 
 static void IntReq( running_machine &machine, int num )
@@ -177,68 +198,64 @@ static void IntReq( running_machine &machine, int num )
 #endif
 }
 
-static READ32_HANDLER( FlipCount_r )
+READ32_MEMBER(crystal_state::FlipCount_r)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
 
 #ifdef IDLE_LOOP_SPEEDUP
-	UINT32 IntPend = space->read_dword(0x01800c0c);
-	state->m_FlipCntRead++;
-	if (state->m_FlipCntRead >= 16 && !IntPend && state->m_FlipCount != 0)
-		device_suspend(state->m_maincpu, SUSPEND_REASON_SPIN, 1);
+	UINT32 IntPend = space.read_dword(0x01800c0c);
+	m_FlipCntRead++;
+	if (m_FlipCntRead >= 16 && !IntPend && m_FlipCount != 0)
+		device_suspend(m_maincpu, SUSPEND_REASON_SPIN, 1);
 #endif
-	return ((UINT32) state->m_FlipCount) << 16;
+	return ((UINT32) m_FlipCount) << 16;
 }
 
-static WRITE32_HANDLER( FlipCount_w )
+WRITE32_MEMBER(crystal_state::FlipCount_w)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
 
 	if (mem_mask & 0x00ff0000)
 	{
 		int fc = (data >> 16) & 0xff;
 		if (fc == 1)
-			state->m_FlipCount++;
+			m_FlipCount++;
 		else if (fc == 0)
-			state->m_FlipCount = 0;
+			m_FlipCount = 0;
 	}
 }
 
-static READ32_HANDLER( Input_r )
+READ32_MEMBER(crystal_state::Input_r)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
 
 	if (offset == 0)
-		return input_port_read(space->machine(), "P1_P2");
+		return input_port_read(machine(), "P1_P2");
 	else if (offset == 1)
-		return input_port_read(space->machine(), "P3_P4");
+		return input_port_read(machine(), "P3_P4");
 	else if( offset == 2)
 	{
-		UINT8 Port4 = input_port_read(space->machine(), "SYSTEM");
-		if (!(Port4 & 0x10) && ((state->m_OldPort4 ^ Port4) & 0x10))	//coin buttons trigger IRQs
-			IntReq(space->machine(), 12);
-		if (!(Port4 & 0x20) && ((state->m_OldPort4 ^ Port4) & 0x20))
-			IntReq(space->machine(), 19);
-		state->m_OldPort4 = Port4;
-		return /*dips*/input_port_read(space->machine(), "DSW") | (Port4 << 16);
+		UINT8 Port4 = input_port_read(machine(), "SYSTEM");
+		if (!(Port4 & 0x10) && ((m_OldPort4 ^ Port4) & 0x10))	//coin buttons trigger IRQs
+			IntReq(machine(), 12);
+		if (!(Port4 & 0x20) && ((m_OldPort4 ^ Port4) & 0x20))
+			IntReq(machine(), 19);
+		m_OldPort4 = Port4;
+		return /*dips*/input_port_read(machine(), "DSW") | (Port4 << 16);
 	}
 	return 0;
 }
 
-static WRITE32_HANDLER( IntAck_w )
+WRITE32_MEMBER(crystal_state::IntAck_w)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
-	UINT32 IntPend = space->read_dword(0x01800c0c);
+	UINT32 IntPend = space.read_dword(0x01800c0c);
 
 	if (mem_mask & 0xff)
 	{
 		IntPend &= ~(1 << (data & 0x1f));
-		space->write_dword(0x01800c0c, IntPend);
+		space.write_dword(0x01800c0c, IntPend);
 		if (!IntPend)
-			device_set_input_line(state->m_maincpu, SE3208_INT, CLEAR_LINE);
+			device_set_input_line(m_maincpu, SE3208_INT, CLEAR_LINE);
 	}
 	if (mem_mask & 0xff00)
-		state->m_IntHigh = (data >> 8) & 7;
+		m_IntHigh = (data >> 8) & 7;
 }
 
 static IRQ_CALLBACK( icallback )
@@ -258,15 +275,14 @@ static IRQ_CALLBACK( icallback )
 	return 0;		//This should never happen
 }
 
-static WRITE32_HANDLER( Banksw_w )
+WRITE32_MEMBER(crystal_state::Banksw_w)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
 
-	state->m_Bank = (data >> 1) & 7;
-	if (state->m_Bank <= 2)
-		memory_set_bankptr(space->machine(), "bank1", space->machine().region("user1")->base() + state->m_Bank * 0x1000000);
+	m_Bank = (data >> 1) & 7;
+	if (m_Bank <= 2)
+		memory_set_bankptr(machine(), "bank1", machine().region("user1")->base() + m_Bank * 0x1000000);
 	else
-		memory_set_bankptr(space->machine(), "bank1", space->machine().region("user2")->base());
+		memory_set_bankptr(machine(), "bank1", machine().region("user2")->base());
 }
 
 static TIMER_CALLBACK( Timercb )
@@ -299,67 +315,62 @@ INLINE void Timer_w( address_space *space, int which, UINT32 data, UINT32 mem_ma
 	COMBINE_DATA(&state->m_Timerctrl[which]);
 }
 
-static WRITE32_HANDLER( Timer0_w )
+WRITE32_MEMBER(crystal_state::Timer0_w)
 {
-	Timer_w(space, 0, data, mem_mask);
+	Timer_w(&space, 0, data, mem_mask);
 }
 
-static READ32_HANDLER( Timer0_r )
+READ32_MEMBER(crystal_state::Timer0_r)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
-	return state->m_Timerctrl[0];
+	return m_Timerctrl[0];
 }
 
-static WRITE32_HANDLER( Timer1_w )
+WRITE32_MEMBER(crystal_state::Timer1_w)
 {
-	Timer_w(space, 1, data, mem_mask);
+	Timer_w(&space, 1, data, mem_mask);
 }
 
-static READ32_HANDLER( Timer1_r )
+READ32_MEMBER(crystal_state::Timer1_r)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
-	return state->m_Timerctrl[1];
+	return m_Timerctrl[1];
 }
 
-static WRITE32_HANDLER( Timer2_w )
+WRITE32_MEMBER(crystal_state::Timer2_w)
 {
-	Timer_w(space, 2, data, mem_mask);
+	Timer_w(&space, 2, data, mem_mask);
 }
 
-static READ32_HANDLER( Timer2_r )
+READ32_MEMBER(crystal_state::Timer2_r)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
-	return state->m_Timerctrl[2];
+	return m_Timerctrl[2];
 }
 
-static WRITE32_HANDLER( Timer3_w )
+WRITE32_MEMBER(crystal_state::Timer3_w)
 {
-	Timer_w(space, 3, data, mem_mask);
+	Timer_w(&space, 3, data, mem_mask);
 }
 
-static READ32_HANDLER( Timer3_r )
+READ32_MEMBER(crystal_state::Timer3_r)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
-	return state->m_Timerctrl[3];
+	return m_Timerctrl[3];
 }
 
-static READ32_HANDLER( FlashCmd_r )
+READ32_MEMBER(crystal_state::FlashCmd_r)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
 
-	if ((state->m_FlashCmd & 0xff) == 0xff)
+	if ((m_FlashCmd & 0xff) == 0xff)
 	{
-		if (state->m_Bank <= 2)
+		if (m_Bank <= 2)
 		{
-			UINT32 *ptr = (UINT32*)(space->machine().region("user1")->base() + state->m_Bank * 0x1000000);
+			UINT32 *ptr = (UINT32*)(machine().region("user1")->base() + m_Bank * 0x1000000);
 			return ptr[0];
 		}
 		else
 			return 0xffffffff;
 	}
-	if ((state->m_FlashCmd & 0xff) == 0x90)
+	if ((m_FlashCmd & 0xff) == 0x90)
 	{
-		if (state->m_Bank <= 2)
+		if (m_Bank <= 2)
             return 0x00180089;	//Intel 128MBit
 		else
 			return 0xffffffff;
@@ -367,37 +378,34 @@ static READ32_HANDLER( FlashCmd_r )
 	return 0;
 }
 
-static WRITE32_HANDLER( FlashCmd_w )
+WRITE32_MEMBER(crystal_state::FlashCmd_w)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
-	state->m_FlashCmd = data;
+	m_FlashCmd = data;
 }
 
-static READ32_HANDLER( PIO_r )
+READ32_MEMBER(crystal_state::PIO_r)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
-	return state->m_PIO;
+	return m_PIO;
 }
 
-static WRITE32_HANDLER( PIO_w )
+WRITE32_MEMBER(crystal_state::PIO_w)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
 	UINT32 RST = data & 0x01000000;
 	UINT32 CLK = data & 0x02000000;
 	UINT32 DAT = data & 0x10000000;
 
 	if (!RST)
-		state->m_ds1302->reset();
+		m_ds1302->reset();
 
-	ds1302_dat_w(state->m_ds1302, 0, DAT ? 1 : 0);
-	ds1302_clk_w(state->m_ds1302, 0, CLK ? 1 : 0);
+	ds1302_dat_w(m_ds1302, 0, DAT ? 1 : 0);
+	ds1302_clk_w(m_ds1302, 0, CLK ? 1 : 0);
 
-	if (ds1302_read(state->m_ds1302, 0))
-		space->write_dword(0x01802008, space->read_dword(0x01802008) | 0x10000000);
+	if (ds1302_read(m_ds1302, 0))
+		space.write_dword(0x01802008, space.read_dword(0x01802008) | 0x10000000);
 	else
-		space->write_dword(0x01802008, space->read_dword(0x01802008) & (~0x10000000));
+		space.write_dword(0x01802008, space.read_dword(0x01802008) & (~0x10000000));
 
-	COMBINE_DATA(&state->m_PIO);
+	COMBINE_DATA(&m_PIO);
 }
 
 INLINE void DMA_w( address_space *space, int which, UINT32 data, UINT32 mem_mask )
@@ -443,57 +451,55 @@ INLINE void DMA_w( address_space *space, int which, UINT32 data, UINT32 mem_mask
 	COMBINE_DATA(&state->m_DMActrl[which]);
 }
 
-static READ32_HANDLER( DMA0_r )
+READ32_MEMBER(crystal_state::DMA0_r)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
-	return state->m_DMActrl[0];
+	return m_DMActrl[0];
 }
 
-static WRITE32_HANDLER( DMA0_w )
+WRITE32_MEMBER(crystal_state::DMA0_w)
 {
-	DMA_w(space, 0, data, mem_mask);
+	DMA_w(&space, 0, data, mem_mask);
 }
 
-static READ32_HANDLER( DMA1_r )
+READ32_MEMBER(crystal_state::DMA1_r)
 {
-	crystal_state *state = space->machine().driver_data<crystal_state>();
-	return state->m_DMActrl[1];
+	return m_DMActrl[1];
 }
 
-static WRITE32_HANDLER( DMA1_w )
+WRITE32_MEMBER(crystal_state::DMA1_w)
 {
-	DMA_w(space, 1, data, mem_mask);
+	DMA_w(&space, 1, data, mem_mask);
 }
 
 
 static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_WRITENOP
 
-	AM_RANGE(0x01200000, 0x0120000f) AM_READ_LEGACY(Input_r)
-	AM_RANGE(0x01280000, 0x01280003) AM_WRITE_LEGACY(Banksw_w)
+	AM_RANGE(0x01200000, 0x0120000f) AM_READ(Input_r)
+	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
 	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE_LEGACY(Timer0_r, Timer0_w)
-	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE_LEGACY(Timer1_r, Timer1_w)
-	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE_LEGACY(Timer2_r, Timer2_w)
-	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE_LEGACY(Timer3_r, Timer3_w)
-	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE_LEGACY(PIO_r, PIO_w)
+	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
+	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
+	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
+	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
+	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
 
-	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE_LEGACY(DMA0_r, DMA0_w)
-	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE_LEGACY(DMA1_r, DMA1_w)
+	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
+	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
 
-	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE_LEGACY(IntAck_w)
+	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
 	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_BASE(m_sysregs)
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_BASE(m_workram)
 
-	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE_LEGACY(FlipCount_r, FlipCount_w)
+	AM_RANGE(0x030000a4, 0x030000a7) AM_READWRITE(FlipCount_r, FlipCount_w)
 
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_BASE(m_vidregs)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_BASE(m_textureram)
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE(m_frameram)
 	AM_RANGE(0x04800000, 0x04800fff) AM_DEVREADWRITE_LEGACY("vrender", vr0_snd_read, vr0_snd_write)
 
-	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE_LEGACY(FlashCmd_r, FlashCmd_w)
+	AM_RANGE(0x05000000, 0x05000003) AM_READWRITE(FlashCmd_r, FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
 
 	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_BASE(m_ResetPatch)

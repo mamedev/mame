@@ -91,6 +91,17 @@ public:
 	size_t m_protection_res;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_READ8_MEMBER(igs_irqack_r);
+	DECLARE_WRITE8_MEMBER(igs_irqack_w);
+	DECLARE_WRITE8_MEMBER(bg_tile_w);
+	DECLARE_WRITE8_MEMBER(fg_tile_w);
+	DECLARE_WRITE8_MEMBER(fg_color_w);
+	DECLARE_WRITE8_MEMBER(igs_nmi_and_coins_w);
+	DECLARE_WRITE8_MEMBER(igs_lamps_w);
+	DECLARE_READ8_MEMBER(custom_io_r);
+	DECLARE_WRITE8_MEMBER(custom_io_w);
+	DECLARE_READ8_MEMBER(exp_rom_r);
+	void show_out();
 };
 
 
@@ -119,16 +130,15 @@ static TIMER_DEVICE_CALLBACK( igs_interrupt )
 }
 
 
-static READ8_HANDLER( igs_irqack_r )
+READ8_MEMBER(igspoker_state::igs_irqack_r)
 {
-	igspoker_state *state = space->machine().driver_data<igspoker_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 	return 0;
 }
 
-static WRITE8_HANDLER( igs_irqack_w )
+WRITE8_MEMBER(igspoker_state::igs_irqack_w)
 {
-//  cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+//  cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -147,25 +157,22 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0, code, tile != 0x1fff ? ((code >> 12) & 0xe) + 1 : 0, 0);
 }
 
-static WRITE8_HANDLER( bg_tile_w )
+WRITE8_MEMBER(igspoker_state::bg_tile_w)
 {
-	igspoker_state *state = space->machine().driver_data<igspoker_state>();
-	state->m_bg_tile_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tile_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( fg_tile_w )
+WRITE8_MEMBER(igspoker_state::fg_tile_w)
 {
-	igspoker_state *state = space->machine().driver_data<igspoker_state>();
-	state->m_fg_tile_ram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_tile_ram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( fg_color_w )
+WRITE8_MEMBER(igspoker_state::fg_color_w)
 {
-	igspoker_state *state = space->machine().driver_data<igspoker_state>();
-	state->m_fg_color_ram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_color_ram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static VIDEO_START(igs_video)
@@ -205,35 +212,33 @@ static SCREEN_UPDATE_IND16(cpokerpk)
 }
 
 
-static void show_out(igspoker_state *state)
+void igspoker_state::show_out()
 {
 #ifdef MAME_DEBUG
-	popmessage("%02x %02x", state->m_out[0], state->m_out[1]);
+	popmessage("%02x %02x", m_out[0], m_out[1]);
 #endif
 }
 
-static WRITE8_HANDLER( igs_nmi_and_coins_w )
+WRITE8_MEMBER(igspoker_state::igs_nmi_and_coins_w)
 {
-	igspoker_state *state = space->machine().driver_data<igspoker_state>();
-	coin_counter_w(space->machine(), 0,		data & 0x01);	// coin_a
-	coin_counter_w(space->machine(), 1,		data & 0x04);	// coin_c
-	coin_counter_w(space->machine(), 2,		data & 0x08);	// key in
-	coin_counter_w(space->machine(), 3,		data & 0x10);	// coin state->m_out mech
+	coin_counter_w(machine(), 0,		data & 0x01);	// coin_a
+	coin_counter_w(machine(), 1,		data & 0x04);	// coin_c
+	coin_counter_w(machine(), 2,		data & 0x08);	// key in
+	coin_counter_w(machine(), 3,		data & 0x10);	// coin m_out mech
 
-	set_led_status(space->machine(), 6,		data & 0x20);	// led for coin state->m_out / state->m_hopper active
+	set_led_status(machine(), 6,		data & 0x20);	// led for coin m_out / m_hopper active
 
-	state->m_nmi_enable = data & 0x80;     // nmi enable?
+	m_nmi_enable = data & 0x80;     // nmi enable?
 #ifdef VERBOSE
-	logerror("PC %06X: NMI change %02x\n",cpu_get_pc(&space->device()),state->m_nmi_enable);
+	logerror("PC %06X: NMI change %02x\n",cpu_get_pc(&space.device()),m_nmi_enable);
 #endif
 
-	state->m_out[0] = data;
-	show_out(state);
+	m_out[0] = data;
+	show_out();
 }
 
-static WRITE8_HANDLER( igs_lamps_w )
+WRITE8_MEMBER(igspoker_state::igs_lamps_w)
 {
-	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 /*
     - Lbits -
     7654 3210
@@ -266,66 +271,64 @@ static WRITE8_HANDLER( igs_lamps_w )
 	output_set_lamp_value(5, (data >> 2) & 1);		/* Lamp 5 - HOLD 5 */
 	output_set_lamp_value(6, (data & 1));			/* Lamp 6 - START */
 
-	state->m_hopper			=	(~data)& 0x80;
+	m_hopper			=	(~data)& 0x80;
 
-	state->m_out[1] = data;
-	show_out(state);
+	m_out[1] = data;
+	show_out();
 }
 
 
 
-static READ8_HANDLER( custom_io_r )
+READ8_MEMBER(igspoker_state::custom_io_r)
 {
-	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 #ifdef VERBOSE
-	logerror("PC %06X: Protection read %02x\n",cpu_get_pc(&space->device()), (int) state->m_protection_res);
+	logerror("PC %06X: Protection read %02x\n",cpu_get_pc(&space.device()), (int) m_protection_res);
 #endif
-	return state->m_protection_res;
+	return m_protection_res;
 }
 
-static WRITE8_HANDLER( custom_io_w )
+WRITE8_MEMBER(igspoker_state::custom_io_w)
 {
-	igspoker_state *state = space->machine().driver_data<igspoker_state>();
 #ifdef VERBOSE
-	logerror("PC %06X: Protection write %02x\n",cpu_get_pc(&space->device()),data);
+	logerror("PC %06X: Protection write %02x\n",cpu_get_pc(&space.device()),data);
 #endif
 
 	switch (data)
 	{
-		case 0x00: state->m_protection_res = input_port_read(space->machine(), "BUTTONS1"); break;
+		case 0x00: m_protection_res = input_port_read(machine(), "BUTTONS1"); break;
 		// CSK227
-		case 0x20: state->m_protection_res = 0x49; break;
-		case 0x21: state->m_protection_res = 0x47; break;
-		case 0x22: state->m_protection_res = 0x53; break;
-		case 0x24: state->m_protection_res = 0x41; break;
-		case 0x25: state->m_protection_res = 0x41; break;
-		case 0x26: state->m_protection_res = 0x7f; break;
-		case 0x27: state->m_protection_res = 0x41; break;
-		case 0x28: state->m_protection_res = 0x41; break;
-		case 0x2a: state->m_protection_res = 0x3e; break;
-		case 0x2b: state->m_protection_res = 0x41; break;
+		case 0x20: m_protection_res = 0x49; break;
+		case 0x21: m_protection_res = 0x47; break;
+		case 0x22: m_protection_res = 0x53; break;
+		case 0x24: m_protection_res = 0x41; break;
+		case 0x25: m_protection_res = 0x41; break;
+		case 0x26: m_protection_res = 0x7f; break;
+		case 0x27: m_protection_res = 0x41; break;
+		case 0x28: m_protection_res = 0x41; break;
+		case 0x2a: m_protection_res = 0x3e; break;
+		case 0x2b: m_protection_res = 0x41; break;
 		// CSK227 and NUMBER10
-		case 0x2c: state->m_protection_res = 0x49; break;
-		case 0x2d: state->m_protection_res = 0xf9; break;
-		case 0x2e: state->m_protection_res = 0x0a; break;
-		case 0x30: state->m_protection_res = 0x26; break;
-		case 0x31: state->m_protection_res = 0x49; break;
-		case 0x32: state->m_protection_res = 0x49; break;
-		case 0x33: state->m_protection_res = 0x49; break;
-		case 0x34: state->m_protection_res = 0x32; break;
+		case 0x2c: m_protection_res = 0x49; break;
+		case 0x2d: m_protection_res = 0xf9; break;
+		case 0x2e: m_protection_res = 0x0a; break;
+		case 0x30: m_protection_res = 0x26; break;
+		case 0x31: m_protection_res = 0x49; break;
+		case 0x32: m_protection_res = 0x49; break;
+		case 0x33: m_protection_res = 0x49; break;
+		case 0x34: m_protection_res = 0x32; break;
 		// NUMBER10
-		case 0x60: state->m_protection_res = 0x30; break;
-		case 0x61: state->m_protection_res = 0x31; break;
-		case 0x62: state->m_protection_res = 0x3e; break;
-		case 0x64: state->m_protection_res = 0x3c; break;
-		case 0x65: state->m_protection_res = 0x31; break;
-		case 0x66: state->m_protection_res = 0x39; break;
-		case 0x67: state->m_protection_res = 0x33; break;
-		case 0x68: state->m_protection_res = 0x35; break;
-		case 0x6a: state->m_protection_res = 0x40; break;
-		case 0x6b: state->m_protection_res = 0x43; break;
+		case 0x60: m_protection_res = 0x30; break;
+		case 0x61: m_protection_res = 0x31; break;
+		case 0x62: m_protection_res = 0x3e; break;
+		case 0x64: m_protection_res = 0x3c; break;
+		case 0x65: m_protection_res = 0x31; break;
+		case 0x66: m_protection_res = 0x39; break;
+		case 0x67: m_protection_res = 0x33; break;
+		case 0x68: m_protection_res = 0x35; break;
+		case 0x6a: m_protection_res = 0x40; break;
+		case 0x6b: m_protection_res = 0x43; break;
 		default:
-			state->m_protection_res = data;
+			m_protection_res = data;
 	}
 }
 
@@ -336,9 +339,9 @@ static CUSTOM_INPUT( hopper_r )
 	return field.machine().input().code_pressed(KEYCODE_H);
 }
 
-static READ8_HANDLER( exp_rom_r )
+READ8_MEMBER(igspoker_state::exp_rom_r)
 {
-	UINT8 *rom = space->machine().region("maincpu")->base();
+	UINT8 *rom = machine().region("maincpu")->base();
 	return rom[offset+0x10000];
 }
 
@@ -355,18 +358,18 @@ static ADDRESS_MAP_START( igspoker_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
 	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")			/* DSW4 */
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
-	AM_RANGE(0x5080, 0x5080) AM_WRITE_LEGACY(igs_nmi_and_coins_w)
+	AM_RANGE(0x5080, 0x5080) AM_WRITE(igs_nmi_and_coins_w)
 	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")			/* Services */
 	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")			/* Coing & Kbd */
-	AM_RANGE(0x5090, 0x5090) AM_WRITE_LEGACY(custom_io_w)
-	AM_RANGE(0x5091, 0x5091) AM_READ_LEGACY(custom_io_r) AM_WRITE_LEGACY(igs_lamps_w )			/* Keyboard */
+	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
+	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE(igs_lamps_w )			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")			/* Not connected */
 	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
-	AM_RANGE(0x50c0, 0x50c0) AM_READ_LEGACY(igs_irqack_r) AM_WRITE_LEGACY(igs_irqack_w)
-	AM_RANGE(0x6800, 0x6fff) AM_RAM_WRITE_LEGACY(bg_tile_w )  AM_BASE(m_bg_tile_ram )
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE_LEGACY(fg_tile_w )  AM_BASE(m_fg_tile_ram )
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE_LEGACY(fg_color_w ) AM_BASE(m_fg_color_ram )
-	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(exp_rom_r )
+	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
+	AM_RANGE(0x6800, 0x6fff) AM_RAM_WRITE(bg_tile_w )  AM_BASE(m_bg_tile_ram )
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_BASE(m_fg_tile_ram )
+	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 ADDRESS_MAP_END
 
 
@@ -1111,17 +1114,17 @@ static ADDRESS_MAP_START( number10_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
 	AM_RANGE(0x4006, 0x4006) AM_READ_PORT("DSW6")
 	AM_RANGE(0x4007, 0x4007) AM_READ_PORT("DSW7")
-	AM_RANGE(0x50f0, 0x50f0) AM_WRITE_LEGACY(igs_nmi_and_coins_w)
+	AM_RANGE(0x50f0, 0x50f0) AM_WRITE(igs_nmi_and_coins_w)
 	AM_RANGE(0x5080, 0x5080) AM_READ_PORT("SERVICE")			/* Services */
-	AM_RANGE(0x5090, 0x5090) AM_WRITE_LEGACY(custom_io_w)
-	AM_RANGE(0x5091, 0x5091) AM_READ_LEGACY(custom_io_r) AM_WRITE_LEGACY(igs_lamps_w )			/* Keyboard */
+	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
+	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE(igs_lamps_w )			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
 	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x50c0, 0x50c0) AM_READ_LEGACY(igs_irqack_r) AM_WRITE_LEGACY(igs_irqack_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE_LEGACY(fg_tile_w )  AM_BASE(m_fg_tile_ram )
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE_LEGACY(fg_color_w ) AM_BASE(m_fg_color_ram )
-	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(exp_rom_r )
+	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_BASE(m_fg_tile_ram )
+	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
@@ -1132,18 +1135,18 @@ static ADDRESS_MAP_START( cpokerpk_io_map, AS_IO, 8, igspoker_state )
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("DSW3")			/* DSW3 */
 	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW4")			/* DSW4 */
 	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW5")			/* DSW5 */
-	AM_RANGE(0x50f0, 0x50f0) AM_WRITE_LEGACY(igs_nmi_and_coins_w)
+	AM_RANGE(0x50f0, 0x50f0) AM_WRITE(igs_nmi_and_coins_w)
 	AM_RANGE(0x5081, 0x5081) AM_READ_PORT("SERVICE")			/* Services */
 	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("COINS")			/* Coing & Kbd */
-	AM_RANGE(0x5090, 0x5090) AM_WRITE_LEGACY(custom_io_w)
-	AM_RANGE(0x5091, 0x5091) AM_READ_LEGACY(custom_io_r) AM_WRITE_LEGACY(igs_lamps_w )			/* Keyboard */
+	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
+	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r) AM_WRITE(igs_lamps_w )			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("BUTTONS2")
 	/* Sound synthesys has been patched out, replaced by ADPCM samples */
 	AM_RANGE(0x50b0, 0x50b0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x50c0, 0x50c0) AM_READ_LEGACY(igs_irqack_r) AM_WRITE_LEGACY(igs_irqack_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE_LEGACY(fg_tile_w )  AM_BASE(m_fg_tile_ram )
-	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE_LEGACY(fg_color_w ) AM_BASE(m_fg_color_ram )
-	AM_RANGE(0x0000, 0xffff) AM_READ_LEGACY(exp_rom_r )
+	AM_RANGE(0x50c0, 0x50c0) AM_READ(igs_irqack_r) AM_WRITE(igs_irqack_w)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(fg_tile_w )  AM_BASE(m_fg_tile_ram )
+	AM_RANGE(0x7800, 0x7fff) AM_RAM_WRITE(fg_color_w ) AM_BASE(m_fg_color_ram )
+	AM_RANGE(0x0000, 0xffff) AM_READ(exp_rom_r )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( number10 )

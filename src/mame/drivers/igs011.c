@@ -108,6 +108,71 @@ public:
 	blitter_t m_blitter;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE16_MEMBER(igs011_priority_w);
+	DECLARE_READ16_MEMBER(igs011_layers_r);
+	DECLARE_WRITE16_MEMBER(igs011_layers_w);
+	DECLARE_WRITE16_MEMBER(igs011_palette);
+	DECLARE_WRITE16_MEMBER(igs011_blit_x_w);
+	DECLARE_WRITE16_MEMBER(igs011_blit_y_w);
+	DECLARE_WRITE16_MEMBER(igs011_blit_gfx_lo_w);
+	DECLARE_WRITE16_MEMBER(igs011_blit_gfx_hi_w);
+	DECLARE_WRITE16_MEMBER(igs011_blit_w_w);
+	DECLARE_WRITE16_MEMBER(igs011_blit_h_w);
+	DECLARE_WRITE16_MEMBER(igs011_blit_depth_w);
+	DECLARE_WRITE16_MEMBER(igs011_blit_pen_w);
+	DECLARE_WRITE16_MEMBER(igs011_blit_flags_w);
+	DECLARE_WRITE16_MEMBER(igs_dips_w);
+	DECLARE_READ16_MEMBER(igs_3_dips_r);
+	DECLARE_READ16_MEMBER(igs_4_dips_r);
+	DECLARE_READ16_MEMBER(igs_5_dips_r);
+	DECLARE_WRITE16_MEMBER(igs011_prot1_w);
+	DECLARE_READ16_MEMBER(igs011_prot1_r);
+	DECLARE_WRITE16_MEMBER(igs011_prot_addr_w);
+	DECLARE_READ16_MEMBER(igs011_prot_fake_r);
+	DECLARE_WRITE16_MEMBER(igs011_prot2_reset_w);
+	DECLARE_READ16_MEMBER(igs011_prot2_reset_r);
+	DECLARE_WRITE16_MEMBER(igs011_prot2_inc_w);
+	DECLARE_WRITE16_MEMBER(igs011_prot2_dec_w);
+	DECLARE_WRITE16_MEMBER(drgnwrld_igs011_prot2_swap_w);
+	DECLARE_WRITE16_MEMBER(lhb_igs011_prot2_swap_w);
+	DECLARE_WRITE16_MEMBER(wlcc_igs011_prot2_swap_w);
+	DECLARE_WRITE16_MEMBER(vbowl_igs011_prot2_swap_w);
+	DECLARE_READ16_MEMBER(drgnwrldv21_igs011_prot2_r);
+	DECLARE_READ16_MEMBER(drgnwrldv20j_igs011_prot2_r);
+	DECLARE_READ16_MEMBER(lhb_igs011_prot2_r);
+	DECLARE_READ16_MEMBER(dbc_igs011_prot2_r);
+	DECLARE_READ16_MEMBER(ryukobou_igs011_prot2_r);
+	DECLARE_READ16_MEMBER(lhb2_igs011_prot2_r);
+	DECLARE_READ16_MEMBER(vbowl_igs011_prot2_r);
+	DECLARE_WRITE16_MEMBER(igs012_prot_reset_w);
+	DECLARE_READ16_MEMBER(igs012_prot_fake_r);
+	DECLARE_WRITE16_MEMBER(igs012_prot_mode_w);
+	DECLARE_WRITE16_MEMBER(igs012_prot_inc_w);
+	DECLARE_WRITE16_MEMBER(igs012_prot_dec_inc_w);
+	DECLARE_WRITE16_MEMBER(igs012_prot_dec_copy_w);
+	DECLARE_WRITE16_MEMBER(igs012_prot_copy_w);
+	DECLARE_WRITE16_MEMBER(igs012_prot_swap_w);
+	DECLARE_READ16_MEMBER(igs012_prot_r);
+	DECLARE_WRITE16_MEMBER(drgnwrld_igs003_w);
+	DECLARE_READ16_MEMBER(drgnwrld_igs003_r);
+	DECLARE_WRITE16_MEMBER(lhb_inputs_w);
+	DECLARE_READ16_MEMBER(lhb_inputs_r);
+	DECLARE_WRITE16_MEMBER(lhb2_igs003_w);
+	DECLARE_READ16_MEMBER(lhb2_igs003_r);
+	DECLARE_WRITE16_MEMBER(wlcc_igs003_w);
+	DECLARE_READ16_MEMBER(wlcc_igs003_r);
+	DECLARE_WRITE16_MEMBER(xymg_igs003_w);
+	DECLARE_READ16_MEMBER(xymg_igs003_r);
+	DECLARE_WRITE16_MEMBER(vbowl_igs003_w);
+	DECLARE_READ16_MEMBER(vbowl_igs003_r);
+	DECLARE_WRITE16_MEMBER(lhb_irq_enable_w);
+	DECLARE_READ16_MEMBER(vbowl_unk_r);
+	DECLARE_WRITE16_MEMBER(vbowl_pen_hi_w);
+	DECLARE_WRITE16_MEMBER(vbowl_link_0_w);
+	DECLARE_WRITE16_MEMBER(vbowl_link_1_w);
+	DECLARE_WRITE16_MEMBER(vbowl_link_2_w);
+	DECLARE_WRITE16_MEMBER(vbowl_link_3_w);
+	UINT16 igs_dips_r(int NUM);
 };
 
 
@@ -132,15 +197,14 @@ public:
 
 
 
-static WRITE16_HANDLER( igs011_priority_w )
+WRITE16_MEMBER(igs011_state::igs011_priority_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	COMBINE_DATA(&state->m_priority);
+	COMBINE_DATA(&m_priority);
 
-//  logerror("%06x: priority = %02x\n", cpu_get_pc(&space->device()), state->m_priority);
+//  logerror("%06x: priority = %02x\n", cpu_get_pc(&space.device()), m_priority);
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to priority = %02x\n", cpu_get_pc(&space->device()), state->m_priority);
+		logerror("%06x: warning, unknown bits written to priority = %02x\n", cpu_get_pc(&space.device()), m_priority);
 }
 
 
@@ -234,13 +298,12 @@ static SCREEN_UPDATE_IND16( igs011 )
 
 ***************************************************************************/
 
-static READ16_HANDLER( igs011_layers_r )
+READ16_MEMBER(igs011_state::igs011_layers_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
-	UINT8 *l0 = state->m_layer[layer0];
-	UINT8 *l1 = state->m_layer[layer0+1];
+	UINT8 *l0 = m_layer[layer0];
+	UINT8 *l1 = m_layer[layer0+1];
 
 	offset >>= 1;
 	offset &= 0x1ffff;
@@ -248,15 +311,14 @@ static READ16_HANDLER( igs011_layers_r )
 	return (l0[offset] << 8) | l1[offset];
 }
 
-static WRITE16_HANDLER( igs011_layers_w )
+WRITE16_MEMBER(igs011_state::igs011_layers_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	UINT16 word;
 
 	int layer0 = ((offset & (0x80000/2)) ? 4 : 0) + ((offset & 1) ? 0 : 2);
 
-	UINT8 *l0 = state->m_layer[layer0];
-	UINT8 *l1 = state->m_layer[layer0+1];
+	UINT8 *l0 = m_layer[layer0];
+	UINT8 *l1 = m_layer[layer0+1];
 
 	offset >>= 1;
 	offset &= 0x1ffff;
@@ -276,14 +338,14 @@ static WRITE16_HANDLER( igs011_layers_w )
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( igs011_palette )
+WRITE16_MEMBER(igs011_state::igs011_palette)
 {
 	int rgb;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
 
-	rgb = (space->machine().generic.paletteram.u16[offset & 0x7ff] & 0xff) | ((space->machine().generic.paletteram.u16[offset | 0x800] & 0xff) << 8);
-	palette_set_color_rgb(space->machine(),offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
+	rgb = (machine().generic.paletteram.u16[offset & 0x7ff] & 0xff) | ((machine().generic.paletteram.u16[offset | 0x800] & 0xff) << 8);
+	palette_set_color_rgb(machine(),offset & 0x7ff,pal5bit(rgb >> 0),pal5bit(rgb >> 5),pal5bit(rgb >> 10));
 }
 
 /***************************************************************************
@@ -293,95 +355,86 @@ static WRITE16_HANDLER( igs011_palette )
 ***************************************************************************/
 
 
-static WRITE16_HANDLER( igs011_blit_x_w )
+WRITE16_MEMBER(igs011_state::igs011_blit_x_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	struct blitter_t &blitter = state->m_blitter;
+	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.x);
 }
 
-static WRITE16_HANDLER( igs011_blit_y_w )
+WRITE16_MEMBER(igs011_state::igs011_blit_y_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	struct blitter_t &blitter = state->m_blitter;
+	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.y);
 }
 
-static WRITE16_HANDLER( igs011_blit_gfx_lo_w )
+WRITE16_MEMBER(igs011_state::igs011_blit_gfx_lo_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	struct blitter_t &blitter = state->m_blitter;
+	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.gfx_lo);
 }
 
-static WRITE16_HANDLER( igs011_blit_gfx_hi_w )
+WRITE16_MEMBER(igs011_state::igs011_blit_gfx_hi_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	struct blitter_t &blitter = state->m_blitter;
+	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.gfx_hi);
 }
 
-static WRITE16_HANDLER( igs011_blit_w_w )
+WRITE16_MEMBER(igs011_state::igs011_blit_w_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	struct blitter_t &blitter = state->m_blitter;
+	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.w);
 }
 
-static WRITE16_HANDLER( igs011_blit_h_w )
+WRITE16_MEMBER(igs011_state::igs011_blit_h_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	struct blitter_t &blitter = state->m_blitter;
+	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.h);
 }
 
-static WRITE16_HANDLER( igs011_blit_depth_w )
+WRITE16_MEMBER(igs011_state::igs011_blit_depth_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	struct blitter_t &blitter = state->m_blitter;
+	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.depth);
 }
 
-static WRITE16_HANDLER( igs011_blit_pen_w )
+WRITE16_MEMBER(igs011_state::igs011_blit_pen_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	struct blitter_t &blitter = state->m_blitter;
+	struct blitter_t &blitter = m_blitter;
 	COMBINE_DATA(&blitter.pen);
 }
 
 
-static WRITE16_HANDLER( igs011_blit_flags_w )
+WRITE16_MEMBER(igs011_state::igs011_blit_flags_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	struct blitter_t &blitter = state->m_blitter;
+	struct blitter_t &blitter = m_blitter;
 	int x, xstart, xend, xinc, flipx;
 	int y, ystart, yend, yinc, flipy;
 	int depth4, clear, opaque, z;
 	UINT8 trans_pen, clear_pen, pen_hi, *dest;
 	UINT8 pen = 0;
 
-	UINT8 *gfx		=	space->machine().region("blitter")->base();
-	UINT8 *gfx2		=	space->machine().region("blitter_hi")->base();
-	int gfx_size	=	space->machine().region("blitter")->bytes();
-	int gfx2_size	=	space->machine().region("blitter_hi")->bytes();
+	UINT8 *gfx		=	machine().region("blitter")->base();
+	UINT8 *gfx2		=	machine().region("blitter_hi")->base();
+	int gfx_size	=	machine().region("blitter")->bytes();
+	int gfx2_size	=	machine().region("blitter_hi")->bytes();
 
-	const rectangle &clip = space->machine().primary_screen->visible_area();
+	const rectangle &clip = machine().primary_screen->visible_area();
 
 	COMBINE_DATA(&blitter.flags);
 
 #if LOG_BLITTER
-	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", cpu_get_pc(&space->device()),
+	logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, gfx %03x%04x, depth %02x, pen %02x, flags %03x\n", cpu_get_pc(&space.device()),
 					blitter.x,blitter.y,blitter.w,blitter.h,blitter.gfx_hi,blitter.gfx_lo,blitter.depth,blitter.pen,blitter.flags);
 #endif
 
-	dest	=	state->m_layer[	   blitter.flags & 0x0007	];
+	dest	=	m_layer[	   blitter.flags & 0x0007	];
 	opaque	=			 !(blitter.flags & 0x0008);
 	clear	=			   blitter.flags & 0x0010;
 	flipx	=			   blitter.flags & 0x0020;
 	flipy	=			   blitter.flags & 0x0040;
 	if					(!(blitter.flags & 0x0400)) return;
 
-	pen_hi	=	(state->m_lhb2_pen_hi & 0x07) << 5;
+	pen_hi	=	(m_lhb2_pen_hi & 0x07) << 5;
 
 	// pixel address
 	z		=	blitter.gfx_lo  + (blitter.gfx_hi << 16);
@@ -449,7 +502,7 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 
 	#ifdef MAME_DEBUG
 #if 1
-	if (space->machine().input().code_pressed(KEYCODE_Z))
+	if (machine().input().code_pressed(KEYCODE_Z))
 	{	char buf[20];
 		sprintf(buf, "%02X%02X",blitter.depth,blitter.flags&0xff);
 //      ui_draw_text(buf, blitter.x, blitter.y);    // crashes mame!
@@ -473,30 +526,28 @@ static CUSTOM_INPUT( igs_hopper_r )
 	return (state->m_igs_hopper && ((field.machine().primary_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }
 
-static WRITE16_HANDLER( igs_dips_w )
+WRITE16_MEMBER(igs011_state::igs_dips_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	COMBINE_DATA(&state->m_igs_dips_sel);
+	COMBINE_DATA(&m_igs_dips_sel);
 }
 
-INLINE UINT16 igs_dips_r(address_space *space, int NUM)
+UINT16 igs011_state::igs_dips_r(int NUM)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	int i;
 	UINT16 ret=0;
 	static const char *const dipnames[] = { "DSW1", "DSW2", "DSW3", "DSW4", "DSW5" };
 
 	for (i = 0; i < NUM; i++)
-		if ((~state->m_igs_dips_sel) & (1 << i) )
-			ret = input_port_read(space->machine(), dipnames[i]);
+		if ((~m_igs_dips_sel) & (1 << i) )
+			ret = input_port_read(machine(), dipnames[i]);
 	/* 0x0100 is blitter busy */
 	return	(ret & 0xff) | 0x0000;
 }
 
 // Games have 3 to 5 dips
-static READ16_HANDLER( igs_3_dips_r ) { return igs_dips_r(space, 3); }
-static READ16_HANDLER( igs_4_dips_r ) { return igs_dips_r(space, 4); }
-static READ16_HANDLER( igs_5_dips_r ) { return igs_dips_r(space, 5); }
+READ16_MEMBER(igs011_state::igs_3_dips_r){ return igs_dips_r(3); }
+READ16_MEMBER(igs011_state::igs_4_dips_r){ return igs_dips_r(4); }
+READ16_MEMBER(igs011_state::igs_5_dips_r){ return igs_dips_r(5); }
 
 /***************************************************************************
 
@@ -903,9 +954,8 @@ static void drgnwrld_gfx_decrypt(running_machine &machine)
 
 
 
-static WRITE16_HANDLER( igs011_prot1_w )
+WRITE16_MEMBER(igs011_state::igs011_prot1_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	offset *= 2;
 
 	switch (offset)
@@ -913,7 +963,7 @@ static WRITE16_HANDLER( igs011_prot1_w )
 		case 0:	// COPY
 			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300)
 			{
-				state->m_prot1 = state->m_prot1_swap;
+				m_prot1 = m_prot1_swap;
 				return;
 			}
 			break;
@@ -921,7 +971,7 @@ static WRITE16_HANDLER( igs011_prot1_w )
 		case 2:	// INC
 			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0xff00)
 			{
-				state->m_prot1++;
+				m_prot1++;
 				return;
 			}
 			break;
@@ -929,7 +979,7 @@ static WRITE16_HANDLER( igs011_prot1_w )
 		case 4:	// DEC
 			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0xaa00)
 			{
-				state->m_prot1--;
+				m_prot1--;
 				return;
 			}
 			break;
@@ -938,53 +988,50 @@ static WRITE16_HANDLER( igs011_prot1_w )
 			if (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x5500)
 			{
 				// b1 . (b2|b3) . b2 . (b0&b3)
-				UINT8 x = state->m_prot1;
-				state->m_prot1_swap = (BIT(x,1)<<3) | ((BIT(x,2)|BIT(x,3))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,3));
+				UINT8 x = m_prot1;
+				m_prot1_swap = (BIT(x,1)<<3) | ((BIT(x,2)|BIT(x,3))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,3));
 				return;
 			}
 			break;
 	}
 
-	logerror("%s: warning, unknown igs011_prot1_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
+	logerror("%s: warning, unknown igs011_prot1_w( %04x, %04x )\n", machine().describe_context(), offset, data);
 }
-static READ16_HANDLER( igs011_prot1_r )
+READ16_MEMBER(igs011_state::igs011_prot1_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// !(b1&b2) . 0 . 0 . (b0^b3) . 0 . 0
-	UINT8 x = state->m_prot1;
+	UINT8 x = m_prot1;
 	return (((BIT(x,1)&BIT(x,2))^1)<<5) | ((BIT(x,0)^BIT(x,3))<<2);
 }
 
 
-static WRITE16_HANDLER( igs011_prot_addr_w )
+WRITE16_MEMBER(igs011_state::igs011_prot_addr_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	state->m_prot1 = 0x00;
-	state->m_prot1_swap = 0x00;
+	m_prot1 = 0x00;
+	m_prot1_swap = 0x00;
 
-//  state->m_prot2 = 0x00;
+//  m_prot2 = 0x00;
 
-	address_space *sp = space->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = space->machine().region("maincpu")->base();
+	address_space *sp = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	UINT8 *rom = machine().region("maincpu")->base();
 
 	// Plug previous address range with ROM access
-	sp->install_rom(state->m_prot1_addr + 0, state->m_prot1_addr + 9, rom + state->m_prot1_addr);
+	sp->install_rom(m_prot1_addr + 0, m_prot1_addr + 9, rom + m_prot1_addr);
 
-	state->m_prot1_addr = (data << 4) ^ 0x8340;
+	m_prot1_addr = (data << 4) ^ 0x8340;
 
 	// Add protection memory range
-	sp->install_legacy_write_handler(state->m_prot1_addr + 0, state->m_prot1_addr + 7, FUNC(igs011_prot1_w));
-	sp->install_legacy_read_handler (state->m_prot1_addr + 8, state->m_prot1_addr + 9, FUNC(igs011_prot1_r));
+	sp->install_write_handler(m_prot1_addr + 0, m_prot1_addr + 7, write16_delegate(FUNC(igs011_state::igs011_prot1_w), this));
+	sp->install_read_handler (m_prot1_addr + 8, m_prot1_addr + 9, read16_delegate(FUNC(igs011_state::igs011_prot1_r), this));
 }
 /*
-static READ16_HANDLER( igs011_prot_fake_r )
+READ16_MEMBER(igs011_state::igs011_prot_fake_r)
 {
-    igs011_state *state = space->machine().driver_data<igs011_state>();
     switch (offset)
     {
-        case 0: return state->m_prot1;
-        case 1: return state->m_prot1_swap;
-        case 2: return state->m_prot2;
+        case 0: return m_prot1;
+        case 1: return m_prot1_swap;
+        case 2: return m_prot2;
     }
     return 0;
 }
@@ -998,176 +1045,161 @@ static READ16_HANDLER( igs011_prot_fake_r )
 // Prot2
 
 // drgnwrld (33)
-static WRITE16_HANDLER( igs011_prot2_reset_w )
+WRITE16_MEMBER(igs011_state::igs011_prot2_reset_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	state->m_prot2 = 0x00;
+	m_prot2 = 0x00;
 }
 
 // wlcc
-static READ16_HANDLER( igs011_prot2_reset_r )
+READ16_MEMBER(igs011_state::igs011_prot2_reset_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	state->m_prot2 = 0x00;
+	m_prot2 = 0x00;
 	return 0;
 }
 
 
 
 // lhb2 (55), lhb/dbc/ryukobou (33)
-static WRITE16_HANDLER( igs011_prot2_inc_w )
+WRITE16_MEMBER(igs011_state::igs011_prot2_inc_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x5500) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0055)) )
 	{
-		state->m_prot2++;
+		m_prot2++;
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_inc_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_inc_w( %04x, %04x )\n", machine().describe_context(), offset, data);
 }
 
 // vbowl (33)
-static WRITE16_HANDLER( igs011_prot2_dec_w )
+WRITE16_MEMBER(igs011_state::igs011_prot2_dec_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
-		state->m_prot2--;
+		m_prot2--;
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_dec_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_dec_w( %04x, %04x )\n", machine().describe_context(), offset, data);
 }
 
 
 
-static WRITE16_HANDLER( drgnwrld_igs011_prot2_swap_w )
+WRITE16_MEMBER(igs011_state::drgnwrld_igs011_prot2_swap_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	offset *= 2;
 
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
 		// (b3&b0) . b2 . (b0|b1) . (b2^!b4) . (!b1^b3)
-		UINT8 x = state->m_prot2;
-		state->m_prot2 = ((BIT(x,3)&BIT(x,0))<<4) | (BIT(x,2)<<3) | ((BIT(x,0)|BIT(x,1))<<2) | ((BIT(x,2)^BIT(x,4)^1)<<1) | (BIT(x,1)^1^BIT(x,3));
+		UINT8 x = m_prot2;
+		m_prot2 = ((BIT(x,3)&BIT(x,0))<<4) | (BIT(x,2)<<3) | ((BIT(x,0)|BIT(x,1))<<2) | ((BIT(x,2)^BIT(x,4)^1)<<1) | (BIT(x,1)^1^BIT(x,3));
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", machine().describe_context(), offset, data);
 }
 
 // lhb, xymg, lhb2
-static WRITE16_HANDLER( lhb_igs011_prot2_swap_w )
+WRITE16_MEMBER(igs011_state::lhb_igs011_prot2_swap_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	offset *= 2;
 
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
 		// (!b0|b1) . b2 . (b0&b1)
-		UINT8 x = state->m_prot2;
-		state->m_prot2 = (((BIT(x,0)^1)|BIT(x,1))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,1));
+		UINT8 x = m_prot2;
+		m_prot2 = (((BIT(x,0)^1)|BIT(x,1))<<2) | (BIT(x,2)<<1) | (BIT(x,0)&BIT(x,1));
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", machine().describe_context(), offset, data);
 }
 
 // wlcc
-static WRITE16_HANDLER( wlcc_igs011_prot2_swap_w )
+WRITE16_MEMBER(igs011_state::wlcc_igs011_prot2_swap_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	offset *= 2;
 
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
 		// (b3 ^ b2) . (b2 ^ b1) . (b1 ^ b0) . !(b4 ^ b0) . !(b4 ^ b3)
-		UINT8 x = state->m_prot2;
-		state->m_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0)^1)<<1) | (BIT(x,4)^BIT(x,3)^1);
+		UINT8 x = m_prot2;
+		m_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0)^1)<<1) | (BIT(x,4)^BIT(x,3)^1);
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", machine().describe_context(), offset, data);
 }
 
 // vbowl
-static WRITE16_HANDLER( vbowl_igs011_prot2_swap_w )
+WRITE16_MEMBER(igs011_state::vbowl_igs011_prot2_swap_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	offset *= 2;
 
 //  if ( (ACCESSING_BITS_8_15 && (data & 0xff00) == 0x3300) || ((ACCESSING_BITS_0_7 && (data & 0x00ff) == 0x0033)) )
 	{
 		// (b3 ^ b2) . (b2 ^ b1) . (b1 ^ b0) . (b4 ^ b0) . (b4 ^ b3)
-		UINT8 x = state->m_prot2;
-		state->m_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0))<<1) | (BIT(x,4)^BIT(x,3));
+		UINT8 x = m_prot2;
+		m_prot2 = ((BIT(x,3)^BIT(x,2))<<4) | ((BIT(x,2)^BIT(x,1))<<3) | ((BIT(x,1)^BIT(x,0))<<2) | ((BIT(x,4)^BIT(x,0))<<1) | (BIT(x,4)^BIT(x,3));
 	}
 //  else
-//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", space->machine().describe_context(), offset, data);
+//      logerror("%s: warning, unknown igs011_prot2_swap_w( %04x, %04x )\n", machine().describe_context(), offset, data);
 }
 
 
 
 // drgnwrld
-static READ16_HANDLER( drgnwrldv21_igs011_prot2_r )
+READ16_MEMBER(igs011_state::drgnwrldv21_igs011_prot2_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b9 = (!b4) | (!b0 & b2) | (!(b3 ^ b1) & !(!(b4 & b0) | b2))
-	UINT8 x = state->m_prot2;
+	UINT8 x = m_prot2;
 	UINT8 b9 = (BIT(x,4)^1) | ((BIT(x,0)^1) & BIT(x,2)) | ( (BIT(x,3)^BIT(x,1)^1) & ((((BIT(x,4)^1) & BIT(x,0)) | BIT(x,2))^1) );
 	return (b9 << 9);
 }
-static READ16_HANDLER( drgnwrldv20j_igs011_prot2_r )
+READ16_MEMBER(igs011_state::drgnwrldv20j_igs011_prot2_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b9 = (!b4 | !b0) | !(b3 | b1) | !(b2 & b0)
-	UINT8 x = state->m_prot2;
+	UINT8 x = m_prot2;
 	UINT8 b9 = ((BIT(x,4)^1) | (BIT(x,0)^1)) | ((BIT(x,3) | BIT(x,1))^1) | ((BIT(x,2) & BIT(x,0))^1);
 	return (b9 << 9);
 }
 
 // lhb, xymg
-static READ16_HANDLER( lhb_igs011_prot2_r )
+READ16_MEMBER(igs011_state::lhb_igs011_prot2_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b9 = !b2 | (b1 & b0)
-	UINT8 x = state->m_prot2;
+	UINT8 x = m_prot2;
 	UINT8 b9 = (BIT(x,2)^1) | (BIT(x,1) & BIT(x,0));
 	return (b9 << 9);
 }
 
 // dbc
-static READ16_HANDLER( dbc_igs011_prot2_r )
+READ16_MEMBER(igs011_state::dbc_igs011_prot2_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b9 = !b1 | (!b0 & b2)
-	UINT8 x = state->m_prot2;
+	UINT8 x = m_prot2;
 	UINT8 b9 = (BIT(x,1)^1) | ((BIT(x,0)^1) & BIT(x,2));
 	return (b9 << 9);
 }
 
 // ryukobou
-static READ16_HANDLER( ryukobou_igs011_prot2_r )
+READ16_MEMBER(igs011_state::ryukobou_igs011_prot2_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b9 = (!b1 | b2) & b0
-	UINT8 x = state->m_prot2;
+	UINT8 x = m_prot2;
 	UINT8 b9 = ((BIT(x,1)^1) | BIT(x,2)) & BIT(x,0);
 	return (b9 << 9);
 }
 
 // lhb2
-static READ16_HANDLER( lhb2_igs011_prot2_r )
+READ16_MEMBER(igs011_state::lhb2_igs011_prot2_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// b3 = !b2 | !b1 | b0
-	UINT8 x = state->m_prot2;
+	UINT8 x = m_prot2;
 	UINT8 b3 = (BIT(x,2)^1) | (BIT(x,1)^1) | BIT(x,0);
 	return (b3 << 3);
 }
 
 // vbowl
-static READ16_HANDLER( vbowl_igs011_prot2_r )
+READ16_MEMBER(igs011_state::vbowl_igs011_prot2_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	UINT8 x = state->m_prot2;
+	UINT8 x = m_prot2;
 	UINT8 b9 = ((BIT(x,4)^1) & (BIT(x,3)^1)) | ((BIT(x,2) & BIT(x,1))^1) | ((BIT(x,4) | BIT(x,0))^1);
 	return (b9 << 9);
 }
@@ -1194,112 +1226,103 @@ static READ16_HANDLER( vbowl_igs011_prot2_r )
 ***************************************************************************/
 
 
-static WRITE16_HANDLER( igs012_prot_reset_w )
+WRITE16_MEMBER(igs011_state::igs012_prot_reset_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	state->m_igs012_prot = 0x00;
-	state->m_igs012_prot_swap = 0x00;
+	m_igs012_prot = 0x00;
+	m_igs012_prot_swap = 0x00;
 
-	state->m_igs012_prot_mode = 0;
+	m_igs012_prot_mode = 0;
 }
 /*
-static READ16_HANDLER( igs012_prot_fake_r )
+READ16_MEMBER(igs011_state::igs012_prot_fake_r)
 {
-    igs011_state *state = space->machine().driver_data<igs011_state>();
     switch (offset)
     {
-        case 0: return state->m_igs012_prot;
-        case 1: return state->m_igs012_prot_swap;
-        case 2: return state->m_igs012_prot_mode;
+        case 0: return m_igs012_prot;
+        case 1: return m_igs012_prot_swap;
+        case 2: return m_igs012_prot_mode;
     }
     return 0;
 }
 */
 
 // Macro that checks whether the current mode and data byte written match the arguments
-#define MODE_AND_DATA(_MODE,_DATA)	(state->m_igs012_prot_mode == (_MODE) && ( (ACCESSING_BITS_8_15 && (data & 0xff00) == ((_DATA)<<8)) || (ACCESSING_BITS_0_7 && ((data & 0x00ff) == (_DATA))) ) )
+#define MODE_AND_DATA(_MODE,_DATA)	(m_igs012_prot_mode == (_MODE) && ( (ACCESSING_BITS_8_15 && (data & 0xff00) == ((_DATA)<<8)) || (ACCESSING_BITS_0_7 && ((data & 0x00ff) == (_DATA))) ) )
 
-static WRITE16_HANDLER( igs012_prot_mode_w )
+WRITE16_MEMBER(igs011_state::igs012_prot_mode_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(0, 0xcc) || MODE_AND_DATA(1, 0xdd) )
 	{
-		state->m_igs012_prot_mode = state->m_igs012_prot_mode ^ 1;
+		m_igs012_prot_mode = m_igs012_prot_mode ^ 1;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_mode_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->m_igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_mode_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-static WRITE16_HANDLER( igs012_prot_inc_w )
+WRITE16_MEMBER(igs011_state::igs012_prot_inc_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(0, 0xff) )
 	{
-		state->m_igs012_prot = (state->m_igs012_prot + 1) & 0x1f;
+		m_igs012_prot = (m_igs012_prot + 1) & 0x1f;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_inc_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->m_igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_inc_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-static WRITE16_HANDLER( igs012_prot_dec_inc_w )
+WRITE16_MEMBER(igs011_state::igs012_prot_dec_inc_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(0, 0xaa) )
 	{
-		state->m_igs012_prot = (state->m_igs012_prot - 1) & 0x1f;
+		m_igs012_prot = (m_igs012_prot - 1) & 0x1f;
 	}
 	else if ( MODE_AND_DATA(1, 0xfa) )
 	{
-		state->m_igs012_prot = (state->m_igs012_prot + 1) & 0x1f;
+		m_igs012_prot = (m_igs012_prot + 1) & 0x1f;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_dec_inc_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->m_igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_dec_inc_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-static WRITE16_HANDLER( igs012_prot_dec_copy_w )
+WRITE16_MEMBER(igs011_state::igs012_prot_dec_copy_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(0, 0x33) )
 	{
-		state->m_igs012_prot = state->m_igs012_prot_swap;
+		m_igs012_prot = m_igs012_prot_swap;
 	}
 	else if ( MODE_AND_DATA(1, 0x5a) )
 	{
-		state->m_igs012_prot = (state->m_igs012_prot - 1) & 0x1f;
+		m_igs012_prot = (m_igs012_prot - 1) & 0x1f;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_dec_copy_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->m_igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_dec_copy_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-static WRITE16_HANDLER( igs012_prot_copy_w )
+WRITE16_MEMBER(igs011_state::igs012_prot_copy_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(1, 0x22) )
 	{
-		state->m_igs012_prot = state->m_igs012_prot_swap;
+		m_igs012_prot = m_igs012_prot_swap;
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_copy_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->m_igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_copy_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-static WRITE16_HANDLER( igs012_prot_swap_w )
+WRITE16_MEMBER(igs011_state::igs012_prot_swap_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if ( MODE_AND_DATA(0, 0x55) || MODE_AND_DATA(1, 0xa5) )
 	{
 		// !(3 | 1)..(2 & 1)..(3 ^ 0)..(!2)
-		UINT8 x = state->m_igs012_prot;
-		state->m_igs012_prot_swap = (((BIT(x,3)|BIT(x,1))^1)<<3) | ((BIT(x,2)&BIT(x,1))<<2) | ((BIT(x,3)^BIT(x,0))<<1) | (BIT(x,2)^1);
+		UINT8 x = m_igs012_prot;
+		m_igs012_prot_swap = (((BIT(x,3)|BIT(x,1))^1)<<3) | ((BIT(x,2)&BIT(x,1))<<2) | ((BIT(x,3)^BIT(x,0))<<1) | (BIT(x,2)^1);
 	}
 	else
-		logerror("%s: warning, unknown igs012_prot_swap_w( %04x, %04x ), mode %x\n", space->machine().describe_context(), offset, data, state->m_igs012_prot_mode);
+		logerror("%s: warning, unknown igs012_prot_swap_w( %04x, %04x ), mode %x\n", machine().describe_context(), offset, data, m_igs012_prot_mode);
 }
 
-static READ16_HANDLER( igs012_prot_r )
+READ16_MEMBER(igs011_state::igs012_prot_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	// FIXME: mode 0 and mode 1 are mapped to different memory ranges
-	UINT8 x = state->m_igs012_prot;
+	UINT8 x = m_igs012_prot;
 
 	UINT8 b1 = (BIT(x,3) | BIT(x,1))^1;
 	UINT8 b0 = BIT(x,3) ^ BIT(x,0);
@@ -1314,23 +1337,22 @@ static READ16_HANDLER( igs012_prot_r )
 ***************************************************************************/
 
 
-static WRITE16_HANDLER( drgnwrld_igs003_w )
+WRITE16_MEMBER(igs011_state::drgnwrld_igs003_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	COMBINE_DATA(&state->m_igs003_reg[offset]);
+	COMBINE_DATA(&m_igs003_reg[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(state->m_igs003_reg[0])
+	switch(m_igs003_reg[0])
 	{
 
 		case 0x00:
 			if (ACCESSING_BITS_0_7)
-				coin_counter_w(space->machine(), 0,data & 2);
+				coin_counter_w(machine(), 0,data & 2);
 
 			if (data & ~0x2)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space->device()), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space.device()), data);
 
 			break;
 
@@ -1342,18 +1364,17 @@ static WRITE16_HANDLER( drgnwrld_igs003_w )
 //      case 0x05:
 
 		default:
-//          popmessage("igs003 %x <- %04x",state->m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space->device()), state->m_igs003_reg[0], data);
+//          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0], data);
 	}
 }
-static READ16_HANDLER( drgnwrld_igs003_r )
+READ16_MEMBER(igs011_state::drgnwrld_igs003_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	switch(state->m_igs003_reg[0])
+	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(space->machine(), "IN0");
-		case 0x01:	return input_port_read(space->machine(), "IN1");
-		case 0x02:	return input_port_read(space->machine(), "IN2");
+		case 0x00:	return input_port_read(machine(), "IN0");
+		case 0x01:	return input_port_read(machine(), "IN1");
+		case 0x02:	return input_port_read(machine(), "IN2");
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -1378,7 +1399,7 @@ static READ16_HANDLER( drgnwrld_igs003_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space->device()), state->m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
 	}
 
 	return 0;
@@ -1386,38 +1407,36 @@ static READ16_HANDLER( drgnwrld_igs003_r )
 
 
 
-static WRITE16_HANDLER( lhb_inputs_w )
+WRITE16_MEMBER(igs011_state::lhb_inputs_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	COMBINE_DATA(&state->m_igs_input_sel);
+	COMBINE_DATA(&m_igs_input_sel);
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0,	data & 0x20	);
+		coin_counter_w(machine(), 0,	data & 0x20	);
 		//  coin out        data & 0x40
-		state->m_igs_hopper		=	data & 0x80;
+		m_igs_hopper		=	data & 0x80;
 	}
 
-	if ( state->m_igs_input_sel & (~0xff) )
-		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space->device()), state->m_igs_input_sel);
+	if ( m_igs_input_sel & (~0xff) )
+		logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space.device()), m_igs_input_sel);
 
-//  popmessage("sel2 %02x",state->m_igs_input_sel&~0x1f);
+//  popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 }
-static READ16_HANDLER( lhb_inputs_r )
+READ16_MEMBER(igs011_state::lhb_inputs_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	switch(offset)
 	{
-		case 0:		return state->m_igs_input_sel;
+		case 0:		return m_igs_input_sel;
 
 		case 1:
-			if (~state->m_igs_input_sel & 0x01)	return input_port_read(space->machine(), "KEY0");
-			if (~state->m_igs_input_sel & 0x02)	return input_port_read(space->machine(), "KEY1");
-			if (~state->m_igs_input_sel & 0x04)	return input_port_read(space->machine(), "KEY2");
-			if (~state->m_igs_input_sel & 0x08)	return input_port_read(space->machine(), "KEY3");
-			if (~state->m_igs_input_sel & 0x10)	return input_port_read(space->machine(), "KEY4");
+			if (~m_igs_input_sel & 0x01)	return input_port_read(machine(), "KEY0");
+			if (~m_igs_input_sel & 0x02)	return input_port_read(machine(), "KEY1");
+			if (~m_igs_input_sel & 0x04)	return input_port_read(machine(), "KEY2");
+			if (~m_igs_input_sel & 0x08)	return input_port_read(machine(), "KEY3");
+			if (~m_igs_input_sel & 0x10)	return input_port_read(machine(), "KEY4");
 
-			logerror("%06x: warning, reading with igs_input_sel = %02x\n", cpu_get_pc(&space->device()), state->m_igs_input_sel);
+			logerror("%06x: warning, reading with igs_input_sel = %02x\n", cpu_get_pc(&space.device()), m_igs_input_sel);
 			break;
 	}
 	return 0;
@@ -1425,65 +1444,63 @@ static READ16_HANDLER( lhb_inputs_r )
 
 
 
-static WRITE16_HANDLER( lhb2_igs003_w )
+WRITE16_MEMBER(igs011_state::lhb2_igs003_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	COMBINE_DATA(&state->m_igs003_reg[offset]);
+	COMBINE_DATA(&m_igs003_reg[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(state->m_igs003_reg[0])
+	switch(m_igs003_reg[0])
 	{
 		case 0x00:
-			COMBINE_DATA(&state->m_igs_input_sel);
+			COMBINE_DATA(&m_igs_input_sel);
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine(), 0,	data & 0x20);
+				coin_counter_w(machine(), 0,	data & 0x20);
 				//  coin out        data & 0x40
-				state->m_igs_hopper		=	data & 0x80;
+				m_igs_hopper		=	data & 0x80;
 			}
 
-			if ( state->m_igs_input_sel & ~0x7f )
-				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space->device()), state->m_igs_input_sel);
+			if ( m_igs_input_sel & ~0x7f )
+				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space.device()), m_igs_input_sel);
 
-//          popmessage("sel2 %02x",state->m_igs_input_sel&~0x1f);
+//          popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 			break;
 
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				state->m_lhb2_pen_hi = data & 0x07;
+				m_lhb2_pen_hi = data & 0x07;
 
-				okim6295_device *oki = space->machine().device<okim6295_device>("oki");
+				okim6295_device *oki = machine().device<okim6295_device>("oki");
 				oki->set_bank_base((data & 0x08) ? 0x40000 : 0);
 			}
 
-			if ( state->m_lhb2_pen_hi & ~0xf )
-				logerror("%06x: warning, unknown bits written in lhb2_pen_hi = %02x\n", cpu_get_pc(&space->device()), state->m_lhb2_pen_hi);
+			if ( m_lhb2_pen_hi & ~0xf )
+				logerror("%06x: warning, unknown bits written in lhb2_pen_hi = %02x\n", cpu_get_pc(&space.device()), m_lhb2_pen_hi);
 
-//          popmessage("oki %02x",state->m_lhb2_pen_hi & 0x08);
+//          popmessage("oki %02x",m_lhb2_pen_hi & 0x08);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space->device()), state->m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0], data);
 	}
 }
-static READ16_HANDLER( lhb2_igs003_r )
+READ16_MEMBER(igs011_state::lhb2_igs003_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	switch(state->m_igs003_reg[0])
+	switch(m_igs003_reg[0])
 	{
 		case 0x01:
-			if (~state->m_igs_input_sel & 0x01)	return input_port_read(space->machine(), "KEY0");
-			if (~state->m_igs_input_sel & 0x02)	return input_port_read(space->machine(), "KEY1");
-			if (~state->m_igs_input_sel & 0x04)	return input_port_read(space->machine(), "KEY2");
-			if (~state->m_igs_input_sel & 0x08)	return input_port_read(space->machine(), "KEY3");
-			if (~state->m_igs_input_sel & 0x10)	return input_port_read(space->machine(), "KEY4");
+			if (~m_igs_input_sel & 0x01)	return input_port_read(machine(), "KEY0");
+			if (~m_igs_input_sel & 0x02)	return input_port_read(machine(), "KEY1");
+			if (~m_igs_input_sel & 0x04)	return input_port_read(machine(), "KEY2");
+			if (~m_igs_input_sel & 0x08)	return input_port_read(machine(), "KEY3");
+			if (~m_igs_input_sel & 0x10)	return input_port_read(machine(), "KEY4");
 			/* fall through */
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space->device()), state->m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
 			break;
 
 //      case 0x03:
@@ -1521,43 +1538,41 @@ static READ16_HANDLER( lhb2_igs003_r )
 
 
 
-static WRITE16_HANDLER( wlcc_igs003_w )
+WRITE16_MEMBER(igs011_state::wlcc_igs003_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	COMBINE_DATA(&state->m_igs003_reg[offset]);
+	COMBINE_DATA(&m_igs003_reg[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(state->m_igs003_reg[0])
+	switch(m_igs003_reg[0])
 	{
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine(), 0,	data & 0x01);
+				coin_counter_w(machine(), 0,	data & 0x01);
 				//  coin out        data & 0x02
 
-				okim6295_device *oki = space->machine().device<okim6295_device>("oki");
+				okim6295_device *oki = machine().device<okim6295_device>("oki");
 				oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
-				state->m_igs_hopper		=	data & 0x20;
+				m_igs_hopper		=	data & 0x20;
 			}
 
 			if (data & ~0x33)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space->device()), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space.device()), data);
 
 //          popmessage("coin %02x",data);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space->device()), state->m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0], data);
 	}
 }
-static READ16_HANDLER( wlcc_igs003_r )
+READ16_MEMBER(igs011_state::wlcc_igs003_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	switch(state->m_igs003_reg[0])
+	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(space->machine(), "IN0");
+		case 0x00:	return input_port_read(machine(), "IN0");
 
 		case 0x20:	return 0x49;
 		case 0x21:	return 0x47;
@@ -1582,7 +1597,7 @@ static READ16_HANDLER( wlcc_igs003_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space->device()), state->m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
 	}
 
 	return 0;
@@ -1590,49 +1605,47 @@ static READ16_HANDLER( wlcc_igs003_r )
 
 
 
-static WRITE16_HANDLER( xymg_igs003_w )
+WRITE16_MEMBER(igs011_state::xymg_igs003_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	COMBINE_DATA(&state->m_igs003_reg[offset]);
+	COMBINE_DATA(&m_igs003_reg[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(state->m_igs003_reg[0])
+	switch(m_igs003_reg[0])
 	{
 		case 0x01:
-			COMBINE_DATA(&state->m_igs_input_sel);
+			COMBINE_DATA(&m_igs_input_sel);
 
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine(), 0,	data & 0x20);
+				coin_counter_w(machine(), 0,	data & 0x20);
 				//  coin out        data & 0x40
-				state->m_igs_hopper		=	data & 0x80;
+				m_igs_hopper		=	data & 0x80;
 			}
 
-			if ( state->m_igs_input_sel & 0x40 )
-				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space->device()), state->m_igs_input_sel);
+			if ( m_igs_input_sel & 0x40 )
+				logerror("%06x: warning, unknown bits written in igs_input_sel = %02x\n", cpu_get_pc(&space.device()), m_igs_input_sel);
 
-//          popmessage("sel2 %02x",state->m_igs_input_sel&~0x1f);
+//          popmessage("sel2 %02x",m_igs_input_sel&~0x1f);
 			break;
 
 		default:
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space->device()), state->m_igs003_reg[0], data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0], data);
 	}
 }
-static READ16_HANDLER( xymg_igs003_r )
+READ16_MEMBER(igs011_state::xymg_igs003_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	switch(state->m_igs003_reg[0])
+	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(space->machine(), "COIN");
+		case 0x00:	return input_port_read(machine(), "COIN");
 
 		case 0x02:
-			if (~state->m_igs_input_sel & 0x01)	return input_port_read(space->machine(), "KEY0");
-			if (~state->m_igs_input_sel & 0x02)	return input_port_read(space->machine(), "KEY1");
-			if (~state->m_igs_input_sel & 0x04)	return input_port_read(space->machine(), "KEY2");
-			if (~state->m_igs_input_sel & 0x08)	return input_port_read(space->machine(), "KEY3");
-			if (~state->m_igs_input_sel & 0x10)	return input_port_read(space->machine(), "KEY4");
+			if (~m_igs_input_sel & 0x01)	return input_port_read(machine(), "KEY0");
+			if (~m_igs_input_sel & 0x02)	return input_port_read(machine(), "KEY1");
+			if (~m_igs_input_sel & 0x04)	return input_port_read(machine(), "KEY2");
+			if (~m_igs_input_sel & 0x08)	return input_port_read(machine(), "KEY3");
+			if (~m_igs_input_sel & 0x10)	return input_port_read(machine(), "KEY4");
 			/* fall through */
 
 		case 0x20:	return 0x49;
@@ -1658,7 +1671,7 @@ static READ16_HANDLER( xymg_igs003_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space->device()), state->m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
 			break;
 	}
 
@@ -1667,40 +1680,38 @@ static READ16_HANDLER( xymg_igs003_r )
 
 
 
-static WRITE16_HANDLER( vbowl_igs003_w )
+WRITE16_MEMBER(igs011_state::vbowl_igs003_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	COMBINE_DATA(&state->m_igs003_reg[offset]);
+	COMBINE_DATA(&m_igs003_reg[offset]);
 
 	if (offset == 0)
 		return;
 
-	switch(state->m_igs003_reg[0])
+	switch(m_igs003_reg[0])
 	{
 		case 0x02:
 			if (ACCESSING_BITS_0_7)
 			{
-				coin_counter_w(space->machine(), 0, data & 1);
-				coin_counter_w(space->machine(), 1, data & 2);
+				coin_counter_w(machine(), 0, data & 1);
+				coin_counter_w(machine(), 1, data & 2);
 			}
 
 			if (data & ~0x3)
-				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space->device()), data);
+				logerror("%06x: warning, unknown bits written in coin counter = %02x\n", cpu_get_pc(&space.device()), data);
 
 			break;
 
 		default:
-//          popmessage("igs003 %x <- %04x",state->m_igs003_reg[0],data);
-			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space->device()), state->m_igs003_reg[0], data);
+//          popmessage("igs003 %x <- %04x",m_igs003_reg[0],data);
+			logerror("%06x: warning, writing to igs003_reg %02x = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0], data);
 	}
 }
-static READ16_HANDLER( vbowl_igs003_r )
+READ16_MEMBER(igs011_state::vbowl_igs003_r)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	switch(state->m_igs003_reg[0])
+	switch(m_igs003_reg[0])
 	{
-		case 0x00:	return input_port_read(space->machine(), "IN0");
-		case 0x01:	return input_port_read(space->machine(), "IN1");
+		case 0x00:	return input_port_read(machine(), "IN0");
+		case 0x01:	return input_port_read(machine(), "IN1");
 
 //      case 0x03:
 //          return 0xff;    // parametric bitswaps?
@@ -1728,7 +1739,7 @@ static READ16_HANDLER( vbowl_igs003_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space->device()), state->m_igs003_reg[0]);
+			logerror("%06x: warning, reading with igs003_reg = %02x\n", cpu_get_pc(&space.device()), m_igs003_reg[0]);
 	}
 
 	return 0;
@@ -1800,8 +1811,8 @@ static DRIVER_INIT( drgnwrldv21 )
 
 	drgnwrld_type2_decrypt(machine);
 	drgnwrld_gfx_decrypt(machine);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd4c0, 0xd4ff, FUNC(drgnwrldv21_igs011_prot2_r));
+	igs011_state *state = machine.driver_data<igs011_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd4c0, 0xd4ff, read16_delegate(FUNC(igs011_state::drgnwrldv21_igs011_prot2_r), state));
 /*
     // PROTECTION CHECKS
     // bp 32ee; bp 11ca8; bp 23d5e; bp 23fd0; bp 24170; bp 24348; bp 2454e; bp 246cc; bp 24922; bp 24b66; bp 24de2; bp 2502a; bp 25556; bp 269de; bp 2766a; bp 2a830
@@ -1941,7 +1952,8 @@ static DRIVER_INIT( dbc )
 
 	dbc_decrypt(machine);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10600, 0x107ff, FUNC(dbc_igs011_prot2_r));
+	igs011_state *state = machine.driver_data<igs011_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::dbc_igs011_prot2_r), state));
 /*
     // PROTECTION CHECKS
     rom[0x04c42/2]  =   0x602e;     // 004C42: 6604         bne 4c48  (rom test error otherwise)
@@ -1970,7 +1982,8 @@ static DRIVER_INIT( ryukobou )
 
 	ryukobou_decrypt(machine);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x10600, 0x107ff, FUNC(ryukobou_igs011_prot2_r));
+	igs011_state *state = machine.driver_data<igs011_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x10600, 0x107ff, read16_delegate(FUNC(igs011_state::ryukobou_igs011_prot2_r), state));
 
 	// PROTECTION CHECKS
 //  rom[0x2df68/2]  =   0x4e75;     // 02DF68: 4E56 FE00    link A6, #-$200  (fills palette with pink otherwise)
@@ -2120,56 +2133,56 @@ static DRIVER_INIT( nkishusp )
 
 static ADDRESS_MAP_START( drgnwrld, AS_PROGRAM, 16, igs011_state )
 //  drgnwrld: IGS011 protection dynamically mapped at 1dd7x
-//  AM_RANGE( 0x01dd70, 0x01dd77 ) AM_WRITE_LEGACY(igs011_prot1_w )
+//  AM_RANGE( 0x01dd70, 0x01dd77 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x01dd78, 0x01dd79 ) AM_READ ( igs011_prot1_r )
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE(m_priority_ram )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE_LEGACY(igs011_palette ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0x700000, 0x700003 ) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_w, 0x00ff )
 
-	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE_LEGACY(drgnwrld_igs003_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_READ_LEGACY(drgnwrld_igs003_r )
+	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE(drgnwrld_igs003_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_READ(drgnwrld_igs003_r )
 
-	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE_LEGACY(igs011_priority_w )
-	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE_LEGACY(igs_dips_w )
+	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE(igs011_priority_w )
+	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE(igs_dips_w )
 
-	AM_RANGE( 0xa50000, 0xa50001 ) AM_WRITE_LEGACY(igs011_prot_addr_w )
-//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ_LEGACY(igs011_prot_fake_r )
+	AM_RANGE( 0xa50000, 0xa50001 ) AM_WRITE(igs011_prot_addr_w )
+//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
 
-	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE_LEGACY(igs011_blit_x_w )
-	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE_LEGACY(igs011_blit_y_w )
-	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE_LEGACY(igs011_blit_w_w )
-	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE_LEGACY(igs011_blit_h_w )
-	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE_LEGACY(igs011_blit_gfx_lo_w )
-	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE_LEGACY(igs011_blit_gfx_hi_w )
-	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE_LEGACY(igs011_blit_flags_w )
-	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE_LEGACY(igs011_blit_pen_w )
-	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE_LEGACY(igs011_blit_depth_w )
-	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ_LEGACY(igs_3_dips_r )
+	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE(igs011_blit_x_w )
+	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE(igs011_blit_y_w )
+	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE(igs011_blit_w_w )
+	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE(igs011_blit_h_w )
+	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE(igs011_blit_gfx_lo_w )
+	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE(igs011_blit_gfx_hi_w )
+	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE(igs011_blit_flags_w )
+	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE(igs011_blit_pen_w )
+	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE(igs011_blit_depth_w )
+	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ(igs_3_dips_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnwrld_igs012, AS_PROGRAM, 16, igs011_state )
 	// IGS012
-	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE_LEGACY(igs012_prot_swap_w		)	AM_MIRROR(0x01c000)	// swap (a5 / 55)
-	AM_RANGE( 0x001610, 0x00161f ) AM_READ_LEGACY(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 0)
-	AM_RANGE( 0x001620, 0x00162f ) AM_WRITE_LEGACY(igs012_prot_dec_inc_w	)	AM_MIRROR(0x01c000)	// dec  (aa), inc  (fa)
-	AM_RANGE( 0x001630, 0x00163f ) AM_WRITE_LEGACY(igs012_prot_inc_w		)	AM_MIRROR(0x01c000)	// inc  (ff)
-	AM_RANGE( 0x001640, 0x00164f ) AM_WRITE_LEGACY(igs012_prot_copy_w		)	AM_MIRROR(0x01c000)	// copy (22)
-	AM_RANGE( 0x001650, 0x00165f ) AM_WRITE_LEGACY(igs012_prot_dec_copy_w	)	AM_MIRROR(0x01c000)	// dec  (5a), copy (33)
-	AM_RANGE( 0x001660, 0x00166f ) AM_READ_LEGACY(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 1)
-	AM_RANGE( 0x001670, 0x00167f ) AM_WRITE_LEGACY(igs012_prot_mode_w		)	AM_MIRROR(0x01c000)	// mode (cc / dd)
+	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE(igs012_prot_swap_w		)	AM_MIRROR(0x01c000)	// swap (a5 / 55)
+	AM_RANGE( 0x001610, 0x00161f ) AM_READ(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 0)
+	AM_RANGE( 0x001620, 0x00162f ) AM_WRITE(igs012_prot_dec_inc_w	)	AM_MIRROR(0x01c000)	// dec  (aa), inc  (fa)
+	AM_RANGE( 0x001630, 0x00163f ) AM_WRITE(igs012_prot_inc_w		)	AM_MIRROR(0x01c000)	// inc  (ff)
+	AM_RANGE( 0x001640, 0x00164f ) AM_WRITE(igs012_prot_copy_w		)	AM_MIRROR(0x01c000)	// copy (22)
+	AM_RANGE( 0x001650, 0x00165f ) AM_WRITE(igs012_prot_dec_copy_w	)	AM_MIRROR(0x01c000)	// dec  (5a), copy (33)
+	AM_RANGE( 0x001660, 0x00166f ) AM_READ(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 1)
+	AM_RANGE( 0x001670, 0x00167f ) AM_WRITE(igs012_prot_mode_w		)	AM_MIRROR(0x01c000)	// mode (cc / dd)
 
-	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE_LEGACY(igs011_prot2_dec_w				)	// dec   (33)
-	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE_LEGACY(drgnwrld_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE_LEGACY(igs011_prot2_reset_w			)	// reset (33)
-	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ_LEGACY(drgnwrldv20j_igs011_prot2_r	)	// read
+	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE(igs011_prot2_dec_w				)	// dec   (33)
+	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE(drgnwrld_igs011_prot2_swap_w	)	// swap  (33)
+	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE(igs011_prot2_reset_w			)	// reset (33)
+	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ(drgnwrldv20j_igs011_prot2_r	)	// read
 
-	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE_LEGACY(igs012_prot_reset_w	)	// reset?
-//  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE_LEGACY(igs012_prot_fake_r )
+	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE(igs012_prot_reset_w	)	// reset?
+//  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE(igs012_prot_fake_r )
 
 	AM_IMPORT_FROM(drgnwrld)
 ADDRESS_MAP_END
@@ -2177,10 +2190,9 @@ ADDRESS_MAP_END
 
 
 // Only values 0 and 7 are written (1 bit per irq source?)
-static WRITE16_HANDLER( lhb_irq_enable_w )
+WRITE16_MEMBER(igs011_state::lhb_irq_enable_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
-	COMBINE_DATA( &state->m_lhb_irq_enable );
+	COMBINE_DATA( &m_lhb_irq_enable );
 }
 
 static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
@@ -2199,158 +2211,158 @@ static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
 
 static ADDRESS_MAP_START( lhb, AS_PROGRAM, 16, igs011_state )
 //  lhb: IGS011 protection dynamically mapped at 834x
-//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE_LEGACY(igs011_prot1_w )
+//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
 
 	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE_LEGACY("oki", lhb_okibank_w )
 
-	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE_LEGACY(igs011_prot2_inc_w			)
-	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE_LEGACY(lhb_igs011_prot2_swap_w	)
-	AM_RANGE( 0x010600, 0x0107ff ) AM_READ_LEGACY(lhb_igs011_prot2_r			)
+	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE(igs011_prot2_inc_w			)
+	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE(lhb_igs011_prot2_swap_w	)
+	AM_RANGE( 0x010600, 0x0107ff ) AM_READ(lhb_igs011_prot2_r			)
 	// no reset
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE(m_priority_ram )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE_LEGACY(igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE_LEGACY(igs011_palette ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT( "COIN" )
-	AM_RANGE( 0x700002, 0x700005 ) AM_READ_LEGACY(lhb_inputs_r )
-	AM_RANGE( 0x700002, 0x700003 ) AM_WRITE_LEGACY(lhb_inputs_w )
-	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE_LEGACY(igs011_priority_w )
-	AM_RANGE( 0x838000, 0x838001 ) AM_WRITE_LEGACY(lhb_irq_enable_w )
-	AM_RANGE( 0x840000, 0x840001 ) AM_WRITE_LEGACY(igs_dips_w )
+	AM_RANGE( 0x700002, 0x700005 ) AM_READ(lhb_inputs_r )
+	AM_RANGE( 0x700002, 0x700003 ) AM_WRITE(lhb_inputs_w )
+	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE(igs011_priority_w )
+	AM_RANGE( 0x838000, 0x838001 ) AM_WRITE(lhb_irq_enable_w )
+	AM_RANGE( 0x840000, 0x840001 ) AM_WRITE(igs_dips_w )
 
-	AM_RANGE( 0x850000, 0x850001 ) AM_WRITE_LEGACY(igs011_prot_addr_w )
-//  AM_RANGE( 0x850000, 0x850005 ) AM_WRITE_LEGACY(igs011_prot_fake_r )
+	AM_RANGE( 0x850000, 0x850001 ) AM_WRITE(igs011_prot_addr_w )
+//  AM_RANGE( 0x850000, 0x850005 ) AM_WRITE(igs011_prot_fake_r )
 
-	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE_LEGACY(igs011_blit_x_w )
-	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE_LEGACY(igs011_blit_y_w )
-	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE_LEGACY(igs011_blit_w_w )
-	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE_LEGACY(igs011_blit_h_w )
-	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE_LEGACY(igs011_blit_gfx_lo_w )
-	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE_LEGACY(igs011_blit_gfx_hi_w )
-	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE_LEGACY(igs011_blit_flags_w )
-	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE_LEGACY(igs011_blit_pen_w )
-	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE_LEGACY(igs011_blit_depth_w )
-	AM_RANGE( 0x888000, 0x888001 ) AM_READ_LEGACY(igs_5_dips_r )
+	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE(igs011_blit_x_w )
+	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE(igs011_blit_y_w )
+	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE(igs011_blit_w_w )
+	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE(igs011_blit_h_w )
+	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE(igs011_blit_gfx_lo_w )
+	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE(igs011_blit_gfx_hi_w )
+	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE(igs011_blit_flags_w )
+	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE(igs011_blit_pen_w )
+	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE(igs011_blit_depth_w )
+	AM_RANGE( 0x888000, 0x888001 ) AM_READ(igs_5_dips_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xymg, AS_PROGRAM, 16, igs011_state )
 //  xymg: IGS011 protection dynamically mapped at 834x
-//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE_LEGACY(igs011_prot1_w )
+//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x008348, 0x008349 ) AM_READ ( igs011_prot1_r )
 
 	AM_RANGE( 0x010000, 0x010001 ) AM_DEVWRITE_LEGACY("oki", lhb_okibank_w )
 
-	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE_LEGACY(igs011_prot2_inc_w			)	// inc  (33)
-	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE_LEGACY(lhb_igs011_prot2_swap_w	)	// swap (33)
-	AM_RANGE( 0x010600, 0x0107ff ) AM_READ_LEGACY(lhb_igs011_prot2_r			)	// read
+	AM_RANGE( 0x010200, 0x0103ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc  (33)
+	AM_RANGE( 0x010400, 0x0105ff ) AM_WRITE(lhb_igs011_prot2_swap_w	)	// swap (33)
+	AM_RANGE( 0x010600, 0x0107ff ) AM_READ(lhb_igs011_prot2_r			)	// read
 	// no reset
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM
 	AM_RANGE( 0x1f0000, 0x1f3fff ) AM_RAM AM_SHARE("nvram") // extra ram
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE(m_priority_ram )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE_LEGACY(igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE_LEGACY(igs011_palette ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE( 0x700000, 0x700003 ) AM_WRITE_LEGACY(xymg_igs003_w )
-	AM_RANGE( 0x700002, 0x700003 ) AM_READ_LEGACY(xymg_igs003_r )
-	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE_LEGACY(igs011_priority_w )
-	AM_RANGE( 0x840000, 0x840001 ) AM_WRITE_LEGACY(igs_dips_w )
+	AM_RANGE( 0x700000, 0x700003 ) AM_WRITE(xymg_igs003_w )
+	AM_RANGE( 0x700002, 0x700003 ) AM_READ(xymg_igs003_r )
+	AM_RANGE( 0x820000, 0x820001 ) AM_WRITE(igs011_priority_w )
+	AM_RANGE( 0x840000, 0x840001 ) AM_WRITE(igs_dips_w )
 
-	AM_RANGE( 0x850000, 0x850001 ) AM_WRITE_LEGACY(igs011_prot_addr_w )
-//  AM_RANGE( 0x850000, 0x850005 ) AM_WRITE_LEGACY(igs011_prot_fake_r )
+	AM_RANGE( 0x850000, 0x850001 ) AM_WRITE(igs011_prot_addr_w )
+//  AM_RANGE( 0x850000, 0x850005 ) AM_WRITE(igs011_prot_fake_r )
 
-	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE_LEGACY(igs011_blit_x_w )
-	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE_LEGACY(igs011_blit_y_w )
-	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE_LEGACY(igs011_blit_w_w )
-	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE_LEGACY(igs011_blit_h_w )
-	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE_LEGACY(igs011_blit_gfx_lo_w )
-	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE_LEGACY(igs011_blit_gfx_hi_w )
-	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE_LEGACY(igs011_blit_flags_w )
-	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE_LEGACY(igs011_blit_pen_w )
-	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE_LEGACY(igs011_blit_depth_w )
-	AM_RANGE( 0x888000, 0x888001 ) AM_READ_LEGACY(igs_3_dips_r )
+	AM_RANGE( 0x858000, 0x858001 ) AM_WRITE(igs011_blit_x_w )
+	AM_RANGE( 0x858800, 0x858801 ) AM_WRITE(igs011_blit_y_w )
+	AM_RANGE( 0x859000, 0x859001 ) AM_WRITE(igs011_blit_w_w )
+	AM_RANGE( 0x859800, 0x859801 ) AM_WRITE(igs011_blit_h_w )
+	AM_RANGE( 0x85a000, 0x85a001 ) AM_WRITE(igs011_blit_gfx_lo_w )
+	AM_RANGE( 0x85a800, 0x85a801 ) AM_WRITE(igs011_blit_gfx_hi_w )
+	AM_RANGE( 0x85b000, 0x85b001 ) AM_WRITE(igs011_blit_flags_w )
+	AM_RANGE( 0x85b800, 0x85b801 ) AM_WRITE(igs011_blit_pen_w )
+	AM_RANGE( 0x85c000, 0x85c001 ) AM_WRITE(igs011_blit_depth_w )
+	AM_RANGE( 0x888000, 0x888001 ) AM_READ(igs_3_dips_r )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wlcc, AS_PROGRAM, 16, igs011_state )
 //  wlcc: IGS011 protection dynamically mapped at 834x
-//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE_LEGACY(igs011_prot1_w )
-//  AM_RANGE( 0x008348, 0x008349 ) AM_READ_LEGACY(igs011_prot1_r )
+//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
+//  AM_RANGE( 0x008348, 0x008349 ) AM_READ(igs011_prot1_r )
 
-	AM_RANGE( 0x518000, 0x5181ff ) AM_WRITE_LEGACY(igs011_prot2_inc_w			)	// inc   (33)
-	AM_RANGE( 0x518200, 0x5183ff ) AM_WRITE_LEGACY(wlcc_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x518800, 0x5189ff ) AM_READ_LEGACY(igs011_prot2_reset_r		)	// reset
-	AM_RANGE( 0x519000, 0x5195ff ) AM_READ_LEGACY(lhb_igs011_prot2_r			)	// read
+	AM_RANGE( 0x518000, 0x5181ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc   (33)
+	AM_RANGE( 0x518200, 0x5183ff ) AM_WRITE(wlcc_igs011_prot2_swap_w	)	// swap  (33)
+	AM_RANGE( 0x518800, 0x5189ff ) AM_READ(igs011_prot2_reset_r		)	// reset
+	AM_RANGE( 0x519000, 0x5195ff ) AM_READ(lhb_igs011_prot2_r			)	// read
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE(m_priority_ram )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE_LEGACY(igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE_LEGACY(igs011_palette ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE_LEGACY(wlcc_igs003_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_READ_LEGACY(wlcc_igs003_r )
-	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE_LEGACY(igs011_priority_w )
-	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE_LEGACY(igs_dips_w )
+	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE(wlcc_igs003_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_READ(wlcc_igs003_r )
+	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE(igs011_priority_w )
+	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE(igs_dips_w )
 
-	AM_RANGE( 0xa50000, 0xa50001 ) AM_WRITE_LEGACY(igs011_prot_addr_w )
-//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ_LEGACY(igs011_prot_fake_r )
+	AM_RANGE( 0xa50000, 0xa50001 ) AM_WRITE(igs011_prot_addr_w )
+//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
 
-	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE_LEGACY(igs011_blit_x_w )
-	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE_LEGACY(igs011_blit_y_w )
-	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE_LEGACY(igs011_blit_w_w )
-	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE_LEGACY(igs011_blit_h_w )
-	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE_LEGACY(igs011_blit_gfx_lo_w )
-	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE_LEGACY(igs011_blit_gfx_hi_w )
-	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE_LEGACY(igs011_blit_flags_w )
-	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE_LEGACY(igs011_blit_pen_w )
-	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE_LEGACY(igs011_blit_depth_w )
-	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ_LEGACY(igs_4_dips_r )
+	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE(igs011_blit_x_w )
+	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE(igs011_blit_y_w )
+	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE(igs011_blit_w_w )
+	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE(igs011_blit_h_w )
+	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE(igs011_blit_gfx_lo_w )
+	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE(igs011_blit_gfx_hi_w )
+	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE(igs011_blit_flags_w )
+	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE(igs011_blit_pen_w )
+	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE(igs011_blit_depth_w )
+	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ(igs_4_dips_r )
 ADDRESS_MAP_END
 
 
 
 static ADDRESS_MAP_START( lhb2, AS_PROGRAM, 16, igs011_state )
 //  lhb2: IGS011 protection dynamically mapped at 1ff8x
-//  AM_RANGE( 0x01ff80, 0x01ff87 ) AM_WRITE_LEGACY(igs011_prot1_w )
+//  AM_RANGE( 0x01ff80, 0x01ff87 ) AM_WRITE(igs011_prot1_w )
 //  AM_RANGE( 0x01ff88, 0x01ff89 ) AM_READ ( igs011_prot1_r )
 
-	AM_RANGE( 0x020000, 0x0201ff ) AM_WRITE_LEGACY(igs011_prot2_inc_w			)	// inc   (55)
-	AM_RANGE( 0x020200, 0x0203ff ) AM_WRITE_LEGACY(lhb_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x020400, 0x0205ff ) AM_READ_LEGACY(lhb2_igs011_prot2_r		)	// read
-	AM_RANGE( 0x020600, 0x0207ff ) AM_WRITE_LEGACY(igs011_prot2_reset_w		)	// reset (55)
+	AM_RANGE( 0x020000, 0x0201ff ) AM_WRITE(igs011_prot2_inc_w			)	// inc   (55)
+	AM_RANGE( 0x020200, 0x0203ff ) AM_WRITE(lhb_igs011_prot2_swap_w	)	// swap  (33)
+	AM_RANGE( 0x020400, 0x0205ff ) AM_READ(lhb2_igs011_prot2_r		)	// read
+	AM_RANGE( 0x020600, 0x0207ff ) AM_WRITE(igs011_prot2_reset_w		)	// reset (55)
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x200000, 0x200001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0x204000, 0x204003 ) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff )
-	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE_LEGACY(lhb2_igs003_w )
-	AM_RANGE( 0x208002, 0x208003 ) AM_READ_LEGACY(lhb2_igs003_r )
+	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE(lhb2_igs003_w )
+	AM_RANGE( 0x208002, 0x208003 ) AM_READ(lhb2_igs003_r )
 	AM_RANGE( 0x20c000, 0x20cfff ) AM_RAM AM_BASE(m_priority_ram)
-	AM_RANGE( 0x210000, 0x211fff ) AM_RAM_WRITE_LEGACY(igs011_palette ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x210000, 0x211fff ) AM_RAM_WRITE(igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x214000, 0x214001 ) AM_READ_PORT( "COIN" )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE_LEGACY(igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE_LEGACY(igs011_priority_w )
-	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE_LEGACY(igs_dips_w )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE(igs011_priority_w )
+	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE(igs_dips_w )
 
-	AM_RANGE( 0xa50000, 0xa50001 ) AM_WRITE_LEGACY(igs011_prot_addr_w )
-//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ_LEGACY(igs011_prot_fake_r )
+	AM_RANGE( 0xa50000, 0xa50001 ) AM_WRITE(igs011_prot_addr_w )
+//  AM_RANGE( 0xa50000, 0xa50005 ) AM_READ(igs011_prot_fake_r )
 
-	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE_LEGACY(igs011_blit_x_w )
-	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE_LEGACY(igs011_blit_y_w )
-	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE_LEGACY(igs011_blit_w_w )
-	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE_LEGACY(igs011_blit_h_w )
-	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE_LEGACY(igs011_blit_gfx_lo_w )
-	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE_LEGACY(igs011_blit_gfx_hi_w )
-	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE_LEGACY(igs011_blit_flags_w )
-	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE_LEGACY(igs011_blit_pen_w )
-	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE_LEGACY(igs011_blit_depth_w )
-	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ_LEGACY(igs_3_dips_r )
+	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE(igs011_blit_x_w )
+	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE(igs011_blit_y_w )
+	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE(igs011_blit_w_w )
+	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE(igs011_blit_h_w )
+	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE(igs011_blit_gfx_lo_w )
+	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE(igs011_blit_gfx_hi_w )
+	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE(igs011_blit_flags_w )
+	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE(igs011_blit_pen_w )
+	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE(igs011_blit_depth_w )
+	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ(igs_3_dips_r )
 ADDRESS_MAP_END
 
 /* trap15's note:
@@ -2383,7 +2395,7 @@ static WRITE16_DEVICE_HANDLER( ics2115_word_w )
 	}
 }
 
-static READ16_HANDLER( vbowl_unk_r )
+READ16_MEMBER(igs011_state::vbowl_unk_r)
 {
 	return 0xffff;
 }
@@ -2399,88 +2411,87 @@ static SCREEN_VBLANK( vbowl )
 	}
 }
 
-static WRITE16_HANDLER( vbowl_pen_hi_w )
+WRITE16_MEMBER(igs011_state::vbowl_pen_hi_w)
 {
-	igs011_state *state = space->machine().driver_data<igs011_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_lhb2_pen_hi = data & 0x07;
+		m_lhb2_pen_hi = data & 0x07;
 	}
 
 	if (data & ~0x7)
-		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", cpu_get_pc(&space->device()), state->m_priority);
+		logerror("%06x: warning, unknown bits written to pen_hi = %04x\n", cpu_get_pc(&space.device()), m_priority);
 }
 
-static WRITE16_HANDLER( vbowl_link_0_w )	{ }
-static WRITE16_HANDLER( vbowl_link_1_w )	{ }
-static WRITE16_HANDLER( vbowl_link_2_w )	{ }
-static WRITE16_HANDLER( vbowl_link_3_w )	{ }
+WRITE16_MEMBER(igs011_state::vbowl_link_0_w){ }
+WRITE16_MEMBER(igs011_state::vbowl_link_1_w){ }
+WRITE16_MEMBER(igs011_state::vbowl_link_2_w){ }
+WRITE16_MEMBER(igs011_state::vbowl_link_3_w){ }
 
 static ADDRESS_MAP_START( vbowl, AS_PROGRAM, 16, igs011_state )
 //  vbowl: IGS011 protection dynamically mapped at 834x
-//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE_LEGACY(igs011_prot1_w )
-//  AM_RANGE( 0x008348, 0x008349 ) AM_READ_LEGACY(igs011_prot1_r )
+//  AM_RANGE( 0x008340, 0x008347 ) AM_WRITE(igs011_prot1_w )
+//  AM_RANGE( 0x008348, 0x008349 ) AM_READ(igs011_prot1_r )
 
 	// IGS012
-	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE_LEGACY(igs012_prot_swap_w		)	AM_MIRROR(0x01c000)	// swap (a5 / 55)
-	AM_RANGE( 0x001610, 0x00161f ) AM_READ_LEGACY(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 0)
-	AM_RANGE( 0x001620, 0x00162f ) AM_WRITE_LEGACY(igs012_prot_dec_inc_w	)	AM_MIRROR(0x01c000)	// dec  (aa), inc  (fa)
-	AM_RANGE( 0x001630, 0x00163f ) AM_WRITE_LEGACY(igs012_prot_inc_w		)	AM_MIRROR(0x01c000)	// inc  (ff)
-	AM_RANGE( 0x001640, 0x00164f ) AM_WRITE_LEGACY(igs012_prot_copy_w		)	AM_MIRROR(0x01c000)	// copy (22)
-	AM_RANGE( 0x001650, 0x00165f ) AM_WRITE_LEGACY(igs012_prot_dec_copy_w	)	AM_MIRROR(0x01c000)	// dec  (5a), copy (33)
-	AM_RANGE( 0x001660, 0x00166f ) AM_READ_LEGACY(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 1)
-	AM_RANGE( 0x001670, 0x00167f ) AM_WRITE_LEGACY(igs012_prot_mode_w		)	AM_MIRROR(0x01c000)	// mode (cc / dd)
+	AM_RANGE( 0x001600, 0x00160f ) AM_WRITE(igs012_prot_swap_w		)	AM_MIRROR(0x01c000)	// swap (a5 / 55)
+	AM_RANGE( 0x001610, 0x00161f ) AM_READ(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 0)
+	AM_RANGE( 0x001620, 0x00162f ) AM_WRITE(igs012_prot_dec_inc_w	)	AM_MIRROR(0x01c000)	// dec  (aa), inc  (fa)
+	AM_RANGE( 0x001630, 0x00163f ) AM_WRITE(igs012_prot_inc_w		)	AM_MIRROR(0x01c000)	// inc  (ff)
+	AM_RANGE( 0x001640, 0x00164f ) AM_WRITE(igs012_prot_copy_w		)	AM_MIRROR(0x01c000)	// copy (22)
+	AM_RANGE( 0x001650, 0x00165f ) AM_WRITE(igs012_prot_dec_copy_w	)	AM_MIRROR(0x01c000)	// dec  (5a), copy (33)
+	AM_RANGE( 0x001660, 0x00166f ) AM_READ(igs012_prot_r			)	AM_MIRROR(0x01c000)	// read (mode 1)
+	AM_RANGE( 0x001670, 0x00167f ) AM_WRITE(igs012_prot_mode_w		)	AM_MIRROR(0x01c000)	// mode (cc / dd)
 
-	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE_LEGACY(igs011_prot2_dec_w				)	// dec   (33)
-	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE_LEGACY(drgnwrld_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE_LEGACY(igs011_prot2_reset_w			)	// reset (33)
-	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ_LEGACY(drgnwrldv20j_igs011_prot2_r	)	// read
+	AM_RANGE( 0x00d400, 0x00d43f ) AM_WRITE(igs011_prot2_dec_w				)	// dec   (33)
+	AM_RANGE( 0x00d440, 0x00d47f ) AM_WRITE(drgnwrld_igs011_prot2_swap_w	)	// swap  (33)
+	AM_RANGE( 0x00d480, 0x00d4bf ) AM_WRITE(igs011_prot2_reset_w			)	// reset (33)
+	AM_RANGE( 0x00d4c0, 0x00d4ff ) AM_READ(drgnwrldv20j_igs011_prot2_r	)	// read
 
-	AM_RANGE( 0x50f000, 0x50f1ff ) AM_WRITE_LEGACY(igs011_prot2_dec_w			)	// dec   (33)
-	AM_RANGE( 0x50f200, 0x50f3ff ) AM_WRITE_LEGACY(vbowl_igs011_prot2_swap_w	)	// swap  (33)
-	AM_RANGE( 0x50f400, 0x50f5ff ) AM_WRITE_LEGACY(igs011_prot2_reset_w		)	// reset (33)
-	AM_RANGE( 0x50f600, 0x50f7ff ) AM_READ_LEGACY(vbowl_igs011_prot2_r		)	// read
+	AM_RANGE( 0x50f000, 0x50f1ff ) AM_WRITE(igs011_prot2_dec_w			)	// dec   (33)
+	AM_RANGE( 0x50f200, 0x50f3ff ) AM_WRITE(vbowl_igs011_prot2_swap_w	)	// swap  (33)
+	AM_RANGE( 0x50f400, 0x50f5ff ) AM_WRITE(igs011_prot2_reset_w		)	// reset (33)
+	AM_RANGE( 0x50f600, 0x50f7ff ) AM_READ(vbowl_igs011_prot2_r		)	// read
 
-	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE_LEGACY(igs012_prot_reset_w	)	// reset?
-//  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE_LEGACY(igs012_prot_fake_r )
+	AM_RANGE( 0x902000, 0x902fff ) AM_WRITE(igs012_prot_reset_w	)	// reset?
+//  AM_RANGE( 0x902000, 0x902005 ) AM_WRITE(igs012_prot_fake_r )
 
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x200000, 0x200fff ) AM_RAM AM_BASE(m_priority_ram )
-	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE_LEGACY(igs011_layers_r, igs011_layers_w )
-	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE_LEGACY(igs011_palette ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0x300000, 0x3fffff ) AM_READWRITE(igs011_layers_r, igs011_layers_w )
+	AM_RANGE( 0x400000, 0x401fff ) AM_RAM_WRITE(igs011_palette ) AM_BASE_GENERIC( paletteram )
 	AM_RANGE( 0x520000, 0x520001 ) AM_READ_PORT( "COIN" )
 	AM_RANGE( 0x600000, 0x600007 ) AM_DEVREADWRITE_LEGACY("ics", ics2115_word_r, ics2115_word_w )
 	AM_RANGE( 0x700000, 0x700003 ) AM_RAM AM_BASE(m_vbowl_trackball )
-	AM_RANGE( 0x700004, 0x700005 ) AM_WRITE_LEGACY(vbowl_pen_hi_w )
-	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE_LEGACY(vbowl_igs003_w )
-	AM_RANGE( 0x800002, 0x800003 ) AM_READ_LEGACY(vbowl_igs003_r )
+	AM_RANGE( 0x700004, 0x700005 ) AM_WRITE(vbowl_pen_hi_w )
+	AM_RANGE( 0x800000, 0x800003 ) AM_WRITE(vbowl_igs003_w )
+	AM_RANGE( 0x800002, 0x800003 ) AM_READ(vbowl_igs003_r )
 
-	AM_RANGE( 0xa00000, 0xa00001 ) AM_WRITE_LEGACY(vbowl_link_0_w )
-	AM_RANGE( 0xa08000, 0xa08001 ) AM_WRITE_LEGACY(vbowl_link_1_w )
-	AM_RANGE( 0xa10000, 0xa10001 ) AM_WRITE_LEGACY(vbowl_link_2_w )
-	AM_RANGE( 0xa18000, 0xa18001 ) AM_WRITE_LEGACY(vbowl_link_3_w )
+	AM_RANGE( 0xa00000, 0xa00001 ) AM_WRITE(vbowl_link_0_w )
+	AM_RANGE( 0xa08000, 0xa08001 ) AM_WRITE(vbowl_link_1_w )
+	AM_RANGE( 0xa10000, 0xa10001 ) AM_WRITE(vbowl_link_2_w )
+	AM_RANGE( 0xa18000, 0xa18001 ) AM_WRITE(vbowl_link_3_w )
 
-	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE_LEGACY(igs011_priority_w )
-	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE_LEGACY(igs_dips_w )
+	AM_RANGE( 0xa20000, 0xa20001 ) AM_WRITE(igs011_priority_w )
+	AM_RANGE( 0xa40000, 0xa40001 ) AM_WRITE(igs_dips_w )
 
-	AM_RANGE( 0xa48000, 0xa48001 ) AM_WRITE_LEGACY(igs011_prot_addr_w )
-//  AM_RANGE( 0xa48000, 0xa48005 ) AM_WRITE_LEGACY(igs011_prot_fake_r )
+	AM_RANGE( 0xa48000, 0xa48001 ) AM_WRITE(igs011_prot_addr_w )
+//  AM_RANGE( 0xa48000, 0xa48005 ) AM_WRITE(igs011_prot_fake_r )
 
-	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE_LEGACY(igs011_blit_x_w )
-	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE_LEGACY(igs011_blit_y_w )
-	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE_LEGACY(igs011_blit_w_w )
-	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE_LEGACY(igs011_blit_h_w )
-	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE_LEGACY(igs011_blit_gfx_lo_w )
-	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE_LEGACY(igs011_blit_gfx_hi_w )
-	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE_LEGACY(igs011_blit_flags_w )
-	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE_LEGACY(igs011_blit_pen_w )
-	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE_LEGACY(igs011_blit_depth_w )
+	AM_RANGE( 0xa58000, 0xa58001 ) AM_WRITE(igs011_blit_x_w )
+	AM_RANGE( 0xa58800, 0xa58801 ) AM_WRITE(igs011_blit_y_w )
+	AM_RANGE( 0xa59000, 0xa59001 ) AM_WRITE(igs011_blit_w_w )
+	AM_RANGE( 0xa59800, 0xa59801 ) AM_WRITE(igs011_blit_h_w )
+	AM_RANGE( 0xa5a000, 0xa5a001 ) AM_WRITE(igs011_blit_gfx_lo_w )
+	AM_RANGE( 0xa5a800, 0xa5a801 ) AM_WRITE(igs011_blit_gfx_hi_w )
+	AM_RANGE( 0xa5b000, 0xa5b001 ) AM_WRITE(igs011_blit_flags_w )
+	AM_RANGE( 0xa5b800, 0xa5b801 ) AM_WRITE(igs011_blit_pen_w )
+	AM_RANGE( 0xa5c000, 0xa5c001 ) AM_WRITE(igs011_blit_depth_w )
 
-	AM_RANGE( 0xa80000, 0xa80001 ) AM_READ_LEGACY(vbowl_unk_r )
-	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ_LEGACY(igs_4_dips_r )
-	AM_RANGE( 0xa90000, 0xa90001 ) AM_READ_LEGACY(vbowl_unk_r )
-	AM_RANGE( 0xa98000, 0xa98001 ) AM_READ_LEGACY(vbowl_unk_r )
+	AM_RANGE( 0xa80000, 0xa80001 ) AM_READ(vbowl_unk_r )
+	AM_RANGE( 0xa88000, 0xa88001 ) AM_READ(igs_4_dips_r )
+	AM_RANGE( 0xa90000, 0xa90001 ) AM_READ(vbowl_unk_r )
+	AM_RANGE( 0xa98000, 0xa98001 ) AM_READ(vbowl_unk_r )
 ADDRESS_MAP_END
 
 

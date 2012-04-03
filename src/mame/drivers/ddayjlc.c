@@ -82,6 +82,18 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(prot_w);
+	DECLARE_WRITE8_MEMBER(char_bank_w);
+	DECLARE_WRITE8_MEMBER(ddayjlc_bgram_w);
+	DECLARE_WRITE8_MEMBER(ddayjlc_videoram_w);
+	DECLARE_WRITE8_MEMBER(sound_nmi_w);
+	DECLARE_WRITE8_MEMBER(main_nmi_w);
+	DECLARE_WRITE8_MEMBER(bg0_w);
+	DECLARE_WRITE8_MEMBER(bg1_w);
+	DECLARE_WRITE8_MEMBER(bg2_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(i8257_CH0_w);
+	DECLARE_WRITE8_MEMBER(i8257_LMSR_w);
 };
 
 
@@ -134,109 +146,97 @@ static CUSTOM_INPUT( prot_r )
 	return prot_data[state->m_prot_addr];
 }
 
-static WRITE8_HANDLER( prot_w )
+WRITE8_MEMBER(ddayjlc_state::prot_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
-	state->m_prot_addr = (state->m_prot_addr & (~(1 << offset))) | ((data & 1) << offset);
+	m_prot_addr = (m_prot_addr & (~(1 << offset))) | ((data & 1) << offset);
 }
 
-static WRITE8_HANDLER( char_bank_w )
+WRITE8_MEMBER(ddayjlc_state::char_bank_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
-	state->m_char_bank = data;
+	m_char_bank = data;
 }
 
-static WRITE8_HANDLER( ddayjlc_bgram_w )
+WRITE8_MEMBER(ddayjlc_state::ddayjlc_bgram_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
 	if (!offset)
-		state->m_bg_tilemap->set_scrollx(0, data + 8);
+		m_bg_tilemap->set_scrollx(0, data + 8);
 
-	state->m_bgram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bgram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-static WRITE8_HANDLER( ddayjlc_videoram_w )
+WRITE8_MEMBER(ddayjlc_state::ddayjlc_videoram_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 }
 
 
-static WRITE8_HANDLER(sound_nmi_w)
+WRITE8_MEMBER(ddayjlc_state::sound_nmi_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
-	state->m_sound_nmi_enable = data;
+	m_sound_nmi_enable = data;
 }
 
-static WRITE8_HANDLER(main_nmi_w)
+WRITE8_MEMBER(ddayjlc_state::main_nmi_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
-	state->m_main_nmi_enable = data;
+	m_main_nmi_enable = data;
 }
 
-static WRITE8_HANDLER( bg0_w )
+WRITE8_MEMBER(ddayjlc_state::bg0_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
-	state->m_bgadr = (state->m_bgadr & 0xfe) | (data & 1);
+	m_bgadr = (m_bgadr & 0xfe) | (data & 1);
 }
 
-static WRITE8_HANDLER( bg1_w )
+WRITE8_MEMBER(ddayjlc_state::bg1_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
-	state->m_bgadr = (state->m_bgadr & 0xfd) | ((data & 1) << 1);
+	m_bgadr = (m_bgadr & 0xfd) | ((data & 1) << 1);
 }
 
-static WRITE8_HANDLER( bg2_w )
+WRITE8_MEMBER(ddayjlc_state::bg2_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
-	state->m_bgadr = (state->m_bgadr & 0xfb) | ((data & 1) << 2);
-	if (state->m_bgadr > 2)
-		state->m_bgadr = 0;
+	m_bgadr = (m_bgadr & 0xfb) | ((data & 1) << 2);
+	if (m_bgadr > 2)
+		m_bgadr = 0;
 
-	memory_set_bank(space->machine(), "bank1", state->m_bgadr);
+	memory_set_bank(machine(), "bank1", m_bgadr);
 }
 
-static WRITE8_HANDLER( sound_w )
+WRITE8_MEMBER(ddayjlc_state::sound_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
 	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( i8257_CH0_w )
+WRITE8_MEMBER(ddayjlc_state::i8257_CH0_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
-	state->m_e00x_d[offset][state->m_e00x_l[offset]] = data;
-	state->m_e00x_l[offset] ^= 1;
+	m_e00x_d[offset][m_e00x_l[offset]] = data;
+	m_e00x_l[offset] ^= 1;
 }
 
-static WRITE8_HANDLER( i8257_LMSR_w )
+WRITE8_MEMBER(ddayjlc_state::i8257_LMSR_w)
 {
-	ddayjlc_state *state = space->machine().driver_data<ddayjlc_state>();
 
 	if (!data)
 	{
-		INT32 src = state->m_e00x_d[0][1] * 256 + state->m_e00x_d[0][0];
-		INT32 dst = state->m_e00x_d[2][1] * 256 + state->m_e00x_d[2][0];
-		INT32 size = (state->m_e00x_d[1][1] * 256 + state->m_e00x_d[1][0]) & 0x3ff;
+		INT32 src = m_e00x_d[0][1] * 256 + m_e00x_d[0][0];
+		INT32 dst = m_e00x_d[2][1] * 256 + m_e00x_d[2][0];
+		INT32 size = (m_e00x_d[1][1] * 256 + m_e00x_d[1][0]) & 0x3ff;
 		INT32 i;
 
 		size++; //??
 
 		for(i = 0; i < size; i++)
 		{
-			space->write_byte(dst++, space->read_byte(src++));
+			space.write_byte(dst++, space.read_byte(src++));
 		}
 
-		state->m_e00x_l[0] = 0;
-		state->m_e00x_l[1] = 0;
-		state->m_e00x_l[2] = 0;
-		state->m_e00x_l[3] = 0;
+		m_e00x_l[0] = 0;
+		m_e00x_l[1] = 0;
+		m_e00x_l[2] = 0;
+		m_e00x_l[3] = 0;
 	}
 }
 
@@ -244,21 +244,21 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, ddayjlc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(m_mainram)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(ddayjlc_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE_LEGACY(ddayjlc_bgram_w) AM_BASE(m_bgram) /* 9800-981f - videoregs */
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(ddayjlc_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(ddayjlc_bgram_w) AM_BASE(m_bgram) /* 9800-981f - videoregs */
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1") AM_WRITENOP
-	AM_RANGE(0xe000, 0xe003) AM_WRITE_LEGACY(i8257_CH0_w)
+	AM_RANGE(0xe000, 0xe003) AM_WRITE(i8257_CH0_w)
 	AM_RANGE(0xe008, 0xe008) AM_WRITENOP
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(sound_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_w)
 	AM_RANGE(0xf100, 0xf100) AM_WRITENOP
-	AM_RANGE(0xf080, 0xf080) AM_WRITE_LEGACY(char_bank_w)
+	AM_RANGE(0xf080, 0xf080) AM_WRITE(char_bank_w)
 	AM_RANGE(0xf081, 0xf081) AM_WRITENOP
-	AM_RANGE(0xf083, 0xf083) AM_WRITE_LEGACY(i8257_LMSR_w)
-	AM_RANGE(0xf084, 0xf084) AM_WRITE_LEGACY(bg0_w)
-	AM_RANGE(0xf085, 0xf085) AM_WRITE_LEGACY(bg1_w)
-	AM_RANGE(0xf086, 0xf086) AM_WRITE_LEGACY(bg2_w)
-	AM_RANGE(0xf101, 0xf101) AM_WRITE_LEGACY(main_nmi_w)
-	AM_RANGE(0xf102, 0xf105) AM_WRITE_LEGACY(prot_w)
+	AM_RANGE(0xf083, 0xf083) AM_WRITE(i8257_LMSR_w)
+	AM_RANGE(0xf084, 0xf084) AM_WRITE(bg0_w)
+	AM_RANGE(0xf085, 0xf085) AM_WRITE(bg1_w)
+	AM_RANGE(0xf086, 0xf086) AM_WRITE(bg2_w)
+	AM_RANGE(0xf101, 0xf101) AM_WRITE(main_nmi_w)
+	AM_RANGE(0xf102, 0xf105) AM_WRITE(prot_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xf100, 0xf100) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf180, 0xf180) AM_READ_PORT("DSW1")
@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, ddayjlc_state )
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
 	AM_RANGE(0x5000, 0x5000) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(sound_nmi_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(sound_nmi_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ddayjlc )

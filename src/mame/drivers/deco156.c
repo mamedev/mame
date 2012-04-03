@@ -41,6 +41,15 @@ public:
 	UINT16   m_pf1_rowscroll[0x800/2];
 	UINT16   m_pf2_rowscroll[0x800/2];
 	UINT16* m_spriteram;
+	DECLARE_WRITE32_MEMBER(hvysmsh_eeprom_w);
+	DECLARE_WRITE32_MEMBER(wcvol95_nonbuffered_palette_w);
+	DECLARE_WRITE32_MEMBER(deco156_nonbuffered_palette_w);
+	DECLARE_READ32_MEMBER(wcvol95_pf1_rowscroll_r);
+	DECLARE_READ32_MEMBER(wcvol95_pf2_rowscroll_r);
+	DECLARE_READ32_MEMBER(wcvol95_spriteram_r);
+	DECLARE_WRITE32_MEMBER(wcvol95_pf1_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(wcvol95_pf2_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(wcvol95_spriteram_w);
 };
 
 
@@ -76,13 +85,12 @@ static SCREEN_UPDATE_RGB32( wcvol95 )
 
 /***************************************************************************/
 
-static WRITE32_HANDLER(hvysmsh_eeprom_w)
+WRITE32_MEMBER(deco156_state::hvysmsh_eeprom_w)
 {
-	deco156_state *state = space->machine().driver_data<deco156_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_oki2->set_bank_base(0x40000 * (data & 0x7));
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+		m_oki2->set_bank_base(0x40000 * (data & 0x7));
+		input_port_write(machine(), "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -92,32 +100,32 @@ static WRITE32_DEVICE_HANDLER( hvysmsh_oki_0_bank_w )
 	oki->set_bank_base((data & 1) * 0x40000);
 }
 
-static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
+WRITE32_MEMBER(deco156_state::wcvol95_nonbuffered_palette_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	palette_set_color_rgb(space->machine(),offset,pal5bit(space->machine().generic.paletteram.u32[offset] >> 0),pal5bit(space->machine().generic.paletteram.u32[offset] >> 5),pal5bit(space->machine().generic.paletteram.u32[offset] >> 10));
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	palette_set_color_rgb(machine(),offset,pal5bit(machine().generic.paletteram.u32[offset] >> 0),pal5bit(machine().generic.paletteram.u32[offset] >> 5),pal5bit(machine().generic.paletteram.u32[offset] >> 10));
 }
 
 /* This is the same as deco32_nonbuffered_palette_w in video/deco32.c */
-static WRITE32_HANDLER( deco156_nonbuffered_palette_w )
+WRITE32_MEMBER(deco156_state::deco156_nonbuffered_palette_w)
 {
 	int r,g,b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
 
-	b = (space->machine().generic.paletteram.u32[offset] >>16) & 0xff;
-	g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
-	r = (space->machine().generic.paletteram.u32[offset] >> 0) & 0xff;
+	b = (machine().generic.paletteram.u32[offset] >>16) & 0xff;
+	g = (machine().generic.paletteram.u32[offset] >> 8) & 0xff;
+	r = (machine().generic.paletteram.u32[offset] >> 0) & 0xff;
 
-	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
-static READ32_HANDLER( wcvol95_pf1_rowscroll_r ) { deco156_state *state = space->machine().driver_data<deco156_state>(); return state->m_pf1_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( wcvol95_pf2_rowscroll_r ) { deco156_state *state = space->machine().driver_data<deco156_state>();	return state->m_pf2_rowscroll[offset] ^ 0xffff0000; }
-static READ32_HANDLER( wcvol95_spriteram_r )     { deco156_state *state = space->machine().driver_data<deco156_state>(); return state->m_spriteram[offset] ^ 0xffff0000; }
-static WRITE32_HANDLER( wcvol95_pf1_rowscroll_w ) { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->m_pf1_rowscroll[offset]); }
-static WRITE32_HANDLER( wcvol95_pf2_rowscroll_w ) { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&state->m_pf2_rowscroll[offset]); }
-static WRITE32_HANDLER( wcvol95_spriteram_w )    { deco156_state *state = space->machine().driver_data<deco156_state>(); data &= 0x0000ffff; mem_mask &= 0x0000ffff;	COMBINE_DATA(&state->m_spriteram[offset]); }
+READ32_MEMBER(deco156_state::wcvol95_pf1_rowscroll_r){ return m_pf1_rowscroll[offset] ^ 0xffff0000; }
+READ32_MEMBER(deco156_state::wcvol95_pf2_rowscroll_r){ return m_pf2_rowscroll[offset] ^ 0xffff0000; }
+READ32_MEMBER(deco156_state::wcvol95_spriteram_r){ return m_spriteram[offset] ^ 0xffff0000; }
+WRITE32_MEMBER(deco156_state::wcvol95_pf1_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf1_rowscroll[offset]); }
+WRITE32_MEMBER(deco156_state::wcvol95_pf2_rowscroll_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_pf2_rowscroll[offset]); }
+WRITE32_MEMBER(deco156_state::wcvol95_spriteram_w){ data &= 0x0000ffff; mem_mask &= 0x0000ffff;	COMBINE_DATA(&m_spriteram[offset]); }
 
 
 static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
@@ -125,7 +133,7 @@ static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x120000, 0x120003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x120000, 0x120003) AM_WRITENOP // Volume control in low byte
-	AM_RANGE(0x120004, 0x120007) AM_WRITE_LEGACY(hvysmsh_eeprom_w)
+	AM_RANGE(0x120004, 0x120007) AM_WRITE(hvysmsh_eeprom_w)
 	AM_RANGE(0x120008, 0x12000b) AM_WRITENOP // IRQ ack?
 	AM_RANGE(0x12000c, 0x12000f) AM_DEVWRITE_LEGACY("oki1", hvysmsh_oki_0_bank_w)
 	AM_RANGE(0x140000, 0x140003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)
@@ -133,11 +141,11 @@ static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x180000, 0x18001f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
 	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
-	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE_LEGACY(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
-	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE_LEGACY(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
-	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE_LEGACY(deco156_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
+	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
+	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(deco156_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1d0010, 0x1d002f) AM_READNOP // Check for DMA complete?
-	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE_LEGACY(wcvol95_spriteram_r, wcvol95_spriteram_w)
+	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32, deco156_state )
@@ -145,14 +153,14 @@ static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_dword_r, deco16ic_pf_control_dword_w)
 	AM_RANGE(0x110000, 0x111fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_dword_r, deco16ic_pf1_data_dword_w)
 	AM_RANGE(0x114000, 0x115fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
-	AM_RANGE(0x120000, 0x120fff) AM_READWRITE_LEGACY(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
-	AM_RANGE(0x124000, 0x124fff) AM_READWRITE_LEGACY(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
+	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
+	AM_RANGE(0x124000, 0x124fff) AM_READWRITE(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
 	AM_RANGE(0x130000, 0x137fff) AM_RAM
 	AM_RANGE(0x140000, 0x140003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x150000, 0x150003) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x160000, 0x161fff) AM_READWRITE_LEGACY(wcvol95_spriteram_r, wcvol95_spriteram_w)
+	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 	AM_RANGE(0x170000, 0x170003) AM_NOP // Irq ack?
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE_LEGACY(wcvol95_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(wcvol95_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x000000ff)
 ADDRESS_MAP_END
 

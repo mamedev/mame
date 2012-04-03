@@ -73,6 +73,13 @@ public:
 	UINT32 m_in_1;
 	UINT32 m_in_0_shift;
 	UINT32 m_in_1_shift;
+	DECLARE_WRITE8_MEMBER(nt_w);
+	DECLARE_READ8_MEMBER(nt_r);
+	DECLARE_WRITE8_MEMBER(sprite_dma_w);
+	DECLARE_READ8_MEMBER(cham24_IN0_r);
+	DECLARE_WRITE8_MEMBER(cham24_IN0_w);
+	DECLARE_READ8_MEMBER(cham24_IN1_r);
+	DECLARE_WRITE8_MEMBER(cham24_mapper_w);
 };
 
 
@@ -110,26 +117,24 @@ static void cham24_set_mirroring( running_machine &machine, int mirroring )
 	}
 }
 
-static WRITE8_HANDLER( nt_w )
+WRITE8_MEMBER(cham24_state::nt_w)
 {
-	cham24_state *state = space->machine().driver_data<cham24_state>();
 	int page = ((offset & 0xc00) >> 10);
-	state->m_nt_page[page][offset & 0x3ff] = data;
+	m_nt_page[page][offset & 0x3ff] = data;
 }
 
-static READ8_HANDLER( nt_r )
+READ8_MEMBER(cham24_state::nt_r)
 {
-	cham24_state *state = space->machine().driver_data<cham24_state>();
 	int page = ((offset & 0xc00) >> 10);
-	return state->m_nt_page[page][offset & 0x3ff];
+	return m_nt_page[page][offset & 0x3ff];
 
 }
 
-static WRITE8_HANDLER( sprite_dma_w )
+WRITE8_MEMBER(cham24_state::sprite_dma_w)
 {
 	int source = (data & 7);
-	ppu2c0x_device *ppu = space->machine().device<ppu2c0x_device>("ppu");
-	ppu->spriteram_dma(space, source);
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
+	ppu->spriteram_dma(&space, source);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -148,15 +153,13 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 }
 
 
-static READ8_HANDLER( cham24_IN0_r )
+READ8_MEMBER(cham24_state::cham24_IN0_r)
 {
-	cham24_state *state = space->machine().driver_data<cham24_state>();
-	return ((state->m_in_0 >> state->m_in_0_shift++) & 0x01) | 0x40;
+	return ((m_in_0 >> m_in_0_shift++) & 0x01) | 0x40;
 }
 
-static WRITE8_HANDLER( cham24_IN0_w )
+WRITE8_MEMBER(cham24_state::cham24_IN0_w)
 {
-	cham24_state *state = space->machine().driver_data<cham24_state>();
 	if (data & 0xfe)
 	{
 		//logerror("Unhandled cham24_IN0_w write: data = %02X\n", data);
@@ -167,21 +170,20 @@ static WRITE8_HANDLER( cham24_IN0_w )
 		return;
 	}
 
-	state->m_in_0_shift = 0;
-	state->m_in_1_shift = 0;
+	m_in_0_shift = 0;
+	m_in_1_shift = 0;
 
-	state->m_in_0 = input_port_read(space->machine(), "P1");
-	state->m_in_1 = input_port_read(space->machine(), "P2");
+	m_in_0 = input_port_read(machine(), "P1");
+	m_in_1 = input_port_read(machine(), "P2");
 
 }
 
-static READ8_HANDLER( cham24_IN1_r )
+READ8_MEMBER(cham24_state::cham24_IN1_r)
 {
-	cham24_state *state = space->machine().driver_data<cham24_state>();
-	return ((state->m_in_1 >> state->m_in_1_shift++) & 0x01) | 0x40;
+	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
 
-static WRITE8_HANDLER( cham24_mapper_w )
+WRITE8_MEMBER(cham24_state::cham24_mapper_w)
 {
 	UINT32 gfx_bank = offset & 0x3f;
 	UINT32 prg_16k_bank_page = (offset >> 6) & 0x01;
@@ -189,14 +191,14 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	UINT32 prg_bank_page_size = (offset >> 12) & 0x01;
 	UINT32 gfx_mirroring = (offset >> 13) & 0x01;
 
-	UINT8* dst = space->machine().region("maincpu")->base();
-	UINT8* src = space->machine().region("user1")->base();
+	UINT8* dst = machine().region("maincpu")->base();
+	UINT8* src = machine().region("user1")->base();
 
 	// switch PPU VROM bank
-	memory_set_bankptr(space->machine(), "bank1", space->machine().region("gfx1")->base() + (0x2000 * gfx_bank));
+	memory_set_bankptr(machine(), "bank1", machine().region("gfx1")->base() + (0x2000 * gfx_bank));
 
 	// set gfx mirroring
-	cham24_set_mirroring(space->machine(), gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	cham24_set_mirroring(machine(), gfx_mirroring != 0 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	// switch PRG bank
 	if (prg_bank_page_size == 0)
@@ -225,11 +227,11 @@ static ADDRESS_MAP_START( cham24_map, AS_PROGRAM, 8, cham24_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM	/* NES RAM */
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
-	AM_RANGE(0x4014, 0x4014) AM_WRITE_LEGACY(sprite_dma_w)
+	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE_LEGACY(cham24_IN0_r,        cham24_IN0_w)			/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ_LEGACY(cham24_IN1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
-	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE_LEGACY(cham24_mapper_w)
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(cham24_IN0_r,        cham24_IN0_w)			/* IN0 - input port 1 */
+	AM_RANGE(0x4017, 0x4017) AM_READ(cham24_IN1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(cham24_mapper_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cham24 )
@@ -320,7 +322,7 @@ static MACHINE_START( cham24 )
 	state->m_nt_page[3] = state->m_nt_ram + 0xc00;
 
 	/* and read/write handlers */
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(nt_r), FUNC(nt_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff,read8_delegate(FUNC(cham24_state::nt_r), state), write8_delegate(FUNC(cham24_state::nt_w), state));
 }
 
 static DRIVER_INIT( cham24 )

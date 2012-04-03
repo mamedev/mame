@@ -297,6 +297,16 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<cpu_device> m_soundcpu;
+	DECLARE_READ32_MEMBER(sysh1_unk_r);
+	DECLARE_WRITE32_MEMBER(sysh1_unk_w);
+	DECLARE_READ32_MEMBER(sysh1_ioga_r);
+	DECLARE_WRITE32_MEMBER(sysh1_ioga_w);
+	DECLARE_WRITE32_MEMBER(sysh1_txt_blit_w);
+	DECLARE_WRITE32_MEMBER(sysh1_pal_w);
+	DECLARE_WRITE32_MEMBER(sysh1_dma_w);
+	DECLARE_WRITE32_MEMBER(sysh1_char_w);
+	DECLARE_READ32_MEMBER(coolridr_hack1_r);
+	DECLARE_READ32_MEMBER(coolridr_hack2_r);
 };
 
 
@@ -376,41 +386,39 @@ static SCREEN_UPDATE_RGB32(coolridr)
 /* end video */
 
 /* unknown purpose */
-static READ32_HANDLER(sysh1_unk_r)
+READ32_MEMBER(coolridr_state::sysh1_unk_r)
 {
-	coolridr_state *state = space->machine().driver_data<coolridr_state>();
 	switch(offset)
 	{
 		case 0x08/4:
 		{
 
-			state->m_vblank^=1;
+			m_vblank^=1;
 
-			return (state->m_h1_unk[offset] & 0xfdffffff) | (state->m_vblank<<25);
+			return (m_h1_unk[offset] & 0xfdffffff) | (m_vblank<<25);
 		}
 		case 0x14/4:
-			return state->m_h1_unk[offset];
+			return m_h1_unk[offset];
 		//case 0x20/4:
 	}
 
-	return 0xffffffff;//state->m_h1_unk[offset];
+	return 0xffffffff;//m_h1_unk[offset];
 }
 
-static WRITE32_HANDLER(sysh1_unk_w)
+WRITE32_MEMBER(coolridr_state::sysh1_unk_w)
 {
-	coolridr_state *state = space->machine().driver_data<coolridr_state>();
-	COMBINE_DATA(&state->m_h1_unk[offset]);
+	COMBINE_DATA(&m_h1_unk[offset]);
 }
 
 /* According to Guru, this is actually the same I/O chip of Sega Model 2 HW */
 #if 0
-static READ32_HANDLER(sysh1_ioga_r)
+READ32_MEMBER(coolridr_state::sysh1_ioga_r)
 {
-	//return space->machine().rand();//h1_ioga[offset];
+	//return machine().rand();//h1_ioga[offset];
 	return h1_ioga[offset];
 }
 
-static WRITE32_HANDLER(sysh1_ioga_w)
+WRITE32_MEMBER(coolridr_state::sysh1_ioga_w)
 {
 	COMBINE_DATA(&h1_ioga[offset]);
 }
@@ -418,41 +426,40 @@ static WRITE32_HANDLER(sysh1_ioga_w)
 
 
 /* This is a RLE-based sprite blitter (US Patent #6,141,122), very unusual from Sega... */
-static WRITE32_HANDLER( sysh1_txt_blit_w )
+WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 {
-	coolridr_state *state = space->machine().driver_data<coolridr_state>();
 
-	COMBINE_DATA(&state->m_sysh1_txt_blit[offset]);
+	COMBINE_DATA(&m_sysh1_txt_blit[offset]);
 
 	switch(offset)
 	{
 		// The mode register
 		case 0x04:
 		{
-			state->m_blitterMode = (data & 0x00ff0000) >> 16;
+			m_blitterMode = (data & 0x00ff0000) >> 16;
 
-			if (state->m_blitterMode == 0xf4)
+			if (m_blitterMode == 0xf4)
 			{
 				// Some sort of addressing state.
 				// In the case of text, simply writes 4 characters per 32-bit word.
 				// These values may be loaded into RAM somewhere as they are written.
 				// The number of characters is determined by the upper-most 8 bits.
-				state->m_textBytesToWrite = (data & 0xff000000) >> 24;
-				state->m_textOffset = (data & 0x0000ffff);
-				state->m_blitterSerialCount = 0;
+				m_textBytesToWrite = (data & 0xff000000) >> 24;
+				m_textOffset = (data & 0x0000ffff);
+				m_blitterSerialCount = 0;
 			}
-			else if (state->m_blitterMode == 0x30 || state->m_blitterMode == 0x90)
+			else if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
 			{
 				// The blitter function(s).
 				// After this is set a fixed count of 11 32-bit words are sent to the data register.
 				// The lower word always seems to be 0x0001 and the upper byte always 0xac.
-				state->m_blitterSerialCount = 0;
+				m_blitterSerialCount = 0;
 			}
-			else if (state->m_blitterMode == 0x10)
+			else if (m_blitterMode == 0x10)
 			{
 				// Could be a full clear of VRAM?
 				for(UINT32 vramAddr = 0x3f40000; vramAddr < 0x3f4ffff; vramAddr+=4)
-					space->write_dword(vramAddr, 0x00000000);
+					space.write_dword(vramAddr, 0x00000000);
 			}
 			break;
 		}
@@ -460,22 +467,22 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 		// The data register
 		case 0x05:
 		{
-			if (state->m_blitterMode == 0xf4)
+			if (m_blitterMode == 0xf4)
 			{
 				// Uploads a series of bytes that index into the encoded sprite table
-				const size_t memOffset = 0x03f40000 + state->m_textOffset + state->m_blitterSerialCount;
-				space->write_dword(memOffset, data);
-				state->m_blitterSerialCount += 0x04;
+				const size_t memOffset = 0x03f40000 + m_textOffset + m_blitterSerialCount;
+				space.write_dword(memOffset, data);
+				m_blitterSerialCount += 0x04;
 
 				// DEBUG: Uncomment to see the ASCII strings as they are being blitted
-				//if (state->m_blitterSerialCount >= state->m_textBytesToWrite)
+				//if (m_blitterSerialCount >= m_textBytesToWrite)
 				//{
-				//  for (int i = 0; i < state->m_textBytesToWrite+1; i++)
-				//      printf("%c", space->read_byte(0x03f40000 + state->m_textOffset + i));
+				//  for (int i = 0; i < m_textBytesToWrite+1; i++)
+				//      printf("%c", read_byte(0x03f40000 + m_textOffset + i));
 				//  printf("\n");
 				//}
 			}
-			else if (state->m_blitterMode == 0x30 || state->m_blitterMode == 0x90)
+			else if (m_blitterMode == 0x30 || m_blitterMode == 0x90)
 			{
 				// Serialized 32-bit words in order of appearance:
 				//  0: 00000000 - totally unknown : always seems to be zero
@@ -495,37 +502,37 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 				//                (See ifdef'ed out code below for a closer examination)
 
 				// Serialized counts
-				if (state->m_blitterSerialCount == 1)
+				if (m_blitterSerialCount == 1)
 				{
-					state->m_colorNumber = (data & 0x000000ff);	// Probably more bits
+					m_colorNumber = (data & 0x000000ff);	// Probably more bits
 				}
-				else if (state->m_blitterSerialCount == 6)
+				else if (m_blitterSerialCount == 6)
 				{
-					state->m_vCellCount = (data & 0xffff0000) >> 16;
-					state->m_hCellCount = (data & 0x0000ffff);
+					m_vCellCount = (data & 0xffff0000) >> 16;
+					m_hCellCount = (data & 0x0000ffff);
 				}
-				else if (state->m_blitterSerialCount == 9)
+				else if (m_blitterSerialCount == 9)
 				{
-					state->m_vPosition = (data & 0xffff0000) >> 16;
-					state->m_hPosition = (data & 0x0000ffff);
+					m_vPosition = (data & 0xffff0000) >> 16;
+					m_hPosition = (data & 0x0000ffff);
 				}
-				else if (state->m_blitterSerialCount == 11)
+				else if (m_blitterSerialCount == 11)
 				{
 					const UINT32 memOffset = data;
 
 					// Splat some sprites
-					for (int h = 0; h < state->m_hCellCount; h++)
+					for (int h = 0; h < m_hCellCount; h++)
 					{
-						for (int v = 0; v < state->m_vCellCount; v++)
+						for (int v = 0; v < m_vCellCount; v++)
 						{
-							const int pixelOffsetX = state->m_hPosition + (h*16);
-							const int pixelOffsetY = state->m_vPosition + (v*16);
+							const int pixelOffsetX = m_hPosition + (h*16);
+							const int pixelOffsetY = m_vPosition + (v*16);
 
 							// It's unknown if it's row-major or column-major
 							// TODO: Study the CRT test and "Cool Riders" logo for clues.
-							UINT8 spriteNumber = space->read_byte(memOffset + h + (v*h));
+							UINT8 spriteNumber = space.read_byte(memOffset + h + (v*h));
 
-							// DEBUG: For demo purposes, skip spaces and NULL characters
+							// DEBUG: For demo purposes, skip &spaces and NULL characters
 							if (spriteNumber == 0x20 || spriteNumber == 0x00)
 								continue;
 
@@ -535,22 +542,22 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 								for (int y = 1; y < 15; y++)
 								{
 									UINT32 color;
-									if (state->m_colorNumber == 0x5b)
+									if (m_colorNumber == 0x5b)
 										color = 0xffff0000;
-									else if (state->m_colorNumber == 0x5d)
+									else if (m_colorNumber == 0x5d)
 										color = 0xff00ff00;
-									else if (state->m_colorNumber == 0x5e)
+									else if (m_colorNumber == 0x5e)
 										color = 0xff0000ff;
 									else
 										color = 0xff00ffff;
-									state->m_temp_bitmap_sprites.pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
+									m_temp_bitmap_sprites.pix32(pixelOffsetY+y, pixelOffsetX+x) = color;
 								}
 							}
 						}
 					}
 				}
 
-				state->m_blitterSerialCount++;
+				m_blitterSerialCount++;
 			}
 			break;
 		}
@@ -558,19 +565,19 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 }
 
 
-static WRITE32_HANDLER( sysh1_pal_w )
+WRITE32_MEMBER(coolridr_state::sysh1_pal_w)
 {
 	int r,g,b;
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
 
-	r = ((space->machine().generic.paletteram.u32[offset] & 0x00007c00) >> 10);
-	g = ((space->machine().generic.paletteram.u32[offset] & 0x000003e0) >> 5);
-	b = ((space->machine().generic.paletteram.u32[offset] & 0x0000001f) >> 0);
-	palette_set_color_rgb(space->machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
-	r = ((space->machine().generic.paletteram.u32[offset] & 0x7c000000) >> 26);
-	g = ((space->machine().generic.paletteram.u32[offset] & 0x03e00000) >> 21);
-	b = ((space->machine().generic.paletteram.u32[offset] & 0x001f0000) >> 16);
-	palette_set_color_rgb(space->machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+	r = ((machine().generic.paletteram.u32[offset] & 0x00007c00) >> 10);
+	g = ((machine().generic.paletteram.u32[offset] & 0x000003e0) >> 5);
+	b = ((machine().generic.paletteram.u32[offset] & 0x0000001f) >> 0);
+	palette_set_color_rgb(machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+	r = ((machine().generic.paletteram.u32[offset] & 0x7c000000) >> 26);
+	g = ((machine().generic.paletteram.u32[offset] & 0x03e00000) >> 21);
+	b = ((machine().generic.paletteram.u32[offset] & 0x001f0000) >> 16);
+	palette_set_color_rgb(machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 
@@ -651,32 +658,30 @@ static void sysh1_dma_transfer( address_space *space, UINT16 dma_index )
 	}while(!end_dma_mark );
 }
 
-static WRITE32_HANDLER( sysh1_dma_w )
+WRITE32_MEMBER(coolridr_state::sysh1_dma_w)
 {
-	coolridr_state *state = space->machine().driver_data<coolridr_state>();
-	COMBINE_DATA(&state->m_framebuffer_vram[offset]);
+	COMBINE_DATA(&m_framebuffer_vram[offset]);
 
 	if(offset*4 == 0x000)
 	{
-		if((state->m_framebuffer_vram[offset] & 0xff00000) == 0xfe00000)
-			sysh1_dma_transfer(space, state->m_framebuffer_vram[offset] & 0xffff);
+		if((m_framebuffer_vram[offset] & 0xff00000) == 0xfe00000)
+			sysh1_dma_transfer(&space, m_framebuffer_vram[offset] & 0xffff);
 	}
 }
 
-static WRITE32_HANDLER( sysh1_char_w )
+WRITE32_MEMBER(coolridr_state::sysh1_char_w)
 {
-	coolridr_state *state = space->machine().driver_data<coolridr_state>();
-	COMBINE_DATA(&state->m_h1_charram[offset]);
+	COMBINE_DATA(&m_h1_charram[offset]);
 
 	{
-		UINT8 *gfx = space->machine().region("ram_gfx")->base();
+		UINT8 *gfx = machine().region("ram_gfx")->base();
 
-		gfx[offset*4+0] = (state->m_h1_charram[offset] & 0xff000000) >> 24;
-		gfx[offset*4+1] = (state->m_h1_charram[offset] & 0x00ff0000) >> 16;
-		gfx[offset*4+2] = (state->m_h1_charram[offset] & 0x0000ff00) >> 8;
-		gfx[offset*4+3] = (state->m_h1_charram[offset] & 0x000000ff) >> 0;
+		gfx[offset*4+0] = (m_h1_charram[offset] & 0xff000000) >> 24;
+		gfx[offset*4+1] = (m_h1_charram[offset] & 0x00ff0000) >> 16;
+		gfx[offset*4+2] = (m_h1_charram[offset] & 0x0000ff00) >> 8;
+		gfx[offset*4+3] = (m_h1_charram[offset] & 0x000000ff) >> 0;
 
-		gfx_element_mark_dirty(space->machine().gfx[2], offset/64); //*4/256
+		gfx_element_mark_dirty(machine().gfx[2], offset/64); //*4/256
 	}
 }
 
@@ -685,13 +690,13 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
 	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_BASE(m_h1_vram)//bg vram
-	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE_LEGACY(sysh1_pal_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE_LEGACY(sysh1_char_w) AM_BASE(m_h1_charram) //FIXME: half size
-	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE_LEGACY(sysh1_dma_w) AM_BASE(m_framebuffer_vram) //FIXME: not all of it
+	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE(sysh1_char_w) AM_BASE(m_h1_charram) //FIXME: half size
+	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE(m_framebuffer_vram) //FIXME: not all of it
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE("share3") /*Communication area RAM*/
 	AM_RANGE(0x03f40000, 0x03f4ffff) AM_RAM AM_BASE(m_txt_vram)//text tilemap + "lineram"
-	AM_RANGE(0x04000000, 0x0400003f) AM_RAM_WRITE_LEGACY(sysh1_txt_blit_w) AM_BASE(m_sysh1_txt_blit)
+	AM_RANGE(0x04000000, 0x0400003f) AM_RAM_WRITE(sysh1_txt_blit_w) AM_BASE(m_sysh1_txt_blit)
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(m_sysh1_workram_h)
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_SHARE("share1")
 
@@ -710,7 +715,7 @@ static ADDRESS_MAP_START( coolridr_submap, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x03208900, 0x03208903) AM_RAM /*???*/
 	AM_RANGE(0x03300400, 0x03300403) AM_RAM /*irq enable?*/
 
-	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE_LEGACY(sysh1_unk_r,sysh1_unk_w) AM_BASE(m_h1_unk)
+	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_unk_r,sysh1_unk_w) AM_BASE(m_h1_unk)
 	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /*???*/
 
 	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
@@ -1215,32 +1220,31 @@ ROM_START( coolridr )
 ROM_END
 
 #if 0
-static READ32_HANDLER( coolridr_hack1_r )
+READ32_MEMBER(coolridr_state::coolridr_hack1_r)
 {
-	coolridr_state *state = space->machine().driver_data<coolridr_state>();
-	offs_t pc = downcast<cpu_device *>(&space->device())->pc();
+	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
 	if(pc == 0x6012374 || pc == 0x6012392)
 		return 0;
 
-	return state->m_sysh1_workram_h[0xd88a4/4];
+	return m_sysh1_workram_h[0xd88a4/4];
 }
 #endif
 
 /*TODO: there must be an irq line with custom vector located somewhere that writes to here...*/
-static READ32_HANDLER( coolridr_hack2_r )
+READ32_MEMBER(coolridr_state::coolridr_hack2_r)
 {
-	coolridr_state *state = space->machine().driver_data<coolridr_state>();
-	offs_t pc = downcast<cpu_device *>(&space->device())->pc();
+	offs_t pc = downcast<cpu_device *>(&space.device())->pc();
 	if(pc == 0x6002cba || pc == 0x6002d42)
 		return 0;
 
-	return state->m_sysh1_workram_h[0xd8894/4];
+	return m_sysh1_workram_h[0xd8894/4];
 }
 
 static DRIVER_INIT( coolridr )
 {
+	coolridr_state *state = machine.driver_data<coolridr_state>();
 //  machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60d88a4, 0x060d88a7, FUNC(coolridr_hack1_r) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x60d8894, 0x060d8897, FUNC(coolridr_hack2_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x60d8894, 0x060d8897, read32_delegate(FUNC(coolridr_state::coolridr_hack2_r), state));
 }
 
 GAME( 1995, coolridr,    0, coolridr,    coolridr,    coolridr, ROT0,  "Sega", "Cool Riders (US)",GAME_NOT_WORKING|GAME_NO_SOUND )

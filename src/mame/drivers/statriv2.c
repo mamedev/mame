@@ -90,6 +90,10 @@ public:
 	UINT8 m_question_offset_high;
 	UINT8 m_latched_coin;
 	UINT8 m_last_coin;
+	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
+	DECLARE_READ8_MEMBER(question_data_r);
+	DECLARE_READ8_MEMBER(laserdisc_io_r);
+	DECLARE_WRITE8_MEMBER(laserdisc_io_w);
 };
 
 
@@ -161,12 +165,11 @@ static VIDEO_START( vertical )
  *
  *************************************/
 
-static WRITE8_HANDLER( statriv2_videoram_w )
+WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
 {
-	statriv2_state *state = space->machine().driver_data<statriv2_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -216,20 +219,19 @@ static INTERRUPT_GEN( statriv2_interrupt )
  *
  *************************************/
 
-static READ8_HANDLER( question_data_r )
+READ8_MEMBER(statriv2_state::question_data_r)
 {
-	statriv2_state *state = space->machine().driver_data<statriv2_state>();
-	const UINT8 *qrom = space->machine().region("questions")->base();
-	UINT32 qromsize = space->machine().region("questions")->bytes();
+	const UINT8 *qrom = machine().region("questions")->base();
+	UINT32 qromsize = machine().region("questions")->bytes();
 	UINT32 address;
 
-	if (state->m_question_offset_high == 0xff)
-		state->m_question_offset[state->m_question_offset_low]++;
+	if (m_question_offset_high == 0xff)
+		m_question_offset[m_question_offset_low]++;
 
-	address = state->m_question_offset[state->m_question_offset_low];
-	address |= state->m_question_offset[state->m_question_offset_mid] << 8;
-	if (state->m_question_offset_high != 0xff)
-		address |= state->m_question_offset[state->m_question_offset_high] << 16;
+	address = m_question_offset[m_question_offset_low];
+	address |= m_question_offset[m_question_offset_mid] << 8;
+	if (m_question_offset_high != 0xff)
+		address |= m_question_offset[m_question_offset_high] << 16;
 
 	return (address < qromsize) ? qrom[address] : 0xff;
 }
@@ -292,12 +294,12 @@ static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8, statriv2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(statriv2_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE(m_videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8, statriv2_state )
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("ppi", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x28, 0x2b) AM_READ_LEGACY(question_data_r) AM_WRITEONLY AM_BASE(m_question_offset)
+	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_BASE(m_question_offset)
 	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xb1, 0xb1) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE_LEGACY("tms", tms9927_r, tms9927_w)
@@ -1109,24 +1111,25 @@ static DRIVER_INIT( addr_lmhe )
 }
 
 
-static READ8_HANDLER( laserdisc_io_r )
+READ8_MEMBER(statriv2_state::laserdisc_io_r)
 {
 	UINT8 result = 0x00;
 	if (offset == 1)
 		result = 0x18;
-	mame_printf_debug("%s:ld read ($%02X) = %02X\n", space->machine().describe_context(), 0x28 + offset, result);
+	mame_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
 	return result;
 }
 
-static WRITE8_HANDLER( laserdisc_io_w )
+WRITE8_MEMBER(statriv2_state::laserdisc_io_w)
 {
-	mame_printf_debug("%s:ld write ($%02X) = %02X\n", space->machine().describe_context(), 0x28 + offset, data);
+	mame_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
 }
 
 static DRIVER_INIT( laserdisc )
 {
 	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
-	iospace->install_legacy_readwrite_handler(0x28, 0x2b, FUNC(laserdisc_io_r), FUNC(laserdisc_io_w));
+	statriv2_state *state = machine.driver_data<statriv2_state>();
+	iospace->install_readwrite_handler(0x28, 0x2b, read8_delegate(FUNC(statriv2_state::laserdisc_io_r), state), write8_delegate(FUNC(statriv2_state::laserdisc_io_w), state));
 }
 
 
