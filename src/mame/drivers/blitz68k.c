@@ -841,18 +841,18 @@ READ8_MEMBER(blitz68k_state::crtc_r)
 {
 	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		return mc6845->register_r(*&space, 0);
+		return mc6845->register_r(space, 0);
 	else
-		return mc6845->status_r(*&space, 0);
+		return mc6845->status_r(space, 0);
 }
 
 WRITE8_MEMBER(blitz68k_state::crtc_w)
 {
 	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		mc6845->register_w(*&space, 0, data);
+		mc6845->register_w(space, 0, data);
 	else
-		mc6845->address_w(*&space, 0, data);
+		mc6845->address_w(space, 0, data);
 }
 
 static WRITE16_DEVICE_HANDLER( crtc_lpen_w )

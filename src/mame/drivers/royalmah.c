@@ -1185,7 +1185,7 @@ READ8_MEMBER(royalmah_state::mjvegasa_rom_io_r)
 	{
 		msm6242_device *rtc = machine().device<msm6242_device>("rtc");
 
-		return rtc->read(*&space, offset & 0xf);
+		return rtc->read(space, offset & 0xf);
 	}
 
 	logerror("%04X: unmapped IO read at %04X\n", cpu_get_pc(&space.device()), offset);
@@ -1207,7 +1207,7 @@ WRITE8_MEMBER(royalmah_state::mjvegasa_rom_io_w)
 	{
 		msm6242_device *rtc = machine().device<msm6242_device>("rtc");
 
-		rtc->write(*&space, offset & 0xf,data);
+		rtc->write(space, offset & 0xf,data);
 		return;
 	}
 

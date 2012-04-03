@@ -398,13 +398,13 @@ WRITE8_MEMBER(firefox_state::adc_select_w)
 
 WRITE8_MEMBER(firefox_state::nvram_w)
 {
-	m_nvram_1c->write(*&space, offset, data >> 4);
-	m_nvram_1d->write(*&space, offset, data & 0xf);
+	m_nvram_1c->write(space, offset, data >> 4);
+	m_nvram_1d->write(space, offset, data & 0xf);
 }
 
 READ8_MEMBER(firefox_state::nvram_r)
 {
-	return (m_nvram_1c->read(*&space, offset) << 4) | (m_nvram_1d->read(*&space, offset) & 0x0f);
+	return (m_nvram_1c->read(space, offset) << 4) | (m_nvram_1d->read(space, offset) & 0x0f);
 }
 
 WRITE8_MEMBER(firefox_state::novram_recall_w)

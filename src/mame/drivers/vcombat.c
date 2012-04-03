@@ -311,9 +311,9 @@ WRITE16_MEMBER(vcombat_state::crtc_w)
 		return;
 
 	if (m_crtc_select == 0)
-		crtc->address_w(*&space, 0, data >> 8);
+		crtc->address_w(space, 0, data >> 8);
 	else
-		crtc->register_w(*&space, 0, data >> 8);
+		crtc->register_w(space, 0, data >> 8);
 
 	m_crtc_select ^= 1;
 }

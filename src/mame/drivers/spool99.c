@@ -178,7 +178,7 @@ READ8_MEMBER(spool99_state::spool99_io_r)
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
 			case 0xafe7: return machine().device<eeprom_device>("eeprom")->read_bit();
-			case 0xaff8: return machine().device<okim6295_device>("oki")->read(*&space,0);
+			case 0xaff8: return machine().device<okim6295_device>("oki")->read(space,0);
 		}
 	}
 //  printf("%04x %d\n",offset+0xaf00,io_switch);
@@ -239,7 +239,7 @@ READ8_MEMBER(spool99_state::vcarn_io_r)
 			case 0xa725: return input_port_read(machine(),"HOLD3");
 			case 0xa726: return input_port_read(machine(),"HOLD4");
 			case 0xa727: return input_port_read(machine(),"HOLD2");
-			case 0xa780: return machine().device<okim6295_device>("oki")->read(*&space,0);
+			case 0xa780: return machine().device<okim6295_device>("oki")->read(space,0);
 			case 0xa7a0: return input_port_read(machine(),"HOLD1");
 			case 0xa7a1: return input_port_read(machine(),"HOLD5");
 			case 0xa7a2: return input_port_read(machine(),"START");

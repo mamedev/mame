@@ -369,7 +369,7 @@ WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 	m_bg_tilemap->mark_tile_dirty(m_vid_address);
 
 	/* An access here triggers a device read !*/
-	machine().device<mc6845_device>("crtc")->register_r(*&space, 0);
+	machine().device<mc6845_device>("crtc")->register_r(space, 0);
 }
 
 WRITE8_MEMBER(peplus_state::peplus_io_w)

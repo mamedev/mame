@@ -526,7 +526,7 @@ READ8_MEMBER(aristmk4_state::mkiv_pia_ina)
 {
 	/* uncomment this code once RTC is fixed */
 
-	//return machine().device<mc146818_device>("rtc")->read(*&space,1);
+	//return machine().device<mc146818_device>("rtc")->read(space,1);
 	return 0;	// OK for now, the aussie version has no RTC on the MB so this is valid.
 }
 
@@ -536,12 +536,12 @@ WRITE8_MEMBER(aristmk4_state::mkiv_pia_outa)
 	mc146818_device *mc = machine().device<mc146818_device>("rtc");
 	if(m_rtc_data_strobe)
 	{
-		mc->write(*&space,1,data);
+		mc->write(space,1,data);
 		//logerror("rtc protocol write data: %02X\n",data);
 	}
 	else
 	{
-		mc->write(*&space,0,data);
+		mc->write(space,0,data);
 		//logerror("rtc protocol write address: %02X\n",data);
 	}
 }

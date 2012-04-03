@@ -321,10 +321,10 @@ READ16_MEMBER(acommand_state::ac_devices_r)
 			return input_port_read(machine(), "IN0");
 		case 0x0014/2:
 		case 0x0016/2:
-			return machine().device<okim6295_device>("oki1")->read(*&space,0);
+			return machine().device<okim6295_device>("oki1")->read(space,0);
 		case 0x0018/2:
 		case 0x001a/2:
-			return machine().device<okim6295_device>("oki2")->read(*&space,0);
+			return machine().device<okim6295_device>("oki2")->read(space,0);
 		case 0x0040/2:
 			/*
                 "Upper switch / Under Switch"
@@ -413,7 +413,7 @@ WRITE16_MEMBER(acommand_state::ac_devices_w)
 			if(ACCESSING_BITS_0_7)
 			{
 				okim6295_device *oki1 = machine().device<okim6295_device>("oki1");
-				oki1->write(*&space,0,data);
+				oki1->write(space,0,data);
 			}
 			break;
 		case 0x18/2:
@@ -421,7 +421,7 @@ WRITE16_MEMBER(acommand_state::ac_devices_w)
 			if(ACCESSING_BITS_0_7)
 			{
 				okim6295_device *oki2 = machine().device<okim6295_device>("oki2");
-				oki2->write(*&space,0,data);
+				oki2->write(space,0,data);
 			}
 			break;
 		case 0x1c/2:
