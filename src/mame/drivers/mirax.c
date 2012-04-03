@@ -96,9 +96,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Same ingame bug as in 'mirax' when you reach level 100 (of course, it will display
     "LUXORI UNIT" instead of "MIRAX CITY" on "presentation" screen).
 
-MIRAX / RUTHIN / GORGAN / PEMBAY / URMIA / VENLO / OHRE / DESBOM / XELUN / MURBO
-LUXORI / " / " / " / " / " / " / DESCOM / " / "
-
 ************************************************
 */
 
