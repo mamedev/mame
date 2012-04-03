@@ -15,12 +15,24 @@ struct m68307_single_timer
 {
 	UINT16 regs[0x8];
 	bool enabled;
+	emu_timer *mametimer;
 };
+
 
 class m68307_timer
 {
 	public:
-	m68307_single_timer timer[2];
+	m68307_single_timer singletimer[2];
+
+	emu_timer *wd_mametimer;
+	legacy_cpu_device *parent;
+
+	void write_tmr(UINT16 data, UINT16 mem_mask, int which);
+	void write_trr(UINT16 data, UINT16 mem_mask, int which);
+	void write_ter(UINT16 data, UINT16 mem_mask, int which);
+	UINT16 read_tcn(UINT16 mem_mask, int which);
+
+	void init(legacy_cpu_device *device);
 	void reset(void);
 };
 

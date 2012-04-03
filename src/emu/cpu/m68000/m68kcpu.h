@@ -745,6 +745,13 @@ public:
 	/* 68308 / 68340 internal address map */
 	address_space *internal;
 
+	/* callbacks for internal ports */
+	m68307_porta_read_callback m_m68307_porta_r;
+	m68307_porta_write_callback m_m68307_porta_w;
+	m68307_portb_read_callback m_m68307_portb_r;
+	m68307_portb_write_callback m_m68307_portb_w;
+
+
 
 	/* external instruction hook (does not depend on debug mode) */
 	typedef int (*instruction_hook_t)(device_t *device, offs_t curpc);

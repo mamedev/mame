@@ -1,6 +1,11 @@
 /* Scorpion 4 + 5 driver releated includes */
 /* mainly used for stuff which is currently shared between sc4 / 5 sets to avoid duplication */
 
+MACHINE_CONFIG_EXTERN( sc4 );
+MACHINE_CONFIG_EXTERN( sc4_adder4 );
+INPUT_PORTS_EXTERN( sc4 );
+
+
 #define sc_ivply_others \
 	ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00 ) \
 	ROM_LOAD( "95004313.snd", 0x0000, 0x080000, CRC(28faed9e) SHA1(624d6cfcc97dd1950b5d908cde2e4d2eb6ea1dc6) ) \

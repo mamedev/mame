@@ -516,6 +516,7 @@ $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfm_sc1.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
 	$(DRIVERS)/bfm_sc4.o \
+	$(DRIVERS)/bfm_sc4h.o \
 	$(DRIVERS)/bfm_sc5.o \
 	$(DRIVERS)/bfm_swp.o \
 	$(DRIVERS)/bfmsys83.o \
@@ -1943,6 +1944,10 @@ $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
 			$(LAYOUT)/slots.lh \
 			$(LAYOUT)/sltblgpo.lh \
 			$(LAYOUT)/sltblgtk.lh
+
+$(DRIVERS)/bfm_sc4.o:	$(LAYOUT)/bfm_sc4.lh
+
+$(DRIVERS)/bfm_sc4h.o:	$(LAYOUT)/bfm_sc4.lh
 
 $(DRIVERS)/blockade.o:	$(LAYOUT)/blockade.lh
 

@@ -267,8 +267,8 @@ int BFM_BD1_newdata(int id, int data)
 			return 0;
 		}
 
-	data = '@';
-	change = BD1_setdata(id, bd1[id].user_def, data);
+		data = '@';
+		change = BD1_setdata(id, bd1[id].user_def, data);
 	}
 	else
 	{
@@ -387,6 +387,9 @@ int BFM_BD1_newdata(int id, int data)
 	}
 	return change;
 }
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////
 

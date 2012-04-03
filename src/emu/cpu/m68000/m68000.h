@@ -101,6 +101,12 @@ typedef void (*m68k_cmpild_func)(device_t *device, UINT32 data, UINT8 reg);
 typedef void (*m68k_rte_func)(device_t *device);
 typedef int (*m68k_tas_func)(device_t *device);
 
+typedef UINT8 (*m68307_porta_read_callback)(address_space *space, offs_t offset);
+typedef void (*m68307_porta_write_callback)(address_space *space, offs_t offset, UINT8 data);
+typedef UINT16 (*m68307_portb_read_callback)(address_space *space, offs_t offset, UINT16 mem_mask);
+typedef void (*m68307_portb_write_callback)(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask);
+
+
 
 DECLARE_LEGACY_CPU_DEVICE(M68000, m68000);
 DECLARE_LEGACY_CPU_DEVICE(M68301, m68301);
@@ -133,7 +139,10 @@ void m68k_set_cmpild_callback(device_t *device, m68k_cmpild_func callback);
 void m68k_set_rte_callback(device_t *device, m68k_rte_func callback);
 void m68k_set_tas_callback(device_t *device, m68k_tas_func callback);
 UINT16 m68k_get_fc(device_t *device);
+
+void m68307_set_port_callbacks(device_t *device, m68307_porta_read_callback porta_r, m68307_porta_write_callback m_m68307_porta_w, m68307_portb_read_callback portb_r, m68307_portb_write_callback m_m68307_portb_w);
 UINT16 m68307_get_cs(device_t *device, offs_t address);
+void m68307_set_interrupt(device_t *device, int level, int vector);
 
 typedef int (*instruction_hook_t)(device_t *device, offs_t curpc);
 void m68k_set_instruction_hook(device_t *device, instruction_hook_t ihook);

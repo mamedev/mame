@@ -1781,6 +1781,16 @@ UINT16 m68k_get_fc(device_t *device)
 	return m68k->mmu_tmp_fc;
 }
 
+void m68307_set_port_callbacks(device_t *device, m68307_porta_read_callback porta_r, m68307_porta_write_callback porta_w, m68307_portb_read_callback portb_r, m68307_portb_write_callback portb_w)
+{
+	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
+	m68k->m_m68307_porta_r = porta_r;
+	m68k->m_m68307_porta_w = porta_w;
+	m68k->m_m68307_portb_r = portb_r;
+	m68k->m_m68307_portb_w = portb_w;
+}
+
+
 UINT16 m68307_get_cs(device_t *device, offs_t address)
 {
 	m68ki_cpu_core *m68k = m68k_get_safe_token(device);
@@ -1920,6 +1930,10 @@ CPU_GET_INFO( m68301 )
 	}
 }
 
+void m68307_set_interrupt(device_t *device, int level, int vector)
+{
+	device_set_input_line_and_vector(device, level, HOLD_LINE, vector);
+}
 
 static CPU_INIT( m68307 )
 {
@@ -1938,6 +1952,8 @@ static CPU_INIT( m68307 )
 	m68k->m68307SERIAL = new m68307_serial();
 	m68k->m68307TIMER  = new m68307_timer();
 
+	m68k->m68307TIMER->init(device);
+
 	m68k->m68307SIM->reset();
 	m68k->m68307MBUS->reset();
 	m68k->m68307SERIAL->reset();
@@ -1947,6 +1963,8 @@ static CPU_INIT( m68307 )
 	m68k->m68307_base = 0xbfff;
 	m68k->m68307_scrhigh = 0x0007;
 	m68k->m68307_scrlow = 0xf010;
+
+	m68307_set_port_callbacks(device, 0,0,0,0);
 }
 
 static READ16_HANDLER( m68307_internal_base_r )
@@ -2025,7 +2043,7 @@ CPU_GET_INFO( m68307 )
 {
 	switch (state)
 	{
-		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 32;							break;
+		case DEVINFO_INT_ADDRBUS_WIDTH + AS_PROGRAM:	info->i = 24;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_INIT:						info->init = CPU_INIT_NAME(m68307);				break;
