@@ -8,9 +8,8 @@ Angelo Salese
 Olivier Galibert
 
 TODO:
-- support screen flipping
 - sound ports are a mystery (PC=0x02e0)
-- sprite offsets?
+- video offsets?
 - score / credits display should stay above the sprites?
 
 ====================================================
@@ -153,8 +152,35 @@ static PALETTE_INIT( mirax )
 	}
 }
 
-static VIDEO_START(mirax)
+
+static void draw_tilemap(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag)
 {
+	mirax_state *state = machine.driver_data<mirax_state>();
+	const gfx_element *gfx = machine.gfx[0];
+	int y,x;
+	int res_x,res_y,wrapy;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			int tile = state->m_videoram[32*y+x];
+			int color = (state->m_colorram[x*2]<<8) | (state->m_colorram[(x*2)+1]);
+			int x_scroll = (color & 0xff00)>>8;
+			tile |= ((color & 0xe0)<<3);
+
+			res_x = (state->m_flipscreen_x) ? 248-x*8 : x*8;
+			res_y = (state->m_flipscreen_y) ? 248-y*8+x_scroll : y*8-x_scroll;
+			wrapy = (state->m_flipscreen_y) ? -256 : 256;
+
+			if((x <= 1 || x >= 30) ^ draw_flag)
+			{
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,(state->m_flipscreen_x),(state->m_flipscreen_y),res_x,res_y);
+				/* wrap-around */
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,(state->m_flipscreen_x),(state->m_flipscreen_y),res_x,res_y+wrapy);
+			}
+		}
+	}
 }
 
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -172,61 +198,24 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		spr_offs = (spriteram[count+1] & 0x3f);
 		color = spriteram[count+2] & 0x7;
-		fx = spriteram[count+1] & 0x40; //<- guess
-		fy = spriteram[count+1] & 0x80;
+		fx = (state->m_flipscreen_x) ^ ((spriteram[count+1] & 0x40) >> 6); //<- guess
+		fy = (state->m_flipscreen_y) ^ ((spriteram[count+1] & 0x80) >> 7);
 
 		spr_offs += (spriteram[count+2] & 0xe0)<<1;
 		spr_offs += (spriteram[count+2] & 0x10)<<5;
 
-		y = 0x100 - spriteram[count];
-		x = spriteram[count+3];
+		y = (state->m_flipscreen_y) ? spriteram[count] : 0x100 - spriteram[count] - 16;
+		x = (state->m_flipscreen_x) ? 240 - spriteram[count+3] : spriteram[count+3];
 
-		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],spr_offs,color,fx,fy,x,y-16,0);
+		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],spr_offs,color,fx,fy,x,y,0);
 	}
 }
 
 static SCREEN_UPDATE_IND16(mirax)
 {
-	mirax_state *state = screen.machine().driver_data<mirax_state>();
-	const gfx_element *gfx = screen.machine().gfx[0];
-	int y,x;
-
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<32;x++)
-		{
-			int tile = state->m_videoram[32*y+x];
-			int color = (state->m_colorram[x*2]<<8) | (state->m_colorram[(x*2)+1]);
-			int x_scroll = (color & 0xff00)>>8;
-			tile |= ((color & 0xe0)<<3);
-
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll);
-			/* wrap-around */
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll+256);
-		}
-	}
-
+	draw_tilemap(screen.machine(),bitmap,cliprect,1);
 	draw_sprites(screen.machine(),bitmap,cliprect);
-
-	/* draw score and credit displays above the sprites */
-	for (y=0;y<32;y++)
-	{
-		for (x=0;x<32;x++)
-		{
-			int tile = state->m_videoram[32*y+x];
-			int color = (state->m_colorram[x*2]<<8) | (state->m_colorram[(x*2)+1]);
-			int x_scroll = (color & 0xff00)>>8;
-			tile |= ((color & 0xe0)<<3);
-
-			if(x <= 1 || x >= 30)
-			{
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll);
-				/* wrap-around */
-				drawgfx_opaque(bitmap,cliprect,gfx,tile,color & 7,0,0,(x*8),(y*8)-x_scroll+256);
-			}
-		}
-	}
-
+	draw_tilemap(screen.machine(),bitmap,cliprect,0);
 	return 0;
 }
 
@@ -239,7 +228,6 @@ static SOUND_START(mirax)
 
 WRITE8_MEMBER(mirax_state::audio_w)
 {
-
 	m_nAyCtrl=offset;
 }
 
@@ -247,10 +235,8 @@ static WRITE8_DEVICE_HANDLER(ay_sel)
 {
 	mirax_state *state = device->machine().driver_data<mirax_state>();
 
-	{
-		ay8910_address_w(device,0,state->m_nAyCtrl);
-		ay8910_data_w(device,0,data);
-	}
+	ay8910_address_w(device,0,state->m_nAyCtrl);
+	ay8910_data_w(device,0,data);
 }
 
 WRITE8_MEMBER(mirax_state::nmi_mask_w)
@@ -281,13 +267,10 @@ WRITE8_MEMBER(mirax_state::mirax_coin_counter1_w)
 WRITE8_MEMBER(mirax_state::mirax_flip_screen_w)
 {
 	if (offset == 0)
-	{
 		m_flipscreen_x = data & 0x01;
-	}
+
 	if (offset == 1)
-	{
 		m_flipscreen_y = data & 0x01;
-	}
 }
 
 static ADDRESS_MAP_START( mirax_main_map, AS_PROGRAM, 8, mirax_state )
@@ -473,13 +456,13 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_PALETTE_LENGTH(0x40)
 	MCFG_PALETTE_INIT(mirax)
 	MCFG_GFXDECODE(mirax)
-	MCFG_VIDEO_START(mirax)
 
 	MCFG_SOUND_START(mirax)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
 	MCFG_SOUND_ADD("ay2", AY8910, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
@@ -509,10 +492,10 @@ ROM_START( mirax )
 	ROM_LOAD( "mxi3-4v.rom",   0x08000, 0x4000, CRC(20fb2099) SHA1(da6bbd5d2218ba49b8ef98e7affdcab912f84ade) )
 	ROM_LOAD( "mxl3-4v.rom",   0x10000, 0x4000, CRC(918487aa) SHA1(47ba6914722a253f65c733b5edff4d15e73ea6c2) )
 
-	ROM_REGION( 0x0060, "proms", 0 ) // data ? encrypted roms for cpu1 ?
+	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "mra3.prm",   0x0000, 0x0020, CRC(ae7e1a63) SHA1(f5596db77c1e352ef7845465db3e54e19cd5df9e) )
 	ROM_LOAD( "mrb3.prm",   0x0020, 0x0020, CRC(e3f3d0f5) SHA1(182b06c9db5bec1e3030f705247763bd2380ba83) )
-	ROM_LOAD( "mirax.prm",	0x0040, 0x0020, NO_DUMP )
+	ROM_LOAD( "mirax.prm",	0x0040, 0x0020, NO_DUMP ) // data ? encrypted roms for cpu1 ?
 ROM_END
 
 ROM_START( miraxa )
@@ -539,7 +522,7 @@ ROM_START( miraxa )
 	ROM_LOAD( "mxi3-4v.rom",   0x08000, 0x4000, CRC(20fb2099) SHA1(da6bbd5d2218ba49b8ef98e7affdcab912f84ade) )
 	ROM_LOAD( "mxl3-4v.rom",   0x10000, 0x4000, CRC(918487aa) SHA1(47ba6914722a253f65c733b5edff4d15e73ea6c2) )
 
-	ROM_REGION( 0x0060, "proms", 0 ) // data ? encrypted roms for cpu1 ?
+	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "mra3.prm",   0x0000, 0x0020, CRC(ae7e1a63) SHA1(f5596db77c1e352ef7845465db3e54e19cd5df9e) )
 	ROM_LOAD( "mrb3.prm",   0x0020, 0x0020, CRC(e3f3d0f5) SHA1(182b06c9db5bec1e3030f705247763bd2380ba83) )
 ROM_END
@@ -566,5 +549,5 @@ static DRIVER_INIT( mirax )
 	state->m_flipscreen_y = 0;
 }
 
-GAME( 1985, mirax,    0,        mirax,    mirax,    mirax,    ROT90, "Current Technologies", "Mirax (set 1)", GAME_NO_COCKTAIL )
-GAME( 1985, miraxa,   mirax,    mirax,    miraxa,   mirax,    ROT90, "Current Technologies", "Mirax (set 2)", GAME_NO_COCKTAIL )
+GAME( 1985, mirax,    0,        mirax,    mirax,    mirax,    ROT90, "Current Technologies", "Mirax (set 1)", 0 )
+GAME( 1985, miraxa,   mirax,    mirax,    miraxa,   mirax,    ROT90, "Current Technologies", "Mirax (set 2)", 0 )
