@@ -141,9 +141,9 @@ static TIMER_CALLBACK( m68307_wd_timer_callback )
 void m68307_timer::init(legacy_cpu_device *device)
 {
 
-	m68ki_cpu_core *m68k;
+	//m68ki_cpu_core *m68k;
 	
-	m68k = m68k_get_safe_token(device);
+	//m68k = m68k_get_safe_token(device);
 
 
 	m68307_single_timer* tptr;
