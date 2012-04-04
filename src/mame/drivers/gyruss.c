@@ -100,10 +100,9 @@ static WRITE8_DEVICE_HANDLER( gyruss_dac_w )
 	discrete_sound_w(device, NODE(16), data);
 }
 
-static WRITE8_HANDLER( gyruss_irq_clear_w )
+WRITE8_MEMBER(gyruss_state::gyruss_irq_clear_w)
 {
-	gyruss_state *state = space->machine().driver_data<gyruss_state>();
-	device_set_input_line(state->m_audiocpu_2, 0, CLEAR_LINE);
+	device_set_input_line(m_audiocpu_2, 0, CLEAR_LINE);
 }
 
 static void filter_w( device_t *device, int chip, int data )
@@ -131,31 +130,27 @@ static WRITE8_DEVICE_HANDLER( gyruss_filter1_w )
 }
 
 
-static WRITE8_HANDLER( gyruss_sh_irqtrigger_w )
+WRITE8_MEMBER(gyruss_state::gyruss_sh_irqtrigger_w)
 {
-	gyruss_state *state = space->machine().driver_data<gyruss_state>();
 	/* writing to this register triggers IRQ on the sound CPU */
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( gyruss_i8039_irq_w )
+WRITE8_MEMBER(gyruss_state::gyruss_i8039_irq_w)
 {
-	gyruss_state *state = space->machine().driver_data<gyruss_state>();
-	device_set_input_line(state->m_audiocpu_2, 0, ASSERT_LINE);
+	device_set_input_line(m_audiocpu_2, 0, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( master_nmi_mask_w )
+WRITE8_MEMBER(gyruss_state::master_nmi_mask_w)
 {
-	gyruss_state *state = space->machine().driver_data<gyruss_state>();
 
-	state->m_master_nmi_mask = data & 1;
+	m_master_nmi_mask = data & 1;
 }
 
-static WRITE8_HANDLER( slave_irq_mask_w )
+WRITE8_MEMBER(gyruss_state::slave_irq_mask_w)
 {
-	gyruss_state *state = space->machine().driver_data<gyruss_state>();
 
-	state->m_slave_irq_mask = data & 1;
+	m_slave_irq_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
@@ -165,18 +160,18 @@ static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x9000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW2") AM_WRITENOP	/* watchdog reset */
-	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(gyruss_sh_irqtrigger_w)
+	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("SYSTEM") AM_WRITE(gyruss_sh_irqtrigger_w)
 	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("P1")
 	AM_RANGE(0xc0c0, 0xc0c0) AM_READ_PORT("P2")
 	AM_RANGE(0xc0e0, 0xc0e0) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0xc180, 0xc180) AM_WRITE_LEGACY(master_nmi_mask_w)
+	AM_RANGE(0xc180, 0xc180) AM_WRITE(master_nmi_mask_w)
 	AM_RANGE(0xc185, 0xc185) AM_WRITEONLY AM_BASE(m_flipscreen)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_cpu2_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x0000) AM_READ_LEGACY(gyruss_scanline_r)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(slave_irq_mask_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(slave_irq_mask_w)
 	AM_RANGE(0x4000, 0x403f) AM_RAM
 	AM_RANGE(0x4040, 0x40ff) AM_RAM_WRITE_LEGACY(gyruss_spriteram_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x4100, 0x47ff) AM_RAM
@@ -207,7 +202,7 @@ static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("ay5", ay8910_address_w)
 	AM_RANGE(0x11, 0x11) AM_DEVREAD_LEGACY("ay5", ay8910_r)
 	AM_RANGE(0x12, 0x12) AM_DEVWRITE_LEGACY("ay5", ay8910_data_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(gyruss_i8039_irq_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE(gyruss_i8039_irq_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE_LEGACY(soundlatch2_w)
 ADDRESS_MAP_END
 
@@ -218,7 +213,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_cpu2_io_map, AS_IO, 8, gyruss_state )
 	AM_RANGE(0x00, 0xff) AM_READ_LEGACY(soundlatch2_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("discrete", gyruss_dac_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE_LEGACY(gyruss_irq_clear_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(gyruss_irq_clear_w)
 ADDRESS_MAP_END
 
 

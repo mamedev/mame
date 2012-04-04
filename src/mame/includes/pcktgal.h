@@ -8,6 +8,10 @@ public:
 	int m_toggle;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(pcktgal_bank_w);
+	DECLARE_WRITE8_MEMBER(pcktgal_sound_bank_w);
+	DECLARE_WRITE8_MEMBER(pcktgal_sound_w);
+	DECLARE_WRITE8_MEMBER(pcktgal_adpcm_data_w);
 };
 
 

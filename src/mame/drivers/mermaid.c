@@ -122,26 +122,23 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 /* Read/Write Handlers */
 
-static WRITE8_HANDLER( mermaid_ay8910_write_port_w )
+WRITE8_MEMBER(mermaid_state::mermaid_ay8910_write_port_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	if (state->m_ay8910_enable[0]) ay8910_data_w(state->m_ay1, offset, data);
-	if (state->m_ay8910_enable[1]) ay8910_data_w(state->m_ay2, offset, data);
+	if (m_ay8910_enable[0]) ay8910_data_w(m_ay1, offset, data);
+	if (m_ay8910_enable[1]) ay8910_data_w(m_ay2, offset, data);
 }
 
-static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
+WRITE8_MEMBER(mermaid_state::mermaid_ay8910_control_port_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	if (state->m_ay8910_enable[0]) ay8910_address_w(state->m_ay1, offset, data);
-	if (state->m_ay8910_enable[1]) ay8910_address_w(state->m_ay2, offset, data);
+	if (m_ay8910_enable[0]) ay8910_address_w(m_ay1, offset, data);
+	if (m_ay8910_enable[1]) ay8910_address_w(m_ay2, offset, data);
 }
 
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(mermaid_state::nmi_mask_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 /* Memory Map */
@@ -160,7 +157,7 @@ static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8, mermaid_state )
 	AM_RANGE(0xe002, 0xe004) AM_WRITENOP // ???
 	AM_RANGE(0xe005, 0xe005) AM_WRITE_LEGACY(mermaid_flip_screen_x_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE_LEGACY(mermaid_flip_screen_y_w)
-	AM_RANGE(0xe007, 0xe007) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xe007, 0xe007) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("P1") AM_WRITENOP // ???
 	AM_RANGE(0xe801, 0xe801) AM_WRITENOP	// ???
 	AM_RANGE(0xe802, 0xe802) AM_WRITENOP	// ???
@@ -171,43 +168,40 @@ static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8, mermaid_state )
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P2")
 	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(mermaid_collision_r)
 	AM_RANGE(0xf802, 0xf802) AM_WRITENOP	// ???
-	AM_RANGE(0xf806, 0xf806) AM_WRITE_LEGACY(mermaid_ay8910_write_port_w)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE_LEGACY(mermaid_ay8910_control_port_w)
+	AM_RANGE(0xf806, 0xf806) AM_WRITE(mermaid_ay8910_write_port_w)
+	AM_RANGE(0xf807, 0xf807) AM_WRITE(mermaid_ay8910_control_port_w)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( rougien_sample_rom_lo_w )
+WRITE8_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
-	state->m_adpcm_rom_sel = (data & 1) | (state->m_adpcm_rom_sel & 2);
+	m_adpcm_rom_sel = (data & 1) | (m_adpcm_rom_sel & 2);
 }
 
-static WRITE8_HANDLER( rougien_sample_rom_hi_w )
+WRITE8_MEMBER(mermaid_state::rougien_sample_rom_hi_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
-	state->m_adpcm_rom_sel = ((data & 1)<<1) | (state->m_adpcm_rom_sel & 1);
+	m_adpcm_rom_sel = ((data & 1)<<1) | (m_adpcm_rom_sel & 1);
 }
 
-static WRITE8_HANDLER( rougien_sample_playback_w )
+WRITE8_MEMBER(mermaid_state::rougien_sample_playback_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
-	if((state->m_adpcm_play_reg & 1) && ((data & 1) == 0))
+	if((m_adpcm_play_reg & 1) && ((data & 1) == 0))
 	{
-		state->m_adpcm_pos = state->m_adpcm_rom_sel*0x1000;
-		state->m_adpcm_end = state->m_adpcm_pos+0x1000;
-		state->m_adpcm_idle = 0;
-		msm5205_reset_w(space->machine().device("adpcm"), 0);
+		m_adpcm_pos = m_adpcm_rom_sel*0x1000;
+		m_adpcm_end = m_adpcm_pos+0x1000;
+		m_adpcm_idle = 0;
+		msm5205_reset_w(machine().device("adpcm"), 0);
 	}
 
-	state->m_adpcm_play_reg = data & 1;
+	m_adpcm_play_reg = data & 1;
 }
 
 static ADDRESS_MAP_START( rougien_map, AS_PROGRAM, 8, mermaid_state )
-	AM_RANGE(0xe002, 0xe002) AM_WRITE_LEGACY(rougien_sample_playback_w)
-	AM_RANGE(0xe802, 0xe802) AM_WRITE_LEGACY(rougien_sample_rom_hi_w)
-	AM_RANGE(0xe803, 0xe803) AM_WRITE_LEGACY(rougien_sample_rom_lo_w)
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(rougien_sample_playback_w)
+	AM_RANGE(0xe802, 0xe802) AM_WRITE(rougien_sample_rom_hi_w)
+	AM_RANGE(0xe803, 0xe803) AM_WRITE(rougien_sample_rom_lo_w)
 	AM_IMPORT_FROM( mermaid_map )
 ADDRESS_MAP_END
 

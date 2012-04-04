@@ -32,6 +32,10 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_sn_1;
 	device_t *m_sn_2;
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(pinbo_sound_command_w);
+	DECLARE_READ8_MEMBER(sound_status_r);
+	DECLARE_WRITE8_MEMBER(sound_select_w);
 };
 
 

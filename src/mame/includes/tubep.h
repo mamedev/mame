@@ -36,6 +36,18 @@ public:
 	UINT8 m_ls175_e8;
 	UINT8 m_ls377_data;
 	UINT32 m_page;
+	DECLARE_WRITE8_MEMBER(tubep_LS259_w);
+	DECLARE_WRITE8_MEMBER(main_cpu_irq_line_clear_w);
+	DECLARE_WRITE8_MEMBER(tubep_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(second_cpu_irq_line_clear_w);
+	DECLARE_READ8_MEMBER(tubep_soundlatch_r);
+	DECLARE_READ8_MEMBER(tubep_sound_irq_ack);
+	DECLARE_WRITE8_MEMBER(tubep_sound_unknown);
+	DECLARE_WRITE8_MEMBER(rjammer_LS259_w);
+	DECLARE_WRITE8_MEMBER(rjammer_soundlatch_w);
+	DECLARE_READ8_MEMBER(rjammer_soundlatch_r);
+	DECLARE_WRITE8_MEMBER(rjammer_voice_input_w);
+	DECLARE_WRITE8_MEMBER(rjammer_voice_intensity_control_w);
 };
 
 

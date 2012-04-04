@@ -37,11 +37,10 @@ static TIMER_DEVICE_CALLBACK( ironhors_irq )
 	}
 }
 
-static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
+WRITE8_MEMBER(ironhors_state::ironhors_sh_irqtrigger_w)
 {
-	ironhors_state *state = space->machine().driver_data<ironhors_state>();
 
-	device_set_input_line_and_vector(state->m_soundcpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_soundcpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( ironhors_filter_w )
@@ -66,7 +65,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0040, 0x005f) AM_RAM
 	AM_RANGE(0x0060, 0x00df) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW3") AM_WRITE_LEGACY(ironhors_sh_irqtrigger_w)
+	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW3") AM_WRITE(ironhors_sh_irqtrigger_w)
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(ironhors_palettebank_w)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(ironhors_flipscreen_w)
 	AM_RANGE(0x0b01, 0x0b01) AM_READ_PORT("P2")
@@ -105,7 +104,7 @@ static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0040, 0x005f) AM_RAM
 	AM_RANGE(0x0060, 0x00ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x0900, 0x0900) /*AM_READ_PORT("DSW3") */AM_WRITE_LEGACY(ironhors_sh_irqtrigger_w)
+	AM_RANGE(0x0900, 0x0900) /*AM_READ_PORT("DSW3") */AM_WRITE(ironhors_sh_irqtrigger_w)
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW2") //AM_WRITE_LEGACY(ironhors_palettebank_w)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(ironhors_flipscreen_w)
 	AM_RANGE(0x0b01, 0x0b01) AM_READ_PORT("DSW2") //AM_WRITE_LEGACY(ironhors_palettebank_w)
@@ -114,7 +113,7 @@ static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8, ironhors_state )
 
 
 
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(ironhors_sh_irqtrigger_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(ironhors_sh_irqtrigger_w)
 	AM_RANGE(0x1a00, 0x1a00) AM_RAM AM_BASE(m_interrupt_enable)
 	AM_RANGE(0x1a01, 0x1a01) AM_RAM_WRITE_LEGACY(ironhors_charbank_w)
 	AM_RANGE(0x1a02, 0x1a02) AM_WRITE_LEGACY(ironhors_palettebank_w)

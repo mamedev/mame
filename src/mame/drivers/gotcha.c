@@ -65,7 +65,7 @@ Notes:
 #include "includes/gotcha.h"
 
 
-static WRITE16_HANDLER( gotcha_lamps_w )
+WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
 {
 #if 0
 	popmessage("%c%c%c%c %c%c%c%c %c%c%c%c",
@@ -98,7 +98,7 @@ static WRITE16_DEVICE_HANDLER( gotcha_oki_bank_w )
 static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(soundlatch_word_w)
-	AM_RANGE(0x100002, 0x100003) AM_WRITE_LEGACY(gotcha_lamps_w)
+	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
 	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE_LEGACY("oki", gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)

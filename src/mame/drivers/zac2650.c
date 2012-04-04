@@ -15,14 +15,14 @@
 #include "tinv2650.lh"
 #include "includes/zac2650.h"
 
-static WRITE8_HANDLER( tinvader_sound_w );
+
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zac2650_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE_LEGACY(tinvader_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x1c00, 0x1cff) AM_RAM
 	AM_RANGE(0x1d00, 0x1dff) AM_RAM
-	AM_RANGE(0x1e80, 0x1e80) AM_READWRITE_LEGACY(tinvader_port_0_r, tinvader_sound_w)
+	AM_RANGE(0x1e80, 0x1e80) AM_READ_LEGACY(tinvader_port_0_r) AM_WRITE(tinvader_sound_w)
 	AM_RANGE(0x1e81, 0x1e81) AM_READ_PORT("1E81")
     AM_RANGE(0x1e82, 0x1e82) AM_READ_PORT("1E82")
 	AM_RANGE(0x1e85, 0x1e85) AM_READ_PORT("1E85")					/* Dodgem Only */
@@ -259,9 +259,9 @@ static MACHINE_CONFIG_START( tinvader, zac2650_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static WRITE8_HANDLER( tinvader_sound_w )
+WRITE8_MEMBER(zac2650_state::tinvader_sound_w)
 {
-    /* sounds are NOT the same as space invaders */
+    /* sounds are NOT the same as &space invaders */
 
 	logerror("Register %x = Data %d\n",data & 0xfe,data & 0x01);
 

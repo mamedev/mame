@@ -14,15 +14,14 @@ Dip locations added from dip listing at crazykong.com
 #include "includes/citycon.h"
 
 
-static READ8_HANDLER( citycon_in_r )
+READ8_MEMBER(citycon_state::citycon_in_r)
 {
-	return input_port_read(space->machine(), flip_screen_get(space->machine()) ? "P2" : "P1");
+	return input_port_read(machine(), flip_screen_get(machine()) ? "P2" : "P1");
 }
 
-static READ8_HANDLER( citycon_irq_ack_r )
+READ8_MEMBER(citycon_state::citycon_irq_ack_r)
 {
-	citycon_state *state = space->machine().driver_data<citycon_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -33,11 +32,11 @@ static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE_LEGACY(citycon_linecolor_w) AM_BASE(m_linecolor)
 	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_NOP //0x2900-0x2fff cleared at post but unused
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(citycon_in_r, citycon_background_w)	/* player 1 & 2 inputs multiplexed */
+	AM_RANGE(0x3000, 0x3000) AM_READ(citycon_in_r) AM_WRITE_LEGACY(citycon_background_w)	/* player 1 & 2 inputs multiplexed */
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(soundlatch2_w)
 	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_BASE(m_scroll)
-	AM_RANGE(0x3007, 0x3007) AM_READ_LEGACY(citycon_irq_ack_r)
+	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
 	AM_RANGE(0x3800, 0x3cff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END

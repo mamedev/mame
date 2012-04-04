@@ -128,9 +128,9 @@ static WRITE8_DEVICE_HANDLER ( unknown_port_2_w )
 	//logerror("%s: write to unknow port 2: 0x%02x\n", device->machine().describe_context(), data);
 }
 
-static WRITE8_HANDLER ( coinlock_w )
+WRITE8_MEMBER(chaknpop_state::coinlock_w)
 {
-	logerror("%04x: coin lock %sable\n", cpu_get_pc(&space->device()), data ? "dis" : "en");
+	logerror("%04x: coin lock %sable\n", cpu_get_pc(&space.device()), data ? "dis" : "en");
 }
 
 
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( chaknpop_map, AS_PROGRAM, 8, chaknpop_state )
 	AM_RANGE(0x880a, 0x880a) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x880b, 0x880b) AM_READ_PORT("P2")
 	AM_RANGE(0x880c, 0x880c) AM_READWRITE_LEGACY(chaknpop_gfxmode_r, chaknpop_gfxmode_w)
-	AM_RANGE(0x880d, 0x880d) AM_WRITE_LEGACY(coinlock_w)												// coin lock out
+	AM_RANGE(0x880d, 0x880d) AM_WRITE(coinlock_w)												// coin lock out
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(chaknpop_txram_w) AM_BASE(m_tx_ram)			// TX tilemap
 	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE_LEGACY(chaknpop_attrram_w) AM_BASE(m_attr_ram)		// Color attribute
 	AM_RANGE(0x9840, 0x98ff) AM_RAM AM_BASE_SIZE(m_spr_ram, m_spr_ram_size)	// sprite

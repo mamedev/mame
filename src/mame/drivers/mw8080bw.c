@@ -165,38 +165,35 @@
  *
  *************************************/
 
-static READ8_HANDLER( mw8080bw_shift_result_rev_r )
+READ8_MEMBER(mw8080bw_state::mw8080bw_shift_result_rev_r)
 {
-	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
-	UINT8 ret = mb14241_shift_result_r(state->m_mb14241, 0);
+	UINT8 ret = mb14241_shift_result_r(m_mb14241, 0);
 
 	return BITSWAP8(ret,0,1,2,3,4,5,6,7);
 }
 
 
-static READ8_HANDLER( mw8080bw_reversable_shift_result_r )
+READ8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_result_r)
 {
-	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
 	UINT8 ret;
 
-	if (state->m_rev_shift_res)
+	if (m_rev_shift_res)
 	{
 		ret = mw8080bw_shift_result_rev_r(space, 0);
 	}
 	else
 	{
-		ret = mb14241_shift_result_r(state->m_mb14241, 0);
+		ret = mb14241_shift_result_r(m_mb14241, 0);
 	}
 
 	return ret;
 }
 
-static WRITE8_HANDLER( mw8080bw_reversable_shift_count_w)
+WRITE8_MEMBER(mw8080bw_state::mw8080bw_reversable_shift_count_w)
 {
-	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
-	mb14241_shift_count_w(state->m_mb14241, offset, data);
+	mb14241_shift_count_w(m_mb14241, offset, data);
 
-	state->m_rev_shift_res = data & 0x08;
+	m_rev_shift_res = data & 0x08;
 }
 
 
@@ -248,7 +245,7 @@ MACHINE_CONFIG_END
 #define SEAWOLF_ERASE_DIP_PORT_TAG	("ERASEDIP")
 
 
-static WRITE8_HANDLER( seawolf_explosion_lamp_w )
+WRITE8_MEMBER(mw8080bw_state::seawolf_explosion_lamp_w)
 {
 /*  D0-D3 are column drivers and D4-D7 are row drivers.
     The following table shows values that light up individual lamps.
@@ -300,7 +297,7 @@ static WRITE8_HANDLER( seawolf_explosion_lamp_w )
 }
 
 
-static WRITE8_HANDLER( seawolf_periscope_lamp_w )
+WRITE8_MEMBER(mw8080bw_state::seawolf_periscope_lamp_w)
 {
 	/* the schematics and the connecting diagrams show the
        torpedo light order differently, but this order is
@@ -325,13 +322,13 @@ static CUSTOM_INPUT( seawolf_erase_input_r )
 
 static ADDRESS_MAP_START( seawolf_io_map, AS_IO, 8, mw8080bw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_LEGACY(mw8080bw_shift_result_rev_r)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN1")
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
 
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(seawolf_explosion_lamp_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(seawolf_periscope_lamp_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(seawolf_explosion_lamp_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(seawolf_periscope_lamp_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_count_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(seawolf_audio_w)
@@ -421,17 +418,16 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static WRITE8_HANDLER( gunfight_io_w )
+WRITE8_MEMBER(mw8080bw_state::gunfight_io_w)
 {
-	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
 	if (offset & 0x01)
-		gunfight_audio_w(space, 0, data);
+		gunfight_audio_w(&space, 0, data);
 
 	if (offset & 0x02)
-		mb14241_shift_count_w(state->m_mb14241, 0, data);
+		mb14241_shift_count_w(m_mb14241, 0, data);
 
 	if (offset & 0x04)
-		mb14241_shift_data_w(state->m_mb14241, 0, data);
+		mb14241_shift_data_w(m_mb14241, 0, data);
 
 }
 
@@ -444,7 +440,7 @@ static ADDRESS_MAP_START( gunfight_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
 
 	/* no decoder, just 3 AND gates */
-	AM_RANGE(0x00, 0x07) AM_WRITE_LEGACY(gunfight_io_w)
+	AM_RANGE(0x00, 0x07) AM_WRITE(gunfight_io_w)
 ADDRESS_MAP_END
 
 
@@ -617,18 +613,17 @@ static CUSTOM_INPUT( tornbase_score_input_r )
 }
 
 
-static WRITE8_HANDLER( tornbase_io_w )
+WRITE8_MEMBER(mw8080bw_state::tornbase_io_w)
 {
-	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
 
 	if (offset & 0x01)
-		tornbase_audio_w(space->machine().device("discrete"), 0, data);
+		tornbase_audio_w(machine().device("discrete"), 0, data);
 
 	if (offset & 0x02)
-		mb14241_shift_count_w(state->m_mb14241, 0, data);
+		mb14241_shift_count_w(m_mb14241, 0, data);
 
 	if (offset & 0x04)
-		mb14241_shift_data_w(state->m_mb14241, 0, data);
+		mb14241_shift_data_w(m_mb14241, 0, data);
 }
 
 
@@ -640,7 +635,7 @@ static ADDRESS_MAP_START( tornbase_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
 
 	/* no decoder, just 3 AND gates */
-	AM_RANGE(0x00, 0x07) AM_WRITE_LEGACY(tornbase_io_w)
+	AM_RANGE(0x00, 0x07) AM_WRITE(tornbase_io_w)
 ADDRESS_MAP_END
 
 
@@ -903,15 +898,15 @@ static MACHINE_START( maze )
 }
 
 
-static WRITE8_HANDLER( maze_coin_counter_w )
+WRITE8_MEMBER(mw8080bw_state::maze_coin_counter_w)
 {
 	/* the data is not used, just pulse the counter */
-	coin_counter_w(space->machine(), 0, 0);
-	coin_counter_w(space->machine(), 0, 1);
+	coin_counter_w(machine(), 0, 0);
+	coin_counter_w(machine(), 0, 1);
 }
 
 
-static WRITE8_HANDLER( maze_io_w )
+WRITE8_MEMBER(mw8080bw_state::maze_io_w)
 {
 	if (offset & 0x01)  maze_coin_counter_w(space, 0, data);
 
@@ -925,7 +920,7 @@ static ADDRESS_MAP_START( maze_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 
 	/* no decoder, just a couple of AND gates */
-	AM_RANGE(0x00, 0x03) AM_WRITE_LEGACY(maze_io_w)
+	AM_RANGE(0x00, 0x03) AM_WRITE(maze_io_w)
 ADDRESS_MAP_END
 
 
@@ -994,9 +989,9 @@ static ADDRESS_MAP_START( boothill_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ_LEGACY(mw8080bw_reversable_shift_result_r)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ(mw8080bw_reversable_shift_result_r)
 
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(mw8080bw_reversable_shift_count_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(mw8080bw_reversable_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("discrete", boothill_audio_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(watchdog_reset_w)
@@ -1073,11 +1068,10 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static WRITE8_HANDLER( checkmat_io_w )
+WRITE8_MEMBER(mw8080bw_state::checkmat_io_w)
 {
-	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
 
-	if (offset & 0x01)  checkmat_audio_w(state->m_discrete, 0, data);
+	if (offset & 0x01)  checkmat_audio_w(m_discrete, 0, data);
 
 	if (offset & 0x02)  watchdog_reset_w(space, 0, data);
 }
@@ -1091,7 +1085,7 @@ static ADDRESS_MAP_START( checkmat_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN3")
 
 	/* no decoder, just a couple of AND gates */
-	AM_RANGE(0x00, 0x03) AM_WRITE_LEGACY(checkmat_io_w)
+	AM_RANGE(0x00, 0x03) AM_WRITE(checkmat_io_w)
 ADDRESS_MAP_END
 
 
@@ -1221,7 +1215,7 @@ static CUSTOM_INPUT( desertgu_dip_sw_0_1_r )
 
 static ADDRESS_MAP_START( desertgu_io_map, AS_IO, 8, mw8080bw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_LEGACY(mw8080bw_shift_result_rev_r)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN1")
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
@@ -1524,9 +1518,9 @@ static ADDRESS_MAP_START( gmissile_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ_LEGACY(mw8080bw_reversable_shift_result_r)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ(mw8080bw_reversable_shift_result_r)
 
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(mw8080bw_reversable_shift_count_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(mw8080bw_reversable_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(gmissile_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(watchdog_reset_w)
@@ -1620,9 +1614,9 @@ static ADDRESS_MAP_START( m4_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ_LEGACY(mw8080bw_reversable_shift_result_r)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ(mw8080bw_reversable_shift_result_r)
 
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(mw8080bw_reversable_shift_count_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(mw8080bw_reversable_shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(m4_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(watchdog_reset_w)
@@ -1966,7 +1960,7 @@ static ADDRESS_MAP_START( shuffle_io_map, AS_IO, 8, mw8080bw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xf)	/* yes, 4, and no mirroring on the read handlers */
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(mw8080bw_shift_result_rev_r)
+	AM_RANGE(0x03, 0x03) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN1")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN2")
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN3")
@@ -2173,35 +2167,34 @@ UINT8 spcenctr_get_trench_slope( *running_machine &machine , UINT8 addr )
 }
 #endif
 
-static WRITE8_HANDLER( spcenctr_io_w )
+WRITE8_MEMBER(mw8080bw_state::spcenctr_io_w)
 {												/* A7 A6 A5 A4 A3 A2 A1 A0 */
-	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
 
 	if ((offset & 0x07) == 0x02)
 		watchdog_reset_w(space, 0, data);		/*  -  -  -  -  -  0  1  0 */
 
 	else if ((offset & 0x5f) == 0x01)
-		spcenctr_audio_1_w(state->m_discrete, 0, data);	/*  -  0  -  0  0  0  0  1 */
+		spcenctr_audio_1_w(m_discrete, 0, data);	/*  -  0  -  0  0  0  0  1 */
 
 	else if ((offset & 0x5f) == 0x09)
-		spcenctr_audio_2_w(state->m_discrete, 0, data);	/*  -  0  -  0  1  0  0  1 */
+		spcenctr_audio_2_w(m_discrete, 0, data);	/*  -  0  -  0  1  0  0  1 */
 
 	else if ((offset & 0x5f) == 0x11)
-		spcenctr_audio_3_w(state->m_discrete, 0, data);	/*  -  0  -  1  0  0  0  1 */
+		spcenctr_audio_3_w(m_discrete, 0, data);	/*  -  0  -  1  0  0  0  1 */
 
 	else if ((offset & 0x07) == 0x03)
 	{											/*  -  -  -  -  -  0  1  1 */
 		UINT8 addr = ((offset & 0xc0) >> 4) | ((offset & 0x18) >> 3);
-		state->m_spcenctr_trench_slope[addr] = data;
+		m_spcenctr_trench_slope[addr] = data;
 	}
 	else if ((offset & 0x07) == 0x04)
-		state->m_spcenctr_trench_center = data;			/*  -  -  -  -  -  1  0  0 */
+		m_spcenctr_trench_center = data;			/*  -  -  -  -  -  1  0  0 */
 
 	else if ((offset & 0x07) == 0x07)
-		state->m_spcenctr_trench_width = data;			/*  -  -  -  -  -  1  1  1 */
+		m_spcenctr_trench_width = data;			/*  -  -  -  -  -  1  1  1 */
 
 	else
-		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%04x:  Unmapped I/O port write to %02x = %02x\n", cpu_get_pc(&space.device()), offset, data);
 }
 
 
@@ -2213,7 +2206,7 @@ static ADDRESS_MAP_START( spcenctr_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0xfc) AM_READNOP
 
 	/* complicated addressing logic */
-	AM_RANGE(0x00, 0xff) AM_WRITE_LEGACY(spcenctr_io_w)
+	AM_RANGE(0x00, 0xff) AM_WRITE(spcenctr_io_w)
 ADDRESS_MAP_END
 
 
@@ -2314,7 +2307,7 @@ static MACHINE_START( phantom2 )
 
 static ADDRESS_MAP_START( phantom2_io_map, AS_IO, 8, mw8080bw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_LEGACY(mw8080bw_shift_result_rev_r)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN1")
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)
@@ -2392,17 +2385,16 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static READ8_HANDLER( bowler_shift_result_r )
+READ8_MEMBER(mw8080bw_state::bowler_shift_result_r)
 {
 	/* ZV - not too sure why this is needed, I don't see
        anything unusual on the schematics that would cause
        the bits to flip */
-	mw8080bw_state *state = space->machine().driver_data<mw8080bw_state>();
 
-	return ~mb14241_shift_result_r(state->m_mb14241, 0);
+	return ~mb14241_shift_result_r(m_mb14241, 0);
 }
 
-static WRITE8_HANDLER( bowler_lights_1_w )
+WRITE8_MEMBER(mw8080bw_state::bowler_lights_1_w)
 {
 	output_set_value("200_LEFT_LIGHT",  (data >> 0) & 0x01);
 
@@ -2423,7 +2415,7 @@ static WRITE8_HANDLER( bowler_lights_1_w )
 }
 
 
-static WRITE8_HANDLER( bowler_lights_2_w )
+WRITE8_MEMBER(mw8080bw_state::bowler_lights_2_w)
 {
 	output_set_value("REGULATION_GAME_LIGHT", ( data >> 0) & 0x01);
 	output_set_value("FLASH_GAME_LIGHT",      (~data >> 0) & 0x01);
@@ -2440,9 +2432,9 @@ static WRITE8_HANDLER( bowler_lights_2_w )
 
 static ADDRESS_MAP_START( bowler_io_map, AS_IO, 8, mw8080bw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xf)  /* no masking on the reads, all 4 bits are decoded */
-	AM_RANGE(0x01, 0x01) AM_READ_LEGACY(bowler_shift_result_r)
+	AM_RANGE(0x01, 0x01) AM_READ(bowler_shift_result_r)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(mw8080bw_shift_result_rev_r)
+	AM_RANGE(0x03, 0x03) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN1")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN2")
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("IN3")
@@ -2452,11 +2444,11 @@ static ADDRESS_MAP_START( bowler_io_map, AS_IO, 8, mw8080bw_state )
 	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("discrete", bowler_audio_1_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(bowler_audio_2_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(bowler_lights_1_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(bowler_lights_1_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(bowler_audio_3_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(bowler_audio_4_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(bowler_audio_5_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE_LEGACY(bowler_lights_2_w)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE(bowler_lights_2_w)
 	AM_RANGE(0x0f, 0x0f) AM_WRITE_LEGACY(bowler_audio_6_w)
 ADDRESS_MAP_END
 
@@ -2762,7 +2754,7 @@ static CUSTOM_INPUT( blueshrk_coin_input_r )
 
 static ADDRESS_MAP_START( blueshrk_io_map, AS_IO, 8, mw8080bw_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_LEGACY(mw8080bw_shift_result_rev_r)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ(mw8080bw_shift_result_rev_r)
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN1")
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_DEVREAD_LEGACY("mb14241", mb14241_shift_result_r)

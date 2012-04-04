@@ -35,6 +35,11 @@ public:
 	int m_supxevs_prot_index;
 	int m_security_counter;
 	int m_ret;
+	DECLARE_WRITE8_MEMBER(sprite_dma_0_w);
+	DECLARE_WRITE8_MEMBER(sprite_dma_1_w);
+	DECLARE_WRITE8_MEMBER(vsnes_coin_counter_w);
+	DECLARE_READ8_MEMBER(vsnes_coin_counter_r);
+	DECLARE_WRITE8_MEMBER(vsnes_coin_counter_1_w);
 };
 
 

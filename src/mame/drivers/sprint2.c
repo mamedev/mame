@@ -118,103 +118,94 @@ static INTERRUPT_GEN( sprint2 )
 }
 
 
-static READ8_HANDLER( sprint2_wram_r )
+READ8_MEMBER(sprint2_state::sprint2_wram_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	return state->m_video_ram[0x380 + offset % 0x80];
+	return m_video_ram[0x380 + offset % 0x80];
 }
 
 
-static READ8_HANDLER( sprint2_dip_r )
+READ8_MEMBER(sprint2_state::sprint2_dip_r)
 {
-	return (input_port_read(space->machine(), "DSW") << (2 * ((offset & 3) ^ 3))) & 0xc0;
+	return (input_port_read(machine(), "DSW") << (2 * ((offset & 3) ^ 3))) & 0xc0;
 }
 
 
-static READ8_HANDLER( sprint2_input_A_r )
+READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	UINT8 val = input_port_read(space->machine(), "INA");
+	UINT8 val = input_port_read(machine(), "INA");
 
-	if (GAME_IS_SPRINT2)
+	if (m_game == 2)// (GAME_IS_SPRINT2)
 	{
-		if (state->m_gear[0] == 1) val &= ~0x01;
-		if (state->m_gear[1] == 1) val &= ~0x02;
-		if (state->m_gear[0] == 2) val &= ~0x04;
-		if (state->m_gear[1] == 2) val &= ~0x08;
-		if (state->m_gear[0] == 3) val &= ~0x10;
-		if (state->m_gear[1] == 3) val &= ~0x20;
+		if (m_gear[0] == 1) val &= ~0x01;
+		if (m_gear[1] == 1) val &= ~0x02;
+		if (m_gear[0] == 2) val &= ~0x04;
+		if (m_gear[1] == 2) val &= ~0x08;
+		if (m_gear[0] == 3) val &= ~0x10;
+		if (m_gear[1] == 3) val &= ~0x20;
 	}
 
 	return (val << (offset ^ 7)) & 0x80;
 }
 
 
-static READ8_HANDLER( sprint2_input_B_r )
+READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	UINT8 val = input_port_read(space->machine(), "INB");
+	UINT8 val = input_port_read(machine(), "INB");
 
-	if (GAME_IS_SPRINT1)
+	if (m_game == 1) // (GAME_IS_SPRINT1)
 	{
-		if (state->m_gear[0] == 1) val &= ~0x01;
-		if (state->m_gear[0] == 2) val &= ~0x02;
-		if (state->m_gear[0] == 3) val &= ~0x04;
+		if (m_gear[0] == 1) val &= ~0x01;
+		if (m_gear[0] == 2) val &= ~0x02;
+		if (m_gear[0] == 3) val &= ~0x04;
 	}
 
 	return (val << (offset ^ 7)) & 0x80;
 }
 
 
-static READ8_HANDLER( sprint2_sync_r )
+READ8_MEMBER(sprint2_state::sprint2_sync_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
 	UINT8 val = 0;
 
-	if (state->m_attract != 0)
+	if (m_attract != 0)
 		val |= 0x10;
 
-	if (space->machine().primary_screen->vpos() == 261)
+	if (machine().primary_screen->vpos() == 261)
 		val |= 0x20; /* VRESET */
 
-	if (space->machine().primary_screen->vpos() >= 224)
+	if (machine().primary_screen->vpos() >= 224)
 		val |= 0x40; /* VBLANK */
 
-	if (space->machine().primary_screen->vpos() >= 131)
+	if (machine().primary_screen->vpos() >= 131)
 		val |= 0x80; /* 60 Hz? */
 
 	return val;
 }
 
 
-static READ8_HANDLER( sprint2_steering1_r )
+READ8_MEMBER(sprint2_state::sprint2_steering1_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	return state->m_steering[0];
+	return m_steering[0];
 }
-static READ8_HANDLER( sprint2_steering2_r )
+READ8_MEMBER(sprint2_state::sprint2_steering2_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	return state->m_steering[1];
+	return m_steering[1];
 }
 
 
-static WRITE8_HANDLER( sprint2_steering_reset1_w )
+WRITE8_MEMBER(sprint2_state::sprint2_steering_reset1_w)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->m_steering[0] |= 0x80;
+	m_steering[0] |= 0x80;
 }
-static WRITE8_HANDLER( sprint2_steering_reset2_w )
+WRITE8_MEMBER(sprint2_state::sprint2_steering_reset2_w)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->m_steering[1] |= 0x80;
+	m_steering[1] |= 0x80;
 }
 
 
-static WRITE8_HANDLER( sprint2_wram_w )
+WRITE8_MEMBER(sprint2_state::sprint2_wram_w)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->m_video_ram[0x380 + offset % 0x80] = data;
+	m_video_ram[0x380 + offset % 0x80] = data;
 }
 
 
@@ -246,37 +237,37 @@ static WRITE8_DEVICE_HANDLER( sprint2_skid2_w )
 }
 
 
-static WRITE8_HANDLER( sprint2_lamp1_w )
+WRITE8_MEMBER(sprint2_state::sprint2_lamp1_w)
 {
-	set_led_status(space->machine(), 0, offset & 1);
+	set_led_status(machine(), 0, offset & 1);
 }
-static WRITE8_HANDLER( sprint2_lamp2_w )
+WRITE8_MEMBER(sprint2_state::sprint2_lamp2_w)
 {
-	set_led_status(space->machine(), 1, offset & 1);
+	set_led_status(machine(), 1, offset & 1);
 }
 
 
 static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
-	AM_RANGE(0x0000, 0x03ff) AM_READWRITE_LEGACY(sprint2_wram_r,sprint2_wram_w)
+	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(sprint2_wram_r,sprint2_wram_w)
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE_LEGACY(sprint2_video_ram_w) AM_BASE(m_video_ram)
-	AM_RANGE(0x0818, 0x081f) AM_READ_LEGACY(sprint2_input_A_r)
-	AM_RANGE(0x0828, 0x082f) AM_READ_LEGACY(sprint2_input_B_r)
-	AM_RANGE(0x0830, 0x0837) AM_READ_LEGACY(sprint2_dip_r)
+	AM_RANGE(0x0818, 0x081f) AM_READ(sprint2_input_A_r)
+	AM_RANGE(0x0828, 0x082f) AM_READ(sprint2_input_B_r)
+	AM_RANGE(0x0830, 0x0837) AM_READ(sprint2_dip_r)
 	AM_RANGE(0x0840, 0x087f) AM_READ_PORT("COIN")
-	AM_RANGE(0x0880, 0x08bf) AM_READ_LEGACY(sprint2_steering1_r)
-	AM_RANGE(0x08c0, 0x08ff) AM_READ_LEGACY(sprint2_steering2_r)
-	AM_RANGE(0x0c00, 0x0fff) AM_READ_LEGACY(sprint2_sync_r)
+	AM_RANGE(0x0880, 0x08bf) AM_READ(sprint2_steering1_r)
+	AM_RANGE(0x08c0, 0x08ff) AM_READ(sprint2_steering2_r)
+	AM_RANGE(0x0c00, 0x0fff) AM_READ(sprint2_sync_r)
 	AM_RANGE(0x0c00, 0x0c0f) AM_DEVWRITE_LEGACY("discrete", sprint2_attract_w)
 	AM_RANGE(0x0c10, 0x0c1f) AM_DEVWRITE_LEGACY("discrete", sprint2_skid1_w)
 	AM_RANGE(0x0c20, 0x0c2f) AM_DEVWRITE_LEGACY("discrete", sprint2_skid2_w)
-	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE_LEGACY(sprint2_lamp1_w)
-	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE_LEGACY(sprint2_lamp2_w)
+	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(sprint2_lamp1_w)
+	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE(sprint2_lamp2_w)
 	AM_RANGE(0x0c60, 0x0c6f) AM_WRITENOP /* SPARE */
 	AM_RANGE(0x0c80, 0x0cff) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x0d00, 0x0d7f) AM_WRITE_LEGACY(sprint2_collision_reset1_w)
 	AM_RANGE(0x0d80, 0x0dff) AM_WRITE_LEGACY(sprint2_collision_reset2_w)
-	AM_RANGE(0x0e00, 0x0e7f) AM_WRITE_LEGACY(sprint2_steering_reset1_w)
-	AM_RANGE(0x0e80, 0x0eff) AM_WRITE_LEGACY(sprint2_steering_reset2_w)
+	AM_RANGE(0x0e00, 0x0e7f) AM_WRITE(sprint2_steering_reset1_w)
+	AM_RANGE(0x0e80, 0x0eff) AM_WRITE(sprint2_steering_reset2_w)
 	AM_RANGE(0x0f00, 0x0f7f) AM_DEVWRITE_LEGACY("discrete", sprint2_noise_reset_w)
 	AM_RANGE(0x1000, 0x13ff) AM_READ_LEGACY(sprint2_collision1_r)
 	AM_RANGE(0x1400, 0x17ff) AM_READ_LEGACY(sprint2_collision2_r)

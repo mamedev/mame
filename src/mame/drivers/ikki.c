@@ -24,19 +24,18 @@ TODO:
  *
  *************************************/
 
-static READ8_HANDLER( ikki_e000_r )
+READ8_MEMBER(ikki_state::ikki_e000_r)
 {
-	ikki_state *state = space->machine().driver_data<ikki_state>();
 
 /* bit1: interrupt type?, bit0: CPU2 busack? */
 
-	return (state->m_irq_source << 1);
+	return (m_irq_source << 1);
 }
 
-static WRITE8_HANDLER( ikki_coin_counters )
+WRITE8_MEMBER(ikki_state::ikki_coin_counters)
 {
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 }
 
 /*************************************
@@ -50,14 +49,14 @@ static ADDRESS_MAP_START( ikki_cpu1, AS_PROGRAM, 8, ikki_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(ikki_e000_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(ikki_e000_r)
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("P1")
 	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("P2")
 	AM_RANGE(0xe008, 0xe008) AM_WRITE_LEGACY(ikki_scrn_ctrl_w)
-	AM_RANGE(0xe009, 0xe009) AM_WRITE_LEGACY(ikki_coin_counters)
+	AM_RANGE(0xe009, 0xe009) AM_WRITE(ikki_coin_counters)
 	AM_RANGE(0xe00a, 0xe00b) AM_WRITEONLY AM_BASE(m_scroll)
 ADDRESS_MAP_END
 

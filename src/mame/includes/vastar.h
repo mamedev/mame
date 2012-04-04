@@ -22,6 +22,11 @@ public:
 	UINT8 *m_sharedram;
 
 	UINT8 m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(vastar_hold_cpu2_w);
+	DECLARE_READ8_MEMBER(vastar_sharedram_r);
+	DECLARE_WRITE8_MEMBER(vastar_sharedram_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 };
 
 

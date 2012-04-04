@@ -24,6 +24,9 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(fuuki16_vregs_w);
+	DECLARE_WRITE16_MEMBER(fuuki16_sound_command_w);
+	DECLARE_WRITE8_MEMBER(fuuki16_sound_rombank_w);
 };
 
 

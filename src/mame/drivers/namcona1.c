@@ -235,18 +235,16 @@ static NVRAM_HANDLER( namcosna1 )
 	}
 } /* namcosna1_nvram_handler */
 
-static READ16_HANDLER( namcona1_nvram_r )
+READ16_MEMBER(namcona1_state::namcona1_nvram_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	return state->m_nvmem[offset];
+	return m_nvmem[offset];
 } /* namcona1_nvram_r */
 
-static WRITE16_HANDLER( namcona1_nvram_w )
+WRITE16_MEMBER(namcona1_state::namcona1_nvram_w)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
 	if( ACCESSING_BITS_0_7 )
 	{
-		state->m_nvmem[offset] = data&0xff;
+		m_nvmem[offset] = data&0xff;
 	}
 } /* namcona1_nvram_w */
 
@@ -378,7 +376,7 @@ static void simulate_mcu( running_machine &machine )
 /* NA2 hardware sends a special command to the MCU, then tests to
  * see if the proper BIOS version string appears in shared memory.
  */
-static void write_version_info( namcona1_state *state )
+void namcona1_state::write_version_info()
 {
 	static const UINT16 source[0x8] =
 	{ /* "NSA-BIOS ver"... */
@@ -387,7 +385,7 @@ static void write_version_info( namcona1_state *state )
 	int i;
 	for( i=0; i<8; i++ )
 	{
-		state->m_workram[0x1000/2+i] = source[i];
+		m_workram[0x1000/2+i] = source[i];
 	}
 }
 
@@ -400,18 +398,17 @@ static void write_version_info( namcona1_state *state )
  * The secondary purpose of the custom key chip is to act as a random number
  * generator in some games.
  */
-static READ16_HANDLER( custom_key_r )
+READ16_MEMBER(namcona1_state::custom_key_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
 	int old_count;
 
-	old_count = state->m_count;
+	old_count = m_count;
 	do
 	{
-		state->m_count = space->machine().rand();
-	} while( old_count == state->m_count );
+		m_count = machine().rand();
+	} while( old_count == m_count );
 
-	switch( state->m_gametype )
+	switch( m_gametype )
 	{
 	case NAMCO_BKRTMAQ:
 		if( offset==2 ) return 0x015c;
@@ -419,7 +416,7 @@ static READ16_HANDLER( custom_key_r )
 
 	case NAMCO_FA:
 		if( offset==2 ) return 0x015d;
-		if( offset==4 ) return state->m_count;
+		if( offset==4 ) return m_count;
 		break;
 
 	case NAMCO_EXBANIA:
@@ -428,27 +425,27 @@ static READ16_HANDLER( custom_key_r )
 
 	case NAMCO_CGANGPZL:
 		if( offset==1 ) return 0x0164;
-		if( offset==2 ) return state->m_count;
+		if( offset==2 ) return m_count;
 		break;
 
 	case NAMCO_SWCOURT:
 		if( offset==1 ) return 0x0165;
-		if( offset==2 ) return state->m_count;
+		if( offset==2 ) return m_count;
 		break;
 
 	case NAMCO_EMERALDA:
 		if( offset==1 ) return 0x0166;
-		if( offset==2 ) return state->m_count;
+		if( offset==2 ) return m_count;
 		break;
 
 	case NAMCO_NUMANATH:
 		if( offset==1 ) return 0x0167;
-		if( offset==2 ) return state->m_count;
+		if( offset==2 ) return m_count;
 		break;
 
 	case NAMCO_KNCKHEAD:
 		if( offset==1 ) return 0x0168;
-		if( offset==2 ) return state->m_count;
+		if( offset==2 ) return m_count;
 		break;
 
 	case NAMCO_QUIZTOU:
@@ -457,16 +454,16 @@ static READ16_HANDLER( custom_key_r )
 
 	case NAMCO_TINKLPIT:
 		if( offset==7 ) return 0x016f;
-		if( offset==4 ) state->m_keyval = 0;
+		if( offset==4 ) m_keyval = 0;
 		if( offset==3 )
 		{
 			UINT16 res;
-			res = BITSWAP16(state->m_keyval, 22,26,31,23,18,20,16,30,24,21,25,19,17,29,28,27);
+			res = BITSWAP16(m_keyval, 22,26,31,23,18,20,16,30,24,21,25,19,17,29,28,27);
 
-			state->m_keyval >>= 1;
-//          printf("popcount(%08X) = %d\n", state->m_keyval & 0x58000c00, popcount(state->m_keyval & 0x58000c00));
-			if((!state->m_keyval) || (popcount(state->m_keyval & 0x58000c00) & 1))
-				state->m_keyval ^= 0x80000000;
+			m_keyval >>= 1;
+//          printf("popcount(%08X) = %d\n", m_keyval & 0x58000c00, popcount(m_keyval & 0x58000c00));
+			if((!m_keyval) || (popcount(m_keyval & 0x58000c00) & 1))
+				m_keyval ^= 0x80000000;
 
 			return res;
 		}
@@ -474,25 +471,24 @@ static READ16_HANDLER( custom_key_r )
 
 	case NAMCO_XDAY2:
 		if( offset==2 ) return 0x018a;
-		if( offset==3 ) return state->m_count;
+		if( offset==3 ) return m_count;
 		break;
 
 	default:
 		return 0;
 	}
-	return space->machine().rand()&0xffff;
+	return machine().rand()&0xffff;
 } /* custom_key_r */
 
-static WRITE16_HANDLER( custom_key_w )
+WRITE16_MEMBER(namcona1_state::custom_key_w)
 {
 } /* custom_key_w */
 
 /***************************************************************/
 
-static READ16_HANDLER( namcona1_vreg_r )
+READ16_MEMBER(namcona1_state::namcona1_vreg_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	return state->m_vreg[offset];
+	return m_vreg[offset];
 } /* namcona1_vreg_r */
 
 static int transfer_dword( running_machine &machine, UINT32 dest, UINT32 source )
@@ -691,20 +687,19 @@ static void namcona1_blit( running_machine &machine )
 	}
 } /* namcona1_blit */
 
-static WRITE16_HANDLER( namcona1_vreg_w )
+WRITE16_MEMBER(namcona1_state::namcona1_vreg_w)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	COMBINE_DATA( &state->m_vreg[offset] );
+	COMBINE_DATA( &m_vreg[offset] );
 
 	switch( offset )
 	{
 	case 0x18/2:
-		namcona1_blit(space->machine());
+		namcona1_blit(machine());
 		/* see also 0x1e */
 		break;
 
 	case 0x1a/2:
-		state->m_mEnableInterrupts = 1;
+		m_mEnableInterrupts = 1;
 		/* interrupt enable mask; 0 enables INT level */
 		break;
 	}
@@ -714,45 +709,42 @@ static WRITE16_HANDLER( namcona1_vreg_w )
 
 // MCU "mailslot" handler - has 8 16-bit slots mirrored
 
-static READ16_HANDLER( mcu_mailbox_r )
+READ16_MEMBER(namcona1_state::mcu_mailbox_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	return state->m_mcu_mailbox[offset%8];
+	return m_mcu_mailbox[offset%8];
 }
 
-static WRITE16_HANDLER( mcu_mailbox_w_68k )
+WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_68k)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
 //  logerror("mailbox_w_68k: %x @ %x\n", data, offset);
 
 	if (offset == 4)
-		cputag_set_input_line(space->machine(), "mcu", M37710_LINE_IRQ0, HOLD_LINE);
+		cputag_set_input_line(machine(), "mcu", M37710_LINE_IRQ0, HOLD_LINE);
 
-	COMBINE_DATA(&state->m_mcu_mailbox[offset%8]);
+	COMBINE_DATA(&m_mcu_mailbox[offset%8]);
 
 	/* FIXME: This shouldn't be necessary now that the C70 BIOS is implemented,
     but for some reason the MCU never responds to the version string command */
-	if ( (state->m_gametype == NAMCO_NUMANATH) || (state->m_gametype == NAMCO_KNCKHEAD) )
+	if ( (m_gametype == NAMCO_NUMANATH) || (m_gametype == NAMCO_KNCKHEAD) )
 	{
-		if ((state->m_workram[0xf72/2] >> 8) == 7)
-			write_version_info(state);
+		if ((m_workram[0xf72/2] >> 8) == 7)
+			write_version_info();
 	}
 }
 
-static WRITE16_HANDLER( mcu_mailbox_w_mcu )
+WRITE16_MEMBER(namcona1_state::mcu_mailbox_w_mcu)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	COMBINE_DATA(&state->m_mcu_mailbox[offset%8]);
+	COMBINE_DATA(&m_mcu_mailbox[offset%8]);
 }
 
 static ADDRESS_MAP_START( namcona1_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(m_workram)
-	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE_LEGACY(mcu_mailbox_r, mcu_mailbox_w_68k)
+	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
 	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)	/* code */
-	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE_LEGACY(namcona1_nvram_r, namcona1_nvram_w)
-	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE_LEGACY(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE_LEGACY(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(m_vreg)
+	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE(namcona1_nvram_r, namcona1_nvram_w)
+	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
+	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(m_vreg)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE_LEGACY(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE_LEGACY(namcona1_gfxram_r, namcona1_gfxram_w)
 	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE_LEGACY(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(m_videoram)
@@ -764,17 +756,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( namcona2_main_map, AS_PROGRAM, 16, namcona1_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(m_workram)
-	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE_LEGACY(mcu_mailbox_r, mcu_mailbox_w_68k)
+	AM_RANGE(0x3f8000, 0x3fffff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_68k)
 	AM_RANGE(0x400000, 0xbfffff) AM_ROM AM_REGION("maincpu", 0x280000)	/* data */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP /* xday: serial out? */
 	AM_RANGE(0xd40000, 0xd40001) AM_WRITENOP /* xday: serial out? */
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP /* xday: serial out? */
 	AM_RANGE(0xdc0000, 0xdc001f) AM_WRITENOP /* xday: serial config? */
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROM AM_REGION("maincpu", 0x080000)	/* code */
-	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE_LEGACY(namcona1_nvram_r, namcona1_nvram_w)
+	AM_RANGE(0xe00000, 0xe00fff) AM_READWRITE(namcona1_nvram_r, namcona1_nvram_w)
 	/* xday: additional battery-backed ram at 00E024FA? */
-	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE_LEGACY(custom_key_r, custom_key_w)
-	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE_LEGACY(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(m_vreg)
+	AM_RANGE(0xe40000, 0xe4000f) AM_READWRITE(custom_key_r, custom_key_w)
+	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(m_vreg)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE_LEGACY(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE_LEGACY(namcona1_gfxram_r, namcona1_gfxram_w)
 	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE_LEGACY(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE(m_videoram)
@@ -786,30 +778,28 @@ ADDRESS_MAP_END
 
 /* ----- NA-1 MCU handling ----------------------------------- */
 
-static READ16_HANDLER( na1mcu_shared_r )
+READ16_MEMBER(namcona1_state::na1mcu_shared_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
 	UINT16 data;
 
-	data = state->m_workram[offset];
+	data = m_workram[offset];
 
 #if 0
 	if (offset >= 0x70000/2)
 	{
-		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, cpu_get_pc(&space->device()));
+		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, cpu_get_pc(&space.device()));
 	}
 #endif
 
 	return ((data>>8)&0xff) | ((data<<8)&0xff00);
 }
 
-static WRITE16_HANDLER( na1mcu_shared_w )
+WRITE16_MEMBER(namcona1_state::na1mcu_shared_w)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
 	mem_mask = FLIPENDIAN_INT16(mem_mask);
 	data = FLIPENDIAN_INT16(data);
 
-	COMBINE_DATA(&state->m_workram[offset]);
+	COMBINE_DATA(&m_workram[offset]);
 }
 
 static READ16_DEVICE_HANDLER(snd_r)
@@ -833,100 +823,92 @@ static WRITE16_DEVICE_HANDLER(snd_w)
 }
 
 static ADDRESS_MAP_START( namcona1_mcu_map, AS_PROGRAM, 16, namcona1_state )
-	AM_RANGE(0x000800, 0x000fff) AM_READWRITE_LEGACY(mcu_mailbox_r, mcu_mailbox_w_mcu)	// "Mailslot" communications ports
+	AM_RANGE(0x000800, 0x000fff) AM_READWRITE(mcu_mailbox_r, mcu_mailbox_w_mcu)	// "Mailslot" communications ports
 	AM_RANGE(0x001000, 0x001fff) AM_DEVREADWRITE_LEGACY("c140", snd_r, snd_w)	// C140-alike sound chip
-	AM_RANGE(0x002000, 0x002fff) AM_READWRITE_LEGACY(na1mcu_shared_r, na1mcu_shared_w)	// mirror of first page of shared work RAM
+	AM_RANGE(0x002000, 0x002fff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w)	// mirror of first page of shared work RAM
 	AM_RANGE(0x003000, 0x00afff) AM_RAM						// there is a 32k RAM chip according to CGFM
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0)			// internal ROM BIOS
-	AM_RANGE(0x200000, 0x27ffff) AM_READWRITE_LEGACY(na1mcu_shared_r, na1mcu_shared_w)	// shared work RAM
+	AM_RANGE(0x200000, 0x27ffff) AM_READWRITE(na1mcu_shared_r, na1mcu_shared_w)	// shared work RAM
 ADDRESS_MAP_END
 
 
 // port 4: bit 3 (0x08) enables the 68000 (see the 68k launch code at c604 in swcourt's BIOS)
-static READ8_HANDLER( port4_r )
+READ8_MEMBER(namcona1_state::port4_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	return state->m_mcu_port4;
+	return m_mcu_port4;
 }
 
-static WRITE8_HANDLER( port4_w )
+WRITE8_MEMBER(namcona1_state::port4_w)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	if ((data & 0x08) && !(state->m_mcu_port4 & 0x08))
+	if ((data & 0x08) && !(m_mcu_port4 & 0x08))
 	{
-		logerror("launching 68k, PC=%x\n", cpu_get_pc(&space->device()));
+		logerror("launching 68k, PC=%x\n", cpu_get_pc(&space.device()));
 
 		// reset and launch the 68k
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
-	state->m_mcu_port4 = data;
+	m_mcu_port4 = data;
 }
 
 // port 5: not sure yet, but MCU code requires this interaction at least
-static READ8_HANDLER( port5_r )
+READ8_MEMBER(namcona1_state::port5_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	return state->m_mcu_port5;
+	return m_mcu_port5;
 }
 
-static WRITE8_HANDLER( port5_w )
+WRITE8_MEMBER(namcona1_state::port5_w)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	state->m_mcu_port5 = data;
+	m_mcu_port5 = data;
 
 	// bit 0 must mirror bit 1 - this is checked at CCD3 in the C69 BIOS
-	state->m_mcu_port5 &= 0xfe;
-	state->m_mcu_port5 |= ((state->m_mcu_port5 & 0x2)>>1);
+	m_mcu_port5 &= 0xfe;
+	m_mcu_port5 |= ((m_mcu_port5 & 0x2)>>1);
 }
 
-static READ8_HANDLER( port6_r )
+READ8_MEMBER(namcona1_state::port6_r)
 {
 	return 0;
 }
 
-static WRITE8_HANDLER( port6_w )
+WRITE8_MEMBER(namcona1_state::port6_w)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	state->m_mcu_port6 = data;
+	m_mcu_port6 = data;
 }
 
-static READ8_HANDLER( port7_r )
+READ8_MEMBER(namcona1_state::port7_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	switch (state->m_mcu_port6 & 0xe0)
+	switch (m_mcu_port6 & 0xe0)
 	{
 		case 0x40:
-			return input_port_read(space->machine(), "P1");
+			return input_port_read(machine(), "P1");
 
 		case 0x60:
-			return input_port_read(space->machine(), "P2");
+			return input_port_read(machine(), "P2");
 
 		case 0x20:
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 
 		case 0x00:
-			return input_port_read(space->machine(), "P4");
+			return input_port_read(machine(), "P4");
 	}
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( port7_w )
+WRITE8_MEMBER(namcona1_state::port7_w)
 {
 }
 
 // port 8: bit 5 (0x20) toggles, watchdog?
-static READ8_HANDLER( port8_r )
+READ8_MEMBER(namcona1_state::port8_r)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	return state->m_mcu_port8;
+	return m_mcu_port8;
 }
 
-static WRITE8_HANDLER( port8_w )
+WRITE8_MEMBER(namcona1_state::port8_w)
 {
-	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	state->m_mcu_port8 = data;
+	m_mcu_port8 = data;
 }
 
 
@@ -955,21 +937,21 @@ static MACHINE_RESET( namcona1_mcu )
 // bit 2 => port 5
 // bit 3 => port 6
 // bit 7 => port 7
-static READ8_HANDLER( portana_r )
+READ8_MEMBER(namcona1_state::portana_r)
 {
 	static const UINT8 bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
-	UINT8 port = input_port_read(space->machine(), "P3");
+	UINT8 port = input_port_read(machine(), "P3");
 
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }
 
 static ADDRESS_MAP_START( namcona1_mcu_io_map, AS_IO, 8, namcona1_state )
-	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READWRITE_LEGACY(port4_r, port4_w )
-	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READWRITE_LEGACY(port5_r, port5_w )
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE_LEGACY(port6_r, port6_w )
-	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READWRITE_LEGACY(port7_r, port7_w )
-	AM_RANGE(M37710_PORT8, M37710_PORT8) AM_READWRITE_LEGACY(port8_r, port8_w )
-	AM_RANGE(0x10, 0x1f) AM_READ_LEGACY(portana_r )
+	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READWRITE(port4_r, port4_w )
+	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READWRITE(port5_r, port5_w )
+	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE(port6_r, port6_w )
+	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READWRITE(port7_r, port7_w )
+	AM_RANGE(M37710_PORT8, M37710_PORT8) AM_READWRITE(port8_r, port8_w )
+	AM_RANGE(0x10, 0x1f) AM_READ(portana_r )
 ADDRESS_MAP_END
 
 

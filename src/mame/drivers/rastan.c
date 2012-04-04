@@ -183,10 +183,9 @@ static void rastan_msm5205_vck( device_t *device )
 	}
 }
 
-static WRITE8_HANDLER( rastan_msm5205_address_w )
+WRITE8_MEMBER(rastan_state::rastan_msm5205_address_w)
 {
-	rastan_state *state = space->machine().driver_data<rastan_state>();
-	state->m_adpcm_pos = (state->m_adpcm_pos & 0x00ff) | (data << 8);
+	m_adpcm_pos = (m_adpcm_pos & 0x00ff) | (data << 8);
 }
 
 static WRITE8_DEVICE_HANDLER( rastan_msm5205_start_w )
@@ -233,7 +232,7 @@ static ADDRESS_MAP_START( rastan_s_map, AS_PROGRAM, 8, rastan_state )
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(rastan_msm5205_address_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(rastan_msm5205_address_w)
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("msm", rastan_msm5205_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", rastan_msm5205_stop_w)
 ADDRESS_MAP_END

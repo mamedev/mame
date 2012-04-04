@@ -13,6 +13,7 @@ public:
 	int m_bg_dispsw;
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_bg_bitmap;
+	DECLARE_READ8_MEMBER(input_port_r);
 };
 
 

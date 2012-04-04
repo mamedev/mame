@@ -424,24 +424,23 @@ static SOUND_START(equites)
 	state->m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
 }
 
-static WRITE8_HANDLER(equites_c0f8_w)
+WRITE8_MEMBER(equites_state::equites_c0f8_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
 
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
-			device_set_input_line(state->m_audio_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+			device_set_input_line(m_audio_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			generic_pulse_irq_line(state->m_audio_cpu, I8085_RST75_LINE, 1);
+			generic_pulse_irq_line(m_audio_cpu, I8085_RST75_LINE, 1);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
 			// verified on PCB:
-			device_set_input_line(state->m_audio_cpu, I8085_INTR_LINE, HOLD_LINE);
+			device_set_input_line(m_audio_cpu, I8085_INTR_LINE, HOLD_LINE);
 			break;
 
 		case 3: // c0fb: n.c.
@@ -449,7 +448,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 			break;
 
 		case 4: // c0fc: increment PROM address (written by NMI handler)
-			state->m_sound_prom_address = (state->m_sound_prom_address + 1) & 0x1f;
+			m_sound_prom_address = (m_sound_prom_address + 1) & 0x1f;
 //       at this point, the 5-bit value
 //       goes to an op-amp and to the base of a transistor. The transistor is part
 //       of a resonator that is used to generate the M5232 clock. The PROM doesn't
@@ -532,10 +531,9 @@ popmessage("HH %d(%d) CYM %d(%d)",state->m_hihat,BIT(state->m_ay_port_b,6),state
 #endif
 }
 
-static WRITE8_HANDLER(equites_cymbal_ctrl_w)
+WRITE8_MEMBER(equites_state::equites_cymbal_ctrl_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	state->m_eq_cymbal_ctrl++;
+	m_eq_cymbal_ctrl++;
 }
 
 
@@ -556,18 +554,16 @@ static void equites_update_dac( running_machine &machine )
 		dac_signed_data_w(state->m_dac_2, state->m_dac_latch);
 }
 
-static WRITE8_HANDLER( equites_dac_latch_w )
+WRITE8_MEMBER(equites_state::equites_dac_latch_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	state->m_dac_latch = data << 2;
-	equites_update_dac(space->machine());
+	m_dac_latch = data << 2;
+	equites_update_dac(machine());
 }
 
-static WRITE8_HANDLER( equites_8155_portb_w )
+WRITE8_MEMBER(equites_state::equites_8155_portb_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	state->m_eq8155_port_b = data;
-	equites_update_dac(space->machine());
+	m_eq8155_port_b = data;
+	equites_update_dac(machine());
 }
 
 static void equites_msm5232_gate( device_t *device, int state )
@@ -603,45 +599,44 @@ static TIMER_DEVICE_CALLBACK( splndrbt_scanline )
 		cputag_set_input_line(timer.machine(), "maincpu", 2, HOLD_LINE);
 }
 
-static WRITE8_HANDLER(equites_8155_w)
+WRITE8_MEMBER(equites_state::equites_8155_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
 
 	// FIXME proper 8155 emulation must be implemented
 	switch( offset )
 	{
 		case 0: //logerror( "8155 Command register write %x, timer command = %x, interrupt enable = %x, ports = %x\n", data, (data >> 6) & 3, (data >> 4) & 3, data & 0xf );
 			if (((data >> 6) & 3) == 3)
-				state->m_nmi_timer->adjust(attotime::from_hz(XTAL_6_144MHz/2 / state->m_timer_count), 0, attotime::from_hz(XTAL_6_144MHz/2 / state->m_timer_count));
+				m_nmi_timer->adjust(attotime::from_hz(XTAL_6_144MHz/2 / m_timer_count), 0, attotime::from_hz(XTAL_6_144MHz/2 / m_timer_count));
 			break;
 		case 1: //logerror( "8155 I/O Port A write %x\n", data );
-			state->m_eq8155_port_a = data;
-			state->m_msm->set_output_gain(0, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			state->m_msm->set_output_gain(1, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			state->m_msm->set_output_gain(2, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			state->m_msm->set_output_gain(3, (data >> 4) / 15.0);	/* group1 from msm5232 */
-			state->m_msm->set_output_gain(4, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			state->m_msm->set_output_gain(5, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			state->m_msm->set_output_gain(6, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
-			state->m_msm->set_output_gain(7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			m_eq8155_port_a = data;
+			m_msm->set_output_gain(0, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			m_msm->set_output_gain(1, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			m_msm->set_output_gain(2, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			m_msm->set_output_gain(3, (data >> 4) / 15.0);	/* group1 from msm5232 */
+			m_msm->set_output_gain(4, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			m_msm->set_output_gain(5, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			m_msm->set_output_gain(6, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
+			m_msm->set_output_gain(7, (data & 0x0f) / 15.0);	/* group2 from msm5232 */
 			break;
 		case 2: //logerror( "8155 I/O Port B write %x\n", data );
 			equites_8155_portb_w(space, 0, data);
 			break;
 		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
-			state->m_eq8155_port_c = data;
-			state->m_msm->set_output_gain(8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
+			m_eq8155_port_c = data;
+			m_msm->set_output_gain(8, (data & 0x0f) / 15.0);	/* SOLO  8' from msm5232 */
 			if (data & 0x20)
-				state->m_msm->set_output_gain(9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
+				m_msm->set_output_gain(9, (data & 0x0f) / 15.0);	/* SOLO 16' from msm5232 */
 			else
-				state->m_msm->set_output_gain(9, 0);	/* SOLO 16' from msm5232 */
+				m_msm->set_output_gain(9, 0);	/* SOLO 16' from msm5232 */
 
 			break;
 		case 4: //logerror( "8155 Timer low 8 bits write %x\n", data );
-			state->m_timer_count = (state->m_timer_count & 0xff00) | data;
+			m_timer_count = (m_timer_count & 0xff00) | data;
 			break;
 		case 5: //logerror( "8155 Timer high 6 bits write %x, timer mode %x\n", data & 0x3f, (data >> 6) & 3);
-			state->m_timer_count = (state->m_timer_count & 0x00ff) | ((data & 0x3f) << 8);
+			m_timer_count = (m_timer_count & 0x00ff) | ((data & 0x3f) << 8);
 			break;
 	}
 }
@@ -650,9 +645,9 @@ static WRITE8_HANDLER(equites_8155_w)
 // Main CPU Handlers
 
 #if HVOLTAGE_DEBUG
-static READ16_HANDLER(hvoltage_debug_r)
+READ16_MEMBER(equites_state::hvoltage_debug_r)
 {
-	return(input_port_read(space->machine(), "FAKE"));
+	return(input_port_read(machine(), "FAKE"));
 }
 #endif
 
@@ -663,54 +658,47 @@ static CUSTOM_INPUT( gekisou_unknown_status )
 	return state->m_unknown_bit;
 }
 
-static WRITE16_HANDLER( gekisou_unknown_0_w )
+WRITE16_MEMBER(equites_state::gekisou_unknown_0_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	state->m_unknown_bit = 0;
+	m_unknown_bit = 0;
 }
 
-static WRITE16_HANDLER( gekisou_unknown_1_w )
+WRITE16_MEMBER(equites_state::gekisou_unknown_1_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	state->m_unknown_bit = 1;
+	m_unknown_bit = 1;
 }
 
 /******************************************************************************/
 // Main CPU Memory Map
 
 
-static READ16_HANDLER(equites_spriteram_kludge_r)
+READ16_MEMBER(equites_state::equites_spriteram_kludge_r)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	if (state->m_spriteram[0] == 0x5555)
+	if (m_spriteram[0] == 0x5555)
 		return 0;
 	else
-		return state->m_spriteram[0];
+		return m_spriteram[0];
 }
 
-static READ16_HANDLER(mcu_r)
+READ16_MEMBER(equites_state::mcu_r)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	return 0xff00 | state->m_mcu_ram[offset];
+	return 0xff00 | m_mcu_ram[offset];
 }
 
-static WRITE16_HANDLER(mcu_w)
+WRITE16_MEMBER(equites_state::mcu_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_mcu_ram[offset] = data & 0xff;
+		m_mcu_ram[offset] = data & 0xff;
 }
 
-static WRITE16_HANDLER( mcu_halt_assert_w )
+WRITE16_MEMBER(equites_state::mcu_halt_assert_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	device_set_input_line(state->m_mcu, INPUT_LINE_HALT, ASSERT_LINE);
+	device_set_input_line(m_mcu, INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-static WRITE16_HANDLER( mcu_halt_clear_w )
+WRITE16_MEMBER(equites_state::mcu_halt_clear_w)
 {
-	equites_state *state = space->machine().driver_data<equites_state>();
-	device_set_input_line(state->m_mcu, INPUT_LINE_HALT, CLEAR_LINE);
+	device_set_input_line(m_mcu, INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 
@@ -721,15 +709,15 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE_LEGACY(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
 	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE_LEGACY(equites_bg_videoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
-	AM_RANGE(0x100000, 0x100001) AM_READ_LEGACY(equites_spriteram_kludge_r)
+	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE_LEGACY(mcu_r, mcu_w)	// 8-bit
+	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_WRITE_LEGACY(soundlatch_word_w) // LSB: sound latch
 	AM_RANGE(0x184000, 0x184001) AM_WRITE_LEGACY(equites_flip0_w)
-	AM_RANGE(0x188000, 0x188001) AM_WRITE_LEGACY(mcu_halt_clear_w) // 8404 control port1
+	AM_RANGE(0x188000, 0x188001) AM_WRITE(mcu_halt_clear_w) // 8404 control port1
 	AM_RANGE(0x18c000, 0x18c001) AM_WRITENOP // 8404 control port2
 	AM_RANGE(0x1a4000, 0x1a4001) AM_WRITE_LEGACY(equites_flip1_w)
-	AM_RANGE(0x1a8000, 0x1a8001) AM_WRITE_LEGACY(mcu_halt_assert_w) // 8404 control port3
+	AM_RANGE(0x1a8000, 0x1a8001) AM_WRITE(mcu_halt_assert_w) // 8404 control port3
 	AM_RANGE(0x1ac000, 0x1ac001) AM_WRITENOP // 8404 control port4
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("IN0") AM_WRITE_LEGACY(equites_scrollreg_w) // scroll register[XXYY]
 	AM_RANGE(0x380000, 0x380001) AM_WRITE_LEGACY(equites_bgcolor_w) // bg color register[CC--]
@@ -743,17 +731,17 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE(m_workram) // work RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0") // joyport [2211]
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN1") AM_WRITE_LEGACY(splndrbt_flip0_w) // [MMLL] MM: bg color register, LL: normal screen
-	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITE_LEGACY(mcu_halt_clear_w) // 8404 control port1
+	AM_RANGE(0x0c4000, 0x0c4001) AM_WRITE(mcu_halt_clear_w) // 8404 control port1
 	AM_RANGE(0x0c8000, 0x0c8001) AM_WRITENOP // 8404 control port2
 	AM_RANGE(0x0cc000, 0x0cc001) AM_WRITE_LEGACY(splndrbt_selchar0_w) // select active char map
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE_LEGACY(splndrbt_flip1_w) // [MMLL] MM: not used, LL: flip screen
-	AM_RANGE(0x0e4000, 0x0e4001) AM_WRITE_LEGACY(mcu_halt_assert_w) // 8404 control port3
+	AM_RANGE(0x0e4000, 0x0e4001) AM_WRITE(mcu_halt_assert_w) // 8404 control port3
 	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITENOP // 8404 control port4
 	AM_RANGE(0x0ec000, 0x0ec001) AM_WRITE_LEGACY(splndrbt_selchar1_w) // select active char map
 	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(splndrbt_bg_scrollx_w)
 	AM_RANGE(0x140000, 0x140001) AM_WRITE_LEGACY(soundlatch_word_w) // LSB: sound command
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE_LEGACY(splndrbt_bg_scrolly_w)
-	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE_LEGACY(mcu_r, mcu_w)	// 8-bit
+	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_READWRITE_LEGACY(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
 	AM_RANGE(0x400000, 0x4007ff) AM_RAM_WRITE_LEGACY(equites_bg_videoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0x400800, 0x400fff) AM_RAM
@@ -767,15 +755,15 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
-	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE_LEGACY(equites_cymbal_ctrl_w)
-	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE_LEGACY(equites_dac_latch_w)	// followed by 1 (and usually 0) on 8155 port B
-	AM_RANGE(0xc0e0, 0xc0e0) AM_WRITE_LEGACY(equites_dac_latch_w)	// followed by 2 (and usually 0) on 8155 port B
-	AM_RANGE(0xc0f8, 0xc0ff) AM_WRITE_LEGACY(equites_c0f8_w)
+	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_cymbal_ctrl_w)
+	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)	// followed by 1 (and usually 0) on 8155 port B
+	AM_RANGE(0xc0e0, 0xc0e0) AM_WRITE(equites_dac_latch_w)	// followed by 2 (and usually 0) on 8155 port B
+	AM_RANGE(0xc0f8, 0xc0ff) AM_WRITE(equites_c0f8_w)
 	AM_RANGE(0xe000, 0xe0ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, equites_state )
-	AM_RANGE(0x00e0, 0x00e5) AM_WRITE_LEGACY(equites_8155_w)
+	AM_RANGE(0x00e0, 0x00e5) AM_WRITE(equites_8155_w)
 ADDRESS_MAP_END
 
 
@@ -1911,8 +1899,9 @@ static DRIVER_INIT( gekisou )
 	unpack_region(machine, "gfx3");
 
 	// install special handlers for unknown device (protection?)
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x580000, 0x580001, FUNC(gekisou_unknown_0_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5a0000, 0x5a0001, FUNC(gekisou_unknown_1_w));
+	equites_state *state = machine.driver_data<equites_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x580000, 0x580001, write16_delegate(FUNC(equites_state::gekisou_unknown_0_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x5a0000, 0x5a0001, write16_delegate(FUNC(equites_state::gekisou_unknown_1_w),state));
 }
 
 static DRIVER_INIT( splndrbt )
@@ -1925,7 +1914,7 @@ static DRIVER_INIT( hvoltage )
 	unpack_region(machine, "gfx3");
 
 #if HVOLTAGE_DEBUG
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x000038, 0x000039, FUNC(hvoltage_debug_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x000038, 0x000039, read16_delegate(FUNC(equites_state::hvoltage_debug_r),state));
 #endif
 }
 

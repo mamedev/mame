@@ -26,6 +26,9 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_READ8_MEMBER(blueprnt_sh_dipsw_r);
+	DECLARE_WRITE8_MEMBER(blueprnt_sound_command_w);
+	DECLARE_WRITE8_MEMBER(blueprnt_coin_counter_w);
 };
 
 

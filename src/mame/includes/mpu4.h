@@ -234,6 +234,17 @@ public:
 	int m_linecounter;
 	struct ef9369_t m_pal;
 	struct bt471_t m_bt471;
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ8_MEMBER(bankswitch_r);
+	DECLARE_WRITE8_MEMBER(bankset_w);
+	DECLARE_WRITE8_MEMBER(characteriser_w);
+	DECLARE_READ8_MEMBER(characteriser_r);
+	DECLARE_WRITE8_MEMBER(bwb_characteriser_w);
+	DECLARE_READ8_MEMBER(bwb_characteriser_r);
+	DECLARE_WRITE8_MEMBER(mpu4_ym2413_w);
+	DECLARE_READ8_MEMBER(mpu4_ym2413_r);
+	DECLARE_READ8_MEMBER(crystal_sound_r);
+	DECLARE_WRITE8_MEMBER(crystal_sound_w);
 };
 
 /* mpu4.c, used by mpu4vid.c */

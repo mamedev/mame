@@ -34,6 +34,11 @@ public:
 	device_t *m_k056832;
 	device_t *m_k053246;
 	device_t *m_k053251;
+	DECLARE_READ16_MEMBER(control2_r);
+	DECLARE_WRITE16_MEMBER(control2_w);
+	DECLARE_WRITE16_MEMBER(sound_cmd_w);
+	DECLARE_WRITE16_MEMBER(sound_irq_w);
+	DECLARE_READ16_MEMBER(sound_status_r);
 };
 
 /*----------- defined in video/gijoe.c -----------*/

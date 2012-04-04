@@ -30,26 +30,24 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "includes/magmax.h"
 
 
-static WRITE16_HANDLER( magmax_sound_w )
+WRITE16_MEMBER(magmax_state::magmax_sound_w)
 {
-	magmax_state *state = space->machine().driver_data<magmax_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_sound_latch = (data & 0xff) << 1;
-		cputag_set_input_line(space->machine(), "audiocpu", 0, ASSERT_LINE);
+		m_sound_latch = (data & 0xff) << 1;
+		cputag_set_input_line(machine(), "audiocpu", 0, ASSERT_LINE);
 	}
 }
 
-static READ8_HANDLER( magmax_sound_irq_ack )
+READ8_MEMBER(magmax_state::magmax_sound_irq_ack)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
 	return 0;
 }
 
-static READ8_HANDLER( magmax_sound_r )
+READ8_MEMBER(magmax_state::magmax_sound_r)
 {
-	magmax_state *state = space->machine().driver_data<magmax_state>();
-	return (state->m_sound_latch | state->m_LS74_q);
+	return (m_sound_latch | m_LS74_q);
 }
 
 static WRITE8_DEVICE_HANDLER( ay8910_portB_0_w )
@@ -188,9 +186,8 @@ bit3 - SOUND Chan#8 name=AY-3-8910 #2 Ch C
 	ay3->set_output_gain(2, percent);
 }
 
-static WRITE16_HANDLER( magmax_vreg_w )
+WRITE16_MEMBER(magmax_state::magmax_vreg_w)
 {
-	magmax_state *state = space->machine().driver_data<magmax_state>();
 	/* VRAM CONTROL REGISTER */
 	/* bit0 - coin counter 1    */
 	/* bit1 - coin counter 2    */
@@ -199,7 +196,7 @@ static WRITE16_HANDLER( magmax_vreg_w )
 	/* bit4 - sprite bank LSB (DP0) */
 	/* bit5 - sprite bank MSB (DP1) */
 	/* bit6 - BG display enable (BE)*/
-	COMBINE_DATA(state->m_vreg);
+	COMBINE_DATA(m_vreg);
 }
 
 
@@ -213,16 +210,16 @@ static ADDRESS_MAP_START( magmax_map, AS_PROGRAM, 16, magmax_state )
 	AM_RANGE(0x030002, 0x030003) AM_READ_PORT("P2")
 	AM_RANGE(0x030004, 0x030005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x030006, 0x030007) AM_READ_PORT("DSW")
-	AM_RANGE(0x030010, 0x030011) AM_WRITE_LEGACY(magmax_vreg_w) AM_BASE(m_vreg)
+	AM_RANGE(0x030010, 0x030011) AM_WRITE(magmax_vreg_w) AM_BASE(m_vreg)
 	AM_RANGE(0x030012, 0x030013) AM_WRITEONLY AM_BASE(m_scroll_x)
 	AM_RANGE(0x030014, 0x030015) AM_WRITEONLY AM_BASE(m_scroll_y)
-	AM_RANGE(0x03001c, 0x03001d) AM_WRITE_LEGACY(magmax_sound_w)
+	AM_RANGE(0x03001c, 0x03001d) AM_WRITE(magmax_sound_w)
 	AM_RANGE(0x03001e, 0x03001f) AM_WRITENOP	/* IRQ ack */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magmax_sound_map, AS_PROGRAM, 8, magmax_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(magmax_sound_irq_ack)
+	AM_RANGE(0x4000, 0x4000) AM_READ(magmax_sound_irq_ack)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -231,7 +228,7 @@ static ADDRESS_MAP_START( magmax_sound_io_map, AS_IO, 8, magmax_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(magmax_sound_r)
+	AM_RANGE(0x06, 0x06) AM_READ(magmax_sound_r)
 ADDRESS_MAP_END
 
 

@@ -12,6 +12,10 @@ public:
 	UINT16 *m_bg0_videoram;
 	tilemap_t *m_fg0_tilemap;
 	tilemap_t *m_bg0_tilemap;
+	DECLARE_WRITE16_MEMBER(wwfsstar_scrollwrite);
+	DECLARE_WRITE16_MEMBER(wwfsstar_soundwrite);
+	DECLARE_WRITE16_MEMBER(wwfsstar_flipscreen_w);
+	DECLARE_WRITE16_MEMBER(wwfsstar_irqack_w);
 };
 
 

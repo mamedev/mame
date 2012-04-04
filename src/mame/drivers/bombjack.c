@@ -107,19 +107,18 @@ static TIMER_CALLBACK( soundlatch_callback )
 	state->m_latch = param;
 }
 
-static WRITE8_HANDLER( bombjack_soundlatch_w )
+WRITE8_MEMBER(bombjack_state::bombjack_soundlatch_w)
 {
 	/* make all the CPUs synchronize, and only AFTER that write the new command to the latch */
-	space->machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
+	machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
 }
 
-static READ8_HANDLER( bombjack_soundlatch_r )
+READ8_MEMBER(bombjack_state::bombjack_soundlatch_r)
 {
-	bombjack_state *state = space->machine().driver_data<bombjack_state>();
 	int res;
 
-	res = state->m_latch;
-	state->m_latch = 0;
+	res = m_latch;
+	m_latch = 0;
 	return res;
 }
 
@@ -130,11 +129,10 @@ static READ8_HANDLER( bombjack_soundlatch_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(bombjack_state::irq_mask_w)
 {
-	bombjack_state *state = space->machine().driver_data<bombjack_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
@@ -147,21 +145,21 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bombjack_state )
 	AM_RANGE(0x9c00, 0x9cff) AM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x9e00, 0x9e00) AM_WRITE_LEGACY(bombjack_background_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("P1")
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(irq_mask_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xb001, 0xb001) AM_READ_PORT("P2")
 	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb003, 0xb003) AM_READNOP	/* watchdog reset? */
 	AM_RANGE(0xb004, 0xb004) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(bombjack_flipscreen_w)
 	AM_RANGE(0xb005, 0xb005) AM_READ_PORT("DSW2")
-	AM_RANGE(0xb800, 0xb800) AM_WRITE_LEGACY(bombjack_soundlatch_w)
+	AM_RANGE(0xb800, 0xb800) AM_WRITE(bombjack_soundlatch_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, bombjack_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(bombjack_soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(bombjack_soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, bombjack_state )

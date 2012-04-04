@@ -184,11 +184,11 @@ static CUSTOM_INPUT( teetert_input_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( fax_bank_select_w )
+WRITE8_MEMBER(exidy_state::fax_bank_select_w)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
-	memory_set_bankptr(space->machine(), "bank1", &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
+	memory_set_bankptr(machine(), "bank1", &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
 	if ((data & 0x1f) > 0x17)
 		logerror("Banking to unpopulated ROM bank %02X!\n",data & 0x1f);
 }
@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( fax_map, AS_PROGRAM, 8, exidy_state )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("IN4")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("IN3")
-	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(fax_bank_select_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(fax_bank_select_w)
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x5200, 0x520f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x5213, 0x5217) AM_WRITENOP		/* empty control lines on color/sound board */
@@ -1502,11 +1502,12 @@ static DRIVER_INIT( pepper2 )
 static DRIVER_INIT( fax )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	exidy_state *state = machine.driver_data<exidy_state>();
 
 	exidy_video_config(machine, 0x04, 0x04, TRUE);
 
 	/* reset the ROM bank */
-	fax_bank_select_w(space,0,0);
+	state->fax_bank_select_w(*space,0,0);
 }
 
 

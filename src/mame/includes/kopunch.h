@@ -24,6 +24,9 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(kopunch_in_r);
+	DECLARE_WRITE8_MEMBER(kopunch_lamp_w);
+	DECLARE_WRITE8_MEMBER(kopunch_coin_w);
 };
 
 /*----------- defined in video/kopunch.c -----------*/

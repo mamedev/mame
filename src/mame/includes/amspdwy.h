@@ -27,6 +27,10 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_READ8_MEMBER(amspdwy_wheel_0_r);
+	DECLARE_READ8_MEMBER(amspdwy_wheel_1_r);
+	DECLARE_WRITE8_MEMBER(amspdwy_sound_w);
+	DECLARE_READ8_MEMBER(amspdwy_port_r);
 };
 
 

@@ -51,9 +51,9 @@ Runs in interrupt mode 0, the interrupt vectors are 0xcf (RST 08h) and
 #include "sound/2203intf.h"
 #include "includes/gundealr.h"
 
-static WRITE8_HANDLER( yamyam_bankswitch_w )
+WRITE8_MEMBER(gundealr_state::yamyam_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	memory_set_bank(machine(), "bank1", data & 0x07);
 }
 
 
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, gundealr_state )
 	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN2")
 	AM_RANGE(0xc010, 0xc013) AM_WRITE_LEGACY(yamyam_fg_scroll_w)		/* Yam Yam only */
 	AM_RANGE(0xc014, 0xc014) AM_WRITE_LEGACY(gundealr_flipscreen_w)
-	AM_RANGE(0xc016, 0xc016) AM_WRITE_LEGACY(yamyam_bankswitch_w)
+	AM_RANGE(0xc016, 0xc016) AM_WRITE(yamyam_bankswitch_w)
 	AM_RANGE(0xc020, 0xc023) AM_WRITE_LEGACY(gundealr_fg_scroll_w)	/* Gun Dealer only */
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(gundealr_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(gundealr_bg_videoram_w) AM_BASE(m_bg_videoram)

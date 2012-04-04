@@ -45,6 +45,13 @@ public:
 	UINT8 *m_audio_comm_stat;
 	UINT8 *m_speech_data;
 	UINT8  m_speech_strobe_state;
+	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(rom_banksel_w);
+	DECLARE_READ8_MEMBER(a2d_data_r);
+	DECLARE_WRITE8_MEMBER(a2d_select_w);
+	DECLARE_WRITE8_MEMBER(jedi_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(nvram_data_w);
+	DECLARE_WRITE8_MEMBER(nvram_enable_w);
 };
 
 

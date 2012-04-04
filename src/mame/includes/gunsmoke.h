@@ -25,6 +25,7 @@ public:
 	UINT8      m_objon;
 	UINT8      m_bgon;
 	UINT8      m_sprite3bank;
+	DECLARE_READ8_MEMBER(gunsmoke_protection_r);
 };
 
 

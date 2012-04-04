@@ -31,30 +31,29 @@ down hardware (it doesn't write any good sound data btw, mostly zeros).
 
 /******************************************************************************/
 
-static READ16_HANDLER( supbtime_controls_r )
+READ16_MEMBER(supbtime_state::supbtime_controls_r)
 {
 	switch (offset << 1)
 	{
 		case 0:
-			return input_port_read(space->machine(), "INPUTS");
+			return input_port_read(machine(), "INPUTS");
 		case 2:
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 		case 8:
-			return input_port_read(space->machine(), "COIN");
+			return input_port_read(machine(), "COIN");
 		case 10: /* ?  Not used for anything */
 		case 12:
 			return 0;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(&space->device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(&space.device()), offset);
 	return ~0;
 }
 
-static WRITE16_HANDLER( sound_w )
+WRITE16_MEMBER(supbtime_state::sound_w)
 {
-	supbtime_state *state = space->machine().driver_data<supbtime_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
 /******************************************************************************/
@@ -66,9 +65,9 @@ static ADDRESS_MAP_START( supbtime_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x120800, 0x13ffff) AM_WRITENOP /* Nothing there */
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(supbtime_controls_r)
+	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE_LEGACY(sound_w)
+	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(sound_w)
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_r, deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x322000, 0x323fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
@@ -78,10 +77,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chinatwn_map, AS_PROGRAM, 16, supbtime_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(sound_w)
+	AM_RANGE(0x100000, 0x100001) AM_WRITE(sound_w)
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(supbtime_controls_r)
+	AM_RANGE(0x180000, 0x18000f) AM_READ(supbtime_controls_r)
 	AM_RANGE(0x18000a, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a3fff) AM_RAM
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf_control_r, deco16ic_pf_control_w)

@@ -7,6 +7,8 @@ public:
 	UINT8* m_videoram;
 	UINT8* m_colorram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_READ8_MEMBER(questions_r);
+	DECLARE_WRITE8_MEMBER(question_bank_w);
 };
 
 

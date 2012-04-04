@@ -137,10 +137,9 @@ static PALETTE_INIT( skydiver )
  *
  *************************************/
 
-static WRITE8_HANDLER( skydiver_nmion_w )
+WRITE8_MEMBER(skydiver_state::skydiver_nmion_w)
 {
-	skydiver_state *state = space->machine().driver_data<skydiver_state>();
-	state->m_nmion = offset;
+	m_nmion = offset;
 }
 
 
@@ -202,7 +201,7 @@ static ADDRESS_MAP_START( skydiver_map, AS_PROGRAM, 8, skydiver_state )
 	AM_RANGE(0x1002, 0x1003) AM_MIRROR(0x47f0) AM_WRITE_LEGACY(skydiver_coin_lockout_w)
 	// AM_RANGE(0x1006, 0x1007) AM_MIRROR(0x47f0) AM_WRITE_LEGACY(skydiver_jump2_lamps_w)
 	AM_RANGE(0x1008, 0x100b) AM_MIRROR(0x47f0) AM_DEVWRITE_LEGACY("discrete", skydiver_whistle_w)
-	AM_RANGE(0x100c, 0x100d) AM_MIRROR(0x47f0) AM_WRITE_LEGACY(skydiver_nmion_w)
+	AM_RANGE(0x100c, 0x100d) AM_MIRROR(0x47f0) AM_WRITE(skydiver_nmion_w)
 	AM_RANGE(0x100e, 0x100f) AM_MIRROR(0x47f0) AM_WRITE_LEGACY(skydiver_width_w)
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x47e0) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_MIRROR(0x47e0) AM_READ_PORT("IN1")

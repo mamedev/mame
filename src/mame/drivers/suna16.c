@@ -38,49 +38,49 @@ Year + Game                 By      Board      Hardware
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( suna16_soundlatch_w )
+WRITE16_MEMBER(suna16_state::suna16_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w( space, 0, data & 0xff );
+		soundlatch_w(space, 0, data & 0xff );
 	}
-	if (data & ~0xff)	logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", cpu_get_pc(&space->device()), data);
+	if (data & ~0xff)	logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
 }
 
 
-static WRITE16_HANDLER( bssoccer_leds_w )
+WRITE16_MEMBER(suna16_state::bssoccer_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		set_led_status(space->machine(), 0, data & 0x01);
-		set_led_status(space->machine(), 1, data & 0x02);
-		set_led_status(space->machine(), 2, data & 0x04);
-		set_led_status(space->machine(), 3, data & 0x08);
-		coin_counter_w(space->machine(), 0, data & 0x10);
+		set_led_status(machine(), 0, data & 0x01);
+		set_led_status(machine(), 1, data & 0x02);
+		set_led_status(machine(), 2, data & 0x04);
+		set_led_status(machine(), 3, data & 0x08);
+		coin_counter_w(machine(), 0, data & 0x10);
 	}
-	if (data & ~0x1f)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space->device()), data);
+	if (data & ~0x1f)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
 }
 
 
-static WRITE16_HANDLER( uballoon_leds_w )
+WRITE16_MEMBER(suna16_state::uballoon_leds_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		set_led_status(space->machine(), 0, data & 0x02);
-		set_led_status(space->machine(), 1, data & 0x04);
+		coin_counter_w(machine(), 0, data & 0x01);
+		set_led_status(machine(), 0, data & 0x02);
+		set_led_status(machine(), 1, data & 0x04);
 	}
-	if (data & ~0x07)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space->device()), data);
+	if (data & ~0x07)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
 }
 
 
-static WRITE16_HANDLER( bestbest_coin_w )
+WRITE16_MEMBER(suna16_state::bestbest_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x04);
+		coin_counter_w(machine(), 0, data & 0x04);
 	}
-	if (data & ~0x04)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space->device()), data);
+	if (data & ~0x04)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(&space.device()), data);
 }
 
 
@@ -94,9 +94,9 @@ static ADDRESS_MAP_START( bssoccer_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x400000, 0x4001ff) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w)  // Banked Palette
 	AM_RANGE(0x400200, 0x400fff) AM_RAM	//
 	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE(m_spriteram)	// Sprites
-	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("P1") AM_WRITE_LEGACY(suna16_soundlatch_w)	// To Sound CPU
+	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)	// To Sound CPU
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("P2") AM_WRITE_LEGACY(suna16_flipscreen_w)	// Flip Screen
-	AM_RANGE(0xa00004, 0xa00005) AM_READ_PORT("P3") AM_WRITE_LEGACY(bssoccer_leds_w)	// Leds
+	AM_RANGE(0xa00004, 0xa00005) AM_READ_PORT("P3") AM_WRITE(bssoccer_leds_w)	// Leds
 	AM_RANGE(0xa00006, 0xa00007) AM_READ_PORT("P4") AM_WRITENOP	// ? IRQ 1 Ack
 	AM_RANGE(0xa00008, 0xa00009) AM_READ_PORT("DSW1") AM_WRITENOP	// ? IRQ 2 Ack
 	AM_RANGE(0xa0000a, 0xa0000b) AM_READ_PORT("DSW2")
@@ -113,11 +113,11 @@ static ADDRESS_MAP_START( uballoon_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x200000, 0x2001ff) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w)	// Banked Palette
 	AM_RANGE(0x200200, 0x200fff) AM_RAM	//
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x1e0000) AM_RAM AM_BASE(m_spriteram)	// Sprites
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1") AM_WRITE_LEGACY(suna16_soundlatch_w)	// To Sound CPU
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)	// To Sound CPU
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(suna16_flipscreen_w)	// Flip Screen
 	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("DSW2")
-	AM_RANGE(0x600008, 0x600009) AM_WRITE_LEGACY(uballoon_leds_w)	// Leds
+	AM_RANGE(0x600008, 0x600009) AM_WRITE(uballoon_leds_w)	// Leds
 	AM_RANGE(0x60000c, 0x60000d) AM_WRITENOP	// ? IRQ 1 Ack
 	AM_RANGE(0x600010, 0x600011) AM_WRITENOP	// ? IRQ 1 Ack
 	AM_RANGE(0xa00000, 0xa0ffff) AM_NOP			// Protection
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sunaq_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// ROM
-	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1") AM_WRITE_LEGACY(suna16_soundlatch_w)	// To Sound CPU
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)	// To Sound CPU
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2") AM_WRITE_LEGACY(suna16_flipscreen_w)	// Flip Screen
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x500006, 0x500007) AM_READ_PORT("DSW2")				// (unused?)
@@ -145,25 +145,23 @@ ADDRESS_MAP_END
                             Best Of Best
 ***************************************************************************/
 
-static READ16_HANDLER( bestbest_prot_r )
+READ16_MEMBER(suna16_state::bestbest_prot_r)
 {
-	suna16_state *state = space->machine().driver_data<suna16_state>();
 
-	return state->m_prot;
+	return m_prot;
 }
 
-static WRITE16_HANDLER( bestbest_prot_w )
+WRITE16_MEMBER(suna16_state::bestbest_prot_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		suna16_state *state = space->machine().driver_data<suna16_state>();
 
 		switch (data & 0xff)
 		{
-			case 0x00:	state->m_prot = state->m_prot ^ 0x0009;	break;
-			case 0x08:	state->m_prot = state->m_prot ^ 0x0002;	break;
-			case 0x0c:	state->m_prot = state->m_prot ^ 0x0003;	break;
-			//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", cpu_get_pc(&space->device()), data);
+			case 0x00:	m_prot = m_prot ^ 0x0009;	break;
+			case 0x08:	m_prot = m_prot ^ 0x0002;	break;
+			case 0x0c:	m_prot = m_prot ^ 0x0003;	break;
+			//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", cpu_get_pc(&space.device()), data);
 		}
 	}
 }
@@ -172,11 +170,11 @@ static WRITE16_HANDLER( bestbest_prot_w )
 static ADDRESS_MAP_START( bestbest_map, AS_PROGRAM, 16, suna16_state )
 	AM_RANGE( 0x000000, 0x03ffff ) AM_ROM AM_MIRROR(0xc0000)		// ROM
 	AM_RANGE( 0x200000, 0x2fffff ) AM_ROM AM_REGION("user1", 0)		// ROM
-	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("P1") AM_WRITE_LEGACY(suna16_soundlatch_w)		// To Sound CPU
+	AM_RANGE( 0x500000, 0x500001 ) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)		// To Sound CPU
 	AM_RANGE( 0x500002, 0x500003 ) AM_READ_PORT("P2") AM_WRITE_LEGACY(bestbest_flipscreen_w)	// P2 + Coins, Flip Screen
-	AM_RANGE( 0x500004, 0x500005 ) AM_READ_PORT("DSW") AM_WRITE_LEGACY(bestbest_coin_w)		// Coin Counter
-	AM_RANGE( 0x500008, 0x500009 ) AM_WRITE_LEGACY(bestbest_prot_w )		// Protection
-	AM_RANGE( 0x500018, 0x500019 ) AM_READ_LEGACY(bestbest_prot_r )		//
+	AM_RANGE( 0x500004, 0x500005 ) AM_READ_PORT("DSW") AM_WRITE(bestbest_coin_w)		// Coin Counter
+	AM_RANGE( 0x500008, 0x500009 ) AM_WRITE(bestbest_prot_w )		// Protection
+	AM_RANGE( 0x500018, 0x500019 ) AM_READ(bestbest_prot_r )		//
 	AM_RANGE( 0x540000, 0x540fff ) AM_READWRITE_LEGACY(suna16_paletteram16_r, suna16_paletteram16_w )	// Banked(?) Palette
 	AM_RANGE( 0x541000, 0x54ffff ) AM_RAM														//
 	AM_RANGE( 0x580000, 0x58ffff ) AM_RAM							// RAM
@@ -260,20 +258,20 @@ ADDRESS_MAP_END
 
 /* Bank Switching */
 
-static WRITE8_HANDLER( bssoccer_pcm_1_bankswitch_w )
+WRITE8_MEMBER(suna16_state::bssoccer_pcm_1_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("pcm1")->base();
+	UINT8 *RAM = machine().region("pcm1")->base();
 	int bank = data & 7;
-	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space->device()), data);
-	memory_set_bankptr(space->machine(), "bank1", &RAM[bank * 0x10000 + 0x1000]);
+	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space.device()), data);
+	memory_set_bankptr(machine(), "bank1", &RAM[bank * 0x10000 + 0x1000]);
 }
 
-static WRITE8_HANDLER( bssoccer_pcm_2_bankswitch_w )
+WRITE8_MEMBER(suna16_state::bssoccer_pcm_2_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("pcm2")->base();
+	UINT8 *RAM = machine().region("pcm2")->base();
 	int bank = data & 7;
-	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space->device()), data);
-	memory_set_bankptr(space->machine(), "bank2", &RAM[bank * 0x10000 + 0x1000]);
+	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space.device()), data);
+	memory_set_bankptr(machine(), "bank2", &RAM[bank * 0x10000 + 0x1000]);
 }
 
 
@@ -304,7 +302,7 @@ static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, AS_IO, 8, suna16_state )
 	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch2_r)	// From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("dac2", bssoccer_DAC_w)	// 2 x DAC
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(bssoccer_pcm_1_bankswitch_w)	// Rom Bank
+	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_1_bankswitch_w)	// Rom Bank
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bssoccer_pcm_2_io_map, AS_IO, 8, suna16_state )
@@ -312,7 +310,7 @@ static ADDRESS_MAP_START( bssoccer_pcm_2_io_map, AS_IO, 8, suna16_state )
 	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch3_r)	// From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac3", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("dac4", bssoccer_DAC_w)	// 2 x DAC
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(bssoccer_pcm_2_bankswitch_w)	// Rom Bank
+	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_2_bankswitch_w)	// Rom Bank
 ADDRESS_MAP_END
 
 
@@ -322,12 +320,12 @@ ADDRESS_MAP_END
 
 /* Bank Switching */
 
-static WRITE8_HANDLER( uballoon_pcm_1_bankswitch_w )
+WRITE8_MEMBER(suna16_state::uballoon_pcm_1_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("pcm1")->base();
+	UINT8 *RAM = machine().region("pcm1")->base();
 	int bank = data & 1;
-	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space->device()), data);
-	memory_set_bankptr(space->machine(), "bank1", &RAM[bank * 0x10000 + 0x400]);
+	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(&space.device()), data);
+	memory_set_bankptr(machine(), "bank1", &RAM[bank * 0x10000 + 0x400]);
 }
 
 /* Memory maps: Yes, *no* RAM */
@@ -342,13 +340,14 @@ static ADDRESS_MAP_START( uballoon_pcm_1_io_map, AS_IO, 8, suna16_state )
 	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch2_r)	// From The Sound Z80
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", bssoccer_DAC_w)	// 2 x DAC
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("dac2", bssoccer_DAC_w)	// 2 x DAC
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(uballoon_pcm_1_bankswitch_w)	// Rom Bank
+	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w)	// Rom Bank
 ADDRESS_MAP_END
 
 static MACHINE_RESET(uballoon)
 {
+	suna16_state *state = machine.driver_data<suna16_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	uballoon_pcm_1_bankswitch_w(space, 0, 0);
+	state->uballoon_pcm_1_bankswitch_w(*space, 0, 0);
 }
 
 

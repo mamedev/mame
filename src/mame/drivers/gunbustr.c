@@ -66,16 +66,16 @@ static INTERRUPT_GEN( gunbustr_interrupt )
 	device_set_input_line(device, 4, HOLD_LINE);
 }
 
-static WRITE32_HANDLER( gunbustr_palette_w )
+WRITE32_MEMBER(gunbustr_state::gunbustr_palette_w)
 {
 	int a;
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
 
-	a = space->machine().generic.paletteram.u32[offset] >> 16;
-	palette_set_color_rgb(space->machine(),offset*2,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
+	a = machine().generic.paletteram.u32[offset] >> 16;
+	palette_set_color_rgb(machine(),offset*2,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 
-	a = space->machine().generic.paletteram.u32[offset] &0xffff;
-	palette_set_color_rgb(space->machine(),offset*2+1,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
+	a = machine().generic.paletteram.u32[offset] &0xffff;
+	palette_set_color_rgb(machine(),offset*2+1,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 }
 
 static CUSTOM_INPUT( coin_word_r )
@@ -84,16 +84,15 @@ static CUSTOM_INPUT( coin_word_r )
 	return state->m_coin_word;
 }
 
-static WRITE32_HANDLER( gunbustr_input_w )
+WRITE32_MEMBER(gunbustr_state::gunbustr_input_w)
 {
-	gunbustr_state *state = space->machine().driver_data<gunbustr_state>();
 
 #if 0
 {
 char t[64];
-COMBINE_DATA(&state->m_mem[offset]);
+COMBINE_DATA(&m_mem[offset]);
 
-sprintf(t,"%08x %08x",state->m_mem[0],state->m_mem[1]);
+sprintf(t,"%08x %08x",m_mem[0],m_mem[1]);
 popmessage(t);
 }
 #endif
@@ -104,12 +103,12 @@ popmessage(t);
 		{
 			if (ACCESSING_BITS_24_31)	/* $400000 is watchdog */
 			{
-				watchdog_reset(space->machine());
+				watchdog_reset(machine());
 			}
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+				eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 				eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom->write_bit(data & 0x40);
 				eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -125,18 +124,18 @@ popmessage(t);
 				/* game does not write a separate counter for coin 2!
                    It should disable both coins when 9 credits reached
                    see code $1d8a-f6... but for some reason it's not */
-				coin_lockout_w(space->machine(), 0, data & 0x01000000);
-				coin_lockout_w(space->machine(), 1, data & 0x02000000);
-				coin_counter_w(space->machine(), 0, data & 0x04000000);
-				coin_counter_w(space->machine(), 1, data & 0x04000000);
-				state->m_coin_word = (data >> 16) &0xffff;
+				coin_lockout_w(machine(), 0, data & 0x01000000);
+				coin_lockout_w(machine(), 1, data & 0x02000000);
+				coin_counter_w(machine(), 0, data & 0x04000000);
+				coin_counter_w(machine(), 1, data & 0x04000000);
+				m_coin_word = (data >> 16) &0xffff;
 			}
-//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(&space->device()),offset);
+//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(&device()),offset);
 		}
 	}
 }
 
-static WRITE32_HANDLER( motor_control_w )
+WRITE32_MEMBER(gunbustr_state::motor_control_w)
 {
 /*
     Standard value poked into MSW is 0x3c00
@@ -174,16 +173,16 @@ static WRITE32_HANDLER( motor_control_w )
 
 
 
-static READ32_HANDLER( gunbustr_gun_r )
+READ32_MEMBER(gunbustr_state::gunbustr_gun_r)
 {
-	return ( input_port_read(space->machine(), "LIGHT0_X") << 24) | (input_port_read(space->machine(), "LIGHT0_Y") << 16) |
-		 ( input_port_read(space->machine(), "LIGHT1_X") << 8)  |  input_port_read(space->machine(), "LIGHT1_Y");
+	return ( input_port_read(machine(), "LIGHT0_X") << 24) | (input_port_read(machine(), "LIGHT0_Y") << 16) |
+		 ( input_port_read(machine(), "LIGHT1_X") << 8)  |  input_port_read(machine(), "LIGHT1_Y");
 }
 
-static WRITE32_HANDLER( gunbustr_gun_w )
+WRITE32_MEMBER(gunbustr_state::gunbustr_gun_w)
 {
 	/* 10000 cycle delay is arbitrary */
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(10000), FUNC(gunbustr_interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), FUNC(gunbustr_interrupt5));
 }
 
 
@@ -195,15 +194,15 @@ static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32, gunbustr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(m_ram)										/* main CPUA ram */
 	AM_RANGE(0x300000, 0x301fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)				/* Sprite ram */
-	AM_RANGE(0x380000, 0x380003) AM_WRITE_LEGACY(motor_control_w)											/* motor, lamps etc. */
+	AM_RANGE(0x380000, 0x380003) AM_WRITE(motor_control_w)											/* motor, lamps etc. */
 	AM_RANGE(0x390000, 0x3907ff) AM_RAM AM_SHARE("f3_shared")										/* Sound shared ram */
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x400000, 0x400007) AM_WRITE_LEGACY(gunbustr_input_w)											/* eerom etc. */
-	AM_RANGE(0x500000, 0x500003) AM_READWRITE_LEGACY(gunbustr_gun_r, gunbustr_gun_w)						/* gun coord read */
+	AM_RANGE(0x400000, 0x400007) AM_WRITE(gunbustr_input_w)											/* eerom etc. */
+	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)						/* gun coord read */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
-	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE_LEGACY(gunbustr_palette_w) AM_BASE_GENERIC(paletteram)			/* Palette ram */
+	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE(gunbustr_palette_w) AM_BASE_GENERIC(paletteram)			/* Palette ram */
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM																/* network ram ?? */
 ADDRESS_MAP_END
 
@@ -472,19 +471,19 @@ ROM_START( gunbustrj )
 	ROM_LOAD16_WORD( "eeprom-gunbustr.bin", 0x0000, 0x0080, CRC(af7dc017) SHA1(5ff106cccd2679025cdd81fbc133d32148e2818c) )
 ROM_END
 
-static READ32_HANDLER( main_cycle_r )
+READ32_MEMBER(gunbustr_state::main_cycle_r)
 {
-	gunbustr_state *state = space->machine().driver_data<gunbustr_state>();
-	if (cpu_get_pc(&space->device())==0x55a && (state->m_ram[0x3acc/4]&0xff000000)==0)
-		device_spin_until_interrupt(&space->device());
+	if (cpu_get_pc(&space.device())==0x55a && (m_ram[0x3acc/4]&0xff000000)==0)
+		device_spin_until_interrupt(&space.device());
 
-	return state->m_ram[0x3acc/4];
+	return m_ram[0x3acc/4];
 }
 
 static DRIVER_INIT( gunbustr )
 {
 	/* Speedup handler */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x203acc, 0x203acf, FUNC(main_cycle_r));
+	gunbustr_state *state = machine.driver_data<gunbustr_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x203acc, 0x203acf, read32_delegate(FUNC(gunbustr_state::main_cycle_r),state));
 }
 
 GAME( 1992, gunbustr,  0,        gunbustr, gunbustr, gunbustr, ORIENTATION_FLIP_X, "Taito Corporation Japan", "Gunbuster (World)", 0 )

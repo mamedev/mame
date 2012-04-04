@@ -39,10 +39,9 @@ static INTERRUPT_GEN( mainevt_interrupt )
 		irq0_line_hold(device);
 }
 
-static WRITE8_HANDLER( dv_nmienable_w )
+WRITE8_MEMBER(mainevt_state::dv_nmienable_w)
 {
-	mainevt_state *state = space->machine().driver_data<mainevt_state>();
-	state->m_nmi_enable = data;
+	m_nmi_enable = data;
 }
 
 static INTERRUPT_GEN( dv_interrupt )
@@ -54,38 +53,36 @@ static INTERRUPT_GEN( dv_interrupt )
 }
 
 
-static WRITE8_HANDLER( mainevt_bankswitch_w )
+WRITE8_MEMBER(mainevt_state::mainevt_bankswitch_w)
 {
-	mainevt_state *state = space->machine().driver_data<mainevt_state>();
 
 	/* bit 0-1 ROM bank select */
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	memory_set_bank(machine(), "bank1", data & 0x03);
 
 	/* TODO: bit 5 = select work RAM or palette? */
 	//palette_selected = data & 0x20;
 
 	/* bit 6 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 7 = NINITSET (unknown) */
 
 	/* other bits unused */
 }
 
-static WRITE8_HANDLER( mainevt_coin_w )
+WRITE8_MEMBER(mainevt_state::mainevt_coin_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x10);
-	coin_counter_w(space->machine(), 1, data & 0x20);
-	set_led_status(space->machine(), 0, data & 0x01);
-	set_led_status(space->machine(), 1, data & 0x02);
-	set_led_status(space->machine(), 2, data & 0x04);
-	set_led_status(space->machine(), 3, data & 0x08);
+	coin_counter_w(machine(), 0, data & 0x10);
+	coin_counter_w(machine(), 1, data & 0x20);
+	set_led_status(machine(), 0, data & 0x01);
+	set_led_status(machine(), 1, data & 0x02);
+	set_led_status(machine(), 2, data & 0x04);
+	set_led_status(machine(), 3, data & 0x08);
 }
 
-static WRITE8_HANDLER( mainevt_sh_irqtrigger_w )
+WRITE8_MEMBER(mainevt_state::mainevt_sh_irqtrigger_w)
 {
-	mainevt_state *state = space->machine().driver_data<mainevt_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static READ8_DEVICE_HANDLER( mainevt_sh_busy_r )
@@ -93,37 +90,34 @@ static READ8_DEVICE_HANDLER( mainevt_sh_busy_r )
 	return upd7759_busy_r(device);
 }
 
-static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )
+WRITE8_MEMBER(mainevt_state::mainevt_sh_irqcontrol_w)
 {
-	mainevt_state *state = space->machine().driver_data<mainevt_state>();
 
-	upd7759_reset_w(state->m_upd, data & 2);
-	upd7759_start_w(state->m_upd, data & 1);
+	upd7759_reset_w(m_upd, data & 2);
+	upd7759_start_w(m_upd, data & 1);
 
-	state->m_sound_irq_mask = data & 4;
+	m_sound_irq_mask = data & 4;
 }
 
-static WRITE8_HANDLER( devstor_sh_irqcontrol_w )
+WRITE8_MEMBER(mainevt_state::devstor_sh_irqcontrol_w)
 {
-	mainevt_state *state = space->machine().driver_data<mainevt_state>();
 
-	state->m_sound_irq_mask = data & 4;
+	m_sound_irq_mask = data & 4;
 }
 
-static WRITE8_HANDLER( mainevt_sh_bankswitch_w )
+WRITE8_MEMBER(mainevt_state::mainevt_sh_bankswitch_w)
 {
-	mainevt_state *state = space->machine().driver_data<mainevt_state>();
 	int bank_A, bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(&space->device()),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(&space.device()),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A = (data & 0x3);
 	bank_B = ((data >> 2) & 0x3);
-	k007232_set_bank(state->m_k007232, bank_A, bank_B);
+	k007232_set_bank(m_k007232, bank_A, bank_B);
 
 	/* bits 4-5 select the UPD7759 bank */
-	upd7759_set_bank_base(state->m_upd, ((data >> 4) & 0x03) * 0x20000);
+	upd7759_set_bank_base(m_upd, ((data >> 4) & 0x03) * 0x20000);
 }
 
 static WRITE8_DEVICE_HANDLER( dv_sh_bankswitch_w )
@@ -138,42 +132,40 @@ static WRITE8_DEVICE_HANDLER( dv_sh_bankswitch_w )
 	k007232_set_bank(device, bank_A, bank_B);
 }
 
-static READ8_HANDLER( k052109_051960_r )
+READ8_MEMBER(mainevt_state::k052109_051960_r)
 {
-	mainevt_state *state = space->machine().driver_data<mainevt_state>();
 
-	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->m_k051960, offset - 0x3800);
+			return k051937_r(m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->m_k052109, offset);
+			return k052109_r(m_k052109, offset);
 		else
-			return k051960_r(state->m_k051960, offset - 0x3c00);
+			return k051960_r(m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->m_k052109, offset);
+		return k052109_r(m_k052109, offset);
 }
 
-static WRITE8_HANDLER( k052109_051960_w )
+WRITE8_MEMBER(mainevt_state::k052109_051960_w)
 {
-	mainevt_state *state = space->machine().driver_data<mainevt_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->m_k051960, offset - 0x3800, data);
+		k051937_w(m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->m_k052109, offset, data);
+		k052109_w(m_k052109, offset, data);
 	else
-		k051960_w(state->m_k051960, offset - 0x3c00, data);
+		k051960_w(m_k051960, offset - 0x3c00, data);
 }
 
 
 static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8, mainevt_state )
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE_LEGACY(mainevt_bankswitch_w)
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE_LEGACY(soundlatch_w)				/* probably */
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE_LEGACY(mainevt_sh_irqtrigger_w)	/* probably */
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)	/* probably */
 	AM_RANGE(0x1f8c, 0x1f8d) AM_WRITENOP	/* ??? */
-	AM_RANGE(0x1f90, 0x1f90) AM_WRITE_LEGACY(mainevt_coin_w)	/* coin counters + lamps */
+	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(mainevt_coin_w)	/* coin counters + lamps */
 
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("P1")
@@ -184,7 +176,7 @@ static ADDRESS_MAP_START( mainevt_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x1f9a, 0x1f9a) AM_READ_PORT("P4")
 	AM_RANGE(0x1f9b, 0x1f9b) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
 	AM_RANGE(0x5e00, 0x5fff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)
@@ -194,11 +186,11 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE_LEGACY(mainevt_bankswitch_w)
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(mainevt_bankswitch_w)
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE_LEGACY(soundlatch_w)				/* probably */
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE_LEGACY(mainevt_sh_irqtrigger_w)	/* probably */
-	AM_RANGE(0x1f90, 0x1f90) AM_WRITE_LEGACY(mainevt_coin_w)	/* coin counters + lamps */
-	AM_RANGE(0x1fb2, 0x1fb2) AM_WRITE_LEGACY(dv_nmienable_w)
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(mainevt_sh_irqtrigger_w)	/* probably */
+	AM_RANGE(0x1f90, 0x1f90) AM_WRITE(mainevt_coin_w)	/* coin counters + lamps */
+	AM_RANGE(0x1fb2, 0x1fb2) AM_WRITE(dv_nmienable_w)
 
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("P1")
@@ -208,7 +200,7 @@ static ADDRESS_MAP_START( devstors_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0x1f9b, 0x1f9b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1fa0, 0x1fbf) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)
 
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 
 	AM_RANGE(0x4000, 0x5dff) AM_RAM
 	AM_RANGE(0x5e00, 0x5fff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)
@@ -224,8 +216,8 @@ static ADDRESS_MAP_START( mainevt_sound_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r,k007232_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVREAD_LEGACY("upd", mainevt_sh_busy_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(mainevt_sh_irqcontrol_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(mainevt_sh_bankswitch_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(mainevt_sh_irqcontrol_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(mainevt_sh_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( devstors_sound_map, AS_PROGRAM, 8, mainevt_state )
@@ -234,7 +226,7 @@ static ADDRESS_MAP_START( devstors_sound_map, AS_PROGRAM, 8, mainevt_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r,k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(devstor_sh_irqcontrol_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(devstor_sh_irqcontrol_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", dv_sh_bankswitch_w)
 ADDRESS_MAP_END
 

@@ -53,24 +53,21 @@ Notes:
 #include "includes/ladyfrog.h"
 
 
-static READ8_HANDLER( from_snd_r )
+READ8_MEMBER(ladyfrog_state::from_snd_r)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	state->m_snd_flag = 0;
-	return state->m_snd_data;
+	m_snd_flag = 0;
+	return m_snd_data;
 }
 
-static WRITE8_HANDLER( to_main_w )
+WRITE8_MEMBER(ladyfrog_state::to_main_w)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	state->m_snd_data = data;
-	state->m_snd_flag = 2;
+	m_snd_data = data;
+	m_snd_flag = 2;
 }
 
-static WRITE8_HANDLER( sound_cpu_reset_w )
+WRITE8_MEMBER(ladyfrog_state::sound_cpu_reset_w)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -83,27 +80,25 @@ static TIMER_CALLBACK( nmi_callback )
 		state->m_pending_nmi = 1;
 }
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(ladyfrog_state::sound_command_w)
 {
 	soundlatch_w(space, 0, data);
-	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
-static WRITE8_HANDLER( nmi_disable_w )
+WRITE8_MEMBER(ladyfrog_state::nmi_disable_w)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	state->m_sound_nmi_enable = 0;
+	m_sound_nmi_enable = 0;
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(ladyfrog_state::nmi_enable_w)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 
-	state->m_sound_nmi_enable = 1;
-	if (state->m_pending_nmi)
+	m_sound_nmi_enable = 1;
+	if (m_pending_nmi)
 	{
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->m_pending_nmi = 0;
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_pending_nmi = 0;
 	}
 }
 
@@ -127,10 +122,9 @@ static const msm5232_interface msm5232_config =
 	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 }
 };
 
-static READ8_HANDLER( snd_flag_r )
+READ8_MEMBER(ladyfrog_state::snd_flag_r)
 {
-	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
-	return state->m_snd_flag | 0xfd;
+	return m_snd_flag | 0xfd;
 }
 
 static ADDRESS_MAP_START( ladyfrog_map, AS_PROGRAM, 8, ladyfrog_state )
@@ -138,9 +132,9 @@ static ADDRESS_MAP_START( ladyfrog_map, AS_PROGRAM, 8, ladyfrog_state )
 	AM_RANGE(0xc000, 0xc07f) AM_RAM
 	AM_RANGE(0xc080, 0xc87f) AM_READWRITE_LEGACY(ladyfrog_videoram_r, ladyfrog_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(ladyfrog_gfxctrl2_w)
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
-	AM_RANGE(0xd403, 0xd403) AM_WRITE_LEGACY(sound_cpu_reset_w)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
+	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("INPUTS")
@@ -163,9 +157,9 @@ static ADDRESS_MAP_START( ladyfrog_sound_map, AS_PROGRAM, 8, ladyfrog_state )
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITENOP
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(soundlatch_r,to_main_w)
-	AM_RANGE(0xd200, 0xd200) AM_READNOP AM_WRITE_LEGACY(nmi_enable_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE_LEGACY(nmi_disable_w)
+	AM_RANGE(0xd000, 0xd000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(to_main_w)
+	AM_RANGE(0xd200, 0xd200) AM_READNOP AM_WRITE(nmi_enable_w)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_NOP
 ADDRESS_MAP_END

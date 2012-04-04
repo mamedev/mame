@@ -25,14 +25,14 @@ todo:
 
 
 /* input ports are rotated 90 degrees */
-static READ8_HANDLER( input_port_r )
+READ8_MEMBER(gomoku_state::input_port_r)
 {
 	int i, res;
 	static const char *const portnames[] = { "IN0", "IN1", "DSW", "UNUSED0", "UNUSED1", "UNUSED2", "UNUSED3", "UNUSED4" };
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((input_port_read_safe(space->machine(), portnames[i], 0xff) >> offset) & 1) << i;
+		res |= ((input_port_read_safe(machine(), portnames[i], 0xff) >> offset) & 1) << i;
 
 	return res;
 }
@@ -50,7 +50,7 @@ static ADDRESS_MAP_START( gomoku_map, AS_PROGRAM, 8, gomoku_state )
 	AM_RANGE(0x7001, 0x7001) AM_WRITE_LEGACY(gomoku_flipscreen_w)
 	AM_RANGE(0x7002, 0x7002) AM_WRITE_LEGACY(gomoku_bg_dispsw_w)
 	AM_RANGE(0x7003, 0x7007) AM_WRITENOP
-	AM_RANGE(0x7800, 0x7807) AM_READ_LEGACY(input_port_r)
+	AM_RANGE(0x7800, 0x7807) AM_READ(input_port_r)
 	AM_RANGE(0x7800, 0x7800) AM_WRITENOP
 ADDRESS_MAP_END
 

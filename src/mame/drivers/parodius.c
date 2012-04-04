@@ -26,82 +26,76 @@ static INTERRUPT_GEN( parodius_interrupt )
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
-static READ8_HANDLER( bankedram_r )
+READ8_MEMBER(parodius_state::bankedram_r)
 {
-	parodius_state *state = space->machine().driver_data<parodius_state>();
 
-	if (state->m_videobank & 0x01)
+	if (m_videobank & 0x01)
 	{
-		if (state->m_videobank & 0x04)
-			return space->machine().generic.paletteram.u8[offset + 0x0800];
+		if (m_videobank & 0x04)
+			return machine().generic.paletteram.u8[offset + 0x0800];
 		else
-			return space->machine().generic.paletteram.u8[offset];
+			return machine().generic.paletteram.u8[offset];
 	}
 	else
-		return state->m_ram[offset];
+		return m_ram[offset];
 }
 
-static WRITE8_HANDLER( bankedram_w )
+WRITE8_MEMBER(parodius_state::bankedram_w)
 {
-	parodius_state *state = space->machine().driver_data<parodius_state>();
 
-	if (state->m_videobank & 0x01)
+	if (m_videobank & 0x01)
 	{
-		if (state->m_videobank & 0x04)
+		if (m_videobank & 0x04)
 			paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset + 0x0800, data);
 		else
 			paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
 	}
 	else
-		state->m_ram[offset] = data;
+		m_ram[offset] = data;
 }
 
-static READ8_HANDLER( parodius_052109_053245_r )
+READ8_MEMBER(parodius_state::parodius_052109_053245_r)
 {
-	parodius_state *state = space->machine().driver_data<parodius_state>();
 
-	if (state->m_videobank & 0x02)
-		return k053245_r(state->m_k053245, offset);
+	if (m_videobank & 0x02)
+		return k053245_r(m_k053245, offset);
 	else
-		return k052109_r(state->m_k052109, offset);
+		return k052109_r(m_k052109, offset);
 }
 
-static WRITE8_HANDLER( parodius_052109_053245_w )
+WRITE8_MEMBER(parodius_state::parodius_052109_053245_w)
 {
-	parodius_state *state = space->machine().driver_data<parodius_state>();
 
-	if (state->m_videobank & 0x02)
-		k053245_w(state->m_k053245, offset, data);
+	if (m_videobank & 0x02)
+		k053245_w(m_k053245, offset, data);
 	else
-		k052109_w(state->m_k052109, offset, data);
+		k052109_w(m_k052109, offset, data);
 }
 
-static WRITE8_HANDLER( parodius_videobank_w )
+WRITE8_MEMBER(parodius_state::parodius_videobank_w)
 {
-	parodius_state *state = space->machine().driver_data<parodius_state>();
 
-	if (state->m_videobank & 0xf8)
-		logerror("%04x: videobank = %02x\n",cpu_get_pc(&space->device()),data);
+	if (m_videobank & 0xf8)
+		logerror("%04x: videobank = %02x\n",cpu_get_pc(&space.device()),data);
 
 	/* bit 0 = select palette or work RAM at 0000-07ff */
 	/* bit 1 = select 052109 or 053245 at 2000-27ff */
 	/* bit 2 = select palette bank 0 or 1 */
-	state->m_videobank = data;
+	m_videobank = data;
 }
 
-static WRITE8_HANDLER( parodius_3fc0_w )
+WRITE8_MEMBER(parodius_state::parodius_3fc0_w)
 {
-	parodius_state *state = space->machine().driver_data<parodius_state>();
 
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(&space->device()),data);
+		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(&space.device()),data);
 
 	/* bit 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 3 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* other bits unknown */
 }
@@ -111,10 +105,9 @@ static READ8_DEVICE_HANDLER( parodius_sound_r )
 	return k053260_r(device, 2 + offset);
 }
 
-static WRITE8_HANDLER( parodius_sh_irqtrigger_w )
+WRITE8_MEMBER(parodius_state::parodius_sh_irqtrigger_w)
 {
-	parodius_state *state = space->machine().driver_data<parodius_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 #if 0
@@ -134,18 +127,17 @@ static TIMER_CALLBACK( nmi_callback )
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( sound_arm_nmi_w )
+WRITE8_MEMBER(parodius_state::sound_arm_nmi_w)
 {
-	parodius_state *state = space->machine().driver_data<parodius_state>();
 
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	space->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
 /********************************************/
 
 static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE(m_ram)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(m_ram)
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x3f8c, 0x3f8c) AM_READ_PORT("P1")
 	AM_RANGE(0x3f8d, 0x3f8d) AM_READ_PORT("P2")
@@ -154,11 +146,11 @@ static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x3f90, 0x3f90) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3fa0, 0x3faf) AM_DEVREADWRITE_LEGACY("k053245", k053244_r, k053244_w)
 	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
-	AM_RANGE(0x3fc0, 0x3fc0) AM_READWRITE_LEGACY(watchdog_reset_r,parodius_3fc0_w)
-	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE_LEGACY(parodius_videobank_w)
-	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE_LEGACY(parodius_sh_irqtrigger_w)
+	AM_RANGE(0x3fc0, 0x3fc0) AM_READ_LEGACY(watchdog_reset_r) AM_WRITE(parodius_3fc0_w)
+	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE(parodius_videobank_w)
+	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE(parodius_sh_irqtrigger_w)
 	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVREADWRITE_LEGACY("k053260", parodius_sound_r, k053260_w)	/* K053260 */
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE_LEGACY(parodius_052109_053245_r, parodius_052109_053245_w)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(parodius_052109_053245_r, parodius_052109_053245_w)
 	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")			/* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM					/* ROM */
@@ -168,7 +160,7 @@ static ADDRESS_MAP_START( parodius_sound_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(sound_arm_nmi_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
 	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r,k053260_w)
 ADDRESS_MAP_END
 

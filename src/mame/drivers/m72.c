@@ -230,23 +230,21 @@ static TIMER_CALLBACK( delayed_ram16_w )
 }
 
 
-static WRITE16_HANDLER( m72_main_mcu_sound_w )
+WRITE16_MEMBER(m72_state::m72_main_mcu_sound_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (data & 0xfff0)
 		logerror("sound_w: %04x %04x\n", mem_mask, data);
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_mcu_snd_cmd_latch = data;
-		cputag_set_input_line(space->machine(), "mcu", 1, ASSERT_LINE);
+		m_mcu_snd_cmd_latch = data;
+		cputag_set_input_line(machine(), "mcu", 1, ASSERT_LINE);
 	}
 }
 
-static WRITE16_HANDLER( m72_main_mcu_w)
+WRITE16_MEMBER(m72_state::m72_main_mcu_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	UINT16 val = state->m_protection_ram[offset];
+	UINT16 val = m_protection_ram[offset];
 
 	COMBINE_DATA(&val);
 
@@ -256,38 +254,36 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
 	{
-		state->m_protection_ram[offset] = val;
-		cputag_set_input_line(space->machine(), "mcu", 0, ASSERT_LINE);
+		m_protection_ram[offset] = val;
+		cputag_set_input_line(machine(), "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
-		//space->machine().scheduler().timer_set(space->machine().device<cpu_device>("mcu")->cycles_to_attotime(2), FUNC(mcu_irq0_clear));
-		//space->machine().scheduler().timer_set(space->machine().device<cpu_device>("mcu")->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
+		//machine().scheduler().timer_set(machine().device<cpu_device>("mcu")->cycles_to_attotime(2), FUNC(mcu_irq0_clear));
+		//machine().scheduler().timer_set(machine().device<cpu_device>("mcu")->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
 	}
 	else
-		space->machine().scheduler().synchronize( FUNC(delayed_ram16_w), (offset<<16) | val, state->m_protection_ram);
+		machine().scheduler().synchronize( FUNC(delayed_ram16_w), (offset<<16) | val, m_protection_ram);
 }
 
-static WRITE8_HANDLER( m72_mcu_data_w )
+WRITE8_MEMBER(m72_state::m72_mcu_data_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	UINT16 val;
-	if (offset&1) val = (state->m_protection_ram[offset/2] & 0x00ff) | (data << 8);
-	else val = (state->m_protection_ram[offset/2] & 0xff00) | (data&0xff);
+	if (offset&1) val = (m_protection_ram[offset/2] & 0x00ff) | (data << 8);
+	else val = (m_protection_ram[offset/2] & 0xff00) | (data&0xff);
 
-	space->machine().scheduler().synchronize( FUNC(delayed_ram16_w), ((offset >>1 ) << 16) | val, state->m_protection_ram);
+	machine().scheduler().synchronize( FUNC(delayed_ram16_w), ((offset >>1 ) << 16) | val, m_protection_ram);
 }
 
-static READ8_HANDLER(m72_mcu_data_r )
+READ8_MEMBER(m72_state::m72_mcu_data_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	UINT8 ret;
 
 	if (offset == 0x0fff || offset == 0x0ffe)
 	{
-		cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
 	}
 
-	if (offset&1) ret = (state->m_protection_ram[offset/2] & 0xff00)>>8;
-	else ret = (state->m_protection_ram[offset/2] & 0x00ff);
+	if (offset&1) ret = (m_protection_ram[offset/2] & 0xff00)>>8;
+	else ret = (m_protection_ram[offset/2] & 0x00ff);
 
 	return ret;
 }
@@ -300,58 +296,52 @@ static INTERRUPT_GEN( m72_mcu_int )
 	device_set_input_line(device, 1, ASSERT_LINE);
 }
 
-static READ8_HANDLER(m72_mcu_sample_r )
+READ8_MEMBER(m72_state::m72_mcu_sample_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	UINT8 sample;
-	sample = space->machine().region("samples")->base()[state->m_mcu_sample_addr++];
+	sample = machine().region("samples")->base()[m_mcu_sample_addr++];
 	return sample;
 }
 
-static WRITE8_HANDLER(m72_mcu_ack_w )
+WRITE8_MEMBER(m72_state::m72_mcu_ack_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	cputag_set_input_line(space->machine(), "mcu", 1, CLEAR_LINE);
-	state->m_mcu_snd_cmd_latch = 0;
+	cputag_set_input_line(machine(), "mcu", 1, CLEAR_LINE);
+	m_mcu_snd_cmd_latch = 0;
 }
 
-static READ8_HANDLER(m72_mcu_snd_r )
+READ8_MEMBER(m72_state::m72_mcu_snd_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	return state->m_mcu_snd_cmd_latch;
+	return m_mcu_snd_cmd_latch;
 }
 
-static READ8_HANDLER(m72_mcu_port_r )
+READ8_MEMBER(m72_state::m72_mcu_port_r)
 {
 	logerror("port read: %02x\n", offset);
 	return 0;
 }
 
-static WRITE8_HANDLER(m72_mcu_port_w )
+WRITE8_MEMBER(m72_state::m72_mcu_port_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (offset == 1)
 	{
-		state->m_mcu_sample_latch = data;
-		cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		m_mcu_sample_latch = data;
+		cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		logerror("port: %02x %02x\n", offset, data);
 
 }
 
-static WRITE8_HANDLER( m72_mcu_low_w )
+WRITE8_MEMBER(m72_state::m72_mcu_low_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	state->m_mcu_sample_addr = (state->m_mcu_sample_addr & 0xffe000) | (data<<5);
-	logerror("low: %02x %02x %08x\n", offset, data, state->m_mcu_sample_addr);
+	m_mcu_sample_addr = (m_mcu_sample_addr & 0xffe000) | (data<<5);
+	logerror("low: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
 }
 
-static WRITE8_HANDLER( m72_mcu_high_w )
+WRITE8_MEMBER(m72_state::m72_mcu_high_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	state->m_mcu_sample_addr = (state->m_mcu_sample_addr & 0x1fff) | (data<<(8+5));
-	logerror("high: %02x %02x %08x\n", offset, data, state->m_mcu_sample_addr);
+	m_mcu_sample_addr = (m_mcu_sample_addr & 0x1fff) | (data<<(8+5));
+	logerror("high: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
 }
 
 static WRITE8_DEVICE_HANDLER( m72_snd_cpu_sample_w )
@@ -360,10 +350,9 @@ static WRITE8_DEVICE_HANDLER( m72_snd_cpu_sample_w )
 	dac_data_w(device, data);
 }
 
-static READ8_HANDLER( m72_snd_cpu_sample_r )
+READ8_MEMBER(m72_state::m72_snd_cpu_sample_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	return state->m_mcu_sample_latch;
+	return m_mcu_sample_latch;
 }
 
 INLINE DRIVER_INIT( m72_8751 )
@@ -376,15 +365,15 @@ INLINE DRIVER_INIT( m72_8751 )
 
 	state->m_protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
 	program->install_read_bank(0xb0000, 0xbffff, "bank1");
-	program->install_legacy_write_handler(0xb0000, 0xb0fff, FUNC(m72_main_mcu_w));
+	program->install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::m72_main_mcu_w),state));
 	memory_set_bankptr(machine, "bank1", state->m_protection_ram);
 
 	//io->install_legacy_write_handler(0xc0, 0xc1, FUNC(loht_sample_trigger_w));
-	io->install_legacy_write_handler(0xc0, 0xc1, FUNC(m72_main_mcu_sound_w));
+	io->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::m72_main_mcu_sound_w),state));
 
 	/* sound cpu */
 	sndio->install_legacy_write_handler(*dac, 0x82, 0x82, 0xff, 0, FUNC(m72_snd_cpu_sample_w));
-	sndio->install_legacy_read_handler (0x84, 0x84, 0xff, 0, FUNC(m72_snd_cpu_sample_r));
+	sndio->install_read_handler (0x84, 0x84, 0xff, 0, read8_delegate(FUNC(m72_state::m72_snd_cpu_sample_r),state));
 
 	/* lohtb2 */
 #if 0
@@ -460,79 +449,70 @@ static INTERRUPT_GEN(fake_nmi)
 }
 
 
-static WRITE16_HANDLER( bchopper_sample_trigger_w )
+WRITE16_MEMBER(m72_state::bchopper_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[6] = { 0x0000, 0x0010, 0x2510, 0x6510, 0x8510, 0x9310 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 6) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 6) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( nspirit_sample_trigger_w )
+WRITE16_MEMBER(m72_state::nspirit_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[9] = { 0x0000, 0x0020, 0x2020, 0, 0x5720, 0, 0x7b60, 0x9b60, 0xc360 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( imgfight_sample_trigger_w )
+WRITE16_MEMBER(m72_state::imgfight_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[7] = { 0x0000, 0x0020, 0x44e0, 0x98a0, 0xc820, 0xf7a0, 0x108c0 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( loht_sample_trigger_w )
+WRITE16_MEMBER(m72_state::loht_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( xmultiplm72_sample_trigger_w )
+WRITE16_MEMBER(m72_state::xmultiplm72_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[3] = { 0x0000, 0x0020, 0x1a40 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 3) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 3) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( dbreedm72_sample_trigger_w )
+WRITE16_MEMBER(m72_state::dbreedm72_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( airduel_sample_trigger_w )
+WRITE16_MEMBER(m72_state::airduel_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[16] = {
 		0x00000, 0x00020, 0x03ec0, 0x05640, 0x06dc0, 0x083a0, 0x0c000, 0x0eb60,
 		0x112e0, 0x13dc0, 0x16520, 0x16d60, 0x18ae0, 0x1a5a0, 0x1bf00, 0x1c340 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( dkgenm72_sample_trigger_w )
+WRITE16_MEMBER(m72_state::dkgenm72_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[28] = {
 		0x00000, 0x00020, 0x01800, 0x02da0, 0x03be0, 0x05ae0, 0x06100, 0x06de0,
 		0x07260, 0x07a60, 0x08720, 0x0a5c0, 0x0c3c0, 0x0c7a0, 0x0e140, 0x0fb00,
 		0x10fa0, 0x10fc0, 0x10fe0, 0x11f40, 0x12b20, 0x130a0, 0x13c60, 0x14740,
 		0x153c0, 0x197e0, 0x1af40, 0x1c080 };
 
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 28) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 28) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( gallop_sample_trigger_w )
+WRITE16_MEMBER(m72_state::gallop_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[31] = {
 		0x00000, 0x00020, 0x00040, 0x01360, 0x02580, 0x04f20, 0x06240, 0x076e0,
 		0x08660, 0x092a0, 0x09ba0, 0x0a560, 0x0cee0, 0x0de20, 0x0e620, 0x0f1c0,
 		0x10200, 0x10220, 0x10240, 0x11380, 0x12760, 0x12780, 0x127a0, 0x13c40,
 		0x140a0, 0x16760, 0x17e40, 0x18ee0, 0x19f60, 0x1bbc0, 0x1cee0 };
 
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 31) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 31) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
 
@@ -734,23 +714,21 @@ static void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes)
 		dest[i/2] = src[i+0] | (src[i+1] << 8);
 }
 
-static READ16_HANDLER( protection_r )
+READ16_MEMBER(m72_state::protection_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_8_15)
-		copy_le(state->m_protection_ram,state->m_protection_code,CODE_LEN);
-	return state->m_protection_ram[0xffa/2+offset];
+		copy_le(m_protection_ram,m_protection_code,CODE_LEN);
+	return m_protection_ram[0xffa/2+offset];
 }
 
-static WRITE16_HANDLER( protection_w )
+WRITE16_MEMBER(m72_state::protection_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	data ^= 0xffff;
-	COMBINE_DATA(&state->m_protection_ram[offset]);
+	COMBINE_DATA(&m_protection_ram[offset]);
 	data ^= 0xffff;
 
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15 && (data >> 8) == 0)
-		copy_le(&state->m_protection_ram[0x0fe0],state->m_protection_crc,CRC_LEN);
+		copy_le(&m_protection_ram[0x0fe0],m_protection_crc,CRC_LEN);
 }
 
 static void install_protection_handler(running_machine &machine, const UINT8 *code,const UINT8 *crc)
@@ -760,37 +738,37 @@ static void install_protection_handler(running_machine &machine, const UINT8 *co
 	state->m_protection_code = code;
 	state->m_protection_crc =  crc;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xb0000, 0xb0fff, "bank1");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xb0ffa, 0xb0ffb, FUNC(protection_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb0000, 0xb0fff, FUNC(protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(FUNC(m72_state::protection_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),state));
 	memory_set_bankptr(machine, "bank1", state->m_protection_ram);
 }
 
 static DRIVER_INIT( bchopper )
 {
 	install_protection_handler(machine, bchopper_code,bchopper_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(bchopper_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( mrheli )
 {
 	install_protection_handler(machine, bchopper_code,mrheli_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(bchopper_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( nspirit )
 {
 	install_protection_handler(machine, nspirit_code,nspirit_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(nspirit_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::nspirit_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( imgfight )
 {
 	install_protection_handler(machine, imgfight_code,imgfight_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(imgfight_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::imgfight_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( loht )
@@ -798,7 +776,7 @@ static DRIVER_INIT( loht )
 	m72_state *state = machine.driver_data<m72_state>();
 	install_protection_handler(machine, loht_code,loht_crc);
 
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(loht_sample_trigger_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::loht_sample_trigger_w),state));
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(state->m_videoram2,0,0x4000);
@@ -807,34 +785,35 @@ static DRIVER_INIT( loht )
 static DRIVER_INIT( xmultiplm72 )
 {
 	install_protection_handler(machine, xmultiplm72_code,xmultiplm72_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(xmultiplm72_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::xmultiplm72_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( dbreedm72 )
 {
 	install_protection_handler(machine, dbreedm72_code,dbreedm72_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(dbreedm72_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dbreedm72_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( airduel )
 {
 	install_protection_handler(machine, airduel_code,airduel_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(airduel_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::airduel_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( dkgenm72 )
 {
 	install_protection_handler(machine, dkgenm72_code,dkgenm72_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(dkgenm72_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dkgenm72_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( gallop )
 {
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(gallop_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::gallop_sample_trigger_w),state));
 }
 
 
@@ -842,25 +821,22 @@ static DRIVER_INIT( gallop )
 
 
 
-static READ16_HANDLER( soundram_r )
+READ16_MEMBER(m72_state::soundram_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	return state->m_soundram[offset * 2 + 0] | (state->m_soundram[offset * 2 + 1] << 8);
+	return m_soundram[offset * 2 + 0] | (m_soundram[offset * 2 + 1] << 8);
 }
 
-static WRITE16_HANDLER( soundram_w )
+WRITE16_MEMBER(m72_state::soundram_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_soundram[offset * 2 + 0] = data;
+		m_soundram[offset * 2 + 0] = data;
 	if (ACCESSING_BITS_8_15)
-		state->m_soundram[offset * 2 + 1] = data >> 8;
+		m_soundram[offset * 2 + 1] = data >> 8;
 }
 
 
-static READ16_HANDLER( poundfor_trackball_r )
+READ16_MEMBER(m72_state::poundfor_trackball_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
 
 	if (offset == 0)
@@ -869,9 +845,9 @@ static READ16_HANDLER( poundfor_trackball_r )
 
 		for (i = 0;i < 4;i++)
 		{
-			curr = input_port_read(space->machine(), axisnames[i]);
-			state->m_diff[i] = (curr - state->m_prev[i]);
-			state->m_prev[i] = curr;
+			curr = input_port_read(machine(), axisnames[i]);
+			m_diff[i] = (curr - m_prev[i]);
+			m_prev[i] = curr;
 		}
 	}
 
@@ -879,13 +855,13 @@ static READ16_HANDLER( poundfor_trackball_r )
 	{
 		default:
 		case 0:
-			return (state->m_diff[0] & 0xff) | ((state->m_diff[2] & 0xff) << 8);
+			return (m_diff[0] & 0xff) | ((m_diff[2] & 0xff) << 8);
 		case 1:
-			return ((state->m_diff[0] >> 8) & 0x1f) | (state->m_diff[2] & 0x1f00) | (input_port_read(space->machine(), "IN0") & 0xe0e0);
+			return ((m_diff[0] >> 8) & 0x1f) | (m_diff[2] & 0x1f00) | (input_port_read(machine(), "IN0") & 0xe0e0);
 		case 2:
-			return (state->m_diff[1] & 0xff) | ((state->m_diff[3] & 0xff) << 8);
+			return (m_diff[1] & 0xff) | ((m_diff[3] & 0xff) << 8);
 		case 3:
-			return ((state->m_diff[1] >> 8) & 0x1f) | (state->m_diff[3] & 0x1f00);
+			return ((m_diff[1] >> 8) & 0x1f) | (m_diff[3] & 0x1f00);
 	}
 }
 
@@ -899,7 +875,7 @@ static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state )		\
 	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE_LEGACY(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)		\
 	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE_LEGACY(m72_videoram1_w) AM_BASE(m_videoram1)		\
 	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE_LEGACY(m72_videoram2_w) AM_BASE(m_videoram2)		\
-	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE_LEGACY(soundram_r, soundram_w)							\
+	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)							\
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM									\
 ADDRESS_MAP_END
 
@@ -1035,7 +1011,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x08, 0x0f) AM_READ_LEGACY(poundfor_trackball_r)
+	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
@@ -1135,14 +1111,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, m72_state )
 	/* External access */
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(m72_mcu_sample_r, m72_mcu_low_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE_LEGACY(m72_mcu_high_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(m72_mcu_snd_r, m72_mcu_ack_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m72_mcu_sample_r, m72_mcu_low_w)
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(m72_mcu_high_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(m72_mcu_snd_r, m72_mcu_ack_w)
 	/* shared at b0000 - b0fff on the main cpu */
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE_LEGACY(m72_mcu_data_r,m72_mcu_data_w )
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(m72_mcu_data_r,m72_mcu_data_w )
 
 	/* Ports */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE_LEGACY(m72_mcu_port_r, m72_mcu_port_w)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(m72_mcu_port_r, m72_mcu_port_w)
 ADDRESS_MAP_END
 
 #define COIN_MODE_1 \

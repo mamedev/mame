@@ -39,60 +39,55 @@ NOTE: An eBay auction of the PCB shows "1996.9.16 PROMAT" on the JAMMA+ adapter 
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
-static READ16_HANDLER( oneshot_in0_word_r )
+READ16_MEMBER(oneshot_state::oneshot_in0_word_r)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	int data = input_port_read(space->machine(), "DSW1");
+	int data = input_port_read(machine(), "DSW1");
 
 	switch (data & 0x0c)
 	{
 		case 0x00 :
-			state->m_gun_x_shift = 35;
+			m_gun_x_shift = 35;
 			break;
 		case 0x04 :
-			state->m_gun_x_shift = 30;
+			m_gun_x_shift = 30;
 			break;
 		case 0x08 :
-			state->m_gun_x_shift = 40;
+			m_gun_x_shift = 40;
 			break;
 		case 0x0c :
-			state->m_gun_x_shift = 50;
+			m_gun_x_shift = 50;
 			break;
 	}
 
 	return data;
 }
 
-static READ16_HANDLER( oneshot_gun_x_p1_r )
+READ16_MEMBER(oneshot_state::oneshot_gun_x_p1_r)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
 
 	/* shots must be in a different location to register */
-	state->m_p1_wobble ^= 1;
+	m_p1_wobble ^= 1;
 
-	return state->m_gun_x_p1 ^ state->m_p1_wobble;
+	return m_gun_x_p1 ^ m_p1_wobble;
 }
 
-static READ16_HANDLER( oneshot_gun_y_p1_r )
+READ16_MEMBER(oneshot_state::oneshot_gun_y_p1_r)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	return state->m_gun_y_p1;
+	return m_gun_y_p1;
 }
 
-static READ16_HANDLER( oneshot_gun_x_p2_r )
+READ16_MEMBER(oneshot_state::oneshot_gun_x_p2_r)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
 
 	/* shots must be in a different location to register */
-	state->m_p2_wobble ^= 1;
+	m_p2_wobble ^= 1;
 
-	return state->m_gun_x_p2 ^ state->m_p2_wobble;
+	return m_gun_x_p2 ^ m_p2_wobble;
 }
 
-static READ16_HANDLER( oneshot_gun_y_p2_r )
+READ16_MEMBER(oneshot_state::oneshot_gun_y_p2_r)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	return state->m_gun_y_p2;
+	return m_gun_y_p2;
 }
 
 static WRITE16_DEVICE_HANDLER( soundbank_w )
@@ -117,11 +112,11 @@ static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
 	AM_RANGE(0x190002, 0x190003) AM_READ_LEGACY(soundlatch_word_r)
 	AM_RANGE(0x190010, 0x190011) AM_WRITE_LEGACY(soundlatch_word_w)
 	AM_RANGE(0x190018, 0x190019) AM_DEVWRITE_LEGACY("oki", soundbank_w)
-	AM_RANGE(0x190026, 0x190027) AM_READ_LEGACY(oneshot_gun_x_p1_r)
-	AM_RANGE(0x19002e, 0x19002f) AM_READ_LEGACY(oneshot_gun_x_p2_r)
-	AM_RANGE(0x190036, 0x190037) AM_READ_LEGACY(oneshot_gun_y_p1_r)
-	AM_RANGE(0x19003e, 0x19003f) AM_READ_LEGACY(oneshot_gun_y_p2_r)
-	AM_RANGE(0x19c020, 0x19c021) AM_READ_LEGACY(oneshot_in0_word_r)
+	AM_RANGE(0x190026, 0x190027) AM_READ(oneshot_gun_x_p1_r)
+	AM_RANGE(0x19002e, 0x19002f) AM_READ(oneshot_gun_x_p2_r)
+	AM_RANGE(0x190036, 0x190037) AM_READ(oneshot_gun_y_p1_r)
+	AM_RANGE(0x19003e, 0x19003f) AM_READ(oneshot_gun_y_p2_r)
+	AM_RANGE(0x19c020, 0x19c021) AM_READ(oneshot_in0_word_r)
 	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSW2")
 	AM_RANGE(0x19c02c, 0x19c02d) AM_READ_PORT("CREDITS")
 	AM_RANGE(0x19c030, 0x19c031) AM_READ_PORT("P1")

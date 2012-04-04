@@ -210,68 +210,65 @@ static TIMER_DEVICE_CALLBACK( xain_scanline )
 	}
 }
 
-static WRITE8_HANDLER( xainCPUA_bankswitch_w )
+WRITE8_MEMBER(xain_state::xainCPUA_bankswitch_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_pri = data & 0x7;
-	memory_set_bank(space->machine(), "bank1", (data >> 3) & 1);
+	m_pri = data & 0x7;
+	memory_set_bank(machine(), "bank1", (data >> 3) & 1);
 }
 
-static WRITE8_HANDLER( xainCPUB_bankswitch_w )
+WRITE8_MEMBER(xain_state::xainCPUB_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank2", data & 1);
+	memory_set_bank(machine(), "bank2", data & 1);
 }
 
-static WRITE8_HANDLER( xain_sound_command_w )
+WRITE8_MEMBER(xain_state::xain_sound_command_w)
 {
 	soundlatch_w(space,offset,data);
-	cputag_set_input_line(space->machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( xain_main_irq_w )
+WRITE8_MEMBER(xain_state::xain_main_irq_w)
 {
 	switch (offset)
 	{
 	case 0: /* 0x3a09 - NMI clear */
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 		break;
 	case 1: /* 0x3a0a - FIRQ clear */
-		cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, CLEAR_LINE);
 		break;
 	case 2: /* 0x3a0b - IRQ clear */
-		cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 		break;
 	case 3: /* 0x3a0c - IRQB assert */
-		cputag_set_input_line(space->machine(), "sub", M6809_IRQ_LINE, ASSERT_LINE);
+		cputag_set_input_line(machine(), "sub", M6809_IRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
 
-static WRITE8_HANDLER( xain_irqA_assert_w )
+WRITE8_MEMBER(xain_state::xain_irqA_assert_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( xain_irqB_clear_w )
+WRITE8_MEMBER(xain_state::xain_irqB_clear_w)
 {
-	cputag_set_input_line(space->machine(), "sub", M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "sub", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-static READ8_HANDLER( xain_68705_r )
+READ8_MEMBER(xain_state::xain_68705_r)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_mcu_ready = 1;
-	return state->m_from_mcu;
+	m_mcu_ready = 1;
+	return m_from_mcu;
 }
 
-static WRITE8_HANDLER( xain_68705_w )
+WRITE8_MEMBER(xain_state::xain_68705_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_from_main = data;
-	state->m_mcu_accept = 0;
+	m_from_main = data;
+	m_mcu_accept = 0;
 
-	if (space->machine().device("mcu") != NULL)
-		cputag_set_input_line(space->machine(), "mcu", 0, ASSERT_LINE);
+	if (machine().device("mcu") != NULL)
+		cputag_set_input_line(machine(), "mcu", 0, ASSERT_LINE);
 }
 
 static CUSTOM_INPUT( xain_vblank_r )
@@ -411,16 +408,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x3a02, 0x3a02) AM_READ_PORT("DSW0")
 	AM_RANGE(0x3a02, 0x3a03) AM_WRITE_LEGACY(xain_scrollyP1_w)
 	AM_RANGE(0x3a03, 0x3a03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3a04, 0x3a04) AM_READ_LEGACY(xain_68705_r)
+	AM_RANGE(0x3a04, 0x3a04) AM_READ(xain_68705_r)
 	AM_RANGE(0x3a04, 0x3a05) AM_WRITE_LEGACY(xain_scrollxP0_w)
 	AM_RANGE(0x3a05, 0x3a05) AM_READ_PORT("VBLANK")
 	AM_RANGE(0x3a06, 0x3a06) AM_READ_LEGACY(mcu_comm_reset_r)
 	AM_RANGE(0x3a06, 0x3a07) AM_WRITE_LEGACY(xain_scrollyP0_w)
-	AM_RANGE(0x3a08, 0x3a08) AM_WRITE_LEGACY(xain_sound_command_w)
-	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE_LEGACY(xain_main_irq_w)
+	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(xain_sound_command_w)
+	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(xain_main_irq_w)
 	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE_LEGACY(xain_flipscreen_w)
-	AM_RANGE(0x3a0e, 0x3a0e) AM_WRITE_LEGACY(xain_68705_w)
-	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE_LEGACY(xainCPUA_bankswitch_w)
+	AM_RANGE(0x3a0e, 0x3a0e) AM_WRITE(xain_68705_w)
+	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(xainCPUA_bankswitch_w)
 	AM_RANGE(0x3c00, 0x3dff) AM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3e00, 0x3fff) AM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -429,9 +426,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu_map_B, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(xain_irqA_assert_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE_LEGACY(xain_irqB_clear_w)
-	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(xainCPUB_bankswitch_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(xain_irqA_assert_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(xain_irqB_clear_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(xainCPUB_bankswitch_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

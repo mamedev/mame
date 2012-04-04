@@ -6,6 +6,7 @@ public:
 
 	UINT8 *m_videoram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(output_port_0_w);
 };
 
 

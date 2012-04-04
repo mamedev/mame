@@ -30,16 +30,15 @@ static MACHINE_RESET( timelimt )
 	state->m_nmi_enabled = 0;
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(timelimt_state::nmi_enable_w)
 {
-	timelimt_state *state = space->machine().driver_data<timelimt_state>();
-	state->m_nmi_enabled = data & 1;	/* bit 0 = nmi enable */
+	m_nmi_enabled = data & 1;	/* bit 0 = nmi enable */
 }
 
-static WRITE8_HANDLER( sound_reset_w )
+WRITE8_MEMBER(timelimt_state::sound_reset_w)
 {
 	if (data & 1)
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /***************************************************************************/
@@ -53,8 +52,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(nmi_enable_w)	/* nmi enable */
-	AM_RANGE(0xb003, 0xb003) AM_WRITE_LEGACY(sound_reset_w)/* sound reset ? */
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(nmi_enable_w)	/* nmi enable */
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(sound_reset_w)/* sound reset ? */
 	AM_RANGE(0xb800, 0xb800) AM_WRITE_LEGACY(soundlatch_w) /* sound write */
 	AM_RANGE(0xb800, 0xb800) AM_READNOP		/* NMI ack? */
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(timelimt_scroll_x_lsb_w)

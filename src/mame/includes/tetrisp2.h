@@ -41,6 +41,22 @@ public:
 	tilemap_t *m_tilemap_sub_rot;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_spriteram2;
+	DECLARE_WRITE16_MEMBER(rockn_systemregs_w);
+	DECLARE_WRITE16_MEMBER(rocknms_sub_systemregs_w);
+	DECLARE_READ16_MEMBER(rockn_adpcmbank_r);
+	DECLARE_WRITE16_MEMBER(rockn_adpcmbank_w);
+	DECLARE_WRITE16_MEMBER(rockn2_adpcmbank_w);
+	DECLARE_READ16_MEMBER(rockn_soundvolume_r);
+	DECLARE_WRITE16_MEMBER(rockn_soundvolume_w);
+	DECLARE_WRITE16_MEMBER(nndmseal_sound_bank_w);
+	DECLARE_READ16_MEMBER(tetrisp2_ip_1_word_r);
+	DECLARE_READ16_MEMBER(rockn_nvram_r);
+	DECLARE_READ16_MEMBER(rocknms_main2sub_r);
+	DECLARE_WRITE16_MEMBER(rocknms_main2sub_w);
+	DECLARE_WRITE16_MEMBER(rocknms_sub2main_w);
+	DECLARE_WRITE16_MEMBER(tetrisp2_coincounter_w);
+	DECLARE_WRITE16_MEMBER(nndmseal_coincounter_w);
+	DECLARE_WRITE16_MEMBER(nndmseal_b20000_w);
 };
 
 WRITE16_HANDLER( tetrisp2_systemregs_w );

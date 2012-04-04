@@ -25,6 +25,8 @@ public:
 	/* misc */
 	UINT8          m_misc;
 	UINT8          m_ic_h3_data;
+	DECLARE_READ8_MEMBER(copsnrob_misc_r);
+	DECLARE_WRITE8_MEMBER(copsnrob_misc2_w);
 };
 
 

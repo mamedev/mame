@@ -51,44 +51,44 @@ ClawGrip, Jul 2006
 #include "sound/okim6295.h"
 #include "includes/pokechmp.h"
 
-static WRITE8_HANDLER( pokechmp_bank_w )
+WRITE8_MEMBER(pokechmp_state::pokechmp_bank_w)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 	if (data == 0x00)
 	{
-		memory_set_bankptr(space->machine(), "bank1",&RAM[0x10000]);
-		memory_set_bankptr(space->machine(), "bank2",&RAM[0x12000]);
+		memory_set_bankptr(machine(), "bank1",&RAM[0x10000]);
+		memory_set_bankptr(machine(), "bank2",&RAM[0x12000]);
 	}
 	if (data == 0x01)
 	{
-		memory_set_bankptr(space->machine(), "bank1",&RAM[0x14000]);
-		memory_set_bankptr(space->machine(), "bank2",&RAM[0x16000]);
+		memory_set_bankptr(machine(), "bank1",&RAM[0x14000]);
+		memory_set_bankptr(machine(), "bank2",&RAM[0x16000]);
 	}
 	if (data == 0x02)
 	{
-		memory_set_bankptr(space->machine(), "bank1",&RAM[0x20000]);
-		memory_set_bankptr(space->machine(), "bank2",&RAM[0x22000]);
+		memory_set_bankptr(machine(), "bank1",&RAM[0x20000]);
+		memory_set_bankptr(machine(), "bank2",&RAM[0x22000]);
 	}
 
 	if (data == 0x03)
 	{
-		memory_set_bankptr(space->machine(), "bank1",&RAM[0x04000]);
-		memory_set_bankptr(space->machine(), "bank2",&RAM[0x06000]);
+		memory_set_bankptr(machine(), "bank1",&RAM[0x04000]);
+		memory_set_bankptr(machine(), "bank2",&RAM[0x06000]);
 	}
 }
 
 #ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( pokechmp_sound_bank_w )
+WRITE8_MEMBER(pokechmp_state::pokechmp_sound_bank_w)
 {
-	memory_set_bank(space->machine(), "bank3", (data >> 2) & 1);
+	memory_set_bank(machine(), "bank3", (data >> 2) & 1);
 }
 #endif
 
-static WRITE8_HANDLER( pokechmp_sound_w )
+WRITE8_MEMBER(pokechmp_state::pokechmp_sound_w)
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -98,10 +98,10 @@ INLINE void pokechmp_set_color(running_machine &machine, pen_t color, int rshift
 }
 
 
-static WRITE8_HANDLER( pokechmp_paletteram_w )
+WRITE8_MEMBER(pokechmp_state::pokechmp_paletteram_w)
 {
-	space->machine().generic.paletteram.u8[offset] = data;
-	pokechmp_set_color(space->machine(), offset &0x3ff, 0, 5, 10, (space->machine().generic.paletteram.u8[offset&0x3ff]<<8) | ( space->machine().generic.paletteram.u8[ (offset&0x3ff)+0x400 ] )  );
+	machine().generic.paletteram.u8[offset] = data;
+	pokechmp_set_color(machine(), offset &0x3ff, 0, 5, 10, (machine().generic.paletteram.u8[offset&0x3ff]<<8) | ( machine().generic.paletteram.u8[ (offset&0x3ff)+0x400 ] )  );
 }
 
 
@@ -115,11 +115,11 @@ static ADDRESS_MAP_START( pokechmp_map, AS_PROGRAM, 8, pokechmp_state )
 	/* 1800 - 0x181f are unused BAC-06 registers, see video/dec0.c */
 	AM_RANGE(0x1802, 0x181f) AM_WRITENOP
 
-	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2") AM_WRITE_LEGACY(pokechmp_sound_w)
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE_LEGACY(pokechmp_bank_w)
+	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2") AM_WRITE(pokechmp_sound_w)
+	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pokechmp_bank_w)
 
 	/* Extra on Poke Champ (not on Pocket Gal) */
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(pokechmp_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(pokechmp_paletteram_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( pokechmp_sound_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP	/* MSM5205 chip on Pocket Gal, not connected here? */
-//  AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(pokechmp_sound_bank_w)/ * might still be sound bank */
+//  AM_RANGE(0x2000, 0x2000) AM_WRITE(pokechmp_sound_bank_w)/ * might still be sound bank */
 	AM_RANGE(0x2800, 0x2800) AM_DEVREADWRITE("oki", okim6295_device, read, write) // extra
 	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r)
 //  AM_RANGE(0x3400, 0x3400) AM_READ_LEGACY(pokechmp_adpcm_reset_r)    /* ? not sure */

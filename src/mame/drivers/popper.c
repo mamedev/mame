@@ -120,36 +120,34 @@ Notes:
 //                      -----x--  free play
 //                      ------x-  continue
 //                      -------x  sound
-static READ8_HANDLER( popper_input_ports_r )
+READ8_MEMBER(popper_state::popper_input_ports_r)
 {
 	UINT8 data = 0;
 	switch (offset)
 	{
 		//           player inputs        dsw1                           dsw2
-		case 0: data = input_port_read(space->machine(), "IN0") | ((input_port_read(space->machine(), "DSW1") & 0x02) << 5) | ((input_port_read(space->machine(), "DSW2") & 0x01) << 4); break;
-		case 1: data = input_port_read(space->machine(), "IN1") | ((input_port_read(space->machine(), "DSW1") & 0x01) << 6) | ((input_port_read(space->machine(), "DSW2") & 0x02) << 3); break;
-		case 2: data = input_port_read(space->machine(), "IN2") | ((input_port_read(space->machine(), "DSW1") & 0x08) << 3) | ((input_port_read(space->machine(), "DSW2") & 0x04) << 2); break;
-		case 3: data = input_port_read(space->machine(), "IN3") | ((input_port_read(space->machine(), "DSW1") & 0x04) << 4) | ((input_port_read(space->machine(), "DSW2") & 0x08) << 1); break;
-		case 4: data = ((input_port_read(space->machine(), "DSW1") & 0x20) << 2) | ((input_port_read(space->machine(), "DSW2") & 0x10) << 1); break;
-		case 5: data = ((input_port_read(space->machine(), "DSW1") & 0x10) << 3) | ((input_port_read(space->machine(), "DSW2") & 0x20) << 0); break;
-		case 6: data = ((input_port_read(space->machine(), "DSW1") & 0x80) << 0) | ((input_port_read(space->machine(), "DSW2") & 0x40) >> 1); break;
-		case 7: data = ((input_port_read(space->machine(), "DSW1") & 0x40) << 1) | ((input_port_read(space->machine(), "DSW2") & 0x80) >> 2); break;
+		case 0: data = input_port_read(machine(), "IN0") | ((input_port_read(machine(), "DSW1") & 0x02) << 5) | ((input_port_read(machine(), "DSW2") & 0x01) << 4); break;
+		case 1: data = input_port_read(machine(), "IN1") | ((input_port_read(machine(), "DSW1") & 0x01) << 6) | ((input_port_read(machine(), "DSW2") & 0x02) << 3); break;
+		case 2: data = input_port_read(machine(), "IN2") | ((input_port_read(machine(), "DSW1") & 0x08) << 3) | ((input_port_read(machine(), "DSW2") & 0x04) << 2); break;
+		case 3: data = input_port_read(machine(), "IN3") | ((input_port_read(machine(), "DSW1") & 0x04) << 4) | ((input_port_read(machine(), "DSW2") & 0x08) << 1); break;
+		case 4: data = ((input_port_read(machine(), "DSW1") & 0x20) << 2) | ((input_port_read(machine(), "DSW2") & 0x10) << 1); break;
+		case 5: data = ((input_port_read(machine(), "DSW1") & 0x10) << 3) | ((input_port_read(machine(), "DSW2") & 0x20) << 0); break;
+		case 6: data = ((input_port_read(machine(), "DSW1") & 0x80) << 0) | ((input_port_read(machine(), "DSW2") & 0x40) >> 1); break;
+		case 7: data = ((input_port_read(machine(), "DSW1") & 0x40) << 1) | ((input_port_read(machine(), "DSW2") & 0x80) >> 2); break;
 	}
 	return data;
 }
 
-static READ8_HANDLER( popper_soundcpu_nmi_r )
+READ8_MEMBER(popper_state::popper_soundcpu_nmi_r)
 {
-	popper_state *state = space->machine().driver_data<popper_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(popper_state::nmi_mask_w)
 {
-	popper_state *state = space->machine().driver_data<popper_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 
@@ -170,13 +168,13 @@ static ADDRESS_MAP_START( popper_map, AS_PROGRAM, 8, popper_state )
 	AM_RANGE(0xce20, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xe000, 0xe007) AM_READ_LEGACY(popper_input_ports_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xe000, 0xe007) AM_READ(popper_input_ports_r)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE_LEGACY(popper_flipscreen_w)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE_LEGACY(popper_e002_w)				//?? seems to be graphic related
 	AM_RANGE(0xe003, 0xe003) AM_WRITE_LEGACY(popper_gfx_bank_w)
 	AM_RANGE(0xe004, 0xe007) AM_WRITENOP					//?? range cleared once when the SP is set
-	AM_RANGE(0xe400, 0xe400) AM_READ_LEGACY(popper_soundcpu_nmi_r)
+	AM_RANGE(0xe400, 0xe400) AM_READ(popper_soundcpu_nmi_r)
 	AM_RANGE(0xf800, 0xf800) AM_READNOP					//?? read once at startup
 	AM_RANGE(0xfc00, 0xfc00) AM_READNOP					//?? possibly watchdog
 	AM_RANGE(0xffff, 0xffff) AM_READNOP

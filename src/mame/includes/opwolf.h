@@ -49,6 +49,15 @@ public:
 	device_t *m_pc090oj;
 	device_t *m_msm1;
 	device_t *m_msm2;
+	DECLARE_READ16_MEMBER(cchip_r);
+	DECLARE_WRITE16_MEMBER(cchip_w);
+	DECLARE_READ16_MEMBER(opwolf_in_r);
+	DECLARE_READ16_MEMBER(opwolf_dsw_r);
+	DECLARE_READ16_MEMBER(opwolf_lightgun_r);
+	DECLARE_READ8_MEMBER(z80_input1_r);
+	DECLARE_READ8_MEMBER(z80_input2_r);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_d_w);
+	DECLARE_WRITE8_MEMBER(opwolf_adpcm_e_w);
 };
 
 

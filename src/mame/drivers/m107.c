@@ -35,7 +35,7 @@ confirmed for m107 games as well.
 #define M107_IRQ_0 ((state->m_irq_vectorbase+0)/4)  /* VBL interrupt */
 #define M107_IRQ_1 ((state->m_irq_vectorbase+4)/4)  /* ??? */
 #define M107_IRQ_2 ((state->m_irq_vectorbase+8)/4)  /* Raster interrupt */
-#define M107_IRQ_3 ((state->m_irq_vectorbase+12)/4) /* Sound cpu interrupt */
+#define M107_IRQ_3 ((m_irq_vectorbase+12)/4) /* Sound cpu interrupt */
 
 
 /*****************************************************************************/
@@ -70,59 +70,57 @@ static TIMER_DEVICE_CALLBACK( m107_scanline_interrupt )
 
 /*****************************************************************************/
 
-static WRITE16_HANDLER( m107_coincounter_w )
+WRITE16_MEMBER(m107_state::m107_coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0,data & 0x01);
-		coin_counter_w(space->machine(), 1,data & 0x02);
+		coin_counter_w(machine(), 0,data & 0x01);
+		coin_counter_w(machine(), 1,data & 0x02);
 	}
 }
 
-static WRITE16_HANDLER( m107_bankswitch_w )
+WRITE16_MEMBER(m107_state::m107_bankswitch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		memory_set_bank(space->machine(), "bank1", (data & 0x06) >> 1);
+		memory_set_bank(machine(), "bank1", (data & 0x06) >> 1);
 		if (data & 0xf9)
-			logerror("%05x: bankswitch %04x\n", cpu_get_pc(&space->device()), data);
+			logerror("%05x: bankswitch %04x\n", cpu_get_pc(&space.device()), data);
 	}
 }
 
-static WRITE16_HANDLER( m107_soundlatch_w )
+WRITE16_MEMBER(m107_state::m107_soundlatch_w)
 {
-	cputag_set_input_line(space->machine(), "soundcpu", NEC_INPUT_LINE_INTP1, ASSERT_LINE);
+	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, ASSERT_LINE);
 	soundlatch_w(space, 0, data & 0xff);
 //      logerror("soundlatch_w %02x\n",data);
 }
 
-static READ16_HANDLER( m107_sound_status_r )
+READ16_MEMBER(m107_state::m107_sound_status_r)
 {
-	m107_state *state = space->machine().driver_data<m107_state>();
-	return state->m_sound_status;
+	return m_sound_status;
 }
 
-static READ16_HANDLER( m107_soundlatch_r )
+READ16_MEMBER(m107_state::m107_soundlatch_r)
 {
-	cputag_set_input_line(space->machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 	return soundlatch_r(space, offset) | 0xff00;
 }
 
-static WRITE16_HANDLER( m107_sound_irq_ack_w )
+WRITE16_MEMBER(m107_state::m107_sound_irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
+	cputag_set_input_line(machine(), "soundcpu", NEC_INPUT_LINE_INTP1, CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( m107_sound_status_w )
+WRITE16_MEMBER(m107_state::m107_sound_status_w)
 {
-	m107_state *state = space->machine().driver_data<m107_state>();
-	COMBINE_DATA(&state->m_sound_status);
-	cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, HOLD_LINE, M107_IRQ_3);
+	COMBINE_DATA(&m_sound_status);
+	cputag_set_input_line_and_vector(machine(), "maincpu", 0, HOLD_LINE, M107_IRQ_3);
 }
 
-static WRITE16_HANDLER( m107_sound_reset_w )
+WRITE16_MEMBER(m107_state::m107_sound_reset_w)
 {
-	cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -142,19 +140,19 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 16, m107_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("COINS_DSW3")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
-	AM_RANGE(0x08, 0x09) AM_READ_LEGACY(m107_sound_status_r)	/* answer from sound CPU */
-	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(m107_soundlatch_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(m107_coincounter_w)
+	AM_RANGE(0x08, 0x09) AM_READ(m107_sound_status_r)	/* answer from sound CPU */
+	AM_RANGE(0x00, 0x01) AM_WRITE(m107_soundlatch_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(m107_coincounter_w)
 	AM_RANGE(0x04, 0x05) AM_WRITENOP /* ??? 0008 */
 	AM_RANGE(0x80, 0x9f) AM_WRITE_LEGACY(m107_control_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITENOP /* Written with 0's in interrupt */
 	AM_RANGE(0xb0, 0xb1) AM_WRITE_LEGACY(m107_spritebuffer_w)
 	AM_RANGE(0xc0, 0xc3) AM_READNOP /* Only wpksoc: ticket related? */
-	AM_RANGE(0xc0, 0xc1) AM_WRITE_LEGACY(m107_sound_reset_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(m107_sound_reset_w)
 ADDRESS_MAP_END
 
 /* same as M107 but with an extra i/o board */
-static WRITE16_HANDLER( wpksoc_output_w )
+WRITE16_MEMBER(m107_state::wpksoc_output_w)
 {
 	/*
     x--- ---- ?
@@ -172,7 +170,7 @@ static ADDRESS_MAP_START( wpksoc_map, AS_PROGRAM, 16, m107_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wpksoc_io_map, AS_IO, 16, m107_state )
-	AM_RANGE(0x22, 0x23) AM_WRITE_LEGACY(wpksoc_output_w)
+	AM_RANGE(0x22, 0x23) AM_WRITE(wpksoc_output_w)
 	AM_RANGE(0xc0, 0xc1) AM_READ_PORT("WPK_IN0")
 	AM_RANGE(0xc2, 0xc3) AM_READ_PORT("WPK_IN1")
 	AM_IMPORT_FROM(main_portmap)
@@ -185,8 +183,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, m107_state )
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
 	AM_RANGE(0xa8000, 0xa803f) AM_DEVREADWRITE8_LEGACY("irem", irem_ga20_r, irem_ga20_w, 0x00ff)
 	AM_RANGE(0xa8040, 0xa8043) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff)
-	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE_LEGACY(m107_soundlatch_r, m107_sound_irq_ack_w)
-	AM_RANGE(0xa8046, 0xa8047) AM_WRITE_LEGACY(m107_sound_status_w)
+	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE(m107_soundlatch_r, m107_sound_irq_ack_w)
+	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(m107_sound_status_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM AM_REGION("soundcpu", 0x1fff0)
 ADDRESS_MAP_END
 
@@ -980,7 +978,7 @@ static DRIVER_INIT( dsoccr94 )
 	UINT8 *ROM = machine.region("maincpu")->base();
 
 	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x80000], 0x20000);
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x06, 0x07, FUNC(m107_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::m107_bankswitch_w),state));
 
 	state->m_irq_vectorbase = 0x80;
 	state->m_spritesystem = 0;

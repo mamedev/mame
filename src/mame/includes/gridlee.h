@@ -40,6 +40,11 @@ public:
 	UINT8 *m_local_videoram;
 	UINT8 m_palettebank_vis;
 	UINT8 *m_spriteram;
+	DECLARE_READ8_MEMBER(analog_port_r);
+	DECLARE_READ8_MEMBER(random_num_r);
+	DECLARE_WRITE8_MEMBER(led_0_w);
+	DECLARE_WRITE8_MEMBER(led_1_w);
+	DECLARE_WRITE8_MEMBER(gridlee_coin_counter_w);
 };
 
 

@@ -32,6 +32,11 @@ public:
 	tilemap_t *m_tilemap_edge1[4];
 	tilemap_t *m_tilemap_edge2[4];
 	bitmap_ind16 *m_headlight_bitmap;
+	DECLARE_READ8_MEMBER(shift_r);
+	DECLARE_READ8_MEMBER(shift_rev_r);
+	DECLARE_WRITE8_MEMBER(madalien_output_w);
+	DECLARE_WRITE8_MEMBER(madalien_sound_command_w);
+	DECLARE_READ8_MEMBER(madalien_sound_command_r);
 };
 
 

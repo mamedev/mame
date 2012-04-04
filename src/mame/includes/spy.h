@@ -32,6 +32,14 @@ public:
 	device_t *m_k007232_2;
 	device_t *m_k052109;
 	device_t *m_k051960;
+	DECLARE_READ8_MEMBER(spy_bankedram1_r);
+	DECLARE_WRITE8_MEMBER(spy_bankedram1_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(spy_3f90_w);
+	DECLARE_WRITE8_MEMBER(spy_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	DECLARE_READ8_MEMBER(k052109_051960_r);
+	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 };
 
 

@@ -35,6 +35,23 @@ public:
 	device_t *m_tc0180vcu;
 	device_t *m_tc0640fio;
 	device_t *m_tc0220ioc;
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ16_MEMBER(tracky1_hi_r);
+	DECLARE_READ16_MEMBER(tracky1_lo_r);
+	DECLARE_READ16_MEMBER(trackx1_hi_r);
+	DECLARE_READ16_MEMBER(trackx1_lo_r);
+	DECLARE_READ16_MEMBER(tracky2_hi_r);
+	DECLARE_READ16_MEMBER(tracky2_lo_r);
+	DECLARE_READ16_MEMBER(trackx2_hi_r);
+	DECLARE_READ16_MEMBER(trackx2_lo_r);
+	DECLARE_WRITE16_MEMBER(gain_control_w);
+	DECLARE_READ16_MEMBER(eep_latch_r);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
+	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
+	DECLARE_READ16_MEMBER(pbobble_input_bypass_r);
+	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
+	DECLARE_WRITE16_MEMBER(realpunc_output_w);
 };
 
 

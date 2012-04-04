@@ -121,12 +121,11 @@ static SAMPLES_START( pbillian_sh_start )
 		state->m_samplebuf[i] = (INT8)(src[i] ^ 0x80) * 256;
 }
 
-static WRITE8_HANDLER( pbillian_sample_trigger_w )
+WRITE8_MEMBER(superqix_state::pbillian_sample_trigger_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	samples_device *samples = space->machine().device<samples_device>("samples");
-	UINT8 *src = space->machine().region("samples")->base();
-	int len = space->machine().region("samples")->bytes();
+	samples_device *samples = machine().device<samples_device>("samples");
+	UINT8 *src = machine().region("samples")->base();
+	int len = machine().region("samples")->bytes();
 	int start,end;
 
 	start = data << 7;
@@ -135,7 +134,7 @@ static WRITE8_HANDLER( pbillian_sample_trigger_w )
 	while (end < len && src[end] != 0xff)
 		end++;
 
-	samples->start_raw(0, state->m_samplebuf + start, end - start, 5000); // 5khz ?
+	samples->start_raw(0, m_samplebuf + start, end - start, 5000); // 5khz ?
 }
 
 
@@ -193,9 +192,9 @@ static TIMER_CALLBACK( mcu_acknowledge_callback )
 //  logerror("Z80->MCU %02x\n",state->m_from_z80);
 }
 
-static READ8_HANDLER( mcu_acknowledge_r )
+READ8_MEMBER(superqix_state::mcu_acknowledge_r)
 {
-	space->machine().scheduler().synchronize(FUNC(mcu_acknowledge_callback));
+	machine().scheduler().synchronize(FUNC(mcu_acknowledge_callback));
 	return 0;
 }
 
@@ -206,127 +205,121 @@ static WRITE8_DEVICE_HANDLER( sqix_z80_mcu_w )
 	state->m_portb = data;
 }
 
-static WRITE8_HANDLER( bootleg_mcu_p1_w )
+WRITE8_MEMBER(superqix_state::bootleg_mcu_p1_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
 	switch ((data & 0x0e) >> 1)
 	{
 		case 0:
 			// ???
 			break;
 		case 1:
-			coin_counter_w(space->machine(), 0,data & 1);
+			coin_counter_w(machine(), 0,data & 1);
 			break;
 		case 2:
-			coin_counter_w(space->machine(), 1,data & 1);
+			coin_counter_w(machine(), 1,data & 1);
 			break;
 		case 3:
-			coin_lockout_global_w(space->machine(), (data & 1) ^ state->m_invert_coin_lockout);
+			coin_lockout_global_w(machine(), (data & 1) ^ m_invert_coin_lockout);
 			break;
 		case 4:
-			flip_screen_set(space->machine(), data & 1);
+			flip_screen_set(machine(), data & 1);
 			break;
 		case 5:
-			state->m_port1 = data;
-			if ((state->m_port1 & 0x80) == 0)
+			m_port1 = data;
+			if ((m_port1 & 0x80) == 0)
 			{
-				state->m_port3_latch = state->m_port3;
+				m_port3_latch = m_port3;
 			}
 			break;
 		case 6:
-			state->m_from_mcu_pending = 0;	// ????
+			m_from_mcu_pending = 0;	// ????
 			break;
 		case 7:
 			if ((data & 1) == 0)
 			{
-//              logerror("%04x: MCU -> Z80 %02x\n",cpu_get_pc(&space->device()),state->m_port3);
-				state->m_from_mcu = state->m_port3_latch;
-				state->m_from_mcu_pending = 1;
-				state->m_from_z80_pending = 0;	// ????
+//              logerror("%04x: MCU -> Z80 %02x\n",cpu_get_pc(&space.device()),m_port3);
+				m_from_mcu = m_port3_latch;
+				m_from_mcu_pending = 1;
+				m_from_z80_pending = 0;	// ????
 			}
 			break;
 	}
 }
 
-static WRITE8_HANDLER( mcu_p3_w )
+WRITE8_MEMBER(superqix_state::mcu_p3_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	state->m_port3 = data;
+	m_port3 = data;
 }
 
-static READ8_HANDLER( bootleg_mcu_p3_r )
+READ8_MEMBER(superqix_state::bootleg_mcu_p3_r)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	if ((state->m_port1 & 0x10) == 0)
+	if ((m_port1 & 0x10) == 0)
 	{
-		return input_port_read(space->machine(), "DSW1");
+		return input_port_read(machine(), "DSW1");
 	}
-	else if ((state->m_port1 & 0x20) == 0)
+	else if ((m_port1 & 0x20) == 0)
 	{
-		return input_port_read(space->machine(), "SYSTEM") | (state->m_from_mcu_pending << 6) | (state->m_from_z80_pending << 7);
+		return input_port_read(machine(), "SYSTEM") | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
 	}
-	else if ((state->m_port1 & 0x40) == 0)
+	else if ((m_port1 & 0x40) == 0)
 	{
-//      logerror("%04x: read Z80 command %02x\n",cpu_get_pc(&space->device()),state->m_from_z80);
-		state->m_from_z80_pending = 0;
-		return state->m_from_z80;
+//      logerror("%04x: read Z80 command %02x\n",cpu_get_pc(&space.device()),m_from_z80);
+		m_from_z80_pending = 0;
+		return m_from_z80;
 	}
 	return 0;
 }
 
-static READ8_HANDLER( sqixu_mcu_p0_r )
+READ8_MEMBER(superqix_state::sqixu_mcu_p0_r)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	return input_port_read(space->machine(), "SYSTEM") | (state->m_from_mcu_pending << 6) | (state->m_from_z80_pending << 7);
+	return input_port_read(machine(), "SYSTEM") | (m_from_mcu_pending << 6) | (m_from_z80_pending << 7);
 }
 
-static WRITE8_HANDLER( sqixu_mcu_p2_w )
+WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
 	// bit 0 = unknown (clocked often)
 
 	// bit 1 = coin cointer 1
-	coin_counter_w(space->machine(), 0,data & 2);
+	coin_counter_w(machine(), 0,data & 2);
 
 	// bit 2 = coin counter 2
-	coin_counter_w(space->machine(), 1,data & 4);
+	coin_counter_w(machine(), 1,data & 4);
 
 	// bit 3 = coin lockout
-	coin_lockout_global_w(space->machine(), ~data & 8);
+	coin_lockout_global_w(machine(), ~data & 8);
 
 	// bit 4 = flip screen
-	flip_screen_set(space->machine(), data & 0x10);
+	flip_screen_set(machine(), data & 0x10);
 
 	// bit 5 = unknown (set on startup)
 
 	// bit 6 = unknown
 	if ((data & 0x40) == 0)
-		state->m_from_mcu_pending = 0;	// ????
+		m_from_mcu_pending = 0;	// ????
 
 	// bit 7 = clock latch from port 3 to Z80
-	if ((state->m_port2 & 0x80) != 0 && (data & 0x80) == 0)
+	if ((m_port2 & 0x80) != 0 && (data & 0x80) == 0)
 	{
-//      logerror("%04x: MCU -> Z80 %02x\n",cpu_get_pc(&space->device()),state->m_port3);
-		state->m_from_mcu = state->m_port3;
-		state->m_from_mcu_pending = 1;
-		state->m_from_z80_pending = 0;	// ????
+//      logerror("%04x: MCU -> Z80 %02x\n",cpu_get_pc(&space.device()),m_port3);
+		m_from_mcu = m_port3;
+		m_from_mcu_pending = 1;
+		m_from_z80_pending = 0;	// ????
 	}
 
-	state->m_port2 = data;
+	m_port2 = data;
 }
 
-static READ8_HANDLER( sqixu_mcu_p3_r )
+READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-//  logerror("%04x: read Z80 command %02x\n",cpu_get_pc(&space->device()),state->m_from_z80);
-	state->m_from_z80_pending = 0;
-	return state->m_from_z80;
+//  logerror("%04x: read Z80 command %02x\n",cpu_get_pc(&space.device()),m_from_z80);
+	m_from_z80_pending = 0;
+	return m_from_z80;
 }
 
 
-static READ8_HANDLER( nmi_ack_r )
+READ8_MEMBER(superqix_state::nmi_ack_r)
 {
-	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 
@@ -335,9 +328,9 @@ static READ8_DEVICE_HANDLER( bootleg_in0_r )
 	return BITSWAP8(input_port_read(device->machine(), "DSW1"), 0,1,2,3,4,5,6,7);
 }
 
-static WRITE8_HANDLER( bootleg_flipscreen_w )
+WRITE8_MEMBER(superqix_state::bootleg_flipscreen_w)
 {
-	flip_screen_set(space->machine(), ~data & 1);
+	flip_screen_set(machine(), ~data & 1);
 }
 
 
@@ -411,79 +404,74 @@ static TIMER_CALLBACK( delayed_mcu_z80_w )
  */
 
 
-static READ8_HANDLER( hotsmash_68705_portA_r )
+READ8_MEMBER(superqix_state::hotsmash_68705_portA_r)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-//  logerror("%04x: 68705 reads port A = %02x\n",cpu_get_pc(&space->device()),state->m_portA_in);
-	return state->m_portA_in;
+//  logerror("%04x: 68705 reads port A = %02x\n",cpu_get_pc(&space.device()),m_portA_in);
+	return m_portA_in;
 }
 
-static WRITE8_HANDLER( hotsmash_68705_portB_w )
+WRITE8_MEMBER(superqix_state::hotsmash_68705_portB_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	state->m_portB_out = data;
+	m_portB_out = data;
 }
 
-static READ8_HANDLER( hotsmash_68705_portC_r )
+READ8_MEMBER(superqix_state::hotsmash_68705_portC_r)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	return state->m_portC;
+	return m_portC;
 }
 
-static WRITE8_HANDLER( hotsmash_68705_portC_w )
+WRITE8_MEMBER(superqix_state::hotsmash_68705_portC_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	state->m_portC = data;
+	m_portC = data;
 
 	if ((data & 0x08) == 0)
 	{
 		switch (data & 0x07)
 		{
 			case 0x0:	// dsw A
-				state->m_portA_in = input_port_read(space->machine(), "DSW1");
+				m_portA_in = input_port_read(machine(), "DSW1");
 				break;
 
 			case 0x1:	// dsw B
-				state->m_portA_in = input_port_read(space->machine(), "DSW2");
+				m_portA_in = input_port_read(machine(), "DSW2");
 				break;
 
 			case 0x2:
 				break;
 
 			case 0x3:	// command from Z80
-				state->m_portA_in = state->m_from_z80;
-//              logerror("%04x: z80 reads command %02x\n",cpu_get_pc(&space->device()),state->m_from_z80);
+				m_portA_in = m_from_z80;
+//              logerror("%04x: z80 reads command %02x\n",cpu_get_pc(&space.device()),m_from_z80);
 				break;
 
 			case 0x4:
 				break;
 
 			case 0x5:	// answer to Z80
-				space->machine().scheduler().synchronize(FUNC(delayed_mcu_z80_w), state->m_portB_out);
+				machine().scheduler().synchronize(FUNC(delayed_mcu_z80_w), m_portB_out);
 				break;
 
 			case 0x6:
-				state->m_portA_in = read_dial(space->machine(), 0);
+				m_portA_in = read_dial(machine(), 0);
 				break;
 
 			case 0x7:
-				state->m_portA_in = read_dial(space->machine(), 1);
+				m_portA_in = read_dial(machine(), 1);
 				break;
 		}
 	}
 }
 
-static WRITE8_HANDLER( hotsmash_z80_mcu_w )
+WRITE8_MEMBER(superqix_state::hotsmash_z80_mcu_w)
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_z80_mcu_w), data);
+	machine().scheduler().synchronize(FUNC(delayed_z80_mcu_w), data);
 }
 
-static READ8_HANDLER(hotsmash_from_mcu_r)
+READ8_MEMBER(superqix_state::hotsmash_from_mcu_r)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-//  logerror("%04x: z80 reads answer %02x\n",cpu_get_pc(&space->device()),state->m_from_mcu);
-	state->m_from_mcu_pending = 0;
-	return state->m_from_mcu;
+//  logerror("%04x: z80 reads answer %02x\n",cpu_get_pc(&space.device()),m_from_mcu);
+	m_from_mcu_pending = 0;
+	return m_from_mcu;
 }
 
 static READ8_DEVICE_HANDLER(hotsmash_ay_port_a_r)
@@ -499,35 +487,33 @@ pbillian MCU simulation
 
 **************************************************************************/
 
-static WRITE8_HANDLER( pbillian_z80_mcu_w )
+WRITE8_MEMBER(superqix_state::pbillian_z80_mcu_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	state->m_from_z80 = data;
+	m_from_z80 = data;
 }
 
-static READ8_HANDLER(pbillian_from_mcu_r)
+READ8_MEMBER(superqix_state::pbillian_from_mcu_r)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
 
-	switch (state->m_from_z80)
+	switch (m_from_z80)
 	{
 		case 0x01:
 		{
-			UINT8 p = input_port_read(space->machine(), state->m_curr_player ? "PLUNGER2" : "PLUNGER1") & 0xbf;
+			UINT8 p = input_port_read(machine(), m_curr_player ? "PLUNGER2" : "PLUNGER1") & 0xbf;
 			if ((p & 0x3f) == 0) p |= 0x40;
 			return p;
 		}
 
-		case 0x02: return input_port_read(space->machine(), state->m_curr_player ? "DIAL2" : "DIAL1");
+		case 0x02: return input_port_read(machine(), m_curr_player ? "DIAL2" : "DIAL1");
 
-		case 0x04: return input_port_read(space->machine(), "DSW1");
-		case 0x08: return input_port_read(space->machine(), "DSW2");
+		case 0x04: return input_port_read(machine(), "DSW1");
+		case 0x08: return input_port_read(machine(), "DSW2");
 
-		case 0x80: state->m_curr_player = 0; return 0;
-		case 0x81: state->m_curr_player = 1; return 0;
+		case 0x80: m_curr_player = 0; return 0;
+		case 0x81: m_curr_player = 1; return 0;
 	}
 
-//  logerror("408[%x] r at %x\n",state->m_from_z80,cpu_get_pc(&space->device()));
+//  logerror("408[%x] r at %x\n",m_from_z80,cpu_get_pc(&space.device()));
 	return 0;
 }
 
@@ -589,12 +575,12 @@ static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE_LEGACY(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x0408, 0x0408) AM_READ_LEGACY(pbillian_from_mcu_r)
-	AM_RANGE(0x0408, 0x0408) AM_WRITE_LEGACY(pbillian_z80_mcu_w)
+	AM_RANGE(0x0408, 0x0408) AM_READ(pbillian_from_mcu_r)
+	AM_RANGE(0x0408, 0x0408) AM_WRITE(pbillian_z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE_LEGACY(pbillian_0410_w)
 	AM_RANGE(0x0418, 0x0418) AM_READNOP  //?
 	AM_RANGE(0x0419, 0x0419) AM_WRITENOP  //? watchdog ?
-	AM_RANGE(0x041a, 0x041a) AM_WRITE_LEGACY(pbillian_sample_trigger_w)
+	AM_RANGE(0x041a, 0x041a) AM_WRITE(pbillian_sample_trigger_w)
 	AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used
 ADDRESS_MAP_END
 
@@ -602,12 +588,12 @@ static ADDRESS_MAP_START( hotsmash_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE_LEGACY(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x0408, 0x0408) AM_READ_LEGACY(hotsmash_from_mcu_r)
-	AM_RANGE(0x0408, 0x0408) AM_WRITE_LEGACY(hotsmash_z80_mcu_w)
+	AM_RANGE(0x0408, 0x0408) AM_READ(hotsmash_from_mcu_r)
+	AM_RANGE(0x0408, 0x0408) AM_WRITE(hotsmash_z80_mcu_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE_LEGACY(pbillian_0410_w)
 	AM_RANGE(0x0418, 0x0418) AM_READNOP  //?
 	AM_RANGE(0x0419, 0x0419) AM_WRITENOP  //? watchdog ?
-	AM_RANGE(0x041a, 0x041a) AM_WRITE_LEGACY(pbillian_sample_trigger_w)
+	AM_RANGE(0x041a, 0x041a) AM_WRITE(pbillian_sample_trigger_w)
 	AM_RANGE(0x041b, 0x041b) AM_READNOP  // input related? but probably not used
 ADDRESS_MAP_END
 
@@ -617,9 +603,9 @@ static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x0405, 0x0405) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0x0406, 0x0407) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
-	AM_RANGE(0x0408, 0x0408) AM_READ_LEGACY(mcu_acknowledge_r)
+	AM_RANGE(0x0408, 0x0408) AM_READ(mcu_acknowledge_r)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE_LEGACY(superqix_0410_w)	/* ROM bank, NMI enable, tile bank */
-	AM_RANGE(0x0418, 0x0418) AM_READ_LEGACY(nmi_ack_r)
+	AM_RANGE(0x0418, 0x0418) AM_READ(nmi_ack_r)
 	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram_w) AM_BASE(m_bitmapram)
 	AM_RANGE(0x8800, 0xf7ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram2_w) AM_BASE(m_bitmapram2)
 ADDRESS_MAP_END
@@ -630,7 +616,7 @@ static ADDRESS_MAP_START( bootleg_port_map, AS_IO, 8, superqix_state )
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x0405, 0x0405) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0x0406, 0x0407) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
-	AM_RANGE(0x0408, 0x0408) AM_WRITE_LEGACY(bootleg_flipscreen_w)
+	AM_RANGE(0x0408, 0x0408) AM_WRITE(bootleg_flipscreen_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE_LEGACY(superqix_0410_w)	/* ROM bank, NMI enable, tile bank */
 	AM_RANGE(0x0418, 0x0418) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0800, 0x77ff) AM_RAM_WRITE_LEGACY(superqix_bitmapram_w) AM_BASE(m_bitmapram)
@@ -640,9 +626,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8, superqix_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ_LEGACY(hotsmash_68705_portA_r)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE_LEGACY(hotsmash_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(hotsmash_68705_portC_r, hotsmash_68705_portC_w)
+	AM_RANGE(0x0000, 0x0000) AM_READ(hotsmash_68705_portA_r)
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(hotsmash_68705_portB_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(hotsmash_68705_portC_r, hotsmash_68705_portC_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -651,15 +637,15 @@ ADDRESS_MAP_END
 /* I8751 memory handlers */
 
 static ADDRESS_MAP_START( bootleg_mcu_io_map, AS_IO, 8, superqix_state )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE_LEGACY(bootleg_mcu_p1_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE_LEGACY(bootleg_mcu_p3_r, mcu_p3_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(bootleg_mcu_p1_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(bootleg_mcu_p3_r, mcu_p3_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqixu_mcu_io_map, AS_IO, 8, superqix_state )
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READ_LEGACY(sqixu_mcu_p0_r)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READ(sqixu_mcu_p0_r)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("DSW1")
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE_LEGACY(sqixu_mcu_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE_LEGACY(sqixu_mcu_p3_r, mcu_p3_w)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_WRITE(sqixu_mcu_p2_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(sqixu_mcu_p3_r, mcu_p3_w)
 ADDRESS_MAP_END
 
 

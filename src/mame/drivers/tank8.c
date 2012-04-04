@@ -27,24 +27,22 @@ static MACHINE_RESET( tank8 )
 }
 
 
-static READ8_HANDLER( tank8_collision_r )
+READ8_MEMBER(tank8_state::tank8_collision_r)
 {
-	tank8_state *state = space->machine().driver_data<tank8_state>();
-	return state->m_collision_index;
+	return m_collision_index;
 }
 
-static WRITE8_HANDLER( tank8_lockout_w )
+WRITE8_MEMBER(tank8_state::tank8_lockout_w)
 {
-	coin_lockout_w(space->machine(), offset, ~data & 1);
+	coin_lockout_w(machine(), offset, ~data & 1);
 }
 
 
-static WRITE8_HANDLER( tank8_int_reset_w )
+WRITE8_MEMBER(tank8_state::tank8_int_reset_w)
 {
-	tank8_state *state = space->machine().driver_data<tank8_state>();
-	state->m_collision_index &= ~0x3f;
+	m_collision_index &= ~0x3f;
 
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( tank8_crash_w )
@@ -101,7 +99,7 @@ static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8, tank8_state )
 	AM_RANGE(0x0400, 0x17ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_LEGACY(tank8_collision_r)
+	AM_RANGE(0x1c00, 0x1c00) AM_READ(tank8_collision_r)
 
 	AM_RANGE(0x1c01, 0x1c01) AM_READ_PORT("P1")
 	AM_RANGE(0x1c02, 0x1c02) AM_READ_PORT("P2")
@@ -121,8 +119,8 @@ static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8, tank8_state )
 	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_BASE(m_pos_v_ram)
 	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_BASE(m_pos_d_ram)
 
-	AM_RANGE(0x1c30, 0x1c37) AM_WRITE_LEGACY(tank8_lockout_w)
-	AM_RANGE(0x1d00, 0x1d00) AM_WRITE_LEGACY(tank8_int_reset_w)
+	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(tank8_lockout_w)
+	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(tank8_int_reset_w)
 	AM_RANGE(0x1d01, 0x1d01) AM_DEVWRITE_LEGACY("discrete", tank8_crash_w)
 	AM_RANGE(0x1d02, 0x1d02) AM_DEVWRITE_LEGACY("discrete", tank8_explosion_w)
 	AM_RANGE(0x1d03, 0x1d03) AM_DEVWRITE_LEGACY("discrete", tank8_bugle_w)

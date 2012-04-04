@@ -11,6 +11,10 @@ public:
 	UINT32 *m_vram;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_READ32_MEMBER(eolith_custom_r);
+	DECLARE_WRITE32_MEMBER(systemcontrol_w);
+	DECLARE_READ32_MEMBER(hidctch3_pen1_r);
+	DECLARE_READ32_MEMBER(hidctch3_pen2_r);
 };
 
 

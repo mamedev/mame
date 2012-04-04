@@ -31,6 +31,14 @@ public:
 	UINT8 m_scrollyP1[2];
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(xainCPUA_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(xainCPUB_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(xain_sound_command_w);
+	DECLARE_WRITE8_MEMBER(xain_main_irq_w);
+	DECLARE_WRITE8_MEMBER(xain_irqA_assert_w);
+	DECLARE_WRITE8_MEMBER(xain_irqB_clear_w);
+	DECLARE_READ8_MEMBER(xain_68705_r);
+	DECLARE_WRITE8_MEMBER(xain_68705_w);
 };
 
 

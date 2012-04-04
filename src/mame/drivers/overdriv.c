@@ -62,15 +62,15 @@ static const eeprom_interface eeprom_intf =
 	"010011000000"	/* unlock command */
 };
 
-static WRITE16_HANDLER( eeprom_w )
+WRITE16_MEMBER(overdriv_state::eeprom_w)
 {
-//logerror("%06x: write %04x to eeprom_w\n",cpu_get_pc(&space->device()),data);
+//logerror("%06x: write %04x to eeprom_w\n",cpu_get_pc(&space.device()),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
 		/* bit 1 is clock (active high) */
 		/* bit 2 is cs (active low) */
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+		input_port_write(machine(), "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -95,40 +95,37 @@ static INTERRUPT_GEN( cpuB_interrupt )
 }
 
 
-static WRITE16_HANDLER( cpuA_ctrl_w )
+WRITE16_MEMBER(overdriv_state::cpuA_ctrl_w)
 {
-	overdriv_state *state = space->machine().driver_data<overdriv_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 probably enables the second 68000 */
-		device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(m_subcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 1 is clear during service mode - function unknown */
 
-		set_led_status(space->machine(), 0, data & 0x08);
-		coin_counter_w(space->machine(), 0, data & 0x10);
-		coin_counter_w(space->machine(), 1, data & 0x20);
+		set_led_status(machine(), 0, data & 0x08);
+		coin_counter_w(machine(), 0, data & 0x10);
+		coin_counter_w(machine(), 1, data & 0x20);
 
-//logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(&space->device()),data);
+//logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(&space.device()),data);
 	}
 }
 
-static READ16_HANDLER( cpuB_ctrl_r )
+READ16_MEMBER(overdriv_state::cpuB_ctrl_r)
 {
-	overdriv_state *state = space->machine().driver_data<overdriv_state>();
-	return state->m_cpuB_ctrl;
+	return m_cpuB_ctrl;
 }
 
-static WRITE16_HANDLER( cpuB_ctrl_w )
+WRITE16_MEMBER(overdriv_state::cpuB_ctrl_w)
 {
-	overdriv_state *state = space->machine().driver_data<overdriv_state>();
-	COMBINE_DATA(&state->m_cpuB_ctrl);
+	COMBINE_DATA(&m_cpuB_ctrl);
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = enable sprite ROM reading */
-		k053246_set_objcha_line(state->m_k053246, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+		k053246_set_objcha_line(m_k053246, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 1 used but unknown (irq enable?) */
 
@@ -142,22 +139,19 @@ static READ8_DEVICE_HANDLER( overdriv_sound_r )
 	return k053260_r(device, 2 + offset);
 }
 
-static WRITE16_HANDLER( overdriv_soundirq_w )
+WRITE16_MEMBER(overdriv_state::overdriv_soundirq_w)
 {
-	overdriv_state *state = space->machine().driver_data<overdriv_state>();
-	device_set_input_line(state->m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE16_HANDLER( overdriv_cpuB_irq5_w )
+WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq5_w)
 {
-	overdriv_state *state = space->machine().driver_data<overdriv_state>();
-	device_set_input_line(state->m_subcpu, 5, HOLD_LINE);
+	device_set_input_line(m_subcpu, 5, HOLD_LINE);
 }
 
-static WRITE16_HANDLER( overdriv_cpuB_irq6_w )
+WRITE16_MEMBER(overdriv_state::overdriv_cpuB_irq6_w)
 {
-	overdriv_state *state = space->machine().driver_data<overdriv_state>();
-	device_set_input_line(state->m_subcpu, 6, HOLD_LINE);
+	device_set_input_line(m_subcpu, 6, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
@@ -175,16 +169,16 @@ static ADDRESS_MAP_START( overdriv_master_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x1d0000, 0x1d001f) AM_DEVWRITE_LEGACY("k053251", k053251_msb_w)
 	AM_RANGE(0x1d8000, 0x1d8003) AM_DEVREADWRITE8_LEGACY("k053260_1", overdriv_sound_r, k053260_w, 0x00ff)	/* K053260 */
 	AM_RANGE(0x1e0000, 0x1e0003) AM_DEVREADWRITE8_LEGACY("k053260_2", overdriv_sound_r, k053260_w, 0x00ff)	/* K053260 */
-	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE_LEGACY(overdriv_soundirq_w)
-	AM_RANGE(0x1f0000, 0x1f0001) AM_WRITE_LEGACY(cpuA_ctrl_w)	/* halt cpu B, coin counter, start lamp, other? */
-	AM_RANGE(0x1f8000, 0x1f8001) AM_WRITE_LEGACY(eeprom_w)
+	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE(overdriv_soundirq_w)
+	AM_RANGE(0x1f0000, 0x1f0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, coin counter, start lamp, other? */
+	AM_RANGE(0x1f8000, 0x1f8001) AM_WRITE(eeprom_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x210000, 0x210fff) AM_DEVREADWRITE8_LEGACY("k051316_1", k051316_r, k051316_w, 0xff00)
 	AM_RANGE(0x218000, 0x218fff) AM_DEVREADWRITE8_LEGACY("k051316_2", k051316_r, k051316_w, 0xff00)
 	AM_RANGE(0x220000, 0x220fff) AM_DEVREAD8_LEGACY("k051316_1", k051316_rom_r, 0xff00)
 	AM_RANGE(0x228000, 0x228fff) AM_DEVREAD8_LEGACY("k051316_2", k051316_rom_r, 0xff00)
-	AM_RANGE(0x230000, 0x230001) AM_WRITE_LEGACY(overdriv_cpuB_irq6_w)
-	AM_RANGE(0x238000, 0x238001) AM_WRITE_LEGACY(overdriv_cpuB_irq5_w)
+	AM_RANGE(0x230000, 0x230001) AM_WRITE(overdriv_cpuB_irq6_w)
+	AM_RANGE(0x238000, 0x238001) AM_WRITE(overdriv_cpuB_irq5_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
@@ -195,7 +189,7 @@ static ADDRESS_MAP_START( overdriv_slave_map, AS_PROGRAM, 16, overdriv_state )
 	AM_RANGE(0x108000, 0x10800f) AM_DEVREADWRITE("k053250_2", k053250_t, reg_r, reg_w)
 	AM_RANGE(0x118000, 0x118fff) AM_DEVREADWRITE_LEGACY("k053246", k053247_word_r, k053247_word_w)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
-	AM_RANGE(0x128000, 0x128001) AM_READWRITE_LEGACY(cpuB_ctrl_r, cpuB_ctrl_w)	/* enable K053247 ROM reading, plus something else */
+	AM_RANGE(0x128000, 0x128001) AM_READWRITE(cpuB_ctrl_r, cpuB_ctrl_w)	/* enable K053247 ROM reading, plus something else */
 	AM_RANGE(0x130000, 0x130007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x208000, 0x20bfff) AM_RAM

@@ -42,36 +42,33 @@ Notes:
 #include "includes/aquarium.h"
 
 
-static READ16_HANDLER( aquarium_coins_r )
+READ16_MEMBER(aquarium_state::aquarium_coins_r)
 {
-	aquarium_state *state = space->machine().driver_data<aquarium_state>();
 
 	int data;
-	data = (input_port_read(space->machine(), "SYSTEM") & 0x7fff);
-	data |= state->m_aquarium_snd_ack;
-	state->m_aquarium_snd_ack = 0;
+	data = (input_port_read(machine(), "SYSTEM") & 0x7fff);
+	data |= m_aquarium_snd_ack;
+	m_aquarium_snd_ack = 0;
 
 	return data;
 }
 
-static WRITE8_HANDLER( aquarium_snd_ack_w )
+WRITE8_MEMBER(aquarium_state::aquarium_snd_ack_w)
 {
-	aquarium_state *state = space->machine().driver_data<aquarium_state>();
-	state->m_aquarium_snd_ack = 0x8000;
+	m_aquarium_snd_ack = 0x8000;
 }
 
-static WRITE16_HANDLER( aquarium_sound_w )
+WRITE16_MEMBER(aquarium_state::aquarium_sound_w)
 {
 //  popmessage("sound write %04x",data);
-	aquarium_state *state = space->machine().driver_data<aquarium_state>();
 
 	soundlatch_w(space, 1, data & 0xff);
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 }
 
-static WRITE8_HANDLER( aquarium_z80_bank_w )
+WRITE8_MEMBER(aquarium_state::aquarium_z80_bank_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	memory_set_bank(machine(), "bank1", data & 0x07);
 }
 
 static UINT8 aquarium_snd_bitswap( UINT8 scrambled_data )
@@ -90,17 +87,17 @@ static UINT8 aquarium_snd_bitswap( UINT8 scrambled_data )
 	return data;
 }
 
-static READ8_HANDLER( aquarium_oki_r )
+READ8_MEMBER(aquarium_state::aquarium_oki_r)
 {
-	okim6295_device *oki = space->machine().device<okim6295_device>("oki");
-	return aquarium_snd_bitswap(oki->read(*space, offset));
+	okim6295_device *oki = machine().device<okim6295_device>("oki");
+	return aquarium_snd_bitswap(oki->read(*&space, offset));
 }
 
-static WRITE8_HANDLER( aquarium_oki_w )
+WRITE8_MEMBER(aquarium_state::aquarium_oki_w)
 {
-	logerror("%s:Writing %04x to the OKI M6295\n", space->machine().describe_context(), aquarium_snd_bitswap(data));
-	okim6295_device *oki = space->machine().device<okim6295_device>("oki");
-	oki->write(*space, offset, (aquarium_snd_bitswap(data)));
+	logerror("%s:Writing %04x to the OKI M6295\n", machine().describe_context(), aquarium_snd_bitswap(data));
+	okim6295_device *oki = machine().device<okim6295_device>("oki");
+	oki->write(*&space, offset, (aquarium_snd_bitswap(data)));
 }
 
 
@@ -118,9 +115,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aquarium_state )
 	AM_RANGE(0xd80080, 0xd80081) AM_READ_PORT("DSW")
 	AM_RANGE(0xd80082, 0xd80083) AM_READNOP	/* stored but not read back ? check code at 0x01f440 */
 	AM_RANGE(0xd80084, 0xd80085) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xd80086, 0xd80087) AM_READ_LEGACY(aquarium_coins_r)
+	AM_RANGE(0xd80086, 0xd80087) AM_READ(aquarium_coins_r)
 	AM_RANGE(0xd80088, 0xd80089) AM_WRITENOP		/* ?? video related */
-	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE_LEGACY(aquarium_sound_w)
+	AM_RANGE(0xd8008a, 0xd8008b) AM_WRITE(aquarium_sound_w)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -133,10 +130,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( snd_portmap, AS_IO, 8, aquarium_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(aquarium_oki_r, aquarium_oki_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(aquarium_oki_r, aquarium_oki_w)
 	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(aquarium_snd_ack_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(aquarium_z80_bank_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(aquarium_snd_ack_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(aquarium_z80_bank_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( aquarium )

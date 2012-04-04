@@ -18,6 +18,8 @@ public:
 	int		 m_sprites_gfx_banked;
 
 	UINT8    m_irq_mask;
+	DECLARE_WRITE8_MEMBER(hyperspt_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 /*----------- defined in video/hyperspt.c -----------*/

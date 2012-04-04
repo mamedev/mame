@@ -24,4 +24,22 @@ public:
 	UINT16				*m_gsp_vram;
 
 	UINT32				*m_adsp_internal_program_ram;
+	DECLARE_READ32_MEMBER(unk_r);
+	DECLARE_READ32_MEMBER(watchdog_r);
+	DECLARE_WRITE32_MEMBER(shifter_w);
+	DECLARE_WRITE32_MEMBER(motor_w);
+	DECLARE_WRITE32_MEMBER(reset_w);
+	DECLARE_READ32_MEMBER(sound_data_r);
+	DECLARE_WRITE32_MEMBER(sound_data_w);
+	DECLARE_WRITE32_MEMBER(dsp32c_1_w);
+	DECLARE_READ32_MEMBER(dsp32c_1_r);
+	DECLARE_WRITE32_MEMBER(dsp32c_2_w);
+	DECLARE_READ32_MEMBER(dsp32c_2_r);
+	DECLARE_WRITE32_MEMBER(host_gsp_w);
+	DECLARE_READ32_MEMBER(host_gsp_r);
+	DECLARE_READ32_MEMBER(host_dram_r);
+	DECLARE_WRITE32_MEMBER(host_dram_w);
+	DECLARE_READ32_MEMBER(host_vram_r);
+	DECLARE_WRITE32_MEMBER(host_vram_w);
+	DECLARE_WRITE32_MEMBER(timer_w);
 };

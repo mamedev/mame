@@ -25,6 +25,9 @@ public:
 	tilemap_t *m_fg;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(pitnrun_hflip_w);
+	DECLARE_WRITE8_MEMBER(pitnrun_vflip_w);
 };
 
 

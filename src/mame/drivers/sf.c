@@ -20,33 +20,32 @@
 #include "sound/msm5205.h"
 #include "includes/sf.h"
 
-static READ16_HANDLER( dummy_r )
+READ16_MEMBER(sf_state::dummy_r)
 {
 	return 0xffff;
 }
 
 
-static WRITE16_HANDLER( sf_coin_w )
+WRITE16_MEMBER(sf_state::sf_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1,  data & 0x02);
-		coin_lockout_w(space->machine(), 0, ~data & 0x10);
-		coin_lockout_w(space->machine(), 1, ~data & 0x20);
-		coin_lockout_w(space->machine(), 2, ~data & 0x40);	/* is there a third coin input? */
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1,  data & 0x02);
+		coin_lockout_w(machine(), 0, ~data & 0x10);
+		coin_lockout_w(machine(), 1, ~data & 0x20);
+		coin_lockout_w(machine(), 2, ~data & 0x40);	/* is there a third coin input? */
 	}
 }
 
 
-static WRITE16_HANDLER( soundcmd_w )
+WRITE16_MEMBER(sf_state::soundcmd_w)
 {
-	sf_state *state = space->machine().driver_data<sf_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -60,7 +59,7 @@ static void write_dword( address_space *space, offs_t offset, UINT32 data )
 	space->write_word(offset + 2, data);
 }
 
-static WRITE16_HANDLER( protection_w )
+WRITE16_MEMBER(sf_state::protection_w)
 {
 	static const int maplist[4][10] = {
 		{ 1, 0, 3, 2, 4, 5, 6, 7, 8, 9 },
@@ -71,10 +70,10 @@ static WRITE16_HANDLER( protection_w )
 	int map;
 
 	map = maplist
-		[space->read_byte(0xffc006)]
-		[(space->read_byte(0xffc003) << 1) + (space->read_word(0xffc004) >> 8)];
+		[space.read_byte(0xffc006)]
+		[(space.read_byte(0xffc003) << 1) + (space.read_word(0xffc004) >> 8)];
 
-	switch (space->read_byte(0xffc684))
+	switch (space.read_byte(0xffc684))
 	{
 	case 1:
 		{
@@ -82,21 +81,21 @@ static WRITE16_HANDLER( protection_w )
 
 			base = 0x1b6e8 + 0x300e * map;
 
-			write_dword(space, 0xffc01c, 0x16bfc + 0x270 * map);
-			write_dword(space, 0xffc020, base + 0x80);
-			write_dword(space, 0xffc024, base);
-			write_dword(space, 0xffc028, base + 0x86);
-			write_dword(space, 0xffc02c, base + 0x8e);
-			write_dword(space, 0xffc030, base + 0x20e);
-			write_dword(space, 0xffc034, base + 0x30e);
-			write_dword(space, 0xffc038, base + 0x38e);
-			write_dword(space, 0xffc03c, base + 0x40e);
-			write_dword(space, 0xffc040, base + 0x80e);
-			write_dword(space, 0xffc044, base + 0xc0e);
-			write_dword(space, 0xffc048, base + 0x180e);
-			write_dword(space, 0xffc04c, base + 0x240e);
-			write_dword(space, 0xffc050, 0x19548 + 0x60 * map);
-			write_dword(space, 0xffc054, 0x19578 + 0x60 * map);
+			write_dword(&space, 0xffc01c, 0x16bfc + 0x270 * map);
+			write_dword(&space, 0xffc020, base + 0x80);
+			write_dword(&space, 0xffc024, base);
+			write_dword(&space, 0xffc028, base + 0x86);
+			write_dword(&space, 0xffc02c, base + 0x8e);
+			write_dword(&space, 0xffc030, base + 0x20e);
+			write_dword(&space, 0xffc034, base + 0x30e);
+			write_dword(&space, 0xffc038, base + 0x38e);
+			write_dword(&space, 0xffc03c, base + 0x40e);
+			write_dword(&space, 0xffc040, base + 0x80e);
+			write_dword(&space, 0xffc044, base + 0xc0e);
+			write_dword(&space, 0xffc048, base + 0x180e);
+			write_dword(&space, 0xffc04c, base + 0x240e);
+			write_dword(&space, 0xffc050, 0x19548 + 0x60 * map);
+			write_dword(&space, 0xffc054, 0x19578 + 0x60 * map);
 			break;
 		}
 	case 2:
@@ -111,24 +110,24 @@ static WRITE16_HANDLER( protection_w )
 			int d1 = delta1[map] + 0xc0;
 			int d2 = delta2[map];
 
-			space->write_word(0xffc680, d1);
-			space->write_word(0xffc682, d2);
-			space->write_word(0xffc00c, 0xc0);
-			space->write_word(0xffc00e, 0);
+			space.write_word(0xffc680, d1);
+			space.write_word(0xffc682, d2);
+			space.write_word(0xffc00c, 0xc0);
+			space.write_word(0xffc00e, 0);
 
-			sf_fg_scroll_w(space, 0, d1, 0xffff);
-			sf_bg_scroll_w(space, 0, d2, 0xffff);
+			sf_fg_scroll_w(&space, 0, d1, 0xffff);
+			sf_bg_scroll_w(&space, 0, d2, 0xffff);
 			break;
 		}
 	case 4:
 		{
-			int pos = space->read_byte(0xffc010);
+			int pos = space.read_byte(0xffc010);
 			pos = (pos + 1) & 3;
-			space->write_byte(0xffc010, pos);
+			space.write_byte(0xffc010, pos);
 			if(!pos)
 			{
-				int d1 = space->read_word(0xffc682);
-				int off = space->read_word(0xffc00e);
+				int d1 = space.read_word(0xffc682);
+				int off = space.read_word(0xffc00e);
 				if (off!=512)
 				{
 					off++;
@@ -139,16 +138,16 @@ static WRITE16_HANDLER( protection_w )
 					off = 0;
 					d1 -= 512;
 				}
-				space->write_word(0xffc682, d1);
-				space->write_word(0xffc00e, off);
-				sf_bg_scroll_w(space, 0, d1, 0xffff);
+				space.write_word(0xffc682, d1);
+				space.write_word(0xffc00e, off);
+				sf_bg_scroll_w(&space, 0, d1, 0xffff);
 			}
 			break;
 		}
 	default:
 		{
-			logerror("Write protection at %06x (%04x)\n", cpu_get_pc(&space->device()), data & 0xffff);
-			logerror("*** Unknown protection %d\n", space->read_byte(0xffc684));
+			logerror("Write protection at %06x (%04x)\n", cpu_get_pc(&space.device()), data & 0xffff);
+			logerror("*** Unknown protection %d\n", space.read_byte(0xffc684));
 			break;
 		}
 	}
@@ -161,20 +160,20 @@ static WRITE16_HANDLER( protection_w )
 
 static const int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
 
-static READ16_HANDLER( button1_r )
+READ16_MEMBER(sf_state::button1_r)
 {
-	return (scale[input_port_read(space->machine(), "IN3")] << 8) | scale[input_port_read(space->machine(), "IN1")];
+	return (scale[input_port_read(machine(), "IN3")] << 8) | scale[input_port_read(machine(), "IN1")];
 }
 
-static READ16_HANDLER( button2_r )
+READ16_MEMBER(sf_state::button2_r)
 {
-	return (scale[input_port_read(space->machine(), "IN4")] << 8) | scale[input_port_read(space->machine(), "IN2")];
+	return (scale[input_port_read(machine(), "IN4")] << 8) | scale[input_port_read(machine(), "IN2")];
 }
 
 
-static WRITE8_HANDLER( sound2_bank_w )
+WRITE8_MEMBER(sf_state::sound2_bank_w)
 {
-	memory_set_bankptr(space->machine(), "bank1", space->machine().region("audio2")->base() + 0x8000 * (data + 1));
+	memory_set_bankptr(machine(), "bank1", machine().region("audio2")->base() + 0x8000 * (data + 1));
 }
 
 
@@ -195,18 +194,18 @@ static ADDRESS_MAP_START( sf_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN0")
-	AM_RANGE(0xc00004, 0xc00005) AM_READ_LEGACY(button1_r)
-	AM_RANGE(0xc00006, 0xc00007) AM_READ_LEGACY(button2_r)
+	AM_RANGE(0xc00004, 0xc00005) AM_READ(button1_r)
+	AM_RANGE(0xc00006, 0xc00007) AM_READ(button2_r)
 	AM_RANGE(0xc00008, 0xc00009) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc0000e, 0xc0000f) AM_READ_LEGACY(dummy_r)
-	AM_RANGE(0xc00010, 0xc00011) AM_WRITE_LEGACY(sf_coin_w)
+	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
 	AM_RANGE(0xc00014, 0xc00015) AM_WRITE_LEGACY(sf_fg_scroll_w)
 	AM_RANGE(0xc00018, 0xc00019) AM_WRITE_LEGACY(sf_bg_scroll_w)
 	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE_LEGACY(sf_gfxctrl_w)
-	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE_LEGACY(soundcmd_w)
-//  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE_LEGACY(protection_w)
+	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
+//  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE(m_objectram)
 ADDRESS_MAP_END
@@ -217,18 +216,18 @@ static ADDRESS_MAP_START( sfus_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xb00000, 0xb007ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")
-	AM_RANGE(0xc00004, 0xc00005) AM_READ_LEGACY(dummy_r)
-	AM_RANGE(0xc00006, 0xc00007) AM_READ_LEGACY(dummy_r)
+	AM_RANGE(0xc00004, 0xc00005) AM_READ(dummy_r)
+	AM_RANGE(0xc00006, 0xc00007) AM_READ(dummy_r)
 	AM_RANGE(0xc00008, 0xc00009) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc0000e, 0xc0000f) AM_READ_LEGACY(dummy_r)
-	AM_RANGE(0xc00010, 0xc00011) AM_WRITE_LEGACY(sf_coin_w)
+	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
 	AM_RANGE(0xc00014, 0xc00015) AM_WRITE_LEGACY(sf_fg_scroll_w)
 	AM_RANGE(0xc00018, 0xc00019) AM_WRITE_LEGACY(sf_bg_scroll_w)
 	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE_LEGACY(sf_gfxctrl_w)
-	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE_LEGACY(soundcmd_w)
-//  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE_LEGACY(protection_w)
+	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
+//  AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE(m_objectram)
 ADDRESS_MAP_END
@@ -240,17 +239,17 @@ static ADDRESS_MAP_START( sfjp_map, AS_PROGRAM, 16, sf_state )
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("P2")
-	AM_RANGE(0xc00006, 0xc00007) AM_READ_LEGACY(dummy_r)
+	AM_RANGE(0xc00006, 0xc00007) AM_READ(dummy_r)
 	AM_RANGE(0xc00008, 0xc00009) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc0000e, 0xc0000f) AM_READ_LEGACY(dummy_r)
-	AM_RANGE(0xc00010, 0xc00011) AM_WRITE_LEGACY(sf_coin_w)
+	AM_RANGE(0xc0000e, 0xc0000f) AM_READ(dummy_r)
+	AM_RANGE(0xc00010, 0xc00011) AM_WRITE(sf_coin_w)
 	AM_RANGE(0xc00014, 0xc00015) AM_WRITE_LEGACY(sf_fg_scroll_w)
 	AM_RANGE(0xc00018, 0xc00019) AM_WRITE_LEGACY(sf_bg_scroll_w)
 	AM_RANGE(0xc0001a, 0xc0001b) AM_WRITE_LEGACY(sf_gfxctrl_w)
-	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE_LEGACY(soundcmd_w)
-	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE_LEGACY(protection_w)
+	AM_RANGE(0xc0001c, 0xc0001d) AM_WRITE(soundcmd_w)
+	AM_RANGE(0xc0001e, 0xc0001f) AM_WRITE(protection_w)
 	AM_RANGE(0xff8000, 0xffdfff) AM_RAM
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM AM_BASE(m_objectram)
 ADDRESS_MAP_END
@@ -274,7 +273,7 @@ static ADDRESS_MAP_START( sound2_io_map, AS_IO, 8, sf_state )
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("msm1", msm5205_w)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm2", msm5205_w)
 	AM_RANGE(0x01, 0x01) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(sound2_bank_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(sound2_bank_w)
 ADDRESS_MAP_END
 
 

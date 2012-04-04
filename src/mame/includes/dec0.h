@@ -21,6 +21,12 @@ public:
 	UINT16 *m_spriteram;
 	UINT16 *m_buffered_spriteram;
 	UINT16 m_pri;
+	DECLARE_WRITE16_MEMBER(dec0_control_w);
+	DECLARE_WRITE16_MEMBER(automat_control_w);
+	DECLARE_WRITE16_MEMBER(slyspy_control_w);
+	DECLARE_WRITE16_MEMBER(midres_sound_w);
+	DECLARE_WRITE16_MEMBER(unmapped_w);
+	DECLARE_WRITE8_MEMBER(automat_adpcm_w);
 };
 
 

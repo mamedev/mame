@@ -242,7 +242,7 @@ Who Dunnit           1988  6809
 #define MAIN_CPU_CLOCK		(EXIDY440_MASTER_CLOCK / 8)
 
 
-static READ8_HANDLER( showdown_bank0_r );
+
 
 
 
@@ -303,7 +303,7 @@ void exidy440_bank_select(running_machine &machine, UINT8 bank)
 	if (state->m_showdown_bank_data[0] != NULL)
 	{
 		if (bank == 0 && state->m_bank != 0)
-			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x7fff, FUNC(showdown_bank0_r));
+			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x4000, 0x7fff, read8_delegate(FUNC(exidy440_state::showdown_bank0_r),state));
 		else if (bank != 0 && state->m_bank == 0)
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank1");
 	}
@@ -314,13 +314,12 @@ void exidy440_bank_select(running_machine &machine, UINT8 bank)
 }
 
 
-static WRITE8_HANDLER( bankram_w )
+WRITE8_MEMBER(exidy440_state::bankram_w)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
 	/* EEROM lives in the upper 8k of bank 15 */
-	if (state->m_bank == 15 && offset >= 0x2000)
+	if (m_bank == 15 && offset >= 0x2000)
 	{
-		space->machine().region("maincpu")->base()[0x10000 + 15 * 0x4000 + offset] = data;
+		machine().region("maincpu")->base()[0x10000 + 15 * 0x4000 + offset] = data;
 		logerror("W EEROM[%04X] = %02X\n", offset - 0x2000, data);
 	}
 
@@ -335,19 +334,18 @@ static WRITE8_HANDLER( bankram_w )
  *
  *************************************/
 
-static READ8_HANDLER( exidy440_input_port_3_r )
+READ8_MEMBER(exidy440_state::exidy440_input_port_3_r)
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-	return input_port_read(space->machine(), "IN3");
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	return input_port_read(machine(), "IN3");
 }
 
 
-static READ8_HANDLER( sound_command_ack_r )
+READ8_MEMBER(exidy440_state::sound_command_ack_r)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
 	/* sound command acknowledgements come on bit 3 here */
-	return exidy440_sound_command_ack(state->m_custom) ? 0xf7 : 0xff;
+	return exidy440_sound_command_ack(m_custom) ? 0xf7 : 0xff;
 }
 
 
@@ -365,22 +363,22 @@ static TIMER_CALLBACK( delayed_sound_command_w )
 }
 
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(exidy440_state::sound_command_w)
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_sound_command_w), data);
+	machine().scheduler().synchronize(FUNC(delayed_sound_command_w), data);
 }
 
 
-static WRITE8_HANDLER( exidy440_input_port_3_w )
+WRITE8_MEMBER(exidy440_state::exidy440_input_port_3_w)
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( exidy440_coin_counter_w )
+WRITE8_MEMBER(exidy440_state::exidy440_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(machine(), 0, data & 1);
 }
 
 
@@ -391,52 +389,50 @@ static WRITE8_HANDLER( exidy440_coin_counter_w )
  *
  *************************************/
 
-static READ8_HANDLER( showdown_bank0_r )
+READ8_MEMBER(exidy440_state::showdown_bank0_r)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
 	/* showdown relies on different values from different memory locations */
 	/* yukon relies on multiple reads from the same location returning different values */
 	UINT8 result = 0xff;
 
 	/* fetch the special data if a bank is selected */
-	if (state->m_showdown_bank_select >= 0)
+	if (m_showdown_bank_select >= 0)
 	{
-		result = state->m_showdown_bank_data[state->m_showdown_bank_select][state->m_showdown_bank_offset++];
+		result = m_showdown_bank_data[m_showdown_bank_select][m_showdown_bank_offset++];
 
 		/* after 24 bytes, stop and revert back to the beginning */
-		if (state->m_showdown_bank_offset == 0x18)
-			state->m_showdown_bank_offset = 0;
+		if (m_showdown_bank_offset == 0x18)
+			m_showdown_bank_offset = 0;
 	}
 
 	/* look for special offsets to adjust our behavior */
 	if (offset == 0x0055)
-		state->m_showdown_bank_select = -1;
-	else if (state->m_showdown_bank_select == -1)
+		m_showdown_bank_select = -1;
+	else if (m_showdown_bank_select == -1)
 	{
-		state->m_showdown_bank_select = (offset == 0x00ed) ? 0 : (offset == 0x1243) ? 1 : 0;
-		state->m_showdown_bank_offset = 0;
+		m_showdown_bank_select = (offset == 0x00ed) ? 0 : (offset == 0x1243) ? 1 : 0;
+		m_showdown_bank_offset = 0;
 	}
 
 	return result;
 }
 
 
-static READ8_HANDLER( claypign_protection_r )
+READ8_MEMBER(exidy440_state::claypign_protection_r)
 {
 	return 0x76;
 }
 
 
-static READ8_HANDLER( topsecex_input_port_5_r )
+READ8_MEMBER(exidy440_state::topsecex_input_port_5_r)
 {
-	return (input_port_read(space->machine(), "AN1") & 1) ? 0x01 : 0x02;
+	return (input_port_read(machine(), "AN1") & 1) ? 0x01 : 0x02;
 }
 
 
-static WRITE8_HANDLER( topsecex_yscroll_w )
+WRITE8_MEMBER(exidy440_state::topsecex_yscroll_w)
 {
-	exidy440_state *state = space->machine().driver_data<exidy440_state>();
-	*state->m_topsecex_yscroll = data;
+	*m_topsecex_yscroll = data;
 }
 
 
@@ -482,15 +478,15 @@ static ADDRESS_MAP_START( exidy440_map, AS_PROGRAM, 8, exidy440_state )
 	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_BASE(m_scanline)
 	AM_RANGE(0x2b03, 0x2b03) AM_READ_PORT("IN0") AM_WRITE_LEGACY(exidy440_control_w)
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE_LEGACY(exidy440_paletteram_r, exidy440_paletteram_w)
-	AM_RANGE(0x2e00, 0x2e1f) AM_RAM_WRITE_LEGACY(sound_command_w)
-	AM_RANGE(0x2e20, 0x2e3f) AM_READWRITE_LEGACY(exidy440_input_port_3_r, exidy440_input_port_3_w)
-	AM_RANGE(0x2e40, 0x2e5f) AM_READNOP AM_WRITE_LEGACY(exidy440_coin_counter_w)	/* read: clear coin counters I/O2 */
+	AM_RANGE(0x2e00, 0x2e1f) AM_RAM_WRITE(sound_command_w)
+	AM_RANGE(0x2e20, 0x2e3f) AM_READWRITE(exidy440_input_port_3_r, exidy440_input_port_3_w)
+	AM_RANGE(0x2e40, 0x2e5f) AM_READNOP AM_WRITE(exidy440_coin_counter_w)	/* read: clear coin counters I/O2 */
 	AM_RANGE(0x2e60, 0x2e7f) AM_READ_PORT("IN1") AM_WRITENOP
 	AM_RANGE(0x2e80, 0x2e9f) AM_READ_PORT("IN2") AM_WRITENOP
-	AM_RANGE(0x2ea0, 0x2ebf) AM_READ_LEGACY(sound_command_ack_r) AM_WRITENOP
+	AM_RANGE(0x2ea0, 0x2ebf) AM_READ(sound_command_ack_r) AM_WRITENOP
 	AM_RANGE(0x2ec0, 0x2eff) AM_NOP
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE_LEGACY(bankram_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank1") AM_WRITE(bankram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1942,8 +1938,8 @@ static DRIVER_INIT( exidy440 )
 static DRIVER_INIT( claypign )
 {
 	DRIVER_INIT_CALL(exidy440);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2ec0, 0x2ec3, FUNC(claypign_protection_r));
+	exidy440_state *state = machine.driver_data<exidy440_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2ec0, 0x2ec3, read8_delegate(FUNC(exidy440_state::claypign_protection_r),state));
 }
 
 
@@ -1953,11 +1949,11 @@ static DRIVER_INIT( topsecex )
 	DRIVER_INIT_CALL(exidy440);
 
 	/* extra input ports and scrolling */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2ec5, 0x2ec5, FUNC(topsecex_input_port_5_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x2ec5, 0x2ec5, read8_delegate(FUNC(exidy440_state::topsecex_input_port_5_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec6, 0x2ec6, "AN0");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port(0x2ec7, 0x2ec7, "IN4");
 
-	state->m_topsecex_yscroll = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2ec1, 0x2ec1, FUNC(topsecex_yscroll_w));
+	state->m_topsecex_yscroll = machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x2ec1, 0x2ec1, write8_delegate(FUNC(exidy440_state::topsecex_yscroll_w),state));
 }
 
 

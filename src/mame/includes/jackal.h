@@ -26,6 +26,15 @@ public:
 	/* devices */
 	device_t *m_mastercpu;
 	device_t *m_slavecpu;
+	DECLARE_READ8_MEMBER(topgunbl_rotary_r);
+	DECLARE_WRITE8_MEMBER(jackal_flipscreen_w);
+	DECLARE_READ8_MEMBER(jackal_zram_r);
+	DECLARE_READ8_MEMBER(jackal_voram_r);
+	DECLARE_READ8_MEMBER(jackal_spriteram_r);
+	DECLARE_WRITE8_MEMBER(jackal_rambank_w);
+	DECLARE_WRITE8_MEMBER(jackal_zram_w);
+	DECLARE_WRITE8_MEMBER(jackal_voram_w);
+	DECLARE_WRITE8_MEMBER(jackal_spriteram_w);
 };
 
 

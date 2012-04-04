@@ -174,8 +174,8 @@ maybe some sprite placement issues
 static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
 
 /* a = 1, 2 = player # */
-#define GUNX( a ) (( ( input_port_read(space->machine(), gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)
-#define GUNY( a ) (( ( input_port_read(space->machine(), gunnames[2 * (a - 1) + 1]) * 223 ) / 0xff ) + 10)
+#define GUNX( a ) (( ( input_port_read(machine(), gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)
+#define GUNY( a ) (( ( input_port_read(machine(), gunnames[2 * (a - 1) + 1]) * 223 ) / 0xff ) + 10)
 
 static const eeprom_interface eeprom_intf =
 {
@@ -188,7 +188,7 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" 	/* unlock command */
 };
 
-static WRITE8_HANDLER( control2_w )
+WRITE8_MEMBER(lethal_state::control2_w)
 {
 	/* bit 0 is data */
 	/* bit 1 is cs (active low) */
@@ -197,11 +197,10 @@ static WRITE8_HANDLER( control2_w )
 	/* bit 4 bankswitches the 4800-4fff region: 0 = registers, 1 = RAM ("CBNK" on schematics) */
 	/* bit 6 is "SHD0" (some kind of shadow control) */
 	/* bit 7 is "SHD1" (ditto) */
-	lethal_state *state = space->machine().driver_data<lethal_state>();
 
-	state->m_cur_control2 = data;
+	m_cur_control2 = data;
 
-	input_port_write(space->machine(), "EEPROMOUT", state->m_cur_control2, 0xff);
+	input_port_write(machine(), "EEPROMOUT", m_cur_control2, 0xff);
 }
 
 static INTERRUPT_GEN(lethalen_interrupt)
@@ -212,18 +211,17 @@ static INTERRUPT_GEN(lethalen_interrupt)
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( sound_cmd_w )
+WRITE8_MEMBER(lethal_state::sound_cmd_w)
 {
 	soundlatch_w(space, 0, data);
 }
 
-static WRITE8_HANDLER( sound_irq_w )
+WRITE8_MEMBER(lethal_state::sound_irq_w)
 {
-	lethal_state *state = space->machine().driver_data<lethal_state>();
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static READ8_HANDLER( sound_status_r )
+READ8_MEMBER(lethal_state::sound_status_r)
 {
 	return 0xf;
 }
@@ -234,18 +232,17 @@ static void sound_nmi( device_t *device )
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( le_bankswitch_w )
+WRITE8_MEMBER(lethal_state::le_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data);
+	memory_set_bank(machine(), "bank1", data);
 }
 
-static READ8_HANDLER( le_4800_r )
+READ8_MEMBER(lethal_state::le_4800_r)
 {
-	lethal_state *state = space->machine().driver_data<lethal_state>();
 
-	if (state->m_cur_control2 & 0x10)	// RAM enable
+	if (m_cur_control2 & 0x10)	// RAM enable
 	{
-		return space->machine().generic.paletteram.u8[offset];
+		return machine().generic.paletteram.u8[offset];
 	}
 	else
 	{
@@ -269,7 +266,7 @@ static READ8_HANDLER( le_4800_r )
 				case 0x4d:
 				case 0x4e:
 				case 0x4f:
-					return k053244_r(state->m_k053244, offset - 0x40);
+					return k053244_r(m_k053244, offset - 0x40);
 
 				case 0x80:
 				case 0x81:
@@ -303,32 +300,31 @@ static READ8_HANDLER( le_4800_r )
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					return k054000_r(state->m_k054000, offset - 0x80);
+					return k054000_r(m_k054000, offset - 0x80);
 
 				case 0xca:
 					return sound_status_r(space, 0);
 			}
 		}
 		else if (offset < 0x1800)
-			return k053245_r(state->m_k053244, (offset - 0x0800) & 0x07ff);
+			return k053245_r(m_k053244, (offset - 0x0800) & 0x07ff);
 		else if (offset < 0x2000)
-			return k056832_ram_code_lo_r(state->m_k056832, offset - 0x1800);
+			return k056832_ram_code_lo_r(m_k056832, offset - 0x1800);
 		else if (offset < 0x2800)
-			return k056832_ram_code_hi_r(state->m_k056832, offset - 0x2000);
+			return k056832_ram_code_hi_r(m_k056832, offset - 0x2000);
 		else if (offset < 0x3000)
-			return k056832_ram_attr_lo_r(state->m_k056832, offset - 0x2800);
+			return k056832_ram_attr_lo_r(m_k056832, offset - 0x2800);
 		else // (offset < 0x3800)
-			return k056832_ram_attr_hi_r(state->m_k056832, offset - 0x3000);
+			return k056832_ram_attr_hi_r(m_k056832, offset - 0x3000);
 	}
 
 	return 0;
 }
 
-static WRITE8_HANDLER( le_4800_w )
+WRITE8_MEMBER(lethal_state::le_4800_w)
 {
-	lethal_state *state = space->machine().driver_data<lethal_state>();
 
-	if (state->m_cur_control2 & 0x10)	// RAM enable
+	if (m_cur_control2 & 0x10)	// RAM enable
 	{
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
 	}
@@ -362,7 +358,7 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x4d:
 				case 0x4e:
 				case 0x4f:
-					k053244_w(state->m_k053244, offset - 0x40, data);
+					k053244_w(m_k053244, offset - 0x40, data);
 					break;
 
 				case 0x80:
@@ -397,34 +393,34 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					k054000_w(state->m_k054000, offset - 0x80, data);
+					k054000_w(m_k054000, offset - 0x80, data);
 					break;
 
 				default:
-					logerror("Unknown LE 48xx register write: %x to %x (PC=%x)\n", data, offset, cpu_get_pc(&space->device()));
+					logerror("Unknown LE 48xx register write: %x to %x (PC=%x)\n", data, offset, cpu_get_pc(&space.device()));
 					break;
 			}
 		}
 		else if (offset < 0x1800)
-			k053245_w(state->m_k053244, (offset - 0x0800) & 0x07ff, data);
+			k053245_w(m_k053244, (offset - 0x0800) & 0x07ff, data);
 		else if (offset < 0x2000)
-			k056832_ram_code_lo_w(state->m_k056832, offset - 0x1800, data);
+			k056832_ram_code_lo_w(m_k056832, offset - 0x1800, data);
 		else if (offset < 0x2800)
-			k056832_ram_code_hi_w(state->m_k056832, offset - 0x2000, data);
+			k056832_ram_code_hi_w(m_k056832, offset - 0x2000, data);
 		else if (offset < 0x3000)
-			k056832_ram_attr_lo_w(state->m_k056832, offset - 0x2800, data);
+			k056832_ram_attr_lo_w(m_k056832, offset - 0x2800, data);
 		else // (offset < 0x3800)
-			k056832_ram_attr_hi_w(state->m_k056832, offset - 0x3000, data);
+			k056832_ram_attr_hi_w(m_k056832, offset - 0x3000, data);
 	}
 }
 
 // use one more palette entry for the BG color
-static WRITE8_HANDLER( le_bgcolor_w )
+WRITE8_MEMBER(lethal_state::le_bgcolor_w)
 {
 	paletteram_xBBBBBGGGGGRRRRR_be_w(space, 0x3800 + offset, data);
 }
 
-static READ8_HANDLER( guns_r )
+READ8_MEMBER(lethal_state::guns_r)
 {
 	switch (offset)
 	{
@@ -449,7 +445,7 @@ static READ8_HANDLER( guns_r )
 	return 0;
 }
 
-static READ8_HANDLER( gunsaux_r )
+READ8_MEMBER(lethal_state::gunsaux_r)
 {
 	int res = 0;
 
@@ -467,15 +463,15 @@ static ADDRESS_MAP_START( le_main, AS_PROGRAM, 8, lethal_state )
 	AM_RANGE(0x4080, 0x4080) AM_READNOP		// watchdog
 	AM_RANGE(0x4090, 0x4090) AM_READNOP
 	AM_RANGE(0x40a0, 0x40a0) AM_READNOP
-	AM_RANGE(0x40c4, 0x40c4) AM_WRITE_LEGACY(control2_w)
+	AM_RANGE(0x40c4, 0x40c4) AM_WRITE(control2_w)
 	AM_RANGE(0x40c8, 0x40d0) AM_WRITE_LEGACY(lethalen_palette_control)	// PCU1-PCU3 on the schematics
-	AM_RANGE(0x40d4, 0x40d7) AM_READ_LEGACY(guns_r)
+	AM_RANGE(0x40d4, 0x40d7) AM_READ(guns_r)
 	AM_RANGE(0x40d8, 0x40d8) AM_READ_PORT("DSW")
 	AM_RANGE(0x40d9, 0x40d9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x40db, 0x40db) AM_READ_LEGACY(gunsaux_r)		// top X bit of guns
-	AM_RANGE(0x40dc, 0x40dc) AM_WRITE_LEGACY(le_bankswitch_w)
-	AM_RANGE(0x47fe, 0x47ff) AM_WRITE_LEGACY(le_bgcolor_w)		// BG color
-	AM_RANGE(0x4800, 0x7fff) AM_READWRITE_LEGACY(le_4800_r, le_4800_w) // bankswitched: RAM and registers
+	AM_RANGE(0x40db, 0x40db) AM_READ(gunsaux_r)		// top X bit of guns
+	AM_RANGE(0x40dc, 0x40dc) AM_WRITE(le_bankswitch_w)
+	AM_RANGE(0x47fe, 0x47ff) AM_WRITE(le_bgcolor_w)		// BG color
+	AM_RANGE(0x4800, 0x7fff) AM_READWRITE(le_4800_r, le_4800_w) // bankswitched: RAM and registers
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 

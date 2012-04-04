@@ -23,6 +23,10 @@ public:
 	device_t *m_k007232;
 	device_t *m_k052109;
 	device_t *m_k051960;
+	DECLARE_WRITE8_MEMBER(crimfght_coin_w);
+	DECLARE_WRITE8_MEMBER(crimfght_sh_irqtrigger_w);
+	DECLARE_READ8_MEMBER(k052109_051960_r);
+	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 };
 
 /*----------- defined in video/crimfght.c -----------*/

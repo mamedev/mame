@@ -53,6 +53,42 @@ public:
 
 	tilemap_t *m_tx_tilemap;	/* Tilemap for extra-text-layer */
 	UINT8 m_tx_flip;
+	DECLARE_READ16_MEMBER(video_count_r);
+	DECLARE_WRITE8_MEMBER(toaplan2_coin_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_coin_word_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_v25_coin_word_w);
+	DECLARE_WRITE16_MEMBER(shippumd_coin_word_w);
+	DECLARE_READ16_MEMBER(shared_ram_r);
+	DECLARE_WRITE16_MEMBER(shared_ram_w);
+	DECLARE_WRITE16_MEMBER(toaplan2_hd647180_cpu_w);
+	DECLARE_READ16_MEMBER(ghox_p1_h_analog_r);
+	DECLARE_READ16_MEMBER(ghox_p2_h_analog_r);
+	DECLARE_READ16_MEMBER(ghox_mcu_r);
+	DECLARE_WRITE16_MEMBER(ghox_mcu_w);
+	DECLARE_READ16_MEMBER(ghox_shared_ram_r);
+	DECLARE_WRITE16_MEMBER(ghox_shared_ram_w);
+	DECLARE_WRITE16_MEMBER(fixeight_subcpu_ctrl_w);
+	DECLARE_WRITE16_MEMBER(fixeightbl_oki_bankswitch_w);
+	DECLARE_READ8_MEMBER(v25_dswa_r);
+	DECLARE_READ8_MEMBER(v25_dswb_r);
+	DECLARE_READ8_MEMBER(v25_jmpr_r);
+	DECLARE_READ8_MEMBER(fixeight_region_r);
+	DECLARE_WRITE8_MEMBER(raizing_z80_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(raizing_oki_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(bgaregga_soundlatch_w);
+	DECLARE_READ8_MEMBER(bgaregga_E01D_r);
+	DECLARE_WRITE8_MEMBER(bgaregga_E00C_w);
+	DECLARE_READ16_MEMBER(batrider_z80_busack_r);
+	DECLARE_WRITE16_MEMBER(batrider_z80_busreq_w);
+	DECLARE_READ16_MEMBER(batrider_z80rom_r);
+	DECLARE_WRITE16_MEMBER(batrider_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(batrider_soundlatch2_w);
+	DECLARE_WRITE16_MEMBER(batrider_unknown_sound_w);
+	DECLARE_WRITE16_MEMBER(batrider_clear_sndirq_w);
+	DECLARE_WRITE8_MEMBER(batrider_sndirq_w);
+	DECLARE_WRITE8_MEMBER(batrider_clear_nmi_w);
+	DECLARE_READ16_MEMBER(bbakraid_eeprom_r);
+	DECLARE_WRITE16_MEMBER(bbakraid_eeprom_w);
 };
 
 /*----------- defined in video/toaplan2.c -----------*/

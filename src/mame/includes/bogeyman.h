@@ -27,6 +27,8 @@ public:
 	int        m_psg_latch;
 	int        m_last_write;
 	int        m_colbank;
+	DECLARE_WRITE8_MEMBER(bogeyman_8910_latch_w);
+	DECLARE_WRITE8_MEMBER(bogeyman_8910_control_w);
 };
 
 

@@ -21,6 +21,12 @@ public:
 	int m_raster_irq_enable;
 	int m_vblank;
 	int m_prev_value;
+	DECLARE_WRITE16_MEMBER(shadfrce_flip_screen);
+	DECLARE_READ16_MEMBER(shadfrce_input_ports_r);
+	DECLARE_WRITE16_MEMBER(shadfrce_sound_brt_w);
+	DECLARE_WRITE16_MEMBER(shadfrce_irq_ack_w);
+	DECLARE_WRITE16_MEMBER(shadfrce_irq_w);
+	DECLARE_WRITE16_MEMBER(shadfrce_scanline_w);
 };
 
 

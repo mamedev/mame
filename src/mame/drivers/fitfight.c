@@ -88,39 +88,35 @@ Stephh's notes :
 #include "includes/fitfight.h"
 
 
-static READ16_HANDLER(fitfight_700000_r)
+READ16_MEMBER(fitfight_state::fitfight_700000_r)
 {
-	fitfight_state *state = space->machine().driver_data<fitfight_state>();
-	UINT16 data = state->m_fof_700000_data;
+	UINT16 data = m_fof_700000_data;
 	return (data << 2);
 }
 
-static READ16_HANDLER(histryma_700000_r)
+READ16_MEMBER(fitfight_state::histryma_700000_r)
 {
-	fitfight_state *state = space->machine().driver_data<fitfight_state>();
-	UINT16 data = (state->m_fof_700000_data & 0x00AA);
-	data |= ((state->m_fof_700000_data & 0x0055) >> 2);
+	UINT16 data = (m_fof_700000_data & 0x00AA);
+	data |= ((m_fof_700000_data & 0x0055) >> 2);
 	return (data);
 }
 
-static READ16_HANDLER(bbprot_700000_r)
+READ16_MEMBER(fitfight_state::bbprot_700000_r)
 {
-	fitfight_state *state = space->machine().driver_data<fitfight_state>();
 	UINT16 data = 0;
-	data  =  (state->m_fof_700000_data & 0x000b);
-	data |= ((state->m_fof_700000_data & 0x01d0) >> 2);
-	data |= ((state->m_fof_700000_data & 0x0004) << 6);
-	data |= ((state->m_fof_700000_data & 0x0020) << 2);
+	data  =  (m_fof_700000_data & 0x000b);
+	data |= ((m_fof_700000_data & 0x01d0) >> 2);
+	data |= ((m_fof_700000_data & 0x0004) << 6);
+	data |= ((m_fof_700000_data & 0x0020) << 2);
 	return (data);
 }
 
-static WRITE16_HANDLER(fitfight_700000_w)
+WRITE16_MEMBER(fitfight_state::fitfight_700000_w)
 {
-	fitfight_state *state = space->machine().driver_data<fitfight_state>();
-	COMBINE_DATA(&state->m_fof_700000[offset]);		// needed for scrolling
+	COMBINE_DATA(&m_fof_700000[offset]);		// needed for scrolling
 
 	if (data < 0x0200)				// to avoid considering writes of 0x0200
-		state->m_fof_700000_data = data;
+		m_fof_700000_data = data;
 }
 
 static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
@@ -145,7 +141,7 @@ static ADDRESS_MAP_START( fitfight_main_map, AS_PROGRAM, 16, fitfight_state )
 	//      @0x000037a6/0x000030e6: 0x??dd byte from 0xe08c05, 0xF101 then 0xF001/0xF157 then 0xF057
 
 //  AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(xxxx) /* see init */
-	AM_RANGE(0x700000, 0x700001) AM_WRITE_LEGACY(fitfight_700000_w) AM_BASE(m_fof_700000)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(fitfight_700000_w) AM_BASE(m_fof_700000)
 	//  kept at 0xe07900/0xe04c56
 
 	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE(m_fof_800000)
@@ -187,7 +183,7 @@ static ADDRESS_MAP_START( bbprot_main_map, AS_PROGRAM, 16, fitfight_state )
 
 	AM_RANGE(0x600000, 0x600001) AM_WRITEONLY AM_BASE(m_fof_600000)
 
-	AM_RANGE(0x700000, 0x700001) AM_READWRITE_LEGACY(bbprot_700000_r, fitfight_700000_w) AM_BASE(m_fof_700000)
+	AM_RANGE(0x700000, 0x700001) AM_READWRITE(bbprot_700000_r, fitfight_700000_w) AM_BASE(m_fof_700000)
 
 	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE(m_fof_800000)
 	AM_RANGE(0x900000, 0x900001) AM_WRITEONLY AM_BASE(m_fof_900000)
@@ -216,43 +212,43 @@ static ADDRESS_MAP_START( snd_mem, AS_PROGRAM, 8, fitfight_state )
 	AM_RANGE(0xff00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER(snd_porta_r)
+READ8_MEMBER(fitfight_state::snd_porta_r)
 {
-	//mame_printf_debug("PA R @%x\n",cpu_get_pc(&space->device()));
-	return space->machine().rand();
+	//mame_printf_debug("PA R @%x\n",cpu_get_pc(&space.device()));
+	return machine().rand();
 }
 
-static READ8_HANDLER(snd_portb_r)
+READ8_MEMBER(fitfight_state::snd_portb_r)
 {
-	//mame_printf_debug("PB R @%x\n",cpu_get_pc(&space->device()));
-	return space->machine().rand();
+	//mame_printf_debug("PB R @%x\n",cpu_get_pc(&space.device()));
+	return machine().rand();
 }
 
-static READ8_HANDLER(snd_portc_r)
+READ8_MEMBER(fitfight_state::snd_portc_r)
 {
-	//mame_printf_debug("PC R @%x\n",cpu_get_pc(&space->device()));
-	return space->machine().rand();
+	//mame_printf_debug("PC R @%x\n",cpu_get_pc(&space.device()));
+	return machine().rand();
 }
 
-static WRITE8_HANDLER(snd_porta_w)
+WRITE8_MEMBER(fitfight_state::snd_porta_w)
 {
-	//mame_printf_debug("PA W %x @%x\n",data,cpu_get_pc(&space->device()));
+	//mame_printf_debug("PA W %x @%x\n",data,cpu_get_pc(&space.device()));
 }
 
-static WRITE8_HANDLER(snd_portb_w)
+WRITE8_MEMBER(fitfight_state::snd_portb_w)
 {
-	//mame_printf_debug("PB W %x @%x\n",data,cpu_get_pc(&space->device()));
+	//mame_printf_debug("PB W %x @%x\n",data,cpu_get_pc(&space.device()));
 }
 
-static WRITE8_HANDLER(snd_portc_w)
+WRITE8_MEMBER(fitfight_state::snd_portc_w)
 {
-	//mame_printf_debug("PC W %x @%x\n",data,cpu_get_pc(&space->device()));
+	//mame_printf_debug("PC W %x @%x\n",data,cpu_get_pc(&space.device()));
 }
 
 static ADDRESS_MAP_START( snd_io, AS_IO, 8, fitfight_state )
-		AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READ_LEGACY(snd_porta_r) AM_WRITE_LEGACY(snd_porta_w)
-		AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_READ_LEGACY(snd_portb_r) AM_WRITE_LEGACY(snd_portb_w)
-		AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READ_LEGACY(snd_portc_r) AM_WRITE_LEGACY(snd_portc_w)
+		AM_RANGE(UPD7810_PORTA, UPD7810_PORTA) AM_READ(snd_porta_r) AM_WRITE(snd_porta_w)
+		AM_RANGE(UPD7810_PORTB, UPD7810_PORTB) AM_READ(snd_portb_r) AM_WRITE(snd_portb_w)
+		AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READ(snd_portc_r) AM_WRITE(snd_portc_w)
 ADDRESS_MAP_END
 
 static INTERRUPT_GEN( snd_irq )
@@ -976,7 +972,7 @@ static DRIVER_INIT( fitfight )
 //  UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
 //  mem16[0x0165B2/2] = 0x4e71; // for now so it boots
 	fitfight_state *state = machine.driver_data<fitfight_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x700000, 0x700001, FUNC(fitfight_700000_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::fitfight_700000_r),state));
 	state->m_bbprot_kludge = 0;
 }
 
@@ -985,7 +981,7 @@ static DRIVER_INIT( histryma )
 //  UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
 //  mem16[0x017FDC/2] = 0x4e71; // for now so it boots
 	fitfight_state *state = machine.driver_data<fitfight_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x700000, 0x700001, FUNC(histryma_700000_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x700000, 0x700001, read16_delegate(FUNC(fitfight_state::histryma_700000_r),state));
 	state->m_bbprot_kludge = 0;
 }
 

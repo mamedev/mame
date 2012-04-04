@@ -15,6 +15,9 @@ public:
 	UINT8 m_main_irq_mask;
 	UINT8 m_sub_irq_mask;
 	UINT8 m_sub2_irq_mask;
+	DECLARE_WRITE8_MEMBER(superpac_latch_w);
+	DECLARE_WRITE8_MEMBER(phozon_latch_w);
+	DECLARE_WRITE8_MEMBER(mappy_latch_w);
 };
 
 

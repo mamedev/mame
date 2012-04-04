@@ -14,6 +14,12 @@ public:
 	int m_xscroll[2];
 	int m_yscroll[2];
 	int m_copy_sprites;
+	DECLARE_WRITE8_MEMBER(inputport_select_w);
+	DECLARE_READ8_MEMBER(inputport_r);
+	DECLARE_WRITE8_MEMBER(baraduke_lamps_w);
+	DECLARE_WRITE8_MEMBER(baraduke_irq_ack_w);
+	DECLARE_READ8_MEMBER(soundkludge_r);
+	DECLARE_READ8_MEMBER(readFF);
 };
 
 

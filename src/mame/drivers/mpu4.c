@@ -517,27 +517,25 @@ However, there is no evidence to suggest this was ever implemented.
 The controls for it exist however, in the form of the Soundboard PIA CB2 pin, which is
 used in some cabinets instead of the main control.
 */
-static WRITE8_HANDLER( bankswitch_w )
+WRITE8_MEMBER(mpu4_state::bankswitch_w)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 //  printf("bank %02x\n", data);
 
-	state->m_pageval = (data & 0x03);
-	memory_set_bank(space->machine(), "bank1", (state->m_pageval + (state->m_pageset ? 4 : 0)) & 0x07);
+	m_pageval = (data & 0x03);
+	memory_set_bank(machine(), "bank1", (m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
 
 
-static READ8_HANDLER( bankswitch_r )
+READ8_MEMBER(mpu4_state::bankswitch_r)
 {
-	return memory_get_bank(space->machine(), "bank1");
+	return memory_get_bank(machine(), "bank1");
 }
 
 
-static WRITE8_HANDLER( bankset_w )
+WRITE8_MEMBER(mpu4_state::bankset_w)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	state->m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
-	memory_set_bank(space->machine(), "bank1", (state->m_pageval + (state->m_pageset ? 4 : 0)) & 0x07);
+	m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
+	memory_set_bank(machine(), "bank1", (m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
 
 
@@ -2357,15 +2355,14 @@ there are again fixed call values.
 */
 
 
-static WRITE8_HANDLER( characteriser_w )
+WRITE8_MEMBER(mpu4_state::characteriser_w)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(&space->device()),offset,data));
-	if (!state->m_current_chr_table)
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(&space.device()),offset,data));
+	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space.device()));
 		return;
 	}
 
@@ -2376,16 +2373,16 @@ static WRITE8_HANDLER( characteriser_w )
 		{
 			if (call == 0)
 			{
-				state->m_prot_col = 0;
+				m_prot_col = 0;
 			}
 			else
 			{
-				for (x = state->m_prot_col; x < 64; x++)
+				for (x = m_prot_col; x < 64; x++)
 				{
-					if	(state->m_current_chr_table[(x)].call == call)
+					if	(m_current_chr_table[(x)].call == call)
 					{
-						state->m_prot_col = x;
-						LOG_CHR(("Characteriser find column %02X\n",state->m_prot_col));
+						m_prot_col = x;
+						LOG_CHR(("Characteriser find column %02X\n",m_prot_col));
 						break;
 					}
 				}
@@ -2399,47 +2396,46 @@ static WRITE8_HANDLER( characteriser_w )
 		// Rather than the search strategy, we can map the calls directly here. Note that they are hex versions of the square number series
 		{
 			case 0x00:
-			state->m_lamp_col = 0;
+			m_lamp_col = 0;
 			break;
 			case 0x01:
-			state->m_lamp_col = 1;
+			m_lamp_col = 1;
 			break;
 			case 0x04:
-			state->m_lamp_col = 2;
+			m_lamp_col = 2;
 			break;
 			case 0x09:
-			state->m_lamp_col = 3;
+			m_lamp_col = 3;
 			break;
 			case 0x10:
-			state->m_lamp_col = 4;
+			m_lamp_col = 4;
 			break;
 			case 0x19:
-			state->m_lamp_col = 5;
+			m_lamp_col = 5;
 			break;
 			case 0x24:
-			state->m_lamp_col = 6;
+			m_lamp_col = 6;
 			break;
 			case 0x31:
-			state->m_lamp_col = 7;
+			m_lamp_col = 7;
 			break;
 		}
-		LOG_CHR(("Characteriser find 2 column %02X\n",state->m_lamp_col));
+		LOG_CHR(("Characteriser find 2 column %02X\n",m_lamp_col));
 	}
 }
 
 
-static READ8_HANDLER( characteriser_r )
+READ8_MEMBER(mpu4_state::characteriser_r)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	if (!state->m_current_chr_table)
+	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x", cpu_get_previouspc(&space->device()));
+		logerror("No Characteriser Table @ %04x", cpu_get_previouspc(&space.device()));
 
 		/* a cheat ... many early games use a standard check */
-		int addr = cpu_get_reg(&space->device(), M6809_X);
+		int addr = cpu_get_reg(&space.device(), M6809_X);
 		if ((addr>=0x800) && (addr<=0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
 
-		UINT8 ret = space->read_byte(addr);
+		UINT8 ret = space.read_byte(addr);
 		logerror(" (returning %02x)",ret);
 
 		logerror("\n");
@@ -2450,13 +2446,13 @@ static READ8_HANDLER( characteriser_r )
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	if (offset == 0)
 	{
-		LOG_CHR(("Characteriser read data %02X \n",state->m_current_chr_table[state->m_prot_col].response));
-		return state->m_current_chr_table[state->m_prot_col].response;
+		LOG_CHR(("Characteriser read data %02X \n",m_current_chr_table[m_prot_col].response));
+		return m_current_chr_table[m_prot_col].response;
 	}
 	if (offset == 3)
 	{
-		LOG_CHR(("Characteriser read data off 3 %02X \n",state->m_current_chr_table[state->m_lamp_col+64].response));
-		return state->m_current_chr_table[state->m_lamp_col+64].response;
+		LOG_CHR(("Characteriser read data off 3 %02X \n",m_current_chr_table[m_lamp_col+64].response));
+		return m_current_chr_table[m_lamp_col+64].response;
 	}
 	return 0;
 }
@@ -2499,58 +2495,56 @@ and two holding the appropriate call and response pairs for the two stages of op
 */
 
 
-static WRITE8_HANDLER( bwb_characteriser_w )
+WRITE8_MEMBER(mpu4_state::bwb_characteriser_w)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(&space->device()),offset,data));
-	if (!state->m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(&space.device()),offset,data));
+	if (!m_current_chr_table)
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space.device()));
 
 	if ((offset & 0x3f)== 0)//initialisation is always at 0x800
 	{
-		if (!state->m_chr_state)
+		if (!m_chr_state)
 		{
-			state->m_chr_state=1;
-			state->m_chr_counter=0;
+			m_chr_state=1;
+			m_chr_counter=0;
 		}
 		if (call == 0)
 		{
-			state->m_init_col ++;
+			m_init_col ++;
 		}
 		else
 		{
-			state->m_init_col =0;
+			m_init_col =0;
 		}
 	}
 
-	state->m_chr_value = space->machine().rand();
+	m_chr_value = machine().rand();
 	for (x = 0; x < 4; x++)
 	{
-		if	(state->m_current_chr_table[(x)].call == call)
+		if	(m_current_chr_table[(x)].call == call)
 		{
 			if (x == 0) // reinit
 			{
-				state->m_bwb_return = 0;
+				m_bwb_return = 0;
 			}
-			state->m_chr_value = bwb_chr_table_common[(state->m_bwb_return)];
-			state->m_bwb_return++;
+			m_chr_value = bwb_chr_table_common[(m_bwb_return)];
+			m_bwb_return++;
 			break;
 		}
 	}
 }
 
-static READ8_HANDLER( bwb_characteriser_r )
+READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 
 
 	if (offset ==0)
 	{
-		switch (state->m_chr_counter)
+		switch (m_chr_counter)
 		{
 			case 6:
 			case 13:
@@ -2558,38 +2552,38 @@ static READ8_HANDLER( bwb_characteriser_r )
 			case 27:
 			case 34:
 			{
-				return state->m_bwb_chr_table1[(((state->m_chr_counter + 1) / 7) - 1)].response;
+				return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)].response;
 				break;
 			}
 			default:
 			{
-				if (state->m_chr_counter > 34)
+				if (m_chr_counter > 34)
 				{
-					state->m_chr_counter = 35;
-					state->m_chr_state = 2;
+					m_chr_counter = 35;
+					m_chr_state = 2;
 				}
-				state->m_chr_counter ++;
-				return state->m_chr_value;
+				m_chr_counter ++;
+				return m_chr_value;
 			}
 		}
 	}
 	else
 	{
-		return state->m_chr_value;
+		return m_chr_value;
 	}
 }
 
 /* Common configurations */
 
-static WRITE8_HANDLER( mpu4_ym2413_w )
+WRITE8_MEMBER(mpu4_state::mpu4_ym2413_w)
 {
-	device_t *ym = space->machine().device("ym2413");
+	device_t *ym = machine().device("ym2413");
 	if (ym) ym2413_w(ym,offset,data);
 }
 
-static READ8_HANDLER( mpu4_ym2413_r )
+READ8_MEMBER(mpu4_state::mpu4_ym2413_r)
 {
-//  device_t *ym = space->machine().device("ym2413");
+//  device_t *ym = machine().device("ym2413");
 //  return ym2413_read(ym,offset);
 	return 0xff;
 }
@@ -2597,8 +2591,9 @@ static READ8_HANDLER( mpu4_ym2413_r )
 
 void mpu4_install_mod4yam_space(address_space *space)
 {
-	space->install_legacy_read_handler(0x0880, 0x0882, FUNC(mpu4_ym2413_r));
-	space->install_legacy_write_handler(0x0880, 0x0881, FUNC(mpu4_ym2413_w));
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	space->install_read_handler(0x0880, 0x0882, read8_delegate(FUNC(mpu4_state::mpu4_ym2413_r),state));
+	space->install_write_handler(0x0880, 0x0881, write8_delegate(FUNC(mpu4_state::mpu4_ym2413_w),state));
 }
 
 void mpu4_install_mod4oki_space(address_space *space)
@@ -2613,7 +2608,8 @@ void mpu4_install_mod4oki_space(address_space *space)
 
 void mpu4_install_mod4bwb_space(address_space *space)
 {
-	space->install_legacy_readwrite_handler(0x0810, 0x0810, 0, 0, FUNC(bwb_characteriser_r),FUNC(bwb_characteriser_w));
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	space->install_readwrite_handler(0x0810, 0x0810, 0, 0, read8_delegate(FUNC(mpu4_state::bwb_characteriser_r),state),write8_delegate(FUNC(mpu4_state::bwb_characteriser_w),state));
 	mpu4_install_mod4oki_space(space);
 }
 
@@ -2872,16 +2868,16 @@ static DRIVER_INIT( m4default_bigbank )
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	DRIVER_INIT_CALL(m4default);
 	state->m_bwb_bank=1;
-	space->install_legacy_write_handler(0x0858, 0x0858, 0, 0, FUNC(bankswitch_w));
-	space->install_legacy_write_handler(0x0878, 0x0878, 0, 0, FUNC(bankset_w));
+	space->install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),state));
+	space->install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),state));
 }
 
-static READ8_HANDLER( crystal_sound_r )
+READ8_MEMBER(mpu4_state::crystal_sound_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static WRITE8_HANDLER( crystal_sound_w )
+WRITE8_MEMBER(mpu4_state::crystal_sound_w)
 {
 	printf("crystal_sound_w %02x\n",data);
 }
@@ -2889,10 +2885,10 @@ static WRITE8_HANDLER( crystal_sound_w )
 static DRIVER_INIT (m_frkstn)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	DRIVER_INIT_CALL(m4default_bigbank);
-	space->install_legacy_read_handler(0x0880, 0x0880, 0, 0, FUNC(crystal_sound_r));
-	space->install_legacy_write_handler(0x0881, 0x0881, 0, 0, FUNC(crystal_sound_w));
+	space->install_read_handler(0x0880, 0x0880, 0, 0, read8_delegate(FUNC(mpu4_state::crystal_sound_r),state));
+	space->install_write_handler(0x0881, 0x0881, 0, 0, write8_delegate(FUNC(mpu4_state::crystal_sound_w),state));
 }
 
 /* generate a 50 Hz signal (based on an RC time) */
@@ -2910,8 +2906,8 @@ TIMER_DEVICE_CALLBACK( gen_50hz )
 
 static ADDRESS_MAP_START( mpu4_memmap, AS_PROGRAM, 8, mpu4_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0810) AM_READWRITE_LEGACY(characteriser_r,characteriser_w)
-	AM_RANGE(0x0850, 0x0850) AM_READWRITE_LEGACY(bankswitch_r,bankswitch_w)	/* write bank (rom page select) */
+	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
+	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)	/* write bank (rom page select) */
 /*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE_LEGACY(68681_duart_r,68681_duart_w) */ //Runs hoppers
 	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */

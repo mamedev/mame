@@ -18,6 +18,9 @@ public:
 	UINT16 m_gunx;
 	UINT16 m_guny;
 	UINT8 m_blank_palette;
+	DECLARE_WRITE16_MEMBER(ripribit_control_w);
+	DECLARE_WRITE16_MEMBER(cfarm_control_w);
+	DECLARE_WRITE16_MEMBER(cclownz_control_w);
 };
 
 

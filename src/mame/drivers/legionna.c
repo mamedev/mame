@@ -125,10 +125,10 @@ static ADDRESS_MAP_START( godzilla_map, AS_PROGRAM, 16, legionna_state )
 ADDRESS_MAP_END
 
 /* did they swap the lines, or does the protection device swap the words during the DMA?? */
-static WRITE16_HANDLER( denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w )
+WRITE16_MEMBER(legionna_state::denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w)
 {
 	offset^=1;
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
 	paletteram16_xBBBBBGGGGGRRRRR_word_w(space,offset,data,mem_mask);
 }
 
@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( denjinmk_map, AS_PROGRAM, 16, legionna_state )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE_LEGACY(legionna_foreground_w) AM_BASE(m_fore_data)
 	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE_LEGACY(legionna_midground_w) AM_BASE(m_mid_data)
 	AM_RANGE(0x102800, 0x103fff) AM_RAM_WRITE_LEGACY(legionna_text_w) AM_BASE(m_textram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE_LEGACY(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x106000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x11dfff) AM_RAM

@@ -40,62 +40,58 @@ TODO:
 #include "includes/spcforce.h"
 
 
-static WRITE8_HANDLER( spcforce_SN76496_latch_w )
+WRITE8_MEMBER(spcforce_state::spcforce_SN76496_latch_w)
 {
-	spcforce_state *state = space->machine().driver_data<spcforce_state>();
 
-	state->m_sn76496_latch = data;
+	m_sn76496_latch = data;
 }
 
-static READ8_HANDLER( spcforce_SN76496_select_r )
+READ8_MEMBER(spcforce_state::spcforce_SN76496_select_r)
 {
-	spcforce_state *state = space->machine().driver_data<spcforce_state>();
 
-	if (~state->m_sn76496_select & 0x40) return sn76496_ready_r(space->machine().device("sn1"));
-	if (~state->m_sn76496_select & 0x20) return sn76496_ready_r(space->machine().device("sn2"));
-	if (~state->m_sn76496_select & 0x10) return sn76496_ready_r(space->machine().device("sn3"));
+	if (~m_sn76496_select & 0x40) return sn76496_ready_r(machine().device("sn1"));
+	if (~m_sn76496_select & 0x20) return sn76496_ready_r(machine().device("sn2"));
+	if (~m_sn76496_select & 0x10) return sn76496_ready_r(machine().device("sn3"));
 
 	return 0;
 }
 
-static WRITE8_HANDLER( spcforce_SN76496_select_w )
+WRITE8_MEMBER(spcforce_state::spcforce_SN76496_select_w)
 {
-	spcforce_state *state = space->machine().driver_data<spcforce_state>();
 
-	state->m_sn76496_select = data;
+	m_sn76496_select = data;
 
-	if (~data & 0x40) sn76496_w(space->machine().device("sn1"), 0, state->m_sn76496_latch);
-	if (~data & 0x20) sn76496_w(space->machine().device("sn2"), 0, state->m_sn76496_latch);
-	if (~data & 0x10) sn76496_w(space->machine().device("sn3"), 0, state->m_sn76496_latch);
+	if (~data & 0x40) sn76496_w(machine().device("sn1"), 0, m_sn76496_latch);
+	if (~data & 0x20) sn76496_w(machine().device("sn2"), 0, m_sn76496_latch);
+	if (~data & 0x10) sn76496_w(machine().device("sn3"), 0, m_sn76496_latch);
 }
 
-static READ8_HANDLER( spcforce_t0_r )
+READ8_MEMBER(spcforce_state::spcforce_t0_r)
 {
 	/* SN76496 status according to Al - not supported by MAME?? */
-	return space->machine().rand() & 1;
+	return machine().rand() & 1;
 }
 
 
-static WRITE8_HANDLER( spcforce_soundtrigger_w )
+WRITE8_MEMBER(spcforce_state::spcforce_soundtrigger_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(spcforce_state::irq_mask_w)
 {
-	spcforce_state *state = space->machine().driver_data<spcforce_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( spcforce_map, AS_PROGRAM, 8, spcforce_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x7001, 0x7001) AM_READ_PORT("P1") AM_WRITE_LEGACY(spcforce_soundtrigger_w)
+	AM_RANGE(0x7001, 0x7001) AM_READ_PORT("P1") AM_WRITE(spcforce_soundtrigger_w)
 	AM_RANGE(0x7002, 0x7002) AM_READ_PORT("P2")
 	AM_RANGE(0x700b, 0x700b) AM_WRITE_LEGACY(spcforce_flip_screen_w)
-	AM_RANGE(0x700e, 0x700e) AM_WRITE_LEGACY(irq_mask_w)
+	AM_RANGE(0x700e, 0x700e) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITENOP
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(m_colorram)
@@ -108,9 +104,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spcforce_sound_io_map, AS_IO, 8, spcforce_state )
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE_LEGACY(spcforce_SN76496_latch_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE_LEGACY(spcforce_SN76496_select_r, spcforce_SN76496_select_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_LEGACY(spcforce_t0_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(spcforce_SN76496_latch_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(spcforce_SN76496_select_r, spcforce_SN76496_select_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(spcforce_t0_r)
 ADDRESS_MAP_END
 
 

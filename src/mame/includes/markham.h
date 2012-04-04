@@ -18,6 +18,7 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
+	DECLARE_READ8_MEMBER(markham_e004_r);
 };
 
 

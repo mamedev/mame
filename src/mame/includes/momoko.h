@@ -30,6 +30,7 @@ public:
 	UINT8          m_bg_mask;
 	UINT8          m_fg_mask;
 	UINT8          m_flipscreen;
+	DECLARE_WRITE8_MEMBER(momoko_bg_read_bank_w);
 };
 
 

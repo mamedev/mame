@@ -45,6 +45,15 @@ public:
 	UINT16 m_bg_scrollx;
 	UINT16 m_bg_scrolly;
 	UINT8 m_pignewt_bg_color_offset;
+	DECLARE_WRITE8_MEMBER(mainram_w);
+	DECLARE_WRITE8_MEMBER(vidram_w);
+	DECLARE_WRITE8_MEMBER(monsterb_vidram_w);
+	DECLARE_WRITE8_MEMBER(pignewt_vidram_w);
+	DECLARE_WRITE8_MEMBER(sindbadm_vidram_w);
+	DECLARE_READ8_MEMBER(mangled_ports_r);
+	DECLARE_READ8_MEMBER(spaceod_mangled_ports_r);
+	DECLARE_READ8_MEMBER(spaceod_port_fc_r);
+	DECLARE_WRITE8_MEMBER(coin_count_w);
 };
 
 

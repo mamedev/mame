@@ -30,6 +30,11 @@ public:
 	device_t *m_2610_1r;
 	device_t *m_2610_2l;
 	device_t *m_2610_2r;
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(warriorb_sound_w);
+	DECLARE_READ16_MEMBER(warriorb_sound_r);
+	DECLARE_WRITE8_MEMBER(warriorb_pancontrol);
+	DECLARE_WRITE16_MEMBER(tc0100scn_dual_screen_w);
 };
 
 

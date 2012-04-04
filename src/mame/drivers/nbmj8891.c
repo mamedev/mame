@@ -411,7 +411,7 @@ static ADDRESS_MAP_START( hanaoji_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static READ8_HANDLER( taiwanmb_unk_r )
+READ8_MEMBER(nbmj8891_state::taiwanmb_unk_r)
 {
 	return 0x00;													// MCU or 1413M3 STATUS?
 }
@@ -421,7 +421,7 @@ static ADDRESS_MAP_START( taiwanmb_map, AS_PROGRAM, 8, nbmj8891_state )
 	AM_RANGE(0xec00, 0xedff) AM_READWRITE_LEGACY(nbmj8891_palette_type3_r,nbmj8891_palette_type3_w)
 	AM_RANGE(0xf800, 0xfeff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xff00, 0xff1f) AM_NOP									// ?
-	AM_RANGE(0xff20, 0xff20) AM_READ_LEGACY(taiwanmb_unk_r)				// MCU or 1413M3 STATUS? (return != 0x00 then loop)
+	AM_RANGE(0xff20, 0xff20) AM_READ(taiwanmb_unk_r)				// MCU or 1413M3 STATUS? (return != 0x00 then loop)
 	AM_RANGE(0xff20, 0xff20) AM_WRITE_LEGACY(nbmj8891_taiwanmb_mcu_w)		// MCU PARAMETER?
 	AM_RANGE(0xff21, 0xff2f) AM_READNOP								// ?
 	AM_RANGE(0xff21, 0xff21) AM_WRITENOP							// blitter parameter set end (write 0x01 only)

@@ -42,6 +42,8 @@ public:
 	int m_interrupt_line_2;
 	optional_device<buffered_spriteram8_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram16;
+	DECLARE_WRITE8_MEMBER(lastday_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
 };
 
 

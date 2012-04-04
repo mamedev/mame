@@ -284,16 +284,14 @@ register. So what is controlling priority.
 #include "sound/msm5205.h"
 #include "includes/opwolf.h"
 
-static READ16_HANDLER( cchip_r )
+READ16_MEMBER(opwolf_state::cchip_r)
 {
-	opwolf_state *state = space->machine().driver_data<opwolf_state>();
-	return state->m_cchip_ram[offset];
+	return m_cchip_ram[offset];
 }
 
-static WRITE16_HANDLER( cchip_w )
+WRITE16_MEMBER(opwolf_state::cchip_w)
 {
-	opwolf_state *state = space->machine().driver_data<opwolf_state>();
-	state->m_cchip_ram[offset] = data &0xff;
+	m_cchip_ram[offset] = data &0xff;
 }
 
 /**********************************************************
@@ -303,43 +301,42 @@ static WRITE16_HANDLER( cchip_w )
 #define P1X_PORT_TAG     "P1X"
 #define P1Y_PORT_TAG     "P1Y"
 
-static READ16_HANDLER( opwolf_in_r )
+READ16_MEMBER(opwolf_state::opwolf_in_r)
 {
 	static const char *const inname[2] = { "IN0", "IN1" };
-	return input_port_read(space->machine(), inname[offset]);
+	return input_port_read(machine(), inname[offset]);
 }
 
-static READ16_HANDLER( opwolf_dsw_r )
+READ16_MEMBER(opwolf_state::opwolf_dsw_r)
 {
 	static const char *const dswname[2] = { "DSWA", "DSWB" };
-	return input_port_read(space->machine(), dswname[offset]);
+	return input_port_read(machine(), dswname[offset]);
 }
 
-static READ16_HANDLER( opwolf_lightgun_r )
+READ16_MEMBER(opwolf_state::opwolf_lightgun_r)
 {
-	opwolf_state *state = space->machine().driver_data<opwolf_state>();
 	int scaled;
 
 	switch (offset)
 	{
 		case 0x00:	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
-			scaled = (input_port_read(space->machine(), P1X_PORT_TAG) * 320 ) / 256;
-			return (scaled + 0x15 + state->m_opwolf_gun_xoffs);
+			scaled = (input_port_read(machine(), P1X_PORT_TAG) * 320 ) / 256;
+			return (scaled + 0x15 + m_opwolf_gun_xoffs);
 		case 0x01:	/* P1Y */
-			return (input_port_read(space->machine(), P1Y_PORT_TAG) - 0x24 + state->m_opwolf_gun_yoffs);
+			return (input_port_read(machine(), P1Y_PORT_TAG) - 0x24 + m_opwolf_gun_yoffs);
 	}
 
 	return 0xff;
 }
 
-static READ8_HANDLER( z80_input1_r )
+READ8_MEMBER(opwolf_state::z80_input1_r)
 {
-	return input_port_read(space->machine(), "IN0");	/* irrelevant mirror ? */
+	return input_port_read(machine(), "IN0");	/* irrelevant mirror ? */
 }
 
-static READ8_HANDLER( z80_input2_r )
+READ8_MEMBER(opwolf_state::z80_input2_r)
 {
-	return input_port_read(space->machine(), "IN0");	/* needed for coins */
+	return input_port_read(machine(), "IN0");	/* needed for coins */
 }
 
 
@@ -366,9 +363,9 @@ static ADDRESS_MAP_START( opwolf_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x0ffc00, 0x0ffc01) AM_WRITE_LEGACY(opwolf_cchip_bank_w)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x380000, 0x380003) AM_READ_LEGACY(opwolf_dsw_r)			/* dip switches */
+	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)			/* dip switches */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE_LEGACY(opwolf_spritectrl_w)	// usually 0x4, changes when you fire
-	AM_RANGE(0x3a0000, 0x3a0003) AM_READ_LEGACY(opwolf_lightgun_r)		/* lightgun, read at $11e0/6 */
+	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)		/* lightgun, read at $11e0/6 */
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP					/* watchdog ?? */
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
@@ -383,13 +380,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( opwolfb_map, AS_PROGRAM, 16, opwolf_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0f0008, 0x0f000b) AM_READ_LEGACY(opwolf_in_r)			/* coins and buttons */
-	AM_RANGE(0x0ff000, 0x0fffff) AM_READWRITE_LEGACY(cchip_r,cchip_w)
+	AM_RANGE(0x0f0008, 0x0f000b) AM_READ(opwolf_in_r)			/* coins and buttons */
+	AM_RANGE(0x0ff000, 0x0fffff) AM_READWRITE(cchip_r,cchip_w)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x380000, 0x380003) AM_READ_LEGACY(opwolf_dsw_r)			/* dip switches */
+	AM_RANGE(0x380000, 0x380003) AM_READ(opwolf_dsw_r)			/* dip switches */
 	AM_RANGE(0x380000, 0x380003) AM_WRITE_LEGACY(opwolf_spritectrl_w)	// usually 0x4, changes when you fire
-	AM_RANGE(0x3a0000, 0x3a0003) AM_READ_LEGACY(opwolf_lightgun_r)		/* lightgun, read at $11e0/6 */
+	AM_RANGE(0x3a0000, 0x3a0003) AM_READ(opwolf_lightgun_r)		/* lightgun, read at $11e0/6 */
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP					/* watchdog ?? */
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
@@ -408,9 +405,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( opwolfb_sub_z80_map, AS_PROGRAM, 8, opwolf_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8800, 0x8800) AM_READ_LEGACY(z80_input1_r)	/* read at PC=$637: poked to $c004 */
+	AM_RANGE(0x8800, 0x8800) AM_READ(z80_input1_r)	/* read at PC=$637: poked to $c004 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITENOP			/* unknown write, 0 then 1 each interrupt */
-	AM_RANGE(0x9800, 0x9800) AM_READ_LEGACY(z80_input2_r)	/* read at PC=$631: poked to $c005 */
+	AM_RANGE(0x9800, 0x9800) AM_READ(z80_input2_r)	/* read at PC=$631: poked to $c005 */
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP	/* IRQ acknowledge (unimplemented) */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(m_cchip_ram)
 ADDRESS_MAP_END
@@ -531,14 +528,14 @@ static WRITE8_DEVICE_HANDLER( opwolf_adpcm_c_w )
 }
 
 
-static WRITE8_HANDLER( opwolf_adpcm_d_w )
+WRITE8_MEMBER(opwolf_state::opwolf_adpcm_d_w)
 {
-//   logerror("CPU #1         d00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(&space->device()) );
+//   logerror("CPU #1         d00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(&space.device()) );
 }
 
-static WRITE8_HANDLER( opwolf_adpcm_e_w )
+WRITE8_MEMBER(opwolf_state::opwolf_adpcm_e_w)
 {
-//  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(&space->device()) );
+//  logerror("CPU #1         e00%i-data=%2x   pc=%4x\n",offset,data,cpu_get_pc(&space.device()) );
 }
 
 static ADDRESS_MAP_START( opwolf_sound_z80_map, AS_PROGRAM, 8, opwolf_state )
@@ -551,8 +548,8 @@ static ADDRESS_MAP_START( opwolf_sound_z80_map, AS_PROGRAM, 8, opwolf_state )
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xb000, 0xb006) AM_DEVWRITE_LEGACY("msm1", opwolf_adpcm_b_w)
 	AM_RANGE(0xc000, 0xc006) AM_DEVWRITE_LEGACY("msm2", opwolf_adpcm_c_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(opwolf_adpcm_d_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(opwolf_adpcm_e_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(opwolf_adpcm_d_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(opwolf_adpcm_e_w)
 ADDRESS_MAP_END
 
 /***********************************************************

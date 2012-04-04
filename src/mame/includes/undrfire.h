@@ -24,6 +24,19 @@ public:
 	UINT8 m_dislayer[6];
 	UINT32 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE32_MEMBER(color_ram_w);
+	DECLARE_READ32_MEMBER(undrfire_input_r);
+	DECLARE_WRITE32_MEMBER(undrfire_input_w);
+	DECLARE_READ16_MEMBER(shared_ram_r);
+	DECLARE_WRITE16_MEMBER(shared_ram_w);
+	DECLARE_READ32_MEMBER(unknown_hardware_r);
+	DECLARE_WRITE32_MEMBER(unknown_int_req_w);
+	DECLARE_READ32_MEMBER(undrfire_lightgun_r);
+	DECLARE_WRITE32_MEMBER(rotate_control_w);
+	DECLARE_WRITE32_MEMBER(motor_control_w);
+	DECLARE_WRITE32_MEMBER(cbombers_cpua_ctrl_w);
+	DECLARE_READ32_MEMBER(cbombers_adc_r);
+	DECLARE_WRITE32_MEMBER(cbombers_adc_w);
 };
 
 

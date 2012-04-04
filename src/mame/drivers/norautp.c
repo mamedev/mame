@@ -717,23 +717,21 @@ static WRITE8_DEVICE_HANDLER( counterlamps_w )
 
 
 /*game waits for /OBF signal (bit 7) to be set.*/
-static READ8_HANDLER( test_r )
+READ8_MEMBER(norautp_state::test_r)
 {
 	return 0xff;
 }
 
-static READ8_HANDLER( vram_data_r )
+READ8_MEMBER(norautp_state::vram_data_r)
 //static READ8_DEVICE_HANDLER( vram_data_r )
 {
-	norautp_state *state = space->machine().driver_data<norautp_state>();
-	return state->m_np_vram[state->m_np_addr];
+	return m_np_vram[m_np_addr];
 }
 
-static WRITE8_HANDLER( vram_data_w )
+WRITE8_MEMBER(norautp_state::vram_data_w)
 //static WRITE8_DEVICE_HANDLER( vram_data_w )
 {
-	norautp_state *state = space->machine().driver_data<norautp_state>();
-	state->m_np_vram[state->m_np_addr] = data & 0xff;
+	m_np_vram[m_np_addr] = data & 0xff;
 
 	/* trigger 8255-2 port C bit 7 (/OBF) */
 //  i8255a_pc7_w(device->machine().device("ppi8255_2"), 0);
@@ -741,15 +739,14 @@ static WRITE8_HANDLER( vram_data_w )
 
 }
 
-static WRITE8_HANDLER( vram_addr_w )
+WRITE8_MEMBER(norautp_state::vram_addr_w)
 //static WRITE8_DEVICE_HANDLER( vram_addr_w )
 {
-	norautp_state *state = space->machine().driver_data<norautp_state>();
-	state->m_np_addr = data;
+	m_np_addr = data;
 }
 
 /* game waits for bit 4 (0x10) to be reset.*/
-static READ8_HANDLER( test2_r )
+READ8_MEMBER(norautp_state::test2_r)
 {
 	return 0x00;
 }
@@ -820,10 +817,10 @@ static ADDRESS_MAP_START( norautp_portmap, AS_IO, 8, norautp_state )
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xa0, 0xa3) AM_MIRROR(0x1c) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 //  AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE_LEGACY(vram_data_r, vram_data_w)
-	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE_LEGACY(vram_addr_w)
-	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ_LEGACY(test_r)
-	AM_RANGE(0xef, 0xef) AM_READ_LEGACY(test2_r)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3c) AM_READWRITE(vram_data_r, vram_data_w)
+	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0x3c) AM_WRITE(vram_addr_w)
+	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0x3c) AM_READ(test_r)
+	AM_RANGE(0xef, 0xef) AM_READ(test2_r)
 ADDRESS_MAP_END
 
 /*

@@ -41,6 +41,10 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	required_device<buffered_spriteram32_device> m_spriteram;
+	DECLARE_WRITE32_MEMBER(psikyosh_irqctrl_w);
+	DECLARE_WRITE32_MEMBER(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);
+	DECLARE_WRITE32_MEMBER(psikyosh_vidregs_w);
+	DECLARE_READ32_MEMBER(mjgtaste_input_r);
 };
 
 /*----------- defined in video/psikyosh.c -----------*/

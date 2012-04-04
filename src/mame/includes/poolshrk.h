@@ -19,6 +19,11 @@ public:
 	UINT8* m_hpos_ram;
 	UINT8* m_vpos_ram;
 	tilemap_t* m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(poolshrk_da_latch_w);
+	DECLARE_WRITE8_MEMBER(poolshrk_led_w);
+	DECLARE_WRITE8_MEMBER(poolshrk_watchdog_w);
+	DECLARE_READ8_MEMBER(poolshrk_input_r);
+	DECLARE_READ8_MEMBER(poolshrk_irq_reset_r);
 };
 
 

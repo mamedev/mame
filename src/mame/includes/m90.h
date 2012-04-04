@@ -15,6 +15,10 @@ public:
 	UINT8 m_last_pf1;
 	UINT8 m_last_pf2;
 	device_t *m_audio;
+	DECLARE_WRITE16_MEMBER(m90_coincounter_w);
+	DECLARE_WRITE16_MEMBER(quizf1_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(dynablsb_sound_command_w);
+	DECLARE_WRITE16_MEMBER(unknown_w);
 };
 
 

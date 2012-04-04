@@ -24,6 +24,7 @@ public:
 
 	/* misc */
 	int        m_input_ports_hack;
+	DECLARE_WRITE8_MEMBER(yamyam_bankswitch_w);
 };
 
 

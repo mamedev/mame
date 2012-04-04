@@ -21,6 +21,24 @@ public:
 	int m_vsgongf_color;
 	int m_key_count;
 	UINT8 *m_spriteram;
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_READ8_MEMBER(unknown_d803_r);
+	DECLARE_READ8_MEMBER(unknown_d803_m660_r);
+	DECLARE_READ8_MEMBER(unknown_d806_r);
+	DECLARE_READ8_MEMBER(unknown_d900_r);
+	DECLARE_READ8_MEMBER(unknown_d938_r);
+	DECLARE_WRITE8_MEMBER(sound_command1_w);
+	DECLARE_WRITE8_MEMBER(sound_command2_w);
+	DECLARE_WRITE8_MEMBER(sound_command3_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(tsamurai_coin_counter_w);
+	DECLARE_READ8_MEMBER(sound_command1_r);
+	DECLARE_READ8_MEMBER(sound_command2_r);
+	DECLARE_READ8_MEMBER(sound_command3_r);
+	DECLARE_WRITE8_MEMBER(vsgongf_sound_nmi_enable_w);
+	DECLARE_READ8_MEMBER(vsgongf_a006_r);
+	DECLARE_READ8_MEMBER(vsgongf_a100_r);
+	DECLARE_WRITE8_MEMBER(vsgongf_sound_command_w);
 };
 
 

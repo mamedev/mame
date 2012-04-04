@@ -65,14 +65,14 @@ static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 	eeprom->write_bit(data & 0x01);
 }
 
-static WRITE16_HANDLER( xorworld_irq2_ack_w )
+WRITE16_MEMBER(xorworld_state::xorworld_irq2_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( xorworld_irq6_ack_w )
+WRITE16_MEMBER(xorworld_state::xorworld_irq6_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 6, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 6, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16, xorworld_state )
@@ -87,8 +87,8 @@ static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16, xorworld_state )
 	AM_RANGE(0xa0000c, 0xa0000d) AM_DEVWRITE_LEGACY("eeprom", eeprom_data_w)
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE_LEGACY(xorworld_videoram16_w) AM_BASE(m_videoram)
 	AM_RANGE(0xffc800, 0xffc87f) AM_RAM	AM_BASE(m_spriteram)
-	AM_RANGE(0xffc880, 0xffc881) AM_WRITE_LEGACY(xorworld_irq2_ack_w)
-	AM_RANGE(0xffc882, 0xffc883) AM_WRITE_LEGACY(xorworld_irq6_ack_w)
+	AM_RANGE(0xffc880, 0xffc881) AM_WRITE(xorworld_irq2_ack_w)
+	AM_RANGE(0xffc882, 0xffc883) AM_WRITE(xorworld_irq6_ack_w)
 	AM_RANGE(0xffc884, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

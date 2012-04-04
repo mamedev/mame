@@ -52,20 +52,20 @@ f80b      ????
 #include "includes/tecmo.h"
 
 
-static WRITE8_HANDLER( tecmo_bankswitch_w )
+WRITE8_MEMBER(tecmo_state::tecmo_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);
+	memory_set_bankptr(machine(), "bank1", &RAM[bankaddress]);
 }
 
-static WRITE8_HANDLER( tecmo_sound_command_w )
+WRITE8_MEMBER(tecmo_state::tecmo_sound_command_w)
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine(), "soundcpu",INPUT_LINE_NMI,PULSE_LINE);
+	cputag_set_input_line(machine(), "soundcpu",INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( tecmo_adpcm_start_w )
@@ -74,10 +74,9 @@ static WRITE8_DEVICE_HANDLER( tecmo_adpcm_start_w )
 	state->m_adpcm_pos = data << 8;
 	msm5205_reset_w(device, 0);
 }
-static WRITE8_HANDLER( tecmo_adpcm_end_w )
+WRITE8_MEMBER(tecmo_state::tecmo_adpcm_end_w)
 {
-	tecmo_state *state = space->machine().driver_data<tecmo_state>();
-	state->m_adpcm_end = (data + 1) << 8;
+	m_adpcm_end = (data + 1) << 8;
 }
 static WRITE8_DEVICE_HANDLER( tecmo_adpcm_vol_w )
 {
@@ -104,30 +103,30 @@ static void tecmo_adpcm_int(device_t *device)
 }
 
 /* the 8-bit dipswitches are split across addresses */
-static READ8_HANDLER( tecmo_dswa_l_r )
+READ8_MEMBER(tecmo_state::tecmo_dswa_l_r)
 {
-	UINT8 port = input_port_read(space->machine(), "DSWA");
+	UINT8 port = input_port_read(machine(), "DSWA");
 	port &= 0x0f;
 	return port;
 }
 
-static READ8_HANDLER( tecmo_dswa_h_r )
+READ8_MEMBER(tecmo_state::tecmo_dswa_h_r)
 {
-	UINT8 port = input_port_read(space->machine(), "DSWA");
+	UINT8 port = input_port_read(machine(), "DSWA");
 	port &= 0xf0;
 	return port>>4;
 }
 
-static READ8_HANDLER( tecmo_dswb_l_r )
+READ8_MEMBER(tecmo_state::tecmo_dswb_l_r)
 {
-	UINT8 port = input_port_read(space->machine(), "DSWB");
+	UINT8 port = input_port_read(machine(), "DSWB");
 	port &= 0x0f;
 	return port;
 }
 
-static READ8_HANDLER( tecmo_dswb_h_r )
+READ8_MEMBER(tecmo_state::tecmo_dswb_h_r)
 {
-	UINT8 port = input_port_read(space->machine(), "DSWB");
+	UINT8 port = input_port_read(machine(), "DSWB");
 	port &= 0xf0;
 	return port>>4;
 }
@@ -148,16 +147,16 @@ static ADDRESS_MAP_START( rygar_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ_LEGACY(tecmo_dswa_l_r )
-	AM_RANGE(0xf807, 0xf807) AM_READ_LEGACY(tecmo_dswa_h_r )
-	AM_RANGE(0xf808, 0xf808) AM_READ_LEGACY(tecmo_dswb_l_r )
-	AM_RANGE(0xf809, 0xf809) AM_READ_LEGACY(tecmo_dswb_h_r )
+	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r )
+	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r )
+	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r )
+	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE_LEGACY(tecmo_fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE_LEGACY(tecmo_bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE_LEGACY(tecmo_sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_WRITE(tecmo_sound_command_w)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE_LEGACY(tecmo_flipscreen_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE_LEGACY(tecmo_bankswitch_w)
+	AM_RANGE(0xf808, 0xf808) AM_WRITE(tecmo_bankswitch_w)
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -176,16 +175,16 @@ static ADDRESS_MAP_START( gemini_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ_LEGACY(tecmo_dswa_l_r )
-	AM_RANGE(0xf807, 0xf807) AM_READ_LEGACY(tecmo_dswa_h_r )
-	AM_RANGE(0xf808, 0xf808) AM_READ_LEGACY(tecmo_dswb_l_r )
-	AM_RANGE(0xf809, 0xf809) AM_READ_LEGACY(tecmo_dswb_h_r )
+	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r )
+	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r )
+	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r )
+	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE_LEGACY(tecmo_fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE_LEGACY(tecmo_bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE_LEGACY(tecmo_sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_WRITE(tecmo_sound_command_w)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE_LEGACY(tecmo_flipscreen_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE_LEGACY(tecmo_bankswitch_w)
+	AM_RANGE(0xf808, 0xf808) AM_WRITE(tecmo_bankswitch_w)
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -204,16 +203,16 @@ static ADDRESS_MAP_START( silkworm_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("BUTTONS2")
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("SYS_0")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("SYS_1")
-	AM_RANGE(0xf806, 0xf806) AM_READ_LEGACY(tecmo_dswa_l_r )
-	AM_RANGE(0xf807, 0xf807) AM_READ_LEGACY(tecmo_dswa_h_r )
-	AM_RANGE(0xf808, 0xf808) AM_READ_LEGACY(tecmo_dswb_l_r )
-	AM_RANGE(0xf809, 0xf809) AM_READ_LEGACY(tecmo_dswb_h_r )
+	AM_RANGE(0xf806, 0xf806) AM_READ(tecmo_dswa_l_r )
+	AM_RANGE(0xf807, 0xf807) AM_READ(tecmo_dswa_h_r )
+	AM_RANGE(0xf808, 0xf808) AM_READ(tecmo_dswb_l_r )
+	AM_RANGE(0xf809, 0xf809) AM_READ(tecmo_dswb_h_r )
 	AM_RANGE(0xf80f, 0xf80f) AM_READ_PORT("SYS_2")
 	AM_RANGE(0xf800, 0xf802) AM_WRITE_LEGACY(tecmo_fgscroll_w)
 	AM_RANGE(0xf803, 0xf805) AM_WRITE_LEGACY(tecmo_bgscroll_w)
-	AM_RANGE(0xf806, 0xf806) AM_WRITE_LEGACY(tecmo_sound_command_w)
+	AM_RANGE(0xf806, 0xf806) AM_WRITE(tecmo_sound_command_w)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE_LEGACY(tecmo_flipscreen_w)
-	AM_RANGE(0xf808, 0xf808) AM_WRITE_LEGACY(tecmo_bankswitch_w)
+	AM_RANGE(0xf808, 0xf808) AM_WRITE(tecmo_bankswitch_w)
 	AM_RANGE(0xf809, 0xf809) AM_WRITENOP	/* ? */
 	AM_RANGE(0xf80b, 0xf80b) AM_WRITENOP	/* ? if mapped to watchdog like in the others, causes reset */
 ADDRESS_MAP_END
@@ -223,7 +222,7 @@ static ADDRESS_MAP_START( rygar_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_start_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(tecmo_adpcm_end_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(tecmo_adpcm_end_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_vol_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* NMI acknowledge */
 ADDRESS_MAP_END
@@ -235,7 +234,7 @@ static ADDRESS_MAP_START( tecmo_sound_map, AS_PROGRAM, 8, tecmo_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_start_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE_LEGACY(tecmo_adpcm_end_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(tecmo_adpcm_end_w)
 	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE_LEGACY("msm", tecmo_adpcm_vol_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP	/* NMI acknowledge */
 ADDRESS_MAP_END

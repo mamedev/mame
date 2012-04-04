@@ -197,13 +197,12 @@ static void appoooh_adpcm_int(device_t *device)
 }
 
 /* adpcm address write */
-static WRITE8_HANDLER( appoooh_adpcm_w )
+WRITE8_MEMBER(appoooh_state::appoooh_adpcm_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 
-	state->m_adpcm_address = data << 8;
-	msm5205_reset_w(state->m_adpcm, 0);
-	state->m_adpcm_data = 0xffffffff;
+	m_adpcm_address = data << 8;
+	msm5205_reset_w(m_adpcm, 0);
+	m_adpcm_data = 0xffffffff;
 }
 
 
@@ -234,7 +233,7 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, appoooh_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(appoooh_adpcm_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(appoooh_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("BUTTON3") AM_WRITE_LEGACY(appoooh_out_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(appoooh_scroll_w) /* unknown */
 ADDRESS_MAP_END

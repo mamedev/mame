@@ -49,14 +49,12 @@
 #define PIXEL_CLOCK		MASTER_CLOCK / 4
 
 /*- in this file -*/
-static READ16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r );
-static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w );
-static WRITE16_HANDLER( wwfwfest_1410_write ); /* priority write */
-static WRITE16_HANDLER( wwfwfest_scroll_write ); /* scrolling write */
+
+
 static WRITE8_DEVICE_HANDLER( oki_bankswitch_w );
-static WRITE16_HANDLER ( wwfwfest_soundwrite );
-static WRITE16_HANDLER ( wwfwfest_flipscreen_w );
-static WRITE16_HANDLER ( wwfwfest_irq_ack_w );
+
+
+
 
 /*******************************************************************************
  Memory Maps
@@ -72,16 +70,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, wwfwfest_state )
 	AM_RANGE(0x0c2000, 0x0c3fff) AM_RAM AM_SHARE("spriteram")						/* SPR Ram */
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(wwfwfest_bg0_videoram_w) AM_BASE(m_bg0_videoram)	/* BG0 Ram - 4 bytes per tile */
 	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE_LEGACY(wwfwfest_bg1_videoram_w) AM_BASE(m_bg1_videoram)	/* BG1 Ram - 2 bytes per tile */
-	AM_RANGE(0x100000, 0x100007) AM_WRITE_LEGACY(wwfwfest_scroll_write)
-	AM_RANGE(0x10000a, 0x10000b) AM_WRITE_LEGACY(wwfwfest_flipscreen_w)
-	AM_RANGE(0x140000, 0x140003) AM_WRITE_LEGACY(wwfwfest_irq_ack_w)
-	AM_RANGE(0x14000c, 0x14000d) AM_WRITE_LEGACY(wwfwfest_soundwrite)
-	AM_RANGE(0x140010, 0x140011) AM_WRITE_LEGACY(wwfwfest_1410_write)
+	AM_RANGE(0x100000, 0x100007) AM_WRITE(wwfwfest_scroll_write)
+	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(wwfwfest_flipscreen_w)
+	AM_RANGE(0x140000, 0x140003) AM_WRITE(wwfwfest_irq_ack_w)
+	AM_RANGE(0x14000c, 0x14000d) AM_WRITE(wwfwfest_soundwrite)
+	AM_RANGE(0x140010, 0x140011) AM_WRITE(wwfwfest_1410_write)
 	AM_RANGE(0x140020, 0x140021) AM_READ_PORT("P1")
 	AM_RANGE(0x140022, 0x140023) AM_READ_PORT("P2")
 	AM_RANGE(0x140024, 0x140025) AM_READ_PORT("P3")
 	AM_RANGE(0x140026, 0x140027) AM_READ_PORT("P4")
-	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE_LEGACY(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r,wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r,wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* Work Ram */
 ADDRESS_MAP_END
 
@@ -100,29 +98,29 @@ ADDRESS_MAP_END
  as used by the above memory map
 *******************************************************************************/
 
-static WRITE16_HANDLER( wwfwfest_irq_ack_w )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_irq_ack_w)
 {
 	if (offset == 0)
-		cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", 3, CLEAR_LINE);
 
 	else
-		cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( wwfwfest_flipscreen_w )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data&1);
+	flip_screen_set(machine(), data&1);
 }
 
 /*- Palette Reads/Writes -*/
 
-static READ16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r )
+READ16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	return space->machine().generic.paletteram.u16[offset];
+	return machine().generic.paletteram.u16[offset];
 }
 
-static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w)
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
 	paletteram16_xxxxBBBBGGGGRRRR_word_w (space, offset, data, mem_mask);
@@ -131,29 +129,27 @@ static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w )
 /*- Priority Control -*/
 
 
-static WRITE16_HANDLER( wwfwfest_1410_write )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_1410_write)
 {
-	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
-	state->m_pri = data;
+	m_pri = data;
 }
 
 /*- Scroll Control -*/
 
-static WRITE16_HANDLER( wwfwfest_scroll_write )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_scroll_write)
 {
-	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
 	switch (offset) {
 		case 0x00:
-			state->m_bg0_scrollx = data;
+			m_bg0_scrollx = data;
 			break;
 		case 0x01:
-			state->m_bg0_scrolly = data;
+			m_bg0_scrolly = data;
 			break;
 		case 0x02:
-			state->m_bg1_scrollx = data;
+			m_bg1_scrollx = data;
 			break;
 		case 0x03:
-			state->m_bg1_scrolly = data;
+			m_bg1_scrolly = data;
 			break;
 	}
 }
@@ -165,10 +161,10 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 	downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 }
 
-static WRITE16_HANDLER ( wwfwfest_soundwrite )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_soundwrite)
 {
 	soundlatch_w(space,1,data & 0xff);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /*******************************************************************************

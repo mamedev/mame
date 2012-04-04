@@ -21,6 +21,10 @@ public:
 
 	/* misc */
 	int            m_prot_val;
+	DECLARE_WRITE8_MEMBER(protection_w);
+	DECLARE_READ8_MEMBER(protection_r);
+	DECLARE_WRITE8_MEMBER(gfire2_protection_w);
+	DECLARE_READ8_MEMBER(gfire2_protection_r);
 };
 
 

@@ -38,6 +38,32 @@ public:
 	INT32 m_video_off;
 	int m_majtitle_rowscroll;
 	device_t *m_audio;
+	DECLARE_WRITE16_MEMBER(m72_main_mcu_sound_w);
+	DECLARE_WRITE16_MEMBER(m72_main_mcu_w);
+	DECLARE_WRITE8_MEMBER(m72_mcu_data_w);
+	DECLARE_READ8_MEMBER(m72_mcu_data_r);
+	DECLARE_READ8_MEMBER(m72_mcu_sample_r);
+	DECLARE_WRITE8_MEMBER(m72_mcu_ack_w);
+	DECLARE_READ8_MEMBER(m72_mcu_snd_r);
+	DECLARE_READ8_MEMBER(m72_mcu_port_r);
+	DECLARE_WRITE8_MEMBER(m72_mcu_port_w);
+	DECLARE_WRITE8_MEMBER(m72_mcu_low_w);
+	DECLARE_WRITE8_MEMBER(m72_mcu_high_w);
+	DECLARE_READ8_MEMBER(m72_snd_cpu_sample_r);
+	DECLARE_WRITE16_MEMBER(bchopper_sample_trigger_w);
+	DECLARE_WRITE16_MEMBER(nspirit_sample_trigger_w);
+	DECLARE_WRITE16_MEMBER(imgfight_sample_trigger_w);
+	DECLARE_WRITE16_MEMBER(loht_sample_trigger_w);
+	DECLARE_WRITE16_MEMBER(xmultiplm72_sample_trigger_w);
+	DECLARE_WRITE16_MEMBER(dbreedm72_sample_trigger_w);
+	DECLARE_WRITE16_MEMBER(airduel_sample_trigger_w);
+	DECLARE_WRITE16_MEMBER(dkgenm72_sample_trigger_w);
+	DECLARE_WRITE16_MEMBER(gallop_sample_trigger_w);
+	DECLARE_READ16_MEMBER(protection_r);
+	DECLARE_WRITE16_MEMBER(protection_w);
+	DECLARE_READ16_MEMBER(soundram_r);
+	DECLARE_WRITE16_MEMBER(soundram_w);
+	DECLARE_READ16_MEMBER(poundfor_trackball_r);
 };
 
 

@@ -18,6 +18,13 @@ public:
 	tilemap_t *m_fg_tilemap;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
+	DECLARE_READ8_MEMBER(tehkanwc_track_0_r);
+	DECLARE_READ8_MEMBER(tehkanwc_track_1_r);
+	DECLARE_WRITE8_MEMBER(tehkanwc_track_0_reset_w);
+	DECLARE_WRITE8_MEMBER(tehkanwc_track_1_reset_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_answer_w);
 };
 
 

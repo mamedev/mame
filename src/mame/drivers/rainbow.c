@@ -329,14 +329,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
 
 
-static WRITE16_HANDLER( jumping_sound_w )
+WRITE16_MEMBER(rbisland_state::jumping_sound_w)
 {
-	rbisland_state *state = space->machine().driver_data<rbisland_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
-		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+		m_jumping_latch = data & 0xff; /*M68000 writes .b to $400007*/
+		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -377,7 +376,7 @@ static ADDRESS_MAP_START( jumping_map, AS_PROGRAM, 16, rbisland_state )
 	AM_RANGE(0x401002, 0x401003) AM_READ_PORT("401003")
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE_LEGACY(jumping_spritectrl_w)
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITENOP		/* watchdog? */
-	AM_RANGE(0x400006, 0x400007) AM_WRITE_LEGACY(jumping_sound_w)
+	AM_RANGE(0x400006, 0x400007) AM_WRITE(jumping_sound_w)
 	AM_RANGE(0x420000, 0x420001) AM_READNOP			/* read, but result not used */
 	AM_RANGE(0x430000, 0x430003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_yscroll_word_w)
 	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
@@ -401,10 +400,9 @@ static WRITE8_DEVICE_HANDLER( bankswitch_w )
 	memory_set_bank(device->machine(), "bank1", data & 3);
 }
 
-static READ8_HANDLER( jumping_latch_r )
+READ8_MEMBER(rbisland_state::jumping_latch_r)
 {
-	rbisland_state *state = space->machine().driver_data<rbisland_state>();
-	return state->m_jumping_latch;
+	return m_jumping_latch;
 }
 
 
@@ -423,7 +421,7 @@ static ADDRESS_MAP_START( jumping_sound_map, AS_PROGRAM, 8, rbisland_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
 	AM_RANGE(0xb400, 0xb401) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(jumping_latch_r)
+	AM_RANGE(0xb800, 0xb800) AM_READ(jumping_latch_r)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	/* looks like a bankswitch, but sound works with or without it */
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END

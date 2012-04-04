@@ -20,26 +20,25 @@
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( vaportra_sound_w )
+WRITE16_MEMBER(vaportra_state::vaportra_sound_w)
 {
-	vaportra_state *state = space->machine().driver_data<vaportra_state>();
 
 	/* Force synchronisation between CPUs with fake timer */
-	space->machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
+	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
 }
 
-static READ16_HANDLER( vaportra_control_r )
+READ16_MEMBER(vaportra_state::vaportra_control_r)
 {
 	switch (offset << 1)
 	{
 		case 4:
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 		case 2:
-			return input_port_read(space->machine(), "COINS");
+			return input_port_read(machine(), "COINS");
 		case 0:
-			return input_port_read(space->machine(), "PLAYERS");
+			return input_port_read(machine(), "PLAYERS");
 	}
 
 	logerror("Unknown control read at %d\n",offset);
@@ -51,8 +50,8 @@ static READ16_HANDLER( vaportra_control_r )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vaportra_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100003) AM_WRITE_LEGACY(vaportra_priority_w)
-	AM_RANGE(0x100006, 0x100007) AM_WRITE_LEGACY(vaportra_sound_w)
-	AM_RANGE(0x100000, 0x10000f) AM_READ_LEGACY(vaportra_control_r)
+	AM_RANGE(0x100006, 0x100007) AM_WRITE(vaportra_sound_w)
+	AM_RANGE(0x100000, 0x10000f) AM_READ(vaportra_control_r)
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
 	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
@@ -70,10 +69,9 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static READ8_HANDLER( vaportra_soundlatch_r )
+READ8_MEMBER(vaportra_state::vaportra_soundlatch_r)
 {
-	vaportra_state *state = space->machine().driver_data<vaportra_state>();
-	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
+	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, offset);
 }
 
@@ -83,7 +81,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vaportra_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE_LEGACY("ym2", ym2151_r, ym2151_w)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_READ_LEGACY(vaportra_soundlatch_r)
+	AM_RANGE(0x140000, 0x140001) AM_READ(vaportra_soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")  /* ??? LOOKUP ??? */
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE_LEGACY(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)

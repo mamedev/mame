@@ -35,6 +35,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	DECLARE_WRITE16_MEMBER(lastduel_sound_w);
+	DECLARE_WRITE8_MEMBER(mg_bankswitch_w);
 };
 
 /*----------- defined in video/lastduel.c -----------*/

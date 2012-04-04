@@ -24,17 +24,16 @@
 static KONAMI_SETLINES_CALLBACK( crimfght_banking );
 
 
-static WRITE8_HANDLER( crimfght_coin_w )
+WRITE8_MEMBER(crimfght_state::crimfght_coin_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 }
 
-static WRITE8_HANDLER( crimfght_sh_irqtrigger_w )
+WRITE8_MEMBER(crimfght_state::crimfght_sh_irqtrigger_w)
 {
-	crimfght_state *state = space->machine().driver_data<crimfght_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
@@ -49,33 +48,31 @@ static WRITE8_DEVICE_HANDLER( crimfght_snd_bankswitch_w )
 	k007232_set_bank(state->m_k007232, bank_A, bank_B );
 }
 
-static READ8_HANDLER( k052109_051960_r )
+READ8_MEMBER(crimfght_state::k052109_051960_r)
 {
-	crimfght_state *state = space->machine().driver_data<crimfght_state>();
 
-	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->m_k051960, offset - 0x3800);
+			return k051937_r(m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->m_k052109, offset);
+			return k052109_r(m_k052109, offset);
 		else
-			return k051960_r(state->m_k051960, offset - 0x3c00);
+			return k051960_r(m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->m_k052109, offset);
+		return k052109_r(m_k052109, offset);
 }
 
-static WRITE8_HANDLER( k052109_051960_w )
+WRITE8_MEMBER(crimfght_state::k052109_051960_w)
 {
-	crimfght_state *state = space->machine().driver_data<crimfght_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->m_k051960, offset - 0x3800, data);
+		k051937_w(m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->m_k052109, offset, data);
+		k052109_w(m_k052109, offset, data);
 	else
-		k051960_w(state->m_k051960, offset - 0x3c00, data);
+		k051960_w(m_k051960, offset - 0x3c00, data);
 }
 
 /********************************************/
@@ -91,9 +88,9 @@ static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x3f85, 0x3f85) AM_READ_PORT("P3")
 	AM_RANGE(0x3f86, 0x3f86) AM_READ_PORT("P4")
 	AM_RANGE(0x3f87, 0x3f87) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f88, 0x3f88) AM_READWRITE_LEGACY(watchdog_reset_r, crimfght_coin_w)	/* watchdog reset */
-	AM_RANGE(0x3f8c, 0x3f8c) AM_WRITE_LEGACY(crimfght_sh_irqtrigger_w)	/* cause interrupt on audio CPU? */
-	AM_RANGE(0x2000, 0x5fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)	/* video RAM + sprite RAM */
+	AM_RANGE(0x3f88, 0x3f88) AM_READ_LEGACY(watchdog_reset_r) AM_WRITE(crimfght_coin_w)	/* watchdog reset */
+	AM_RANGE(0x3f8c, 0x3f8c) AM_WRITE(crimfght_sh_irqtrigger_w)	/* cause interrupt on audio CPU? */
+	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)	/* video RAM + sprite RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")						/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */
 ADDRESS_MAP_END

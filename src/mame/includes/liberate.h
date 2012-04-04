@@ -25,6 +25,16 @@ public:
 
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_READ8_MEMBER(deco16_bank_r);
+	DECLARE_READ8_MEMBER(deco16_io_r);
+	DECLARE_WRITE8_MEMBER(deco16_bank_w);
+	DECLARE_READ8_MEMBER(prosoccr_bank_r);
+	DECLARE_READ8_MEMBER(prosoccr_charram_r);
+	DECLARE_WRITE8_MEMBER(prosoccr_charram_w);
+	DECLARE_WRITE8_MEMBER(prosoccr_char_bank_w);
+	DECLARE_WRITE8_MEMBER(prosoccr_io_bank_w);
+	DECLARE_READ8_MEMBER(prosport_charram_r);
+	DECLARE_WRITE8_MEMBER(prosport_charram_w);
 };
 
 

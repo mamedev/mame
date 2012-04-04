@@ -22,6 +22,8 @@ public:
 
 	/* devices */
 	device_t *m_subcpu;
+	DECLARE_WRITE8_MEMBER(himesiki_rombank_w);
+	DECLARE_WRITE8_MEMBER(himesiki_sound_w);
 };
 
 

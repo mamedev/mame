@@ -9,6 +9,8 @@ public:
 	UINT16 *m_vregs;
 	UINT16 *m_videoram;
 	UINT16 *m_spriteram;
+	DECLARE_READ8_MEMBER(dallas_share_r);
+	DECLARE_WRITE8_MEMBER(dallas_share_w);
 };
 
 

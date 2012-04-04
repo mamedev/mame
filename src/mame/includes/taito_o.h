@@ -16,6 +16,8 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_tc0080vco;
+	DECLARE_WRITE16_MEMBER(io_w);
+	DECLARE_READ16_MEMBER(io_r);
 };
 
 /*----------- defined in video/taito_o.c -----------*/

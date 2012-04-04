@@ -30,6 +30,10 @@ public:
 
 	UINT8    m_irq_mask;
 	UINT8    m_yieartf_nmi_mask;
+	DECLARE_WRITE8_MEMBER(coin_w);
+	DECLARE_WRITE8_MEMBER(questions_bank_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(yieartf_nmi_mask_w);
 };
 
 

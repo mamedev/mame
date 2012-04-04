@@ -8,6 +8,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_paletteram;
 	UINT8 *m_videoram;
+	DECLARE_READ8_MEMBER(sichuan2_dsw1_r);
+	DECLARE_WRITE8_MEMBER(sichuan2_coin_w);
 };
 
 

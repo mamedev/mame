@@ -28,6 +28,8 @@ public:
 	size_t m_spriteram_size;
 
 	UINT8 m_irq_mask;
+	DECLARE_WRITE8_MEMBER(bagman_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 

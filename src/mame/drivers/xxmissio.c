@@ -14,9 +14,9 @@ XX Mission (c) 1986 UPL
 #include "includes/xxmissio.h"
 
 
-static WRITE8_HANDLER( xxmissio_bank_sel_w )
+WRITE8_MEMBER(xxmissio_state::xxmissio_bank_sel_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 7);
+	memory_set_bank(machine(), "bank1", data & 7);
 }
 
 static CUSTOM_INPUT( xxmissio_status_r )
@@ -26,42 +26,40 @@ static CUSTOM_INPUT( xxmissio_status_r )
 	return (state->m_status & bit_mask) ? 1 : 0;
 }
 
-static WRITE8_HANDLER ( xxmissio_status_m_w )
+WRITE8_MEMBER(xxmissio_state::xxmissio_status_m_w)
 {
-	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
 	switch (data)
 	{
 		case 0x00:
-			state->m_status |= 0x20;
+			m_status |= 0x20;
 			break;
 
 		case 0x40:
-			state->m_status &= ~0x08;
-			cputag_set_input_line_and_vector(space->machine(), "sub", 0, HOLD_LINE, 0x10);
+			m_status &= ~0x08;
+			cputag_set_input_line_and_vector(machine(), "sub", 0, HOLD_LINE, 0x10);
 			break;
 
 		case 0x80:
-			state->m_status |= 0x04;
+			m_status |= 0x04;
 			break;
 	}
 }
 
-static WRITE8_HANDLER ( xxmissio_status_s_w )
+WRITE8_MEMBER(xxmissio_state::xxmissio_status_s_w)
 {
-	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
 	switch (data)
 	{
 		case 0x00:
-			state->m_status |= 0x10;
+			m_status |= 0x10;
 			break;
 
 		case 0x40:
-			state->m_status |= 0x08;
+			m_status |= 0x08;
 			break;
 
 		case 0x80:
-			state->m_status &= ~0x04;
-			cputag_set_input_line_and_vector(space->machine(), "maincpu", 0, HOLD_LINE, 0x10);
+			m_status &= ~0x04;
+			cputag_set_input_line_and_vector(machine(), "maincpu", 0, HOLD_LINE, 0x10);
 			break;
 	}
 }
@@ -97,7 +95,7 @@ static ADDRESS_MAP_START( map1, AS_PROGRAM, 8, xxmissio_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("STATUS")
-	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(xxmissio_status_m_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_m_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(xxmissio_flipscreen_w)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM AM_BASE(m_fgram)
@@ -117,12 +115,12 @@ static ADDRESS_MAP_START( map2, AS_PROGRAM, 8, xxmissio_state )
 
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x8002, 0x8003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0x8006, 0x8006) AM_WRITE_LEGACY(xxmissio_bank_sel_w)
+	AM_RANGE(0x8006, 0x8006) AM_WRITE(xxmissio_bank_sel_w)
 
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("STATUS")
-	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(xxmissio_status_s_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_s_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(xxmissio_flipscreen_w)
 
 	AM_RANGE(0xc000, 0xc7ff) AM_SHARE("share1") AM_RAM

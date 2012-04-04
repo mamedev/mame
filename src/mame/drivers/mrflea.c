@@ -75,51 +75,45 @@ Stephh's notes (based on the games Z80 code and some tests) :
  *
  *************************************/
 
-static WRITE8_HANDLER( mrflea_main_w )
+WRITE8_MEMBER(mrflea_state::mrflea_main_w)
 {
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
-	state->m_status |= 0x01; // pending command to main CPU
-	state->m_main = data;
+	m_status |= 0x01; // pending command to main CPU
+	m_main = data;
 }
 
-static WRITE8_HANDLER( mrflea_io_w )
+WRITE8_MEMBER(mrflea_state::mrflea_io_w)
 {
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
-	state->m_status |= 0x08; // pending command to IO CPU
-	state->m_io = data;
-	device_set_input_line(state->m_subcpu, 0, HOLD_LINE );
+	m_status |= 0x08; // pending command to IO CPU
+	m_io = data;
+	device_set_input_line(m_subcpu, 0, HOLD_LINE );
 }
 
-static READ8_HANDLER( mrflea_main_r )
+READ8_MEMBER(mrflea_state::mrflea_main_r)
 {
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
-	state->m_status &= ~0x01; // main CPU command read
-	return state->m_main;
+	m_status &= ~0x01; // main CPU command read
+	return m_main;
 }
 
-static READ8_HANDLER( mrflea_io_r )
+READ8_MEMBER(mrflea_state::mrflea_io_r)
 {
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
-	state->m_status &= ~0x08; // IO CPU command read
-	return state->m_io;
+	m_status &= ~0x08; // IO CPU command read
+	return m_io;
 }
 
-static READ8_HANDLER( mrflea_main_status_r )
+READ8_MEMBER(mrflea_state::mrflea_main_status_r)
 {
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 
 	/*  0x01: main CPU command pending
         0x08: io cpu ready */
-	return state->m_status ^ 0x08;
+	return m_status ^ 0x08;
 }
 
-static READ8_HANDLER( mrflea_io_status_r )
+READ8_MEMBER(mrflea_state::mrflea_io_status_r)
 {
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 
 	/*  0x08: IO CPU command pending
         0x01: main cpu ready */
-	return state->m_status ^ 0x01;
+	return m_status ^ 0x01;
 }
 
 static TIMER_DEVICE_CALLBACK( mrflea_slave_interrupt )
@@ -131,32 +125,30 @@ static TIMER_DEVICE_CALLBACK( mrflea_slave_interrupt )
 		device_set_input_line(state->m_subcpu, 0, HOLD_LINE);
 }
 
-static READ8_HANDLER( mrflea_interrupt_type_r )
+READ8_MEMBER(mrflea_state::mrflea_interrupt_type_r)
 {
 /* there are two interrupt types:
     1. triggered (in response to sound command)
     2. heartbeat (for music timing)
 */
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
 
-	if (state->m_status & 0x08 )
+	if (m_status & 0x08 )
 		return 0x00; /* process command */
 
 	return 0x01; /* music/sound update? */
 }
 
-static WRITE8_HANDLER( mrflea_select1_w )
+WRITE8_MEMBER(mrflea_state::mrflea_select1_w)
 {
-	mrflea_state *state = space->machine().driver_data<mrflea_state>();
-	state->m_select1 = data;
+	m_select1 = data;
 }
 
-static READ8_HANDLER( mrflea_input1_r )
+READ8_MEMBER(mrflea_state::mrflea_input1_r)
 {
 	return 0x00;
 }
 
-static WRITE8_HANDLER( mrflea_data1_w )
+WRITE8_MEMBER(mrflea_state::mrflea_data1_w)
 {
 }
 
@@ -177,9 +169,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mrflea_master_io_map, AS_IO, 8, mrflea_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog? */
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(mrflea_io_w)
-	AM_RANGE(0x41, 0x41) AM_READ_LEGACY(mrflea_main_r)
-	AM_RANGE(0x42, 0x42) AM_READ_LEGACY(mrflea_main_status_r)
+	AM_RANGE(0x40, 0x40) AM_WRITE(mrflea_io_w)
+	AM_RANGE(0x41, 0x41) AM_READ(mrflea_main_r)
+	AM_RANGE(0x42, 0x42) AM_READ(mrflea_main_status_r)
 	AM_RANGE(0x43, 0x43) AM_WRITENOP /* 0xa6,0x0d,0x05 */
 	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(mrflea_gfx_bank_w)
 ADDRESS_MAP_END
@@ -195,16 +187,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mrflea_slave_io_map, AS_IO, 8, mrflea_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x10, 0x10) AM_READ_LEGACY(mrflea_interrupt_type_r) AM_WRITENOP /* ? / irq ACK */
+	AM_RANGE(0x10, 0x10) AM_READ(mrflea_interrupt_type_r) AM_WRITENOP /* ? / irq ACK */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP /* 0x83,0x00,0xfc */
-	AM_RANGE(0x20, 0x20) AM_READ_LEGACY(mrflea_io_r)
-	AM_RANGE(0x21, 0x21) AM_WRITE_LEGACY(mrflea_main_w)
-	AM_RANGE(0x22, 0x22) AM_READ_LEGACY(mrflea_io_status_r)
+	AM_RANGE(0x20, 0x20) AM_READ(mrflea_io_r)
+	AM_RANGE(0x21, 0x21) AM_WRITE(mrflea_main_w)
+	AM_RANGE(0x22, 0x22) AM_READ(mrflea_io_status_r)
 	AM_RANGE(0x23, 0x23) AM_WRITENOP /* 0xb4,0x09,0x05 */
 	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
-	AM_RANGE(0x42, 0x42) AM_READWRITE_LEGACY(mrflea_input1_r, mrflea_data1_w)
-	AM_RANGE(0x43, 0x43) AM_WRITE_LEGACY(mrflea_select1_w)
+	AM_RANGE(0x42, 0x42) AM_READWRITE(mrflea_input1_r, mrflea_data1_w)
+	AM_RANGE(0x43, 0x43) AM_WRITE(mrflea_select1_w)
 	AM_RANGE(0x44, 0x44) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0x44, 0x45) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x46, 0x46) AM_DEVREAD_LEGACY("ay3", ay8910_r)

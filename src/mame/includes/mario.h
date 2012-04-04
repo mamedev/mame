@@ -60,6 +60,7 @@ public:
 	int m_monitor;
 
 	UINT8   m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 };
 
 /*----------- defined in video/mario.c -----------*/

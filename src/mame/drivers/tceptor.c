@@ -23,17 +23,15 @@
 /*******************************************************************/
 
 
-static READ16_HANDLER( m68k_shared_word_r )
+READ16_MEMBER(tceptor_state::m68k_shared_word_r)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	return state->m_m68k_shared_ram[offset];
+	return m_m68k_shared_ram[offset];
 }
 
-static WRITE16_HANDLER( m68k_shared_word_w )
+WRITE16_MEMBER(tceptor_state::m68k_shared_word_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_m68k_shared_ram[offset] = data & 0xff;
+		m_m68k_shared_ram[offset] = data & 0xff;
 }
 
 
@@ -48,16 +46,14 @@ static INTERRUPT_GEN( m6809_vb_interrupt )
 		state->m_m6809_irq_enable = 1;
 }
 
-static WRITE8_HANDLER( m6809_irq_enable_w )
+WRITE8_MEMBER(tceptor_state::m6809_irq_enable_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_m6809_irq_enable = 1;
+	m_m6809_irq_enable = 1;
 }
 
-static WRITE8_HANDLER( m6809_irq_disable_w )
+WRITE8_MEMBER(tceptor_state::m6809_irq_disable_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_m6809_irq_enable = 0;
+	m_m6809_irq_enable = 0;
 }
 
 
@@ -68,10 +64,9 @@ static INTERRUPT_GEN( m68k_vb_interrupt )
 		device_set_input_line(device, M68K_IRQ_1, HOLD_LINE);
 }
 
-static WRITE16_HANDLER( m68k_irq_enable_w )
+WRITE16_MEMBER(tceptor_state::m68k_irq_enable_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_m68k_irq_enable = data;
+	m_m68k_irq_enable = data;
 }
 
 
@@ -84,16 +79,14 @@ static INTERRUPT_GEN( mcu_vb_interrupt )
 		state->m_mcu_irq_enable = 1;
 }
 
-static WRITE8_HANDLER( mcu_irq_enable_w )
+WRITE8_MEMBER(tceptor_state::mcu_irq_enable_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_mcu_irq_enable = 1;
+	m_mcu_irq_enable = 1;
 }
 
-static WRITE8_HANDLER( mcu_irq_disable_w )
+WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_mcu_irq_enable = 0;
+	m_mcu_irq_enable = 0;
 }
 
 
@@ -136,27 +129,27 @@ static UINT8 fix_input1(UINT8 in1, UINT8 in2)
 	return r;
 }
 
-static READ8_HANDLER( dsw0_r )
+READ8_MEMBER(tceptor_state::dsw0_r)
 {
-	return fix_input0(input_port_read(space->machine(), "DSW1"), input_port_read(space->machine(), "DSW2"));
+	return fix_input0(input_port_read(machine(), "DSW1"), input_port_read(machine(), "DSW2"));
 }
 
-static READ8_HANDLER( dsw1_r )
+READ8_MEMBER(tceptor_state::dsw1_r)
 {
-	return fix_input1(input_port_read(space->machine(), "DSW1"), input_port_read(space->machine(), "DSW2"));
+	return fix_input1(input_port_read(machine(), "DSW1"), input_port_read(machine(), "DSW2"));
 }
 
-static READ8_HANDLER( input0_r )
+READ8_MEMBER(tceptor_state::input0_r)
 {
-	return fix_input0(input_port_read(space->machine(), "BUTTONS"), input_port_read(space->machine(), "SERVICE"));
+	return fix_input0(input_port_read(machine(), "BUTTONS"), input_port_read(machine(), "SERVICE"));
 }
 
-static READ8_HANDLER( input1_r )
+READ8_MEMBER(tceptor_state::input1_r)
 {
-	return fix_input1(input_port_read(space->machine(), "BUTTONS"), input_port_read(space->machine(), "SERVICE"));
+	return fix_input1(input_port_read(machine(), "BUTTONS"), input_port_read(machine(), "SERVICE"));
 }
 
-static READ8_HANDLER( readFF )
+READ8_MEMBER(tceptor_state::readFF)
 {
 	return 0xff;
 }
@@ -177,8 +170,8 @@ static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x4f00, 0x4f03) AM_WRITENOP				// analog input control?
 	AM_RANGE(0x5000, 0x5006) AM_WRITE_LEGACY(tceptor_bg_scroll_w)	// bg scroll
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE(m_m68k_shared_ram) // COM RAM
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(m6809_irq_disable_w)
-	AM_RANGE(0x8800, 0x8800) AM_WRITE_LEGACY(m6809_irq_enable_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(m6809_irq_disable_w)
+	AM_RANGE(0x8800, 0x8800) AM_WRITE(m6809_irq_enable_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -211,8 +204,8 @@ static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, tceptor_state )
 	AM_RANGE(0x300000, 0x300001) AM_WRITEONLY
 	AM_RANGE(0x400000, 0x4001ff) AM_WRITEONLY AM_BASE(m_sprite_ram)
 	AM_RANGE(0x500000, 0x51ffff) AM_WRITE_LEGACY(namco_road16_w)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE_LEGACY(m68k_irq_enable_w)	// not sure
-	AM_RANGE(0x700000, 0x703fff) AM_READWRITE_LEGACY(m68k_shared_word_r, m68k_shared_word_w) AM_SHARE("share1")
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(m68k_irq_enable_w)	// not sure
+	AM_RANGE(0x700000, 0x703fff) AM_READWRITE(m68k_shared_word_r, m68k_shared_word_w) AM_SHARE("share1")
 ADDRESS_MAP_END
 
 
@@ -223,12 +216,12 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x1400, 0x154d) AM_RAM
 	AM_RANGE(0x17c0, 0x17ff) AM_RAM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0x2100, 0x2100) AM_READ_LEGACY(dsw0_r)
-	AM_RANGE(0x2101, 0x2101) AM_READ_LEGACY(dsw1_r)
-	AM_RANGE(0x2200, 0x2200) AM_READ_LEGACY(input0_r)
-	AM_RANGE(0x2201, 0x2201) AM_READ_LEGACY(input1_r)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(mcu_irq_disable_w)
-	AM_RANGE(0x8800, 0x8800) AM_WRITE_LEGACY(mcu_irq_enable_w)
+	AM_RANGE(0x2100, 0x2100) AM_READ(dsw0_r)
+	AM_RANGE(0x2101, 0x2101) AM_READ(dsw1_r)
+	AM_RANGE(0x2200, 0x2200) AM_READ(input0_r)
+	AM_RANGE(0x2201, 0x2201) AM_READ(input1_r)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(mcu_irq_disable_w)
+	AM_RANGE(0x8800, 0x8800) AM_WRITE(mcu_irq_enable_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_SHARE("nvram")	// Battery Backup
@@ -237,8 +230,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, tceptor_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_LEGACY(readFF) AM_WRITENOP
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ_LEGACY(readFF) AM_WRITENOP
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(readFF) AM_WRITENOP
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF) AM_WRITENOP
 ADDRESS_MAP_END
 
 

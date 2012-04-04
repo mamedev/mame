@@ -9,6 +9,12 @@ public:
 
 	int mux_port;
 	required_device<cpu_device> m_maincpu;
+	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_WRITE8_MEMBER(mux_select_w);
+	DECLARE_READ32_MEMBER(latch32_r);
+	DECLARE_WRITE32_MEMBER(latch32_w);
+	DECLARE_READ8_MEMBER(latch8_r);
+	DECLARE_WRITE8_MEMBER(latch8_w);
 };
 
 #define ISMACS  (st0016_game&0x80)

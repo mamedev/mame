@@ -28,6 +28,12 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE8_MEMBER(sound_reset_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_msm_w);
+	DECLARE_READ8_MEMBER(sound_reset_r);
+	DECLARE_WRITE8_MEMBER(kc_sound_control_w);
 };
 
 

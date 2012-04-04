@@ -91,43 +91,40 @@ static void triplhnt_update_misc(running_machine &machine, int offset)
 }
 
 
-static WRITE8_HANDLER( triplhnt_misc_w )
+WRITE8_MEMBER(triplhnt_state::triplhnt_misc_w)
 {
-	triplhnt_update_misc(space->machine(), offset);
+	triplhnt_update_misc(machine(), offset);
 }
 
 
-static READ8_HANDLER( triplhnt_cmos_r )
+READ8_MEMBER(triplhnt_state::triplhnt_cmos_r)
 {
-	triplhnt_state *state = space->machine().driver_data<triplhnt_state>();
-	state->m_cmos_latch = offset;
+	m_cmos_latch = offset;
 
-	return state->m_cmos[state->m_cmos_latch] ^ 15;
+	return m_cmos[m_cmos_latch] ^ 15;
 }
 
 
-static READ8_HANDLER( triplhnt_input_port_4_r )
+READ8_MEMBER(triplhnt_state::triplhnt_input_port_4_r)
 {
 	watchdog_reset_w(space, 0, 0);
-	return input_port_read(space->machine(), "0C0B");
+	return input_port_read(machine(), "0C0B");
 }
 
 
-static READ8_HANDLER( triplhnt_misc_r )
+READ8_MEMBER(triplhnt_state::triplhnt_misc_r)
 {
-	triplhnt_state *state = space->machine().driver_data<triplhnt_state>();
-	triplhnt_update_misc(space->machine(), offset);
-	return input_port_read(space->machine(), "VBLANK") | state->m_hit_code;
+	triplhnt_update_misc(machine(), offset);
+	return input_port_read(machine(), "VBLANK") | m_hit_code;
 }
 
 
-static READ8_HANDLER( triplhnt_da_latch_r )
+READ8_MEMBER(triplhnt_state::triplhnt_da_latch_r)
 {
-	triplhnt_state *state = space->machine().driver_data<triplhnt_state>();
-	int cross_x = input_port_read(space->machine(), "STICKX");
-	int cross_y = input_port_read(space->machine(), "STICKY");
+	int cross_x = input_port_read(machine(), "STICKX");
+	int cross_y = input_port_read(machine(), "STICKY");
 
-	state->m_da_latch = offset;
+	m_da_latch = offset;
 
 	/* the following is a slight simplification */
 
@@ -147,10 +144,10 @@ static ADDRESS_MAP_START( triplhnt_map, AS_PROGRAM, 8, triplhnt_state )
 	AM_RANGE(0x0c08, 0x0c08) AM_READ_PORT("0C08")
 	AM_RANGE(0x0c09, 0x0c09) AM_READ_PORT("0C09")
 	AM_RANGE(0x0c0a, 0x0c0a) AM_READ_PORT("0C0A")
-	AM_RANGE(0x0c0b, 0x0c0b) AM_READ_LEGACY(triplhnt_input_port_4_r)
-	AM_RANGE(0x0c10, 0x0c1f) AM_READ_LEGACY(triplhnt_da_latch_r)
-	AM_RANGE(0x0c20, 0x0c2f) AM_READ_LEGACY(triplhnt_cmos_r) AM_SHARE("nvram")
-	AM_RANGE(0x0c30, 0x0c3f) AM_READWRITE_LEGACY(triplhnt_misc_r, triplhnt_misc_w)
+	AM_RANGE(0x0c0b, 0x0c0b) AM_READ(triplhnt_input_port_4_r)
+	AM_RANGE(0x0c10, 0x0c1f) AM_READ(triplhnt_da_latch_r)
+	AM_RANGE(0x0c20, 0x0c2f) AM_READ(triplhnt_cmos_r) AM_SHARE("nvram")
+	AM_RANGE(0x0c30, 0x0c3f) AM_READWRITE(triplhnt_misc_r, triplhnt_misc_w)
 	AM_RANGE(0x0c40, 0x0c40) AM_READ_PORT("0C40")
 	AM_RANGE(0x0c48, 0x0c48) AM_READ_PORT("0C48")
 	AM_RANGE(0x7000, 0x7fff) AM_ROM /* program */

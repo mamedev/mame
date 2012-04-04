@@ -14,6 +14,16 @@ public:
 	UINT16 m_control;
 	INT32 m_gp2_irq_control;
 	INT32 m_pal;
+	DECLARE_WRITE16_MEMBER(gp_control_w);
+	DECLARE_WRITE16_MEMBER(gp2_control_w);
+	DECLARE_READ16_MEMBER(v_rom_r);
+	DECLARE_READ16_MEMBER(gp2_vram_r);
+	DECLARE_READ16_MEMBER(gp2_vram_mirror_r);
+	DECLARE_WRITE16_MEMBER(gp2_vram_w);
+	DECLARE_WRITE16_MEMBER(gp2_vram_mirror_w);
+	DECLARE_READ16_MEMBER(sndram_r);
+	DECLARE_WRITE16_MEMBER(sndram_w);
+	DECLARE_READ16_MEMBER(gp2_ide_std_r);
 };
 
 /*----------- defined in video/qdrmfgp.c -----------*/

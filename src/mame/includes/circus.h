@@ -22,6 +22,7 @@ public:
 
 	/* game id */
 	int m_game_id;
+	DECLARE_READ8_MEMBER(circus_paddle_r);
 };
 
 

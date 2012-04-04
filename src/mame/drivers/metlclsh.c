@@ -44,16 +44,14 @@ metlclsh:
 
 ***************************************************************************/
 
-static WRITE8_HANDLER( metlclsh_cause_irq )
+WRITE8_MEMBER(metlclsh_state::metlclsh_cause_irq)
 {
-	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+	device_set_input_line(m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( metlclsh_ack_nmi )
+WRITE8_MEMBER(metlclsh_state::metlclsh_ack_nmi)
 {
-	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8, metlclsh_state )
@@ -65,8 +63,8 @@ static ADDRESS_MAP_START( metlclsh_master_map, AS_PROGRAM, 8, metlclsh_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
 	AM_RANGE(0xc080, 0xc080) AM_WRITENOP							// ? 0
-	AM_RANGE(0xc0c2, 0xc0c2) AM_WRITE_LEGACY(metlclsh_cause_irq)			// cause irq on cpu #2
-	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE_LEGACY(metlclsh_ack_nmi)				// nmi ack
+	AM_RANGE(0xc0c2, 0xc0c2) AM_WRITE(metlclsh_cause_irq)			// cause irq on cpu #2
+	AM_RANGE(0xc0c3, 0xc0c3) AM_WRITE(metlclsh_ack_nmi)				// nmi ack
 /**/AM_RANGE(0xc800, 0xc82f) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 /**/AM_RANGE(0xcc00, 0xcc2f) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
@@ -83,27 +81,24 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static WRITE8_HANDLER( metlclsh_cause_nmi2 )
+WRITE8_MEMBER(metlclsh_state::metlclsh_cause_nmi2)
 {
-	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( metlclsh_ack_irq2 )
+WRITE8_MEMBER(metlclsh_state::metlclsh_ack_irq2)
 {
-	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+	device_set_input_line(m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( metlclsh_ack_nmi2 )
+WRITE8_MEMBER(metlclsh_state::metlclsh_ack_nmi2)
 {
-	metlclsh_state *state = space->machine().driver_data<metlclsh_state>();
-	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(m_subcpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( metlclsh_flipscreen_w )
+WRITE8_MEMBER(metlclsh_state::metlclsh_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(machine(), data & 1);
 }
 
 static ADDRESS_MAP_START( metlclsh_slave_map, AS_PROGRAM, 8, metlclsh_state )
@@ -113,15 +108,15 @@ static ADDRESS_MAP_START( metlclsh_slave_map, AS_PROGRAM, 8, metlclsh_state )
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW")
-	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE_LEGACY(metlclsh_cause_nmi2)			// cause nmi on cpu #1
-	AM_RANGE(0xc0c1, 0xc0c1) AM_WRITE_LEGACY(metlclsh_ack_irq2)			// irq ack
+	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(metlclsh_cause_nmi2)			// cause nmi on cpu #1
+	AM_RANGE(0xc0c1, 0xc0c1) AM_WRITE(metlclsh_ack_irq2)			// irq ack
 	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(metlclsh_bgram_w) AM_BASE(m_bgram) // this is banked
-	AM_RANGE(0xe301, 0xe301) AM_WRITE_LEGACY(metlclsh_flipscreen_w)		// 0/1
+	AM_RANGE(0xe301, 0xe301) AM_WRITE(metlclsh_flipscreen_w)		// 0/1
 	AM_RANGE(0xe401, 0xe401) AM_WRITE_LEGACY(metlclsh_rambank_w)
 	AM_RANGE(0xe402, 0xe403) AM_WRITEONLY AM_BASE(m_scrollx)
 //  AM_RANGE(0xe404, 0xe404) AM_WRITENOP                            // ? 0
 //  AM_RANGE(0xe410, 0xe410) AM_WRITENOP                            // ? 0 on startup only
-	AM_RANGE(0xe417, 0xe417) AM_WRITE_LEGACY(metlclsh_ack_nmi2)			// nmi ack
+	AM_RANGE(0xe417, 0xe417) AM_WRITE(metlclsh_ack_nmi2)			// nmi ack
 	AM_RANGE(0xfff0, 0xffff) AM_ROM									// Reset/IRQ vectors
 ADDRESS_MAP_END
 

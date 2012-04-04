@@ -20,6 +20,9 @@ public:
 
 	/* misc */
 	int        m_keyb;
+	DECLARE_READ8_MEMBER(keyboard_0_r);
+	DECLARE_READ8_MEMBER(keyboard_1_r);
+	DECLARE_WRITE8_MEMBER(keyboard_w);
 };
 
 

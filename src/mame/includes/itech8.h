@@ -53,6 +53,16 @@ public:
 	UINT8 m_grmatch_palcontrol;
 	UINT8 m_grmatch_xscroll;
 	rgb_t m_grmatch_palette[2][16];
+	DECLARE_WRITE8_MEMBER(itech8_nmi_ack_w);
+	DECLARE_WRITE8_MEMBER(blitter_w);
+	DECLARE_WRITE8_MEMBER(rimrockn_bank_w);
+	DECLARE_WRITE8_MEMBER(pia_portb_out);
+	DECLARE_WRITE8_MEMBER(sound_data_w);
+	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
+	DECLARE_READ8_MEMBER(sound_data_r);
+	DECLARE_WRITE16_MEMBER(grom_bank16_w);
+	DECLARE_WRITE16_MEMBER(display_page16_w);
+	DECLARE_WRITE16_MEMBER(palette16_w);
 };
 
 

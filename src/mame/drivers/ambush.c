@@ -45,15 +45,15 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( ambush_coin_counter_w )
+WRITE8_MEMBER(ambush_state::ambush_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 }
 
-static WRITE8_HANDLER( flip_screen_w )
+WRITE8_MEMBER(ambush_state::flip_screen_w)
 {
-	flip_screen_set(space->machine(), data);
+	flip_screen_set(machine(), data);
 }
 
 
@@ -74,9 +74,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ambush_state )
 	AM_RANGE(0xc400, 0xc7ff) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xcc00, 0xcc03) AM_WRITENOP
-	AM_RANGE(0xcc04, 0xcc04) AM_WRITE_LEGACY(flip_screen_w)
+	AM_RANGE(0xcc04, 0xcc04) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xcc05, 0xcc05) AM_WRITEONLY AM_BASE(m_colorbank)
-	AM_RANGE(0xcc07, 0xcc07) AM_WRITE_LEGACY(ambush_coin_counter_w)
+	AM_RANGE(0xcc07, 0xcc07) AM_WRITE(ambush_coin_counter_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, ambush_state )

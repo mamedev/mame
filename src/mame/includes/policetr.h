@@ -30,6 +30,11 @@ public:
 	UINT16 m_dst_yoffs;
 	UINT8 m_video_latch;
 	UINT32 m_srcbitmap_height_mask;
+	DECLARE_WRITE32_MEMBER(control_w);
+	DECLARE_WRITE32_MEMBER(policetr_bsmt2000_reg_w);
+	DECLARE_WRITE32_MEMBER(policetr_bsmt2000_data_w);
+	DECLARE_READ32_MEMBER(bsmt2000_data_r);
+	DECLARE_WRITE32_MEMBER(speedup_w);
 };
 
 

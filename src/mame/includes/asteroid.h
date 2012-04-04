@@ -14,6 +14,8 @@ public:
 
 	UINT8 *m_ram1;
 	UINT8 *m_ram2;
+	DECLARE_WRITE8_MEMBER(astdelux_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(llander_led_w);
 };
 
 

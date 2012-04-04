@@ -36,6 +36,11 @@ public:
 	int m_sprite_bank;
 	bitmap_ind16 m_helper;
 	tilemap_t* m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(triplhnt_misc_w);
+	DECLARE_READ8_MEMBER(triplhnt_cmos_r);
+	DECLARE_READ8_MEMBER(triplhnt_input_port_4_r);
+	DECLARE_READ8_MEMBER(triplhnt_misc_r);
+	DECLARE_READ8_MEMBER(triplhnt_da_latch_r);
 };
 
 

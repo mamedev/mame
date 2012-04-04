@@ -215,49 +215,45 @@ static CUSTOM_INPUT( mahjong_ctrl_r ) /* used by hotgmck/hgkairak */
 	return ret;
 }
 
-static WRITE32_HANDLER( ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
+WRITE32_MEMBER(psikyo4_state::ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w)
 {
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 	int r, g, b;
-	COMBINE_DATA(&state->m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 
-	b = ((state->m_paletteram[offset] & 0x0000ff00) >> 8);
-	g = ((state->m_paletteram[offset] & 0x00ff0000) >> 16);
-	r = ((state->m_paletteram[offset] & 0xff000000) >> 24);
+	b = ((m_paletteram[offset] & 0x0000ff00) >> 8);
+	g = ((m_paletteram[offset] & 0x00ff0000) >> 16);
+	r = ((m_paletteram[offset] & 0xff000000) >> 24);
 
-	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
-	palette_set_color(space->machine(), offset + 0x800, MAKE_RGB(r, g, b)); // For screen 2
+	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset + 0x800, MAKE_RGB(r, g, b)); // For screen 2
 }
 
-static WRITE32_HANDLER( ps4_bgpen_1_dword_w )
+WRITE32_MEMBER(psikyo4_state::ps4_bgpen_1_dword_w)
 {
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 	int r, g, b;
-	COMBINE_DATA(&state->m_bgpen_1[0]);
+	COMBINE_DATA(&m_bgpen_1[0]);
 
-	b = ((state->m_bgpen_1[0] & 0x0000ff00) >>8);
-	g = ((state->m_bgpen_1[0] & 0x00ff0000) >>16);
-	r = ((state->m_bgpen_1[0] & 0xff000000) >>24);
+	b = ((m_bgpen_1[0] & 0x0000ff00) >>8);
+	g = ((m_bgpen_1[0] & 0x00ff0000) >>16);
+	r = ((m_bgpen_1[0] & 0xff000000) >>24);
 
-	palette_set_color(space->machine(), 0x1000, MAKE_RGB(r, g, b)); // Clear colour for screen 1
+	palette_set_color(machine(), 0x1000, MAKE_RGB(r, g, b)); // Clear colour for screen 1
 }
 
-static WRITE32_HANDLER( ps4_bgpen_2_dword_w )
+WRITE32_MEMBER(psikyo4_state::ps4_bgpen_2_dword_w)
 {
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 	int r, g, b;
-	COMBINE_DATA(&state->m_bgpen_2[0]);
+	COMBINE_DATA(&m_bgpen_2[0]);
 
-	b = ((state->m_bgpen_2[0] & 0x0000ff00) >>8);
-	g = ((state->m_bgpen_2[0] & 0x00ff0000) >>16);
-	r = ((state->m_bgpen_2[0] & 0xff000000) >>24);
+	b = ((m_bgpen_2[0] & 0x0000ff00) >>8);
+	g = ((m_bgpen_2[0] & 0x00ff0000) >>16);
+	r = ((m_bgpen_2[0] & 0xff000000) >>24);
 
-	palette_set_color(space->machine(), 0x1001, MAKE_RGB(r, g, b)); // Clear colour for screen 2
+	palette_set_color(machine(), 0x1001, MAKE_RGB(r, g, b)); // Clear colour for screen 2
 }
 
-static WRITE32_HANDLER( ps4_screen1_brt_w )
+WRITE32_MEMBER(psikyo4_state::ps4_screen1_brt_w)
 {
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -268,14 +264,14 @@ static WRITE32_HANDLER( ps4_screen1_brt_w )
 			brt1 = 0x7f; /* I reckon values must be clamped to 0x7f */
 
 		brt1 = (0x7f - brt1) / 127.0;
-		if (state->m_oldbrt1 != brt1)
+		if (m_oldbrt1 != brt1)
 		{
 			int i;
 
 			for (i = 0; i < 0x800; i++)
-				palette_set_pen_contrast(space->machine(), i, brt1);
+				palette_set_pen_contrast(machine(), i, brt1);
 
-			state->m_oldbrt1 = brt1;
+			m_oldbrt1 = brt1;
 		}
 	}
 	else
@@ -286,9 +282,8 @@ static WRITE32_HANDLER( ps4_screen1_brt_w )
 	}
 }
 
-static WRITE32_HANDLER( ps4_screen2_brt_w )
+WRITE32_MEMBER(psikyo4_state::ps4_screen2_brt_w)
 {
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -300,14 +295,14 @@ static WRITE32_HANDLER( ps4_screen2_brt_w )
 
 		brt2 = (0x7f - brt2) / 127.0;
 
-		if (state->m_oldbrt2 != brt2)
+		if (m_oldbrt2 != brt2)
 		{
 			int i;
 
 			for (i = 0x800; i < 0x1000; i++)
-				palette_set_pen_contrast(space->machine(), i, brt2);
+				palette_set_pen_contrast(machine(), i, brt2);
 
-			state->m_oldbrt2 = brt2;
+			m_oldbrt2 = brt2;
 		}
 	}
 	else
@@ -318,19 +313,18 @@ static WRITE32_HANDLER( ps4_screen2_brt_w )
 	}
 }
 
-static WRITE32_HANDLER( ps4_vidregs_w )
+WRITE32_MEMBER(psikyo4_state::ps4_vidregs_w)
 {
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
-	COMBINE_DATA(&state->m_vidregs[offset]);
+	COMBINE_DATA(&m_vidregs[offset]);
 
 	if (offset == 2) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
-			memory_set_bankptr(space->machine(), "bank2", space->machine().region("gfx1")->base() + 0x2000 * (state->m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
+			memory_set_bankptr(machine(), "bank2", machine().region("gfx1")->base() + 0x2000 * (m_vidregs[offset] & 0x1fff)); /* Bank comes from vidregs */
 	}
 }
 
-#define PCM_BANK_NO(n)	((state->m_io_select[0] >> (n * 4 + 24)) & 0x07)
+#define PCM_BANK_NO_LEGACY(n)	((state->m_io_select[0] >> (n * 4 + 24)) & 0x07)
 
 static void set_hotgmck_pcm_bank( running_machine &machine, int n )
 {
@@ -338,26 +332,25 @@ static void set_hotgmck_pcm_bank( running_machine &machine, int n )
 	UINT8 *ymf_pcmbank = machine.region("ymf")->base() + 0x200000;
 	UINT8 *pcm_rom = machine.region("ymfsource")->base();
 
-	memcpy(ymf_pcmbank + n * 0x100000, pcm_rom + PCM_BANK_NO(n) * 0x100000, 0x100000);
+	memcpy(ymf_pcmbank + n * 0x100000, pcm_rom + PCM_BANK_NO_LEGACY(n) * 0x100000, 0x100000);
 }
-
-static WRITE32_HANDLER( hotgmck_pcm_bank_w )
+#define PCM_BANK_NO(n)	((m_io_select[0] >> (n * 4 + 24)) & 0x07)
+WRITE32_MEMBER(psikyo4_state::hotgmck_pcm_bank_w)
 {
-	psikyo4_state *state = space->machine().driver_data<psikyo4_state>();
 	int old_bank0 = PCM_BANK_NO(0);
 	int old_bank1 = PCM_BANK_NO(1);
 	int new_bank0, new_bank1;
 
-	COMBINE_DATA(&state->m_io_select[0]);
+	COMBINE_DATA(&m_io_select[0]);
 
 	new_bank0 = PCM_BANK_NO(0);
 	new_bank1 = PCM_BANK_NO(1);
 
 	if (old_bank0 != new_bank0)
-		set_hotgmck_pcm_bank(space->machine(), 0);
+		set_hotgmck_pcm_bank(machine(), 0);
 
 	if (old_bank1 != new_bank1)
-		set_hotgmck_pcm_bank(space->machine(), 1);
+		set_hotgmck_pcm_bank(machine(), 1);
 }
 
 static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
@@ -367,12 +360,12 @@ static ADDRESS_MAP_START( ps4_map, AS_PROGRAM, 32, psikyo4_state )
 	AM_RANGE(0x03003fe0, 0x03003fe3) AM_DEVREADWRITE_LEGACY("eeprom", ps4_eeprom_r,ps4_eeprom_w)
 	AM_RANGE(0x03003fe4, 0x03003fe7) AM_READNOP // also writes to this address - might be vblank?
 //  AM_RANGE(0x03003fe4, 0x03003fe7) AM_WRITENOP // might be vblank?
-	AM_RANGE(0x03003fe4, 0x03003fef) AM_RAM_WRITE_LEGACY(ps4_vidregs_w) AM_BASE(m_vidregs) // vid regs?
-	AM_RANGE(0x03003ff0, 0x03003ff3) AM_WRITE_LEGACY(ps4_screen1_brt_w) // screen 1 brightness
-	AM_RANGE(0x03003ff4, 0x03003ff7) AM_WRITE_LEGACY(ps4_bgpen_1_dword_w) AM_BASE(m_bgpen_1) // screen 1 clear colour
-	AM_RANGE(0x03003ff8, 0x03003ffb) AM_WRITE_LEGACY(ps4_screen2_brt_w) // screen 2 brightness
-	AM_RANGE(0x03003ffc, 0x03003fff) AM_WRITE_LEGACY(ps4_bgpen_2_dword_w) AM_BASE(m_bgpen_2) // screen 2 clear colour
-	AM_RANGE(0x03004000, 0x03005fff) AM_RAM_WRITE_LEGACY(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(m_paletteram) // palette
+	AM_RANGE(0x03003fe4, 0x03003fef) AM_RAM_WRITE(ps4_vidregs_w) AM_BASE(m_vidregs) // vid regs?
+	AM_RANGE(0x03003ff0, 0x03003ff3) AM_WRITE(ps4_screen1_brt_w) // screen 1 brightness
+	AM_RANGE(0x03003ff4, 0x03003ff7) AM_WRITE(ps4_bgpen_1_dword_w) AM_BASE(m_bgpen_1) // screen 1 clear colour
+	AM_RANGE(0x03003ff8, 0x03003ffb) AM_WRITE(ps4_screen2_brt_w) // screen 2 brightness
+	AM_RANGE(0x03003ffc, 0x03003fff) AM_WRITE(ps4_bgpen_2_dword_w) AM_BASE(m_bgpen_2) // screen 2 clear colour
+	AM_RANGE(0x03004000, 0x03005fff) AM_RAM_WRITE(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(m_paletteram) // palette
 	AM_RANGE(0x03006000, 0x03007fff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
 	AM_RANGE(0x05000000, 0x05000007) AM_DEVREADWRITE8_LEGACY("ymf", ymf278b_r, ymf278b_w, 0xffffffff)
 	AM_RANGE(0x05800000, 0x05800003) AM_READ_PORT("P1_P2")
@@ -972,7 +965,7 @@ static void install_hotgmck_pcm_bank(running_machine &machine)
 	set_hotgmck_pcm_bank(machine, 0);
 	set_hotgmck_pcm_bank(machine, 1);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x5800008, 0x580000b, FUNC(hotgmck_pcm_bank_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x5800008, 0x580000b, write32_delegate(FUNC(psikyo4_state::hotgmck_pcm_bank_w),state));
 	machine.save().register_postload(save_prepost_delegate(FUNC(hotgmck_pcm_bank_postload), &machine));
 }
 

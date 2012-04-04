@@ -22,32 +22,30 @@
 /* prototypes */
 static KONAMI_SETLINES_CALLBACK( rollerg_banking );
 
-static WRITE8_HANDLER( rollerg_0010_w )
+WRITE8_MEMBER(rollerg_state::rollerg_0010_w)
 {
-	rollerg_state *state = space->machine().driver_data<rollerg_state>();
-	logerror("%04x: write %02x to 0010\n",cpu_get_pc(&space->device()), data);
+	logerror("%04x: write %02x to 0010\n",cpu_get_pc(&space.device()), data);
 
 	/* bits 0/1 are coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 2 enables 051316 ROM reading */
-	state->m_readzoomroms = data & 0x04;
+	m_readzoomroms = data & 0x04;
 
 	/* bit 5 enables 051316 wraparound */
-	k051316_wraparound_enable(state->m_k051316, data & 0x20);
+	k051316_wraparound_enable(m_k051316, data & 0x20);
 
 	/* other bits unknown */
 }
 
-static READ8_HANDLER( rollerg_k051316_r )
+READ8_MEMBER(rollerg_state::rollerg_k051316_r)
 {
-	rollerg_state *state = space->machine().driver_data<rollerg_state>();
 
-	if (state->m_readzoomroms)
-		return k051316_rom_r(state->m_k051316, offset);
+	if (m_readzoomroms)
+		return k051316_rom_r(m_k051316, offset);
 	else
-		return k051316_r(state->m_k051316, offset);
+		return k051316_r(m_k051316, offset);
 }
 
 static READ8_DEVICE_HANDLER( rollerg_sound_r )
@@ -57,10 +55,9 @@ static READ8_DEVICE_HANDLER( rollerg_sound_r )
 	return k053260_r(device, 2 + offset);
 }
 
-static WRITE8_HANDLER( soundirq_w )
+WRITE8_MEMBER(rollerg_state::soundirq_w)
 {
-	rollerg_state *state = space->machine().driver_data<rollerg_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -69,33 +66,32 @@ static TIMER_CALLBACK( nmi_callback )
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( sound_arm_nmi_w )
+WRITE8_MEMBER(rollerg_state::sound_arm_nmi_w)
 {
-	rollerg_state *state = space->machine().driver_data<rollerg_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	space->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
-static READ8_HANDLER( pip_r )
+READ8_MEMBER(rollerg_state::pip_r)
 {
 	return 0x7f;
 }
 
 static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
-	AM_RANGE(0x0010, 0x0010) AM_WRITE_LEGACY(rollerg_0010_w)
+	AM_RANGE(0x0010, 0x0010) AM_WRITE(rollerg_0010_w)
 	AM_RANGE(0x0020, 0x0020) AM_READWRITE_LEGACY(watchdog_reset_r,watchdog_reset_w)
 	AM_RANGE(0x0030, 0x0031) AM_DEVREADWRITE_LEGACY("k053260", rollerg_sound_r, k053260_w)	/* K053260 */
-	AM_RANGE(0x0040, 0x0040) AM_WRITE_LEGACY(soundirq_w)
+	AM_RANGE(0x0040, 0x0040) AM_WRITE(soundirq_w)
 	AM_RANGE(0x0050, 0x0050) AM_READ_PORT("P1")
 	AM_RANGE(0x0051, 0x0051) AM_READ_PORT("P2")
 	AM_RANGE(0x0052, 0x0052) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0053, 0x0053) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0060, 0x0060) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0061, 0x0061) AM_READ_LEGACY(pip_r)				/* ????? */
+	AM_RANGE(0x0061, 0x0061) AM_READ(pip_r)				/* ????? */
 	AM_RANGE(0x0100, 0x010f) AM_DEVREADWRITE_LEGACY("k053252",k053252_r,k053252_w)		/* 053252? */
 	AM_RANGE(0x0200, 0x020f) AM_DEVWRITE_LEGACY("k051316", k051316_ctrl_w)
 	AM_RANGE(0x0300, 0x030f) AM_DEVREADWRITE_LEGACY("k053244", k053244_r, k053244_w)
-	AM_RANGE(0x0800, 0x0fff) AM_READ_LEGACY(rollerg_k051316_r) AM_DEVWRITE_LEGACY("k051316", k051316_w)
+	AM_RANGE(0x0800, 0x0fff) AM_READ(rollerg_k051316_r) AM_DEVWRITE_LEGACY("k051316", k051316_w)
 	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE_LEGACY("k053244", k053245_r, k053245_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2000, 0x3aff) AM_RAM
@@ -108,7 +104,7 @@ static ADDRESS_MAP_START( rollerg_sound_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa02f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r,k053260_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(sound_arm_nmi_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
 
 

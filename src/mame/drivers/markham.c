@@ -14,7 +14,7 @@
 #include "includes/markham.h"
 
 
-static READ8_HANDLER( markham_e004_r )
+READ8_MEMBER(markham_state::markham_e004_r)
 {
 	return 0;
 }
@@ -34,7 +34,7 @@ static ADDRESS_MAP_START( markham_master_map, AS_PROGRAM, 8, markham_state )
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P1")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("P2")
 
-	AM_RANGE(0xe004, 0xe004) AM_READ_LEGACY(markham_e004_r) /* from CPU2 busack */
+	AM_RANGE(0xe004, 0xe004) AM_READ(markham_e004_r) /* from CPU2 busack */
 
 	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("SYSTEM")
 

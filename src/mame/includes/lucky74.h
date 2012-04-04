@@ -18,6 +18,12 @@ public:
 	UINT8 *m_bg_colorram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_READ8_MEMBER(custom_09R81P_port_r);
+	DECLARE_WRITE8_MEMBER(custom_09R81P_port_w);
+	DECLARE_READ8_MEMBER(usart_8251_r);
+	DECLARE_WRITE8_MEMBER(usart_8251_w);
+	DECLARE_READ8_MEMBER(copro_sm7831_r);
+	DECLARE_WRITE8_MEMBER(copro_sm7831_w);
 };
 
 

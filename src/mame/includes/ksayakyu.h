@@ -23,6 +23,10 @@ public:
 
 	/* misc */
 	int        m_sound_status;
+	DECLARE_WRITE8_MEMBER(bank_select_w);
+	DECLARE_WRITE8_MEMBER(latch_w);
+	DECLARE_READ8_MEMBER(sound_status_r);
+	DECLARE_WRITE8_MEMBER(tomaincpu_w);
 };
 
 

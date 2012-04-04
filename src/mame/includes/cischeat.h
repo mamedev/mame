@@ -28,6 +28,22 @@ public:
 	int m_debugsprites;
 	int m_show_unknown;
 	UINT16 *m_spriteram;
+	DECLARE_WRITE16_MEMBER(bigrun_paletteram16_w);
+	DECLARE_WRITE16_MEMBER(cischeat_paletteram16_w);
+	DECLARE_WRITE16_MEMBER(f1gpstar_paletteram16_w);
+	DECLARE_WRITE16_MEMBER(scudhamm_paletteram16_w);
+	DECLARE_WRITE16_MEMBER(scudhamm_motor_command_w);
+	DECLARE_WRITE16_MEMBER(scudhamm_leds_w);
+	DECLARE_WRITE16_MEMBER(scudhamm_enable_w);
+	DECLARE_WRITE16_MEMBER(scudhamm_oki_bank_w);
+	DECLARE_READ16_MEMBER(armchmp2_motor_status_r);
+	DECLARE_WRITE16_MEMBER(armchmp2_motor_command_w);
+	DECLARE_READ16_MEMBER(armchmp2_analog_r);
+	DECLARE_READ16_MEMBER(armchmp2_buttons_r);
+	DECLARE_WRITE16_MEMBER(armchmp2_leds_w);
+	DECLARE_WRITE16_MEMBER(bigrun_soundbank_w);
+	DECLARE_READ16_MEMBER(f1gpstr2_io_r);
+	DECLARE_WRITE16_MEMBER(f1gpstr2_io_w);
 };
 
 

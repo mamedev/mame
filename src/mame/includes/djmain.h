@@ -15,6 +15,24 @@ public:
 	const UINT8 *m_ide_user_password;
 	const UINT8 *m_ide_master_password;
 	UINT32 *m_obj_ram;
+	DECLARE_WRITE32_MEMBER(paletteram32_w);
+	DECLARE_WRITE32_MEMBER(sndram_bank_w);
+	DECLARE_READ32_MEMBER(sndram_r);
+	DECLARE_WRITE32_MEMBER(sndram_w);
+	DECLARE_READ32_MEMBER(obj_ctrl_r);
+	DECLARE_WRITE32_MEMBER(obj_ctrl_w);
+	DECLARE_READ32_MEMBER(obj_rom_r);
+	DECLARE_WRITE32_MEMBER(v_ctrl_w);
+	DECLARE_READ32_MEMBER(v_rom_r);
+	DECLARE_READ8_MEMBER(inp1_r);
+	DECLARE_READ8_MEMBER(inp2_r);
+	DECLARE_READ32_MEMBER(turntable_r);
+	DECLARE_WRITE32_MEMBER(turntable_select_w);
+	DECLARE_WRITE32_MEMBER(light_ctrl_1_w);
+	DECLARE_WRITE32_MEMBER(light_ctrl_2_w);
+	DECLARE_WRITE32_MEMBER(unknown590000_w);
+	DECLARE_WRITE32_MEMBER(unknown802000_w);
+	DECLARE_WRITE32_MEMBER(unknownc02000_w);
 };
 
 

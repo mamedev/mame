@@ -113,44 +113,42 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 /* End of ADPCM custom chip code */
 
 
-static READ8_HANDLER( keyboard_r )
+READ8_MEMBER(mjkjidai_state::keyboard_r)
 {
-	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "PL2_1", "PL2_2", "PL2_3", "PL2_4", "PL2_5", "PL2_6", "PL1_1", "PL1_2", "PL1_3", "PL1_4", "PL1_5", "PL1_6" };
 
-//  logerror("%04x: keyboard_r\n", cpu_get_pc(&space->device()));
+//  logerror("%04x: keyboard_r\n", cpu_get_pc(&space.device()));
 
 	for (i = 0; i < 12; i++)
 	{
-		if (~state->m_keyb & (1 << i))
+		if (~m_keyb & (1 << i))
 		{
-			res = input_port_read(space->machine(), keynames[i]) & 0x3f;
+			res = input_port_read(machine(), keynames[i]) & 0x3f;
 			break;
 		}
 	}
 
-	res |= (input_port_read(space->machine(), "IN3") & 0xc0);
+	res |= (input_port_read(machine(), "IN3") & 0xc0);
 
-	if (state->m_nvram_init_count)
+	if (m_nvram_init_count)
 	{
-		state->m_nvram_init_count--;
+		m_nvram_init_count--;
 		res &= 0xbf;
 	}
 
 	return res;
 }
 
-static WRITE8_HANDLER( keyboard_select_w )
+WRITE8_MEMBER(mjkjidai_state::keyboard_select_w)
 {
-	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 
-//  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(&space->device()),offset,data);
+//  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(&space.device()),offset,data);
 
 	switch (offset)
 	{
-		case 0: state->m_keyb = (state->m_keyb & 0xff00) | (data);      break;
-		case 1: state->m_keyb = (state->m_keyb & 0x00ff) | (data << 8); break;
+		case 0: m_keyb = (m_keyb & 0xff00) | (data);      break;
+		case 1: m_keyb = (m_keyb & 0x00ff) | (data << 8); break;
 	}
 }
 
@@ -183,10 +181,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8, mjkjidai_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(keyboard_r)
+	AM_RANGE(0x00, 0x00) AM_READ(keyboard_r)
 	AM_RANGE(0x01, 0x01) AM_READNOP	// ???
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x01, 0x02) AM_WRITE_LEGACY(keyboard_select_w)
+	AM_RANGE(0x01, 0x02) AM_WRITE(keyboard_select_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")

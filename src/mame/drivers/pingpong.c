@@ -12,9 +12,8 @@ Ping Pong (c) 1985 Konami
 
 
 
-static WRITE8_HANDLER( cashquiz_question_bank_high_w )
+WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_high_w)
 {
-	pingpong_state *state = space->machine().driver_data<pingpong_state>();
 	if( data != 0xff )
 	{
 		int i;
@@ -23,37 +22,35 @@ static WRITE8_HANDLER( cashquiz_question_bank_high_w )
 		{
 			if((~data & 0xff) == 1 << i)
 			{
-				state->m_question_addr_high = i*0x8000;
+				m_question_addr_high = i*0x8000;
 				return;
 			}
 		}
 	}
 }
 
-static WRITE8_HANDLER( cashquiz_question_bank_low_w )
+WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
 {
-	pingpong_state *state = space->machine().driver_data<pingpong_state>();
 	if(data >= 0x60 && data <= 0xdf)
 	{
 		static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 		const char *bank = bankname[data & 7];
-		int bankaddr = state->m_question_addr_high | ((data - 0x60) * 0x100);
-		UINT8 *questions = space->machine().region("user1")->base() + bankaddr;
-		memory_set_bankptr(space->machine(), bank,questions);
+		int bankaddr = m_question_addr_high | ((data - 0x60) * 0x100);
+		UINT8 *questions = machine().region("user1")->base() + bankaddr;
+		memory_set_bankptr(machine(), bank,questions);
 
 	}
 }
 
 
-static WRITE8_HANDLER( coin_w )
+WRITE8_MEMBER(pingpong_state::coin_w)
 {
-	pingpong_state *state = space->machine().driver_data<pingpong_state>();
 	/* bit 2 = irq enable, bit 3 = nmi enable */
-	state->m_intenable = data & 0x0c;
+	m_intenable = data & 0x0c;
 
 	/* bit 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0,data & 1);
-	coin_counter_w(space->machine(), 1,data & 2);
+	coin_counter_w(machine(), 0,data & 1);
+	coin_counter_w(machine(), 1,data & 2);
 
 	/* other bits unknown */
 }
@@ -99,7 +96,7 @@ static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0xa880, 0xa880) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa900, 0xa900) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa980, 0xa980) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(coin_w)	/* coin counters + irq enables */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* coin counters + irq enables */
 	AM_RANGE(0xa200, 0xa200) AM_WRITENOP		/* SN76496 data latch */
 	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* trigger read */
 	AM_RANGE(0xa600, 0xa600) AM_WRITE_LEGACY(watchdog_reset_w)
@@ -116,7 +113,7 @@ static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0x9000, 0x9002) AM_RAM
 	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(coin_w)	/* irq enables */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* irq enables */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("IN1")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN2")
@@ -586,8 +583,9 @@ static DRIVER_INIT( cashquiz )
 		ROM[i] = BITSWAP8(ROM[i],0,1,2,3,4,5,6,7);
 
 	/* questions banking handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4000, 0x4000, FUNC(cashquiz_question_bank_high_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4001, 0x4001, FUNC(cashquiz_question_bank_low_w));
+	pingpong_state *state = machine.driver_data<pingpong_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4000, 0x4000, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_high_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4001, 0x4001, write8_delegate(FUNC(pingpong_state::cashquiz_question_bank_low_w),state));
 
 	// 8 independents banks for questions
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x50ff, "bank1");

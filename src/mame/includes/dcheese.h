@@ -30,6 +30,12 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_bsmt;
+	DECLARE_WRITE16_MEMBER(eeprom_control_w);
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_READ8_MEMBER(sound_command_r);
+	DECLARE_READ8_MEMBER(sound_status_r);
+	DECLARE_WRITE8_MEMBER(sound_control_w);
+	DECLARE_WRITE8_MEMBER(bsmt_data_w);
 };
 
 

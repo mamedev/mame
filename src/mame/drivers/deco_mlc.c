@@ -107,23 +107,23 @@
 
 /***************************************************************************/
 
-static READ32_HANDLER(test2_r)
+READ32_MEMBER(deco_mlc_state::test2_r)
 {
 //  if (offset==0)
-//      return input_port_read(space->machine(), "IN0"); //0xffffffff;
-//   logerror("%08x:  Test2_r %d\n",cpu_get_pc(&space->device()),offset);
-	return space->machine().rand(); //0xffffffff;
+//      return input_port_read(machine(), "IN0"); //0xffffffff;
+//   logerror("%08x:  Test2_r %d\n",cpu_get_pc(&space.device()),offset);
+	return machine().rand(); //0xffffffff;
 }
 
-static READ32_HANDLER(test3_r)
+READ32_MEMBER(deco_mlc_state::test3_r)
 {
 /*
     test3 7 - vbl loop on 0x10 0000 at end of IRQ
 
 */
 //if (offset==0)
-//  return space->machine().rand()|(space->machine().rand()<<16);
-//  logerror("%08x:  Test3_r %d\n",cpu_get_pc(&space->device()),offset);
+//  return machine().rand()|(machine().rand()<<16);
+//  logerror("%08x:  Test3_r %d\n",cpu_get_pc(&space.device()),offset);
 	return 0xffffffff;
 }
 
@@ -145,26 +145,25 @@ static WRITE32_DEVICE_HANDLER( avengrs_eprom_w )
 		logerror("%s:  eprom_w %08x mask %08x\n",device->machine().describe_context(),data,mem_mask);
 }
 
-static WRITE32_HANDLER( avengrs_palette_w )
+WRITE32_MEMBER(deco_mlc_state::avengrs_palette_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
 	/* x bbbbb ggggg rrrrr */
-	palette_set_color_rgb(space->machine(),offset,pal5bit(space->machine().generic.paletteram.u32[offset] >> 0),pal5bit(space->machine().generic.paletteram.u32[offset] >> 5),pal5bit(space->machine().generic.paletteram.u32[offset] >> 10));
+	palette_set_color_rgb(machine(),offset,pal5bit(machine().generic.paletteram.u32[offset] >> 0),pal5bit(machine().generic.paletteram.u32[offset] >> 5),pal5bit(machine().generic.paletteram.u32[offset] >> 10));
 }
 
-static READ32_HANDLER( decomlc_vbl_r )
+READ32_MEMBER(deco_mlc_state::decomlc_vbl_r)
 {
-	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
-	state->m_vbl_i ^=0xffffffff;
-//logerror("vbl r %08x\n", cpu_get_pc(&space->device()));
+	m_vbl_i ^=0xffffffff;
+//logerror("vbl r %08x\n", cpu_get_pc(&space.device()));
 	// Todo: Vblank probably in $10
-	return state->m_vbl_i;
+	return m_vbl_i;
 }
 
-static READ32_HANDLER( mlc_scanline_r )
+READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
 {
-//  logerror("read scanline counter (%d)\n", space->machine().primary_screen->vpos());
-	return space->machine().primary_screen->vpos();
+//  logerror("read scanline counter (%d)\n", machine().primary_screen->vpos());
+	return machine().primary_screen->vpos();
 }
 
 static TIMER_DEVICE_CALLBACK( interrupt_gen )
@@ -174,20 +173,19 @@ static TIMER_DEVICE_CALLBACK( interrupt_gen )
 	cputag_set_input_line(timer.machine(), "maincpu", state->m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
-static WRITE32_HANDLER( mlc_irq_w )
+WRITE32_MEMBER(deco_mlc_state::mlc_irq_w)
 {
-	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
-	int scanline=space->machine().primary_screen->vpos();
-	state->m_irq_ram[offset]=data&0xffff;
+	int scanline=machine().primary_screen->vpos();
+	m_irq_ram[offset]=data&0xffff;
 
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cputag_set_input_line(space->machine(), "maincpu", state->m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", m_mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 	case 0x14: /* Prepare scanline interrupt */
-		state->m_raster_irq_timer->adjust(space->machine().primary_screen->time_until_pos(state->m_irq_ram[0x14/4]));
-		//logerror("prepare scanline to fire at %d (currently on %d)\n", state->m_irq_ram[0x14/4], space->machine().primary_screen->vpos());
+		m_raster_irq_timer->adjust(machine().primary_screen->time_until_pos(m_irq_ram[0x14/4]));
+		//logerror("prepare scanline to fire at %d (currently on %d)\n", m_irq_ram[0x14/4], machine().primary_screen->vpos());
 		return;
 	case 0x18:
 	case 0x1c:
@@ -201,17 +199,17 @@ static WRITE32_HANDLER( mlc_irq_w )
 		if (scanline > 255)
 			scanline = 255;
 		/* Update scanlines up to present line */
-		while (state->m_lastScanline[offset-6]<scanline)
+		while (m_lastScanline[offset-6]<scanline)
 		{
-			state->m_mlc_raster_table[offset-6][state->m_lastScanline[offset-6]+1]=state->m_mlc_raster_table[offset-6][state->m_lastScanline[offset-6]];
-			state->m_lastScanline[offset-6]++;
+			m_mlc_raster_table[offset-6][m_lastScanline[offset-6]+1]=m_mlc_raster_table[offset-6][m_lastScanline[offset-6]];
+			m_lastScanline[offset-6]++;
 		}
 
-		if (state->m_lastScanline[offset-6] > scanline)
-			state->m_lastScanline[offset-6]=0;
+		if (m_lastScanline[offset-6] > scanline)
+			m_lastScanline[offset-6]=0;
 
 		/* Set current scanline value */
-		state->m_mlc_raster_table[offset-6][scanline]=data&0xffff;
+		m_mlc_raster_table[offset-6][scanline]=data&0xffff;
 		break;
 
 	default:
@@ -221,19 +219,17 @@ static WRITE32_HANDLER( mlc_irq_w )
 //  logerror("irqw %04x %04x (%d)\n", offset * 4, data&0xffff, scanline);
 }
 
-static READ32_HANDLER(mlc_spriteram_r)
+READ32_MEMBER(deco_mlc_state::mlc_spriteram_r)
 {
-	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
-	return state->m_spriteram[offset]&0xffff;
+	return m_spriteram[offset]&0xffff;
 }
 
-static READ32_HANDLER(mlc_vram_r)
+READ32_MEMBER(deco_mlc_state::mlc_vram_r)
 {
-	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
-	return state->m_mlc_vram[offset]&0xffff;
+	return m_mlc_vram[offset]&0xffff;
 }
 
-static READ32_HANDLER(stadhr96_prot_146_r)
+READ32_MEMBER(deco_mlc_state::stadhr96_prot_146_r)
 {
 	/*
         cpu #0 (PC=00041BD0): unmapped program memory dword write to 00708004 = 000F0000 & FFFFFFFF
@@ -244,7 +240,7 @@ static READ32_HANDLER(stadhr96_prot_146_r)
     */
 	offset<<=1;
 
-	logerror("%08x:  Read prot %04x\n", cpu_get_pc(&space->device()), offset);
+	logerror("%08x:  Read prot %04x\n", cpu_get_pc(&space.device()), offset);
 
 	if (offset==0x5c4)
 		return 0xaa55 << 16;
@@ -264,20 +260,20 @@ static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM AM_MIRROR(0xff000000)
 	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_BASE(m_mlc_ram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x020000f) AM_READNOP AM_MIRROR(0xff000000)/* IRQ control? */
-	AM_RANGE(0x0200070, 0x0200073) AM_READ_LEGACY(decomlc_vbl_r) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200074, 0x0200077) AM_READ_LEGACY(mlc_scanline_r) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200078, 0x020007f) AM_READ_LEGACY(test2_r)	AM_MIRROR(0xff000000)
-	AM_RANGE(0x0200000, 0x020007f) AM_WRITE_LEGACY(mlc_irq_w) AM_BASE(m_irq_ram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200070, 0x0200073) AM_READ(decomlc_vbl_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200078, 0x020007f) AM_READ(test2_r)	AM_MIRROR(0xff000000)
+	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_BASE(m_irq_ram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_BASE(m_mlc_clip_ram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0204000, 0x0206fff) AM_RAM_READ_LEGACY(mlc_spriteram_r) AM_BASE_SIZE(m_spriteram, m_spriteram_size) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0280000, 0x029ffff) AM_RAM_READ_LEGACY(mlc_vram_r) AM_BASE(m_mlc_vram) AM_MIRROR(0xff000000)
-	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE_LEGACY(avengrs_palette_w) AM_BASE_GENERIC(paletteram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0204000, 0x0206fff) AM_RAM_READ(mlc_spriteram_r) AM_BASE_SIZE(m_spriteram, m_spriteram_size) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0280000, 0x029ffff) AM_RAM_READ(mlc_vram_r) AM_BASE(m_mlc_vram) AM_MIRROR(0xff000000)
+	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_BASE_GENERIC(paletteram) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS") AM_MIRROR(0xff000000)
-	AM_RANGE(0x0440000, 0x044001f) AM_READ_LEGACY(test3_r)	AM_MIRROR(0xff000000)
+	AM_RANGE(0x0440000, 0x044001f) AM_READ(test3_r)	AM_MIRROR(0xff000000)
 	AM_RANGE(0x044001c, 0x044001f) AM_WRITENOP AM_MIRROR(0xff000000)
 	AM_RANGE(0x0500000, 0x0500003) AM_DEVWRITE_LEGACY("eeprom", avengrs_eprom_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xff000000) AM_MIRROR(0xff000000)
-	AM_RANGE(0x070f000, 0x070ffff) AM_READ_LEGACY(stadhr96_prot_146_r) AM_MIRROR(0xff000000)
+	AM_RANGE(0x070f000, 0x070ffff) AM_READ(stadhr96_prot_146_r) AM_MIRROR(0xff000000)
 //  AM_RANGE(0x070f000, 0x070ffff) AM_READ_LEGACY(stadhr96_prot_146_w) AM_BASE_LEGACY(&deco32_prot_ram)
 ADDRESS_MAP_END
 
@@ -722,13 +718,12 @@ static void descramble_sound( running_machine &machine )
 	auto_free (machine, buf1);
 }
 
-static READ32_HANDLER( avengrgs_speedup_r )
+READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 {
-	deco_mlc_state *state = space->machine().driver_data<deco_mlc_state>();
-	UINT32 a=state->m_mlc_ram[0x89a0/4];
-	UINT32 p=cpu_get_pc(&space->device());
+	UINT32 a=m_mlc_ram[0x89a0/4];
+	UINT32 p=cpu_get_pc(&space.device());
 
-	if ((p==0x3234 || p==0x32dc) && (a&1)) device_spin_until_interrupt(&space->device());
+	if ((p==0x3234 || p==0x32dc) && (a&1)) device_spin_until_interrupt(&space.device());
 
 	return a;
 }
@@ -744,7 +739,7 @@ static DRIVER_INIT( avengrgs )
 	sh2drc_add_pcflush(machine.device("maincpu"), 0x32dc);
 
 	state->m_mainCpuIsArm = 0;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x01089a0, 0x01089a3, FUNC(avengrgs_speedup_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x01089a0, 0x01089a3, read32_delegate(FUNC(deco_mlc_state::avengrgs_speedup_r),state));
 	descramble_sound(machine);
 }
 

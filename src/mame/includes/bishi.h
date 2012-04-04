@@ -31,6 +31,11 @@ public:
 	device_t *m_k056832;
 	device_t *m_k054338;
 	device_t *m_k055555;
+	DECLARE_READ16_MEMBER(control_r);
+	DECLARE_WRITE16_MEMBER(control_w);
+	DECLARE_WRITE16_MEMBER(control2_w);
+	DECLARE_READ16_MEMBER(bishi_mirror_r);
+	DECLARE_READ16_MEMBER(bishi_K056832_rom_r);
 };
 
 /*----------- defined in video/bishi.c -----------*/

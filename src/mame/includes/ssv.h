@@ -49,6 +49,41 @@ public:
 
 	UINT8 m_trackball_select;
 	UINT8 m_gfxrom_select;
+	DECLARE_WRITE16_MEMBER(ssv_irq_ack_w);
+	DECLARE_WRITE16_MEMBER(ssv_irq_enable_w);
+	DECLARE_WRITE16_MEMBER(ssv_lockout_w);
+	DECLARE_WRITE16_MEMBER(ssv_lockout_inv_w);
+	DECLARE_READ16_MEMBER(dsp_dr_r);
+	DECLARE_WRITE16_MEMBER(dsp_dr_w);
+	DECLARE_READ16_MEMBER(dsp_r);
+	DECLARE_WRITE16_MEMBER(dsp_w);
+	DECLARE_READ16_MEMBER(fake_r);
+	DECLARE_READ16_MEMBER(drifto94_rand_r);
+	DECLARE_READ16_MEMBER(gdfs_gfxram_r);
+	DECLARE_WRITE16_MEMBER(gdfs_gfxram_w);
+	DECLARE_READ16_MEMBER(gdfs_blitram_r);
+	DECLARE_WRITE16_MEMBER(gdfs_blitram_w);
+	DECLARE_READ16_MEMBER(hypreact_input_r);
+	DECLARE_READ16_MEMBER(ssv_mainram_r);
+	DECLARE_WRITE16_MEMBER(ssv_mainram_w);
+	DECLARE_READ16_MEMBER(srmp4_input_r);
+	DECLARE_READ16_MEMBER(srmp7_irqv_r);
+	DECLARE_WRITE16_MEMBER(srmp7_sound_bank_w);
+	DECLARE_READ16_MEMBER(srmp7_input_r);
+	DECLARE_READ16_MEMBER(sxyreact_ballswitch_r);
+	DECLARE_READ16_MEMBER(sxyreact_dial_r);
+	DECLARE_WRITE16_MEMBER(sxyreact_dial_w);
+	DECLARE_WRITE16_MEMBER(sxyreact_motor_w);
+	DECLARE_READ32_MEMBER(latch32_r);
+	DECLARE_WRITE32_MEMBER(latch32_w);
+	DECLARE_READ16_MEMBER(latch16_r);
+	DECLARE_WRITE16_MEMBER(latch16_w);
+	DECLARE_READ16_MEMBER(eaglshot_gfxrom_r);
+	DECLARE_WRITE16_MEMBER(eaglshot_gfxrom_w);
+	DECLARE_READ16_MEMBER(eaglshot_trackball_r);
+	DECLARE_WRITE16_MEMBER(eaglshot_trackball_w);
+	DECLARE_READ16_MEMBER(eaglshot_gfxram_r);
+	DECLARE_WRITE16_MEMBER(eaglshot_gfxram_w);
 };
 
 /*----------- defined in video/ssv.c -----------*/

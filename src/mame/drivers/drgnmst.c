@@ -41,87 +41,80 @@ Notes:
 #include "includes/drgnmst.h"
 
 
-static WRITE16_HANDLER( drgnmst_coin_w )
+WRITE16_MEMBER(drgnmst_state::drgnmst_coin_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x100);
-	coin_lockout_w(space->machine(), 0, ~data & 0x400);
-	coin_lockout_w(space->machine(), 1, ~data & 0x800);
+	coin_counter_w(machine(), 0, data & 0x100);
+	coin_lockout_w(machine(), 0, ~data & 0x400);
+	coin_lockout_w(machine(), 1, ~data & 0x800);
 }
 
-static WRITE16_HANDLER( drgnmst_snd_command_w )
+WRITE16_MEMBER(drgnmst_state::drgnmst_snd_command_w)
 {
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_snd_command = (data & 0xff);
-		device_yield(&space->device());
+		m_snd_command = (data & 0xff);
+		device_yield(&space.device());
 	}
 }
 
-static WRITE16_HANDLER( drgnmst_snd_flag_w )
+WRITE16_MEMBER(drgnmst_state::drgnmst_snd_flag_w)
 {
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
 
 	/* Enables the following 68K write operation to latch through to the PIC */
 	if (ACCESSING_BITS_0_7)
-		state->m_snd_flag = 1;
+		m_snd_flag = 1;
 }
 
 
-static READ8_HANDLER( pic16c5x_port0_r )
+READ8_MEMBER(drgnmst_state::pic16c5x_port0_r)
 {
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
-	return state->m_pic16c5x_port0;
+	return m_pic16c5x_port0;
 }
 
-static READ8_HANDLER( drgnmst_snd_command_r )
+READ8_MEMBER(drgnmst_state::drgnmst_snd_command_r)
 {
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
 	int data = 0;
 
-	switch (state->m_oki_control & 0x1f)
+	switch (m_oki_control & 0x1f)
 	{
-		case 0x12:	data = (state->m_oki_2->read(*space, 0) & 0x0f); break;
-		case 0x16:	data = (state->m_oki_1->read(*space, 0) & 0x0f); break;
+		case 0x12:	data = (m_oki_2->read(*&space, 0) & 0x0f); break;
+		case 0x16:	data = (m_oki_1->read(*&space, 0) & 0x0f); break;
 		case 0x0b:
-		case 0x0f:	data = state->m_snd_command; break;
+		case 0x0f:	data = m_snd_command; break;
 		default:	break;
 	}
 
 	return data;
 }
 
-static READ8_HANDLER( drgnmst_snd_flag_r )
+READ8_MEMBER(drgnmst_state::drgnmst_snd_flag_r)
 {
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
-	if (state->m_snd_flag)
+	if (m_snd_flag)
 	{
-		state->m_snd_flag = 0;
+		m_snd_flag = 0;
 		return 0x40;
 	}
 
 	return 0x00;
 }
 
-static WRITE8_HANDLER( drgnmst_pcm_banksel_w )
+WRITE8_MEMBER(drgnmst_state::drgnmst_pcm_banksel_w)
 {
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
 	/*  This is a 4 bit port.
         Each pair of bits is used in part of the OKI PCM ROM bank selectors.
         See the Port 2 write handler below (drgnmst_snd_control_w) for details.
     */
 
-	state->m_pic16c5x_port0 = data;
+	m_pic16c5x_port0 = data;
 }
 
-static WRITE8_HANDLER( drgnmst_oki_w )
+WRITE8_MEMBER(drgnmst_state::drgnmst_oki_w)
 {
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
-	state->m_oki_command = data;
+	m_oki_command = data;
 }
 
-static WRITE8_HANDLER( drgnmst_snd_control_w )
+WRITE8_MEMBER(drgnmst_state::drgnmst_snd_control_w)
 {
 	/*  This port controls communications to and from the 68K, both OKI
         devices, and part of the OKI PCM ROM bank selection.
@@ -146,45 +139,44 @@ static WRITE8_HANDLER( drgnmst_snd_control_w )
         The OKI0 banks are pre-configured below in the driver init.
     */
 
-	drgnmst_state *state = space->machine().driver_data<drgnmst_state>();
 	int oki_new_bank;
-	state->m_oki_control = data;
+	m_oki_control = data;
 
 
-	oki_new_bank = ((state->m_pic16c5x_port0 & 0xc) >> 2) | ((state->m_oki_control & 0x80) >> 5);
-	if (oki_new_bank != state->m_oki0_bank)
+	oki_new_bank = ((m_pic16c5x_port0 & 0xc) >> 2) | ((m_oki_control & 0x80) >> 5);
+	if (oki_new_bank != m_oki0_bank)
 	{
-		state->m_oki0_bank = oki_new_bank;
-		if (state->m_oki0_bank)
+		m_oki0_bank = oki_new_bank;
+		if (m_oki0_bank)
 			oki_new_bank--;
-		state->m_oki_1->set_bank_base(oki_new_bank * 0x40000);
+		m_oki_1->set_bank_base(oki_new_bank * 0x40000);
 	}
 
-	oki_new_bank = ((state->m_pic16c5x_port0 & 0x3) >> 0) | ((state->m_oki_control & 0x20) >> 3);
-	if (oki_new_bank != state->m_oki1_bank)
+	oki_new_bank = ((m_pic16c5x_port0 & 0x3) >> 0) | ((m_oki_control & 0x20) >> 3);
+	if (oki_new_bank != m_oki1_bank)
 	{
-		state->m_oki1_bank = oki_new_bank;
-		state->m_oki_2->set_bank_base(oki_new_bank * 0x40000);
+		m_oki1_bank = oki_new_bank;
+		m_oki_2->set_bank_base(oki_new_bank * 0x40000);
 	}
 
-	switch (state->m_oki_control & 0x1f)
+	switch (m_oki_control & 0x1f)
 	{
 		case 0x11:
-//                  logerror("Writing %02x to OKI1", state->m_oki_command);
-//                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", state->m_oki_control, state->m_snd_command, state->m_oki0_bank, state->m_oki1_bank);
-					state->m_oki_2->write(*space, 0, state->m_oki_command);
+//                  logerror("Writing %02x to OKI1", m_oki_command);
+//                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki0_bank, m_oki1_bank);
+					m_oki_2->write(*&space, 0, m_oki_command);
 					break;
 		case 0x15:
-//                  logerror("Writing %02x to OKI0", state->m_oki_command);
-//                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", state->m_oki_control, state->m_snd_command, state->m_oki0_bank, state->m_oki1_bank);
-					state->m_oki_1->write(*space, 0, state->m_oki_command);
+//                  logerror("Writing %02x to OKI0", m_oki_command);
+//                  logerror(", PortC=%02x, Code=%02x, Bank0=%01x, Bank1=%01x\n", m_oki_control, m_snd_command, m_oki0_bank, m_oki1_bank);
+					m_oki_1->write(*&space, 0, m_oki_command);
 					break;
 		default:	break;
 	}
 }
 
 
-static READ8_HANDLER( PIC16C5X_T0_clk_r )
+READ8_MEMBER(drgnmst_state::PIC16C5X_T0_clk_r)
 {
 	return 0;
 }
@@ -198,14 +190,14 @@ static ADDRESS_MAP_START( drgnmst_main_map, AS_PROGRAM, 16, drgnmst_state )
 	AM_RANGE(0x800018, 0x800019) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80001a, 0x80001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x80001c, 0x80001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x800030, 0x800031) AM_WRITE_LEGACY(drgnmst_coin_w)
+	AM_RANGE(0x800030, 0x800031) AM_WRITE(drgnmst_coin_w)
 	AM_RANGE(0x800100, 0x80011f) AM_WRITEONLY AM_BASE(m_vidregs)
 	AM_RANGE(0x800120, 0x800121) AM_WRITENOP
 	AM_RANGE(0x80014a, 0x80014b) AM_WRITENOP
 	AM_RANGE(0x800154, 0x800155) AM_WRITEONLY AM_BASE(m_vidregs2) // seems to be priority control
 	AM_RANGE(0x800176, 0x800177) AM_READ_PORT("EXTRA")
-	AM_RANGE(0x800180, 0x800181) AM_WRITE_LEGACY(drgnmst_snd_command_w)
-	AM_RANGE(0x800188, 0x800189) AM_WRITE_LEGACY(drgnmst_snd_flag_w)
+	AM_RANGE(0x800180, 0x800181) AM_WRITE(drgnmst_snd_command_w)
+	AM_RANGE(0x800188, 0x800189) AM_WRITE(drgnmst_snd_flag_w)
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE_LEGACY(drgnmst_md_videoram_w) AM_BASE(m_md_videoram)
@@ -224,10 +216,10 @@ ADDRESS_MAP_END
 	/* $000 - 01F  PIC16C55 Internal Data RAM */
 
 static ADDRESS_MAP_START( drgnmst_sound_io_map, AS_IO, 8, drgnmst_state )
-	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(pic16c5x_port0_r, drgnmst_pcm_banksel_w)	/* 4 bit port */
-	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(drgnmst_snd_command_r, drgnmst_oki_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(drgnmst_snd_flag_r, drgnmst_snd_control_w)
-	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ_LEGACY(PIC16C5X_T0_clk_r)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(pic16c5x_port0_r, drgnmst_pcm_banksel_w)	/* 4 bit port */
+	AM_RANGE(0x01, 0x01) AM_READWRITE(drgnmst_snd_command_r, drgnmst_oki_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(drgnmst_snd_flag_r, drgnmst_snd_control_w)
+	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 
 

@@ -27,84 +27,76 @@
 #include "includes/konamipt.h"
 #include "includes/gradius3.h"
 
-static READ16_HANDLER( k052109_halfword_r )
+READ16_MEMBER(gradius3_state::k052109_halfword_r)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
-	return k052109_r(state->m_k052109, offset);
+	return k052109_r(m_k052109, offset);
 }
 
-static WRITE16_HANDLER( k052109_halfword_w )
+WRITE16_MEMBER(gradius3_state::k052109_halfword_w)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
 
 	if (ACCESSING_BITS_0_7)
-		k052109_w(state->m_k052109, offset, data & 0xff);
+		k052109_w(m_k052109, offset, data & 0xff);
 
 	/* is this a bug in the game or something else? */
 	if (!ACCESSING_BITS_0_7)
-		k052109_w(state->m_k052109, offset, (data >> 8) & 0xff);
-//      logerror("%06x half %04x = %04x\n",cpu_get_pc(&space->device()),offset,data);
+		k052109_w(m_k052109, offset, (data >> 8) & 0xff);
+//      logerror("%06x half %04x = %04x\n",cpu_get_pc(&space.device()),offset,data);
 }
 
-static READ16_HANDLER( k051937_halfword_r )
+READ16_MEMBER(gradius3_state::k051937_halfword_r)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
-	return k051937_r(state->m_k051960, offset);
+	return k051937_r(m_k051960, offset);
 }
 
-static WRITE16_HANDLER( k051937_halfword_w )
+WRITE16_MEMBER(gradius3_state::k051937_halfword_w)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
 
 	if (ACCESSING_BITS_0_7)
-		k051937_w(state->m_k051960, offset, data & 0xff);
+		k051937_w(m_k051960, offset, data & 0xff);
 }
 
-static READ16_HANDLER( k051960_halfword_r )
+READ16_MEMBER(gradius3_state::k051960_halfword_r)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
-	return k051960_r(state->m_k051960, offset);
+	return k051960_r(m_k051960, offset);
 }
 
-static WRITE16_HANDLER( k051960_halfword_w )
+WRITE16_MEMBER(gradius3_state::k051960_halfword_w)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
 	if (ACCESSING_BITS_0_7)
-		k051960_w(state->m_k051960, offset, data & 0xff);
+		k051960_w(m_k051960, offset, data & 0xff);
 }
 
-static WRITE16_HANDLER( cpuA_ctrl_w )
+WRITE16_MEMBER(gradius3_state::cpuA_ctrl_w)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
 
 		/* bits 0-1 are coin counters */
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1, data & 0x02);
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);
 
 		/* bit 2 selects layer priority */
-		state->m_priority = data & 0x04;
+		m_priority = data & 0x04;
 
 		/* bit 3 enables cpu B */
-		device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(m_subcpu, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 5 enables irq */
-		state->m_irqAen = data & 0x20;
+		m_irqAen = data & 0x20;
 
 		/* other bits unknown */
-	//logerror("%06x: write %04x to c0000\n",cpu_get_pc(&space->device()),data);
+	//logerror("%06x: write %04x to c0000\n",cpu_get_pc(&space.device()),data);
 	}
 }
 
-static WRITE16_HANDLER( cpuB_irqenable_w )
+WRITE16_MEMBER(gradius3_state::cpuB_irqenable_w)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
 
 	if (ACCESSING_BITS_8_15)
-		state->m_irqBmask = (data >> 8) & 0x07;
+		m_irqBmask = (data >> 8) & 0x07;
 }
 
 static INTERRUPT_GEN( cpuA_interrupt )
@@ -127,29 +119,27 @@ static TIMER_DEVICE_CALLBACK( gradius3_sub_scanline )
 		cputag_set_input_line(timer.machine(), "sub", 2, HOLD_LINE);
 }
 
-static WRITE16_HANDLER( cpuB_irqtrigger_w )
+WRITE16_MEMBER(gradius3_state::cpuB_irqtrigger_w)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
 
-	if (state->m_irqBmask & 4)
+	if (m_irqBmask & 4)
 	{
-		logerror("%04x trigger cpu B irq 4 %02x\n",cpu_get_pc(&space->device()),data);
-		device_set_input_line(state->m_subcpu, 4, HOLD_LINE);
+		logerror("%04x trigger cpu B irq 4 %02x\n",cpu_get_pc(&space.device()),data);
+		device_set_input_line(m_subcpu, 4, HOLD_LINE);
 	}
 	else
-		logerror("%04x MISSED cpu B irq 4 %02x\n",cpu_get_pc(&space->device()),data);
+		logerror("%04x MISSED cpu B irq 4 %02x\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(gradius3_state::sound_command_w)
 {
 	if (ACCESSING_BITS_8_15)
 		soundlatch_w(space, 0, (data >> 8) & 0xff);
 }
 
-static WRITE16_HANDLER( sound_irq_w )
+WRITE16_MEMBER(gradius3_state::sound_irq_w)
 {
-	gradius3_state *state = space->machine().driver_data<gradius3_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bank_w )
@@ -168,19 +158,19 @@ static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(cpuA_ctrl_w)	/* halt cpu B, irq enable, priority, coin counters, other? */
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, irq enable, priority, coin counters, other? */
 	AM_RANGE(0x0c8000, 0x0c8001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c8002, 0x0c8003) AM_READ_PORT("P1")
 	AM_RANGE(0x0c8004, 0x0c8005) AM_READ_PORT("P2")
 	AM_RANGE(0x0c8006, 0x0c8007) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0d0000, 0x0d0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0d0002, 0x0d0003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0d8000, 0x0d8001) AM_WRITE_LEGACY(cpuB_irqtrigger_w)
+	AM_RANGE(0x0d8000, 0x0d8001) AM_WRITE(cpuB_irqtrigger_w)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE_LEGACY(watchdog_reset16_w)
-	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE_LEGACY(sound_command_w)
-	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE_LEGACY(sound_irq_w)
+	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE(sound_command_w)
+	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x14c000, 0x153fff) AM_READWRITE_LEGACY(k052109_halfword_r, k052109_halfword_w)
+	AM_RANGE(0x14c000, 0x153fff) AM_READWRITE(k052109_halfword_r, k052109_halfword_w)
 	AM_RANGE(0x180000, 0x19ffff) AM_RAM_WRITE_LEGACY(gradius3_gfxram_w) AM_BASE(m_gfxram) AM_SHARE("share2")
 ADDRESS_MAP_END
 
@@ -188,12 +178,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gradius3_map2, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x140000, 0x140001) AM_WRITE_LEGACY(cpuB_irqenable_w)
+	AM_RANGE(0x140000, 0x140001) AM_WRITE(cpuB_irqenable_w)
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x24c000, 0x253fff) AM_READWRITE_LEGACY(k052109_halfword_r, k052109_halfword_w)
+	AM_RANGE(0x24c000, 0x253fff) AM_READWRITE(k052109_halfword_r, k052109_halfword_w)
 	AM_RANGE(0x280000, 0x29ffff) AM_RAM_WRITE_LEGACY(gradius3_gfxram_w) AM_SHARE("share2")
-	AM_RANGE(0x2c0000, 0x2c000f) AM_READWRITE_LEGACY(k051937_halfword_r, k051937_halfword_w)
-	AM_RANGE(0x2c0800, 0x2c0fff) AM_READWRITE_LEGACY(k051960_halfword_r, k051960_halfword_w)
+	AM_RANGE(0x2c0000, 0x2c000f) AM_READWRITE(k051937_halfword_r, k051937_halfword_w)
+	AM_RANGE(0x2c0800, 0x2c0fff) AM_READWRITE(k051960_halfword_r, k051960_halfword_w)
 	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(gradius3_gfxrom_r)		/* gfx ROMs are mapped here, and copied to RAM */
 ADDRESS_MAP_END
 

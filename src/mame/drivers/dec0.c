@@ -173,54 +173,54 @@ Notes:
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( dec0_control_w )
+WRITE16_MEMBER(dec0_state::dec0_control_w)
 {
 	switch (offset << 1)
 	{
 		case 0: /* Playfield & Sprite priority */
-			dec0_priority_w(space, 0, data, mem_mask);
+			dec0_priority_w(&space, 0, data, mem_mask);
 			break;
 
 		case 2: /* DMA flag */
-			dec0_update_sprites_w(space, 0, 0, mem_mask);
+			dec0_update_sprites_w(&space, 0, 0, mem_mask);
 			break;
 
 		case 4: /* 6502 sound cpu */
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_w(space, 0, data & 0xff);
-				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 
 		case 6: /* Intel 8751 microcontroller - Bad Dudes, Heavy Barrel, Birdy Try only */
-			dec0_i8751_write(space->machine(), data);
+			dec0_i8751_write(machine(), data);
 			break;
 
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
-			cputag_set_input_line(space->machine(), "maincpu", 6, CLEAR_LINE);
+			cputag_set_input_line(machine(), "maincpu", 6, CLEAR_LINE);
 			break;
 
 		case 0xa: /* Mix Psel(?). */
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+(offset<<1));
 			break;
 
 		case 0xc: /* Cblk - coin blockout.  Seems to be unused by the games */
 			break;
 
 		case 0xe: /* Reset Intel 8751? - not sure, all the games write here at startup */
-			dec0_i8751_reset(space->machine());
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
+			dec0_i8751_reset(machine());
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+(offset<<1));
 			break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+(offset<<1));
 			break;
 	}
 }
 
 
-static WRITE16_HANDLER( automat_control_w )
+WRITE16_MEMBER(dec0_state::automat_control_w)
 {
 	switch (offset << 1)
 	{
@@ -228,19 +228,19 @@ static WRITE16_HANDLER( automat_control_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_w(space, 0, data & 0xff);
-				cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+				cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 			}
 			break;
 
 		case 12: /* DMA flag */
-			dec0_update_sprites_w(space, 0, 0, mem_mask);
+			dec0_update_sprites_w(&space, 0, 0, mem_mask);
 			break;
 #if 0
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
 			break;
 
 		case 0xa: /* Mix Psel(?). */
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+(offset<<1));
 			break;
 
 		case 0xc: /* Cblk - coin blockout.  Seems to be unused by the games */
@@ -248,12 +248,12 @@ static WRITE16_HANDLER( automat_control_w )
 #endif
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+(offset<<1));
 			break;
 	}
 }
 
-static WRITE16_HANDLER( slyspy_control_w )
+WRITE16_MEMBER(dec0_state::slyspy_control_w)
 {
     switch (offset << 1)
 	{
@@ -261,21 +261,21 @@ static WRITE16_HANDLER( slyspy_control_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_w(space, 0, data & 0xff);
-				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 		case 2:
-			dec0_priority_w(space, 0, data, mem_mask);
+			dec0_priority_w(&space, 0, data, mem_mask);
 			break;
     }
 }
 
-static WRITE16_HANDLER( midres_sound_w )
+WRITE16_MEMBER(dec0_state::midres_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16, dec0_state )
 
 	AM_RANGE(0x300000, 0x30001f) AM_READ_LEGACY(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ_LEGACY(dec0_controls_r)
-	AM_RANGE(0x30c010, 0x30c01f) AM_WRITE_LEGACY(dec0_control_w)									/* Priority, sound, etc. */
+	AM_RANGE(0x30c010, 0x30c01f) AM_WRITE(dec0_control_w)									/* Priority, sound, etc. */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE_LEGACY(dec0_paletteram_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM_WRITE_LEGACY(dec0_paletteram_b_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE(m_ram)									/* Main ram */
@@ -398,11 +398,10 @@ READ16_HANDLER( slyspy_protection_r )
 
 */
 
-static WRITE16_HANDLER( unmapped_w )
+WRITE16_MEMBER(dec0_state::unmapped_w)
 {
 	// fall through for unmapped protection areas
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	logerror("unmapped memory write to %04x = %04x in mode %d\n", 0x240000+offset*2, data, state->m_slyspy_state);
+	logerror("unmapped memory write to %04x = %04x in mode %d\n", 0x240000+offset*2, data, m_slyspy_state);
 }
 
 void slyspy_set_protection_map(running_machine& machine, int type);
@@ -426,12 +425,13 @@ READ16_HANDLER( slyspy_state_r )
 
 void slyspy_set_protection_map(running_machine& machine, int type)
 {
+	dec0_state *state = machine.driver_data<dec0_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	deco_bac06_device *tilegen1 = (deco_bac06_device*)space->machine().device<deco_bac06_device>("tilegen1");
 	deco_bac06_device *tilegen2 = (deco_bac06_device*)space->machine().device<deco_bac06_device>("tilegen2");
 
-	space->install_legacy_write_handler( 0x240000, 0x24ffff, FUNC(unmapped_w));
+	space->install_write_handler( 0x240000, 0x24ffff, write16_delegate(FUNC(dec0_state::unmapped_w),state));
 
 	space->install_legacy_write_handler( 0x24a000, 0x24a001, FUNC(slyspy_state_w));
 	space->install_legacy_read_handler( 0x244000, 0x244001, FUNC(slyspy_state_r));
@@ -510,7 +510,7 @@ static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE(m_ram)	/* Sly spy main ram */
 	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE(m_spriteram)	/* Sprites */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x314000, 0x314003) AM_WRITE_LEGACY(slyspy_control_w)
+	AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
 	AM_RANGE(0x314008, 0x31400f) AM_READ_LEGACY(slyspy_controls_r)
 	AM_RANGE(0x31c000, 0x31c00f) AM_READ_LEGACY(slyspy_protection_r) AM_WRITENOP
 ADDRESS_MAP_END
@@ -524,7 +524,7 @@ static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x160000, 0x160001) AM_WRITE_LEGACY(dec0_priority_w)
 	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(midres_controls_r)
 	AM_RANGE(0x180008, 0x18000f) AM_WRITENOP /* ?? watchdog ?? */
-	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE_LEGACY(midres_sound_w)
+	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(midres_sound_w)
 
 	AM_RANGE(0x200000, 0x200007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_0_w)
 	AM_RANGE(0x200010, 0x200017) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_1_w)
@@ -600,7 +600,7 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_state )
 //  AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 
 	AM_RANGE(0x314008, 0x31400f) AM_READ_LEGACY(slyspy_controls_r)
-//  AM_RANGE(0x314000, 0x314003) AM_WRITE_LEGACY(slyspy_control_w)
+//  AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
 
 	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_0_w)
 	AM_RANGE(0x300010, 0x300017) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_1_w)
@@ -637,7 +637,7 @@ static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_state )
 
 	AM_RANGE(0x300000, 0x30001f) AM_READ_LEGACY(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ_LEGACY(dec0_controls_r)
-	AM_RANGE(0x30c000, 0x30c01f) AM_WRITE_LEGACY(automat_control_w)			/* Priority, sound, etc. */
+	AM_RANGE(0x30c000, 0x30c01f) AM_WRITE(automat_control_w)			/* Priority, sound, etc. */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM
 	AM_RANGE(0x400008, 0x400009) AM_WRITE_LEGACY(dec0_priority_w)				// NEW
@@ -645,10 +645,9 @@ static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE(m_spriteram)			/* Sprites */
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( automat_adpcm_w )
+WRITE8_MEMBER(dec0_state::automat_adpcm_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->m_automat_adpcm_byte = data;
+	m_automat_adpcm_byte = data;
 }
 
 static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_state )
@@ -658,7 +657,7 @@ static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(soundlatch_r)
 //  AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(ym2203_control_port_1_w)
 //  AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(ym2203_write_port_1_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(automat_adpcm_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(automat_adpcm_w)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -3062,10 +3061,11 @@ static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 
 static DRIVER_INIT( midresb )
 {
+	dec0_state *state = machine.driver_data<dec0_state>();
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00180000, 0x0018000f, FUNC(dec0_controls_r) );
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001a0000, 0x001a000f, FUNC(dec0_rotary_r) );
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00180014, 0x00180015, FUNC(midres_sound_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),state));
 }
 
 /******************************************************************************/

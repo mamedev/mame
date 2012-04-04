@@ -34,6 +34,12 @@ public:
 
 	/* devices */
 	device_t *m_audio_cpu;
+	DECLARE_WRITE8_MEMBER(finalizr_coin_w);
+	DECLARE_WRITE8_MEMBER(finalizr_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(finalizr_i8039_irq_w);
+	DECLARE_WRITE8_MEMBER(i8039_irqen_w);
+	DECLARE_READ8_MEMBER(i8039_T1_r);
+	DECLARE_WRITE8_MEMBER(i8039_T0_w);
 };
 
 

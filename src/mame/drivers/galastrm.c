@@ -62,31 +62,28 @@ static TIMER_CALLBACK( galastrm_interrupt6 )
 
 
 
-static WRITE32_HANDLER( galastrm_palette_w )
+WRITE32_MEMBER(galastrm_state::galastrm_palette_w)
 {
-	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
-		state->m_tc0110pcr_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (state->m_tc0110pcr_addr < 4096))
-		palette_set_color_rgb(space->machine(), state->m_tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+		m_tc0110pcr_addr = data >> 16;
+	if ((ACCESSING_BITS_0_15) && (m_tc0110pcr_addr < 4096))
+		palette_set_color_rgb(machine(), m_tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-static WRITE32_HANDLER( galastrm_tc0610_0_w )
+WRITE32_MEMBER(galastrm_state::galastrm_tc0610_0_w)
 {
-	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
-		state->m_tc0610_0_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (state->m_tc0610_0_addr < 8))
-		state->m_tc0610_ctrl_reg[0][state->m_tc0610_0_addr] = data;
+		m_tc0610_0_addr = data >> 16;
+	if ((ACCESSING_BITS_0_15) && (m_tc0610_0_addr < 8))
+		m_tc0610_ctrl_reg[0][m_tc0610_0_addr] = data;
 }
 
-static WRITE32_HANDLER( galastrm_tc0610_1_w )
+WRITE32_MEMBER(galastrm_state::galastrm_tc0610_1_w)
 {
-	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 	if (ACCESSING_BITS_16_31)
-		state->m_tc0610_1_addr = data >> 16;
-	if ((ACCESSING_BITS_0_15) && (state->m_tc0610_1_addr < 8))
-		state->m_tc0610_ctrl_reg[1][state->m_tc0610_1_addr] = data;
+		m_tc0610_1_addr = data >> 16;
+	if ((ACCESSING_BITS_0_15) && (m_tc0610_1_addr < 8))
+		m_tc0610_ctrl_reg[1][m_tc0610_1_addr] = data;
 }
 
 
@@ -102,16 +99,15 @@ static CUSTOM_INPUT( coin_word_r )
 	return state->m_coin_word;
 }
 
-static WRITE32_HANDLER( galastrm_input_w )
+WRITE32_MEMBER(galastrm_state::galastrm_input_w)
 {
-	galastrm_state *state = space->machine().driver_data<galastrm_state>();
 
 #if 0
 {
 char t[64];
-COMBINE_DATA(&state->m_mem[offset]);
+COMBINE_DATA(&m_mem[offset]);
 
-sprintf(t,"%08x %08x",state->m_mem[0],state->m_mem[1]);
+sprintf(t,"%08x %08x",m_mem[0],m_mem[1]);
 popmessage(t);
 }
 #endif
@@ -122,12 +118,12 @@ popmessage(t);
 		{
 			if (ACCESSING_BITS_24_31)	/* $400000 is watchdog */
 			{
-				watchdog_reset(space->machine());
+				watchdog_reset(machine());
 			}
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+				eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 				eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom->write_bit(data & 0x40);
 				eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -140,32 +136,32 @@ popmessage(t);
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(space->machine(), 0, ~data & 0x01000000);
-				coin_lockout_w(space->machine(), 1, ~data & 0x02000000);
-				coin_counter_w(space->machine(), 0, data & 0x04000000);
-				coin_counter_w(space->machine(), 1, data & 0x04000000);
-				state->m_coin_word = (data >> 16) &0xffff;
+				coin_lockout_w(machine(), 0, ~data & 0x01000000);
+				coin_lockout_w(machine(), 1, ~data & 0x02000000);
+				coin_counter_w(machine(), 0, data & 0x04000000);
+				coin_counter_w(machine(), 1, data & 0x04000000);
+				m_coin_word = (data >> 16) &0xffff;
 			}
-//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(&space->device()),offset);
+//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(&device()),offset);
 		}
 	}
 }
 
-static READ32_HANDLER( galastrm_adstick_ctrl_r )
+READ32_MEMBER(galastrm_state::galastrm_adstick_ctrl_r)
 {
 	if (offset == 0x00)
 	{
 		if (ACCESSING_BITS_24_31)
-			return input_port_read(space->machine(), "STICKX") << 24;
+			return input_port_read(machine(), "STICKX") << 24;
 		if (ACCESSING_BITS_16_23)
-			return input_port_read(space->machine(), "STICKY") << 16;
+			return input_port_read(machine(), "STICKY") << 16;
 	}
 	return 0;
 }
 
-static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
+WRITE32_MEMBER(galastrm_state::galastrm_adstick_ctrl_w)
 {
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(1000), FUNC(galastrm_interrupt6));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), FUNC(galastrm_interrupt6));
 }
 
 /***********************************************************
@@ -178,15 +174,15 @@ static ADDRESS_MAP_START( galastrm_map, AS_PROGRAM, 32, galastrm_state )
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x400000, 0x400003) AM_READ_PORT("IN0")
 	AM_RANGE(0x400004, 0x400007) AM_READ_PORT("IN1")
-	AM_RANGE(0x400000, 0x400007) AM_WRITE_LEGACY(galastrm_input_w)									/* eerom etc. */
+	AM_RANGE(0x400000, 0x400007) AM_WRITE(galastrm_input_w)									/* eerom etc. */
 	AM_RANGE(0x40fff0, 0x40fff3) AM_WRITENOP
-	AM_RANGE(0x500000, 0x500007) AM_READWRITE_LEGACY(galastrm_adstick_ctrl_r, galastrm_adstick_ctrl_w)
+	AM_RANGE(0x500000, 0x500007) AM_READWRITE(galastrm_adstick_ctrl_r, galastrm_adstick_ctrl_w)
 	AM_RANGE(0x600000, 0x6007ff) AM_RAM AM_SHARE("f3_shared")								/* Sound shared ram */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)		/* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
-	AM_RANGE(0x900000, 0x900003) AM_WRITE_LEGACY(galastrm_palette_w)								/* TC0110PCR */
-	AM_RANGE(0xb00000, 0xb00003) AM_WRITE_LEGACY(galastrm_tc0610_0_w)								/* TC0610 */
-	AM_RANGE(0xc00000, 0xc00003) AM_WRITE_LEGACY(galastrm_tc0610_1_w)
+	AM_RANGE(0x900000, 0x900003) AM_WRITE(galastrm_palette_w)								/* TC0110PCR */
+	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(galastrm_tc0610_0_w)								/* TC0610 */
+	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(galastrm_tc0610_1_w)
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)		/* piv tilemaps */
 	AM_RANGE(0xd20000, 0xd2000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
 ADDRESS_MAP_END

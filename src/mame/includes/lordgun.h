@@ -31,6 +31,12 @@ public:
 	bitmap_ind16 *m_bitmaps[5];
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE16_MEMBER(lordgun_priority_w);
+	DECLARE_READ16_MEMBER(lordgun_gun_0_x_r);
+	DECLARE_READ16_MEMBER(lordgun_gun_0_y_r);
+	DECLARE_READ16_MEMBER(lordgun_gun_1_x_r);
+	DECLARE_READ16_MEMBER(lordgun_gun_1_y_r);
+	DECLARE_WRITE16_MEMBER(lordgun_soundlatch_w);
 };
 
 

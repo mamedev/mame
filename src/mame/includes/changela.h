@@ -55,6 +55,27 @@ public:
 
 	/* devices */
 	device_t *m_mcu;
+	DECLARE_READ8_MEMBER(mcu_r);
+	DECLARE_WRITE8_MEMBER(mcu_w);
+	DECLARE_READ8_MEMBER(changela_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(changela_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(changela_68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(changela_68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(changela_68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(changela_68705_ddr_b_w);
+	DECLARE_READ8_MEMBER(changela_68705_port_c_r);
+	DECLARE_WRITE8_MEMBER(changela_68705_port_c_w);
+	DECLARE_WRITE8_MEMBER(changela_68705_ddr_c_w);
+	DECLARE_READ8_MEMBER(changela_24_r);
+	DECLARE_READ8_MEMBER(changela_25_r);
+	DECLARE_READ8_MEMBER(changela_30_r);
+	DECLARE_READ8_MEMBER(changela_31_r);
+	DECLARE_READ8_MEMBER(changela_2c_r);
+	DECLARE_READ8_MEMBER(changela_2d_r);
+	DECLARE_WRITE8_MEMBER(mcu_pc_0_w);
+	DECLARE_WRITE8_MEMBER(changela_collision_reset_0);
+	DECLARE_WRITE8_MEMBER(changela_collision_reset_1);
+	DECLARE_WRITE8_MEMBER(changela_coin_counter_w);
 };
 
 /*----------- defined in video/changela.c -----------*/

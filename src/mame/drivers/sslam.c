@@ -371,10 +371,10 @@ static WRITE16_DEVICE_HANDLER( sslam_snd_w )
 
 
 
-static WRITE16_HANDLER( powerbls_sound_w )
+WRITE16_MEMBER(sslam_state::powerbls_sound_w)
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "audiocpu", MCS51_INT1_LINE, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", MCS51_INT1_LINE, HOLD_LINE);
 }
 
 /* Memory Maps */
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START( powerbls_map, AS_PROGRAM, 16, sslam_state )
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("IN2")
 	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE_LEGACY(powerbls_sound_w)
+	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(powerbls_sound_w)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM	  /* Main RAM */
 ADDRESS_MAP_END
@@ -427,46 +427,43 @@ ADDRESS_MAP_END
     Sound MCU mapping
 */
 
-static READ8_HANDLER( playmark_snd_command_r )
+READ8_MEMBER(sslam_state::playmark_snd_command_r)
 {
-	sslam_state *state = space->machine().driver_data<sslam_state>();
 	UINT8 data = 0;
 
-	if ((state->m_oki_control & 0x38) == 0x30) {
+	if ((m_oki_control & 0x38) == 0x30) {
 		data = soundlatch_r(space,0);
 	}
-	else if ((state->m_oki_control & 0x38) == 0x28) {
-		data = (space->machine().device<okim6295_device>("oki")->read(*space,0) & 0x0f);
+	else if ((m_oki_control & 0x38) == 0x28) {
+		data = (machine().device<okim6295_device>("oki")->read(*&space,0) & 0x0f);
 	}
 
 	return data;
 }
 
-static WRITE8_HANDLER( playmark_oki_w )
+WRITE8_MEMBER(sslam_state::playmark_oki_w)
 {
-	sslam_state *state = space->machine().driver_data<sslam_state>();
 
-	state->m_oki_command = data;
+	m_oki_command = data;
 }
 
-static WRITE8_HANDLER( playmark_snd_control_w )
+WRITE8_MEMBER(sslam_state::playmark_snd_control_w)
 {
-	sslam_state *state = space->machine().driver_data<sslam_state>();
 
-	state->m_oki_control = data;
+	m_oki_control = data;
 
 	if (data & 3)
 	{
-		if (state->m_oki_bank != ((data & 3) - 1))
+		if (m_oki_bank != ((data & 3) - 1))
 		{
-			state->m_oki_bank = (data & 3) - 1;
-			space->machine().device<okim6295_device>("oki")->set_bank_base(0x40000 * state->m_oki_bank);
+			m_oki_bank = (data & 3) - 1;
+			machine().device<okim6295_device>("oki")->set_bank_base(0x40000 * m_oki_bank);
 		}
 	}
 
 	if ((data & 0x38) == 0x18)
 	{
-		space->machine().device<okim6295_device>("oki")->write(*space, 0, state->m_oki_command);
+		machine().device<okim6295_device>("oki")->write(*&space, 0, m_oki_command);
 	}
 
 //  !(data & 0x80) -> sound enable
@@ -474,8 +471,8 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 }
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, sslam_state )
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE_LEGACY(playmark_snd_control_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE_LEGACY(playmark_snd_command_r, playmark_oki_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(playmark_snd_control_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

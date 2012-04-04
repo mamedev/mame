@@ -27,6 +27,8 @@ public:
 
 	/* memory */
 	UINT8      m_videoram[0x4000];
+	DECLARE_WRITE8_MEMBER(yunsung8_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(yunsung8_adpcm_w);
 };
 
 

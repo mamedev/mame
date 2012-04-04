@@ -36,15 +36,15 @@
 
 /* Read/Write Handlers */
 
-static READ8_HANDLER( c1943_protection_r )
+READ8_MEMBER(_1943_state::c1943_protection_r)
 {
 	/*
         This is a protection check. The game crashes (thru a jump to 0x8000)
         if a read from this address doesn't return the value it expects.
     */
 
-	int data = cpu_get_reg(&space->device(), Z80_BC) >> 8;
-//  logerror("protection read, PC: %04x Result:%02x\n", cpu_get_pc(&space->device()), data);
+	int data = cpu_get_reg(&space.device(), Z80_BC) >> 8;
+//  logerror("protection read, PC: %04x Result:%02x\n", cpu_get_pc(&space.device()), data);
 	return data;
 }
 
@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( c1943_map, AS_PROGRAM, 8, _1943_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSWB")
-	AM_RANGE(0xc007, 0xc007) AM_READ_LEGACY(c1943_protection_r)
+	AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(c1943_c804_w)	// ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE_LEGACY(watchdog_reset_w)
@@ -647,14 +647,15 @@ static DRIVER_INIT( 1943 )
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 }
 
-static READ8_HANDLER( _1943b_c007_r ) { return 0; }
+READ8_MEMBER(_1943_state::_1943b_c007_r){ return 0; }
 
 static DRIVER_INIT( 1943b )
 {
+	_1943_state *state = machine.driver_data<_1943_state>();
 	DRIVER_INIT_CALL( 1943 );
 	//it expects 0x00 to be returned from the protection reads because the protection has been patched out.
-	//AM_RANGE(0xc007, 0xc007) AM_READ_LEGACY(c1943_protection_r)
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc007, 0xc007, FUNC(_1943b_c007_r));
+	//AM_RANGE(0xc007, 0xc007) AM_READ(c1943_protection_r)
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc007, 0xc007, read8_delegate(FUNC(_1943_state::_1943b_c007_r),state));
 
 }
 

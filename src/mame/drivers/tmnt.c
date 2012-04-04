@@ -80,39 +80,36 @@ Updates:
 #include "includes/tmnt.h"
 #include "includes/konamipt.h"
 
-static READ16_HANDLER( k052109_word_noA12_r )
+READ16_MEMBER(tmnt_state::k052109_word_noA12_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	return k052109_word_r(state->m_k052109, offset, mem_mask);
+	return k052109_word_r(m_k052109, offset, mem_mask);
 }
 
-static WRITE16_HANDLER( k052109_word_noA12_w )
+WRITE16_MEMBER(tmnt_state::k052109_word_noA12_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
 	offset = ((offset & 0x3000) >> 1) | (offset & 0x07ff);
-	k052109_word_w(state->m_k052109, offset, data, mem_mask);
+	k052109_word_w(m_k052109, offset, data, mem_mask);
 }
 
-static WRITE16_HANDLER( punkshot_k052109_word_w )
+WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	/* it seems that a word write is supposed to affect only the MSB. The */
 	/* "ROUND 1" text in punkshtj goes lost otherwise. */
 	if (ACCESSING_BITS_8_15)
-		k052109_w(state->m_k052109, offset, (data >> 8) & 0xff);
+		k052109_w(m_k052109, offset, (data >> 8) & 0xff);
 	else if (ACCESSING_BITS_0_7)
-		k052109_w(state->m_k052109, offset + 0x2000, data & 0xff);
+		k052109_w(m_k052109, offset + 0x2000, data & 0xff);
 }
 
-static WRITE16_HANDLER( punkshot_k052109_word_noA12_w )
+WRITE16_MEMBER(tmnt_state::punkshot_k052109_word_noA12_w)
 {
 	/* some games have the A12 line not connected, so the chip spans */
 	/* twice the memory range, with mirroring */
@@ -124,51 +121,47 @@ static WRITE16_HANDLER( punkshot_k052109_word_noA12_w )
 /* the interface with the 053245 is weird. The chip can address only 0x800 bytes */
 /* of RAM, but they put 0x4000 there. The CPU can access them all. Address lines */
 /* A1, A5 and A6 don't go to the 053245. */
-static READ16_HANDLER( k053245_scattered_word_r )
+READ16_MEMBER(tmnt_state::k053245_scattered_word_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (offset & 0x0031)
-		return state->m_spriteram[offset];
+		return m_spriteram[offset];
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		return k053245_word_r(state->m_k053245, offset, mem_mask);
+		return k053245_word_r(m_k053245, offset, mem_mask);
 	}
 }
 
-static WRITE16_HANDLER( k053245_scattered_word_w )
+WRITE16_MEMBER(tmnt_state::k053245_scattered_word_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
-	COMBINE_DATA(state->m_spriteram + offset);
+	COMBINE_DATA(m_spriteram + offset);
 
 	if (!(offset & 0x0031))
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x1fc0) >> 3);
-		k053245_word_w(state->m_k053245, offset, data, mem_mask);
+		k053245_word_w(m_k053245, offset, data, mem_mask);
 	}
 }
 
-static READ16_HANDLER( k053244_word_noA1_r )
+READ16_MEMBER(tmnt_state::k053244_word_noA1_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	offset &= ~1;	/* handle mirror address */
 
-	return k053244_r(state->m_k053245, offset + 1) | (k053244_r(state->m_k053245, offset) << 8);
+	return k053244_r(m_k053245, offset + 1) | (k053244_r(m_k053245, offset) << 8);
 }
 
-static WRITE16_HANDLER( k053244_word_noA1_w )
+WRITE16_MEMBER(tmnt_state::k053244_word_noA1_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	offset &= ~1;	/* handle mirror address */
 
 	if (ACCESSING_BITS_8_15)
-		k053244_w(state->m_k053245, offset, (data >> 8) & 0xff);
+		k053244_w(m_k053245, offset, (data >> 8) & 0xff);
 	if (ACCESSING_BITS_0_7)
-		k053244_w(state->m_k053245, offset + 1, data & 0xff);
+		k053244_w(m_k053245, offset + 1, data & 0xff);
 }
 
 static INTERRUPT_GEN(cuebrick_interrupt)
@@ -197,7 +190,7 @@ static INTERRUPT_GEN( lgtnfght_interrupt )
 
 
 
-static WRITE16_HANDLER( tmnt_sound_command_w )
+WRITE16_MEMBER(tmnt_state::tmnt_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 		soundlatch_w(space, 0, data & 0xff);
@@ -219,12 +212,12 @@ static WRITE8_DEVICE_HANDLER( glfgreat_sound_w )
 		device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static READ16_HANDLER( prmrsocr_sound_r )
+READ16_MEMBER(tmnt_state::prmrsocr_sound_r)
 {
 	return soundlatch3_r(space, 0);
 }
 
-static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
+WRITE16_MEMBER(tmnt_state::prmrsocr_sound_cmd_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -236,40 +229,37 @@ static WRITE16_HANDLER( prmrsocr_sound_cmd_w )
 	}
 }
 
-static WRITE16_HANDLER( prmrsocr_sound_irq_w )
+WRITE16_MEMBER(tmnt_state::prmrsocr_sound_irq_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
+WRITE8_MEMBER(tmnt_state::prmrsocr_audio_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 7);
+	memory_set_bank(machine(), "bank1", data & 7);
 }
 
 
-static READ8_HANDLER( tmnt_sres_r )
+READ8_MEMBER(tmnt_state::tmnt_sres_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
-	return state->m_tmnt_soundlatch;
+	return m_tmnt_soundlatch;
 }
 
-static WRITE8_HANDLER( tmnt_sres_w )
+WRITE8_MEMBER(tmnt_state::tmnt_sres_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	/* bit 1 resets the UPD7795C sound chip */
-	upd7759_reset_w(state->m_upd, data & 2);
+	upd7759_reset_w(m_upd, data & 2);
 
 	/* bit 2 plays the title music */
 	if (data & 0x04)
 	{
-		if (!state->m_samples->playing(0))
-			state->m_samples->start_raw(0, state->m_sampledata, 0x40000, 20000);
+		if (!m_samples->playing(0))
+			m_samples->start_raw(0, m_sampledata, 0x40000, 20000);
 	}
 	else
-		state->m_samples->stop(0);
-	state->m_tmnt_soundlatch = data;
+		m_samples->stop(0);
+	m_tmnt_soundlatch = data;
 }
 
 static WRITE8_DEVICE_HANDLER( tmnt_upd_start_w )
@@ -331,31 +321,29 @@ static TIMER_CALLBACK( nmi_callback )
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( sound_arm_nmi_w )
+WRITE8_MEMBER(tmnt_state::sound_arm_nmi_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 //  sound_nmi_enabled = 1;
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	space->machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	machine().scheduler().timer_set(attotime::from_usec(50), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
 
-static READ16_HANDLER( punkshot_kludge_r )
+READ16_MEMBER(tmnt_state::punkshot_kludge_r)
 {
 	/* I don't know what's going on here; at one point, the code reads location */
 	/* 0xffffff, and returning 0 causes the game to mess up - locking up in a */
 	/* loop where the ball is continuously bouncing from the basket. Returning */
 	/* a random number seems to prevent that. */
-	return space->machine().rand();
+	return machine().rand();
 }
 
 
 /* protection simulation derived from a bootleg */
-static READ16_HANDLER( ssriders_protection_r )
+READ16_MEMBER(tmnt_state::ssriders_protection_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
-	int data = space->read_word(0x105a0a);
-	int cmd = space->read_word(0x1058fc);
+	int data = space.read_word(0x105a0a);
+	int cmd = space.read_word(0x1058fc);
 
 	switch (cmd)
 	{
@@ -382,22 +370,21 @@ static READ16_HANDLER( ssriders_protection_r )
 
 		case 0x8abc:
 			/* collision table */
-			data = -space->read_word(0x105818);
+			data = -space.read_word(0x105818);
 			data = ((data / 8 - 4) & 0x1f) * 0x40;
-			data += ((space->read_word(0x105cb0) +
-						256 * k052109_r(state->m_k052109, 0x1a01) + k052109_r(state->m_k052109, 0x1a00) - 6) / 8 + 12) & 0x3f;
+			data += ((space.read_word(0x105cb0) +
+						256 * k052109_r(m_k052109, 0x1a01) + k052109_r(m_k052109, 0x1a00) - 6) / 8 + 12) & 0x3f;
 			return data;
 
 		default:
-			popmessage("%06x: unknown protection read",cpu_get_pc(&space->device()));
-			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",cpu_get_pc(&space->device()),(UINT32)cpu_get_reg(&space->device(), M68K_D7),cmd,data);
+			popmessage("%06x: unknown protection read",cpu_get_pc(&space.device()));
+			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",cpu_get_pc(&space.device()),(UINT32)cpu_get_reg(&space.device(), M68K_D7),cmd,data);
 			return 0xffff;
     }
 }
 
-static WRITE16_HANDLER( ssriders_protection_w )
+WRITE16_MEMBER(tmnt_state::ssriders_protection_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (offset == 1)
 	{
@@ -411,9 +398,9 @@ static WRITE16_HANDLER( ssriders_protection_w )
 
 			for (i = 0; i < 128; i++)
 			{
-				if ((space->read_word(0x180006 + 128 * i) >> 8) == logical_pri)
+				if ((space.read_word(0x180006 + 128 * i) >> 8) == logical_pri)
 				{
-					k053245_word_w(state->m_k053245, 8 * i, hardware_pri, 0x00ff);
+					k053245_word_w(m_k053245, 8 * i, hardware_pri, 0x00ff);
 					hardware_pri++;
 				}
 			}
@@ -441,57 +428,54 @@ static const eeprom_interface eeprom_intf =
 };
 
 
-static READ16_HANDLER( blswhstl_coin_r )
+READ16_MEMBER(tmnt_state::blswhstl_coin_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int res;
 
 	/* bit 3 is service button */
 	/* bit 6 is ??? VBLANK? OBJMPX? */
-	res = input_port_read(space->machine(), "COINS");
+	res = input_port_read(machine(), "COINS");
 
-	state->m_toggle ^= 0x40;
-	return res ^ state->m_toggle;
+	m_toggle ^= 0x40;
+	return res ^ m_toggle;
 }
 
-static READ16_HANDLER( ssriders_eeprom_r )
+READ16_MEMBER(tmnt_state::ssriders_eeprom_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int res;
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = input_port_read(space->machine(), "EEPROM");
+	res = input_port_read(machine(), "EEPROM");
 
-	state->m_toggle ^= 0x04;
-	return res ^ state->m_toggle;
+	m_toggle ^= 0x04;
+	return res ^ m_toggle;
 }
 
-static READ16_HANDLER( sunsetbl_eeprom_r )
+READ16_MEMBER(tmnt_state::sunsetbl_eeprom_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int res;
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
 	/* bit 2 is VBLANK (???) */
 	/* bit 3 is service button */
-	res = input_port_read(space->machine(), "EEPROM");
+	res = input_port_read(machine(), "EEPROM");
 
-	state->m_toggle ^= 0x04;
-	return res ^ state->m_toggle;
+	m_toggle ^= 0x04;
+	return res ^ m_toggle;
 }
 
-static WRITE16_HANDLER( blswhstl_eeprom_w )
+WRITE16_MEMBER(tmnt_state::blswhstl_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+		input_port_write(machine(), "EEPROMOUT", data, 0xff);
 	}
 }
 
@@ -506,46 +490,44 @@ static const eeprom_interface thndrx2_eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static READ16_HANDLER( thndrx2_eeprom_r )
+READ16_MEMBER(tmnt_state::thndrx2_eeprom_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int res;
 
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is VBLANK (???) */
 	/* bit 7 is service button */
-	res = input_port_read(space->machine(), "P2/EEPROM");
-	state->m_toggle ^= 0x0800;
-	return (res ^ state->m_toggle);
+	res = input_port_read(machine(), "P2/EEPROM");
+	m_toggle ^= 0x0800;
+	return (res ^ m_toggle);
 }
 
-static WRITE16_HANDLER( thndrx2_eeprom_w )
+WRITE16_MEMBER(tmnt_state::thndrx2_eeprom_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
 		/* bit 1 is cs (active low) */
 		/* bit 2 is clock (active high) */
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+		input_port_write(machine(), "EEPROMOUT", data, 0xff);
 
 		/* bit 5 triggers IRQ on sound cpu */
-		if (state->m_last == 0 && (data & 0x20) != 0)
-			device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
-		state->m_last = data & 0x20;
+		if (m_last == 0 && (data & 0x20) != 0)
+			device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
+		m_last = data & 0x20;
 
 		/* bit 6 = enable char ROM reading through the video RAM */
-		k052109_set_rmrd_line(state->m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		k052109_set_rmrd_line(m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
-static WRITE16_HANDLER( prmrsocr_eeprom_w )
+WRITE16_MEMBER(tmnt_state::prmrsocr_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		prmrsocr_122000_w(space, offset, data, mem_mask);
+		prmrsocr_122000_w(&space, offset, data, mem_mask);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -553,26 +535,23 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 		/* bit 8 is data */
 		/* bit 9 is cs (active low) */
 		/* bit 10 is clock (active high) */
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xffff);
+		input_port_write(machine(), "EEPROMOUT", data, 0xffff);
 	}
 }
 
-static READ16_HANDLER( cuebrick_nv_r )
+READ16_MEMBER(tmnt_state::cuebrick_nv_r)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
-	return state->m_cuebrick_nvram[offset + (state->m_cuebrick_nvram_bank * 0x400 / 2)];
+	return m_cuebrick_nvram[offset + (m_cuebrick_nvram_bank * 0x400 / 2)];
 }
 
-static WRITE16_HANDLER( cuebrick_nv_w )
+WRITE16_MEMBER(tmnt_state::cuebrick_nv_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
-       COMBINE_DATA(&state->m_cuebrick_nvram[offset + (state->m_cuebrick_nvram_bank * 0x400 / 2)]);
+       COMBINE_DATA(&m_cuebrick_nvram[offset + (m_cuebrick_nvram_bank * 0x400 / 2)]);
 }
 
-static WRITE16_HANDLER( cuebrick_nvbank_w )
+WRITE16_MEMBER(tmnt_state::cuebrick_nvbank_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
-	state->m_cuebrick_nvram_bank = data >> 8;
+	m_cuebrick_nvram_bank = data >> 8;
 }
 
 static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16, tmnt_state )
@@ -583,14 +562,14 @@ static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE_LEGACY(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE_LEGACY(tmnt_sound_command_w)
+	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE_LEGACY(cuebrick_nv_r, cuebrick_nv_w) AM_SHARE("nvram")
-	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE_LEGACY(cuebrick_nvbank_w)
+	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrick_nv_r, cuebrick_nv_w) AM_SHARE("nvram")
+	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrick_nvbank_w)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0xff00)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE_LEGACY(k052109_word_noA12_r, k052109_word_noA12_w)
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
@@ -604,14 +583,14 @@ static ADDRESS_MAP_START( mia_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE_LEGACY(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE_LEGACY(tmnt_sound_command_w)
+	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
 #if 0
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(tmnt_priority_w)
 #endif
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE_LEGACY(k052109_word_noA12_r, k052109_word_noA12_w)
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
 	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
@@ -626,13 +605,13 @@ static ADDRESS_MAP_START( tmnt_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P3")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE_LEGACY(tmnt_sound_command_w)
+	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0014, 0x0a0015) AM_READ_PORT("P4")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(tmnt_priority_w)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE_LEGACY(k052109_word_noA12_r, k052109_word_noA12_w)
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 //  AM_RANGE(0x10e800, 0x10e801) AM_WRITENOP ???
 	AM_RANGE(0x140000, 0x140007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x140400, 0x1407ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
@@ -652,10 +631,10 @@ static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0040, 0x0a0041) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x0a0060, 0x0a007f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x0a0080, 0x0a0081) AM_WRITE_LEGACY(watchdog_reset16_w)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE_LEGACY(k052109_word_noA12_r, punkshot_k052109_word_noA12_w)
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, punkshot_k052109_word_noA12_w)
 	AM_RANGE(0x110000, 0x110007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x110400, 0x1107ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
-	AM_RANGE(0xfffffc, 0xffffff) AM_READ_LEGACY(punkshot_kludge_r)
+	AM_RANGE(0xfffffc, 0xffffff) AM_READ(punkshot_kludge_r)
 ADDRESS_MAP_END
 
 
@@ -673,60 +652,58 @@ static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0020, 0x0a0023) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x0a0020, 0x0a0021) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x0a0028, 0x0a0029) AM_WRITE_LEGACY(watchdog_reset16_w)
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_READWRITE_LEGACY(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
-	AM_RANGE(0x0c0000, 0x0c001f) AM_READWRITE_LEGACY(k053244_word_noA1_r, k053244_word_noA1_w)
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x0c0000, 0x0c001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x0e0000, 0x0e001f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE_LEGACY(k052109_word_noA12_r, k052109_word_noA12_w)
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 ADDRESS_MAP_END
 
 
-static WRITE16_HANDLER( ssriders_soundkludge_w )
+WRITE16_MEMBER(tmnt_state::ssriders_soundkludge_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 
 	/* I think this is more than just a trigger */
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x180000, 0x183fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_word_r, k052109_word_w)
 	AM_RANGE(0x204000, 0x207fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x300000, 0x303fff) AM_READWRITE_LEGACY(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x300000, 0x303fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE_LEGACY("k054000", k054000_lsb_r, k054000_lsb_w)
-	AM_RANGE(0x680000, 0x68001f) AM_READWRITE_LEGACY(k053244_word_noA1_r, k053244_word_noA1_w)
+	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")
-	AM_RANGE(0x700004, 0x700005) AM_READ_LEGACY(blswhstl_coin_r)
+	AM_RANGE(0x700004, 0x700005) AM_READ(blswhstl_coin_r)
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("EEPROM")
-	AM_RANGE(0x700200, 0x700201) AM_WRITE_LEGACY(blswhstl_eeprom_w)
+	AM_RANGE(0x700200, 0x700201) AM_WRITE(blswhstl_eeprom_w)
 	AM_RANGE(0x700300, 0x700301) AM_WRITE_LEGACY(blswhstl_700300_w)
 	AM_RANGE(0x700400, 0x700401) AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0x780600, 0x780603) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x780600, 0x780601) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
-	AM_RANGE(0x780604, 0x780605) AM_WRITE_LEGACY(ssriders_soundkludge_w)
+	AM_RANGE(0x780604, 0x780605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x780700, 0x78071f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 ADDRESS_MAP_END
 
 
-static WRITE16_HANDLER( k053251_glfgreat_w )
+WRITE16_MEMBER(tmnt_state::k053251_glfgreat_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	int i;
 
 	if (ACCESSING_BITS_8_15)
 	{
-		k053251_w(state->m_k053251, offset, (data >> 8) & 0xff);
+		k053251_w(m_k053251, offset, (data >> 8) & 0xff);
 
 		/* FIXME: in the old code k052109 tilemaps were tilemaps 2,3,4 for k053251
         and got marked as dirty in the write above... how was the original hardware working?!? */
 		for (i = 0; i < 3; i++)
 		{
-			if (k053251_get_tmap_dirty(state->m_k053251, 2 + i))
+			if (k053251_get_tmap_dirty(m_k053251, 2 + i))
 			{
-				k052109_tilemap_mark_dirty(state->m_k052109, i);
-				k053251_set_tmap_dirty(state->m_k053251, 2 + i, 0);
+				k052109_tilemap_mark_dirty(m_k052109, i);
+				k053251_set_tmap_dirty(m_k053251, 2 + i, 0);
 			}
 		}
 	}
@@ -735,14 +712,14 @@ static WRITE16_HANDLER( k053251_glfgreat_w )
 static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x104000, 0x107fff) AM_READWRITE_LEGACY(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)	/* 053936? */
-	AM_RANGE(0x110000, 0x11001f) AM_WRITE_LEGACY(k053244_word_noA1_w)				/* duplicate! */
+	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)				/* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE_LEGACY("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE_LEGACY("k053251", k053251_msb_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE_LEGACY(k053251_glfgreat_w)
+	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/P2")
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P3/P4")
 	AM_RANGE(0x120004, 0x120005) AM_READ_PORT("COINS/DSW3")
@@ -751,7 +728,7 @@ static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x122000, 0x122001) AM_WRITE_LEGACY(glfgreat_122000_w)
 	AM_RANGE(0x124000, 0x124001) AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0x125000, 0x125003) AM_DEVREADWRITE8_LEGACY("k053260", punkshot_sound_r, glfgreat_sound_w, 0xff00)	/* K053260 */
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE_LEGACY(k052109_word_noA12_r, k052109_word_noA12_w)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x300000, 0x3fffff) AM_READ_LEGACY(glfgreat_rom_r)
 ADDRESS_MAP_END
 
@@ -759,21 +736,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x104000, 0x107fff) AM_READWRITE_LEGACY(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)
-	AM_RANGE(0x110000, 0x11001f) AM_WRITE_LEGACY(k053244_word_noA1_w)				/* duplicate! */
+	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)				/* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE_LEGACY("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
 	AM_RANGE(0x118000, 0x11801f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
 	AM_RANGE(0x11c000, 0x11c01f) AM_DEVWRITE_LEGACY("k053251", k053251_msb_w)
-	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE_LEGACY(k053251_glfgreat_w)
+	AM_RANGE(0x11c000, 0x11c01f) AM_WRITE(k053251_glfgreat_w)
 	AM_RANGE(0x120000, 0x120001) AM_READ_PORT("P1/COINS")
 	AM_RANGE(0x120002, 0x120003) AM_READ_PORT("P2/EEPROM")
-	AM_RANGE(0x12100c, 0x12100f) AM_WRITE_LEGACY(prmrsocr_sound_cmd_w)
-	AM_RANGE(0x121014, 0x121015) AM_READ_LEGACY(prmrsocr_sound_r)
-	AM_RANGE(0x122000, 0x122001) AM_WRITE_LEGACY(prmrsocr_eeprom_w)	/* EEPROM + video control */
-	AM_RANGE(0x123000, 0x123001) AM_WRITE_LEGACY(prmrsocr_sound_irq_w)
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE_LEGACY(k052109_word_noA12_r, k052109_word_noA12_w)
+	AM_RANGE(0x12100c, 0x12100f) AM_WRITE(prmrsocr_sound_cmd_w)
+	AM_RANGE(0x121014, 0x121015) AM_READ(prmrsocr_sound_r)
+	AM_RANGE(0x122000, 0x122001) AM_WRITE(prmrsocr_eeprom_w)	/* EEPROM + video control */
+	AM_RANGE(0x123000, 0x123001) AM_WRITE(prmrsocr_sound_irq_w)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x280000, 0x280001) AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0x300000, 0x33ffff) AM_READ_LEGACY(prmrsocr_rom_r)
 ADDRESS_MAP_END
@@ -812,21 +789,20 @@ static void tmnt2_put_word( address_space *space, UINT32 addr, UINT16 data )
 		state->m_sunset_104000[addr - 0x104000 / 2] = data;
 }
 
-static WRITE16_HANDLER( tmnt2_1c0800_w )
+WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
 	UINT32 src_addr, dst_addr, mod_addr, attr1, code, attr2, cbase, cmod, color;
 	int xoffs, yoffs, xmod, ymod, zmod, xzoom, yzoom, i;
 	UINT16 *mcu;
 	UINT16 src[4], mod[24];
 	UINT8 keepaspect, xlock, ylock, zlock;
 
-	COMBINE_DATA(state->m_tmnt2_1c0800 + offset);
+	COMBINE_DATA(m_tmnt2_1c0800 + offset);
 
 	if (offset != 0x18/2 || !ACCESSING_BITS_8_15)
 		return;
 
-	mcu = state->m_tmnt2_1c0800;
+	mcu = m_tmnt2_1c0800;
 	if ((mcu[8] & 0xff00) != 0x8200)
 		return;
 
@@ -836,9 +812,9 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 	zlock    = (mcu[8] & 0xff) == 0x0001;
 
 	for (i = 0; i < 4; i++)
-		src[i] = tmnt2_get_word(space->machine(), src_addr + i);
+		src[i] = tmnt2_get_word(machine(), src_addr + i);
 	for (i = 0; i < 24; i++) mod[i] =
-		tmnt2_get_word(space->machine(), mod_addr + i);
+		tmnt2_get_word(machine(), mod_addr + i);
 
 	code = src[0];			// code
 
@@ -926,18 +902,17 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 	xoffs += xmod;
 	yoffs += ymod;
 
-	tmnt2_put_word(space, dst_addr +  0, attr1);
-	tmnt2_put_word(space, dst_addr +  2, code);
-	tmnt2_put_word(space, dst_addr +  4, (UINT32)yoffs);
-	tmnt2_put_word(space, dst_addr +  6, (UINT32)xoffs);
-	tmnt2_put_word(space, dst_addr + 12, attr2 | color);
+	tmnt2_put_word(&space, dst_addr +  0, attr1);
+	tmnt2_put_word(&space, dst_addr +  2, code);
+	tmnt2_put_word(&space, dst_addr +  4, (UINT32)yoffs);
+	tmnt2_put_word(&space, dst_addr +  6, (UINT32)xoffs);
+	tmnt2_put_word(&space, dst_addr + 12, attr2 | color);
 }
 #else // for reference; do not remove
-static WRITE16_HANDLER( tmnt2_1c0800_w )
+WRITE16_MEMBER(tmnt_state::tmnt2_1c0800_w)
 {
-	tmnt_state *state = space->machine().driver_data<tmnt_state>();
-	COMBINE_DATA(state->m_tmnt2_1c0800 + offset);
-	if (offset == 0x0008 && (state->m_tmnt2_1c0800[0x8] & 0xff00) == 0x8200)
+	COMBINE_DATA(m_tmnt2_1c0800 + offset);
+	if (offset == 0x0008 && (m_tmnt2_1c0800[0x8] & 0xff00) == 0x8200)
 	{
 		UINT32 CellSrc;
 		UINT32 CellVar;
@@ -945,18 +920,18 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 		int dst;
 		int x,y;
 
-		CellVar = state->m_tmnt2_1c0800[0x04] | (state->m_tmnt2_1c0800[0x05] << 16 );
-		dst = state->m_tmnt2_1c0800[0x02] | (state->m_tmnt2_1c0800[0x03] << 16 );
-		CellSrc = state->m_tmnt2_1c0800[0x00] | (state->m_tmnt2_1c0800[0x01] << 16 );
+		CellVar = m_tmnt2_1c0800[0x04] | (m_tmnt2_1c0800[0x05] << 16 );
+		dst = m_tmnt2_1c0800[0x02] | (m_tmnt2_1c0800[0x03] << 16 );
+		CellSrc = m_tmnt2_1c0800[0x00] | (m_tmnt2_1c0800[0x01] << 16 );
 //        if (CellDest >= 0x180000 && CellDest < 0x183fe0) {
 		CellVar -= 0x104000;
-		src = (UINT16 *)(space->machine().region("maincpu")->base() + CellSrc);
+		src = (UINT16 *)(machine().region("maincpu")->base() + CellSrc);
 
 		CellVar >>= 1;
 
-		space->write_word(dst + 0x00, 0x8000 | ((src[1] & 0xfc00) >> 2));	/* size, flip xy */
-		space->write_word(dst + 0x04, src[0]);	/* code */
-		space->write_word(dst + 0x18, (src[1] & 0x3ff) ^		/* color, mirror, priority */
+		write_word(dst + 0x00, 0x8000 | ((src[1] & 0xfc00) >> 2));	/* size, flip xy */
+		write_word(dst + 0x04, src[0]);	/* code */
+		write_word(dst + 0x18, (src[1] & 0x3ff) ^		/* color, mirror, priority */
 				(sunset_104000[CellVar + 0x00] & 0x0060));
 
 		/* base color modifier */
@@ -965,55 +940,55 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 		/* It fixes the enemies, though, they are not all purple when you throw them around. */
 		/* Also, the bosses don't blink when they are about to die - don't know */
 		/* if this is correct or not. */
-//      if (state->m_sunset_104000[CellVar + 0x15] & 0x001f)
-//          dst + 0x18->write_word((space->read_word(dst + 0x18) & 0xffe0) |
-//                  (state->m_sunset_104000[CellVar + 0x15] & 0x001f));
+//      if (m_sunset_104000[CellVar + 0x15] & 0x001f)
+//          dst + 0x18->write_word((read_word(dst + 0x18) & 0xffe0) |
+//                  (m_sunset_104000[CellVar + 0x15] & 0x001f));
 
 		x = src[2];
-		if (state->m_sunset_104000[CellVar + 0x00] & 0x4000)
+		if (m_sunset_104000[CellVar + 0x00] & 0x4000)
 		{
 			/* flip x */
-			space->write_word(dst + 0x00, space->read_word(dst + 0x00) ^ 0x1000);
+			write_word(dst + 0x00, read_word(dst + 0x00) ^ 0x1000);
 			x = -x;
 		}
-		x += state->m_sunset_104000[CellVar + 0x06];
-		space->write_word(dst + 0x0c, x);
+		x += m_sunset_104000[CellVar + 0x06];
+		write_word(dst + 0x0c, x);
 		y = src[3];
-		y += state->m_sunset_104000[CellVar + 0x07];
+		y += m_sunset_104000[CellVar + 0x07];
 		/* don't do second offset for shadows */
-		if ((state->m_tmnt2_1c0800[0x08] & 0x00ff) != 0x01)
-			y += state->m_sunset_104000[CellVar + 0x08];
-		space->write_word(dst + 0x08, y);
+		if ((m_tmnt2_1c0800[0x08] & 0x00ff) != 0x01)
+			y += m_sunset_104000[CellVar + 0x08];
+		write_word(dst + 0x08, y);
 #if 0
 logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers %08x:%04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x %04x%04x\n",
-	state->m_tmnt2_1c0800[0x05],
+	m_tmnt2_1c0800[0x05],
 	CellDest,CellSrc,
 	src[0], src[1], src[2], src[3],
 	CellVar*2,
-	state->m_sunset_104000[CellVar + 0x00],
-	state->m_sunset_104000[CellVar + 0x01],
-	state->m_sunset_104000[CellVar + 0x02],
-	state->m_sunset_104000[CellVar + 0x03],
-	state->m_sunset_104000[CellVar + 0x04],
-	state->m_sunset_104000[CellVar + 0x05],
-	state->m_sunset_104000[CellVar + 0x06],
-	state->m_sunset_104000[CellVar + 0x07],
-	state->m_sunset_104000[CellVar + 0x08],
-	state->m_sunset_104000[CellVar + 0x09],
-	state->m_sunset_104000[CellVar + 0x0a],
-	state->m_sunset_104000[CellVar + 0x0b],
-	state->m_sunset_104000[CellVar + 0x0c],
-	state->m_sunset_104000[CellVar + 0x0d],
-	state->m_sunset_104000[CellVar + 0x0e],
-	state->m_sunset_104000[CellVar + 0x0f],
-	state->m_sunset_104000[CellVar + 0x10],
-	state->m_sunset_104000[CellVar + 0x11],
-	state->m_sunset_104000[CellVar + 0x12],
-	state->m_sunset_104000[CellVar + 0x13],
-	state->m_sunset_104000[CellVar + 0x14],
-	state->m_sunset_104000[CellVar + 0x15],
-	state->m_sunset_104000[CellVar + 0x16],
-	state->m_sunset_104000[CellVar + 0x17]
+	m_sunset_104000[CellVar + 0x00],
+	m_sunset_104000[CellVar + 0x01],
+	m_sunset_104000[CellVar + 0x02],
+	m_sunset_104000[CellVar + 0x03],
+	m_sunset_104000[CellVar + 0x04],
+	m_sunset_104000[CellVar + 0x05],
+	m_sunset_104000[CellVar + 0x06],
+	m_sunset_104000[CellVar + 0x07],
+	m_sunset_104000[CellVar + 0x08],
+	m_sunset_104000[CellVar + 0x09],
+	m_sunset_104000[CellVar + 0x0a],
+	m_sunset_104000[CellVar + 0x0b],
+	m_sunset_104000[CellVar + 0x0c],
+	m_sunset_104000[CellVar + 0x0d],
+	m_sunset_104000[CellVar + 0x0e],
+	m_sunset_104000[CellVar + 0x0f],
+	m_sunset_104000[CellVar + 0x10],
+	m_sunset_104000[CellVar + 0x11],
+	m_sunset_104000[CellVar + 0x12],
+	m_sunset_104000[CellVar + 0x13],
+	m_sunset_104000[CellVar + 0x14],
+	m_sunset_104000[CellVar + 0x15],
+	m_sunset_104000[CellVar + 0x16],
+	m_sunset_104000[CellVar + 0x17]
 	);
 #endif
 //        }
@@ -1025,23 +1000,23 @@ static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_BASE(m_tmnt2_rom)
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_BASE(m_sunset_104000)	/* main RAM */
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE_LEGACY(k053245_scattered_word_w) AM_BASE(m_spriteram)	// k053245_scattered_word_r
+	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(k053245_scattered_word_w) AM_BASE(m_spriteram)	// k053245_scattered_word_r
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P2")
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P3")
 	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("P4")
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("COINS")
-	AM_RANGE(0x1c0102, 0x1c0103) AM_READ_LEGACY(ssriders_eeprom_r)
+	AM_RANGE(0x1c0102, 0x1c0103) AM_READ(ssriders_eeprom_r)
 	AM_RANGE(0x1c0200, 0x1c0201) AM_WRITE_LEGACY(ssriders_eeprom_w)	/* EEPROM and gfx control */
 	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE_LEGACY(ssriders_1c0300_w)
 	AM_RANGE(0x1c0400, 0x1c0401) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)
 	AM_RANGE(0x1c0500, 0x1c057f) AM_RAM	/* TMNT2 only (1J) unknown, mostly MCU blit offsets */
-//  AM_RANGE(0x1c0800, 0x1c0801) AM_READ_LEGACY(ssriders_protection_r) /* protection device */
-	AM_RANGE(0x1c0800, 0x1c081f) AM_WRITE_LEGACY(tmnt2_1c0800_w) AM_BASE(m_tmnt2_1c0800)	/* protection device */
-	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE_LEGACY(k053244_word_noA1_r, k053244_word_noA1_w)
+//  AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r) /* protection device */
+	AM_RANGE(0x1c0800, 0x1c081f) AM_WRITE(tmnt2_1c0800_w) AM_BASE(m_tmnt2_1c0800)	/* protection device */
+	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x5c0600, 0x5c0601) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
-	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE_LEGACY(ssriders_soundkludge_w)
+	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_word_r, k052109_word_w)
 ADDRESS_MAP_END
@@ -1051,23 +1026,23 @@ static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE_LEGACY(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P2")
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P3")
 	AM_RANGE(0x1c0006, 0x1c0007) AM_READ_PORT("P4")
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("COINS")
-	AM_RANGE(0x1c0102, 0x1c0103) AM_READ_LEGACY(ssriders_eeprom_r)
+	AM_RANGE(0x1c0102, 0x1c0103) AM_READ(ssriders_eeprom_r)
 	AM_RANGE(0x1c0200, 0x1c0201) AM_WRITE_LEGACY(ssriders_eeprom_w)	/* EEPROM and gfx control */
 	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE_LEGACY(ssriders_1c0300_w)
 	AM_RANGE(0x1c0400, 0x1c0401) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)
 	AM_RANGE(0x1c0500, 0x1c057f) AM_RAM	/* TMNT2 only (1J) unknown */
-	AM_RANGE(0x1c0800, 0x1c0801) AM_READ_LEGACY(ssriders_protection_r)
-	AM_RANGE(0x1c0800, 0x1c0803) AM_WRITE_LEGACY(ssriders_protection_w)
-	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE_LEGACY(k053244_word_noA1_r, k053244_word_noA1_w)
+	AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r)
+	AM_RANGE(0x1c0800, 0x1c0803) AM_WRITE(ssriders_protection_w)
+	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x5c0600, 0x5c0603) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x5c0600, 0x5c0601) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
-	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE_LEGACY(ssriders_soundkludge_w)
+	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x5c0700, 0x5c071f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_word_r, k052109_word_w)
 ADDRESS_MAP_END
@@ -1078,11 +1053,11 @@ static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x14c000, 0x14cfff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x14e700, 0x14e71f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
-	AM_RANGE(0x180000, 0x183fff) AM_READWRITE_LEGACY(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x184000, 0x18ffff) AM_RAM
 	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE_LEGACY(ssriders_1c0300_w)
 	AM_RANGE(0x1c0400, 0x1c0401) AM_WRITENOP
-	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE_LEGACY(k053244_word_noA1_r, k053244_word_noA1_w)
+	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x600000, 0x603fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_word_r, k052109_word_w)
 	AM_RANGE(0x604020, 0x60402f) AM_WRITENOP	/* written every frame */
 	AM_RANGE(0x604200, 0x604201) AM_WRITENOP	/* watchdog */
@@ -1093,7 +1068,7 @@ static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0xc00006, 0xc00007) AM_READ_PORT("P4")
 	AM_RANGE(0xc00200, 0xc00201) AM_WRITE_LEGACY(ssriders_eeprom_w)	/* EEPROM and gfx control */
 	AM_RANGE(0xc00404, 0xc00405) AM_READ_PORT("COINS")
-	AM_RANGE(0xc00406, 0xc00407) AM_READ_LEGACY(sunsetbl_eeprom_r)
+	AM_RANGE(0xc00406, 0xc00407) AM_READ(sunsetbl_eeprom_r)
 	AM_RANGE(0xc00600, 0xc00601) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x75d288, 0x75d289) AM_READNOP	// read repeatedly in some test menus (PC=181f2)
 ADDRESS_MAP_END
@@ -1107,11 +1082,11 @@ static ADDRESS_MAP_START( thndrx2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x400000, 0x400003) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE_LEGACY("k054000", k054000_lsb_r, k054000_lsb_w)
-	AM_RANGE(0x500100, 0x500101) AM_WRITE_LEGACY(thndrx2_eeprom_w)
+	AM_RANGE(0x500100, 0x500101) AM_WRITE(thndrx2_eeprom_w)
 	AM_RANGE(0x500200, 0x500201) AM_READ_PORT("P1/COINS")
-	AM_RANGE(0x500202, 0x500203) AM_READ_LEGACY(thndrx2_eeprom_r)
+	AM_RANGE(0x500202, 0x500203) AM_READ(thndrx2_eeprom_r)
 	AM_RANGE(0x500300, 0x500301) AM_WRITENOP	/* watchdog reset? irq enable? */
-	AM_RANGE(0x600000, 0x607fff) AM_READWRITE_LEGACY(k052109_word_noA12_r, k052109_word_noA12_w)
+	AM_RANGE(0x600000, 0x607fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x700000, 0x700007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x700400, 0x7007ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
 ADDRESS_MAP_END
@@ -1130,7 +1105,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tmnt_audio_map, AS_PROGRAM, 8, tmnt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE_LEGACY(tmnt_sres_r, tmnt_sres_w)	/* title music & UPD7759C reset */
+	AM_RANGE(0x9000, 0x9000) AM_READWRITE(tmnt_sres_r, tmnt_sres_w)	/* title music & UPD7759C reset */
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
@@ -1144,7 +1119,7 @@ static ADDRESS_MAP_START( punkshot_audio_map, AS_PROGRAM, 8, tmnt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(sound_arm_nmi_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
 	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r, k053260_w)
 ADDRESS_MAP_END
 
@@ -1161,7 +1136,7 @@ static ADDRESS_MAP_START( glfgreat_audio_map, AS_PROGRAM, 8, tmnt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf82f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r, k053260_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(sound_arm_nmi_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
 
 
@@ -1170,7 +1145,7 @@ static ADDRESS_MAP_START( ssriders_audio_map, AS_PROGRAM, 8, tmnt_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xfa00, 0xfa2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r, k053260_w)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(sound_arm_nmi_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
 
 
@@ -1178,19 +1153,19 @@ static ADDRESS_MAP_START( thndrx2_audio_map, AS_PROGRAM, 8, tmnt_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf801) AM_MIRROR(0x0010) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(sound_arm_nmi_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
 	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r, k053260_w)
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( k054539_ctrl_r )
+READ8_MEMBER(tmnt_state::k054539_ctrl_r)
 {
-	return space->machine().device<k054539_device>("k054539")->read(*space, 0x200 + offset, 0xff);
+	return machine().device<k054539_device>("k054539")->read(*&space, 0x200 + offset, 0xff);
 }
 
-static WRITE8_HANDLER( k054539_ctrl_w )
+WRITE8_MEMBER(tmnt_state::k054539_ctrl_w)
 {
-	space->machine().device<k054539_device>("k054539")->write(*space, 0x200 + offset, data, 0xff);
+	machine().device<k054539_device>("k054539")->write(*&space, 0x200 + offset, data, 0xff);
 }
 
 static ADDRESS_MAP_START( prmrsocr_audio_map, AS_PROGRAM, 8, tmnt_state )
@@ -1198,11 +1173,11 @@ static ADDRESS_MAP_START( prmrsocr_audio_map, AS_PROGRAM, 8, tmnt_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xe100, 0xe12f) AM_READWRITE_LEGACY(k054539_ctrl_r, k054539_ctrl_w)
+	AM_RANGE(0xe100, 0xe12f) AM_READWRITE(k054539_ctrl_r, k054539_ctrl_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(soundlatch3_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ_LEGACY(soundlatch2_r)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(prmrsocr_audio_bankswitch_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(prmrsocr_audio_bankswitch_w)
 ADDRESS_MAP_END
 
 

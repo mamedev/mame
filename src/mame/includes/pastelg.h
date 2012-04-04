@@ -19,6 +19,11 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_clut;
 	int m_flipscreen_old;
+	DECLARE_READ8_MEMBER(pastelg_sndrom_r);
+	DECLARE_READ8_MEMBER(pastelg_irq_ack_r);
+	DECLARE_READ8_MEMBER(threeds_inputport1_r);
+	DECLARE_READ8_MEMBER(threeds_inputport2_r);
+	DECLARE_WRITE8_MEMBER(threeds_inputportsel_w);
 };
 
 

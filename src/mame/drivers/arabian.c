@@ -98,11 +98,10 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
  *
  *************************************/
 
-static READ8_HANDLER( mcu_port_r_r )
+READ8_MEMBER(arabian_state::mcu_port_r_r)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
 
-	UINT8 val = state->m_mcu_port_r[offset];
+	UINT8 val = m_mcu_port_r[offset];
 
 	/* RAM mode is enabled */
 	if (offset == 0)
@@ -111,44 +110,42 @@ static READ8_HANDLER( mcu_port_r_r )
 	return val;
 }
 
-static WRITE8_HANDLER( mcu_port_r_w )
+WRITE8_MEMBER(arabian_state::mcu_port_r_w)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
 
 	if (offset == 0)
 	{
-		UINT32 ram_addr = ((state->m_mcu_port_p & 7) << 8) | state->m_mcu_port_o;
+		UINT32 ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
 
 		if (~data & 2)
-			state->m_custom_cpu_ram[ram_addr] = 0xf0 | state->m_mcu_port_r[3];
+			m_custom_cpu_ram[ram_addr] = 0xf0 | m_mcu_port_r[3];
 
-		state->m_flip_screen = data & 8;
+		m_flip_screen = data & 8;
 	}
 
-	state->m_mcu_port_r[offset] = data & 0x0f;
+	m_mcu_port_r[offset] = data & 0x0f;
 }
 
-static READ8_HANDLER( mcu_portk_r )
+READ8_MEMBER(arabian_state::mcu_portk_r)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
 	UINT8 val = 0xf;
 
-	if (~state->m_mcu_port_r[0] & 1)
+	if (~m_mcu_port_r[0] & 1)
 	{
-		UINT32 ram_addr = ((state->m_mcu_port_p & 7) << 8) | state->m_mcu_port_o;
-		val = state->m_custom_cpu_ram[ram_addr];
+		UINT32 ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
+		val = m_custom_cpu_ram[ram_addr];
 	}
 	else
 	{
 		static const char *const comnames[] = { "COM0", "COM1", "COM2", "COM3", "COM4", "COM5" };
-		UINT8 sel = ((state->m_mcu_port_r[2] << 4) | state->m_mcu_port_r[1]) & 0x3f;
+		UINT8 sel = ((m_mcu_port_r[2] << 4) | m_mcu_port_r[1]) & 0x3f;
 		int i;
 
 		for (i = 0; i < 6; ++i)
 		{
 			if (~sel & (1 << i))
 			{
-				val = input_port_read(space->machine(), comnames[i]);
+				val = input_port_read(machine(), comnames[i]);
 				break;
 			}
 		}
@@ -157,21 +154,19 @@ static READ8_HANDLER( mcu_portk_r )
 	return val & 0x0f;
 }
 
-static WRITE8_HANDLER( mcu_port_o_w )
+WRITE8_MEMBER(arabian_state::mcu_port_o_w)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
 	UINT8 out = data & 0x0f;
 
 	if (data & 0x10)
-		state->m_mcu_port_o = (state->m_mcu_port_o & 0x0f) | (out << 4);
+		m_mcu_port_o = (m_mcu_port_o & 0x0f) | (out << 4);
 	else
-		state->m_mcu_port_o = (state->m_mcu_port_o & 0xf0) | out;
+		m_mcu_port_o = (m_mcu_port_o & 0xf0) | out;
 }
 
-static WRITE8_HANDLER( mcu_port_p_w )
+WRITE8_MEMBER(arabian_state::mcu_port_p_w)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
-	state->m_mcu_port_p = data & 0x0f;
+	m_mcu_port_p = data & 0x0f;
 }
 
 
@@ -213,10 +208,10 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, arabian_state )
-	AM_RANGE(MB88_PORTK,  MB88_PORTK ) AM_READ_LEGACY(mcu_portk_r)
-	AM_RANGE(MB88_PORTO,  MB88_PORTO ) AM_WRITE_LEGACY(mcu_port_o_w)
-	AM_RANGE(MB88_PORTP,  MB88_PORTP ) AM_WRITE_LEGACY(mcu_port_p_w)
-	AM_RANGE(MB88_PORTR0, MB88_PORTR3) AM_READWRITE_LEGACY(mcu_port_r_r, mcu_port_r_w)
+	AM_RANGE(MB88_PORTK,  MB88_PORTK ) AM_READ(mcu_portk_r)
+	AM_RANGE(MB88_PORTO,  MB88_PORTO ) AM_WRITE(mcu_port_o_w)
+	AM_RANGE(MB88_PORTP,  MB88_PORTP ) AM_WRITE(mcu_port_p_w)
+	AM_RANGE(MB88_PORTR0, MB88_PORTR3) AM_READWRITE(mcu_port_r_r, mcu_port_r_w)
 ADDRESS_MAP_END
 
 

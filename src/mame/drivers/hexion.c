@@ -87,16 +87,16 @@ Notes:
 #include "machine/k053252.h"
 
 
-static WRITE8_HANDLER( coincntr_w )
+WRITE8_MEMBER(hexion_state::coincntr_w)
 {
-//logerror("%04x: coincntr_w %02x\n",cpu_get_pc(&space->device()),data);
+//logerror("%04x: coincntr_w %02x\n",cpu_get_pc(&space.device()),data);
 
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0,data & 0x01);
-	coin_counter_w(space->machine(), 1,data & 0x02);
+	coin_counter_w(machine(), 0,data & 0x01);
+	coin_counter_w(machine(), 1,data & 0x02);
 
 	/* bit 5 = flip screen */
-	flip_screen_set(space->machine(), data & 0x20);
+	flip_screen_set(machine(), data & 0x20);
 
 	/* other bit unknown */
 if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xf440, 0xf440) AM_READ_PORT("DSW3")
 	AM_RANGE(0xf441, 0xf441) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf480, 0xf480) AM_WRITE_LEGACY(hexion_bankswitch_w)
-	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE_LEGACY(coincntr_w)
+	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
 	AM_RANGE(0xf500, 0xf500) AM_WRITE_LEGACY(hexion_gfxrom_select_w)
 	AM_RANGE(0xf540, 0xf540) AM_READ_LEGACY(watchdog_reset_r)
 ADDRESS_MAP_END

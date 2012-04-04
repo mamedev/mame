@@ -13,6 +13,15 @@ public:
 	int m_color_bank;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE16_MEMBER(suna16_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(bssoccer_leds_w);
+	DECLARE_WRITE16_MEMBER(uballoon_leds_w);
+	DECLARE_WRITE16_MEMBER(bestbest_coin_w);
+	DECLARE_READ16_MEMBER(bestbest_prot_r);
+	DECLARE_WRITE16_MEMBER(bestbest_prot_w);
+	DECLARE_WRITE8_MEMBER(bssoccer_pcm_1_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(bssoccer_pcm_2_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(uballoon_pcm_1_bankswitch_w);
 };
 
 

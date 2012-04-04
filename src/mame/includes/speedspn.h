@@ -9,6 +9,9 @@ public:
 	UINT8 m_display_disable;
 	int m_bank_vidram;
 	UINT8* m_vidram;
+	DECLARE_READ8_MEMBER(speedspn_irq_ack_r);
+	DECLARE_WRITE8_MEMBER(speedspn_banked_rom_change);
+	DECLARE_WRITE8_MEMBER(speedspn_sound_w);
 };
 
 

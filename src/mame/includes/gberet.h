@@ -26,6 +26,13 @@ public:
 	UINT8 *     m_soundlatch;
 	UINT8       m_interrupt_mask;
 	UINT8       m_interrupt_ticks;
+	DECLARE_WRITE8_MEMBER(gberet_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(mrgoemon_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(gberet_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(gberet_sound_w);
+	DECLARE_WRITE8_MEMBER(gberetb_flipscreen_w);
+	DECLARE_READ8_MEMBER(gberetb_irq_ack_r);
+	DECLARE_WRITE8_MEMBER(gberetb_nmi_ack_w);
 };
 
 

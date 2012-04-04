@@ -17,6 +17,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<buffered_spriteram8_device> m_spriteram;
+	DECLARE_WRITE8_MEMBER(srumbler_bankswitch_w);
 };
 
 

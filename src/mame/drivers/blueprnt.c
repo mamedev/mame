@@ -63,23 +63,21 @@ static WRITE8_DEVICE_HANDLER( dipsw_w )
 	state->m_dipsw = data;
 }
 
-static READ8_HANDLER( blueprnt_sh_dipsw_r )
+READ8_MEMBER(blueprnt_state::blueprnt_sh_dipsw_r)
 {
-	blueprnt_state *state = space->machine().driver_data<blueprnt_state>();
-	return state->m_dipsw;
+	return m_dipsw;
 }
 
-static WRITE8_HANDLER( blueprnt_sound_command_w )
+WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
 {
-	blueprnt_state *state = space->machine().driver_data<blueprnt_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( blueprnt_coin_counter_w )
+WRITE8_MEMBER(blueprnt_state::blueprnt_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 }
 
 /*************************************
@@ -94,10 +92,10 @@ static ADDRESS_MAP_START( blueprnt_map, AS_PROGRAM, 8, blueprnt_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(blueprnt_videoram_w) AM_MIRROR(0x400) AM_BASE(m_videoram)
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE(m_scrollram)
 	AM_RANGE(0xb000, 0xb0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1") AM_WRITE_LEGACY(blueprnt_coin_counter_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1") AM_WRITE(blueprnt_coin_counter_w)
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
-	AM_RANGE(0xc003, 0xc003) AM_READ_LEGACY(blueprnt_sh_dipsw_r)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(blueprnt_sound_command_w)
+	AM_RANGE(0xc003, 0xc003) AM_READ(blueprnt_sh_dipsw_r)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(blueprnt_sound_command_w)
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE_LEGACY(watchdog_reset_r, blueprnt_flipscreen_w)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE_LEGACY(blueprnt_colorram_w) AM_BASE(m_colorram)
 ADDRESS_MAP_END

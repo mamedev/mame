@@ -32,6 +32,17 @@ public:
 	device_t *m_k052109;
 	device_t *m_k051960;
 	device_t *m_k051316;
+	DECLARE_READ8_MEMBER(k052109_051960_r);
+	DECLARE_WRITE8_MEMBER(k052109_051960_w);
+	DECLARE_READ8_MEMBER(bottom9_bankedram1_r);
+	DECLARE_WRITE8_MEMBER(bottom9_bankedram1_w);
+	DECLARE_READ8_MEMBER(bottom9_bankedram2_r);
+	DECLARE_WRITE8_MEMBER(bottom9_bankedram2_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(bottom9_1f90_w);
+	DECLARE_WRITE8_MEMBER(bottom9_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
 };
 
 /*----------- defined in video/bottom9.c -----------*/

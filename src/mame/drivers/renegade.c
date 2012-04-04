@@ -212,10 +212,10 @@ static WRITE8_DEVICE_HANDLER( adpcm_play_w )
 		logerror("out of range adpcm command: 0x%02x\n", data);
 }
 
-static WRITE8_HANDLER( sound_w )
+WRITE8_MEMBER(renegade_state::sound_w)
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /********************************************************************************************/
@@ -372,68 +372,66 @@ WRITE8_HANDLER( renegade_68705_ddr_c_w )
 
 ***************************************************************************/
 
-static READ8_HANDLER( mcu_reset_r )
+READ8_MEMBER(renegade_state::mcu_reset_r)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	if (state->m_mcu_sim == TRUE)
+	if (m_mcu_sim == TRUE)
 	{
-		state->m_mcu_key = -1;
-		state->m_mcu_input_size = 0;
-		state->m_mcu_output_byte = 0;
+		m_mcu_key = -1;
+		m_mcu_input_size = 0;
+		m_mcu_output_byte = 0;
 	}
 	else
 	{
-		cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 	return 0;
 }
 
-static WRITE8_HANDLER( mcu_w )
+WRITE8_MEMBER(renegade_state::mcu_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	if (state->m_mcu_sim == TRUE)
+	if (m_mcu_sim == TRUE)
 	{
-		state->m_mcu_output_byte = 0;
+		m_mcu_output_byte = 0;
 
-		if (state->m_mcu_key < 0)
+		if (m_mcu_key < 0)
 		{
-			state->m_mcu_key = 0;
-			state->m_mcu_input_size = 1;
-			state->m_mcu_buffer[0] = data;
+			m_mcu_key = 0;
+			m_mcu_input_size = 1;
+			m_mcu_buffer[0] = data;
 		}
 		else
 		{
-			data ^= state->m_mcu_encrypt_table[state->m_mcu_key++];
-			if (state->m_mcu_key == state->m_mcu_encrypt_table_len)
-				state->m_mcu_key = 0;
-			if (state->m_mcu_input_size < MCU_BUFFER_MAX)
-				state->m_mcu_buffer[state->m_mcu_input_size++] = data;
+			data ^= m_mcu_encrypt_table[m_mcu_key++];
+			if (m_mcu_key == m_mcu_encrypt_table_len)
+				m_mcu_key = 0;
+			if (m_mcu_input_size < MCU_BUFFER_MAX)
+				m_mcu_buffer[m_mcu_input_size++] = data;
 		}
 	}
 	else
 	{
-		state->m_from_main = data;
-		state->m_main_sent = 1;
-		cputag_set_input_line(space->machine(), "mcu", 0, ASSERT_LINE);
+		m_from_main = data;
+		m_main_sent = 1;
+		cputag_set_input_line(machine(), "mcu", 0, ASSERT_LINE);
 	}
 }
 
-static void mcu_process_command(renegade_state *state)
+void renegade_state::mcu_process_command()
 {
-	state->m_mcu_input_size = 0;
-	state->m_mcu_output_byte = 0;
+	m_mcu_input_size = 0;
+	m_mcu_output_byte = 0;
 
-	switch (state->m_mcu_buffer[0])
+	switch (m_mcu_buffer[0])
 	{
 	/* 0x0d: stop MCU when ROM check fails */
 
 	case 0x10:
-		state->m_mcu_buffer[0] = state->m_mcu_checksum;
+		m_mcu_buffer[0] = m_mcu_checksum;
 		break;
 
 	case 0x26: /* sound code -> sound command */
 		{
-			int sound_code = state->m_mcu_buffer[1];
+			int sound_code = m_mcu_buffer[1];
 			static const UINT8 sound_command_table[256] =
 			{
 				0xa0, 0xa1, 0xa2, 0x80, 0x81, 0x82, 0x83, 0x84,
@@ -469,27 +467,27 @@ static void mcu_process_command(renegade_state *state)
 				0x0f, 0x0f, 0x0f, 0x0f, 0x0f, 0xff, 0xff, 0xff,
 				0xef, 0xef, 0xcf, 0x8f, 0x8f, 0x0f, 0x0f, 0x0f
 			};
-			state->m_mcu_buffer[0] = 1;
-			state->m_mcu_buffer[1] = sound_command_table[sound_code];
+			m_mcu_buffer[0] = 1;
+			m_mcu_buffer[1] = sound_command_table[sound_code];
 		}
 		break;
 
 	case 0x33: /* joy bits -> joy dir */
 		{
-			int joy_bits = state->m_mcu_buffer[2];
+			int joy_bits = m_mcu_buffer[2];
 			static const UINT8 joy_table[0x10] =
 			{
 				0, 3, 7, 0, 1, 2, 8, 0, 5, 4, 6, 0, 0, 0, 0, 0
 			};
-			state->m_mcu_buffer[0] = 1;
-			state->m_mcu_buffer[1] = joy_table[joy_bits & 0xf];
+			m_mcu_buffer[0] = 1;
+			m_mcu_buffer[1] = joy_table[joy_bits & 0xf];
 		}
 		break;
 
 	case 0x44: /* 0x44, 0xff, DSW2, stage# -> difficulty */
 		{
-			int difficulty = state->m_mcu_buffer[2] & 0x3;
-			int stage = state->m_mcu_buffer[3];
+			int difficulty = m_mcu_buffer[2] & 0x3;
+			int stage = m_mcu_buffer[3];
 			static const UINT8 difficulty_table[4] = { 5, 3, 1, 2 };
 			int result = difficulty_table[difficulty];
 
@@ -499,38 +497,38 @@ static void mcu_process_command(renegade_state *state)
 			if (result > 0x21)
 				result += 0xc0;
 
-			state->m_mcu_buffer[0] = 1;
-			state->m_mcu_buffer[1] = result;
+			m_mcu_buffer[0] = 1;
+			m_mcu_buffer[1] = result;
 		}
 		break;
 
 	case 0x55: /* 0x55, 0x00, 0x00, 0x00, DSW2 -> timer */
 		{
-			int difficulty = state->m_mcu_buffer[4] & 0x3;
+			int difficulty = m_mcu_buffer[4] & 0x3;
 			static const UINT16 table[4] =
 			{
 				0x4001, 0x5001, 0x1502, 0x0002
 			};
 
-			state->m_mcu_buffer[0] = 3;
-			state->m_mcu_buffer[2] = table[difficulty] >> 8;
-			state->m_mcu_buffer[3] = table[difficulty] & 0xff;
+			m_mcu_buffer[0] = 3;
+			m_mcu_buffer[2] = table[difficulty] >> 8;
+			m_mcu_buffer[3] = table[difficulty] & 0xff;
 		}
 		break;
 
 	case 0x41: /* 0x41, 0x00, 0x00, stage# -> ? */
 		{
-//          int stage = state->m_mcu_buffer[3];
-			state->m_mcu_buffer[0] = 2;
-			state->m_mcu_buffer[1] = 0x20;
-			state->m_mcu_buffer[2] = 0x78;
+//          int stage = m_mcu_buffer[3];
+			m_mcu_buffer[0] = 2;
+			m_mcu_buffer[1] = 0x20;
+			m_mcu_buffer[2] = 0x78;
 		}
 		break;
 
 	case 0x40: /* 0x40, 0x00, difficulty, enemy_type -> enemy health */
 		{
-			int difficulty = state->m_mcu_buffer[2];
-			int enemy_type = state->m_mcu_buffer[3];
+			int difficulty = m_mcu_buffer[2];
+			int enemy_type = m_mcu_buffer[3];
 			int health;
 
 			if (enemy_type <= 4)
@@ -546,15 +544,15 @@ static void mcu_process_command(renegade_state *state)
 					health = 0x20;	/* max 0x20 */
 			}
 			logerror("e_type:0x%02x diff:0x%02x -> 0x%02x\n", enemy_type, difficulty, health);
-			state->m_mcu_buffer[0] = 1;
-			state->m_mcu_buffer[1] = health;
+			m_mcu_buffer[0] = 1;
+			m_mcu_buffer[1] = health;
 		}
 		break;
 
 	case 0x42: /* 0x42, 0x00, stage#, character# -> enemy_type */
 		{
-			int stage = state->m_mcu_buffer[2] & 0x3;
-			int indx = state->m_mcu_buffer[3];
+			int stage = m_mcu_buffer[2] & 0x3;
+			int indx = m_mcu_buffer[3];
 			int enemy_type=0;
 
 			static const int table[] =
@@ -572,36 +570,35 @@ static void mcu_process_command(renegade_state *state)
 
 			enemy_type = table[offset];
 
-			state->m_mcu_buffer[0] = 1;
-			state->m_mcu_buffer[1] = enemy_type;
+			m_mcu_buffer[0] = 1;
+			m_mcu_buffer[1] = enemy_type;
 		}
 		break;
 
 	default:
-		logerror("unknown MCU command: %02x\n", state->m_mcu_buffer[0]);
+		logerror("unknown MCU command: %02x\n", m_mcu_buffer[0]);
 		break;
 	}
 }
 
-static READ8_HANDLER( mcu_r )
+READ8_MEMBER(renegade_state::mcu_r)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	if (state->m_mcu_sim == TRUE)
+	if (m_mcu_sim == TRUE)
 	{
 		int result = 1;
 
-		if (state->m_mcu_input_size)
-			mcu_process_command(state);
+		if (m_mcu_input_size)
+			mcu_process_command();
 
-		if (state->m_mcu_output_byte < MCU_BUFFER_MAX)
-			result = state->m_mcu_buffer[state->m_mcu_output_byte++];
+		if (m_mcu_output_byte < MCU_BUFFER_MAX)
+			result = m_mcu_buffer[m_mcu_output_byte++];
 
 		return result;
 	}
 	else
 	{
-		state->m_mcu_sent = 0;
-		return state->m_from_mcu;
+		m_mcu_sent = 0;
+		return m_from_mcu;
 	}
 }
 
@@ -627,13 +624,12 @@ static CUSTOM_INPUT( mcu_status_r )
 
 /********************************************************************************************/
 
-static WRITE8_HANDLER( bankswitch_w )
+WRITE8_MEMBER(renegade_state::bankswitch_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	if ((data & 1) != state->m_bank)
+	if ((data & 1) != m_bank)
 	{
-		state->m_bank = data & 1;
-		setbank(space->machine());
+		m_bank = data & 1;
+		setbank(machine());
 	}
 }
 
@@ -648,7 +644,7 @@ static TIMER_DEVICE_CALLBACK( renegade_interrupt )
 		device_set_input_line(state->m_maincpu, 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( renegade_coin_counter_w )
+WRITE8_MEMBER(renegade_state::renegade_coin_counter_w)
 {
 	//coin_counter_w(offset, data);
 }
@@ -665,12 +661,12 @@ static ADDRESS_MAP_START( renegade_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x3100, 0x31ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0") AM_WRITE_LEGACY(renegade_scroll0_w)		/* Player#1 controls, P1,P2 start */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE_LEGACY(renegade_scroll1_w)		/* Player#2 controls, coin triggers */
-	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(sound_w)	/* DIP2  various IO ports */
+	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_WRITE(sound_w)	/* DIP2  various IO ports */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(renegade_flipscreen_w)	/* DIP1 */
-	AM_RANGE(0x3804, 0x3804) AM_READWRITE_LEGACY(mcu_r, mcu_w)
-	AM_RANGE(0x3805, 0x3805) AM_READWRITE_LEGACY(mcu_reset_r, bankswitch_w)
+	AM_RANGE(0x3804, 0x3804) AM_READWRITE(mcu_r, mcu_w)
+	AM_RANGE(0x3805, 0x3805) AM_READWRITE(mcu_reset_r, bankswitch_w)
 	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
-	AM_RANGE(0x3807, 0x3807) AM_WRITE_LEGACY(renegade_coin_counter_w)
+	AM_RANGE(0x3807, 0x3807) AM_WRITE(renegade_coin_counter_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

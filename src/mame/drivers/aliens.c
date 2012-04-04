@@ -27,39 +27,36 @@ static INTERRUPT_GEN( aliens_interrupt )
 		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
-static READ8_HANDLER( bankedram_r )
+READ8_MEMBER(aliens_state::bankedram_r)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
 
-	if (state->m_palette_selected)
-		return space->machine().generic.paletteram.u8[offset];
+	if (m_palette_selected)
+		return machine().generic.paletteram.u8[offset];
 	else
-		return state->m_ram[offset];
+		return m_ram[offset];
 }
 
-static WRITE8_HANDLER( bankedram_w )
+WRITE8_MEMBER(aliens_state::bankedram_w)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
 
-	if (state->m_palette_selected)
+	if (m_palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
 	else
-		state->m_ram[offset] = data;
+		m_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( aliens_coin_counter_w )
+WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
 
 	/* bits 0-1 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 5 = select work RAM or palette */
-	state->m_palette_selected = data & 0x20;
+	m_palette_selected = data & 0x20;
 
 	/* bit 6 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* other bits unknown */
 #if 0
@@ -71,12 +68,11 @@ static WRITE8_HANDLER( aliens_coin_counter_w )
 #endif
 }
 
-static WRITE8_HANDLER( aliens_sh_irqtrigger_w )
+WRITE8_MEMBER(aliens_state::aliens_sh_irqtrigger_w)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
 
 	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
@@ -93,37 +89,35 @@ static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
 }
 
 
-static READ8_HANDLER( k052109_051960_r )
+READ8_MEMBER(aliens_state::k052109_051960_r)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
 
-	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->m_k051960, offset - 0x3800);
+			return k051937_r(m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->m_k052109, offset);
+			return k052109_r(m_k052109, offset);
 		else
-			return k051960_r(state->m_k051960, offset - 0x3c00);
+			return k051960_r(m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->m_k052109, offset);
+		return k052109_r(m_k052109, offset);
 }
 
-static WRITE8_HANDLER( k052109_051960_w )
+WRITE8_MEMBER(aliens_state::k052109_051960_w)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->m_k051960, offset - 0x3800, data);
+		k051937_w(m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->m_k052109, offset, data);
+		k052109_w(m_k052109, offset, data);
 	else
-		k051960_w(state->m_k051960, offset - 0x3c00, data);
+		k051960_w(m_k051960, offset - 0x3c00, data);
 }
 
 static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8, aliens_state )
-	AM_RANGE(0x0000, 0x03ff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE(m_ram)		/* palette + work RAM */
+	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(m_ram)		/* palette + work RAM */
 	AM_RANGE(0x0400, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")												/* banked ROM */
 	AM_RANGE(0x5f80, 0x5f80) AM_READ_PORT("DSW3")
@@ -131,9 +125,9 @@ static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8, aliens_state )
 	AM_RANGE(0x5f82, 0x5f82) AM_READ_PORT("P2")
 	AM_RANGE(0x5f83, 0x5f83) AM_READ_PORT("DSW2")
 	AM_RANGE(0x5f84, 0x5f84) AM_READ_PORT("DSW1")
-	AM_RANGE(0x5f88, 0x5f88) AM_READWRITE_LEGACY(watchdog_reset_r, aliens_coin_counter_w)		/* coin counters */
-	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE_LEGACY(aliens_sh_irqtrigger_w)							/* cause interrupt on audio CPU */
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)
+	AM_RANGE(0x5f88, 0x5f88) AM_READ_LEGACY(watchdog_reset_r) AM_WRITE(aliens_coin_counter_w)		/* coin counters */
+	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(aliens_sh_irqtrigger_w)							/* cause interrupt on audio CPU */
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM														/* ROM e24_j02.bin */
 ADDRESS_MAP_END
 

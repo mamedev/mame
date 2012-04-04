@@ -96,14 +96,14 @@ ADDRESS_MAP_END
 
 /* Pocket Gal Deluxe (bootleg!) */
 
-static READ16_HANDLER( pckgaldx_unknown_r )
+READ16_MEMBER(pktgaldx_state::pckgaldx_unknown_r)
 {
 	return 0xffff;
 }
 
-static READ16_HANDLER( pckgaldx_protection_r )
+READ16_MEMBER(pktgaldx_state::pckgaldx_protection_r)
 {
-	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(&space->device()));
+	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(&space.device()));
 	return -1;
 }
 
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 //  AM_RANGE(0x160000, 0x167fff) AM_RAM
 	AM_RANGE(0x164800, 0x164801) AM_DEVWRITE_LEGACY("oki2", pktgaldx_oki_bank_w)
 	AM_RANGE(0x160000, 0x167fff) AM_WRITENOP
-	AM_RANGE(0x16500a, 0x16500b) AM_READ_LEGACY(pckgaldx_unknown_r)
+	AM_RANGE(0x16500a, 0x16500b) AM_READ(pckgaldx_unknown_r)
 
 	/* should we really be using these to read the i/o in the BOOTLEG?
       these look like i/o through protection ... */
@@ -144,8 +144,8 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x167c4c, 0x167c4d) AM_READ_PORT("DSW")
 	AM_RANGE(0x167db2, 0x167db3) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x167d10, 0x167d11) AM_READ_LEGACY(pckgaldx_protection_r) // check code at 6ea
-	AM_RANGE(0x167d1a, 0x167d1b) AM_READ_LEGACY(pckgaldx_protection_r) // check code at 7C4
+	AM_RANGE(0x167d10, 0x167d11) AM_READ(pckgaldx_protection_r) // check code at 6ea
+	AM_RANGE(0x167d1a, 0x167d1b) AM_READ(pckgaldx_protection_r) // check code at 7C4
 
 	AM_RANGE(0x170000, 0x17ffff) AM_RAM
 

@@ -247,9 +247,9 @@ static INTERRUPT_GEN( cadash_interrupt )
             SOUND
 ************************************************/
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(asuka_state::sound_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	memory_set_bank(machine(), "bank1", data & 0x03);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_2151_w )
@@ -276,10 +276,9 @@ static void asuka_msm5205_vck( device_t *device )
 	}
 }
 
-static WRITE8_HANDLER( asuka_msm5205_address_w )
+WRITE8_MEMBER(asuka_state::asuka_msm5205_address_w)
 {
-	asuka_state *state = space->machine().driver_data<asuka_state>();
-	state->m_adpcm_pos = (state->m_adpcm_pos & 0x00ff) | (data << 8);
+	m_adpcm_pos = (m_adpcm_pos & 0x00ff) | (data << 8);
 }
 
 static WRITE8_DEVICE_HANDLER( asuka_msm5205_start_w )
@@ -296,12 +295,12 @@ static WRITE8_DEVICE_HANDLER( asuka_msm5205_stop_w )
 
 static UINT8 *cadash_shared_ram;
 
-static READ16_HANDLER( cadash_share_r )
+READ16_MEMBER(asuka_state::cadash_share_r)
 {
 	return cadash_shared_ram[offset];
 }
 
-static WRITE16_HANDLER( cadash_share_w )
+WRITE16_MEMBER(asuka_state::cadash_share_w)
 {
 	cadash_shared_ram[offset] = data & 0xff;
 }
@@ -352,7 +351,7 @@ static ADDRESS_MAP_START( cadash_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x100000, 0x107fff) AM_RAM
-	AM_RANGE(0x800000, 0x800fff) AM_READWRITE_LEGACY(cadash_share_r,cadash_share_w)	/* network ram */
+	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(cadash_share_r,cadash_share_w)	/* network ram */
 	AM_RANGE(0x900000, 0x90000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
 	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_4bpg_word_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("pc090oj", pc090oj_word_r, pc090oj_word_w)	/* sprite ram */
@@ -389,7 +388,7 @@ static ADDRESS_MAP_START( bonzeadv_z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0xe600, 0xe600) AM_WRITENOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP
-	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(sound_bankswitch_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, asuka_state )
@@ -400,7 +399,7 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, asuka_state )
 //  AM_RANGE(0x9002, 0x9100) AM_READNOP
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(asuka_msm5205_address_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(asuka_msm5205_address_w)
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("msm", asuka_msm5205_start_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", asuka_msm5205_stop_w)
 ADDRESS_MAP_END

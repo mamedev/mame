@@ -81,6 +81,13 @@ public:
 	struct star m_stars[STAR_COUNT];
 
 	UINT8 m_nmi_mask; /* Harem per-game specific */
+	DECLARE_READ8_MEMBER(drivfrcg_port0_r);
+	DECLARE_READ8_MEMBER(scramb2_protection_r);
+	DECLARE_READ8_MEMBER(scramb2_port0_r);
+	DECLARE_READ8_MEMBER(scramb2_port1_r);
+	DECLARE_READ8_MEMBER(scramb2_port2_r);
+	DECLARE_WRITE8_MEMBER(harem_nmi_mask_w);
+	DECLARE_READ8_MEMBER(hexpoola_data_port_r);
 };
 
 

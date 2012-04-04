@@ -46,6 +46,7 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(exerion_protection_r);
 };
 
 

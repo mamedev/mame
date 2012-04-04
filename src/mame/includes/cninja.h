@@ -45,6 +45,13 @@ public:
 	optional_device<okim6295_device> m_oki2;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram2;
+	DECLARE_WRITE16_MEMBER(cninja_sound_w);
+	DECLARE_WRITE16_MEMBER(stoneage_sound_w);
+	DECLARE_READ16_MEMBER(cninja_irq_r);
+	DECLARE_WRITE16_MEMBER(cninja_irq_w);
+	DECLARE_READ16_MEMBER(robocop2_prot_r);
+	DECLARE_WRITE16_MEMBER(cninja_pf12_control_w);
+	DECLARE_WRITE16_MEMBER(cninja_pf34_control_w);
 };
 
 /*----------- defined in video/cninja.c -----------*/

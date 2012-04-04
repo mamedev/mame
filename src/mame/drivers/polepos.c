@@ -241,42 +241,40 @@ Todo:
 /* Pole Position II protection                                                       */
 /*************************************************************************************/
 
-static READ16_HANDLER( polepos2_ic25_r )
+READ16_MEMBER(polepos_state::polepos2_ic25_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
 	int result;
 	/* protection states */
 
 	offset = offset & 0x1ff;
 	if (offset < 0x100)
 	{
-		state->m_last_signed = offset & 0xff;
-		result = state->m_last_result & 0xff;
+		m_last_signed = offset & 0xff;
+		result = m_last_result & 0xff;
 	}
 	else
 	{
-		state->m_last_unsigned = offset & 0xff;
-		result = (state->m_last_result >> 8) & 0xff;
-		state->m_last_result = (INT8)state->m_last_signed * (UINT8)state->m_last_unsigned;
+		m_last_unsigned = offset & 0xff;
+		result = (m_last_result >> 8) & 0xff;
+		m_last_result = (INT8)m_last_signed * (UINT8)m_last_unsigned;
 	}
 
-//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(&space->device()), offset, result);
+//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(&space.device()), offset, result);
 
 	return result | (result << 8);
 }
 
 
-static READ8_HANDLER( polepos_adc_r )
+READ8_MEMBER(polepos_state::polepos_adc_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return input_port_read(space->machine(), state->m_adc_input ? "ACCEL" : "BRAKE");
+	return input_port_read(machine(), m_adc_input ? "ACCEL" : "BRAKE");
 }
 
-static READ8_HANDLER( polepos_ready_r )
+READ8_MEMBER(polepos_state::polepos_ready_r)
 {
 	int ret = 0xff;
 
-	if (space->machine().primary_screen->vpos() >= 128)
+	if (machine().primary_screen->vpos() >= 128)
 		ret ^= 0x02;
 
 	ret ^= 0x08; /* ADC End Flag */
@@ -285,17 +283,16 @@ static READ8_HANDLER( polepos_ready_r )
 }
 
 
-static WRITE8_HANDLER( polepos_latch_w )
+WRITE8_MEMBER(polepos_state::polepos_latch_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
 	int bit = data & 1;
 
 	switch (offset)
 	{
 		case 0x00:	/* IRQON */
-			state->m_main_irq_mask = bit;
+			m_main_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IOSEL */
@@ -303,44 +300,43 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x02:	/* CLSON */
-			polepos_sound_enable(space->machine().device("namco"),bit);
+			polepos_sound_enable(machine().device("namco"),bit);
 			if (!bit)
 			{
-				polepos_engine_sound_lsb_w(space->machine().device("polepos"), 0, 0);
-				polepos_engine_sound_msb_w(space->machine().device("polepos"), 0, 0);
+				polepos_engine_sound_lsb_w(machine().device("polepos"), 0, 0);
+				polepos_engine_sound_msb_w(machine().device("polepos"), 0, 0);
 			}
 			break;
 
 		case 0x03:	/* GASEL */
-			state->m_adc_input = bit;
+			m_adc_input = bit;
 			break;
 
 		case 0x04:	/* RESB */
-			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x05:	/* RESA */
-			cputag_set_input_line(space->machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x06:	/* SB0 */
-			state->m_auto_start_mask = !bit;
+			m_auto_start_mask = !bit;
 			break;
 
 		case 0x07:	/* CHACL */
-			polepos_chacl_w(space,offset,data);
+			polepos_chacl_w(&space,offset,data);
 			break;
 	}
 }
 
-static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
+WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
 	data &= 1;
 
-	state->m_sub_irq_mask = data;
+	m_sub_irq_mask = data;
 	if (!data)
-		device_set_input_line(&space->device(), 0, CLEAR_LINE);
+		device_set_input_line(&space.device(), 0, CLEAR_LINE);
 }
 
 
@@ -470,12 +466,13 @@ static TIMER_DEVICE_CALLBACK( polepos_scanline )
 
 static MACHINE_RESET( polepos )
 {
+	polepos_state *state = machine.driver_data<polepos_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 8; i++)
-		polepos_latch_w(space, i, 0);
+		state->polepos_latch_w(*space, i, 0);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
 	device_set_input_line_vector(machine.device("sub"), 0, Z8000_NVI);
@@ -501,8 +498,8 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, polepos_state )
 
 	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0eff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_data_r, namco_06xx_data_w)
 	AM_RANGE(0x9100, 0x9100) AM_MIRROR(0x0eff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0cff) AM_READ_LEGACY(polepos_ready_r)					/* READY */
-	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x0cf8) AM_WRITE_LEGACY(polepos_latch_w)				/* misc latches */
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0cff) AM_READ(polepos_ready_r)					/* READY */
+	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x0cf8) AM_WRITE(polepos_latch_w)				/* misc latches */
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(watchdog_reset_w)				/* Watchdog */
 	AM_RANGE(0xa200, 0xa200) AM_MIRROR(0x0cff) AM_DEVWRITE_LEGACY("polepos", polepos_engine_sound_lsb_w)	/* Car Sound ( Lower Nibble ) */
 	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x0cff) AM_DEVWRITE_LEGACY("polepos", polepos_engine_sound_msb_w)	/* Car Sound ( Upper Nibble ) */
@@ -510,14 +507,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io, AS_IO, 8, polepos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(polepos_adc_r) AM_WRITENOP
+	AM_RANGE(0x00, 0x00) AM_READ(polepos_adc_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
 /* the same memory map is used by both Z8002 CPUs; all RAM areas are shared */
 static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16, polepos_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE_LEGACY(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
+	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE_LEGACY(polepos_sprite16_r, polepos_sprite16_w) AM_BASE(m_sprite16_memory)	/* Motion Object */
 	AM_RANGE(0x9000, 0x97ff) AM_READWRITE_LEGACY(polepos_road16_r, polepos_road16_w) AM_BASE(m_road16_memory)		/* Road Memory */
 	AM_RANGE(0x9800, 0x9fff) AM_READWRITE_LEGACY(polepos_alpha16_r, polepos_alpha16_w) AM_BASE(m_alpha16_memory)	/* Alphanumeric (char ram) */
@@ -1991,8 +1988,9 @@ static DRIVER_INIT( topracern )
 
 static DRIVER_INIT( polepos2 )
 {
+	polepos_state *state = machine.driver_data<polepos_state>();
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x5fff, FUNC(polepos2_ic25_r));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),state));
 }
 
 

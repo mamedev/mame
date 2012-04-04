@@ -21,6 +21,8 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 
 	int m_flipscreen;
+	DECLARE_WRITE16_MEMBER(darkseal_control_w);
+	DECLARE_READ16_MEMBER(darkseal_control_r);
 };
 
 

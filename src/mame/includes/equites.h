@@ -53,6 +53,19 @@ public:
 	msm5232_device *m_msm;
 	device_t *m_dac_1;
 	device_t *m_dac_2;
+	DECLARE_WRITE8_MEMBER(equites_c0f8_w);
+	DECLARE_WRITE8_MEMBER(equites_cymbal_ctrl_w);
+	DECLARE_WRITE8_MEMBER(equites_dac_latch_w);
+	DECLARE_WRITE8_MEMBER(equites_8155_portb_w);
+	DECLARE_WRITE8_MEMBER(equites_8155_w);
+	DECLARE_READ16_MEMBER(hvoltage_debug_r);
+	DECLARE_WRITE16_MEMBER(gekisou_unknown_0_w);
+	DECLARE_WRITE16_MEMBER(gekisou_unknown_1_w);
+	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
+	DECLARE_READ16_MEMBER(mcu_r);
+	DECLARE_WRITE16_MEMBER(mcu_w);
+	DECLARE_WRITE16_MEMBER(mcu_halt_assert_w);
+	DECLARE_WRITE16_MEMBER(mcu_halt_clear_w);
 };
 
 

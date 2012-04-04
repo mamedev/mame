@@ -37,6 +37,14 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_WRITE32_MEMBER(paletteram32_xRRRRRGGGGGBBBBB_dword_w);
+	DECLARE_READ32_MEMBER(snd_020_r);
+	DECLARE_WRITE32_MEMBER(snd_020_w);
+	DECLARE_WRITE32_MEMBER(fuuki32_vregs_w);
+	DECLARE_WRITE8_MEMBER(fuuki32_sound_bw_w);
+	DECLARE_READ8_MEMBER(snd_z80_r);
+	DECLARE_WRITE8_MEMBER(snd_z80_w);
+	DECLARE_WRITE8_MEMBER(snd_ymf278b_w);
 };
 
 

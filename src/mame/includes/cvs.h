@@ -63,6 +63,12 @@ public:
 	UINT8      m_character_ram[3 * 0x800];	/* only half is used, but
                                                by allocating twice the amount,
                                                we can use the same gfx_layout */
+	DECLARE_READ8_MEMBER(cvs_input_r);
+	DECLARE_READ8_MEMBER(cvs_393hz_clock_r);
+	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_lo_w);
+	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_hi_w);
+	DECLARE_READ8_MEMBER(cvs_speech_command_r);
+	DECLARE_WRITE8_MEMBER(audio_command_w);
 };
 
 

@@ -25,6 +25,21 @@ public:
 	tilemap_t *m_tilemap_page[8];
 	UINT8 m_tilemap_pages;
 	UINT8 *m_spriteram;
+	DECLARE_WRITE8_MEMBER(videomode_w);
+	DECLARE_READ8_MEMBER(sound_data_r);
+	DECLARE_WRITE8_MEMBER(soundport_w);
+	DECLARE_WRITE8_MEMBER(mcu_control_w);
+	DECLARE_WRITE8_MEMBER(mcu_io_w);
+	DECLARE_READ8_MEMBER(mcu_io_r);
+	DECLARE_WRITE8_MEMBER(nob_mcu_control_p2_w);
+	DECLARE_READ8_MEMBER(nob_maincpu_latch_r);
+	DECLARE_WRITE8_MEMBER(nob_maincpu_latch_w);
+	DECLARE_READ8_MEMBER(nob_mcu_status_r);
+	DECLARE_READ8_MEMBER(nobb_inport1c_r);
+	DECLARE_READ8_MEMBER(nobb_inport22_r);
+	DECLARE_READ8_MEMBER(nobb_inport23_r);
+	DECLARE_WRITE8_MEMBER(nobb_outport24_w);
+	DECLARE_READ8_MEMBER(nob_start_r);
 };
 
 

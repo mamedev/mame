@@ -28,6 +28,19 @@ public:
 	UINT16 m_video_register;
 	tilemap_t *m_text_tilemap;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	DECLARE_READ16_MEMBER(videoram16_r);
+	DECLARE_WRITE16_MEMBER(videoram16_w);
+	DECLARE_READ16_MEMBER(extra_rom_r);
+	DECLARE_READ16_MEMBER(twin16_gfx_rom1_r);
+	DECLARE_READ16_MEMBER(twin16_gfx_rom2_r);
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE16_MEMBER(twin16_CPUA_register_w);
+	DECLARE_WRITE16_MEMBER(twin16_CPUB_register_w);
+	DECLARE_WRITE16_MEMBER(fround_CPU_register_w);
+	DECLARE_READ16_MEMBER(twin16_input_r);
+	DECLARE_READ16_MEMBER(cuebrickj_nvram_r);
+	DECLARE_WRITE16_MEMBER(cuebrickj_nvram_w);
+	DECLARE_WRITE16_MEMBER(cuebrickj_nvram_bank_w);
 };
 
 

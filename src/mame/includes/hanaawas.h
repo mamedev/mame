@@ -19,6 +19,8 @@ public:
 
 	/* misc */
 	int        m_mux;
+	DECLARE_READ8_MEMBER(hanaawas_input_port_0_r);
+	DECLARE_WRITE8_MEMBER(hanaawas_inputs_mux_w);
 };
 
 

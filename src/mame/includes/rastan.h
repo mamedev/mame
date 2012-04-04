@@ -26,6 +26,7 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_pc090oj;
 	device_t *m_pc080sn;
+	DECLARE_WRITE8_MEMBER(rastan_msm5205_address_w);
 };
 
 

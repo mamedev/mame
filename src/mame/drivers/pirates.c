@@ -105,11 +105,11 @@ static const eeprom_interface eeprom_intf =
 	"*10011xxxx"	/* unlock command */
 };
 
-static WRITE16_HANDLER( pirates_out_w )
+WRITE16_MEMBER(pirates_state::pirates_out_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+		eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 
 		/* bits 0-2 control EEPROM */
 		eeprom->write_bit(data & 0x04);
@@ -117,13 +117,13 @@ static WRITE16_HANDLER( pirates_out_w )
 		eeprom->set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 selects oki bank */
-		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
+		okim6295_device *oki = machine().device<okim6295_device>("oki");
 		oki->set_bank_base((data & 0x40) ? 0x40000 : 0x00000);
 
 		/* bit 7 used (function unknown) */
 	}
 
-//  logerror("%06x: out_w %04x\n",cpu_get_pc(&space->device()),data);
+//  logerror("%06x: out_w %04x\n",cpu_get_pc(&space.device()),data);
 }
 
 static CUSTOM_INPUT( prot_r )
@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( pirates_map, AS_PROGRAM, 16, pirates_state )
 //  AM_RANGE(0x500000, 0x5007ff) AM_RAM
 	AM_RANGE(0x500000, 0x5007ff) AM_WRITEONLY AM_BASE(m_spriteram)
 //  AM_RANGE(0x500800, 0x50080f) AM_WRITENOP
-	AM_RANGE(0x600000, 0x600001) AM_WRITE_LEGACY(pirates_out_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(pirates_out_w)
 	AM_RANGE(0x700000, 0x700001) AM_WRITEONLY AM_BASE(m_scroll)	// scroll reg
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x900000, 0x90017f) AM_RAM  // more of tilemaps ?
@@ -449,7 +449,7 @@ static DRIVER_INIT( pirates )
 	rom[0x62c0/2] = 0x6006; // beq -> bra
 }
 
-static READ16_HANDLER( genix_prot_r ) {	if(!offset)	return 0x0004; else	return 0x0000; }
+READ16_MEMBER(pirates_state::genix_prot_r){	if(!offset)	return 0x0004; else	return 0x0000; }
 
 static DRIVER_INIT( genix )
 {
@@ -460,7 +460,8 @@ static DRIVER_INIT( genix )
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x109e98, 0x109e9b, FUNC(genix_prot_r) );
+	pirates_state *state = machine.driver_data<pirates_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x109e98, 0x109e9b, read16_delegate(FUNC(pirates_state::genix_prot_r),state));
 }
 
 

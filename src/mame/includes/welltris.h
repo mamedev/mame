@@ -17,6 +17,9 @@ public:
 	UINT16 m_pixelpalettebank;
 	int m_scrollx;
 	int m_scrolly;
+	DECLARE_WRITE8_MEMBER(welltris_sh_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 };
 
 

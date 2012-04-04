@@ -92,10 +92,9 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( irobot_nvram_w )
+WRITE8_MEMBER(irobot_state::irobot_nvram_w)
 {
-	irobot_state *state = space->machine().driver_data<irobot_state>();
-	state->m_nvram[offset] = data & 0x0f;
+	m_nvram[offset] = data & 0x0f;
 }
 
 
@@ -106,15 +105,15 @@ static WRITE8_HANDLER( irobot_nvram_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( irobot_clearirq_w )
+WRITE8_MEMBER(irobot_state::irobot_clearirq_w)
 {
-    cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE ,CLEAR_LINE);
+    cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE ,CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( irobot_clearfirq_w )
+WRITE8_MEMBER(irobot_state::irobot_clearfirq_w)
 {
-    cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE ,CLEAR_LINE);
+    cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE ,CLEAR_LINE);
 }
 
 
@@ -132,16 +131,16 @@ static ADDRESS_MAP_START( irobot_map, AS_PROGRAM, 8, irobot_state )
     AM_RANGE(0x1040, 0x1040) AM_READ_PORT("IN1")
     AM_RANGE(0x1080, 0x1080) AM_READ_LEGACY(irobot_status_r)
     AM_RANGE(0x10c0, 0x10c0) AM_READ_PORT("DSW1")
-    AM_RANGE(0x1100, 0x1100) AM_WRITE_LEGACY(irobot_clearirq_w)
+    AM_RANGE(0x1100, 0x1100) AM_WRITE(irobot_clearirq_w)
     AM_RANGE(0x1140, 0x1140) AM_WRITE_LEGACY(irobot_statwr_w)
     AM_RANGE(0x1180, 0x1180) AM_WRITE_LEGACY(irobot_out0_w)
     AM_RANGE(0x11c0, 0x11c0) AM_WRITE_LEGACY(irobot_rom_banksel_w)
-    AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE_LEGACY(irobot_nvram_w) AM_SHARE("nvram")
+    AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE(irobot_nvram_w) AM_SHARE("nvram")
     AM_RANGE(0x1300, 0x13ff) AM_READ_LEGACY(irobot_control_r)
     AM_RANGE(0x1400, 0x143f) AM_READWRITE_LEGACY(quad_pokey_r, quad_pokey_w)
     AM_RANGE(0x1800, 0x18ff) AM_WRITE_LEGACY(irobot_paletteram_w)
     AM_RANGE(0x1900, 0x19ff) AM_WRITEONLY            /* Watchdog reset */
-    AM_RANGE(0x1a00, 0x1a00) AM_WRITE_LEGACY(irobot_clearfirq_w)
+    AM_RANGE(0x1a00, 0x1a00) AM_WRITE(irobot_clearfirq_w)
     AM_RANGE(0x1b00, 0x1bff) AM_WRITE_LEGACY(irobot_control_w)
     AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE(m_videoram)
     AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(irobot_sharedmem_r, irobot_sharedmem_w)

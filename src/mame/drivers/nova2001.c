@@ -138,18 +138,16 @@ static CUSTOM_INPUT( ninjakun_io_A002_ctrl_r )
 	return state->m_ninjakun_io_a002_ctrl;
 }
 
-static WRITE8_HANDLER( ninjakun_cpu1_io_A002_w )
+WRITE8_MEMBER(nova2001_state::ninjakun_cpu1_io_A002_w)
 {
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	if( data == 0x80 ) state->m_ninjakun_io_a002_ctrl |= 0x01;
-	if( data == 0x40 ) state->m_ninjakun_io_a002_ctrl &= ~0x02;
+	if( data == 0x80 ) m_ninjakun_io_a002_ctrl |= 0x01;
+	if( data == 0x40 ) m_ninjakun_io_a002_ctrl &= ~0x02;
 }
 
-static WRITE8_HANDLER( ninjakun_cpu2_io_A002_w )
+WRITE8_MEMBER(nova2001_state::ninjakun_cpu2_io_A002_w)
 {
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	if( data == 0x40 ) state->m_ninjakun_io_a002_ctrl |= 0x02;
-	if( data == 0x80 ) state->m_ninjakun_io_a002_ctrl &= ~0x01;
+	if( data == 0x40 ) m_ninjakun_io_a002_ctrl |= 0x02;
+	if( data == 0x80 ) m_ninjakun_io_a002_ctrl &= ~0x01;
 }
 
 
@@ -202,7 +200,7 @@ static ADDRESS_MAP_START( ninjakun_cpu1_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0x8003, 0x8003) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE_LEGACY(ninjakun_cpu1_io_A002_w)
+	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu1_io_A002_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(pkunwar_flipscreen_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(nova2001_fg_videoram_w) AM_BASE(m_fg_videoram) AM_SHARE("share1")
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_BASE(m_bg_videoram) AM_SHARE("share2")
@@ -221,7 +219,7 @@ static ADDRESS_MAP_START( ninjakun_cpu2_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0x8003, 0x8003) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
-	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE_LEGACY(ninjakun_cpu2_io_A002_w)
+	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu2_io_A002_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(nova2001_flipscreen_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(nova2001_fg_videoram_w) AM_SHARE("share1")
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("share2")

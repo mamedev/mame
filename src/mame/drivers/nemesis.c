@@ -118,86 +118,78 @@ static INTERRUPT_GEN( blkpnthr_interrupt )
 }
 
 
-static WRITE16_HANDLER( gx400_irq1_enable_word_w )
+WRITE16_MEMBER(nemesis_state::gx400_irq1_enable_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_irq1_on = data & 0x0001;
+		m_irq1_on = data & 0x0001;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(space->machine(), 1, data & 0x0100);
+		coin_lockout_w(machine(), 1, data & 0x0100);
 }
 
-static WRITE16_HANDLER( gx400_irq2_enable_word_w )
+WRITE16_MEMBER(nemesis_state::gx400_irq2_enable_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_irq2_on = data & 0x0001;
+		m_irq2_on = data & 0x0001;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(space->machine(), 0, data & 0x0100);
+		coin_lockout_w(machine(), 0, data & 0x0100);
 }
 
-static WRITE16_HANDLER( gx400_irq4_enable_word_w )
+WRITE16_MEMBER(nemesis_state::gx400_irq4_enable_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_8_15)
-		state->m_irq4_on = data & 0x0100;
+		m_irq4_on = data & 0x0100;
 }
 
-static WRITE16_HANDLER( nemesis_irq_enable_word_w )
+WRITE16_MEMBER(nemesis_state::nemesis_irq_enable_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_irq_on = data & 0xff;
+		m_irq_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_global_w(space->machine(), data & 0x0100);
+		coin_lockout_global_w(machine(), data & 0x0100);
 }
 
-static WRITE16_HANDLER( konamigt_irq_enable_word_w )
+WRITE16_MEMBER(nemesis_state::konamigt_irq_enable_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_irq_on = data & 0xff;
+		m_irq_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(space->machine(), 1, data & 0x0100);
+		coin_lockout_w(machine(), 1, data & 0x0100);
 }
 
-static WRITE16_HANDLER( konamigt_irq2_enable_word_w )
+WRITE16_MEMBER(nemesis_state::konamigt_irq2_enable_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_irq2_on = data & 0xff;
+		m_irq2_on = data & 0xff;
 
 	if (ACCESSING_BITS_8_15)
-		coin_lockout_w(space->machine(), 0, data & 0x0100);
+		coin_lockout_w(machine(), 0, data & 0x0100);
 }
 
 
-static READ16_HANDLER( gx400_sharedram_word_r )
+READ16_MEMBER(nemesis_state::gx400_sharedram_word_r)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
-	return state->m_gx400_shared_ram[offset];
+	return m_gx400_shared_ram[offset];
 }
 
-static WRITE16_HANDLER( gx400_sharedram_word_w )
+WRITE16_MEMBER(nemesis_state::gx400_sharedram_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_gx400_shared_ram[offset] = data;
+		m_gx400_shared_ram[offset] = data;
 }
 
 
-static READ16_HANDLER( konamigt_input_word_r )
+READ16_MEMBER(nemesis_state::konamigt_input_word_r)
 {
 /*
     bit 0-7:   steering
@@ -206,8 +198,8 @@ static READ16_HANDLER( konamigt_input_word_r )
     bit 12-15: accel
 */
 
-	int data = input_port_read(space->machine(), "IN3");
-	int data2 = input_port_read(space->machine(), "PADDLE");
+	int data = input_port_read(machine(), "IN3");
+	int data2 = input_port_read(machine(), "PADDLE");
 
 	int ret=0x0000;
 
@@ -224,31 +216,29 @@ static READ16_HANDLER( konamigt_input_word_r )
 	return ret;
 }
 
-static WRITE16_HANDLER( selected_ip_word_w )
+WRITE16_MEMBER(nemesis_state::selected_ip_word_w)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_selected_ip = data & 0xff;	// latch the value
+		m_selected_ip = data & 0xff;	// latch the value
 }
 
-static READ16_HANDLER( selected_ip_word_r )
+READ16_MEMBER(nemesis_state::selected_ip_word_r)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
 
-	switch (state->m_selected_ip & 0xf)
+	switch (m_selected_ip & 0xf)
 	{												// From WEC Le Mans Schems:
-		case 0xc:  return input_port_read(space->machine(), "ACCEL");	// Accel - Schems: Accelevr
-		case 0:    return input_port_read(space->machine(), "ACCEL");
-		case 0xd:  return input_port_read(space->machine(), "WHEEL");	// Wheel - Schems: Handlevr
-		case 1:    return input_port_read(space->machine(), "WHEEL");
+		case 0xc:  return input_port_read(machine(), "ACCEL");	// Accel - Schems: Accelevr
+		case 0:    return input_port_read(machine(), "ACCEL");
+		case 0xd:  return input_port_read(machine(), "WHEEL");	// Wheel - Schems: Handlevr
+		case 1:    return input_port_read(machine(), "WHEEL");
 
 		default: return ~0;
 	}
 }
 
 
-static WRITE16_HANDLER( nemesis_soundlatch_word_w )
+WRITE16_MEMBER(nemesis_state::nemesis_soundlatch_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 		soundlatch_w(space, offset, data & 0xff);
@@ -311,7 +301,7 @@ static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE_LEGACY(nemesis_colorram2_word_w) AM_BASE(m_colorram2)
 	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE_LEGACY(nemesis_palette_word_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x05c000, 0x05c001) AM_WRITE_LEGACY(nemesis_soundlatch_word_w)
+	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x05c400, 0x05c401) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05c800, 0x05c801) AM_WRITE_LEGACY(watchdog_reset16_w)	/* probably */
@@ -319,7 +309,7 @@ static ADDRESS_MAP_START( nemesis_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
 	AM_RANGE(0x05cc06, 0x05cc07) AM_READ_PORT("TEST")
-	AM_RANGE(0x05e000, 0x05e001) AM_WRITE_LEGACY(&nemesis_irq_enable_word_w)
+	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(nemesis_irq_enable_word_w)
 	AM_RANGE(0x05e002, 0x05e003) AM_WRITENOP		/* not used irq */
 	AM_RANGE(0x05e004, 0x05e005) AM_WRITE_LEGACY(nemesis_gfx_flipx_word_w)
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE_LEGACY(nemesis_gfx_flipy_word_w)
@@ -331,7 +321,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM		/* ROM BIOS */
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
-	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE_LEGACY(gx400_sharedram_word_r, gx400_sharedram_word_w)
+	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM_WRITE_LEGACY(nemesis_charram_word_w) AM_BASE_SIZE(m_charram, m_charram_size)
 	AM_RANGE(0x050000, 0x051fff) AM_RAM
 	AM_RANGE(0x050000, 0x0503ff) AM_BASE(m_xscroll1)
@@ -345,7 +335,7 @@ static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x057000, 0x057fff) AM_RAM				/* needed for twinbee */
 	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE_LEGACY(nemesis_palette_word_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x05c000, 0x05c001) AM_WRITE_LEGACY(nemesis_soundlatch_word_w)
+	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c404, 0x05c405) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05c406, 0x05c407) AM_READ_PORT("TEST")
@@ -353,12 +343,12 @@ static ADDRESS_MAP_START( gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
-	AM_RANGE(0x05e000, 0x05e001) AM_WRITE_LEGACY(&gx400_irq2_enable_word_w)	/* ?? */
-	AM_RANGE(0x05e002, 0x05e003) AM_WRITE_LEGACY(&gx400_irq1_enable_word_w)	/* ?? */
+	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(gx400_irq2_enable_word_w)	/* ?? */
+	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(gx400_irq1_enable_word_w)	/* ?? */
 	AM_RANGE(0x05e004, 0x05e005) AM_WRITE_LEGACY(nemesis_gfx_flipx_word_w)
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE_LEGACY(nemesis_gfx_flipy_word_w)
 	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP		/* IRQ acknowledge??? */
-	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE_LEGACY(&gx400_irq4_enable_word_w)	/* ?? */
+	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(gx400_irq4_enable_word_w)	/* ?? */
 	AM_RANGE(0x060000, 0x07ffff) AM_RAM			/* WORK RAM */
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
@@ -377,7 +367,7 @@ static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE_LEGACY(nemesis_colorram2_word_w) AM_BASE(m_colorram2)
 	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE_LEGACY(nemesis_palette_word_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x05c000, 0x05c001) AM_WRITE_LEGACY(nemesis_soundlatch_word_w)
+	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x05c400, 0x05c401) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05c800, 0x05c801) AM_WRITE_LEGACY(watchdog_reset16_w)	/* probably */
@@ -385,20 +375,20 @@ static ADDRESS_MAP_START( konamigt_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
 	AM_RANGE(0x05cc06, 0x05cc07) AM_READ_PORT("TEST")
-	AM_RANGE(0x05e000, 0x05e001) AM_WRITE_LEGACY(&konamigt_irq2_enable_word_w)
-	AM_RANGE(0x05e002, 0x05e003) AM_WRITE_LEGACY(&konamigt_irq_enable_word_w)
+	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(konamigt_irq2_enable_word_w)
+	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(konamigt_irq_enable_word_w)
 	AM_RANGE(0x05e004, 0x05e005) AM_WRITE_LEGACY(nemesis_gfx_flipx_word_w)
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE_LEGACY(nemesis_gfx_flipy_word_w)
 	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP		/* not used irq */
 	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITENOP		/* not used irq */
 	AM_RANGE(0x060000, 0x067fff) AM_RAM			/* WORK RAM */
-	AM_RANGE(0x070000, 0x070001) AM_READ_LEGACY(konamigt_input_word_r)
+	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM		/* ROM BIOS */
 	AM_RANGE(0x010000, 0x01ffff) AM_RAM
-	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE_LEGACY(gx400_sharedram_word_r, gx400_sharedram_word_w)
+	AM_RANGE(0x020000, 0x0287ff) AM_READWRITE(gx400_sharedram_word_r, gx400_sharedram_word_w)
 	AM_RANGE(0x030000, 0x03ffff) AM_RAM_WRITE_LEGACY(nemesis_charram_word_w) AM_BASE_SIZE(m_charram, m_charram_size)
 	AM_RANGE(0x050000, 0x051fff) AM_RAM
 	AM_RANGE(0x050000, 0x0503ff) AM_BASE(m_xscroll1)
@@ -411,7 +401,7 @@ static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x055000, 0x055fff) AM_RAM_WRITE_LEGACY(nemesis_colorram2_word_w) AM_BASE(m_colorram2)
 	AM_RANGE(0x056000, 0x056fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x05a000, 0x05afff) AM_RAM_WRITE_LEGACY(nemesis_palette_word_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x05c000, 0x05c001) AM_WRITE_LEGACY(nemesis_soundlatch_word_w)
+	AM_RANGE(0x05c000, 0x05c001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x05c402, 0x05c403) AM_READ_PORT("DSW0")
 	AM_RANGE(0x05c404, 0x05c405) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05c406, 0x05c407) AM_READ_PORT("TEST")
@@ -419,14 +409,14 @@ static ADDRESS_MAP_START( rf2_gx400_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x05cc00, 0x05cc01) AM_READ_PORT("IN0")
 	AM_RANGE(0x05cc02, 0x05cc03) AM_READ_PORT("IN1")
 	AM_RANGE(0x05cc04, 0x05cc05) AM_READ_PORT("IN2")
-	AM_RANGE(0x05e000, 0x05e001) AM_WRITE_LEGACY(&gx400_irq2_enable_word_w)	/* ?? */
-	AM_RANGE(0x05e002, 0x05e003) AM_WRITE_LEGACY(&gx400_irq1_enable_word_w)	/* ?? */
+	AM_RANGE(0x05e000, 0x05e001) AM_WRITE(gx400_irq2_enable_word_w)	/* ?? */
+	AM_RANGE(0x05e002, 0x05e003) AM_WRITE(gx400_irq1_enable_word_w)	/* ?? */
 	AM_RANGE(0x05e004, 0x05e005) AM_WRITE_LEGACY(nemesis_gfx_flipx_word_w)
 	AM_RANGE(0x05e006, 0x05e007) AM_WRITE_LEGACY(nemesis_gfx_flipy_word_w)
 	AM_RANGE(0x05e008, 0x05e009) AM_WRITENOP	/* IRQ acknowledge??? */
-	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE_LEGACY(&gx400_irq4_enable_word_w)	/* ?? */
+	AM_RANGE(0x05e00e, 0x05e00f) AM_WRITE(gx400_irq4_enable_word_w)	/* ?? */
 	AM_RANGE(0x060000, 0x067fff) AM_RAM			/* WORK RAM */
-	AM_RANGE(0x070000, 0x070001) AM_READ_LEGACY(konamigt_input_word_r)
+	AM_RANGE(0x070000, 0x070001) AM_READ(konamigt_input_word_r)
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -472,7 +462,7 @@ static ADDRESS_MAP_START( salamand_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
 	AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE_LEGACY(salamander_palette_word_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE_LEGACY(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(nemesis_soundlatch_word_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_WRITE_LEGACY(watchdog_reset16_w)	/* probably */
 	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_PORT("IN0")	/* Coins, start buttons, test mode */
@@ -497,7 +487,7 @@ static ADDRESS_MAP_START( blkpnthr_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x080000, 0x081fff) AM_RAM_WRITE_LEGACY(salamander_palette_word_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x090000, 0x097fff) AM_RAM
 	AM_RANGE(0x0a0000, 0x0a0001) AM_RAM_WRITE_LEGACY(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(nemesis_soundlatch_word_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_WRITE_LEGACY(watchdog_reset16_w)	/* probably */
 	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_PORT("IN0")	/* Coins, start buttons, test mode */
@@ -526,9 +516,9 @@ static ADDRESS_MAP_START( citybomb_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x0f0004, 0x0f0005) AM_READ_PORT("IN1")
 	AM_RANGE(0x0f0006, 0x0f0007) AM_READ_PORT("IN0")	/* Coins, start buttons, test mode */
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW0")
-	AM_RANGE(0x0f0010, 0x0f0011) AM_WRITE_LEGACY(nemesis_soundlatch_word_w)
+	AM_RANGE(0x0f0010, 0x0f0011) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x0f0018, 0x0f0019) AM_WRITE_LEGACY(watchdog_reset16_w)	/* probably */
-	AM_RANGE(0x0f0020, 0x0f0021) AM_READ_LEGACY(selected_ip_word_r) AM_WRITENOP	/* WEC Le Mans 24 control? */
+	AM_RANGE(0x0f0020, 0x0f0021) AM_READ(selected_ip_word_r) AM_WRITENOP	/* WEC Le Mans 24 control? */
 	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE_LEGACY(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
 	AM_RANGE(0x100000, 0x1bffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE_LEGACY(nemesis_charram_word_w) AM_BASE_SIZE(m_charram, m_charram_size)
@@ -554,7 +544,7 @@ static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x070004, 0x070005) AM_READ_PORT("IN1")
 	AM_RANGE(0x070006, 0x070007) AM_READ_PORT("IN0")	/* Coins, start buttons, test mode */
 	AM_RANGE(0x070008, 0x070009) AM_READ_PORT("DSW0")
-	AM_RANGE(0x070010, 0x070011) AM_WRITE_LEGACY(nemesis_soundlatch_word_w)
+	AM_RANGE(0x070010, 0x070011) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x070018, 0x070019) AM_WRITE_LEGACY(watchdog_reset16_w)	/* probably */
 	AM_RANGE(0x078000, 0x078001) AM_WRITE_LEGACY(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE_LEGACY(nemesis_videoram1_word_w) AM_BASE(m_videoram1)		/* VRAM */
@@ -570,11 +560,10 @@ static ADDRESS_MAP_START( nyanpani_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x310f80, 0x310fff) AM_BASE(m_yscroll1)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( wd_r )
+READ8_MEMBER(nemesis_state::wd_r)
 {
-	nemesis_state *state = space->machine().driver_data<nemesis_state>();
-	state->m_frame_counter ^= 1;
-	return state->m_frame_counter;
+	m_frame_counter ^= 1;
+	return m_frame_counter;
 }
 
 static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8, nemesis_state )
@@ -584,7 +573,7 @@ static ADDRESS_MAP_START( sal_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(wd_r) /* watchdog?? */
+	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("vlm", salamand_speech_start_w)
 ADDRESS_MAP_END
 
@@ -594,7 +583,7 @@ static ADDRESS_MAP_START( blkpnthr_sound_map, AS_PROGRAM, 8, nemesis_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(wd_r) /* watchdog?? */
+	AM_RANGE(0xe000, 0xe000) AM_READ(wd_r) /* watchdog?? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( city_sound_map, AS_PROGRAM, 8, nemesis_state )
@@ -619,18 +608,18 @@ static ADDRESS_MAP_START( hcrash_map, AS_PROGRAM, 16, nemesis_state )
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x090000, 0x091fff) AM_RAM_WRITE_LEGACY(salamander_palette_word_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE_LEGACY(salamand_control_port_word_w)		/* irq enable, flipscreen, etc. */
-	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE_LEGACY(nemesis_soundlatch_word_w)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_WRITE(nemesis_soundlatch_word_w)
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("TEST")
 	AM_RANGE(0x0c0008, 0x0c0009) AM_WRITE_LEGACY(watchdog_reset16_w)	/* watchdog probably */
 	AM_RANGE(0x0c000a, 0x0c000b) AM_READ_PORT("IN0")
-	AM_RANGE(0x0c2000, 0x0c2001) AM_READ_LEGACY(konamigt_input_word_r)	/* Konami GT control */
+	AM_RANGE(0x0c2000, 0x0c2001) AM_READ(konamigt_input_word_r)	/* Konami GT control */
 	AM_RANGE(0x0c2800, 0x0c2801) AM_WRITENOP
-	AM_RANGE(0x0c2802, 0x0c2803) AM_WRITE_LEGACY(gx400_irq2_enable_word_w) // or at 0x0c2804 ?
+	AM_RANGE(0x0c2802, 0x0c2803) AM_WRITE(gx400_irq2_enable_word_w) // or at 0x0c2804 ?
 	AM_RANGE(0x0c2804, 0x0c2805) AM_WRITENOP
-	AM_RANGE(0x0c4000, 0x0c4001) AM_READ_PORT("IN1") AM_WRITE_LEGACY(selected_ip_word_w)
-	AM_RANGE(0x0c4002, 0x0c4003) AM_READ_LEGACY(selected_ip_word_r) AM_WRITENOP	/* WEC Le Mans 24 control. latches the value read previously */
+	AM_RANGE(0x0c4000, 0x0c4001) AM_READ_PORT("IN1") AM_WRITE(selected_ip_word_w)
+	AM_RANGE(0x0c4002, 0x0c4003) AM_READ(selected_ip_word_r) AM_WRITENOP	/* WEC Le Mans 24 control. latches the value read previously */
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE_LEGACY(nemesis_videoram2_word_w) AM_BASE(m_videoram2)		/* VRAM */
 	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE_LEGACY(nemesis_videoram1_word_w) AM_BASE(m_videoram1)
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE_LEGACY(nemesis_colorram2_word_w) AM_BASE(m_colorram2)

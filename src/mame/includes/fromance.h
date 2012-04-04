@@ -51,6 +51,16 @@ public:
 
 	/* devices */
 	device_t *m_subcpu;
+	DECLARE_READ8_MEMBER(fromance_commanddata_r);
+	DECLARE_WRITE8_MEMBER(fromance_commanddata_w);
+	DECLARE_READ8_MEMBER(fromance_busycheck_main_r);
+	DECLARE_READ8_MEMBER(fromance_busycheck_sub_r);
+	DECLARE_WRITE8_MEMBER(fromance_busycheck_sub_w);
+	DECLARE_WRITE8_MEMBER(fromance_rombank_w);
+	DECLARE_WRITE8_MEMBER(fromance_adpcm_w);
+	DECLARE_WRITE8_MEMBER(fromance_portselect_w);
+	DECLARE_READ8_MEMBER(fromance_keymatrix_r);
+	DECLARE_WRITE8_MEMBER(fromance_coinctr_w);
 };
 
 

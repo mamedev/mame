@@ -17,21 +17,20 @@
 #include "includes/hcastle.h"
 
 
-static WRITE8_HANDLER( hcastle_bankswitch_w )
+WRITE8_MEMBER(hcastle_state::hcastle_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x1f);
+	memory_set_bank(machine(), "bank1", data & 0x1f);
 }
 
-static WRITE8_HANDLER( hcastle_soundirq_w )
+WRITE8_MEMBER(hcastle_state::hcastle_soundirq_w)
 {
-	hcastle_state *state = space->machine().driver_data<hcastle_state>();
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( hcastle_coin_w )
+WRITE8_MEMBER(hcastle_state::hcastle_coin_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x40);
-	coin_counter_w(space->machine(), 1, data & 0x80);
+	coin_counter_w(machine(), 0, data & 0x40);
+	coin_counter_w(machine(), 1, data & 0x80);
 }
 
 
@@ -41,11 +40,11 @@ static ADDRESS_MAP_START( hcastle_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0x0020, 0x003f) AM_RAM	/* rowscroll? */
 	AM_RANGE(0x0200, 0x0207) AM_WRITE_LEGACY(hcastle_pf2_control_w)
 	AM_RANGE(0x0220, 0x023f) AM_RAM /* rowscroll? */
-	AM_RANGE(0x0400, 0x0400) AM_WRITE_LEGACY(hcastle_bankswitch_w)
+	AM_RANGE(0x0400, 0x0400) AM_WRITE(hcastle_bankswitch_w)
 	AM_RANGE(0x0404, 0x0404) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x0408, 0x0408) AM_WRITE_LEGACY(hcastle_soundirq_w)
+	AM_RANGE(0x0408, 0x0408) AM_WRITE(hcastle_soundirq_w)
 	AM_RANGE(0x040c, 0x040c) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(hcastle_coin_w)
+	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("SYSTEM") AM_WRITE(hcastle_coin_w)
 	AM_RANGE(0x0411, 0x0411) AM_READ_PORT("P1")
 	AM_RANGE(0x0412, 0x0412) AM_READ_PORT("P2")
 	AM_RANGE(0x0413, 0x0413) AM_READ_PORT("DSW3")

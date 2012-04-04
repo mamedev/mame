@@ -32,6 +32,9 @@ public:
 	device_t *m_audiocpu;
 
 	UINT8 m_nmi_mask;
+	DECLARE_READ8_MEMBER(popper_input_ports_r);
+	DECLARE_READ8_MEMBER(popper_soundcpu_nmi_r);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 };
 
 

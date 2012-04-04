@@ -49,12 +49,12 @@ TODO:
 #include "includes/playmark.h"
 
 
-static WRITE16_HANDLER( coinctrl_w )
+WRITE16_MEMBER(playmark_state::coinctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0100);
-		coin_counter_w(space->machine(), 1, data & 0x0200);
+		coin_counter_w(machine(), 0, data & 0x0100);
+		coin_counter_w(machine(), 1, data & 0x0200);
 	}
 	if (data & 0xfcff)
 		logerror("Writing %04x to unknown coin control bits\n", data);
@@ -80,83 +80,78 @@ static const eeprom_interface eeprom_intf =
 	5				/* reset_delay (otherwise wbeachvl will hang when saving settings) */
 };
 
-static WRITE16_HANDLER( wbeachvl_coin_eeprom_w )
+WRITE16_MEMBER(playmark_state::wbeachvl_coin_eeprom_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bits 0-3 are coin counters? (only 0 used?) */
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1, data & 0x02);
-		coin_counter_w(space->machine(), 2, data & 0x04);
-		coin_counter_w(space->machine(), 3, data & 0x08);
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);
+		coin_counter_w(machine(), 2, data & 0x04);
+		coin_counter_w(machine(), 3, data & 0x08);
 
 		/* bits 5-7 control EEPROM */
-		state->m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-		state->m_eeprom->write_bit(data & 0x80);
-		state->m_eeprom->set_clock_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->set_cs_line((data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->write_bit(data & 0x80);
+		m_eeprom->set_clock_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
-static WRITE16_HANDLER( hotmind_coin_eeprom_w )
+WRITE16_MEMBER(playmark_state::hotmind_coin_eeprom_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0,data & 0x20);
+		coin_counter_w(machine(), 0,data & 0x20);
 
-		state->m_eeprom->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE);
-		state->m_eeprom->write_bit(data & 4);
-		state->m_eeprom->set_clock_line((data & 2) ? ASSERT_LINE : CLEAR_LINE );
+		m_eeprom->set_cs_line((data & 1) ? CLEAR_LINE : ASSERT_LINE);
+		m_eeprom->write_bit(data & 4);
+		m_eeprom->set_clock_line((data & 2) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 
-static WRITE16_HANDLER( hrdtimes_coin_w )
+WRITE16_MEMBER(playmark_state::hrdtimes_coin_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 }
 
-static WRITE16_HANDLER( playmark_snd_command_w )
+WRITE16_MEMBER(playmark_state::playmark_snd_command_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_snd_command = (data & 0xff);
-		state->m_snd_flag = 1;
-		device_yield(&space->device());
+		m_snd_command = (data & 0xff);
+		m_snd_flag = 1;
+		device_yield(&space.device());
 	}
 }
 
-static READ8_HANDLER( playmark_snd_command_r )
+READ8_MEMBER(playmark_state::playmark_snd_command_r)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 	int data = 0;
 
-	if ((state->m_oki_control & 0x38) == 0x30)
+	if ((m_oki_control & 0x38) == 0x30)
 	{
-		data = state->m_snd_command;
-		// logerror("PC$%03x PortB reading %02x from the 68K\n", cpu_get_previouspc(&space->device()), data);
+		data = m_snd_command;
+		// logerror("PC$%03x PortB reading %02x from the 68K\n", cpu_get_previouspc(&space.device()), data);
 	}
-	else if ((state->m_oki_control & 0x38) == 0x28)
+	else if ((m_oki_control & 0x38) == 0x28)
 	{
-		data = (state->m_oki->read(*space, 0) & 0x0f);
-		// logerror("PC$%03x PortB reading %02x from the OKI status port\n", cpu_get_previouspc(&space->device()), data);
+		data = (m_oki->read(*&space, 0) & 0x0f);
+		// logerror("PC$%03x PortB reading %02x from the OKI status port\n", cpu_get_previouspc(&space.device()), data);
 	}
 
 	return data;
 }
 
-static READ8_HANDLER( playmark_snd_flag_r )
+READ8_MEMBER(playmark_state::playmark_snd_flag_r)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
 
-	if (state->m_snd_flag)
+	if (m_snd_flag)
 	{
-		state->m_snd_flag = 0;
+		m_snd_flag = 0;
 		return 0x00;
 	}
 
@@ -179,16 +174,14 @@ static WRITE8_DEVICE_HANDLER( playmark_oki_banking_w )
 	}
 }
 
-static WRITE8_HANDLER( playmark_oki_w )
+WRITE8_MEMBER(playmark_state::playmark_oki_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
-	state->m_oki_command = data;
+	m_oki_command = data;
 }
 
-static WRITE8_HANDLER( playmark_snd_control_w )
+WRITE8_MEMBER(playmark_state::playmark_snd_control_w)
 {
-	playmark_state *state = space->machine().driver_data<playmark_state>();
-//  address_space *space = device->machine().device("audiocpu")->memory().space(AS_PROGRAM);
+//  address_&space *&space = device->machine().device("audiocpu")->memory().&space(AS_PROGRAM);
 
     /*  This port controls communications to and from the 68K, and the OKI
         device.
@@ -203,18 +196,18 @@ static WRITE8_HANDLER( playmark_snd_control_w )
         1   Not used
         0   Not used
     */
-	state->m_oki_control = data;
+	m_oki_control = data;
 
 	if ((data & 0x38) == 0x18)
 	{
-		// logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",cpu_get_previouspc(&space->device()),playmark_oki_command,playmark_oki_control,playmark_snd_command);
-		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
-		oki->write(*space, 0, state->m_oki_command);
+		// logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",cpu_get_previouspc(&space.device()),playmark_oki_command,playmark_oki_control,playmark_snd_command);
+		okim6295_device *oki = machine().device<okim6295_device>("oki");
+		oki->write(*&space, 0, m_oki_command);
 	}
 }
 
 
-static READ8_HANDLER( PIC16C5X_T0_clk_r )
+READ8_MEMBER(playmark_state::PIC16C5X_T0_clk_r)
 {
 	return 0;
 }
@@ -236,10 +229,10 @@ static ADDRESS_MAP_START( bigtwin_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
 	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("P2")
-	AM_RANGE(0x700016, 0x700017) AM_WRITE_LEGACY(coinctrl_w)
+	AM_RANGE(0x700016, 0x700017) AM_WRITE(coinctrl_w)
 	AM_RANGE(0x70001a, 0x70001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x70001e, 0x70001f) AM_WRITE_LEGACY(playmark_snd_command_w)
+	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(playmark_snd_command_w)
 	AM_RANGE(0x780000, 0x7807ff) AM_WRITE_LEGACY(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
 //  AM_RANGE(0xe00000, 0xe00001) ?? written on startup
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
@@ -259,7 +252,7 @@ static ADDRESS_MAP_START( bigtwinb_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
 	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE_LEGACY(playmark_snd_command_w)
+	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP		/* watchdog? irq ack? */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -278,7 +271,7 @@ static ADDRESS_MAP_START( wbeachvl_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x710010, 0x710011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x710012, 0x710013) AM_READ_PORT("P1")
 	AM_RANGE(0x710014, 0x710015) AM_READ_PORT("P2")
-	AM_RANGE(0x710016, 0x710017) AM_WRITE_LEGACY(wbeachvl_coin_eeprom_w)
+	AM_RANGE(0x710016, 0x710017) AM_WRITE(wbeachvl_coin_eeprom_w)
 	AM_RANGE(0x710018, 0x710019) AM_READ_PORT("P3")
 	AM_RANGE(0x71001a, 0x71001b) AM_READ_PORT("P4")
 //  AM_RANGE(0x71001c, 0x71001d) AM_READ_LEGACY(playmark_snd_status???)
@@ -299,10 +292,10 @@ static ADDRESS_MAP_START( excelsr_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x700012, 0x700013) AM_READ_PORT("P1")
 	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("P2")
-	AM_RANGE(0x700016, 0x700017) AM_WRITE_LEGACY(coinctrl_w)
+	AM_RANGE(0x700016, 0x700017) AM_WRITE(coinctrl_w)
 	AM_RANGE(0x70001a, 0x70001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x70001e, 0x70001f) AM_WRITE_LEGACY(playmark_snd_command_w)
+	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(playmark_snd_command_w)
 	AM_RANGE(0x780000, 0x7807ff) AM_RAM_WRITE_LEGACY(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -317,10 +310,10 @@ static ADDRESS_MAP_START( hotmind_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM_WRITE_LEGACY(bigtwin_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
-	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2") AM_WRITE_LEGACY(hotmind_coin_eeprom_w)
+	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2") AM_WRITE(hotmind_coin_eeprom_w)
 	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW2")
-	AM_RANGE(0x30001e, 0x30001f) AM_WRITE_LEGACY(playmark_snd_command_w)
+	AM_RANGE(0x30001e, 0x30001f) AM_WRITE(playmark_snd_command_w)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP		/* watchdog? irq ack? */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -339,7 +332,7 @@ static ADDRESS_MAP_START( hrdtimes_main_map, AS_PROGRAM, 16, playmark_state )
 	AM_RANGE(0x300010, 0x300011) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x300012, 0x300013) AM_READ_PORT("P1")
 	AM_RANGE(0x300014, 0x300015) AM_READ_PORT("P2")
-	AM_RANGE(0x300016, 0x300017) AM_WRITE_LEGACY(hrdtimes_coin_w)
+	AM_RANGE(0x300016, 0x300017) AM_WRITE(hrdtimes_coin_w)
 	AM_RANGE(0x30001a, 0x30001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x30001c, 0x30001d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x30001e, 0x30001f) AM_WRITENOP //(playmark_snd_command_w)
@@ -355,9 +348,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( playmark_sound_io_map, AS_IO, 8, playmark_state )
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("oki", playmark_oki_banking_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(playmark_snd_command_r, playmark_oki_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(playmark_snd_flag_r, playmark_snd_control_w)
-	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ_LEGACY(PIC16C5X_T0_clk_r)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, playmark_snd_control_w)
+	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 
 

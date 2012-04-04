@@ -37,11 +37,10 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 #include "sound/dac.h"
 #include "includes/trucocl.h"
 
-static WRITE8_HANDLER( irq_enable_w )
+WRITE8_MEMBER(trucocl_state::irq_enable_w)
 {
-	trucocl_state *state = space->machine().driver_data<trucocl_state>();
 
-	state->m_irq_mask = (data & 1) ^ 1;
+	m_irq_mask = (data & 1) ^ 1;
 }
 
 
@@ -85,7 +84,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )
 	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(trucocl_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE_LEGACY(trucocl_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
 	AM_RANGE(0x5080, 0x5080) AM_DEVWRITE_LEGACY("dac", audio_dac_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE_LEGACY(watchdog_reset_w)

@@ -60,17 +60,17 @@ static void niyanpai_soundbank_w(running_machine &machine, int data)
 	memory_set_bankptr(machine, "bank1", &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
-static READ8_HANDLER( niyanpai_sound_r )
+READ8_MEMBER(niyanpai_state::niyanpai_sound_r)
 {
 	return soundlatch_r(space, 0);
 }
 
-static WRITE16_HANDLER( niyanpai_sound_w )
+WRITE16_MEMBER(niyanpai_state::niyanpai_sound_w)
 {
 	soundlatch_w(space, 0, ((data >> 8) & 0xff));
 }
 
-static WRITE8_HANDLER( niyanpai_soundclr_w )
+WRITE8_MEMBER(niyanpai_state::niyanpai_soundclr_w)
 {
 	soundlatch_clear_w(space, 0, 0);
 }
@@ -78,7 +78,7 @@ static WRITE8_HANDLER( niyanpai_soundclr_w )
 
 /* TMPZ84C011 PIO emulation */
 
-static READ8_HANDLER( tmpz84c011_pio_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_pio_r)
 {
 	int portdata;
 
@@ -101,7 +101,7 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 			break;
 
 		default:
-			logerror("%s: TMPZ84C011_PIO Unknown Port Read %02X\n", space->machine().describe_context(), offset);
+			logerror("%s: TMPZ84C011_PIO Unknown Port Read %02X\n", machine().describe_context(), offset);
 			portdata = 0xff;
 			break;
 	}
@@ -109,18 +109,18 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 	return portdata;
 }
 
-static WRITE8_HANDLER( tmpz84c011_pio_w)
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_pio_w)
 {
 	switch (offset)
 	{
 		case 0:			/* PA_0 */
-			niyanpai_soundbank_w(space->machine(), data & 0x03);
+			niyanpai_soundbank_w(machine(), data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_WRITE(space->machine().device("dac2"), 0, data);
+			DAC_WRITE(machine().device("dac2"), 0, data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_WRITE(space->machine().device("dac1"), 0, data);
+			DAC_WRITE(machine().device("dac1"), 0, data);
 			break;
 		case 3:			/* PD_0 */
 			break;
@@ -129,134 +129,114 @@ static WRITE8_HANDLER( tmpz84c011_pio_w)
 			break;
 
 		default:
-			logerror("%s: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", space->machine().describe_context(), offset, data);
+			logerror("%s: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
 
 /* CPU interface */
-static READ8_HANDLER( tmpz84c011_0_pa_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_0_pa_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	return (tmpz84c011_pio_r(space,0) & ~state->m_pio_dir[0]) | (state->m_pio_latch[0] & state->m_pio_dir[0]);
+	return (tmpz84c011_pio_r(space,0) & ~m_pio_dir[0]) | (m_pio_latch[0] & m_pio_dir[0]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pb_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_0_pb_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	return (tmpz84c011_pio_r(space,1) & ~state->m_pio_dir[1]) | (state->m_pio_latch[1] & state->m_pio_dir[1]);
+	return (tmpz84c011_pio_r(space,1) & ~m_pio_dir[1]) | (m_pio_latch[1] & m_pio_dir[1]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pc_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_0_pc_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	return (tmpz84c011_pio_r(space,2) & ~state->m_pio_dir[2]) | (state->m_pio_latch[2] & state->m_pio_dir[2]);
+	return (tmpz84c011_pio_r(space,2) & ~m_pio_dir[2]) | (m_pio_latch[2] & m_pio_dir[2]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pd_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_0_pd_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	return (tmpz84c011_pio_r(space,3) & ~state->m_pio_dir[3]) | (state->m_pio_latch[3] & state->m_pio_dir[3]);
+	return (tmpz84c011_pio_r(space,3) & ~m_pio_dir[3]) | (m_pio_latch[3] & m_pio_dir[3]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pe_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_0_pe_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	return (tmpz84c011_pio_r(space,4) & ~state->m_pio_dir[4]) | (state->m_pio_latch[4] & state->m_pio_dir[4]);
+	return (tmpz84c011_pio_r(space,4) & ~m_pio_dir[4]) | (m_pio_latch[4] & m_pio_dir[4]);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pa_w )
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_pa_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_pio_latch[0] = data;
+	m_pio_latch[0] = data;
 	tmpz84c011_pio_w(space, 0, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pb_w )
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_pb_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_pio_latch[1] = data;
+	m_pio_latch[1] = data;
 	tmpz84c011_pio_w(space, 1, data);
 }
-static WRITE8_HANDLER( tmpz84c011_0_pc_w )
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_pc_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_pio_latch[2] = data;
+	m_pio_latch[2] = data;
 	tmpz84c011_pio_w(space, 2, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pd_w )
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_pd_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_pio_latch[3] = data;
+	m_pio_latch[3] = data;
 	tmpz84c011_pio_w(space, 3, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pe_w )
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_pe_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_pio_latch[4] = data;
+	m_pio_latch[4] = data;
 	tmpz84c011_pio_w(space, 4, data);
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pa_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pa_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	return state->m_pio_dir[0];
+	return m_pio_dir[0];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pb_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pb_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	return state->m_pio_dir[1];
+	return m_pio_dir[1];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pc_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pc_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	return state->m_pio_dir[2];
+	return m_pio_dir[2];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pd_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pd_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	return state->m_pio_dir[3];
+	return m_pio_dir[3];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pe_r )
+READ8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pe_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	return state->m_pio_dir[4];
+	return m_pio_dir[4];
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pa_w )
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pa_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_pio_dir[0] = data;
+	m_pio_dir[0] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pb_w )
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pb_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_pio_dir[1] = data;
+	m_pio_dir[1] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pc_w )
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pc_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_pio_dir[2] = data;
+	m_pio_dir[2] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pd_w )
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pd_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_pio_dir[3] = data;
+	m_pio_dir[3] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )
+WRITE8_MEMBER(niyanpai_state::tmpz84c011_0_dir_pe_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_pio_dir[4] = data;
+	m_pio_dir[4] = data;
 }
 
 
@@ -279,7 +259,7 @@ static MACHINE_RESET( niyanpai )
 	for (i = 0; i < 5; i++)
 	{
 		state->m_pio_dir[i] = state->m_pio_latch[i] = 0;
-		tmpz84c011_pio_w(space, i, 0);
+		state->tmpz84c011_pio_w(*space, i, 0);
 	}
 }
 
@@ -299,37 +279,36 @@ static DRIVER_INIT( niyanpai )
 }
 
 
-static READ16_HANDLER( niyanpai_dipsw_r )
+READ16_MEMBER(niyanpai_state::niyanpai_dipsw_r)
 {
 	UINT8 dipsw_a, dipsw_b;
 
-	dipsw_a = (((input_port_read(space->machine(), "DSWA") & 0x01) << 7) | ((input_port_read(space->machine(), "DSWA") & 0x02) << 5) |
-			   ((input_port_read(space->machine(), "DSWA") & 0x04) << 3) | ((input_port_read(space->machine(), "DSWA") & 0x08) << 1) |
-			   ((input_port_read(space->machine(), "DSWA") & 0x10) >> 1) | ((input_port_read(space->machine(), "DSWA") & 0x20) >> 3) |
-			   ((input_port_read(space->machine(), "DSWA") & 0x40) >> 5) | ((input_port_read(space->machine(), "DSWA") & 0x80) >> 7));
+	dipsw_a = (((input_port_read(machine(), "DSWA") & 0x01) << 7) | ((input_port_read(machine(), "DSWA") & 0x02) << 5) |
+			   ((input_port_read(machine(), "DSWA") & 0x04) << 3) | ((input_port_read(machine(), "DSWA") & 0x08) << 1) |
+			   ((input_port_read(machine(), "DSWA") & 0x10) >> 1) | ((input_port_read(machine(), "DSWA") & 0x20) >> 3) |
+			   ((input_port_read(machine(), "DSWA") & 0x40) >> 5) | ((input_port_read(machine(), "DSWA") & 0x80) >> 7));
 
-	dipsw_b = (((input_port_read(space->machine(), "DSWB") & 0x01) << 7) | ((input_port_read(space->machine(), "DSWB") & 0x02) << 5) |
-			   ((input_port_read(space->machine(), "DSWB") & 0x04) << 3) | ((input_port_read(space->machine(), "DSWB") & 0x08) << 1) |
-			   ((input_port_read(space->machine(), "DSWB") & 0x10) >> 1) | ((input_port_read(space->machine(), "DSWB") & 0x20) >> 3) |
-			   ((input_port_read(space->machine(), "DSWB") & 0x40) >> 5) | ((input_port_read(space->machine(), "DSWB") & 0x80) >> 7));
+	dipsw_b = (((input_port_read(machine(), "DSWB") & 0x01) << 7) | ((input_port_read(machine(), "DSWB") & 0x02) << 5) |
+			   ((input_port_read(machine(), "DSWB") & 0x04) << 3) | ((input_port_read(machine(), "DSWB") & 0x08) << 1) |
+			   ((input_port_read(machine(), "DSWB") & 0x10) >> 1) | ((input_port_read(machine(), "DSWB") & 0x20) >> 3) |
+			   ((input_port_read(machine(), "DSWB") & 0x40) >> 5) | ((input_port_read(machine(), "DSWB") & 0x80) >> 7));
 
 	return ((dipsw_a << 8) | dipsw_b);
 }
 
-static READ16_HANDLER( musobana_inputport_0_r )
+READ16_MEMBER(niyanpai_state::musobana_inputport_0_r)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
 	int portdata;
 
-	switch ((state->m_musobana_inputport ^ 0xff00) >> 8)
+	switch ((m_musobana_inputport ^ 0xff00) >> 8)
 	{
-		case 0x01:	portdata = input_port_read(space->machine(), "KEY0"); break;
-		case 0x02:	portdata = input_port_read(space->machine(), "KEY1"); break;
-		case 0x04:	portdata = input_port_read(space->machine(), "KEY2"); break;
-		case 0x08:	portdata = input_port_read(space->machine(), "KEY3"); break;
-		case 0x10:	portdata = input_port_read(space->machine(), "KEY4"); break;
-		default:	portdata = input_port_read(space->machine(), "KEY0") & input_port_read(space->machine(), "KEY1") & input_port_read(space->machine(), "KEY2")
-								& input_port_read(space->machine(), "KEY3") & input_port_read(space->machine(), "KEY4"); break;
+		case 0x01:	portdata = input_port_read(machine(), "KEY0"); break;
+		case 0x02:	portdata = input_port_read(machine(), "KEY1"); break;
+		case 0x04:	portdata = input_port_read(machine(), "KEY2"); break;
+		case 0x08:	portdata = input_port_read(machine(), "KEY3"); break;
+		case 0x10:	portdata = input_port_read(machine(), "KEY4"); break;
+		default:	portdata = input_port_read(machine(), "KEY0") & input_port_read(machine(), "KEY1") & input_port_read(machine(), "KEY2")
+								& input_port_read(machine(), "KEY3") & input_port_read(machine(), "KEY4"); break;
 	}
 
 	return (portdata);
@@ -350,10 +329,9 @@ static CUSTOM_INPUT( musobana_outcoin_flag_r )
 	return state->m_musobana_outcoin_flag & 0x01;
 }
 
-static WRITE16_HANDLER ( musobana_inputport_w )
+WRITE16_MEMBER(niyanpai_state::musobana_inputport_w)
 {
-	niyanpai_state *state = space->machine().driver_data<niyanpai_state>();
-	state->m_musobana_inputport = data;
+	m_musobana_inputport = data;
 }
 
 static ADDRESS_MAP_START( tmp68301_regs, AS_PROGRAM, 16, niyanpai_state )
@@ -373,7 +351,7 @@ static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE_LEGACY(niyanpai_sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
 	AM_RANGE(0x200200, 0x200201) AM_WRITENOP			// unknown
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
@@ -388,7 +366,7 @@ static ADDRESS_MAP_START( niyanpai_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x240800, 0x240803) AM_READ_LEGACY(niyanpai_blitter_2_r)
 	AM_RANGE(0x240800, 0x24081f) AM_WRITE_LEGACY(niyanpai_blitter_2_w)
 	AM_RANGE(0x240820, 0x24083f) AM_WRITE_LEGACY(niyanpai_clut_2_w)
-	AM_RANGE(0x280000, 0x280001) AM_READ_LEGACY(niyanpai_dipsw_r)
+	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
 
 	AM_RANGE(0x280200, 0x280201) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
@@ -409,9 +387,9 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE_LEGACY(niyanpai_sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
-	AM_RANGE(0x200200, 0x200201) AM_WRITE_LEGACY(musobana_inputport_w)	// inputport select
+	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w)	// inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
@@ -430,8 +408,8 @@ static ADDRESS_MAP_START( musobana_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x240c00, 0x240c01) AM_WRITE_LEGACY(niyanpai_clutsel_1_w)
 	AM_RANGE(0x240e00, 0x240e01) AM_WRITE_LEGACY(niyanpai_clutsel_2_w)
 
-	AM_RANGE(0x280000, 0x280001) AM_READ_LEGACY(niyanpai_dipsw_r)
-	AM_RANGE(0x280200, 0x280201) AM_READ_LEGACY(musobana_inputport_0_r)
+	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
+	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
 	AM_IMPORT_FROM( tmp68301_regs )
@@ -448,9 +426,9 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf000, 0x0bffff) AM_RAM
 
-	AM_RANGE(0x200000, 0x200001) AM_WRITE_LEGACY(niyanpai_sound_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
 
-	AM_RANGE(0x200200, 0x200201) AM_WRITE_LEGACY(musobana_inputport_w)	// inputport select
+	AM_RANGE(0x200200, 0x200201) AM_WRITE(musobana_inputport_w)	// inputport select
 	AM_RANGE(0x240000, 0x240009) AM_WRITENOP			// unknown
 	AM_RANGE(0x240200, 0x2403ff) AM_WRITENOP			// unknown
 
@@ -470,8 +448,8 @@ static ADDRESS_MAP_START( mhhonban_map, AS_PROGRAM, 16, niyanpai_state )
 	AM_RANGE(0x240c00, 0x240c01) AM_WRITE_LEGACY(niyanpai_clutsel_1_w)
 	AM_RANGE(0x240e00, 0x240e01) AM_WRITE_LEGACY(niyanpai_clutsel_2_w)
 
-	AM_RANGE(0x280000, 0x280001) AM_READ_LEGACY(niyanpai_dipsw_r)
-	AM_RANGE(0x280200, 0x280201) AM_READ_LEGACY(musobana_inputport_0_r)
+	AM_RANGE(0x280000, 0x280001) AM_READ(niyanpai_dipsw_r)
+	AM_RANGE(0x280200, 0x280201) AM_READ(musobana_inputport_0_r)
 	AM_RANGE(0x280400, 0x280401) AM_READ_PORT("SYSTEM")
 
 	AM_IMPORT_FROM( tmp68301_regs )
@@ -487,16 +465,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( niyanpai_sound_io_map, AS_IO, 8, niyanpai_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x50, 0x50) AM_READWRITE_LEGACY(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
-	AM_RANGE(0x51, 0x51) AM_READWRITE_LEGACY(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
-	AM_RANGE(0x52, 0x52) AM_READWRITE_LEGACY(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
-	AM_RANGE(0x30, 0x30) AM_READWRITE_LEGACY(tmpz84c011_0_pd_r, tmpz84c011_0_pd_w)
-	AM_RANGE(0x40, 0x40) AM_READWRITE_LEGACY(tmpz84c011_0_pe_r, tmpz84c011_0_pe_w)
-	AM_RANGE(0x54, 0x54) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pa_r, tmpz84c011_0_dir_pa_w)
-	AM_RANGE(0x55, 0x55) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pb_r, tmpz84c011_0_dir_pb_w)
-	AM_RANGE(0x56, 0x56) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
-	AM_RANGE(0x34, 0x34) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
-	AM_RANGE(0x44, 0x44) AM_READWRITE_LEGACY(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
+	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
+	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
+	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
+	AM_RANGE(0x30, 0x30) AM_READWRITE(tmpz84c011_0_pd_r, tmpz84c011_0_pd_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(tmpz84c011_0_pe_r, tmpz84c011_0_pe_w)
+	AM_RANGE(0x54, 0x54) AM_READWRITE(tmpz84c011_0_dir_pa_r, tmpz84c011_0_dir_pa_w)
+	AM_RANGE(0x55, 0x55) AM_READWRITE(tmpz84c011_0_dir_pb_r, tmpz84c011_0_dir_pb_w)
+	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
+	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
+	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 ADDRESS_MAP_END
 

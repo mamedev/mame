@@ -46,6 +46,13 @@ public:
 	device_t *m_maincpu;
 	device_t *m_subcpu;
 	device_t *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(bwp12_sharedram1_w);
+	DECLARE_WRITE8_MEMBER(bwp3_u8F_w);
+	DECLARE_WRITE8_MEMBER(bwp3_nmimask_w);
+	DECLARE_WRITE8_MEMBER(bwp3_nmiack_w);
+	DECLARE_READ8_MEMBER(bwp1_io_r);
+	DECLARE_WRITE8_MEMBER(bwp1_ctrl_w);
+	DECLARE_WRITE8_MEMBER(bwp2_ctrl_w);
 };
 
 

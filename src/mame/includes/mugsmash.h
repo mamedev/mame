@@ -16,6 +16,8 @@ public:
 
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(mugsmash_reg2_w);
+	DECLARE_READ16_MEMBER(mugsmash_input_ports_r);
 };
 
 

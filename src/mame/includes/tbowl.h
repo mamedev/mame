@@ -19,6 +19,16 @@ public:
 	UINT16 m_yscroll;
 	UINT16 m_bg2xscroll;
 	UINT16 m_bg2yscroll;
+	DECLARE_WRITE8_MEMBER(tbowl_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(tbowlb_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(tbowlc_bankswitch_w);
+	DECLARE_READ8_MEMBER(shared_r);
+	DECLARE_WRITE8_MEMBER(shared_w);
+	DECLARE_WRITE8_MEMBER(tbowl_sound_command_w);
+	DECLARE_WRITE8_MEMBER(tbowl_trigger_nmi);
+	DECLARE_WRITE8_MEMBER(tbowl_adpcm_start_w);
+	DECLARE_WRITE8_MEMBER(tbowl_adpcm_end_w);
+	DECLARE_WRITE8_MEMBER(tbowl_adpcm_vol_w);
 };
 
 

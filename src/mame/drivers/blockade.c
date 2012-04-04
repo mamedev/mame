@@ -76,29 +76,27 @@ static INTERRUPT_GEN( blockade_interrupt )
  *
  *************************************/
 
-static READ8_HANDLER( blockade_input_port_0_r )
+READ8_MEMBER(blockade_state::blockade_input_port_0_r)
 {
-	blockade_state *state = space->machine().driver_data<blockade_state>();
 	/* coin latch is bit 7 */
-	UINT8 temp = (input_port_read(space->machine(), "IN0") & 0x7f);
+	UINT8 temp = (input_port_read(machine(), "IN0") & 0x7f);
 
-	return (state->m_coin_latch << 7) | temp;
+	return (m_coin_latch << 7) | temp;
 }
 
-static WRITE8_HANDLER( blockade_coin_latch_w )
+WRITE8_MEMBER(blockade_state::blockade_coin_latch_w)
 {
-	blockade_state *state = space->machine().driver_data<blockade_state>();
 
 	if (data & 0x80)
 	{
 		if (BLOCKADE_LOG) mame_printf_debug("Reset Coin Latch\n");
-		if (state->m_just_been_reset)
+		if (m_just_been_reset)
 		{
-			state->m_just_been_reset = 0;
-			state->m_coin_latch = 0;
+			m_just_been_reset = 0;
+			m_coin_latch = 0;
 		}
 		else
-			state->m_coin_latch = 1;
+			m_coin_latch = 1;
 	}
 
 	if (data & 0x20)
@@ -127,7 +125,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockade_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, blockade_state )
-    AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(blockade_input_port_0_r, blockade_coin_latch_w)
+    AM_RANGE(0x01, 0x01) AM_READWRITE(blockade_input_port_0_r, blockade_coin_latch_w)
     AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1")
     AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("discrete", blockade_sound_freq_w)
     AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2")

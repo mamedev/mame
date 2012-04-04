@@ -32,27 +32,26 @@ static INTERRUPT_GEN( contra_interrupt )
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( contra_bankswitch_w )
+WRITE8_MEMBER(contra_state::contra_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
-static WRITE8_HANDLER( contra_sh_irqtrigger_w )
+WRITE8_MEMBER(contra_state::contra_sh_irqtrigger_w)
 {
-	contra_state *state = space->machine().driver_data<contra_state>();
-	device_set_input_line(state->m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( contra_coin_counter_w )
+WRITE8_MEMBER(contra_state::contra_coin_counter_w)
 {
 	if (data & 0x01)
-		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 0, data & 0x01);
 
 	if (data & 0x02)
-		coin_counter_w(space->machine(), 1, (data & 0x02) >> 1);
+		coin_counter_w(machine(), 1, (data & 0x02) >> 1);
 }
 
-static WRITE8_HANDLER( cpu_sound_command_w )
+WRITE8_MEMBER(contra_state::cpu_sound_command_w)
 {
 	soundlatch_w(space, offset, data);
 }
@@ -69,9 +68,9 @@ static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8, contra_state )
 	AM_RANGE(0x0015, 0x0015) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0016, 0x0016) AM_READ_PORT("DSW3")
 
-	AM_RANGE(0x0018, 0x0018) AM_WRITE_LEGACY(contra_coin_counter_w)
-	AM_RANGE(0x001a, 0x001a) AM_WRITE_LEGACY(contra_sh_irqtrigger_w)
-	AM_RANGE(0x001c, 0x001c) AM_WRITE_LEGACY(cpu_sound_command_w)
+	AM_RANGE(0x0018, 0x0018) AM_WRITE(contra_coin_counter_w)
+	AM_RANGE(0x001a, 0x001a) AM_WRITE(contra_sh_irqtrigger_w)
+	AM_RANGE(0x001c, 0x001c) AM_WRITE(cpu_sound_command_w)
 	AM_RANGE(0x001e, 0x001e) AM_WRITENOP	/* ? */
 	AM_RANGE(0x0060, 0x0067) AM_WRITE_LEGACY(contra_K007121_ctrl_1_w)
 
@@ -91,7 +90,7 @@ static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8, contra_state )
 	AM_RANGE(0x4800, 0x5fff) AM_WRITEONLY
 
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(contra_bankswitch_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(contra_bankswitch_w)
 
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

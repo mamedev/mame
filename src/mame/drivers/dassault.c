@@ -129,82 +129,77 @@ Dip locations verified with US conversion kit manual.
 
 /**********************************************************************************/
 
-static READ16_HANDLER( dassault_control_r )
+READ16_MEMBER(dassault_state::dassault_control_r)
 {
 	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(space->machine(), "P1_P2");
+			return input_port_read(machine(), "P1_P2");
 
 		case 2: /* Player 3 & Player 4 joysticks & fire buttons */
-			return input_port_read(space->machine(), "P3_P4");
+			return input_port_read(machine(), "P3_P4");
 
 		case 4: /* Dip 1 (stored at 0x3f8035) */
-			return input_port_read(space->machine(), "DSW1");
+			return input_port_read(machine(), "DSW1");
 
 		case 6: /* Dip 2 (stored at 0x3f8034) */
-			return input_port_read(space->machine(), "DSW2");
+			return input_port_read(machine(), "DSW2");
 
 		case 8: /* VBL, Credits */
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 	}
 
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( dassault_control_w )
+WRITE16_MEMBER(dassault_state::dassault_control_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(machine(), 0, data & 1);
 	if (data & 0xfffe)
 		logerror("Coin cointrol %04x\n", data);
 }
 
-static READ16_HANDLER( dassault_sub_control_r )
+READ16_MEMBER(dassault_state::dassault_sub_control_r)
 {
-	return input_port_read(space->machine(), "VBLANK1");
+	return input_port_read(machine(), "VBLANK1");
 }
 
-static WRITE16_HANDLER( dassault_sound_w )
+WRITE16_MEMBER(dassault_state::dassault_sound_w)
 {
-	dassault_state *state = space->machine().driver_data<dassault_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE); /* IRQ1 */
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
-static READ16_HANDLER( dassault_irq_r )
+READ16_MEMBER(dassault_state::dassault_irq_r)
 {
-	dassault_state *state = space->machine().driver_data<dassault_state>();
 	switch (offset)
 	{
-	case 0: device_set_input_line(state->m_maincpu, 5, CLEAR_LINE); break;
-	case 1: device_set_input_line(state->m_subcpu, 6, CLEAR_LINE); break;
+	case 0: device_set_input_line(m_maincpu, 5, CLEAR_LINE); break;
+	case 1: device_set_input_line(m_subcpu, 6, CLEAR_LINE); break;
 	}
-	return state->m_shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
+	return m_shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
 }
 
-static WRITE16_HANDLER( dassault_irq_w )
+WRITE16_MEMBER(dassault_state::dassault_irq_w)
 {
-	dassault_state *state = space->machine().driver_data<dassault_state>();
 	switch (offset)
 	{
-	case 0: device_set_input_line(state->m_maincpu, 5, ASSERT_LINE); break;
-	case 1: device_set_input_line(state->m_subcpu, 6, ASSERT_LINE); break;
+	case 0: device_set_input_line(m_maincpu, 5, ASSERT_LINE); break;
+	case 1: device_set_input_line(m_subcpu, 6, ASSERT_LINE); break;
 	}
 
-	COMBINE_DATA(&state->m_shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
+	COMBINE_DATA(&m_shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
 }
 
-static WRITE16_HANDLER( shared_ram_w )
+WRITE16_MEMBER(dassault_state::shared_ram_w)
 {
-	dassault_state *state = space->machine().driver_data<dassault_state>();
-	COMBINE_DATA(&state->m_shared_ram[offset]);
+	COMBINE_DATA(&m_shared_ram[offset]);
 }
 
-static READ16_HANDLER( shared_ram_r )
+READ16_MEMBER(dassault_state::shared_ram_r)
 {
-	dassault_state *state = space->machine().driver_data<dassault_state>();
-	return state->m_shared_ram[offset];
+	return m_shared_ram[offset];
 }
 
 /**********************************************************************************/
@@ -215,12 +210,12 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x140004, 0x140007) AM_WRITENOP /* ? */
-	AM_RANGE(0x180000, 0x180001) AM_WRITE_LEGACY(dassault_sound_w)
+	AM_RANGE(0x180000, 0x180001) AM_WRITE(dassault_sound_w)
 
-	AM_RANGE(0x1c0000, 0x1c000f) AM_READ_LEGACY(dassault_control_r)
+	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
 	AM_RANGE(0x1c000a, 0x1c000b) AM_DEVWRITE_LEGACY("deco_common", decocomn_priority_w)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)
-	AM_RANGE(0x1c000e, 0x1c000f) AM_WRITE_LEGACY(dassault_control_w)
+	AM_RANGE(0x1c000e, 0x1c000f) AM_WRITE(dassault_control_w)
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
@@ -234,8 +229,8 @@ static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE(m_ram) /* Main ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram2") /* Spriteram (2nd) */
-	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE_LEGACY(dassault_irq_r, dassault_irq_w)
-	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w) AM_BASE(m_shared_ram) /* Shared ram */
+	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
+	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(m_shared_ram) /* Shared ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
@@ -243,12 +238,12 @@ static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
 
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
 	AM_RANGE(0x100002, 0x100007) AM_WRITENOP /* ? */
-	AM_RANGE(0x100004, 0x100005) AM_READ_LEGACY(dassault_sub_control_r)
+	AM_RANGE(0x100004, 0x100005) AM_READ(dassault_sub_control_r)
 
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE(m_ram2) /* Sub cpu ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram") /* Sprite ram */
-	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE_LEGACY(dassault_irq_r, dassault_irq_w)
-	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w)
+	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
+	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

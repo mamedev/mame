@@ -32,6 +32,30 @@ public:
 	UINT16 m_dsp56k_bank02_ram[2 * 8 * dsp56k_bank02_size];
 	UINT16 m_dsp56k_shared_ram_16[2 * 8 * dsp56k_shared_ram_16_size];
 	UINT16 m_dsp56k_bank04_ram[2 * 8 * dsp56k_bank04_size];
+	DECLARE_WRITE32_MEMBER(polygonet_eeprom_w);
+	DECLARE_READ32_MEMBER(ttl_rom_r);
+	DECLARE_READ32_MEMBER(psac_rom_r);
+	DECLARE_READ32_MEMBER(sound_r);
+	DECLARE_WRITE32_MEMBER(sound_w);
+	DECLARE_WRITE32_MEMBER(sound_irq_w);
+	DECLARE_READ32_MEMBER(dsp_host_interface_r);
+	DECLARE_WRITE32_MEMBER(shared_ram_write);
+	DECLARE_WRITE32_MEMBER(dsp_w_lines);
+	DECLARE_WRITE32_MEMBER(dsp_host_interface_w);
+	DECLARE_READ32_MEMBER(network_r);
+	DECLARE_WRITE32_MEMBER(plygonet_palette_w);
+	DECLARE_READ16_MEMBER(dsp56k_bootload_r);
+	DECLARE_READ16_MEMBER(dsp56k_ram_bank00_read);
+	DECLARE_WRITE16_MEMBER(dsp56k_ram_bank00_write);
+	DECLARE_READ16_MEMBER(dsp56k_ram_bank01_read);
+	DECLARE_WRITE16_MEMBER(dsp56k_ram_bank01_write);
+	DECLARE_READ16_MEMBER(dsp56k_ram_bank02_read);
+	DECLARE_WRITE16_MEMBER(dsp56k_ram_bank02_write);
+	DECLARE_READ16_MEMBER(dsp56k_shared_ram_read);
+	DECLARE_WRITE16_MEMBER(dsp56k_shared_ram_write);
+	DECLARE_READ16_MEMBER(dsp56k_ram_bank04_read);
+	DECLARE_WRITE16_MEMBER(dsp56k_ram_bank04_write);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 /*----------- defined in video/plygonet.c -----------*/

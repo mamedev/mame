@@ -35,6 +35,12 @@ public:
 	int m_rsyoffs;
 	UINT32 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE32_MEMBER(galastrm_palette_w);
+	DECLARE_WRITE32_MEMBER(galastrm_tc0610_0_w);
+	DECLARE_WRITE32_MEMBER(galastrm_tc0610_1_w);
+	DECLARE_WRITE32_MEMBER(galastrm_input_w);
+	DECLARE_READ32_MEMBER(galastrm_adstick_ctrl_r);
+	DECLARE_WRITE32_MEMBER(galastrm_adstick_ctrl_w);
 };
 
 

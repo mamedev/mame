@@ -28,6 +28,9 @@ public:
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	DECLARE_WRITE16_MEMBER(vaportra_sound_w);
+	DECLARE_READ16_MEMBER(vaportra_control_r);
+	DECLARE_READ8_MEMBER(vaportra_soundlatch_r);
 };
 
 

@@ -72,31 +72,31 @@
 *       R/W Handlers       *
 ***************************/
 
-static READ16_HANDLER ( sderby_input_r )
+READ16_MEMBER(sderby_state::sderby_input_r)
 {
 	switch (offset)
 	{
 		case 0x00 >> 1:
-			return input_port_read(space->machine(), "IN0");
+			return input_port_read(machine(), "IN0");
 		case 0x02 >> 1:
 			return 0xffff;			// to avoid game to reset (needs more work)
 	}
 
-	logerror("sderby_input_r : offset = %x - PC = %06x\n",offset*2,cpu_get_pc(&space->device()));
+	logerror("sderby_input_r : offset = %x - PC = %06x\n",offset*2,cpu_get_pc(&space.device()));
 
 	return 0xffff;
 }
 
-static READ16_HANDLER( roulette_input_r )
+READ16_MEMBER(sderby_state::roulette_input_r)
 {
 	switch (offset)
 	{
 		case 0x00 >> 1:
-			return input_port_read(space->machine(), "IN0");
+			return input_port_read(machine(), "IN0");
 		case 0x02 >> 1:
-			return input_port_read(space->machine(), "IN1");
+			return input_port_read(machine(), "IN1");
 		case 0x04 >> 1:
-			return input_port_read(space->machine(), "IN2");
+			return input_port_read(machine(), "IN2");
 	}
 
 	return 0xffff;
@@ -124,9 +124,9 @@ static READ16_HANDLER( roulette_input_r )
 
 ****************************************************************/
 
-static READ16_HANDLER( rprot_r )
+READ16_MEMBER(sderby_state::rprot_r)
 {
-	logerror("rprot_r : offset = %02x\n",cpu_get_pc(&space->device()));
+	logerror("rprot_r : offset = %02x\n",cpu_get_pc(&space.device()));
 
 /* This is the only mask I found that allow a normal play.
    Using other values, the game hangs waiting for response,
@@ -135,10 +135,10 @@ static READ16_HANDLER( rprot_r )
    If someone more skilled in 68K code can help to trace it,
    searching for an accurated response, I'll appreciate.
 */
-	return space->machine().rand() & 0x1f;
+	return machine().rand() & 0x1f;
 }
 
-static WRITE16_HANDLER( rprot_w )
+WRITE16_MEMBER(sderby_state::rprot_w)
 {
 	logerror("rprot_w %02x\n", data);
 }
@@ -148,7 +148,7 @@ static WRITE16_HANDLER( rprot_w )
 *       Outputs / Lamps       *
 ******************************/
 
-static WRITE16_HANDLER( sderby_out_w )
+WRITE16_MEMBER(sderby_state::sderby_out_w)
 {
 /*
   ---------------------------
@@ -188,11 +188,11 @@ static WRITE16_HANDLER( sderby_out_w )
 	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - BET */
 	output_set_lamp_value(3, (data >> 15) & 1);		/* Lamp 3 - END OF RACE */
 
-	coin_counter_w(space->machine(), 0, data & 0x2000);
+	coin_counter_w(machine(), 0, data & 0x2000);
 }
 
 
-static WRITE16_HANDLER( scmatto_out_w )
+WRITE16_MEMBER(sderby_state::scmatto_out_w)
 {
 /*
   ----------------------------------------
@@ -237,11 +237,11 @@ static WRITE16_HANDLER( scmatto_out_w )
 	output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
 	output_set_lamp_value(7, (data >> 6) & 1);		/* Lamp 7 - BET    */
 
-	coin_counter_w(space->machine(), 0, data & 0x2000);
+	coin_counter_w(machine(), 0, data & 0x2000);
 }
 
 
-static WRITE16_HANDLER( roulette_out_w )
+WRITE16_MEMBER(sderby_state::roulette_out_w)
 {
 /*
   -----------------------------------
@@ -283,8 +283,8 @@ static ADDRESS_MAP_START( sderby_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP	/* ??? - check code at 0x000456 (executed once at startup) */
 	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP	/* ??? - check code at 0x000524 (executed once at startup) */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x308000, 0x30800d) AM_READ_LEGACY(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE_LEGACY(sderby_out_w)	/* output port */
+	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
+	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w)	/* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE_LEGACY(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
@@ -302,8 +302,8 @@ static ADDRESS_MAP_START( luckboom_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x10400c, 0x10400d) AM_WRITENOP	/* ??? - check code at 0x000456 (executed once at startup) */
 	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP	/* ??? - check code at 0x000524 (executed once at startup) */
 	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
-	AM_RANGE(0x308000, 0x30800d) AM_READ_LEGACY(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE_LEGACY(sderby_out_w)	/* output port */
+	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
+	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w)	/* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE_LEGACY(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
@@ -321,8 +321,8 @@ static ADDRESS_MAP_START( spacewin_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x10400e, 0x10400f) AM_WRITENOP	/* seems another video register. constantly used */
 	AM_RANGE(0x104010, 0x105fff) AM_WRITENOP	/* unknown */
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP	/* unknown... write 0x01 in game, and 0x00 on reset */
-	AM_RANGE(0x308000, 0x30800d) AM_READ_LEGACY(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE_LEGACY(scmatto_out_w)	/* output port */
+	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
+	AM_RANGE(0x308008, 0x308009) AM_WRITE(scmatto_out_w)	/* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE_LEGACY(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd00000, 0xd001ff) AM_RAM
@@ -341,11 +341,11 @@ static ADDRESS_MAP_START( roulette_map, AS_PROGRAM, 16, sderby_state )
 	AM_RANGE(0x504000, 0x50400b) AM_RAM_WRITE_LEGACY(sderby_scroll_w)
 	AM_RANGE(0x50400e, 0x50400f) AM_WRITENOP
 
-	AM_RANGE(0x708000, 0x708009) AM_READ_LEGACY(roulette_input_r)
-	AM_RANGE(0x708006, 0x708007) AM_WRITE_LEGACY(roulette_out_w)
+	AM_RANGE(0x708000, 0x708009) AM_READ(roulette_input_r)
+	AM_RANGE(0x708006, 0x708007) AM_WRITE(roulette_out_w)
 	AM_RANGE(0x70800a, 0x70800b) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x70800c, 0x70800d) AM_WRITENOP	/* watchdog?? (0x0003) */
-	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE_LEGACY(rprot_r, rprot_w)	/* MCU communication */
+	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE(rprot_r, rprot_w)	/* MCU communication */
 	AM_RANGE(0x780000, 0x780fff) AM_WRITE_LEGACY(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0xff0000, 0xff07ff) AM_RAM AM_SHARE("nvram")

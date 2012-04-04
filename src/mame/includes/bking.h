@@ -47,6 +47,20 @@ public:
 	UINT8 m_port_b_out;
 	UINT8 m_ddr_b;
 #endif
+	DECLARE_READ8_MEMBER(bking_sndnmi_disable_r);
+	DECLARE_WRITE8_MEMBER(bking_sndnmi_enable_w);
+	DECLARE_WRITE8_MEMBER(bking_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(bking3_addr_l_w);
+	DECLARE_WRITE8_MEMBER(bking3_addr_h_w);
+	DECLARE_READ8_MEMBER(bking3_extrarom_r);
+	DECLARE_READ8_MEMBER(bking3_ext_check_r);
+	DECLARE_READ8_MEMBER(bking3_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(bking3_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(bking3_68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(bking3_68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(bking3_68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(bking3_68705_ddr_b_w);
+	DECLARE_READ8_MEMBER(bking3_68705_port_c_r);
 };
 
 

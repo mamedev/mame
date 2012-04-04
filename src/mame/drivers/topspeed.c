@@ -243,16 +243,14 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "topspeed.lh"
 
 
-static READ16_HANDLER( sharedram_r )
+READ16_MEMBER(topspeed_state::sharedram_r)
 {
-	topspeed_state *state = space->machine().driver_data<topspeed_state>();
-	return state->m_sharedram[offset];
+	return m_sharedram[offset];
 }
 
-static WRITE16_HANDLER( sharedram_w )
+WRITE16_MEMBER(topspeed_state::sharedram_w)
 {
-	topspeed_state *state = space->machine().driver_data<topspeed_state>();
-	COMBINE_DATA(&state->m_sharedram[offset]);
+	COMBINE_DATA(&m_sharedram[offset]);
 }
 
 static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched between 68Ks */
@@ -264,18 +262,17 @@ static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched 
 	device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, (state->m_cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE16_HANDLER( cpua_ctrl_w )
+WRITE16_MEMBER(topspeed_state::cpua_ctrl_w)
 {
-	topspeed_state *state = space->machine().driver_data<topspeed_state>();
 
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;	/* for Wgp */
 
-	state->m_cpua_ctrl = data;
+	m_cpua_ctrl = data;
 
-	parse_control(space->machine());
+	parse_control(machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space->device()), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
 }
 
 
@@ -323,13 +320,12 @@ static INTERRUPT_GEN( topspeed_cpub_interrupt )
 #define STEER_PORT_TAG   "STEER"
 #define FAKE_PORT_TAG    "FAKE"
 
-static READ8_HANDLER( topspeed_input_bypass_r )
+READ8_MEMBER(topspeed_state::topspeed_input_bypass_r)
 {
-	topspeed_state *state = space->machine().driver_data<topspeed_state>();
-	UINT8 port = tc0220ioc_port_r(state->m_tc0220ioc, 0);	/* read port number */
+	UINT8 port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
 	int steer = 0;
-	int analogue_steer = input_port_read_safe(space->machine(), STEER_PORT_TAG, 0x00);
-	int fake = input_port_read_safe(space->machine(), FAKE_PORT_TAG, 0x00);
+	int analogue_steer = input_port_read_safe(machine(), STEER_PORT_TAG, 0x00);
+	int fake = input_port_read_safe(machine(), FAKE_PORT_TAG, 0x00);
 
 	if (!(fake & 0x10))	/* Analogue steer (the real control method) */
 	{
@@ -361,31 +357,31 @@ static READ8_HANDLER( topspeed_input_bypass_r )
 			return steer >> 8;
 
 		default:
-			return tc0220ioc_portreg_r(state->m_tc0220ioc, offset);
+			return tc0220ioc_portreg_r(m_tc0220ioc, offset);
 	}
 }
 
 
-static READ16_HANDLER( topspeed_motor_r )
+READ16_MEMBER(topspeed_state::topspeed_motor_r)
 {
 	switch (offset)
 	{
 		case 0x0:
-			return (space->machine().rand() & 0xff);	/* motor status ?? */
+			return (machine().rand() & 0xff);	/* motor status ?? */
 
 		case 0x101:
 			return 0x55;	/* motor cpu status ? */
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", cpu_get_pc(&space->device()), offset);
+			logerror("CPU #0 PC %06x: warning - read from motor cpu %03x\n", cpu_get_pc(&space.device()), offset);
 			return 0;
 	}
 }
 
-static WRITE16_HANDLER( topspeed_motor_w )
+WRITE16_MEMBER(topspeed_state::topspeed_motor_w)
 {
 	/* Writes $900000-25 and $900200-219 */
-	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", cpu_get_pc(&space->device()), data, offset);
+	logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n", cpu_get_pc(&space.device()), data, offset);
 }
 
 
@@ -444,9 +440,9 @@ static WRITE8_DEVICE_HANDLER( topspeed_msm5205_stop_w )
 
 static ADDRESS_MAP_START( topspeed_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE_SIZE(m_sharedram, m_sharedram_size)
+	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_SIZE(m_sharedram, m_sharedram_size)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x600002, 0x600003) AM_WRITE_LEGACY(cpua_ctrl_w)
+	AM_RANGE(0x600002, 0x600003) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x7e0000, 0x7e0001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x7e0002, 0x7e0003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM AM_BASE(m_raster_ctrl)
@@ -465,10 +461,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( topspeed_cpub_map, AS_PROGRAM, 16, topspeed_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
-	AM_RANGE(0x880000, 0x880001) AM_READ8_LEGACY(topspeed_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x400000, 0X40ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x880000, 0x880001) AM_READ8(topspeed_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x880002, 0x880003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
-	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE_LEGACY(topspeed_motor_r, topspeed_motor_w)	/* motor CPU */
+	AM_RANGE(0x900000, 0x9003ff) AM_READWRITE(topspeed_motor_r, topspeed_motor_w)	/* motor CPU */
 ADDRESS_MAP_END
 
 

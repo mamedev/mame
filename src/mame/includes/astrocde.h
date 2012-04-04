@@ -69,6 +69,28 @@ public:
 	UINT8 m_profpac_writemode;
 	UINT16 m_profpac_writemask;
 	UINT8 m_profpac_vw;
+	DECLARE_WRITE8_MEMBER(protected_ram_enable_w);
+	DECLARE_READ8_MEMBER(protected_ram_r);
+	DECLARE_WRITE8_MEMBER(protected_ram_w);
+	DECLARE_WRITE8_MEMBER(seawolf2_lamps_w);
+	DECLARE_WRITE8_MEMBER(seawolf2_sound_1_w);
+	DECLARE_WRITE8_MEMBER(seawolf2_sound_2_w);
+	DECLARE_WRITE8_MEMBER(ebases_trackball_select_w);
+	DECLARE_WRITE8_MEMBER(ebases_coin_w);
+	DECLARE_READ8_MEMBER(spacezap_io_r);
+	DECLARE_READ8_MEMBER(wow_io_r);
+	DECLARE_READ8_MEMBER(gorf_io_1_r);
+	DECLARE_READ8_MEMBER(gorf_io_2_r);
+	DECLARE_READ8_MEMBER(robby_io_r);
+	DECLARE_READ8_MEMBER(profpac_io_1_r);
+	DECLARE_READ8_MEMBER(profpac_io_2_r);
+	DECLARE_WRITE8_MEMBER(profpac_banksw_w);
+	DECLARE_READ8_MEMBER(demndrgn_io_r);
+	DECLARE_WRITE8_MEMBER(demndrgn_sound_w);
+	DECLARE_WRITE8_MEMBER(tenpindx_sound_w);
+	DECLARE_WRITE8_MEMBER(tenpindx_lamp_w);
+	DECLARE_WRITE8_MEMBER(tenpindx_counter_w);
+	DECLARE_WRITE8_MEMBER(tenpindx_lights_w);
 };
 
 

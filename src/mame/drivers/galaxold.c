@@ -395,9 +395,9 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 
 
 /* Send sound data to the sound cpu and cause an nmi */
-static READ8_HANDLER( drivfrcg_port0_r )
+READ8_MEMBER(galaxold_state::drivfrcg_port0_r)
 {
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 		case 0x002e:
 		case 0x0297:
@@ -579,10 +579,10 @@ static ADDRESS_MAP_START( scramblb_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x8202, 0x8202) AM_READ_LEGACY(scramblb_protection_2_r)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( scramb2_protection_r ) { return 0x25; }
-static READ8_HANDLER( scramb2_port0_r ) { return (input_port_read(space->machine(), "IN0") >> offset) & 0x1; }
-static READ8_HANDLER( scramb2_port1_r ) { return (input_port_read(space->machine(), "IN1") >> offset) & 0x1; }
-static READ8_HANDLER( scramb2_port2_r ) { return (input_port_read(space->machine(), "IN2") >> offset) & 0x1; }
+READ8_MEMBER(galaxold_state::scramb2_protection_r){ return 0x25; }
+READ8_MEMBER(galaxold_state::scramb2_port0_r){ return (input_port_read(machine(), "IN0") >> offset) & 0x1; }
+READ8_MEMBER(galaxold_state::scramb2_port1_r){ return (input_port_read(machine(), "IN1") >> offset) & 0x1; }
+READ8_MEMBER(galaxold_state::scramb2_port2_r){ return (input_port_read(machine(), "IN2") >> offset) & 0x1; }
 
 static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -593,9 +593,9 @@ static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE(m_spriteram) AM_SIZE(m_spriteram_size)
 	AM_RANGE(0x5060, 0x507f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
 	AM_RANGE(0x5080, 0x50ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_READ_LEGACY(scramb2_protection_r) // must return 0x25
-	AM_RANGE(0x6000, 0x6007) AM_READ_LEGACY(scramb2_port0_r) // reads from 8 addresses, 1 bit per address
-	AM_RANGE(0x6800, 0x6807) AM_READ_LEGACY(scramb2_port1_r) // reads from 8 addresses, 1 bit per address
+	AM_RANGE(0x5800, 0x5fff) AM_READ(scramb2_protection_r) // must return 0x25
+	AM_RANGE(0x6000, 0x6007) AM_READ(scramb2_port0_r) // reads from 8 addresses, 1 bit per address
+	AM_RANGE(0x6800, 0x6807) AM_READ(scramb2_port1_r) // reads from 8 addresses, 1 bit per address
 	AM_RANGE(0x6801, 0x6801) AM_WRITE_LEGACY(galaxold_nmi_enable_w)
 	AM_RANGE(0x6802, 0x6802) AM_WRITE_LEGACY(galaxold_coin_counter_w)
 	AM_RANGE(0x6804, 0x6804) AM_WRITE_LEGACY(galaxold_stars_enable_w)
@@ -604,7 +604,7 @@ static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7000, 0x7007) AM_READ_LEGACY(watchdog_reset_r)
 	AM_RANGE(0x7006, 0x7006) AM_WRITENOP
 	AM_RANGE(0x7007, 0x7007) AM_WRITENOP
-	AM_RANGE(0x7800, 0x7807) AM_READ_LEGACY(scramb2_port2_r) // reads from 8 addresses, 1 bit per address
+	AM_RANGE(0x7800, 0x7807) AM_READ(scramb2_port2_r) // reads from 8 addresses, 1 bit per address
 	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 ADDRESS_MAP_END
 
@@ -762,11 +762,10 @@ static ADDRESS_MAP_START( ozon1_io_map, AS_IO, 8, galaxold_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( harem_nmi_mask_w )
+WRITE8_MEMBER(galaxold_state::harem_nmi_mask_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( harem_cpu1, AS_PROGRAM, 8, galaxold_state )
@@ -775,7 +774,7 @@ static ADDRESS_MAP_START( harem_cpu1, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4fff) AM_READWRITE_LEGACY(galaxold_videoram_r, galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP
-	AM_RANGE(0x5800, 0x5800) AM_READNOP AM_WRITE_LEGACY(harem_nmi_mask_w)
+	AM_RANGE(0x5800, 0x5800) AM_READNOP AM_WRITE(harem_nmi_mask_w)
 	AM_RANGE(0x5801, 0x5807) AM_WRITENOP
 	AM_RANGE(0x6101, 0x6101) AM_READ_PORT("IN0")
 	AM_RANGE(0x6102, 0x6102) AM_READ_PORT("IN1")
@@ -860,7 +859,7 @@ static ADDRESS_MAP_START( drivfrcg, AS_PROGRAM, 8, galaxold_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivfrcg_io, AS_IO, 8, galaxold_state )
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(drivfrcg_port0_r)
+	AM_RANGE(0x00, 0x00) AM_READ(drivfrcg_port0_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE") AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -894,9 +893,9 @@ static ADDRESS_MAP_START( racknrol_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
-static READ8_HANDLER( hexpoola_data_port_r )
+READ8_MEMBER(galaxold_state::hexpoola_data_port_r)
 {
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 		case 0x0022:
 			return 0;
@@ -911,7 +910,7 @@ static READ8_HANDLER( hexpoola_data_port_r )
 static ADDRESS_MAP_START( hexpoola_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x20, 0x3f) AM_WRITE_LEGACY(racknrol_tiles_bank_w) AM_BASE(m_racknrol_tiles_bank)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ_LEGACY(hexpoola_data_port_r) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ(hexpoola_data_port_r) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 

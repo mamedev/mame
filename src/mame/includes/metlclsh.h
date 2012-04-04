@@ -29,6 +29,12 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_subcpu;
+	DECLARE_WRITE8_MEMBER(metlclsh_cause_irq);
+	DECLARE_WRITE8_MEMBER(metlclsh_ack_nmi);
+	DECLARE_WRITE8_MEMBER(metlclsh_cause_nmi2);
+	DECLARE_WRITE8_MEMBER(metlclsh_ack_irq2);
+	DECLARE_WRITE8_MEMBER(metlclsh_ack_nmi2);
+	DECLARE_WRITE8_MEMBER(metlclsh_flipscreen_w);
 };
 
 

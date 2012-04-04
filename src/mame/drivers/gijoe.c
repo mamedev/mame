@@ -58,15 +58,13 @@ static const eeprom_interface eeprom_intf =
 };
 
 
-static READ16_HANDLER( control2_r )
+READ16_MEMBER(gijoe_state::control2_r)
 {
-	gijoe_state *state = space->machine().driver_data<gijoe_state>();
-	return state->m_cur_control2;
+	return m_cur_control2;
 }
 
-static WRITE16_HANDLER( control2_w )
+WRITE16_MEMBER(gijoe_state::control2_w)
 {
-	gijoe_state *state = space->machine().driver_data<gijoe_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -76,12 +74,12 @@ static WRITE16_HANDLER( control2_w )
 		/* bit 3  (unknown: coin) */
 		/* bit 5  is enable irq 6 */
 		/* bit 7  (unknown: enable irq 5?) */
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+		input_port_write(machine(), "EEPROMOUT", data, 0xff);
 
-		state->m_cur_control2 = data;
+		m_cur_control2 = data;
 
 		/* bit 6 = enable sprite ROM reading */
-		k053246_set_objcha_line(state->m_k053246, (data & 0x0040) ? ASSERT_LINE : CLEAR_LINE);
+		k053246_set_objcha_line(m_k053246, (data & 0x0040) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -139,7 +137,7 @@ static INTERRUPT_GEN( gijoe_interrupt )
 		device_set_input_line(device, 5, HOLD_LINE);
 }
 
-static WRITE16_HANDLER( sound_cmd_w )
+WRITE16_MEMBER(gijoe_state::sound_cmd_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -148,13 +146,12 @@ static WRITE16_HANDLER( sound_cmd_w )
 	}
 }
 
-static WRITE16_HANDLER( sound_irq_w )
+WRITE16_MEMBER(gijoe_state::sound_irq_w)
 {
-	gijoe_state *state = space->machine().driver_data<gijoe_state>();
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static READ16_HANDLER( sound_status_r )
+READ16_MEMBER(gijoe_state::sound_status_r)
 {
 	return soundlatch2_r(space, 0);
 }
@@ -178,15 +175,15 @@ static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
 	AM_RANGE(0x190000, 0x190fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1a0000, 0x1a001f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x1b0000, 0x1b003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE_LEGACY(sound_cmd_w)
-	AM_RANGE(0x1c0014, 0x1c0015) AM_READ_LEGACY(sound_status_r)
+	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(sound_cmd_w)
+	AM_RANGE(0x1c0014, 0x1c0015) AM_READ(sound_status_r)
 	AM_RANGE(0x1c0000, 0x1c001f) AM_RAM
-	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE_LEGACY(sound_irq_w)
+	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x1e0000, 0x1e0001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1e0002, 0x1e0003) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x1e4000, 0x1e4001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1e4002, 0x1e4003) AM_READ_PORT("START")
-	AM_RANGE(0x1e8000, 0x1e8001) AM_READWRITE_LEGACY(control2_r, control2_w)
+	AM_RANGE(0x1e8000, 0x1e8001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x1f0000, 0x1f0001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
 #if JOE_DEBUG
 	AM_RANGE(0x110000, 0x110007) AM_DEVREAD_LEGACY("k053246", k053246_reg_word_r)

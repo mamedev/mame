@@ -8,6 +8,8 @@ public:
 	tilemap_t *m_pf1_tilemap;
 	int m_flipscreen;
 	UINT16 *m_spriteram;
+	DECLARE_READ16_MEMBER(stadhero_control_r);
+	DECLARE_WRITE16_MEMBER(stadhero_control_w);
 };
 
 

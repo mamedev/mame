@@ -17,6 +17,12 @@ public:
 	int m_ball_sizey;
 	int m_handle_joystick;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_READ8_MEMBER(geebee_in_r);
+	DECLARE_WRITE8_MEMBER(geebee_out6_w);
+	DECLARE_WRITE8_MEMBER(geebee_out7_w);
+	DECLARE_READ8_MEMBER(warpwarp_sw_r);
+	DECLARE_WRITE8_MEMBER(warpwarp_out0_w);
+	DECLARE_WRITE8_MEMBER(warpwarp_out3_w);
 };
 
 

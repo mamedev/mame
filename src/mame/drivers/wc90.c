@@ -80,30 +80,30 @@ voice.ic82     CRC32 abc61f3d   SHA1 c6f123d16a26c4d77c635617dd97bb4b906c463a
 #include "includes/wc90.h"
 
 
-static WRITE8_HANDLER( wc90_bankswitch_w )
+WRITE8_MEMBER(wc90_state::wc90_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
-	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress] );
+	memory_set_bankptr(machine(), "bank1", &RAM[bankaddress] );
 }
 
-static WRITE8_HANDLER( wc90_bankswitch1_w )
+WRITE8_MEMBER(wc90_state::wc90_bankswitch1_w)
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine().region("sub")->base();
+	UINT8 *RAM = machine().region("sub")->base();
 
 
 	bankaddress = 0x10000 + ( ( data & 0xf8 ) << 8 );
-	memory_set_bankptr(space->machine(), "bank2", &RAM[bankaddress] );
+	memory_set_bankptr(machine(), "bank2", &RAM[bankaddress] );
 }
 
-static WRITE8_HANDLER( wc90_sound_command_w )
+WRITE8_MEMBER(wc90_state::wc90_sound_command_w)
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -135,9 +135,9 @@ static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xfc43, 0xfc43) AM_WRITEONLY AM_BASE(m_scroll2yhi)
 	AM_RANGE(0xfc46, 0xfc46) AM_WRITEONLY AM_BASE(m_scroll2xlo)
 	AM_RANGE(0xfc47, 0xfc47) AM_WRITEONLY AM_BASE(m_scroll2xhi)
-	AM_RANGE(0xfcc0, 0xfcc0) AM_WRITE_LEGACY(wc90_sound_command_w)
+	AM_RANGE(0xfcc0, 0xfcc0) AM_WRITE(wc90_sound_command_w)
 	AM_RANGE(0xfcd0, 0xfcd0) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0xfce0, 0xfce0) AM_WRITE_LEGACY(wc90_bankswitch_w)
+	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(wc90_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(wc90_bankswitch1_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90_bankswitch1_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE_LEGACY(watchdog_reset_w)
 ADDRESS_MAP_END
 

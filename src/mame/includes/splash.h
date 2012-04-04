@@ -28,6 +28,22 @@ public:
 	int m_snd_interrupt_enable2;
 
 	UINT16 *m_protdata;
+	DECLARE_WRITE16_MEMBER(splash_sh_irqtrigger_w);
+	DECLARE_WRITE16_MEMBER(roldf_sh_irqtrigger_w);
+	DECLARE_WRITE16_MEMBER(splash_coin_w);
+	DECLARE_WRITE8_MEMBER(splash_adpcm_data_w);
+	DECLARE_READ16_MEMBER(roldfrog_bombs_r);
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	DECLARE_WRITE8_MEMBER(roldfrog_vblank_ack_w);
+	DECLARE_READ8_MEMBER(roldfrog_unk_r);
+	DECLARE_READ16_MEMBER(spr_read);
+	DECLARE_WRITE16_MEMBER(spr_write);
+	DECLARE_WRITE16_MEMBER(funystrp_sh_irqtrigger_w);
+	DECLARE_READ8_MEMBER(int_source_r);
+	DECLARE_WRITE8_MEMBER(msm1_data_w);
+	DECLARE_WRITE8_MEMBER(msm1_interrupt_w);
+	DECLARE_WRITE8_MEMBER(msm2_interrupt_w);
+	DECLARE_WRITE8_MEMBER(msm2_data_w);
 };
 
 

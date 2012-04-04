@@ -35,6 +35,12 @@ public:
 	device_t *m_k053251;
 	device_t *m_lscreen;
 	device_t *m_rscreen;
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_READ16_MEMBER(sound_status_r);
+	DECLARE_WRITE16_MEMBER(sound_cmd_w);
+	DECLARE_WRITE16_MEMBER(sound_irq_w);
+	DECLARE_WRITE16_MEMBER(xmen_18fa00_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 /*----------- defined in video/xmen.c -----------*/

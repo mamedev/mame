@@ -16,6 +16,8 @@ public:
 	tilemap_t *m_fg_tilemap;
 
 	UINT8 m_sound_nmi_mask;
+	DECLARE_WRITE8_MEMBER(ssozumo_sh_command_w);
+	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
 };
 
 

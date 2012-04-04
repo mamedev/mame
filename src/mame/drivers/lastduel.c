@@ -124,7 +124,7 @@ Notes:
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( lastduel_sound_w )
+WRITE16_MEMBER(lastduel_state::lastduel_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
 		soundlatch_w(space, 0, data & 0xff);
@@ -137,7 +137,7 @@ static ADDRESS_MAP_START( lastduel_map, AS_PROGRAM, 16, lastduel_state )
 	AM_RANGE(0xfc0000, 0xfc0003) AM_WRITENOP /* Written rarely */
 	AM_RANGE(0xfc0800, 0xfc0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("P1_P2") AM_WRITE_LEGACY(lastduel_flip_w)
-	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(lastduel_sound_w)
+	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("SYSTEM") AM_WRITE(lastduel_sound_w)
 	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc8000, 0xfc800f) AM_WRITE_LEGACY(lastduel_scroll_w)
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( madgear_map, AS_PROGRAM, 16, lastduel_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0xfc1800, 0xfc1fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfc4000, 0xfc4001) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(lastduel_flip_w)
-	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(lastduel_sound_w)
+	AM_RANGE(0xfc4002, 0xfc4003) AM_READ_PORT("DSW2") AM_WRITE(lastduel_sound_w)
 	AM_RANGE(0xfc4004, 0xfc4005) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xfc4006, 0xfc4007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfc8000, 0xfc9fff) AM_RAM_WRITE_LEGACY(lastduel_vram_w) AM_BASE(m_vram)
@@ -173,9 +173,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lastduel_state )
 	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( mg_bankswitch_w )
+WRITE8_MEMBER(lastduel_state::mg_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x01);
+	memory_set_bank(machine(), "bank1", data & 0x01);
 }
 
 static ADDRESS_MAP_START( madgear_sound_map, AS_PROGRAM, 8, lastduel_state )
@@ -186,7 +186,7 @@ static ADDRESS_MAP_START( madgear_sound_map, AS_PROGRAM, 8, lastduel_state )
 	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)
 	AM_RANGE(0xf004, 0xf004) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0xf006, 0xf006) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xf00a, 0xf00a) AM_WRITE_LEGACY(mg_bankswitch_w)
+	AM_RANGE(0xf00a, 0xf00a) AM_WRITE(mg_bankswitch_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

@@ -33,14 +33,13 @@ Updates:
 #include "includes/kncljoe.h"
 
 
-static WRITE8_HANDLER( sound_cmd_w )
+WRITE8_MEMBER(kncljoe_state::sound_cmd_w)
 {
-	kncljoe_state *state = space->machine().driver_data<kncljoe_state>();
 
 	if ((data & 0x80) == 0)
 		soundlatch_w(space, 0, data & 0x7f);
 	else
-		device_set_input_line(state->m_soundcpu, 0, ASSERT_LINE);
+		device_set_input_line(m_soundcpu, 0, ASSERT_LINE);
 }
 
 
@@ -53,7 +52,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kncljoe_state )
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("P2")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("DSWB")
-	AM_RANGE(0xd800, 0xd800) AM_WRITE_LEGACY(sound_cmd_w)
+	AM_RANGE(0xd800, 0xd800) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0xd801, 0xd801) AM_WRITE_LEGACY(kncljoe_control_w)
 	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0xd803, 0xd803) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
@@ -97,10 +96,9 @@ static READ8_DEVICE_HANDLER( m6803_port2_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( sound_irq_ack_w )
+WRITE8_MEMBER(kncljoe_state::sound_irq_ack_w)
 {
-	kncljoe_state *state = space->machine().driver_data<kncljoe_state>();
-	device_set_input_line(state->m_soundcpu, 0, CLEAR_LINE);
+	device_set_input_line(m_soundcpu, 0, CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER(unused_w)
@@ -111,7 +109,7 @@ static WRITE8_DEVICE_HANDLER(unused_w)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, kncljoe_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_WRITENOP
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE_LEGACY(sound_irq_ack_w)
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 

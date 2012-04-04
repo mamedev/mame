@@ -30,9 +30,9 @@ static TIMER_CALLBACK( soundlatch_callback )
 	state->m_latch = param;
 }
 
-static WRITE8_HANDLER( tankbust_soundlatch_w )
+WRITE8_MEMBER(tankbust_state::tankbust_soundlatch_w)
 {
-	space->machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
+	machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
 }
 
 static READ8_DEVICE_HANDLER( tankbust_soundlatch_r )
@@ -62,31 +62,30 @@ static TIMER_CALLBACK( soundirqline_callback )
 
 
 
-static WRITE8_HANDLER( tankbust_e0xx_w )
+WRITE8_MEMBER(tankbust_state::tankbust_e0xx_w)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	state->m_e0xx_data[offset] = data;
+	m_e0xx_data[offset] = data;
 
 #if 0
 	popmessage("e0: %x %x (%x cnt) %x %x %x %x",
-		state->m_e0xx_data[0], state->m_e0xx_data[1],
-		state->m_e0xx_data[2], state->m_e0xx_data[3],
-		state->m_e0xx_data[4], state->m_e0xx_data[5],
-		state->m_e0xx_data[6] );
+		m_e0xx_data[0], m_e0xx_data[1],
+		m_e0xx_data[2], m_e0xx_data[3],
+		m_e0xx_data[4], m_e0xx_data[5],
+		m_e0xx_data[6] );
 #endif
 
 	switch (offset)
 	{
 	case 0:	/* 0xe000 interrupt enable */
-		state->m_irq_mask = data & 1;
+		m_irq_mask = data & 1;
 		break;
 
 	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_w */
-		space->machine().scheduler().synchronize(FUNC(soundirqline_callback), data);
+		machine().scheduler().synchronize(FUNC(soundirqline_callback), data);
 		break;
 
 	case 2:	/* 0xe002 coin counter */
-		coin_counter_w(space->machine(), 0, data&1);
+		coin_counter_w(machine(), 0, data&1);
 		break;
 
 	case 6:	/* 0xe006 screen disable ?? or disable screen update */
@@ -100,16 +99,15 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	case 7: /* 0xe007 bankswitch */
 		/* bank 1 at 0x6000-9fff = from 0x10000 when bit0=0 else from 0x14000 */
 		/* bank 2 at 0xa000-bfff = from 0x18000 when bit0=0 else from 0x1a000 */
-		memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() + 0x10000 + ((data&1) * 0x4000) );
-		memory_set_bankptr(space->machine(),  "bank2", space->machine().region("maincpu")->base() + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
+		memory_set_bankptr(machine(),  "bank1", machine().region("maincpu")->base() + 0x10000 + ((data&1) * 0x4000) );
+		memory_set_bankptr(machine(),  "bank2", machine().region("maincpu")->base() + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
 		break;
 	}
 }
 
-static READ8_HANDLER( debug_output_area_r )
+READ8_MEMBER(tankbust_state::debug_output_area_r)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	return state->m_e0xx_data[offset];
+	return m_e0xx_data[offset];
 }
 
 
@@ -164,17 +162,16 @@ static PALETTE_INIT( tankbust )
 }
 
 #if 0
-static READ8_HANDLER( read_from_unmapped_memory )
+READ8_MEMBER(tankbust_state::read_from_unmapped_memory)
 {
 	return 0xff;
 }
 #endif
 
-static READ8_HANDLER( some_changing_input )
+READ8_MEMBER(tankbust_state::some_changing_input)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	state->m_variable_data += 8;
-	return state->m_variable_data;
+	m_variable_data += 8;
+	return m_variable_data;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbust_state )
@@ -185,15 +182,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbust_state )
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(tankbust_background_colorram_r, tankbust_background_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE_LEGACY(tankbust_txtram_r, tankbust_txtram_w) AM_BASE(m_txtram)
 	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xe000, 0xe007) AM_READWRITE_LEGACY(debug_output_area_r, tankbust_e0xx_w)
+	AM_RANGE(0xe000, 0xe007) AM_READWRITE(debug_output_area_r, tankbust_e0xx_w)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(tankbust_yscroll_w)
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSW")
 	AM_RANGE(0xe801, 0xe802) AM_WRITE_LEGACY(tankbust_xscroll_w)
-	AM_RANGE(0xe803, 0xe803) AM_READWRITE_LEGACY(some_changing_input, tankbust_soundlatch_w)	/*unknown. Game expects this to change so this is not player input */
+	AM_RANGE(0xe803, 0xe803) AM_READWRITE(some_changing_input, tankbust_soundlatch_w)	/*unknown. Game expects this to change so this is not player input */
 	AM_RANGE(0xe804, 0xe804) AM_WRITENOP	/* watchdog ? ; written in long-lasting loops */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	//AM_RANGE(0xf800, 0xffff) AM_READ_LEGACY(read_from_unmapped_memory)   /* a bug in game code ? */
+	//AM_RANGE(0xf800, 0xffff) AM_READ(read_from_unmapped_memory)   /* a bug in game code ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map_cpu2, AS_IO, 8, tankbust_state )

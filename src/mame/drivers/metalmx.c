@@ -307,35 +307,34 @@ static SCREEN_UPDATE_IND16( metalmx )
  *
  *************************************/
 
-static READ32_HANDLER( unk_r )
+READ32_MEMBER(metalmx_state::unk_r)
 {
-	return 0;//space->machine().rand();
+	return 0;//machine().rand();
 }
 
-static READ32_HANDLER( watchdog_r )
+READ32_MEMBER(metalmx_state::watchdog_r)
 {
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER( shifter_w )
+WRITE32_MEMBER(metalmx_state::shifter_w)
 {
 
 }
 
-static WRITE32_HANDLER( motor_w )
+WRITE32_MEMBER(metalmx_state::motor_w)
 {
 
 }
 
-static WRITE32_HANDLER( reset_w )
+WRITE32_MEMBER(metalmx_state::reset_w)
 {
-	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
 	if (ACCESSING_BITS_16_31)
 	{
 		data >>= 16;
-		device_set_input_line(state->m_dsp32c_1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
-		device_set_input_line(state->m_dsp32c_2, INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(m_dsp32c_1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(m_dsp32c_2, INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
 	}
 }
 
@@ -346,23 +345,23 @@ static WRITE32_HANDLER( reset_w )
  *
  *************************************/
 
-static READ32_HANDLER( sound_data_r )
+READ32_MEMBER(metalmx_state::sound_data_r)
 {
 	UINT32 result = 0;
 
 	if (ACCESSING_BITS_0_15)
-		result |= cage_control_r(space->machine());
+		result |= cage_control_r(machine());
 	if (ACCESSING_BITS_16_31)
-		result |= cage_main_r(space) << 16;
+		result |= cage_main_r(&space) << 16;
 	return result;
 }
 
-static WRITE32_HANDLER( sound_data_w )
+WRITE32_MEMBER(metalmx_state::sound_data_w)
 {
 	if (ACCESSING_BITS_0_15)
-		cage_control_w(space->machine(), data);
+		cage_control_w(machine(), data);
 	if (ACCESSING_BITS_16_31)
-		cage_main_w(space, data >> 16);
+		cage_main_w(&space, data >> 16);
 }
 
 static void cage_irq_callback(running_machine &machine, int reason)
@@ -376,9 +375,8 @@ static void cage_irq_callback(running_machine &machine, int reason)
  *
  *************************************/
 
-static WRITE32_HANDLER( dsp32c_1_w )
+WRITE32_MEMBER(metalmx_state::dsp32c_1_w)
 {
-	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
 	offset <<= 1;
 
@@ -387,12 +385,11 @@ static WRITE32_HANDLER( dsp32c_1_w )
 	else if (ACCESSING_BITS_16_31)
 		data >>= 16;
 
-	state->m_dsp32c_1->pio_w(offset, data);
+	m_dsp32c_1->pio_w(offset, data);
 }
 
-static READ32_HANDLER( dsp32c_1_r )
+READ32_MEMBER(metalmx_state::dsp32c_1_r)
 {
-	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 	UINT32 data;
 
 	offset <<= 1;
@@ -400,7 +397,7 @@ static READ32_HANDLER( dsp32c_1_r )
 	if (ACCESSING_BITS_0_15)
 		offset += 1;
 
-	data = state->m_dsp32c_1->pio_r(offset);
+	data = m_dsp32c_1->pio_r(offset);
 
 	if (ACCESSING_BITS_16_31)
 		data <<= 16;
@@ -408,9 +405,8 @@ static READ32_HANDLER( dsp32c_1_r )
 	return data;
 }
 
-static WRITE32_HANDLER( dsp32c_2_w )
+WRITE32_MEMBER(metalmx_state::dsp32c_2_w)
 {
-	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
 	offset <<= 1;
 
@@ -419,12 +415,11 @@ static WRITE32_HANDLER( dsp32c_2_w )
 	else if (ACCESSING_BITS_16_31)
 		data >>= 16;
 
-	state->m_dsp32c_2->pio_w(offset, data);
+	m_dsp32c_2->pio_w(offset, data);
 }
 
-static READ32_HANDLER( dsp32c_2_r )
+READ32_MEMBER(metalmx_state::dsp32c_2_r)
 {
-	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 	UINT32 data;
 
 	offset <<= 1;
@@ -432,7 +427,7 @@ static READ32_HANDLER( dsp32c_2_r )
 	if (ACCESSING_BITS_0_15)
 		offset += 1;
 
-	data = state->m_dsp32c_2->pio_r(offset);
+	data = m_dsp32c_2->pio_r(offset);
 
 	if (ACCESSING_BITS_16_31)
 		data <<= 16;
@@ -447,17 +442,17 @@ static READ32_HANDLER( dsp32c_2_r )
  *
  *************************************/
 
-static WRITE32_HANDLER( host_gsp_w )
+WRITE32_MEMBER(metalmx_state::host_gsp_w)
 {
-	address_space *gsp_space = space->machine().device("gsp")->memory().space(AS_PROGRAM);
+	address_space *gsp_space = machine().device("gsp")->memory().space(AS_PROGRAM);
 
 	gsp_space->write_word((0xc0000000 + (offset << 5) + 0x10) / 8, data);
 	gsp_space->write_word((0xc0000000 + (offset << 5))/ 8 , data >> 16);
 }
 
-static READ32_HANDLER( host_gsp_r )
+READ32_MEMBER(metalmx_state::host_gsp_r)
 {
-	address_space *gsp_space = space->machine().device("gsp")->memory().space(AS_PROGRAM);
+	address_space *gsp_space = machine().device("gsp")->memory().space(AS_PROGRAM);
 	UINT32 val;
 
 	val  = gsp_space->read_word((0xc0000000 + (offset << 5) + 0x10) / 8);
@@ -466,38 +461,34 @@ static READ32_HANDLER( host_gsp_r )
 }
 
 
-static READ32_HANDLER( host_dram_r )
+READ32_MEMBER(metalmx_state::host_dram_r)
 {
-	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
-	return (state->m_gsp_dram[offset * 2] << 16) | state->m_gsp_dram[offset * 2 + 1];
+	return (m_gsp_dram[offset * 2] << 16) | m_gsp_dram[offset * 2 + 1];
 }
 
-static WRITE32_HANDLER( host_dram_w )
+WRITE32_MEMBER(metalmx_state::host_dram_w)
 {
-	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
-	COMBINE_DATA(state->m_gsp_dram + offset * 2 + 1);
+	COMBINE_DATA(m_gsp_dram + offset * 2 + 1);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(state->m_gsp_dram + offset * 2);
+	COMBINE_DATA(m_gsp_dram + offset * 2);
 }
 
-static READ32_HANDLER( host_vram_r )
+READ32_MEMBER(metalmx_state::host_vram_r)
 {
-	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
-	return (state->m_gsp_vram[offset * 2] << 16) | state->m_gsp_vram[offset * 2 + 1];
+	return (m_gsp_vram[offset * 2] << 16) | m_gsp_vram[offset * 2 + 1];
 }
 
-static WRITE32_HANDLER( host_vram_w )
+WRITE32_MEMBER(metalmx_state::host_vram_w)
 {
-	metalmx_state *state = space->machine().driver_data<metalmx_state>();
 
-	COMBINE_DATA(state->m_gsp_vram + offset * 2 + 1);
+	COMBINE_DATA(m_gsp_vram + offset * 2 + 1);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(state->m_gsp_vram + offset * 2);
+	COMBINE_DATA(m_gsp_vram + offset * 2);
 }
 
 static void tms_interrupt(device_t *device, int state)
@@ -506,7 +497,7 @@ static void tms_interrupt(device_t *device, int state)
 }
 
 
-static WRITE32_HANDLER( timer_w )
+WRITE32_MEMBER(metalmx_state::timer_w)
 {
 	// Offsets
 	// 9000 with 1 changes to external clock source
@@ -530,24 +521,24 @@ static WRITE32_HANDLER( timer_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, metalmx_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM
-	AM_RANGE(0x400000, 0x4000ff) AM_READWRITE_LEGACY(host_gsp_r, host_gsp_w)
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(host_dram_r, host_dram_w)
-	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE_LEGACY(host_vram_r, host_vram_w)
-	AM_RANGE(0x800000, 0x80001f) AM_READWRITE_LEGACY(dsp32c_2_r, dsp32c_2_w)
+	AM_RANGE(0x400000, 0x4000ff) AM_READWRITE(host_gsp_r, host_gsp_w)
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(host_dram_r, host_dram_w)
+	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(host_vram_r, host_vram_w)
+	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(dsp32c_2_r, dsp32c_2_w)
 	AM_RANGE(0x800000, 0x85ffff) AM_NOP			/* Unknown */
-	AM_RANGE(0x880000, 0x88001f) AM_READWRITE_LEGACY(dsp32c_1_r, dsp32c_1_w)
-	AM_RANGE(0x980000, 0x9800ff) AM_WRITE_LEGACY(reset_w)
-	AM_RANGE(0xb40000, 0xb40003) AM_READWRITE_LEGACY(sound_data_r, sound_data_w)
+	AM_RANGE(0x880000, 0x88001f) AM_READWRITE(dsp32c_1_r, dsp32c_1_w)
+	AM_RANGE(0x980000, 0x9800ff) AM_WRITE(reset_w)
+	AM_RANGE(0xb40000, 0xb40003) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0xf00000, 0xf00003) AM_RAM			/* Network message port */
-	AM_RANGE(0xf02000, 0xf02003) AM_READWRITE_LEGACY(watchdog_r, shifter_w)
-	AM_RANGE(0xf03000, 0xf03003) AM_READ_PORT("P1") AM_WRITE_LEGACY(motor_w)
+	AM_RANGE(0xf02000, 0xf02003) AM_READWRITE(watchdog_r, shifter_w)
+	AM_RANGE(0xf03000, 0xf03003) AM_READ_PORT("P1") AM_WRITE(motor_w)
 	AM_RANGE(0xf04000, 0xf04003) AM_READ_PORT("P2")
 	AM_RANGE(0xf05000, 0xf05fff) AM_WRITENOP	/* Lamps */ // f06000 = ADC  // f01xxx = ADC
 	AM_RANGE(0xf19000, 0xf19003) AM_WRITENOP	/* Network */
 	AM_RANGE(0xf1a000, 0xf1a003) AM_WRITENOP
 	AM_RANGE(0xf1b000, 0xf1b003) AM_WRITENOP
 	AM_RANGE(0xf1e000, 0xf1e003) AM_RAM			/* Network status flags : 1000 = LIRQ  4000 = SFLAG  8000 = 68FLAG */
-	AM_RANGE(0xf20000, 0xf2ffff) AM_WRITE_LEGACY(timer_w)
+	AM_RANGE(0xf20000, 0xf2ffff) AM_WRITE(timer_w)
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM			/* Zero power RAM */
 	AM_RANGE(0xfd0000, 0xffffff) AM_RAM			/* Scratch RAM */
 ADDRESS_MAP_END
@@ -596,8 +587,8 @@ static ADDRESS_MAP_START( dsp32c_1_map, AS_PROGRAM, 32, metalmx_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM
 	AM_RANGE(0x700000, 0x700003) AM_WRITENOP	/* LEDs? */
-	AM_RANGE(0xa00000, 0xa00003) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0xb00000, 0xb00003) AM_READ_LEGACY(unk_r)
+	AM_RANGE(0xa00000, 0xa00003) AM_READ(unk_r)
+	AM_RANGE(0xb00000, 0xb00003) AM_READ(unk_r)
 	AM_RANGE(0xc00000, 0xc00003) AM_RAM			/* FIFO? */
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM			/* 3D registers */
 ADDRESS_MAP_END
@@ -613,8 +604,8 @@ static ADDRESS_MAP_START( dsp32c_2_map, AS_PROGRAM, 32, metalmx_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM
 	AM_RANGE(0x600000, 0x67ffff) AM_RAM
 	AM_RANGE(0x700000, 0x700003) AM_WRITENOP	/* LEDs? */
-	AM_RANGE(0xa00000, 0xa00003) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0xb00000, 0xb00003) AM_READ_LEGACY(unk_r)
+	AM_RANGE(0xa00000, 0xa00003) AM_READ(unk_r)
+	AM_RANGE(0xb00000, 0xb00003) AM_READ(unk_r)
 	AM_RANGE(0xc00000, 0xc00003) AM_RAM			/* FIFO? */
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM			/* 3D registers */
 ADDRESS_MAP_END

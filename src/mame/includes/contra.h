@@ -34,6 +34,10 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_k007121_1;
 	device_t *m_k007121_2;
+	DECLARE_WRITE8_MEMBER(contra_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(contra_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(contra_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(cpu_sound_command_w);
 };
 
 

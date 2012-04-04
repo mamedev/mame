@@ -25,6 +25,8 @@ public:
 	int m_sprite_inc;
 
 	int irq_count;
+	DECLARE_WRITE8_MEMBER(paradise_rombank_w);
+	DECLARE_WRITE8_MEMBER(torus_coin_counter_w);
 };
 
 /*----------- defined in video/paradise.c -----------*/

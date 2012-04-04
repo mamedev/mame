@@ -34,6 +34,10 @@ public:
 	const UINT8 *m_color_codes;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(int_enable_w);
+	DECLARE_READ8_MEMBER(razmataz_counter_r);
+	DECLARE_WRITE8_MEMBER(zaxxon_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_coin_enable_w);
 };
 
 

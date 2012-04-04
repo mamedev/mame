@@ -37,6 +37,40 @@ public:
 	int m_sample;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_READ8_MEMBER(hardhead_protection_r);
+	DECLARE_WRITE8_MEMBER(hardhead_protection_w);
+	DECLARE_READ8_MEMBER(hardhead_ip_r);
+	DECLARE_WRITE8_MEMBER(hardhead_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(hardhead_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(rranger_bankswitch_w);
+	DECLARE_READ8_MEMBER(rranger_soundstatus_r);
+	DECLARE_WRITE8_MEMBER(sranger_prot_w);
+	DECLARE_READ8_MEMBER(brickzn_c140_r);
+	DECLARE_WRITE8_MEMBER(brickzn_palettebank_w);
+	DECLARE_WRITE8_MEMBER(brickzn_spritebank_w);
+	DECLARE_WRITE8_MEMBER(brickzn_unknown_w);
+	DECLARE_WRITE8_MEMBER(brickzn_rombank_w);
+	DECLARE_WRITE8_MEMBER(hardhea2_nmi_w);
+	DECLARE_WRITE8_MEMBER(hardhea2_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(hardhea2_leds_w);
+	DECLARE_WRITE8_MEMBER(hardhea2_spritebank_w);
+	DECLARE_WRITE8_MEMBER(hardhea2_rombank_w);
+	DECLARE_WRITE8_MEMBER(hardhea2_spritebank_0_w);
+	DECLARE_WRITE8_MEMBER(hardhea2_spritebank_1_w);
+	DECLARE_WRITE8_MEMBER(hardhea2_rambank_0_w);
+	DECLARE_WRITE8_MEMBER(hardhea2_rambank_1_w);
+	DECLARE_WRITE8_MEMBER(starfigh_spritebank_latch_w);
+	DECLARE_WRITE8_MEMBER(starfigh_spritebank_w);
+	DECLARE_WRITE8_MEMBER(sparkman_cmd_prot_w);
+	DECLARE_WRITE8_MEMBER(suna8_wram_w);
+	DECLARE_WRITE8_MEMBER(sparkman_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(sparkman_leds_w);
+	DECLARE_WRITE8_MEMBER(sparkman_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(sparkman_spritebank_w);
+	DECLARE_WRITE8_MEMBER(sparkman_rombank_w);
+	DECLARE_READ8_MEMBER(sparkman_c0a3_r);
+	DECLARE_WRITE8_MEMBER(sparkman_en_trash_w);
+	DECLARE_WRITE8_MEMBER(brickzn_pcm_w);
 };
 
 

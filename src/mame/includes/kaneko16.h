@@ -110,6 +110,16 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_shared_ptr<UINT16> m_spriteram;
+	DECLARE_READ16_MEMBER(kaneko16_rnd_r);
+	DECLARE_WRITE16_MEMBER(kaneko16_coin_lockout_w);
+	DECLARE_WRITE16_MEMBER(kaneko16_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(kaneko16_eeprom_w);
+	DECLARE_WRITE16_MEMBER(bloodwar_coin_lockout_w);
+	DECLARE_READ16_MEMBER(gtmr_wheel_r);
+	DECLARE_READ16_MEMBER(gtmr2_wheel_r);
+	DECLARE_READ16_MEMBER(gtmr2_IN1_r);
+	DECLARE_WRITE16_MEMBER(shogwarr_oki_bank_w);
+	DECLARE_WRITE16_MEMBER(brapboys_oki_bank_w);
 };
 
 

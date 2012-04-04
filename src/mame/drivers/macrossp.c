@@ -304,55 +304,51 @@ Notes:
 
 /*** VARIOUS READ / WRITE HANDLERS *******************************************/
 
-static WRITE32_HANDLER( paletteram32_macrossp_w )
+WRITE32_MEMBER(macrossp_state::paletteram32_macrossp_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 	int r,g,b;
-	COMBINE_DATA(&state->m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 
-	b = ((state->m_paletteram[offset] & 0x0000ff00) >>8);
-	g = ((state->m_paletteram[offset] & 0x00ff0000) >>16);
-	r = ((state->m_paletteram[offset] & 0xff000000) >>24);
+	b = ((m_paletteram[offset] & 0x0000ff00) >>8);
+	g = ((m_paletteram[offset] & 0x00ff0000) >>16);
+	r = ((m_paletteram[offset] & 0xff000000) >>24);
 
-	palette_set_color(space->machine(), offset, MAKE_RGB(r,g,b));
+	palette_set_color(machine(), offset, MAKE_RGB(r,g,b));
 }
 
 
-static READ32_HANDLER ( macrossp_soundstatus_r )
+READ32_MEMBER(macrossp_state::macrossp_soundstatus_r)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	//  logerror("%08x read soundstatus\n", cpu_get_pc(&space->device()));
+	//  logerror("%08x read soundstatus\n", cpu_get_pc(&space.device()));
 
 	/* bit 1 is sound status */
 	/* bit 0 unknown - it is expected to toggle, vblank? */
 
-	state->m_snd_toggle ^= 1;
+	m_snd_toggle ^= 1;
 
-	return (state->m_sndpending << 1) | state->m_snd_toggle;
+	return (m_sndpending << 1) | m_snd_toggle;
 }
 
-static WRITE32_HANDLER( macrossp_soundcmd_w )
+WRITE32_MEMBER(macrossp_state::macrossp_soundcmd_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
 	if (ACCESSING_BITS_16_31)
 	{
-		//logerror("%08x write soundcmd %08x (%08x)\n",cpu_get_pc(&space->device()),data,mem_mask);
+		//logerror("%08x write soundcmd %08x (%08x)\n",cpu_get_pc(&space.device()),data,mem_mask);
 		soundlatch_word_w(space, 0, data >> 16, 0xffff);
-		state->m_sndpending = 1;
-		device_set_input_line(state->m_audiocpu, 2, HOLD_LINE);
+		m_sndpending = 1;
+		device_set_input_line(m_audiocpu, 2, HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
-		device_spin_until_time(&space->device(), attotime::from_usec(50));
+		device_spin_until_time(&space.device(), attotime::from_usec(50));
 	}
 }
 
-static READ16_HANDLER( macrossp_soundcmd_r )
+READ16_MEMBER(macrossp_state::macrossp_soundcmd_r)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	//  logerror("%06x read soundcmd\n",cpu_get_pc(&space->device()));
-	state->m_sndpending = 0;
+	//  logerror("%06x read soundcmd\n",cpu_get_pc(&space.device()));
+	m_sndpending = 0;
 	return soundlatch_word_r(space, offset, mem_mask);
 }
 
@@ -386,17 +382,16 @@ static void update_colors( running_machine &machine )
 	}
 }
 
-static WRITE32_HANDLER( macrossp_palette_fade_w )
+WRITE32_MEMBER(macrossp_state::macrossp_palette_fade_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	state->m_fade_effect = ((data & 0xff00) >> 8) - 0x28; //it writes two times, first with a -0x28 then with the proper data
+	m_fade_effect = ((data & 0xff00) >> 8) - 0x28; //it writes two times, first with a -0x28 then with the proper data
 	//  popmessage("%02x",fade_effect);
 
-	if (state->m_old_fade != state->m_fade_effect)
+	if (m_old_fade != m_fade_effect)
 	{
-		state->m_old_fade = state->m_fade_effect;
-		update_colors(space->machine());
+		m_old_fade = m_fade_effect;
+		update_colors(machine());
 	}
 }
 
@@ -422,16 +417,16 @@ static ADDRESS_MAP_START( macrossp_map, AS_PROGRAM, 32, macrossp_state )
 	AM_RANGE(0x91c200, 0x91c3ff) AM_WRITEONLY /* W/O? */
 	AM_RANGE(0x91d000, 0x91d00b) AM_WRITEONLY AM_BASE(m_text_videoregs) /* W/O? */
 
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE_LEGACY(paletteram32_macrossp_w) AM_BASE(m_paletteram)
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(paletteram32_macrossp_w) AM_BASE(m_paletteram)
 
 	AM_RANGE(0xb00000, 0xb00003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xb00004, 0xb00007) AM_READ_LEGACY(macrossp_soundstatus_r) AM_WRITENOP // irq related?
+	AM_RANGE(0xb00004, 0xb00007) AM_READ(macrossp_soundstatus_r) AM_WRITENOP // irq related?
 	AM_RANGE(0xb00008, 0xb0000b) AM_WRITENOP	// irq related?
 	AM_RANGE(0xb0000c, 0xb0000f) AM_READ_PORT("DSW") AM_WRITENOP
-	AM_RANGE(0xb00010, 0xb00013) AM_WRITE_LEGACY(macrossp_palette_fade_w)	// macrossp palette fade
+	AM_RANGE(0xb00010, 0xb00013) AM_WRITE(macrossp_palette_fade_w)	// macrossp palette fade
 	AM_RANGE(0xb00020, 0xb00023) AM_WRITENOP
 
-	AM_RANGE(0xc00000, 0xc00003) AM_WRITE_LEGACY(macrossp_soundcmd_w)
+	AM_RANGE(0xc00000, 0xc00003) AM_WRITE(macrossp_soundcmd_w)
 
 	AM_RANGE(0xf00000, 0xf1ffff) AM_RAM AM_BASE(m_mainram) /* Main Ram */
 //  AM_RANGE(0xfe0000, 0xfe0003) AM_NOP
@@ -441,7 +436,7 @@ static ADDRESS_MAP_START( macrossp_sound_map, AS_PROGRAM, 16, macrossp_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM
 	AM_RANGE(0x400000, 0x40007f) AM_DEVREADWRITE8_LEGACY("ensoniq", es5506_r, es5506_w, 0x00ff)
-	AM_RANGE(0x600000, 0x600001) AM_READ_LEGACY(macrossp_soundcmd_r)
+	AM_RANGE(0x600000, 0x600001) AM_READ(macrossp_soundcmd_r)
 ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/
@@ -766,38 +761,38 @@ ROM_END
 
 
 
-static WRITE32_HANDLER( macrossp_speedup_w )
+WRITE32_MEMBER(macrossp_state::macrossp_speedup_w)
 {
 /*
 PC :00018104 018104: addq.w  #1, $f1015a.l
 PC :0001810A 01810A: cmp.w   $f10140.l, D0
 PC :00018110 018110: beq     18104
 */
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	COMBINE_DATA(&state->m_mainram[0x10158 / 4]);
-	if (cpu_get_pc(&space->device()) == 0x001810A) device_spin_until_interrupt(&space->device());
+	COMBINE_DATA(&m_mainram[0x10158 / 4]);
+	if (cpu_get_pc(&space.device()) == 0x001810A) device_spin_until_interrupt(&space.device());
 }
 
 #ifdef UNUSED_FUNCTION
-static WRITE32_HANDLER( quizmoon_speedup_w )
+WRITE32_MEMBER(macrossp_state::quizmoon_speedup_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	COMBINE_DATA(&state->m_mainram[0x00020 / 4]);
-	if (cpu_get_pc(&space->device()) == 0x1cc) device_spin_until_interrupt(&space->device());
+	COMBINE_DATA(&m_mainram[0x00020 / 4]);
+	if (cpu_get_pc(&space.device()) == 0x1cc) device_spin_until_interrupt(&space.device());
 }
 #endif
 
 static DRIVER_INIT( macrossp )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf10158, 0xf1015b, FUNC(macrossp_speedup_w) );
+	macrossp_state *state = machine.driver_data<macrossp_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xf10158, 0xf1015b, write32_delegate(FUNC(macrossp_state::macrossp_speedup_w),state));
 }
 
 static DRIVER_INIT( quizmoon )
 {
 #ifdef UNUSED_FUNCTION
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf00020, 0xf00023, FUNC(quizmoon_speedup_w) );
+	macrossp_state *state = machine.driver_data<macrossp_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xf00020, 0xf00023, write32_delegate(FUNC(macrossp_state::quizmoon_speedup_w),state));
 #endif
 }
 

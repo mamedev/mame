@@ -25,6 +25,7 @@ public:
 
 	/* misc */
 	int            m_bank;
+	DECLARE_WRITE8_MEMBER(compgolf_ctrl_w);
 };
 
 

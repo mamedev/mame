@@ -155,58 +155,52 @@
 
 /***************************************************************************/
 
-static READ16_HANDLER(cyclwarr_cpu_bb_r)
+READ16_MEMBER(tatsumi_state::cyclwarr_cpu_bb_r)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	return state->m_cyclwarr_cpub_ram[offset];
+	return m_cyclwarr_cpub_ram[offset];
 }
 
-static WRITE16_HANDLER(cyclwarr_cpu_bb_w)
+WRITE16_MEMBER(tatsumi_state::cyclwarr_cpu_bb_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->m_cyclwarr_cpub_ram[offset]);
+	COMBINE_DATA(&m_cyclwarr_cpub_ram[offset]);
 }
 
-static READ16_HANDLER(cyclwarr_palette_r) { return space->machine().generic.paletteram.u16[offset]; }
-static READ16_HANDLER(cyclwarr_sprite_r) {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>(); return state->m_spriteram[offset]; }
-static WRITE16_HANDLER(cyclwarr_sprite_w) {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>(); COMBINE_DATA(&state->m_spriteram[offset]); }
-
-static WRITE16_HANDLER(bigfight_a20000_w)
+READ16_MEMBER(tatsumi_state::cyclwarr_palette_r){ return machine().generic.paletteram.u16[offset]; }
+READ16_MEMBER(tatsumi_state::cyclwarr_sprite_r){
+	return m_spriteram[offset]; }
+WRITE16_MEMBER(tatsumi_state::cyclwarr_sprite_w){
+	COMBINE_DATA(&m_spriteram[offset]); }
+WRITE16_MEMBER(tatsumi_state::bigfight_a20000_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->m_bigfight_a20000[offset]);
+	COMBINE_DATA(&m_bigfight_a20000[offset]);
 }
 
-static WRITE16_HANDLER(bigfight_a40000_w)
+WRITE16_MEMBER(tatsumi_state::bigfight_a40000_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->m_bigfight_a40000[offset]);
+	COMBINE_DATA(&m_bigfight_a40000[offset]);
 }
 
-static WRITE16_HANDLER(bigfight_a60000_w)
+WRITE16_MEMBER(tatsumi_state::bigfight_a60000_w)
 {
-	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
-	COMBINE_DATA(&state->m_bigfight_a60000[offset]);
+	COMBINE_DATA(&m_bigfight_a60000[offset]);
 }
 
-static READ16_HANDLER(cyclwarr_input_r)
+READ16_MEMBER(tatsumi_state::cyclwarr_input_r)
 {
 	static const char *const port[] = { "SERVICE", "P1", "P2", "DSW3" };
-	return input_port_read(space->machine(), port[offset]);
+	return input_port_read(machine(), port[offset]);
 }
 
-static READ16_HANDLER(cyclwarr_input2_r)
+READ16_MEMBER(tatsumi_state::cyclwarr_input2_r)
 {
 	static const char *const port2[] = { "DSW1", "DSW2", "P3", "P4" };
-	return input_port_read(space->machine(), port2[offset]);
+	return input_port_read(machine(), port2[offset]);
 }
 
-static WRITE16_HANDLER(cyclwarr_sound_w)
+WRITE16_MEMBER(tatsumi_state::cyclwarr_sound_w)
 {
 	soundlatch_w(space, 0, data >> 8);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /***************************************************************************/
@@ -299,21 +293,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclwarr_68000a_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(m_cyclwarr_cpua_ram)
 	AM_RANGE(0x03e000, 0x03efff) AM_RAM
-	AM_RANGE(0x040000, 0x043fff) AM_READWRITE_LEGACY(cyclwarr_cpu_bb_r, cyclwarr_cpu_bb_w)
+	AM_RANGE(0x040000, 0x043fff) AM_READWRITE(cyclwarr_cpu_bb_r, cyclwarr_cpu_bb_w)
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE_LEGACY(cyclwarr_videoram1_r, cyclwarr_videoram1_w) AM_BASE(m_cyclwarr_videoram1)
 	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE_LEGACY(cyclwarr_videoram0_r, cyclwarr_videoram0_w) AM_BASE(m_cyclwarr_videoram0)
 
-	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE_LEGACY(bigfight_a20000_w)
-	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE_LEGACY(bigfight_a40000_w)
-	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE_LEGACY(bigfight_a60000_w)
+	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
+	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
+	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
-	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE_LEGACY(cyclwarr_sound_w)
-	AM_RANGE(0x0b9002, 0x0b9009) AM_READ_LEGACY(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
-	AM_RANGE(0x0ba000, 0x0ba007) AM_READ_LEGACY(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE(cyclwarr_sound_w)
+	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
+	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE_LEGACY(cyclwarr_control_r, cyclwarr_control_w)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE_LEGACY(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE_LEGACY(tatsumi_sprite_control_w) AM_BASE(m_sprite_control_ram)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE_LEGACY(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
 	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK("bank1") /* CPU A ROM */
 ADDRESS_MAP_END
@@ -324,17 +318,17 @@ static ADDRESS_MAP_START( cyclwarr_68000b_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE_LEGACY(cyclwarr_videoram1_r, cyclwarr_videoram1_w)
 	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE_LEGACY(cyclwarr_videoram0_r, cyclwarr_videoram0_w)
 
-	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE_LEGACY(bigfight_a20000_w)
-	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE_LEGACY(bigfight_a40000_w)
-	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE_LEGACY(bigfight_a60000_w)
+	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
+	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
+	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
-	AM_RANGE(0x0b9002, 0x0b9009) AM_READ_LEGACY(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
-	AM_RANGE(0x0ba000, 0x0ba007) AM_READ_LEGACY(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
+	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READ_LEGACY(cyclwarr_control_r)
 
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE_LEGACY(cyclwarr_sprite_r, cyclwarr_sprite_w)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE_LEGACY(tatsumi_sprite_control_w)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE_LEGACY(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w)
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w)
 	AM_RANGE(0x140000, 0x1bffff) AM_ROMBANK("bank2") /* CPU B ROM */
 	AM_RANGE(0x2c0000, 0x33ffff) AM_ROMBANK("bank1") /* CPU A ROM */
 ADDRESS_MAP_END
@@ -354,22 +348,22 @@ static ADDRESS_MAP_START( bigfight_68000a_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(m_cyclwarr_cpua_ram)
 
 	AM_RANGE(0x03e000, 0x03efff) AM_RAM
-	AM_RANGE(0x040000, 0x04ffff) AM_READWRITE_LEGACY(cyclwarr_cpu_bb_r, cyclwarr_cpu_bb_w)
+	AM_RANGE(0x040000, 0x04ffff) AM_READWRITE(cyclwarr_cpu_bb_r, cyclwarr_cpu_bb_w)
 
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE_LEGACY(cyclwarr_videoram1_r, cyclwarr_videoram1_w) AM_BASE(m_cyclwarr_videoram1)
 	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE_LEGACY(cyclwarr_videoram0_r, cyclwarr_videoram0_w) AM_BASE(m_cyclwarr_videoram0)
 
-	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE_LEGACY(bigfight_a20000_w)
-	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE_LEGACY(bigfight_a40000_w)
-	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE_LEGACY(bigfight_a60000_w)
+	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
+	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
+	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
-	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE_LEGACY(cyclwarr_sound_w)
-	AM_RANGE(0x0b9002, 0x0b9009) AM_READ_LEGACY(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
-	AM_RANGE(0x0ba000, 0x0ba007) AM_READ_LEGACY(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0b8000, 0x0b8001) AM_WRITE(cyclwarr_sound_w)
+	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
+	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READWRITE_LEGACY(cyclwarr_control_r, cyclwarr_control_w)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE_LEGACY(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE(m_spriteram)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE_LEGACY(tatsumi_sprite_control_w) AM_BASE(m_sprite_control_ram)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE_LEGACY(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1") /* CPU B ROM */
 ADDRESS_MAP_END
@@ -378,17 +372,17 @@ static ADDRESS_MAP_START( bigfight_68000b_map, AS_PROGRAM, 16, tatsumi_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(m_cyclwarr_cpub_ram)
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE_LEGACY(cyclwarr_videoram1_r, cyclwarr_videoram1_w)
 	AM_RANGE(0x090000, 0x09ffff) AM_READWRITE_LEGACY(cyclwarr_videoram0_r, cyclwarr_videoram0_w)
-	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE_LEGACY(bigfight_a20000_w)
-	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE_LEGACY(bigfight_a40000_w)
-	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE_LEGACY(bigfight_a60000_w)
+	AM_RANGE(0x0a2000, 0x0a2007) AM_WRITE(bigfight_a20000_w)
+	AM_RANGE(0x0a4000, 0x0a4001) AM_WRITE(bigfight_a40000_w)
+	AM_RANGE(0x0a6000, 0x0a6001) AM_WRITE(bigfight_a60000_w)
 
-	AM_RANGE(0x0b9002, 0x0b9009) AM_READ_LEGACY(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
-	AM_RANGE(0x0ba000, 0x0ba007) AM_READ_LEGACY(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
+	AM_RANGE(0x0b9002, 0x0b9009) AM_READ(cyclwarr_input_r) /* Coins, P1 input, P2 input, dip 3 */
+	AM_RANGE(0x0ba000, 0x0ba007) AM_READ(cyclwarr_input2_r) /* Dip 1, Dip 2, P3 input, P4 input */
 	AM_RANGE(0x0ba008, 0x0ba009) AM_READ_LEGACY(cyclwarr_control_r)
 
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE_LEGACY(cyclwarr_sprite_r, cyclwarr_sprite_w)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_READWRITE(cyclwarr_sprite_r, cyclwarr_sprite_w)
 	AM_RANGE(0x0ca000, 0x0ca1ff) AM_WRITE_LEGACY(tatsumi_sprite_control_w)
-	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE_LEGACY(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w)
+	AM_RANGE(0x0d0000, 0x0d3fff) AM_READWRITE(cyclwarr_palette_r, paletteram16_xRRRRRGGGGGBBBBB_word_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROMBANK("bank2") /* CPU A ROM */
 	AM_RANGE(0x200000, 0x27ffff) AM_ROMBANK("bank1") /* CPU B ROM */
 ADDRESS_MAP_END

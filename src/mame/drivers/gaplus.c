@@ -158,60 +158,55 @@ TODO:
 #include "includes/gaplus.h"
 
 
-static READ8_HANDLER( gaplus_spriteram_r )
+READ8_MEMBER(gaplus_state::gaplus_spriteram_r)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	return state->m_spriteram[offset];
+	return m_spriteram[offset];
 }
 
-static WRITE8_HANDLER( gaplus_spriteram_w )
+WRITE8_MEMBER(gaplus_state::gaplus_spriteram_w)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	state->m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 }
 
-static WRITE8_HANDLER( gaplus_irq_1_ctrl_w )
+WRITE8_MEMBER(gaplus_state::gaplus_irq_1_ctrl_w)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	int bit = !BIT(offset, 11);
-	state->m_main_irq_mask = bit & 1;
+	m_main_irq_mask = bit & 1;
 	if (!bit)
-		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( gaplus_irq_2_ctrl_w )
+WRITE8_MEMBER(gaplus_state::gaplus_irq_2_ctrl_w)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	int bit = offset & 1;
-	state->m_sub_irq_mask = bit & 1;
+	m_sub_irq_mask = bit & 1;
 	if (!bit)
-		cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( gaplus_irq_3_ctrl_w )
+WRITE8_MEMBER(gaplus_state::gaplus_irq_3_ctrl_w)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	int bit = !BIT(offset, 13);
-	state->m_sub2_irq_mask = bit & 1;
+	m_sub2_irq_mask = bit & 1;
 	if (!bit)
-		cputag_set_input_line(space->machine(), "sub2", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "sub2", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( gaplus_sreset_w )
+WRITE8_MEMBER(gaplus_state::gaplus_sreset_w)
 {
 	int bit = !BIT(offset, 11);
-	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-	cputag_set_input_line(space->machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-	mappy_sound_enable(space->machine().device("namco"), bit);
+	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+	mappy_sound_enable(machine().device("namco"), bit);
 }
 
-static WRITE8_HANDLER( gaplus_freset_w )
+WRITE8_MEMBER(gaplus_state::gaplus_freset_w)
 {
-	device_t *io58xx = space->machine().device("58xx");
-	device_t *io56xx = space->machine().device("56xx");
+	device_t *io58xx = machine().device("58xx");
+	device_t *io56xx = machine().device("56xx");
 	int bit = !BIT(offset, 11);
 
-	logerror("%04x: freset %d\n",cpu_get_pc(&space->device()), bit);
+	logerror("%04x: freset %d\n",cpu_get_pc(&space.device()), bit);
 
 	namcoio_set_reset_line(io58xx, bit ? CLEAR_LINE : ASSERT_LINE);
 	namcoio_set_reset_line(io56xx, bit ? CLEAR_LINE : ASSERT_LINE);
@@ -292,46 +287,46 @@ static INTERRUPT_GEN( gaplus_vblank_sub2_irq )
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gaplus_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(gaplus_videoram_r, gaplus_videoram_w) AM_BASE(m_videoram)		/* tilemap RAM (shared with CPU #2) */
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE_LEGACY(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE(m_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
+	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE(m_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)										/* shared RAM with CPU #3 */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE_LEGACY("56xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE_LEGACY("58xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
 	AM_RANGE(0x6820, 0x682f) AM_READWRITE_LEGACY(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE(m_customio_3)	/* custom I/O chip #3 interface */
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE_LEGACY(gaplus_irq_1_ctrl_w)														/* main CPU irq control */
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(gaplus_irq_1_ctrl_w)														/* main CPU irq control */
 	AM_RANGE(0x7800, 0x7fff) AM_READ_LEGACY(watchdog_reset_r)															/* watchdog */
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE_LEGACY(gaplus_sreset_w)															/* reset CPU #2 & #3, enable sound */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE_LEGACY(gaplus_freset_w)															/* reset I/O chips */
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(gaplus_sreset_w)															/* reset CPU #2 & #3, enable sound */
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(gaplus_freset_w)															/* reset I/O chips */
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE_LEGACY(gaplus_starfield_control_w)				/* starfield control */
 	AM_RANGE(0xa000, 0xffff) AM_ROM																				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gaplusa_cpu1_map, AS_PROGRAM, 8, gaplus_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(gaplus_videoram_r, gaplus_videoram_w) AM_BASE(m_videoram)		/* tilemap RAM (shared with CPU #2) */
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE_LEGACY(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE(m_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
+	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w) AM_BASE(m_spriteram)	/* shared RAM with CPU #2 (includes sprite RAM) */
 	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)													/* shared RAM with CPU #3 */
 	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE_LEGACY("58xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE_LEGACY("56xx", namcoio_r, namcoio_w)													/* custom I/O chips interface */
 	AM_RANGE(0x6820, 0x682f) AM_READWRITE_LEGACY(gaplus_customio_3_r, gaplus_customio_3_w) AM_BASE(m_customio_3)	/* custom I/O chip #3 interface */
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE_LEGACY(gaplus_irq_1_ctrl_w)														/* main CPU irq control */
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(gaplus_irq_1_ctrl_w)														/* main CPU irq control */
 	AM_RANGE(0x7800, 0x7fff) AM_READ_LEGACY(watchdog_reset_r)															/* watchdog */
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE_LEGACY(gaplus_sreset_w)															/* reset CPU #2 & #3, enable sound */
-	AM_RANGE(0x9000, 0x9fff) AM_WRITE_LEGACY(gaplus_freset_w)															/* reset I/O chips */
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(gaplus_sreset_w)															/* reset CPU #2 & #3, enable sound */
+	AM_RANGE(0x9000, 0x9fff) AM_WRITE(gaplus_freset_w)															/* reset I/O chips */
 	AM_RANGE(0xa000, 0xa7ff) AM_WRITE_LEGACY(gaplus_starfield_control_w)				/* starfield control */
 	AM_RANGE(0xa000, 0xffff) AM_ROM																				/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gaplus_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(gaplus_videoram_r, gaplus_videoram_w)		/* tilemap RAM (shared with CPU #1) */
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE_LEGACY(gaplus_spriteram_r, gaplus_spriteram_w)	/* shared RAM with CPU #1 */
+	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(gaplus_spriteram_r, gaplus_spriteram_w)	/* shared RAM with CPU #1 */
 //  AM_RANGE(0x500f, 0x500f) AM_WRITENOP                                            /* ??? written 256 times on startup */
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE_LEGACY(gaplus_irq_2_ctrl_w)							/* IRQ 2 control */
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(gaplus_irq_2_ctrl_w)							/* IRQ 2 control */
 	AM_RANGE(0xa000, 0xffff) AM_ROM													/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gaplus_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(watchdog_reset_r, watchdog_reset_w)						/* watchdog? */
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE_LEGACY(gaplus_irq_3_ctrl_w)											/* interrupt enable/disable */
+	AM_RANGE(0x4000, 0x7fff) AM_WRITE(gaplus_irq_3_ctrl_w)											/* interrupt enable/disable */
 	AM_RANGE(0xe000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END
 

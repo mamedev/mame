@@ -21,16 +21,15 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "includes/hyperspt.h"
 
 
-static WRITE8_HANDLER( hyperspt_coin_counter_w )
+WRITE8_MEMBER(hyperspt_state::hyperspt_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data);
+	coin_counter_w(machine(), offset, data);
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(hyperspt_state::irq_mask_w)
 {
-	hyperspt_state *state = space->machine().driver_data<hyperspt_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8, hyperspt_state )
@@ -39,8 +38,8 @@ static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x1400, 0x1400) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE_LEGACY(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE_LEGACY(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
-	AM_RANGE(0x1483, 0x1484) AM_WRITE_LEGACY(hyperspt_coin_counter_w)
-	AM_RANGE(0x1487, 0x1487) AM_WRITE_LEGACY(irq_mask_w)  /* Interrupt enable */
+	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
+	AM_RANGE(0x1487, 0x1487) AM_WRITE(irq_mask_w)  /* Interrupt enable */
 	AM_RANGE(0x1500, 0x1500) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
@@ -60,8 +59,8 @@ static ADDRESS_MAP_START( roadf_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x1400, 0x1400) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE_LEGACY(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE_LEGACY(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
-	AM_RANGE(0x1483, 0x1484) AM_WRITE_LEGACY(hyperspt_coin_counter_w)
-	AM_RANGE(0x1487, 0x1487) AM_WRITE_LEGACY(irq_mask_w)  /* Interrupt enable */
+	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
+	AM_RANGE(0x1487, 0x1487) AM_WRITE(irq_mask_w)  /* Interrupt enable */
 	AM_RANGE(0x1500, 0x1500) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")

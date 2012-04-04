@@ -12,28 +12,26 @@ Issues:
 #include "sound/ay8910.h"
 #include "includes/rollrace.h"
 
-static READ8_HANDLER( ra_fake_d800_r )
+READ8_MEMBER(rollrace_state::ra_fake_d800_r)
 {
 	return 0x51;
 }
 
-static WRITE8_HANDLER( ra_fake_d800_w )
+WRITE8_MEMBER(rollrace_state::ra_fake_d800_w)
 {
 /*  logerror("d900: %02X\n",data);*/
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(rollrace_state::nmi_mask_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
-static WRITE8_HANDLER( sound_nmi_mask_w )
+WRITE8_MEMBER(rollrace_state::sound_nmi_mask_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 
-	state->m_sound_nmi_mask = data & 1;
+	m_sound_nmi_mask = data & 1;
 }
 
 
@@ -42,7 +40,7 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROM			 /* only rollace2 */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd806, 0xd806) AM_READNOP /* looks like a watchdog, bit4 checked*/
-	AM_RANGE(0xd900, 0xd900) AM_READWRITE_LEGACY(ra_fake_d800_r,ra_fake_d800_w) /* protection ??*/
+	AM_RANGE(0xd900, 0xd900) AM_READWRITE(ra_fake_d800_r,ra_fake_d800_w) /* protection ??*/
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_BASE(m_colorram)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(soundlatch_w)
@@ -56,7 +54,7 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(rollrace_flipx_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xfc02, 0xfc03) AM_WRITENOP /* coin counters */
 	AM_RANGE(0xfc04, 0xfc05) AM_WRITE_LEGACY(rollrace_charbank_w)
 	AM_RANGE(0xfc06, 0xfc06) AM_WRITE_LEGACY(rollrace_spritebank_w)
@@ -66,7 +64,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(soundlatch_r,sound_nmi_mask_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(sound_nmi_mask_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)

@@ -30,6 +30,8 @@ public:
 	device_t *m_k007121;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(k007121_registers_w);
+	DECLARE_WRITE8_MEMBER(fastlane_bankswitch_w);
 };
 
 

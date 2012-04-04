@@ -61,6 +61,23 @@ public:
 	device_t *m_filter1_3r;
 	device_t *m_msm5205_l;
 	device_t *m_msm5205_r;
+	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_WRITE16_MEMBER(darius_watchdog_w);
+	DECLARE_READ16_MEMBER(darius_ioc_r);
+	DECLARE_WRITE16_MEMBER(darius_ioc_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(adpcm_command_w);
+	DECLARE_WRITE8_MEMBER(display_value);
+	DECLARE_WRITE8_MEMBER(darius_fm0_pan);
+	DECLARE_WRITE8_MEMBER(darius_fm1_pan);
+	DECLARE_WRITE8_MEMBER(darius_psg0_pan);
+	DECLARE_WRITE8_MEMBER(darius_psg1_pan);
+	DECLARE_WRITE8_MEMBER(darius_da_pan);
+	DECLARE_READ8_MEMBER(adpcm_command_read);
+	DECLARE_READ8_MEMBER(readport2);
+	DECLARE_READ8_MEMBER(readport3);
+	DECLARE_WRITE8_MEMBER(adpcm_nmi_disable);
+	DECLARE_WRITE8_MEMBER(adpcm_nmi_enable);
 };
 
 

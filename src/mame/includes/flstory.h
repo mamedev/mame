@@ -64,6 +64,14 @@ public:
 	UINT8 m_mcu_bb_res;
 	UINT8 m_mcu_b5_res;
 	UINT8 m_mcu_b6_res;
+	DECLARE_READ8_MEMBER(from_snd_r);
+	DECLARE_READ8_MEMBER(snd_flag_r);
+	DECLARE_WRITE8_MEMBER(to_main_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_READ8_MEMBER(rumba_mcu_r);
+	DECLARE_WRITE8_MEMBER(rumba_mcu_w);
 };
 
 

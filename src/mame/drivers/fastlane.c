@@ -28,29 +28,27 @@ static TIMER_DEVICE_CALLBACK( fastlane_scanline )
 }
 
 
-static WRITE8_HANDLER( k007121_registers_w )
+WRITE8_MEMBER(fastlane_state::k007121_registers_w)
 {
-	fastlane_state *state = space->machine().driver_data<fastlane_state>();
 
 	if (offset < 8)
-		k007121_ctrl_w(state->m_k007121, offset, data);
+		k007121_ctrl_w(m_k007121, offset, data);
 	else	/* scroll registers */
-		state->m_k007121_regs[offset] = data;
+		m_k007121_regs[offset] = data;
 }
 
-static WRITE8_HANDLER( fastlane_bankswitch_w )
+WRITE8_MEMBER(fastlane_state::fastlane_bankswitch_w)
 {
-	fastlane_state *state = space->machine().driver_data<fastlane_state>();
 
 	/* bits 0 & 1 coin counters */
-	coin_counter_w(space->machine(), 0,data & 0x01);
-	coin_counter_w(space->machine(), 1,data & 0x02);
+	coin_counter_w(machine(), 0,data & 0x01);
+	coin_counter_w(machine(), 1,data & 0x02);
 
 	/* bits 2 & 3 = bank number */
-	memory_set_bank(space->machine(), "bank1", (data & 0x0c) >> 2);
+	memory_set_bank(machine(), "bank1", (data & 0x0c) >> 2);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
-	k007232_set_bank(state->m_konami2, 0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
+	k007232_set_bank(m_konami2, 0 + ((data & 0x10) >> 4), 2 + ((data & 0x10) >> 4));
 
 	/* other bits seems to be unused */
 }
@@ -70,7 +68,7 @@ static WRITE8_DEVICE_HANDLER( fastlane_k007232_w )
 
 
 static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
-	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE_LEGACY(k007121_registers_w) AM_BASE(m_k007121_regs)	/* 007121 registers */
+	AM_RANGE(0x0000, 0x005f) AM_RAM_WRITE(k007121_registers_w) AM_BASE(m_k007121_regs)	/* 007121 registers */
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("P2")
 	AM_RANGE(0x0802, 0x0802) AM_READ_PORT("P1")
@@ -78,7 +76,7 @@ static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
 	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0901, 0x0901) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0b00, 0x0b00) AM_WRITE_LEGACY(watchdog_reset_w)											/* watchdog reset */
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE_LEGACY(fastlane_bankswitch_w)									/* bankswitch control */
+	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(fastlane_bankswitch_w)									/* bankswitch control */
 	AM_RANGE(0x0d00, 0x0d0d) AM_DEVREADWRITE_LEGACY("konami1", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_DEVREADWRITE_LEGACY("konami2", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 2) */
 	AM_RANGE(0x0f00, 0x0f1f) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)									/* 051733 (protection) */

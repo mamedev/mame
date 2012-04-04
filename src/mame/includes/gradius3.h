@@ -30,6 +30,17 @@ public:
 	device_t *m_k007232;
 	device_t *m_k052109;
 	device_t *m_k051960;
+	DECLARE_READ16_MEMBER(k052109_halfword_r);
+	DECLARE_WRITE16_MEMBER(k052109_halfword_w);
+	DECLARE_READ16_MEMBER(k051937_halfword_r);
+	DECLARE_WRITE16_MEMBER(k051937_halfword_w);
+	DECLARE_READ16_MEMBER(k051960_halfword_r);
+	DECLARE_WRITE16_MEMBER(k051960_halfword_w);
+	DECLARE_WRITE16_MEMBER(cpuA_ctrl_w);
+	DECLARE_WRITE16_MEMBER(cpuB_irqenable_w);
+	DECLARE_WRITE16_MEMBER(cpuB_irqtrigger_w);
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE16_MEMBER(sound_irq_w);
 };
 
 /*----------- defined in video/gradius3.c -----------*/

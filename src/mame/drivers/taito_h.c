@@ -179,53 +179,52 @@ static const ym2610_interface ym2610_config =
 #define P2TRACKX_PORT_TAG     "P2X"
 #define P2TRACKY_PORT_TAG     "P2Y"
 
-static READ8_HANDLER( syvalion_input_bypass_r )
+READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	taitoh_state *state = space->machine().driver_data<taitoh_state>();
-	UINT8	port = tc0220ioc_port_r(state->m_tc0220ioc, 0);	/* read port number */
+	UINT8	port = tc0220ioc_port_r(m_tc0220ioc, 0);	/* read port number */
 
 	switch( port )
 	{
 		case 0x08:				/* trackball y coords bottom 8 bits for 2nd player */
-			return input_port_read(space->machine(), P2TRACKY_PORT_TAG);
+			return input_port_read(machine(), P2TRACKY_PORT_TAG);
 
 		case 0x09:				/* trackball y coords top 8 bits for 2nd player */
-			if (input_port_read(space->machine(), P2TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
+			if (input_port_read(machine(), P2TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
 				return 0xff;
 			else												/* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0a:				/* trackball x coords bottom 8 bits for 2nd player */
-			return input_port_read(space->machine(), P2TRACKX_PORT_TAG);
+			return input_port_read(machine(), P2TRACKX_PORT_TAG);
 
 		case 0x0b:				/* trackball x coords top 8 bits for 2nd player */
-			if (input_port_read(space->machine(), P2TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
+			if (input_port_read(machine(), P2TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
 				return 0xff;
 			else												/* x+ direction (positive value) */
 				return 0x00;
 
 		case 0x0c:				/* trackball y coords bottom 8 bits for 1st player */
-			return input_port_read(space->machine(), P1TRACKY_PORT_TAG);
+			return input_port_read(machine(), P1TRACKY_PORT_TAG);
 
 		case 0x0d:				/* trackball y coords top 8 bits for 1st player */
-			if (input_port_read(space->machine(), P1TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
+			if (input_port_read(machine(), P1TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
 				return 0xff;
 			else												/* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0e:				/* trackball x coords bottom 8 bits for 1st player */
-			return input_port_read(space->machine(), P1TRACKX_PORT_TAG);
+			return input_port_read(machine(), P1TRACKX_PORT_TAG);
 
 		case 0x0f:				/* trackball x coords top 8 bits for 1st player */
-			if (input_port_read(space->machine(), P1TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
+			if (input_port_read(machine(), P1TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
 				return 0xff;
 			else												/* x+ direction (positive value) */
 				return 0x00;
 
 		default:
-			return tc0220ioc_portreg_r(state->m_tc0220ioc, offset);
+			return tc0220ioc_portreg_r(m_tc0220ioc, offset);
 	}
 }
 
@@ -235,11 +234,10 @@ static void reset_sound_region(running_machine &machine)
 	memory_set_bank(machine, "bank1", state->m_banknum);
 }
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(taitoh_state::sound_bankswitch_w)
 {
-	taitoh_state *state = space->machine().driver_data<taitoh_state>();
-	state->m_banknum = data & 3;
-	reset_sound_region(space->machine());
+	m_banknum = data & 3;
+	reset_sound_region(machine());
 }
 
 
@@ -252,7 +250,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static ADDRESS_MAP_START( syvalion_map, AS_PROGRAM, 16, taitoh_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM AM_BASE(m_m68000_mainram)
-	AM_RANGE(0x200000, 0x200001) AM_READ8_LEGACY(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READ8(syvalion_input_bypass_r, 0x00ff) AM_DEVWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READNOP AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0x00ff)
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0x00ff)
@@ -294,7 +292,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitoh_state )
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP		/* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP		/* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(sound_bankswitch_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
 

@@ -87,35 +87,32 @@ static void dragrace_update_misc_flags( running_machine &machine )
 	discrete_sound_w(state->m_discrete, DRAGRACE_HITONE_EN, (state->m_misc_flags & 0x20000000) ? 1: 0);	// HiTone enable
 }
 
-static WRITE8_HANDLER( dragrace_misc_w )
+WRITE8_MEMBER(dragrace_state::dragrace_misc_w)
 {
-	dragrace_state *state = space->machine().driver_data<dragrace_state>();
 
 	/* Set/clear individual bit */
 	UINT32 mask = 1 << offset;
 	if (data & 0x01)
-		state->m_misc_flags |= mask;
+		m_misc_flags |= mask;
 	else
-		state->m_misc_flags &= (~mask);
-	logerror("Set   %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0900 + offset, mask, state->m_misc_flags, data & 0x01);
-	dragrace_update_misc_flags(space->machine());
+		m_misc_flags &= (~mask);
+	logerror("Set   %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0900 + offset, mask, m_misc_flags, data & 0x01);
+	dragrace_update_misc_flags(machine());
 }
 
-static WRITE8_HANDLER( dragrace_misc_clear_w )
+WRITE8_MEMBER(dragrace_state::dragrace_misc_clear_w)
 {
-	dragrace_state *state = space->machine().driver_data<dragrace_state>();
 
 	/* Clear 8 bits */
 	UINT32 mask = 0xff << (((offset >> 3) & 0x03) * 8);
-	state->m_misc_flags &= (~mask);
-	logerror("Clear %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0920 + offset, mask, state->m_misc_flags, data & 0x01);
-	dragrace_update_misc_flags(space->machine());
+	m_misc_flags &= (~mask);
+	logerror("Clear %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0920 + offset, mask, m_misc_flags, data & 0x01);
+	dragrace_update_misc_flags(machine());
 }
 
-static READ8_HANDLER( dragrace_input_r )
+READ8_MEMBER(dragrace_state::dragrace_input_r)
 {
-	dragrace_state *state = space->machine().driver_data<dragrace_state>();
-	int val = input_port_read(space->machine(), "IN2");
+	int val = input_port_read(machine(), "IN2");
 	static const char *const portnames[] = { "IN0", "IN1" };
 
 	UINT8 maskA = 1 << (offset % 8);
@@ -125,10 +122,10 @@ static READ8_HANDLER( dragrace_input_r )
 
 	for (i = 0; i < 2; i++)
 	{
-		int in = input_port_read(space->machine(), portnames[i]);
+		int in = input_port_read(machine(), portnames[i]);
 
-		if (state->m_gear[i] != 0)
-			in &= ~(1 << state->m_gear[i]);
+		if (m_gear[i] != 0)
+			in &= ~(1 << m_gear[i]);
 
 		if (in & maskA)
 			val |= 1 << i;
@@ -138,7 +135,7 @@ static READ8_HANDLER( dragrace_input_r )
 }
 
 
-static READ8_HANDLER( dragrace_steering_r )
+READ8_MEMBER(dragrace_state::dragrace_steering_r)
 {
 	int bitA[2];
 	int bitB[2];
@@ -148,7 +145,7 @@ static READ8_HANDLER( dragrace_steering_r )
 
 	for (i = 0; i < 2; i++)
 	{
-		int dial = input_port_read(space->machine(), dialnames[i]);
+		int dial = input_port_read(machine(), dialnames[i]);
 
 		bitA[i] = ((dial + 1) / 2) & 1;
 		bitB[i] = ((dial + 0) / 2) & 1;
@@ -160,21 +157,21 @@ static READ8_HANDLER( dragrace_steering_r )
 }
 
 
-static READ8_HANDLER( dragrace_scanline_r )
+READ8_MEMBER(dragrace_state::dragrace_scanline_r)
 {
-	return (space->machine().primary_screen->vpos() ^ 0xf0) | 0x0f;
+	return (machine().primary_screen->vpos() ^ 0xf0) | 0x0f;
 }
 
 
 static ADDRESS_MAP_START( dragrace_map, AS_PROGRAM, 8, dragrace_state )
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x0800, 0x083f) AM_READ_LEGACY(dragrace_input_r)
-	AM_RANGE(0x0900, 0x091f) AM_WRITE_LEGACY(dragrace_misc_w)
-	AM_RANGE(0x0920, 0x093f) AM_WRITE_LEGACY(dragrace_misc_clear_w)
+	AM_RANGE(0x0800, 0x083f) AM_READ(dragrace_input_r)
+	AM_RANGE(0x0900, 0x091f) AM_WRITE(dragrace_misc_w)
+	AM_RANGE(0x0920, 0x093f) AM_WRITE(dragrace_misc_clear_w)
 	AM_RANGE(0x0a00, 0x0aff) AM_WRITEONLY AM_BASE(m_playfield_ram)
 	AM_RANGE(0x0b00, 0x0bff) AM_WRITEONLY AM_BASE(m_position_ram)
-	AM_RANGE(0x0c00, 0x0c00) AM_READ_LEGACY(dragrace_steering_r)
-	AM_RANGE(0x0d00, 0x0d00) AM_READ_LEGACY(dragrace_scanline_r)
+	AM_RANGE(0x0c00, 0x0c00) AM_READ(dragrace_steering_r)
+	AM_RANGE(0x0d00, 0x0d00) AM_READ(dragrace_scanline_r)
 	AM_RANGE(0x0e00, 0x0eff) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM /* program */
 	AM_RANGE(0xf800, 0xffff) AM_ROM /* program mirror */

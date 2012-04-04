@@ -22,6 +22,13 @@ public:
 	UINT16 m_bg0_dx;
 	UINT16 m_bg1_dx[2];
 	required_device<buffered_spriteram16_device> m_spriteram;
+	DECLARE_WRITE16_MEMBER(wwfwfest_1410_write);
+	DECLARE_WRITE16_MEMBER(wwfwfest_scroll_write);
+	DECLARE_WRITE16_MEMBER(wwfwfest_irq_ack_w);
+	DECLARE_WRITE16_MEMBER(wwfwfest_flipscreen_w);
+	DECLARE_READ16_MEMBER(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r);
+	DECLARE_WRITE16_MEMBER(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w);
+	DECLARE_WRITE16_MEMBER(wwfwfest_soundwrite);
 };
 
 

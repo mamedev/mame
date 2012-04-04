@@ -48,10 +48,9 @@ static MACHINE_RESET( aztarac )
  *
  *************************************/
 
-static READ16_HANDLER( nvram_r )
+READ16_MEMBER(aztarac_state::nvram_r)
 {
-	aztarac_state *state = space->machine().driver_data<aztarac_state>();
-	return state->m_nvram[offset] | 0xfff0;
+	return m_nvram[offset] | 0xfff0;
 }
 
 
@@ -62,10 +61,10 @@ static READ16_HANDLER( nvram_r )
  *
  *************************************/
 
-static READ16_HANDLER( joystick_r )
+READ16_MEMBER(aztarac_state::joystick_r)
 {
-    return (((input_port_read(space->machine(), "STICKZ") - 0xf) << 8) |
-            ((input_port_read(space->machine(), "STICKY") - 0xf) & 0xff));
+    return (((input_port_read(machine(), "STICKZ") - 0xf) << 8) |
+            ((input_port_read(machine(), "STICKY") - 0xf) & 0xff));
 }
 
 
@@ -78,8 +77,8 @@ static READ16_HANDLER( joystick_r )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aztarac_state )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM
-	AM_RANGE(0x022000, 0x0220ff) AM_READ_LEGACY(nvram_r) AM_WRITEONLY AM_SHARE("nvram")
-	AM_RANGE(0x027000, 0x027001) AM_READ_LEGACY(joystick_r)
+	AM_RANGE(0x022000, 0x0220ff) AM_READ(nvram_r) AM_WRITEONLY AM_SHARE("nvram")
+	AM_RANGE(0x027000, 0x027001) AM_READ(joystick_r)
 	AM_RANGE(0x027004, 0x027005) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x027008, 0x027009) AM_READWRITE_LEGACY(aztarac_sound_r, aztarac_sound_w)
 	AM_RANGE(0x02700c, 0x02700d) AM_READ_PORT("DIAL")

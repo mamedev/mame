@@ -25,6 +25,18 @@ public:
 	bitmap_ind16 m_temp_bitmap;
 	UINT16 *m_sprite_ram_buffered;
 	int m_is_mask_spr[1024/16];
+	DECLARE_READ16_MEMBER(m68k_shared_word_r);
+	DECLARE_WRITE16_MEMBER(m68k_shared_word_w);
+	DECLARE_WRITE8_MEMBER(m6809_irq_enable_w);
+	DECLARE_WRITE8_MEMBER(m6809_irq_disable_w);
+	DECLARE_WRITE16_MEMBER(m68k_irq_enable_w);
+	DECLARE_WRITE8_MEMBER(mcu_irq_enable_w);
+	DECLARE_WRITE8_MEMBER(mcu_irq_disable_w);
+	DECLARE_READ8_MEMBER(dsw0_r);
+	DECLARE_READ8_MEMBER(dsw1_r);
+	DECLARE_READ8_MEMBER(input0_r);
+	DECLARE_READ8_MEMBER(input1_r);
+	DECLARE_READ8_MEMBER(readFF);
 };
 
 

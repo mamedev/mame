@@ -42,6 +42,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<msm5205_device> m_msm;
+	DECLARE_READ16_MEMBER(ioc_r);
+	DECLARE_WRITE16_MEMBER(ioc_w);
 };
 
 

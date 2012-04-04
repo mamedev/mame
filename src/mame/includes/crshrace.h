@@ -31,6 +31,11 @@ public:
 	required_device<k053936_device> m_k053936;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram2;
+	DECLARE_READ16_MEMBER(extrarom1_r);
+	DECLARE_READ16_MEMBER(extrarom2_r);
+	DECLARE_WRITE8_MEMBER(crshrace_sh_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 };
 
 /*----------- defined in video/crshrace.c -----------*/

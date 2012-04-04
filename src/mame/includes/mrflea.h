@@ -27,6 +27,16 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_subcpu;
+	DECLARE_WRITE8_MEMBER(mrflea_main_w);
+	DECLARE_WRITE8_MEMBER(mrflea_io_w);
+	DECLARE_READ8_MEMBER(mrflea_main_r);
+	DECLARE_READ8_MEMBER(mrflea_io_r);
+	DECLARE_READ8_MEMBER(mrflea_main_status_r);
+	DECLARE_READ8_MEMBER(mrflea_io_status_r);
+	DECLARE_READ8_MEMBER(mrflea_interrupt_type_r);
+	DECLARE_WRITE8_MEMBER(mrflea_select1_w);
+	DECLARE_READ8_MEMBER(mrflea_input1_r);
+	DECLARE_WRITE8_MEMBER(mrflea_data1_w);
 };
 
 

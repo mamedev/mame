@@ -14,6 +14,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 	int m_charbank;
 	int m_palette_bank;
+	DECLARE_WRITE8_MEMBER(ctrl_w);
+	DECLARE_WRITE8_MEMBER(scotrsht_soundlatch_w);
 };
 
 

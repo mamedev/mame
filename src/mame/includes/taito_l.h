@@ -59,6 +59,38 @@ public:
 	UINT8         m_rambanks[0x1000 * 12];
 	UINT8         m_palette_ram[0x1000];
 	UINT8         m_empty_ram[0x1000];
+	DECLARE_WRITE8_MEMBER(irq_adr_w);
+	DECLARE_READ8_MEMBER(irq_adr_r);
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_READ8_MEMBER(irq_enable_r);
+	DECLARE_WRITE8_MEMBER(rombankswitch_w);
+	DECLARE_WRITE8_MEMBER(rombank2switch_w);
+	DECLARE_READ8_MEMBER(rombankswitch_r);
+	DECLARE_READ8_MEMBER(rombank2switch_r);
+	DECLARE_WRITE8_MEMBER(rambankswitch_w);
+	DECLARE_READ8_MEMBER(rambankswitch_r);
+	DECLARE_WRITE8_MEMBER(bank0_w);
+	DECLARE_WRITE8_MEMBER(bank1_w);
+	DECLARE_WRITE8_MEMBER(bank2_w);
+	DECLARE_WRITE8_MEMBER(bank3_w);
+	DECLARE_WRITE8_MEMBER(control2_w);
+	DECLARE_WRITE8_MEMBER(mcu_data_w);
+	DECLARE_WRITE8_MEMBER(mcu_control_w);
+	DECLARE_READ8_MEMBER(mcu_data_r);
+	DECLARE_READ8_MEMBER(mcu_control_r);
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_READ8_MEMBER(mux_r);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(mux_ctrl_w);
+	DECLARE_WRITE8_MEMBER(champwr_msm5205_lo_w);
+	DECLARE_WRITE8_MEMBER(champwr_msm5205_hi_w);
+	DECLARE_READ8_MEMBER(horshoes_tracky_reset_r);
+	DECLARE_READ8_MEMBER(horshoes_trackx_reset_r);
+	DECLARE_READ8_MEMBER(horshoes_tracky_lo_r);
+	DECLARE_READ8_MEMBER(horshoes_tracky_hi_r);
+	DECLARE_READ8_MEMBER(horshoes_trackx_lo_r);
+	DECLARE_READ8_MEMBER(horshoes_trackx_hi_r);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 /*----------- defined in video/taito_l.c -----------*/

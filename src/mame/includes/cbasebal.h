@@ -31,6 +31,10 @@ public:
 
 	/* misc */
 	UINT8      m_rambank;
+	DECLARE_WRITE8_MEMBER(cbasebal_bankswitch_w);
+	DECLARE_READ8_MEMBER(bankedram_r);
+	DECLARE_WRITE8_MEMBER(bankedram_w);
+	DECLARE_WRITE8_MEMBER(cbasebal_coinctrl_w);
 };
 
 /*----------- defined in video/cbasebal.c -----------*/

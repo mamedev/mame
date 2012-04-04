@@ -52,6 +52,18 @@ public:
     INT16 m_eyecoordBuffer[4];  /* homogeneous */
 
     //bitmap_ind16 *m_buffer3d;
+	DECLARE_WRITE16_MEMBER(system_control_w);
+	DECLARE_READ16_MEMBER(lineram_r);
+	DECLARE_WRITE16_MEMBER(lineram_w);
+	DECLARE_READ16_MEMBER(dspram_r);
+	DECLARE_WRITE16_MEMBER(dspram_w);
+	DECLARE_READ16_MEMBER(dsp_HOLD_signal_r);
+	DECLARE_WRITE16_MEMBER(dsp_HOLDA_signal_w);
+	DECLARE_WRITE16_MEMBER(airsys_paletteram16_w);
+	DECLARE_WRITE16_MEMBER(airsys_gradram_w);
+	DECLARE_READ16_MEMBER(stick_input_r);
+	DECLARE_READ16_MEMBER(stick2_input_r);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 

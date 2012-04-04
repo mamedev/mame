@@ -15,33 +15,32 @@
 #include "sound/msm5205.h"
 #include "includes/goal92.h"
 
-static WRITE16_HANDLER( goal92_sound_command_w )
+WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
 {
-	goal92_state *state = space->machine().driver_data<goal92_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space, 0, (data >> 8) & 0xff);
-		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 	}
 }
 
-static READ16_HANDLER( goal92_inputs_r )
+READ16_MEMBER(goal92_state::goal92_inputs_r)
 {
 	switch(offset)
 	{
 		case 0:
-			return input_port_read(space->machine(), "DSW1");
+			return input_port_read(machine(), "DSW1");
 		case 1:
-			return input_port_read(space->machine(), "IN1");
+			return input_port_read(machine(), "IN1");
 		case 2:
-			return input_port_read(space->machine(), "IN2");
+			return input_port_read(machine(), "IN2");
 		case 3:
-			return input_port_read(space->machine(), "IN3");
+			return input_port_read(machine(), "IN3");
 		case 7:
-			return input_port_read(space->machine(), "DSW2");
+			return input_port_read(machine(), "DSW2");
 
 		default:
-			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,cpu_get_pc(&space->device()));
+			logerror("reading unhandled goal92 inputs %04X %04X @ PC = %04X\n", offset, mem_mask,cpu_get_pc(&space.device()));
 	}
 
 	return 0;
@@ -59,8 +58,8 @@ static ADDRESS_MAP_START( goal92_map, AS_PROGRAM, 16, goal92_state )
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x140800, 0x140801) AM_WRITENOP
 	AM_RANGE(0x140802, 0x140803) AM_WRITENOP
-	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(goal92_inputs_r)
-	AM_RANGE(0x180008, 0x180009) AM_WRITE_LEGACY(goal92_sound_command_w)
+	AM_RANGE(0x180000, 0x18000f) AM_READ(goal92_inputs_r)
+	AM_RANGE(0x180008, 0x180009) AM_WRITE(goal92_sound_command_w)
 	AM_RANGE(0x18000a, 0x18000b) AM_WRITENOP
 	AM_RANGE(0x180010, 0x180017) AM_WRITEONLY AM_BASE(m_scrollram)
 	AM_RANGE(0x18001c, 0x18001d) AM_READWRITE_LEGACY(goal92_fg_bank_r, goal92_fg_bank_w)
@@ -75,17 +74,16 @@ static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 	msm5205_reset_w(device, data & 0x08);
 }
 
-static WRITE8_HANDLER( adpcm_data_w )
+WRITE8_MEMBER(goal92_state::adpcm_data_w)
 {
-	goal92_state *state = space->machine().driver_data<goal92_state>();
-	state->m_msm5205next = data;
+	m_msm5205next = data;
 }
 
 static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, goal92_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", adpcm_control_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE_LEGACY(adpcm_data_w)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM

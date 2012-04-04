@@ -15,6 +15,10 @@ public:
 	tilemap_t *m_fg_tilemap;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(iqblock_prot_w);
+	DECLARE_WRITE8_MEMBER(grndtour_prot_w);
+	DECLARE_WRITE8_MEMBER(iqblock_irqack_w);
+	DECLARE_READ8_MEMBER(extrarom_r);
 };
 
 

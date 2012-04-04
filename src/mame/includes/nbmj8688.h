@@ -26,6 +26,8 @@ public:
 	int m_HD61830B_instr[2];
 	int m_HD61830B_addr[2];
 	int m_mjsikaku_flipscreen_old;
+	DECLARE_READ8_MEMBER(ff_r);
+	DECLARE_WRITE8_MEMBER(barline_output_w);
 };
 
 

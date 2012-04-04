@@ -28,6 +28,8 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
+	DECLARE_WRITE16_MEMBER(twocrude_control_w);
+	DECLARE_READ16_MEMBER(twocrude_control_r);
 };
 
 

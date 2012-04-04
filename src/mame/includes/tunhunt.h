@@ -10,6 +10,8 @@ public:
 	UINT8 *m_videoram;
 	tilemap_t *m_fg_tilemap;
 	bitmap_ind16 m_tmpbitmap;
+	DECLARE_WRITE8_MEMBER(tunhunt_control_w);
+	DECLARE_READ8_MEMBER(tunhunt_button_r);
 };
 
 

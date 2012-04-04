@@ -22,6 +22,9 @@ public:
 	UINT8 m_collision_address_clear;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_irq_mask;
+	DECLARE_WRITE8_MEMBER(pc3092_w);
+	DECLARE_READ8_MEMBER(pc3259_r);
+	DECLARE_WRITE8_MEMBER(port_sound_w);
 };
 
 

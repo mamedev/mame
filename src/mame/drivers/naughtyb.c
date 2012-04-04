@@ -110,28 +110,27 @@ TODO:
 
 #define CLOCK_XTAL 12000000
 
-static READ8_HANDLER( in0_port_r )
+READ8_MEMBER(naughtyb_state::in0_port_r)
 {
-	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
-	int in0 = input_port_read(space->machine(), "IN0");
+	int in0 = input_port_read(machine(), "IN0");
 
-	if ( state->m_cocktail )
+	if ( m_cocktail )
 	{
 		// cabinet == cocktail -AND- handling player 2
 
 		in0 = ( in0 & 0x03 ) |				// start buttons
-			  ( input_port_read(space->machine(), "IN0_COCKTAIL") & 0xFC );	// cocktail inputs
+			  ( input_port_read(machine(), "IN0_COCKTAIL") & 0xFC );	// cocktail inputs
 	}
 
 	return in0;
 }
 
-static READ8_HANDLER( dsw0_port_r )
+READ8_MEMBER(naughtyb_state::dsw0_port_r)
 {
 	// vblank replaces the cabinet dip
 
-	return ( ( input_port_read(space->machine(), "DSW0") & 0x7F ) |		// dsw0
-			 ( input_port_read(space->machine(), "FAKE") & 0x80 ) );		// vblank
+	return ( ( input_port_read(machine(), "DSW0") & 0x7F ) |		// dsw0
+			 ( input_port_read(machine(), "FAKE") & 0x80 ) );		// vblank
 }
 
 /* Pop Flamer
@@ -142,32 +141,31 @@ static READ8_HANDLER( dsw0_port_r )
    Paul Priest: tourniquet@mameworld.net */
 
 
-static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
+READ8_MEMBER(naughtyb_state::popflame_protection_r)/* Not used by bootleg/hack */
 {
-	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
 	static const int seed00[4] = { 0x78, 0x68, 0x48, 0x38|0x80 };
 	static const int seed10[4] = { 0x68, 0x60, 0x68, 0x60|0x80 };
 	UINT8 seedxx;
 
-	seedxx = (state->m_r_index < 0x89) ? 1 : 0;
+	seedxx = (m_r_index < 0x89) ? 1 : 0;
 
-	state->m_prot_count = (state->m_prot_count + 1) % 4;
-	if(state->m_popflame_prot_seed == 0x10)
-		return seed10[state->m_prot_count] | seedxx;
+	m_prot_count = (m_prot_count + 1) % 4;
+	if(m_popflame_prot_seed == 0x10)
+		return seed10[m_prot_count] | seedxx;
 	else
-		return seed00[state->m_prot_count] | seedxx;
+		return seed00[m_prot_count] | seedxx;
 
 #if 0
-	if ( cpu_get_pc(&space->device()) == (0x26F2 + 0x03) )
+	if ( cpu_get_pc(&space.device()) == (0x26F2 + 0x03) )
 	{
 		popflame_prot_count = 0;
 		return 0x01;
 	} /* Must not carry when rotated left */
 
-	if ( cpu_get_pc(&space->device()) == (0x26F9 + 0x03) )
+	if ( cpu_get_pc(&space.device()) == (0x26F9 + 0x03) )
 		return 0x80; /* Must carry when rotated left */
 
-	if ( cpu_get_pc(&space->device()) == (0x270F + 0x03) )
+	if ( cpu_get_pc(&space.device()) == (0x270F + 0x03) )
 	{
 		switch( popflame_prot_count++ )
 		{
@@ -177,14 +175,13 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 			case 3: return 0x38; /* x011 1xxx, matches 0x07 at $2693, stored in $400D */
 		}
 	}
-	logerror("CPU #0 PC %06x: unmapped protection read\n", cpu_get_pc(&space->device()));
+	logerror("CPU #0 PC %06x: unmapped protection read\n", cpu_get_pc(&space.device()));
 	return 0x00;
 #endif
 }
 
-static WRITE8_HANDLER( popflame_protection_w )
+WRITE8_MEMBER(naughtyb_state::popflame_protection_w)
 {
-	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
 	/*
     Alternative protection check is executed at the end of stage 3, it seems some kind of pseudo "EEPROM" device:
 2720: 21 98 B0      ld   hl,$B098
@@ -235,12 +232,12 @@ static WRITE8_HANDLER( popflame_protection_w )
     ---- --x- puts a bit into the write buffer
     ---- ---x reset write index buffer
     */
-	if(data & 1 && ((state->m_popflame_prot_seed & 1) == 0)) //Note: we use the write buffer index
-		state->m_r_index = 0;
-	if(data & 8 && ((state->m_popflame_prot_seed & 8) == 0))
-		state->m_r_index++;
+	if(data & 1 && ((m_popflame_prot_seed & 1) == 0)) //Note: we use the write buffer index
+		m_r_index = 0;
+	if(data & 8 && ((m_popflame_prot_seed & 8) == 0))
+		m_r_index++;
 
-	state->m_popflame_prot_seed = data & 0x10;
+	m_popflame_prot_seed = data & 0x10;
 
 }
 
@@ -255,8 +252,8 @@ static ADDRESS_MAP_START( naughtyb_map, AS_PROGRAM, 8, naughtyb_state )
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_scrollreg)
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_b_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_READ_LEGACY(in0_port_r)	// IN0
-	AM_RANGE(0xb800, 0xbfff) AM_READ_LEGACY(dsw0_port_r)	// DSW0
+	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
+	AM_RANGE(0xb800, 0xbfff) AM_READ(dsw0_port_r)	// DSW0
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popflame_map, AS_PROGRAM, 8, naughtyb_state )
@@ -268,8 +265,8 @@ static ADDRESS_MAP_START( popflame_map, AS_PROGRAM, 8, naughtyb_state )
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(m_scrollreg)
 	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_a_w)
 	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE_LEGACY("cust", pleiads_sound_control_b_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_READ_LEGACY(in0_port_r)	// IN0
-	AM_RANGE(0xb800, 0xbfff) AM_READ_LEGACY(dsw0_port_r)	// DSW0
+	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
+	AM_RANGE(0xb800, 0xbfff) AM_READ(dsw0_port_r)	// DSW0
 ADDRESS_MAP_END
 
 
@@ -839,32 +836,31 @@ ROM_END
 static DRIVER_INIT( popflame )
 {
 	/* install a handler to catch protection checks */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9000, 0x9000, FUNC(popflame_protection_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x9090, 0x9090, FUNC(popflame_protection_r));
+	naughtyb_state *state = machine.driver_data<naughtyb_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x9000, 0x9000, read8_delegate(FUNC(naughtyb_state::popflame_protection_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x9090, 0x9090, read8_delegate(FUNC(naughtyb_state::popflame_protection_r),state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb000, 0xb0ff, FUNC(popflame_protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb000, 0xb0ff, write8_delegate(FUNC(naughtyb_state::popflame_protection_w),state));
 }
 
 
-static READ8_HANDLER( trvmstr_questions_r )
+READ8_MEMBER(naughtyb_state::trvmstr_questions_r)
 {
-	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
-	return space->machine().region("user1")->base()[state->m_question_offset];
+	return machine().region("user1")->base()[m_question_offset];
 }
 
-static WRITE8_HANDLER( trvmstr_questions_w )
+WRITE8_MEMBER(naughtyb_state::trvmstr_questions_w)
 {
-	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
 	switch(offset)
 	{
 	case 0:
-		state->m_question_offset = (state->m_question_offset & 0xffff00) | data;
+		m_question_offset = (m_question_offset & 0xffff00) | data;
 		break;
 	case 1:
-		state->m_question_offset = (state->m_question_offset & 0xff00ff) | (data << 8);
+		m_question_offset = (m_question_offset & 0xff00ff) | (data << 8);
 		break;
 	case 2:
-		state->m_question_offset = (state->m_question_offset & 0x00ffff) | (data << 16);
+		m_question_offset = (m_question_offset & 0x00ffff) | (data << 16);
 		break;
 	}
 }
@@ -872,7 +868,8 @@ static WRITE8_HANDLER( trvmstr_questions_w )
 static DRIVER_INIT( trvmstr )
 {
 	/* install questions' handlers  */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xc000, 0xc002, FUNC(trvmstr_questions_r), FUNC(trvmstr_questions_w));
+	naughtyb_state *state = machine.driver_data<naughtyb_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc000, 0xc002, read8_delegate(FUNC(naughtyb_state::trvmstr_questions_r),state), write8_delegate(FUNC(naughtyb_state::trvmstr_questions_w),state));
 }
 
 

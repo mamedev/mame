@@ -194,69 +194,64 @@ Notes:
 UINT16 *pgm_mainram;
 
 
-static READ16_HANDLER( pgm_videoram_r )
+READ16_MEMBER(pgm_state::pgm_videoram_r)
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (offset < 0x4000 / 2)
-		return state->m_bg_videoram[offset&0x7ff];
+		return m_bg_videoram[offset&0x7ff];
 	else if (offset < 0x7000 / 2)
-		return state->m_tx_videoram[offset&0xfff];
+		return m_tx_videoram[offset&0xfff];
 	else
-		return state->m_videoram[offset];
+		return m_videoram[offset];
 }
 
 
-static WRITE16_HANDLER( pgm_videoram_w )
+WRITE16_MEMBER(pgm_state::pgm_videoram_w)
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (offset < 0x4000 / 2)
-		pgm_bg_videoram_w(space, offset&0x7ff, data, mem_mask);
+		pgm_bg_videoram_w(&space, offset&0x7ff, data, mem_mask);
 	else if (offset < 0x7000 / 2)
-		pgm_tx_videoram_w(space, offset&0xfff, data, mem_mask);
+		pgm_tx_videoram_w(&space, offset&0xfff, data, mem_mask);
 	else
-		COMBINE_DATA(&state->m_videoram[offset]);
+		COMBINE_DATA(&m_videoram[offset]);
 }
 
-static READ16_HANDLER ( z80_ram_r )
+READ16_MEMBER(pgm_state::z80_ram_r)
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	return (state->m_z80_mainram[offset * 2] << 8) | state->m_z80_mainram[offset * 2 + 1];
+	return (m_z80_mainram[offset * 2] << 8) | m_z80_mainram[offset * 2 + 1];
 }
 
-static WRITE16_HANDLER ( z80_ram_w )
+WRITE16_MEMBER(pgm_state::z80_ram_w)
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
-	int pc = cpu_get_pc(&space->device());
+	int pc = cpu_get_pc(&space.device());
 
 	if (ACCESSING_BITS_8_15)
-		state->m_z80_mainram[offset * 2] = data >> 8;
+		m_z80_mainram[offset * 2] = data >> 8;
 	if (ACCESSING_BITS_0_7)
-		state->m_z80_mainram[offset * 2 + 1] = data;
+		m_z80_mainram[offset * 2 + 1] = data;
 
 	if (pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
 		if (PGMLOGERROR)
-			logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset * 2, data, mem_mask, cpu_get_pc(&space->device()));
+			logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset * 2, data, mem_mask, cpu_get_pc(&space.device()));
 }
 
-static WRITE16_HANDLER ( z80_reset_w )
+WRITE16_MEMBER(pgm_state::z80_reset_w)
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if (PGMLOGERROR)
-		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(&space->device()));
+		logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(&space.device()));
 
 	if (data == 0x5050)
 	{
-		state->m_ics->reset();
-		device_set_input_line(state->m_soundcpu, INPUT_LINE_HALT, CLEAR_LINE);
-		device_set_input_line(state->m_soundcpu, INPUT_LINE_RESET, PULSE_LINE);
+		m_ics->reset();
+		device_set_input_line(m_soundcpu, INPUT_LINE_HALT, CLEAR_LINE);
+		device_set_input_line(m_soundcpu, INPUT_LINE_RESET, PULSE_LINE);
 		if(0)
 		{
 			FILE *out;
 			out = fopen("z80ram.bin", "wb");
-			fwrite(state->m_z80_mainram, 1, 65536, out);
+			fwrite(m_z80_mainram, 1, 65536, out);
 			fclose(out);
 		}
 	}
@@ -264,33 +259,32 @@ static WRITE16_HANDLER ( z80_reset_w )
 	{
 		/* this might not be 100% correct, but several of the games (ddp2, puzzli2 etc. expect the z80 to be turned
            off during data uploads, they write here before the upload */
-		device_set_input_line(state->m_soundcpu, INPUT_LINE_HALT, ASSERT_LINE);
+		device_set_input_line(m_soundcpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
-static WRITE16_HANDLER ( z80_ctrl_w )
+WRITE16_MEMBER(pgm_state::z80_ctrl_w)
 {
 	if (PGMLOGERROR)
-		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(&space->device()));
+		logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(&space.device()));
 }
 
-static WRITE16_HANDLER ( m68k_l1_w )
+WRITE16_MEMBER(pgm_state::m68k_l1_w)
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
 
 	if(ACCESSING_BITS_0_7)
 	{
 		if (PGMLOGERROR)
-			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(&space->device()));
+			logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(&space.device()));
 		soundlatch_w(space, 0, data);
-		device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE );
+		device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE );
 	}
 }
 
-static WRITE8_HANDLER( z80_l3_w )
+WRITE8_MEMBER(pgm_state::z80_l3_w)
 {
 	if (PGMLOGERROR)
-		logerror("SL 3 z80.w %02x (%04x)\n", data, cpu_get_pc(&space->device()));
+		logerror("SL 3 z80.w %02x (%04x)\n", data, cpu_get_pc(&space.device()));
 	soundlatch3_w(space, 0, data);
 }
 
@@ -316,7 +310,7 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START( pgm_z80_io, AS_IO, 8, pgm_state )
 	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE_LEGACY("ics", ics2115_device::read, ics2115_device::write)
-	AM_RANGE(0x8100, 0x81ff) AM_READWRITE_LEGACY(soundlatch3_r, z80_l3_w)
+	AM_RANGE(0x8100, 0x81ff) AM_READ_LEGACY(soundlatch3_r) AM_WRITE(z80_l3_w)
 	AM_RANGE(0x8200, 0x82ff) AM_READWRITE_LEGACY(soundlatch_r, soundlatch_w)
 	AM_RANGE(0x8400, 0x84ff) AM_READWRITE_LEGACY(soundlatch2_r, soundlatch2_w)
 ADDRESS_MAP_END
@@ -328,15 +322,15 @@ ADDRESS_MAP_START( pgm_base_mem, AS_PROGRAM, 16, pgm_state )
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE_LEGACY(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
 
-	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_READWRITE_LEGACY(pgm_videoram_r, pgm_videoram_w) AM_BASE(m_videoram) /* IGS023 VIDEO CHIP */
+	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_READWRITE(pgm_videoram_r, pgm_videoram_w) AM_BASE(m_videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(m_videoregs) /* Video Regs inc. Zoom Table */
 
-	AM_RANGE(0xc00002, 0xc00003) AM_READWRITE_LEGACY(soundlatch_word_r, m68k_l1_w)
+	AM_RANGE(0xc00002, 0xc00003) AM_READ_LEGACY(soundlatch_word_r) AM_WRITE(m68k_l1_w)
 	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE_LEGACY(soundlatch2_word_r, soundlatch2_word_w)
 	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8("rtc", v3021_device, read, write, 0x00ff)
-	AM_RANGE(0xc00008, 0xc00009) AM_WRITE_LEGACY(z80_reset_w)
-	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE_LEGACY(z80_ctrl_w)
+	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
+	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
 	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE_LEGACY(soundlatch3_word_r, soundlatch3_word_w)
 
 	AM_RANGE(0xc08000, 0xc08001) AM_READ_PORT("P1P2")
@@ -344,7 +338,7 @@ ADDRESS_MAP_START( pgm_base_mem, AS_PROGRAM, 16, pgm_state )
 	AM_RANGE(0xc08004, 0xc08005) AM_READ_PORT("Service")
 	AM_RANGE(0xc08006, 0xc08007) AM_READ_PORT("DSW")
 
-	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE_LEGACY(z80_ram_r, z80_ram_w) /* Z80 Program */
+	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
 ADDRESS_MAP_END
 
 ADDRESS_MAP_START( pgm_mem, AS_PROGRAM, 16, pgm_state )

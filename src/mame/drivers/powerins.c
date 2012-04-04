@@ -44,29 +44,28 @@ TODO:
 ***************************************************************************/
 
 
-static WRITE16_HANDLER( powerins_okibank_w )
+WRITE16_MEMBER(powerins_state::powerins_okibank_w)
 {
-	powerins_state *state = space->machine().driver_data<powerins_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = space->machine().region("oki1")->base();
+		UINT8 *RAM = machine().region("oki1")->base();
 		int new_bank = data & 0x7;
 
-		if (new_bank != state->m_oki_bank)
+		if (new_bank != m_oki_bank)
 		{
-			state->m_oki_bank = new_bank;
+			m_oki_bank = new_bank;
 			memcpy(&RAM[0x30000],&RAM[0x40000 + 0x10000*new_bank],0x10000);
 		}
 	}
 }
 
-static WRITE16_HANDLER( powerins_soundlatch_w )
+WRITE16_MEMBER(powerins_state::powerins_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 		soundlatch_w(space, 0, data & 0xff);
 }
 
-static READ8_HANDLER( powerinb_fake_ym2203_r )
+READ8_MEMBER(powerins_state::powerinb_fake_ym2203_r)
 {
 	return 0x01;
 }
@@ -81,8 +80,8 @@ static ADDRESS_MAP_START( powerins_map, AS_PROGRAM, 16, powerins_state )
 	AM_RANGE(0x100014, 0x100015) AM_WRITE_LEGACY(powerins_flipscreen_w)								// Flip Screen
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP													// ? always 1
 	AM_RANGE(0x100018, 0x100019) AM_WRITE_LEGACY(powerins_tilebank_w)									// Tiles Banking (VRAM 0)
-	AM_RANGE(0x10001e, 0x10001f) AM_WRITE_LEGACY(powerins_soundlatch_w)								// Sound Latch
-	AM_RANGE(0x100030, 0x100031) AM_WRITE_LEGACY(powerins_okibank_w)									// Sound
+	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(powerins_soundlatch_w)								// Sound Latch
+	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE_LEGACY(powerins_paletteram16_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(m_vctrl_0)								// VRAM 0 Control
 	AM_RANGE(0x140000, 0x143fff) AM_RAM_WRITE_LEGACY(powerins_vram_0_w) AM_BASE(m_vram_0)		// VRAM 0
@@ -102,7 +101,7 @@ static ADDRESS_MAP_START( powerina_map, AS_PROGRAM, 16, powerins_state )
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP													// ? always 1
 	AM_RANGE(0x100018, 0x100019) AM_WRITE_LEGACY(powerins_tilebank_w)									// Tiles Banking (VRAM 0)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITENOP													// Sound Latch, NOPed since there is no sound cpu
-	AM_RANGE(0x100030, 0x100031) AM_WRITE_LEGACY(powerins_okibank_w)									// Sound
+	AM_RANGE(0x100030, 0x100031) AM_WRITE(powerins_okibank_w)									// Sound
 	AM_RANGE(0x10003e, 0x10003f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)		// (used by powerina)
 	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE_LEGACY(powerins_paletteram16_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x130000, 0x130007) AM_RAM AM_BASE(m_vctrl_0)								// VRAM 0 Control
@@ -130,7 +129,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( powerinb_sound_io_map, AS_IO, 8, powerins_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(powerinb_fake_ym2203_r) AM_WRITENOP
+	AM_RANGE(0x00, 0x00) AM_READ(powerinb_fake_ym2203_r) AM_WRITENOP
 	AM_RANGE(0x01, 0x01) AM_NOP
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x88, 0x88) AM_DEVREADWRITE("oki2", okim6295_device, read, write)

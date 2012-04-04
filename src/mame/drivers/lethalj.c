@@ -173,31 +173,31 @@ static CUSTOM_INPUT( cclownz_paddle )
  *
  *************************************/
 
-static WRITE16_HANDLER( ripribit_control_w )
+WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	ticket_dispenser_w(space->machine().device("ticket"), 0, ((data >> 1) & 1) << 7);
+	coin_counter_w(machine(), 0, data & 1);
+	ticket_dispenser_w(machine().device("ticket"), 0, ((data >> 1) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 }
 
 
-static WRITE16_HANDLER( cfarm_control_w )
+WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 {
-	ticket_dispenser_w(space->machine().device("ticket"), 0, ((data >> 0) & 1) << 7);
+	ticket_dispenser_w(machine().device("ticket"), 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 3) & 1);
 	output_set_lamp_value(2, (data >> 4) & 1);
-	coin_counter_w(space->machine(), 0, (data >> 7) & 1);
+	coin_counter_w(machine(), 0, (data >> 7) & 1);
 }
 
 
-static WRITE16_HANDLER( cclownz_control_w )
+WRITE16_MEMBER(lethalj_state::cclownz_control_w)
 {
-	ticket_dispenser_w(space->machine().device("ticket"), 0, ((data >> 0) & 1) << 7);
+	ticket_dispenser_w(machine().device("ticket"), 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 4) & 1);
 	output_set_lamp_value(2, (data >> 5) & 1);
-	coin_counter_w(space->machine(), 0, (data >> 6) & 1);
+	coin_counter_w(machine(), 0, (data >> 6) & 1);
 }
 
 
@@ -896,19 +896,22 @@ ROM_END
 
 static DRIVER_INIT( ripribit )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x04100010, 0x0410001f, FUNC(ripribit_control_w));
+	lethalj_state *state = machine.driver_data<lethalj_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),state));
 }
 
 
 static DRIVER_INIT( cfarm )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x04100010, 0x0410001f, FUNC(cfarm_control_w));
+	lethalj_state *state = machine.driver_data<lethalj_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),state));
 }
 
 
 static DRIVER_INIT( cclownz )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x04100010, 0x0410001f, FUNC(cclownz_control_w));
+	lethalj_state *state = machine.driver_data<lethalj_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),state));
 }
 
 

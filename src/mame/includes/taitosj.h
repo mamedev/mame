@@ -39,6 +39,7 @@ public:
 	bitmap_ind16 m_sprite_layer_collbitmap1;
 	bitmap_ind16 m_sprite_layer_collbitmap2[3];
 	int m_draw_order[32][4];
+	DECLARE_WRITE8_MEMBER(taitosj_soundcommand_w);
 };
 
 

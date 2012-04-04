@@ -56,32 +56,31 @@ Games by Nihon Game/Culture Brain:
 
 /***************************************************************************************/
 
-static WRITE8_HANDLER( shangkid_maincpu_bank_w )
+WRITE8_MEMBER(shangkid_state::shangkid_maincpu_bank_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 1);
+	memory_set_bank(machine(), "bank1", data & 1);
 }
 
-static WRITE8_HANDLER( shangkid_bbx_enable_w )
+WRITE8_MEMBER(shangkid_state::shangkid_bbx_enable_w)
 {
-	cputag_set_input_line(space->machine(), "bbx", INPUT_LINE_HALT, data?0:1 );
+	cputag_set_input_line(machine(), "bbx", INPUT_LINE_HALT, data?0:1 );
 }
 
-static WRITE8_HANDLER( shangkid_cpu_reset_w )
+WRITE8_MEMBER(shangkid_state::shangkid_cpu_reset_w)
 {
 	if( data == 0 )
 	{
-		cputag_set_input_line(space->machine(), "bbx", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(machine(), "bbx", INPUT_LINE_RESET, PULSE_LINE);
 	}
 	else if( data == 1 )
 	{
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 
-static WRITE8_HANDLER( shangkid_sound_enable_w )
+WRITE8_MEMBER(shangkid_state::shangkid_sound_enable_w)
 {
-	shangkid_state *state = space->machine().driver_data<shangkid_state>();
-	state->m_bbx_sound_enable = data;
+	m_bbx_sound_enable = data;
 }
 
 static WRITE8_DEVICE_HANDLER( chinhero_ay8910_porta_w )
@@ -116,10 +115,9 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 
 /***************************************************************************************/
 
-static READ8_HANDLER( shangkid_soundlatch_r )
+READ8_MEMBER(shangkid_state::shangkid_soundlatch_r)
 {
-	shangkid_state *state = space->machine().driver_data<shangkid_state>();
-	return state->m_sound_latch;
+	return m_sound_latch;
 }
 
 /***************************************************************************************/
@@ -238,11 +236,11 @@ GFXDECODE_END
 static ADDRESS_MAP_START( chinhero_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
@@ -258,13 +256,13 @@ static ADDRESS_MAP_START( shangkid_main_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
-	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(shangkid_maincpu_bank_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(shangkid_maincpu_bank_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
@@ -280,11 +278,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( chinhero_bbx_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
@@ -298,13 +296,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shangkid_bbx_map, AS_PROGRAM, 8, shangkid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP /* ? */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(shangkid_bbx_enable_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(shangkid_sound_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(shangkid_bbx_enable_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(shangkid_sound_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP		/* main CPU interrupt-related */
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP		/* BBX interrupt-related */
-	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(shangkid_cpu_reset_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(shangkid_cpu_reset_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITENOP		/* coin counter */
-	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(shangkid_maincpu_bank_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(shangkid_maincpu_bank_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW")
 	AM_RANGE(0xb801, 0xb801) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
@@ -338,7 +336,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, shangkid_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(shangkid_soundlatch_r) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x00, 0x00) AM_READ(shangkid_soundlatch_r) AM_DEVWRITE_LEGACY("dac", dac_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/

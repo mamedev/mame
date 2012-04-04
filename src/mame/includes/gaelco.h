@@ -22,6 +22,13 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(bigkarnk_sound_command_w);
+	DECLARE_WRITE16_MEMBER(bigkarnk_coin_w);
+	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(gaelco_vram_encrypted_w);
+	DECLARE_WRITE16_MEMBER(gaelco_encrypted_w);
+	DECLARE_WRITE16_MEMBER(thoop_vram_encrypted_w);
+	DECLARE_WRITE16_MEMBER(thoop_encrypted_w);
 };
 
 

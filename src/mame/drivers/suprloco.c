@@ -17,12 +17,12 @@ TODO:
 #include "sound/sn76496.h"
 #include "includes/suprloco.h"
 
-static WRITE8_HANDLER( suprloco_soundport_w )
+WRITE8_MEMBER(suprloco_state::suprloco_soundport_w)
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
-	device_spin_until_time(&space->device(), attotime::from_usec(50));
+	device_spin_until_time(&space.device(), attotime::from_usec(50));
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprloco_state )
@@ -34,7 +34,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("P2")
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(suprloco_soundport_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(suprloco_soundport_w)
 	AM_RANGE(0xe801, 0xe801) AM_READWRITE_LEGACY(suprloco_control_r, suprloco_control_w)
 	AM_RANGE(0xf000, 0xf6ff) AM_RAM_WRITE_LEGACY(suprloco_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xf700, 0xf7df) AM_RAM /* unused */

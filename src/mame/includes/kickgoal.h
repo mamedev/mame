@@ -40,6 +40,8 @@ public:
 	/* devices */
 	required_device<okim6295_device> m_adpcm;
 	required_device<eeprom_device> m_eeprom;
+	DECLARE_READ16_MEMBER(kickgoal_eeprom_r);
+	DECLARE_WRITE16_MEMBER(kickgoal_eeprom_w);
 };
 
 

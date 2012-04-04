@@ -25,31 +25,31 @@ $208 strikes count
 #include "sound/2203intf.h"
 #include "includes/tryout.h"
 
-static WRITE8_HANDLER( tryout_nmi_ack_w )
+WRITE8_MEMBER(tryout_state::tryout_nmi_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE );
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE );
 }
 
-static WRITE8_HANDLER( tryout_sound_w )
+WRITE8_MEMBER(tryout_state::tryout_sound_w)
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 /*this is actually irq/nmi mask, polls only four values at start up (81->01->81->01) and then
   stays on this state.*/
-static WRITE8_HANDLER( tryout_sound_irq_ack_w )
+WRITE8_MEMBER(tryout_state::tryout_sound_irq_ack_w)
 {
-//  cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
+//  cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( tryout_bankswitch_w )
+WRITE8_MEMBER(tryout_state::tryout_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x2000;
-	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);
+	memory_set_bankptr(machine(), "bank1", &RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )
@@ -65,11 +65,11 @@ static ADDRESS_MAP_START( main_cpu, AS_PROGRAM, 8, tryout_state )
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P2")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe301, 0xe301) AM_WRITE_LEGACY(tryout_flipscreen_w)
-	AM_RANGE(0xe302, 0xe302) AM_WRITE_LEGACY(tryout_bankswitch_w)
+	AM_RANGE(0xe302, 0xe302) AM_WRITE(tryout_bankswitch_w)
 	AM_RANGE(0xe401, 0xe401) AM_WRITE_LEGACY(tryout_vram_bankswitch_w)
 	AM_RANGE(0xe402, 0xe404) AM_WRITEONLY AM_BASE(m_gfx_control)
-	AM_RANGE(0xe414, 0xe414) AM_WRITE_LEGACY(tryout_sound_w)
-	AM_RANGE(0xe417, 0xe417) AM_WRITE_LEGACY(tryout_nmi_ack_w)
+	AM_RANGE(0xe414, 0xe414) AM_WRITE(tryout_sound_w)
+	AM_RANGE(0xe417, 0xe417) AM_WRITE(tryout_nmi_ack_w)
 	AM_RANGE(0xfff0, 0xffff) AM_ROM AM_REGION("maincpu", 0xbff0) /* reset vectors */
 ADDRESS_MAP_END
 
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, tryout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(tryout_sound_irq_ack_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(tryout_sound_irq_ack_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -17,6 +17,9 @@ public:
 	tilemap_t *m_foreground_layer;
 	tilemap_t *m_text_layer;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	DECLARE_WRITE16_MEMBER(tokib_soundcommand16_w);
+	DECLARE_READ16_MEMBER(pip16_r);
+	DECLARE_WRITE8_MEMBER(toki_adpcm_data_w);
 };
 
 

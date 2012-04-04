@@ -35,6 +35,16 @@ public:
 	UINT8 m_palette_bank;
 
 	required_device<buffered_spriteram16_device> m_spriteram;
+	DECLARE_READ16_MEMBER(m92_eeprom_r);
+	DECLARE_WRITE16_MEMBER(m92_eeprom_w);
+	DECLARE_WRITE16_MEMBER(m92_coincounter_w);
+	DECLARE_WRITE16_MEMBER(m92_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(m92_soundlatch_w);
+	DECLARE_READ16_MEMBER(m92_sound_status_r);
+	DECLARE_READ16_MEMBER(m92_soundlatch_r);
+	DECLARE_WRITE16_MEMBER(m92_sound_irq_ack_w);
+	DECLARE_WRITE16_MEMBER(m92_sound_status_w);
+	DECLARE_WRITE16_MEMBER(m92_sound_reset_w);
 };
 
 

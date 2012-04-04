@@ -136,13 +136,13 @@ static TIMER_DEVICE_CALLBACK( vball_scanline )
 	}
 }
 
-static WRITE8_HANDLER( vball_irq_ack_w )
+WRITE8_MEMBER(vball_state::vball_irq_ack_w)
 {
 	if (offset == 0)
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	else
-		cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -155,25 +155,24 @@ static WRITE8_HANDLER( vball_irq_ack_w )
    bit 6 = scroll y hi
    bit 7 = ?
 */
-static WRITE8_HANDLER( vb_bankswitch_w )
+WRITE8_MEMBER(vball_state::vb_bankswitch_w)
 {
-	vball_state *state = space->machine().driver_data<vball_state>();
-	UINT8 *RAM = space->machine().region("maincpu")->base();
-	memory_set_bankptr(space->machine(), "bank1", &RAM[0x10000 + (0x4000 * (data & 1))]);
+	UINT8 *RAM = machine().region("maincpu")->base();
+	memory_set_bankptr(machine(), "bank1", &RAM[0x10000 + (0x4000 * (data & 1))]);
 
-	if (state->m_gfxset != ((data  & 0x20) ^ 0x20))
+	if (m_gfxset != ((data  & 0x20) ^ 0x20))
 	{
-		state->m_gfxset = (data  & 0x20) ^ 0x20;
-			vb_mark_all_dirty(space->machine());
+		m_gfxset = (data  & 0x20) ^ 0x20;
+			vb_mark_all_dirty(machine());
 	}
-	state->m_vb_scrolly_hi = (data & 0x40) << 2;
+	m_vb_scrolly_hi = (data & 0x40) << 2;
 }
 
 /* The sound system comes all but verbatim from Double Dragon */
-static WRITE8_HANDLER( cpu_sound_command_w )
+WRITE8_MEMBER(vball_state::cpu_sound_command_w)
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -186,21 +185,19 @@ static WRITE8_HANDLER( cpu_sound_command_w )
    bit 6 = sp prom bank
    bit 7 = sp prom bank
 */
-static WRITE8_HANDLER( vb_scrollx_hi_w )
+WRITE8_MEMBER(vball_state::vb_scrollx_hi_w)
 {
-	vball_state *state = space->machine().driver_data<vball_state>();
-	flip_screen_set(space->machine(), ~data&1);
-	state->m_vb_scrollx_hi = (data & 0x02) << 7;
-	vb_bgprombank_w(space->machine(), (data >> 2) & 0x07);
-	vb_spprombank_w(space->machine(), (data >> 5) & 0x07);
-	//logerror("%04x: vb_scrollx_hi = %d\n", cpu_get_previouspc(&space->device()), state->m_vb_scrollx_hi);
+	flip_screen_set(machine(), ~data&1);
+	m_vb_scrollx_hi = (data & 0x02) << 7;
+	vb_bgprombank_w(machine(), (data >> 2) & 0x07);
+	vb_spprombank_w(machine(), (data >> 5) & 0x07);
+	//logerror("%04x: vb_scrollx_hi = %d\n", cpu_get_previouspc(&space.device()), m_vb_scrollx_hi);
 }
 
-static WRITE8_HANDLER(vb_scrollx_lo_w)
+WRITE8_MEMBER(vball_state::vb_scrollx_lo_w)
 {
-	vball_state *state = space->machine().driver_data<vball_state>();
-	state->m_vb_scrollx_lo = data;
-	//logerror("%04x: vb_scrollx_lo =%d\n", cpu_get_previouspc(&space->device()), state->m_vb_scrollx_lo);
+	m_vb_scrollx_lo = data;
+	//logerror("%04x: vb_scrollx_lo =%d\n", cpu_get_previouspc(&space.device()), m_vb_scrollx_lo);
 }
 
 
@@ -215,11 +212,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vball_state )
 	AM_RANGE(0x1004, 0x1004) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1005, 0x1005) AM_READ_PORT("P3")
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("P4")
-	AM_RANGE(0x1008, 0x1008) AM_WRITE_LEGACY(vb_scrollx_hi_w)
-	AM_RANGE(0x1009, 0x1009) AM_WRITE_LEGACY(vb_bankswitch_w)
-	AM_RANGE(0x100a, 0x100b) AM_WRITE_LEGACY(vball_irq_ack_w)	/* is there a scanline counter here? */
-	AM_RANGE(0x100c, 0x100c) AM_WRITE_LEGACY(vb_scrollx_lo_w)
-	AM_RANGE(0x100d, 0x100d) AM_WRITE_LEGACY(cpu_sound_command_w)
+	AM_RANGE(0x1008, 0x1008) AM_WRITE(vb_scrollx_hi_w)
+	AM_RANGE(0x1009, 0x1009) AM_WRITE(vb_bankswitch_w)
+	AM_RANGE(0x100a, 0x100b) AM_WRITE(vball_irq_ack_w)	/* is there a scanline counter here? */
+	AM_RANGE(0x100c, 0x100c) AM_WRITE(vb_scrollx_lo_w)
+	AM_RANGE(0x100d, 0x100d) AM_WRITE(cpu_sound_command_w)
 	AM_RANGE(0x100e, 0x100e) AM_WRITEONLY AM_BASE(m_vb_scrolly_lo)
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE_LEGACY(vb_videoram_w) AM_BASE(m_vb_videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE_LEGACY(vb_attrib_w) AM_BASE(m_vb_attribram)

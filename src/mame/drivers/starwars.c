@@ -72,9 +72,9 @@ static MACHINE_RESET( starwars )
  *
  *************************************/
 
-static WRITE8_HANDLER( irq_ack_w )
+WRITE8_MEMBER(starwars_state::irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -99,18 +99,17 @@ static void esb_slapstic_tweak(address_space *space, offs_t offset)
 }
 
 
-static READ8_HANDLER( esb_slapstic_r )
+READ8_MEMBER(starwars_state::esb_slapstic_r)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
-	int result = state->m_slapstic_base[offset];
-	esb_slapstic_tweak(space, offset);
+	int result = m_slapstic_base[offset];
+	esb_slapstic_tweak(&space, offset);
 	return result;
 }
 
 
-static WRITE8_HANDLER( esb_slapstic_w )
+WRITE8_MEMBER(starwars_state::esb_slapstic_w)
 {
-	esb_slapstic_tweak(space, offset);
+	esb_slapstic_tweak(&space, offset);
 }
 
 
@@ -167,7 +166,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4600, 0x461f) AM_WRITE_LEGACY(avgdvg_go_w)
 	AM_RANGE(0x4620, 0x463f) AM_WRITE_LEGACY(avgdvg_reset_w)
 	AM_RANGE(0x4640, 0x465f) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x4660, 0x467f) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x4660, 0x467f) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x4680, 0x469f) AM_READNOP AM_WRITE_LEGACY(starwars_out_w)
 	AM_RANGE(0x46a0, 0x46bf) AM_WRITE_LEGACY(starwars_nstore_w)
 	AM_RANGE(0x46c0, 0x46c2) AM_WRITE_LEGACY(starwars_adc_select_w)
@@ -524,7 +523,7 @@ static DRIVER_INIT( esb )
 	space->set_direct_update_handler(direct_update_delegate(FUNC(esb_setdirect), &machine));
 
 	/* install read/write handlers for it */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0x9fff, FUNC(esb_slapstic_r), FUNC(esb_slapstic_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(starwars_state::esb_slapstic_r),state), write8_delegate(FUNC(starwars_state::esb_slapstic_w),state));
 
 	/* install additional banking */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xffff, "bank2");

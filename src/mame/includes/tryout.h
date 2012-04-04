@@ -13,6 +13,10 @@ public:
 	UINT8 *m_vram_gfx;
 	UINT8 *m_spriteram;
 	UINT8 *m_spriteram2;
+	DECLARE_WRITE8_MEMBER(tryout_nmi_ack_w);
+	DECLARE_WRITE8_MEMBER(tryout_sound_w);
+	DECLARE_WRITE8_MEMBER(tryout_sound_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(tryout_bankswitch_w);
 };
 
 

@@ -86,9 +86,9 @@ Dip locations and factory settings verified from dip listing
 #include "buggychl.lh"
 
 
-static WRITE8_HANDLER( bankswitch_w )
+WRITE8_MEMBER(buggychl_state::bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x07);	// shall we check if data&7 < # banks?
+	memory_set_bank(machine(), "bank1", data & 0x07);	// shall we check if data&7 < # banks?
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -101,32 +101,30 @@ static TIMER_CALLBACK( nmi_callback )
 		state->m_pending_nmi = 1;
 }
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(buggychl_state::sound_command_w)
 {
 	soundlatch_w(space, 0, data);
-	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
-static WRITE8_HANDLER( nmi_disable_w )
+WRITE8_MEMBER(buggychl_state::nmi_disable_w)
 {
-	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	state->m_sound_nmi_enable = 0;
+	m_sound_nmi_enable = 0;
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(buggychl_state::nmi_enable_w)
 {
-	buggychl_state *state = space->machine().driver_data<buggychl_state>();
-	state->m_sound_nmi_enable = 1;
-	if (state->m_pending_nmi)
+	m_sound_nmi_enable = 1;
+	if (m_pending_nmi)
 	{
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->m_pending_nmi = 0;
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_pending_nmi = 0;
 	}
 }
 
-static WRITE8_HANDLER( sound_enable_w )
+WRITE8_MEMBER(buggychl_state::sound_enable_w)
 {
-	space->machine().sound().system_enable(data & 1);
+	machine().sound().system_enable(data & 1);
 }
 
 
@@ -140,7 +138,7 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(buggychl_chargen_w) AM_BASE(m_charram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xd100, 0xd100) AM_WRITE_LEGACY(buggychl_ctrl_w)
-	AM_RANGE(0xd200, 0xd200) AM_WRITE_LEGACY(bankswitch_w)
+	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xd303, 0xd303) AM_WRITE_LEGACY(buggychl_sprite_lookup_bank_w)
 	AM_RANGE(0xd400, 0xd400) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_mcu_r, buggychl_mcu_w)
@@ -154,7 +152,7 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xd609, 0xd609) AM_READ_PORT("IN1")	/* coin + accelerator */
 //  AM_RANGE(0xd60a, 0xd60a) // other inputs, not used?
 //  AM_RANGE(0xd60b, 0xd60b) // other inputs, not used?
-	AM_RANGE(0xd610, 0xd610) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
 	AM_RANGE(0xd618, 0xd618) AM_WRITENOP	/* accelerator clear */
 	AM_RANGE(0xd700, 0xd7ff) AM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_BASE(m_scrollv)
@@ -173,9 +171,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x4830, 0x4830) AM_RAM	/* TRBL/BASS for the 7630 on the MSM5232 output  */
 	AM_RANGE(0x5000, 0x5000) AM_READ_LEGACY(soundlatch_r)
 //  AM_RANGE(0x5001, 0x5001) AM_READNOP /* is command pending? */
-	AM_RANGE(0x5001, 0x5001) AM_WRITE_LEGACY(nmi_enable_w)
-	AM_RANGE(0x5002, 0x5002) AM_WRITE_LEGACY(nmi_disable_w)
-	AM_RANGE(0x5003, 0x5003) AM_WRITE_LEGACY(sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_WRITE(nmi_enable_w)
+	AM_RANGE(0x5002, 0x5002) AM_WRITE(nmi_disable_w)
+	AM_RANGE(0x5003, 0x5003) AM_WRITE(sound_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostics ROM */
 ADDRESS_MAP_END
 

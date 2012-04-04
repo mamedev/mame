@@ -147,45 +147,40 @@ Notes:
 
 /* KANEKO BEAST state */
 
-static WRITE8_HANDLER( beast_data_w )
+WRITE8_MEMBER(djboy_state::beast_data_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 
-	state->m_data_to_beast = data;
-	state->m_z80_to_beast_full = 1;
-	state->m_beast_int0_l = 0;
-	device_set_input_line(state->m_beast, INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_data_to_beast = data;
+	m_z80_to_beast_full = 1;
+	m_beast_int0_l = 0;
+	device_set_input_line(m_beast, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static READ8_HANDLER( beast_data_r )
+READ8_MEMBER(djboy_state::beast_data_r)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 
-	state->m_beast_to_z80_full = 0;
-	return state->m_data_to_z80;
+	m_beast_to_z80_full = 0;
+	return m_data_to_z80;
 }
 
-static READ8_HANDLER( beast_status_r )
+READ8_MEMBER(djboy_state::beast_status_r)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
-	return (!state->m_beast_to_z80_full << 2) | (state->m_z80_to_beast_full << 3);
+	return (!m_beast_to_z80_full << 2) | (m_z80_to_beast_full << 3);
 }
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
+WRITE8_MEMBER(djboy_state::trigger_nmi_on_cpu0)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( cpu0_bankswitch_w )
+WRITE8_MEMBER(djboy_state::cpu0_bankswitch_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 
-	data ^= state->m_bankxor;
-	memory_set_bank(space->machine(), "bank1", data);
-	memory_set_bank(space->machine(), "bank4", 0); /* unsure if/how this area is banked */
+	data ^= m_bankxor;
+	memory_set_bank(machine(), "bank1", data);
+	memory_set_bank(machine(), "bank4", 0); /* unsure if/how this area is banked */
 }
 
 /******************************************************************************/
@@ -196,10 +191,9 @@ static WRITE8_HANDLER( cpu0_bankswitch_w )
  * ---x---- screen flip
  * ----xxxx bank
  */
-static WRITE8_HANDLER( cpu1_bankswitch_w )
+WRITE8_MEMBER(djboy_state::cpu1_bankswitch_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
-	state->m_videoreg = data;
+	m_videoreg = data;
 
 	switch (data & 0xf)
 	{
@@ -208,7 +202,7 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 	case 0x01:
 	case 0x02:
 	case 0x03:
-		memory_set_bank(space->machine(), "bank2", (data & 0xf));
+		memory_set_bank(machine(), "bank2", (data & 0xf));
 		break;
 
 	/* bs101.6w */
@@ -220,7 +214,7 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 	case 0x0d:
 	case 0x0e:
 	case 0x0f:
-		memory_set_bank(space->machine(), "bank2", (data & 0xf) - 4);
+		memory_set_bank(machine(), "bank2", (data & 0xf) - 4);
 		break;
 
 	default:
@@ -228,24 +222,23 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 	}
 }
 
-static WRITE8_HANDLER( coin_count_w )
+WRITE8_MEMBER(djboy_state::coin_count_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 }
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
+WRITE8_MEMBER(djboy_state::trigger_nmi_on_sound_cpu2)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_cpu2, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_cpu2, INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
-static WRITE8_HANDLER( cpu2_bankswitch_w )
+WRITE8_MEMBER(djboy_state::cpu2_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank3", data);	// shall we check data<0x07?
+	memory_set_bank(machine(), "bank3", data);	// shall we check data<0x07?
 }
 
 /******************************************************************************/
@@ -262,7 +255,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_port_am, AS_IO, 8, djboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(cpu0_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(cpu0_bankswitch_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -278,14 +271,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_port_am, AS_IO, 8, djboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(cpu1_bankswitch_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(trigger_nmi_on_sound_cpu2)
-	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(beast_data_r, beast_data_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(cpu1_bankswitch_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(beast_data_r, beast_data_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(djboy_scrolly_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(djboy_scrollx_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(trigger_nmi_on_cpu0)
-	AM_RANGE(0x0c, 0x0c) AM_READ_LEGACY(beast_status_r)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE_LEGACY(coin_count_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(trigger_nmi_on_cpu0)
+	AM_RANGE(0x0c, 0x0c) AM_READ(beast_status_r)
+	AM_RANGE(0x0e, 0x0e) AM_WRITE(coin_count_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -298,7 +291,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu2_port_am, AS_IO, 8, djboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(cpu2_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(cpu2_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
@@ -307,102 +300,95 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static READ8_HANDLER( beast_p0_r )
+READ8_MEMBER(djboy_state::beast_p0_r)
 {
 	// ?
 	return 0;
 }
 
-static WRITE8_HANDLER( beast_p0_w )
+WRITE8_MEMBER(djboy_state::beast_p0_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 
-	if (!BIT(state->m_beast_p0, 1) && BIT(data, 1))
+	if (!BIT(m_beast_p0, 1) && BIT(data, 1))
 	{
-		state->m_beast_to_z80_full = 1;
-		state->m_data_to_z80 = state->m_beast_p1;
+		m_beast_to_z80_full = 1;
+		m_data_to_z80 = m_beast_p1;
 	}
 
 	if (BIT(data, 0) == 1)
-		state->m_z80_to_beast_full = 0;
+		m_z80_to_beast_full = 0;
 
-	state->m_beast_p0 = data;
+	m_beast_p0 = data;
 }
 
-static READ8_HANDLER( beast_p1_r )
+READ8_MEMBER(djboy_state::beast_p1_r)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 
-	if (BIT(state->m_beast_p0, 0) == 0)
-		return state->m_data_to_beast;
+	if (BIT(m_beast_p0, 0) == 0)
+		return m_data_to_beast;
 	else
 		return 0; // ?
 }
 
-static WRITE8_HANDLER( beast_p1_w )
+WRITE8_MEMBER(djboy_state::beast_p1_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	if (data == 0xff)
 	{
-		state->m_beast_int0_l = 1;
-		device_set_input_line(state->m_beast, INPUT_LINE_IRQ0, CLEAR_LINE);
+		m_beast_int0_l = 1;
+		device_set_input_line(m_beast, INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 
-	state->m_beast_p1 = data;
+	m_beast_p1 = data;
 }
 
-static READ8_HANDLER( beast_p2_r )
+READ8_MEMBER(djboy_state::beast_p2_r)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 
-	switch ((state->m_beast_p0 >> 2) & 3)
+	switch ((m_beast_p0 >> 2) & 3)
 	{
-		case 0: return input_port_read(space->machine(), "IN1");
-		case 1: return input_port_read(space->machine(), "IN2");
-		case 2: return input_port_read(space->machine(), "IN0");
+		case 0: return input_port_read(machine(), "IN1");
+		case 1: return input_port_read(machine(), "IN2");
+		case 2: return input_port_read(machine(), "IN0");
 		default: return 0xff;
 	}
 }
 
-static WRITE8_HANDLER( beast_p2_w )
+WRITE8_MEMBER(djboy_state::beast_p2_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
-	state->m_beast_p2 = data;
+	m_beast_p2 = data;
 }
 
-static READ8_HANDLER( beast_p3_r )
+READ8_MEMBER(djboy_state::beast_p3_r)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 
 	UINT8 dsw = 0;
-	UINT8 dsw1 = ~input_port_read(space->machine(), "DSW1");
-	UINT8 dsw2 = ~input_port_read(space->machine(), "DSW2");
+	UINT8 dsw1 = ~input_port_read(machine(), "DSW1");
+	UINT8 dsw2 = ~input_port_read(machine(), "DSW2");
 
-	switch ((state->m_beast_p0 >> 5) & 3)
+	switch ((m_beast_p0 >> 5) & 3)
 	{
 		case 0: dsw = (BIT(dsw2, 4) << 3) | (BIT(dsw2, 0) << 2) | (BIT(dsw1, 4) << 1) | BIT(dsw1, 0); break;
 		case 1: dsw = (BIT(dsw2, 5) << 3) | (BIT(dsw2, 1) << 2) | (BIT(dsw1, 5) << 1) | BIT(dsw1, 1); break;
 		case 2: dsw = (BIT(dsw2, 6) << 3) | (BIT(dsw2, 2) << 2) | (BIT(dsw1, 6) << 1) | BIT(dsw1, 2); break;
 		case 3: dsw = (BIT(dsw2, 7) << 3) | (BIT(dsw2, 3) << 2) | (BIT(dsw1, 7) << 1) | BIT(dsw1, 3); break;
 	}
-	return (dsw << 4) | (state->m_beast_int0_l << 2) | (state->m_beast_to_z80_full << 3);
+	return (dsw << 4) | (m_beast_int0_l << 2) | (m_beast_to_z80_full << 3);
 }
 
-static WRITE8_HANDLER( beast_p3_w )
+WRITE8_MEMBER(djboy_state::beast_p3_w)
 {
-	djboy_state *state = space->machine().driver_data<djboy_state>();
 
-	state->m_beast_p3 = data;
-	device_set_input_line(state->m_cpu1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	m_beast_p3 = data;
+	device_set_input_line(m_cpu1, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }
 /* Program/data maps are defined in the 8051 core */
 
 static ADDRESS_MAP_START( djboy_mcu_io_map, AS_IO, 8, djboy_state )
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE_LEGACY(beast_p0_r, beast_p0_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE_LEGACY(beast_p1_r, beast_p1_w)
-	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE_LEGACY(beast_p2_r, beast_p2_w)
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE_LEGACY(beast_p3_r, beast_p3_w)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(beast_p0_r, beast_p0_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(beast_p1_r, beast_p1_w)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(beast_p2_r, beast_p2_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(beast_p3_r, beast_p3_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

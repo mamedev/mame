@@ -75,6 +75,25 @@ public:
 	int m_lastscan;
 	int m_video_changed;
 	gaelco3d_renderer *m_poly;
+	DECLARE_WRITE16_MEMBER(irq_ack_w);
+	DECLARE_WRITE32_MEMBER(irq_ack32_w);
+	DECLARE_WRITE16_MEMBER(sound_data_w);
+	DECLARE_READ16_MEMBER(sound_data_r);
+	DECLARE_READ16_MEMBER(sound_status_r);
+	DECLARE_WRITE16_MEMBER(sound_status_w);
+	DECLARE_WRITE16_MEMBER(analog_port_clock_w);
+	DECLARE_WRITE16_MEMBER(analog_port_latch_w);
+	DECLARE_READ32_MEMBER(tms_m68k_ram_r);
+	DECLARE_WRITE32_MEMBER(tms_m68k_ram_w);
+	DECLARE_WRITE16_MEMBER(tms_reset_w);
+	DECLARE_WRITE16_MEMBER(tms_irq_w);
+	DECLARE_WRITE16_MEMBER(tms_control3_w);
+	DECLARE_WRITE16_MEMBER(tms_comm_w);
+	DECLARE_WRITE16_MEMBER(adsp_control_w);
+	DECLARE_WRITE16_MEMBER(adsp_rombank_w);
+	DECLARE_WRITE32_MEMBER(radikalb_lamp_w);
+	DECLARE_WRITE32_MEMBER(unknown_137_w);
+	DECLARE_WRITE32_MEMBER(unknown_13a_w);
 };
 
 

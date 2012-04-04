@@ -30,6 +30,14 @@ public:
 	device_t *m_k052109;
 	device_t *m_k053245;
 	device_t *m_k053251;
+	DECLARE_READ8_MEMBER(bankedram_r);
+	DECLARE_WRITE8_MEMBER(bankedram_w);
+	DECLARE_READ8_MEMBER(parodius_052109_053245_r);
+	DECLARE_WRITE8_MEMBER(parodius_052109_053245_w);
+	DECLARE_WRITE8_MEMBER(parodius_videobank_w);
+	DECLARE_WRITE8_MEMBER(parodius_3fc0_w);
+	DECLARE_WRITE8_MEMBER(parodius_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
 };
 
 /*----------- defined in video/parodius.c -----------*/

@@ -39,6 +39,7 @@ public:
 	UINT8 m_queue[64];
 	int m_qfront;
 	int m_qstate;
+	DECLARE_WRITE8_MEMBER(mexico86_sub_output_w);
 };
 
 

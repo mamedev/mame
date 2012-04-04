@@ -38,6 +38,11 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_READ16_MEMBER(fake_4a00a_r);
+	DECLARE_WRITE16_MEMBER(ashnojoe_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(adpcm_w);
+	DECLARE_READ8_MEMBER(sound_latch_r);
+	DECLARE_READ8_MEMBER(sound_latch_status_r);
 };
 
 

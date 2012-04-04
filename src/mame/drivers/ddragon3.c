@@ -160,43 +160,42 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 	oki->set_bank_base((data & 1) * 0x40000);
 }
 
-static WRITE16_HANDLER( ddragon3_io_w )
+WRITE16_MEMBER(ddragon3_state::ddragon3_io_w)
 {
-	ddragon3_state *state = space->machine().driver_data<ddragon3_state>();
 
-	COMBINE_DATA(&state->m_io_reg[offset]);
+	COMBINE_DATA(&m_io_reg[offset]);
 
 	switch (offset)
 	{
 		case 0:
-			state->m_vreg = state->m_io_reg[0];
+			m_vreg = m_io_reg[0];
 			break;
 
 		case 1: /* soundlatch_w */
-			soundlatch_w(space, 1, state->m_io_reg[1] & 0xff);
-			device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+			soundlatch_w(space, 1, m_io_reg[1] & 0xff);
+			device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:
 			/*  this gets written to on startup and at the end of IRQ6
             **  possibly trigger IRQ on sound CPU
             */
-			device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
+			device_set_input_line(m_maincpu, 6, CLEAR_LINE);
 			break;
 
 		case 3:
 			/*  this gets written to on startup,
             **  and at the end of IRQ5 (input port read) */
-			device_set_input_line(state->m_maincpu, 5, CLEAR_LINE);
+			device_set_input_line(m_maincpu, 5, CLEAR_LINE);
 			break;
 
 		case 4:
 			/* this gets written to at the end of IRQ6 only */
-			device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
+			device_set_input_line(m_maincpu, 6, CLEAR_LINE);
 			break;
 
 		default:
-			logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(&space->device()) );
+			logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(&space.device()) );
 			break;
 	}
 }
@@ -216,7 +215,7 @@ static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("DSW")
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("P3")
-	AM_RANGE(0x100000, 0x10000f) AM_WRITE_LEGACY(ddragon3_io_w)
+	AM_RANGE(0x100000, 0x10000f) AM_WRITE(ddragon3_io_w)
 	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
 	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
@@ -229,7 +228,7 @@ static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE_LEGACY(ddragon3_bg_videoram_w) AM_BASE(m_bg_videoram) /* Background (32x32 Tiles - 2 by per tile) */
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE_LEGACY(ddragon3_scroll_w)
 	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE_LEGACY(ddragon3_io_w)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN0")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")
@@ -245,7 +244,7 @@ static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x082800, 0x082fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c000f) AM_READWRITE_LEGACY(ddragon3_scroll_r, ddragon3_scroll_w)
 	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
-	AM_RANGE(0x140000, 0x14000f) AM_WRITE_LEGACY(ddragon3_io_w)
+	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN0")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("IN2")

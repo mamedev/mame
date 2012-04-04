@@ -81,9 +81,9 @@ static double calc_plunger_pos(running_machine &machine)
 }
 
 
-static READ8_HANDLER( videopin_misc_r )
+READ8_MEMBER(videopin_state::videopin_misc_r)
 {
-	double plunger = calc_plunger_pos(space->machine());
+	double plunger = calc_plunger_pos(machine());
 
 	// The plunger of the ball shooter has a black piece of
 	// plastic (flag) attached to it. When the plunger flag passes
@@ -94,7 +94,7 @@ static READ8_HANDLER( videopin_misc_r )
 	// signals received. This results in the MPU displaying the
 	// ball being shot onto the playfield at a certain speed.
 
-	UINT8 val = input_port_read(space->machine(), "IN1");
+	UINT8 val = input_port_read(machine(), "IN1");
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{
@@ -109,9 +109,9 @@ static READ8_HANDLER( videopin_misc_r )
 }
 
 
-static WRITE8_HANDLER( videopin_led_w )
+WRITE8_MEMBER(videopin_state::videopin_led_w)
 {
-	int i = (space->machine().primary_screen->vpos() >> 5) & 7;
+	int i = (machine().primary_screen->vpos() >> 5) & 7;
 	static const char *const matrix[8][4] =
 	{
 		{ "LED26", "LED18", "LED11", "LED13" },
@@ -130,9 +130,9 @@ static WRITE8_HANDLER( videopin_led_w )
 	output_set_value(matrix[i][3], (data >> 3) & 1);
 
 	if (i == 7)
-		set_led_status(space->machine(), 0, data & 8);   /* start button */
+		set_led_status(machine(), 0, data & 8);   /* start button */
 
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -196,8 +196,8 @@ static WRITE8_DEVICE_HANDLER( videopin_note_dvsr_w )
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, videopin_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE_LEGACY(videopin_video_ram_w) AM_BASE(m_video_ram)
-	AM_RANGE(0x0800, 0x0800) AM_READ_LEGACY(videopin_misc_r) AM_DEVWRITE_LEGACY("discrete", videopin_note_dvsr_w)
-	AM_RANGE(0x0801, 0x0801) AM_WRITE_LEGACY(videopin_led_w)
+	AM_RANGE(0x0800, 0x0800) AM_READ(videopin_misc_r) AM_DEVWRITE_LEGACY("discrete", videopin_note_dvsr_w)
+	AM_RANGE(0x0801, 0x0801) AM_WRITE(videopin_led_w)
 	AM_RANGE(0x0802, 0x0802) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x0804, 0x0804) AM_WRITE_LEGACY(videopin_ball_w)
 	AM_RANGE(0x0805, 0x0805) AM_DEVWRITE_LEGACY("discrete", videopin_out1_w)

@@ -22,6 +22,12 @@ public:
 	UINT8 *m_current_bitmap_videoram_displayed;
 	UINT16 *m_palette_ram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(cloak_led_w);
+	DECLARE_WRITE8_MEMBER(cloak_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(cloak_custom_w);
+	DECLARE_WRITE8_MEMBER(cloak_irq_reset_0_w);
+	DECLARE_WRITE8_MEMBER(cloak_irq_reset_1_w);
+	DECLARE_WRITE8_MEMBER(cloak_nvram_enable_w);
 };
 
 

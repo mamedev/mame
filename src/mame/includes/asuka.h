@@ -34,6 +34,10 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_pc090oj;
 	device_t *m_tc0100scn;
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(asuka_msm5205_address_w);
+	DECLARE_READ16_MEMBER(cadash_share_r);
+	DECLARE_WRITE16_MEMBER(cadash_share_w);
 };
 
 

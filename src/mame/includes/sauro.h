@@ -14,6 +14,11 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	UINT8 m_palette_bank;
+	DECLARE_WRITE8_MEMBER(sauro_sound_command_w);
+	DECLARE_READ8_MEMBER(sauro_sound_command_r);
+	DECLARE_WRITE8_MEMBER(sauro_coin1_w);
+	DECLARE_WRITE8_MEMBER(sauro_coin2_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
 };
 
 

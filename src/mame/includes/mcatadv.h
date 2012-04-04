@@ -26,6 +26,10 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_soundcpu;
+	DECLARE_WRITE16_MEMBER(mcat_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(mcat_coin_w);
+	DECLARE_READ16_MEMBER(mcat_wd_r);
+	DECLARE_WRITE8_MEMBER(mcatadv_sound_bw_w);
 };
 
 /*----------- defined in video/mcatadv.c -----------*/

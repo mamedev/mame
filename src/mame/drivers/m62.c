@@ -82,23 +82,21 @@ other supported games as well.
 /* that to select the ROM. The only exception I make is a special case used in */
 /* service mode to test the ROMs. */
 
-static READ8_HANDLER( ldrun2_bankswitch_r )
+READ8_MEMBER(m62_state::ldrun2_bankswitch_r)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
-	if (state->m_ldrun2_bankswap)
+	if (m_ldrun2_bankswap)
 	{
-		state->m_ldrun2_bankswap--;
+		m_ldrun2_bankswap--;
 
 		/* swap to bank #1 on second read */
-		if (state->m_ldrun2_bankswap == 0)
-			memory_set_bank(space->machine(), "bank1", 1);
+		if (m_ldrun2_bankswap == 0)
+			memory_set_bank(machine(), "bank1", 1);
 	}
 	return 0;
 }
 
-static WRITE8_HANDLER( ldrun2_bankswitch_w )
+WRITE8_MEMBER(m62_state::ldrun2_bankswitch_w)
 {
-	m62_state *state = space->machine().driver_data<m62_state>();
 	static const int banks[30] =
 	{
 		0,0,0,0,0,1,0,1,0,0,
@@ -107,7 +105,7 @@ static WRITE8_HANDLER( ldrun2_bankswitch_w )
 	};
 
 
-	state->m_bankcontrol[offset] = data;
+	m_bankcontrol[offset] = data;
 
 	if (offset == 0)
 	{
@@ -116,15 +114,15 @@ static WRITE8_HANDLER( ldrun2_bankswitch_w )
 			logerror("unknown bank select %02x\n",data);
 			return;
 		}
-		memory_set_bank(space->machine(), "bank1", banks[data - 1]);
+		memory_set_bank(machine(), "bank1", banks[data - 1]);
 	}
 	else
 	{
-		if (state->m_bankcontrol[0] == 0x01 && data == 0x0d)
+		if (m_bankcontrol[0] == 0x01 && data == 0x0d)
 		/* special case for service mode */
-			state->m_ldrun2_bankswap = 2;
+			m_ldrun2_bankswap = 2;
 		else
-			state->m_ldrun2_bankswap = 0;
+			m_ldrun2_bankswap = 0;
 	}
 }
 
@@ -132,43 +130,43 @@ static WRITE8_HANDLER( ldrun2_bankswitch_w )
 /* Lode Runner 3 has, it seems, a poor man's protection consisting of a PAL */
 /* (I think; it's included in the ROM set) which is read at certain times, */
 /* and the game crashes if it doesn't match the expected values. */
-static READ8_HANDLER( ldrun3_prot_5_r )
+READ8_MEMBER(m62_state::ldrun3_prot_5_r)
 {
 	return 5;
 }
 
-static READ8_HANDLER( ldrun3_prot_7_r )
+READ8_MEMBER(m62_state::ldrun3_prot_7_r)
 {
 	return 7;
 }
 
 
-static WRITE8_HANDLER( ldrun4_bankswitch_w )
+WRITE8_MEMBER(m62_state::ldrun4_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x01);
+	memory_set_bank(machine(), "bank1", data & 0x01);
 }
 
-static WRITE8_HANDLER( kidniki_bankswitch_w )
+WRITE8_MEMBER(m62_state::kidniki_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
 #define battroad_bankswitch_w kidniki_bankswitch_w
 
-static WRITE8_HANDLER( spelunkr_bankswitch_w )
+WRITE8_MEMBER(m62_state::spelunkr_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	memory_set_bank(machine(), "bank1", data & 0x03);
 }
 
-static WRITE8_HANDLER( spelunk2_bankswitch_w )
+WRITE8_MEMBER(m62_state::spelunk2_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", (data & 0xc0) >> 6);
-	memory_set_bank(space->machine(), "bank2", (data & 0x3c) >> 2);
+	memory_set_bank(machine(), "bank1", (data & 0xc0) >> 6);
+	memory_set_bank(machine(), "bank2", (data & 0x3c) >> 2);
 }
 
-static WRITE8_HANDLER( youjyudn_bankswitch_w )
+WRITE8_MEMBER(m62_state::youjyudn_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x01);
+	memory_set_bank(machine(), "bank1", data & 0x01);
 }
 
 
@@ -211,7 +209,7 @@ static ADDRESS_MAP_START( battroad_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(m62_vscroll_low_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(m62_hscroll_high_w)
 	AM_RANGE(0x82, 0x82) AM_WRITE_LEGACY(m62_hscroll_low_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE_LEGACY(battroad_bankswitch_w)
+	AM_RANGE(0x83, 0x83) AM_WRITE(battroad_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun_map, AS_PROGRAM, 8, m62_state )
@@ -236,15 +234,15 @@ static ADDRESS_MAP_START( ldrun2_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x80, 0x80) AM_READ_LEGACY(ldrun2_bankswitch_r)
-	AM_RANGE(0x80, 0x81) AM_WRITE_LEGACY(ldrun2_bankswitch_w)
+	AM_RANGE(0x80, 0x80) AM_READ(ldrun2_bankswitch_r)
+	AM_RANGE(0x80, 0x81) AM_WRITE(ldrun2_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ldrun3_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc800, 0xc800) AM_READ_LEGACY(ldrun3_prot_5_r)
-	AM_RANGE(0xcc00, 0xcc00) AM_READ_LEGACY(ldrun3_prot_7_r)
-	AM_RANGE(0xcfff, 0xcfff) AM_READ_LEGACY(ldrun3_prot_7_r)
+	AM_RANGE(0xc800, 0xc800) AM_READ(ldrun3_prot_5_r)
+	AM_RANGE(0xcc00, 0xcc00) AM_READ(ldrun3_prot_7_r)
+	AM_RANGE(0xcfff, 0xcfff) AM_READ(ldrun3_prot_7_r)
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xd000, 0xefff) AM_RAM
@@ -265,7 +263,7 @@ static ADDRESS_MAP_START( ldrun4_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc0ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(ldrun4_bankswitch_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(ldrun4_bankswitch_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(m62_tileram_w) AM_BASE(m_m62_tileram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
@@ -310,7 +308,7 @@ static ADDRESS_MAP_START( kidniki_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x82, 0x82) AM_WRITE_LEGACY(kidniki_text_vscroll_low_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE_LEGACY(kidniki_text_vscroll_high_w)
 	AM_RANGE(0x84, 0x84) AM_WRITE_LEGACY(kidniki_background_bank_w)
-	AM_RANGE(0x85, 0x85) AM_WRITE_LEGACY(kidniki_bankswitch_w)
+	AM_RANGE(0x85, 0x85) AM_WRITE(kidniki_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spelunkr_map, AS_PROGRAM, 8, m62_state )
@@ -323,7 +321,7 @@ static ADDRESS_MAP_START( spelunkr_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(m62_vscroll_high_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE_LEGACY(m62_hscroll_low_w)
 	AM_RANGE(0xd003, 0xd003) AM_WRITE_LEGACY(m62_hscroll_high_w)
-	AM_RANGE(0xd004, 0xd004) AM_WRITE_LEGACY(spelunkr_bankswitch_w)
+	AM_RANGE(0xd004, 0xd004) AM_WRITE(spelunkr_bankswitch_w)
 	AM_RANGE(0xd005, 0xd005) AM_WRITE_LEGACY(spelunkr_palbank_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
@@ -338,7 +336,7 @@ static ADDRESS_MAP_START( spelunk2_map, AS_PROGRAM, 8, m62_state )
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(m62_vscroll_low_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(m62_hscroll_low_w)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE_LEGACY(spelunk2_gfxport_w)
-	AM_RANGE(0xd003, 0xd003) AM_WRITE_LEGACY(spelunk2_bankswitch_w)
+	AM_RANGE(0xd003, 0xd003) AM_WRITE(spelunk2_bankswitch_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -360,7 +358,7 @@ static ADDRESS_MAP_START( youjyudn_io_map, AS_IO, 8, m62_state )
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(m62_hscroll_high_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(m62_hscroll_low_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE_LEGACY(youjyudn_bankswitch_w)
+	AM_RANGE(0x83, 0x83) AM_WRITE(youjyudn_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( horizon_map, AS_PROGRAM, 8, m62_state )

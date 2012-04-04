@@ -43,6 +43,12 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(gaiden_sound_command_w);
+	DECLARE_WRITE16_MEMBER(drgnbowl_sound_command_w);
+	DECLARE_WRITE16_MEMBER(wildfang_protection_w);
+	DECLARE_READ16_MEMBER(wildfang_protection_r);
+	DECLARE_WRITE16_MEMBER(raiga_protection_w);
+	DECLARE_READ16_MEMBER(raiga_protection_r);
 };
 
 

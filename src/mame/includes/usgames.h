@@ -7,6 +7,9 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_charram;
 	tilemap_t *m_tilemap;
+	DECLARE_WRITE8_MEMBER(usgames_rombank_w);
+	DECLARE_WRITE8_MEMBER(lamps1_w);
+	DECLARE_WRITE8_MEMBER(lamps2_w);
 };
 
 

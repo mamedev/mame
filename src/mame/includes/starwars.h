@@ -39,6 +39,9 @@ public:
 	INT16 m_B;
 	INT16 m_C;
 	INT32 m_ACC;
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_READ8_MEMBER(esb_slapstic_r);
+	DECLARE_WRITE8_MEMBER(esb_slapstic_w);
 };
 
 

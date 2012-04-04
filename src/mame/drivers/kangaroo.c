@@ -163,8 +163,8 @@
 #define MASTER_CLOCK		XTAL_10MHz
 
 
-static READ8_HANDLER(mcu_sim_r);
-static WRITE8_HANDLER(mcu_sim_w);
+
+
 
 /*************************************
  *
@@ -183,7 +183,7 @@ static MACHINE_START( kangaroo_mcu )
 	kangaroo_state *state = machine.driver_data<kangaroo_state>();
 
 	MACHINE_START_CALL(kangaroo);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xef00, 0xefff, FUNC(mcu_sim_r), FUNC(mcu_sim_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xef00, 0xefff, read8_delegate(FUNC(kangaroo_state::mcu_sim_r),state), write8_delegate(FUNC(kangaroo_state::mcu_sim_w),state));
 	state->save_item(NAME(state->m_clock));
 }
 
@@ -220,13 +220,12 @@ static MACHINE_RESET( kangaroo )
    this just seems to do the trick -V-
 */
 
-static READ8_HANDLER( mcu_sim_r )
+READ8_MEMBER(kangaroo_state::mcu_sim_r)
 {
-	kangaroo_state *state = space->machine().driver_data<kangaroo_state>();
-	return ++state->m_clock & 0x0f;
+	return ++m_clock & 0x0f;
 }
 
-static WRITE8_HANDLER( mcu_sim_w )
+WRITE8_MEMBER(kangaroo_state::mcu_sim_w)
 {
 }
 
@@ -238,10 +237,10 @@ static WRITE8_HANDLER( mcu_sim_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( kangaroo_coin_counter_w )
+WRITE8_MEMBER(kangaroo_state::kangaroo_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 }
 
 
@@ -260,7 +259,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kangaroo_state )
 	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW0")
 	AM_RANGE(0xe800, 0xe80a) AM_MIRROR(0x03f0) AM_WRITE_LEGACY(kangaroo_video_control_w) AM_BASE(m_video_control)
 	AM_RANGE(0xec00, 0xec00) AM_MIRROR(0x00ff) AM_READ_PORT("IN0") AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0xed00, 0xed00) AM_MIRROR(0x00ff) AM_READ_PORT("IN1") AM_WRITE_LEGACY(kangaroo_coin_counter_w)
+	AM_RANGE(0xed00, 0xed00) AM_MIRROR(0x00ff) AM_READ_PORT("IN1") AM_WRITE(kangaroo_coin_counter_w)
 	AM_RANGE(0xee00, 0xee00) AM_MIRROR(0x00ff) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 

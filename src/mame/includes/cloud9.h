@@ -40,6 +40,12 @@ public:
 	/* devices */
 	required_device<m6502_device> m_maincpu;
 	required_device<x2212_device> m_nvram;
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(cloud9_led_w);
+	DECLARE_WRITE8_MEMBER(cloud9_coin_counter_w);
+	DECLARE_READ8_MEMBER(leta_r);
+	DECLARE_WRITE8_MEMBER(nvram_recall_w);
+	DECLARE_WRITE8_MEMBER(nvram_store_w);
 };
 
 

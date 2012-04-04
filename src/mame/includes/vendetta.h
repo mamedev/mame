@@ -31,6 +31,13 @@ public:
 	device_t *m_k053246;
 	device_t *m_k053251;
 	device_t *m_k054000;
+	DECLARE_WRITE8_MEMBER(vendetta_eeprom_w);
+	DECLARE_READ8_MEMBER(vendetta_K052109_r);
+	DECLARE_WRITE8_MEMBER(vendetta_K052109_w);
+	DECLARE_WRITE8_MEMBER(vendetta_5fe0_w);
+	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
+	DECLARE_WRITE8_MEMBER(z80_irq_w);
+	DECLARE_READ8_MEMBER(vendetta_sound_interrupt_r);
 };
 
 /*----------- defined in video/vendetta.c -----------*/

@@ -26,6 +26,12 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_READ16_MEMBER(aquarium_coins_r);
+	DECLARE_WRITE8_MEMBER(aquarium_snd_ack_w);
+	DECLARE_WRITE16_MEMBER(aquarium_sound_w);
+	DECLARE_WRITE8_MEMBER(aquarium_z80_bank_w);
+	DECLARE_READ8_MEMBER(aquarium_oki_r);
+	DECLARE_WRITE8_MEMBER(aquarium_oki_w);
 };
 
 

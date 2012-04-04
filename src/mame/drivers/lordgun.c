@@ -226,45 +226,40 @@ static WRITE8_DEVICE_HANDLER( aliencha_dip_w )
 
 
 // Unknown, always equal to 7 in lordgun, aliencha.
-static WRITE16_HANDLER( lordgun_priority_w )
+WRITE16_MEMBER(lordgun_state::lordgun_priority_w)
 {
-	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	COMBINE_DATA(&state->m_priority);
+	COMBINE_DATA(&m_priority);
 //  popmessage("PR: %04x", data);
 }
 
 
-static READ16_HANDLER( lordgun_gun_0_x_r )
+READ16_MEMBER(lordgun_state::lordgun_gun_0_x_r)
 {
-	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	return state->m_gun[0].hw_x;
+	return m_gun[0].hw_x;
 }
 
-static READ16_HANDLER( lordgun_gun_0_y_r )
+READ16_MEMBER(lordgun_state::lordgun_gun_0_y_r)
 {
-	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	return state->m_gun[0].hw_y;
+	return m_gun[0].hw_y;
 }
 
-static READ16_HANDLER( lordgun_gun_1_x_r )
+READ16_MEMBER(lordgun_state::lordgun_gun_1_x_r)
 {
-	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	return state->m_gun[1].hw_x;
+	return m_gun[1].hw_x;
 }
 
-static READ16_HANDLER( lordgun_gun_1_y_r )
+READ16_MEMBER(lordgun_state::lordgun_gun_1_y_r)
 {
-	lordgun_state *state = space->machine().driver_data<lordgun_state>();
-	return state->m_gun[1].hw_y;
+	return m_gun[1].hw_y;
 }
 
 
-static WRITE16_HANDLER( lordgun_soundlatch_w )
+WRITE16_MEMBER(lordgun_state::lordgun_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)		soundlatch_w (space, 0, (data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)	soundlatch2_w(space, 0, (data >> 8) & 0xff);
 
-	cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16, lordgun_state )
@@ -287,12 +282,12 @@ static ADDRESS_MAP_START( lordgun_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_BASE(m_scroll_y[1])
 	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_BASE(m_scroll_y[2])
 	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_BASE(m_scroll_y[3])
-	AM_RANGE(0x503000, 0x503001) AM_WRITE_LEGACY(lordgun_priority_w)
-	AM_RANGE(0x503800, 0x503801) AM_READ_LEGACY(lordgun_gun_0_x_r)
-	AM_RANGE(0x503a00, 0x503a01) AM_READ_LEGACY(lordgun_gun_1_x_r)
-	AM_RANGE(0x503c00, 0x503c01) AM_READ_LEGACY(lordgun_gun_0_y_r)
-	AM_RANGE(0x503e00, 0x503e01) AM_READ_LEGACY(lordgun_gun_1_y_r)
-	AM_RANGE(0x504000, 0x504001) AM_WRITE_LEGACY(lordgun_soundlatch_w)
+	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
+	AM_RANGE(0x503800, 0x503801) AM_READ(lordgun_gun_0_x_r)
+	AM_RANGE(0x503a00, 0x503a01) AM_READ(lordgun_gun_1_x_r)
+	AM_RANGE(0x503c00, 0x503c01) AM_READ(lordgun_gun_0_y_r)
+	AM_RANGE(0x503e00, 0x503e01) AM_READ(lordgun_gun_1_y_r)
+	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
 	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w, 0x00ff)
 	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w, 0x00ff)
 	AM_RANGE(0x50a900, 0x50a9ff) AM_RAM	// protection
@@ -319,8 +314,8 @@ static ADDRESS_MAP_START( aliencha_map, AS_PROGRAM, 16, lordgun_state )
 	AM_RANGE(0x502a00, 0x502a01) AM_WRITEONLY AM_BASE(m_scroll_y[1])
 	AM_RANGE(0x502c00, 0x502c01) AM_WRITEONLY AM_BASE(m_scroll_y[2])
 	AM_RANGE(0x502e00, 0x502e01) AM_WRITEONLY AM_BASE(m_scroll_y[3])
-	AM_RANGE(0x503000, 0x503001) AM_WRITE_LEGACY(lordgun_priority_w)
-	AM_RANGE(0x504000, 0x504001) AM_WRITE_LEGACY(lordgun_soundlatch_w)
+	AM_RANGE(0x503000, 0x503001) AM_WRITE(lordgun_priority_w)
+	AM_RANGE(0x504000, 0x504001) AM_WRITE(lordgun_soundlatch_w)
 	AM_RANGE(0x506000, 0x506007) AM_DEVREADWRITE8_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w, 0x00ff)
 	AM_RANGE(0x508000, 0x508007) AM_DEVREADWRITE8_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w, 0x00ff)
 	AM_RANGE(0x50b900, 0x50b9ff) AM_RAM	// protection

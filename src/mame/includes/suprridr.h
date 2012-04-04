@@ -20,6 +20,10 @@ public:
 	UINT8 m_flipx;
 	UINT8 m_flipy;
 	UINT8 *m_spriteram;
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(sound_data_w);
+	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(coin_lock_w);
 };
 
 

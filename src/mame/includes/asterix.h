@@ -32,6 +32,11 @@ public:
 	device_t *m_k056832;
 	device_t *m_k053244;
 	device_t *m_k053251;
+	DECLARE_READ16_MEMBER(control2_r);
+	DECLARE_WRITE16_MEMBER(control2_w);
+	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
+	DECLARE_WRITE16_MEMBER(sound_irq_w);
+	DECLARE_WRITE16_MEMBER(protection_w);
 };
 
 

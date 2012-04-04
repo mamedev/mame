@@ -256,22 +256,21 @@ static void update_irq( running_machine &machine )
 	device_set_input_line(state->m_maincpu, 5, state->m_vblank_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( irq_ack_w )
+WRITE16_MEMBER(othunder_state::irq_ack_w)
 {
-	othunder_state *state = space->machine().driver_data<othunder_state>();
 
 	switch (offset)
 	{
 		case 0:
-			state->m_vblank_irq = 0;
+			m_vblank_irq = 0;
 			break;
 
 		case 1:
-			state->m_ad_irq = 0;
+			m_ad_irq = 0;
 			break;
 	}
 
-	update_irq(space->machine());
+	update_irq(machine());
 }
 
 static INTERRUPT_GEN( vblank_interrupt )
@@ -310,9 +309,8 @@ static const eeprom_interface eeprom_intf =
 	"0100111111"	/* unlock command */
 };
 
-static WRITE16_HANDLER( othunder_tc0220ioc_w )
+WRITE16_MEMBER(othunder_state::othunder_tc0220ioc_w)
 {
-	othunder_state *state = space->machine().driver_data<othunder_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -336,13 +334,13 @@ static WRITE16_HANDLER( othunder_tc0220ioc_w )
 				if (data & 4)
 					popmessage("OBPRI SET!");
 
-				state->m_eeprom->write_bit(data & 0x40);
-				state->m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
-				state->m_eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->write_bit(data & 0x40);
+				m_eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 
 			default:
-				tc0220ioc_w(state->m_tc0220ioc, offset, data & 0xff);
+				tc0220ioc_w(m_tc0220ioc, offset, data & 0xff);
 		}
 	}
 }
@@ -352,17 +350,16 @@ static WRITE16_HANDLER( othunder_tc0220ioc_w )
             GAME INPUTS
 **********************************************************/
 
-static READ16_HANDLER( othunder_tc0220ioc_r )
+READ16_MEMBER(othunder_state::othunder_tc0220ioc_r)
 {
-	othunder_state *state = space->machine().driver_data<othunder_state>();
 
 	switch (offset)
 	{
 		case 0x03:
-			return (state->m_eeprom->read_bit() & 1) << 7;
+			return (m_eeprom->read_bit() & 1) << 7;
 
 		default:
-			return tc0220ioc_r(state->m_tc0220ioc, offset);
+			return tc0220ioc_r(m_tc0220ioc, offset);
 	}
 }
 
@@ -372,20 +369,20 @@ static READ16_HANDLER( othunder_tc0220ioc_r )
 #define P2Y_PORT_TAG     "P2Y"
 #define ROTARY_PORT_TAG  "ROTARY"
 
-static READ16_HANDLER( othunder_lightgun_r )
+READ16_MEMBER(othunder_state::othunder_lightgun_r)
 {
 	static const char *const portname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
-	return input_port_read(space->machine(), portname[offset]);
+	return input_port_read(machine(), portname[offset]);
 }
 
-static WRITE16_HANDLER( othunder_lightgun_w )
+WRITE16_MEMBER(othunder_state::othunder_lightgun_w)
 {
 	/* A write starts the A/D conversion. An interrupt will be triggered when
        the conversion is complete.
        The ADC60808 clock is 512kHz. Conversion takes between 0 and 8 clock
        cycles, so would end in a maximum of 15.625us. We'll use 10. */
 
-	space->machine().scheduler().timer_set(attotime::from_usec(10), FUNC(ad_interrupt));
+	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(ad_interrupt));
 }
 
 
@@ -400,58 +397,54 @@ static void reset_sound_region( running_machine &machine )
 }
 
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(othunder_state::sound_bankswitch_w)
 {
-	othunder_state *state = space->machine().driver_data<othunder_state>();
-	state->m_banknum = data & 7;
-	reset_sound_region(space->machine());
+	m_banknum = data & 7;
+	reset_sound_region(machine());
 }
 
-static WRITE16_HANDLER( othunder_sound_w )
+WRITE16_MEMBER(othunder_state::othunder_sound_w)
 {
-	othunder_state *state = space->machine().driver_data<othunder_state>();
 	if (offset == 0)
-		tc0140syt_port_w(state->m_tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(m_tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(state->m_tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(m_tc0140syt, 0, data & 0xff);
 }
 
-static READ16_HANDLER( othunder_sound_r )
+READ16_MEMBER(othunder_state::othunder_sound_r)
 {
-	othunder_state *state = space->machine().driver_data<othunder_state>();
 	if (offset == 1)
-		return ((tc0140syt_comm_r(state->m_tc0140syt, 0) & 0xff));
+		return ((tc0140syt_comm_r(m_tc0140syt, 0) & 0xff));
 	else
 		return 0;
 }
 
-static WRITE8_HANDLER( othunder_TC0310FAM_w )
+WRITE8_MEMBER(othunder_state::othunder_TC0310FAM_w)
 {
 	/* there are two TC0310FAM, one for CH1 and one for CH2 from the YM2610. The
        PSG output is routed to both chips. */
-	othunder_state *state = space->machine().driver_data<othunder_state>();
 	int voll, volr;
 
-	state->m_pan[offset] = data & 0x1f;
+	m_pan[offset] = data & 0x1f;
 
 	/* PSG output (single ANALOG OUT pin on the YM2610, but we have three channels
        because we are using the AY-3-8910 emulation. */
-	volr = (state->m_pan[0] + state->m_pan[2]) * 100 / (2 * 0x1f);
-	voll = (state->m_pan[1] + state->m_pan[3]) * 100 / (2 * 0x1f);
-	flt_volume_set_volume(state->m_2610_0l, voll / 100.0);
-	flt_volume_set_volume(state->m_2610_0r, volr / 100.0);
+	volr = (m_pan[0] + m_pan[2]) * 100 / (2 * 0x1f);
+	voll = (m_pan[1] + m_pan[3]) * 100 / (2 * 0x1f);
+	flt_volume_set_volume(m_2610_0l, voll / 100.0);
+	flt_volume_set_volume(m_2610_0r, volr / 100.0);
 
 	/* CH1 */
-	volr = state->m_pan[0] * 100 / 0x1f;
-	voll = state->m_pan[1] * 100 / 0x1f;
-	flt_volume_set_volume(state->m_2610_1l, voll / 100.0);
-	flt_volume_set_volume(state->m_2610_1r, volr / 100.0);
+	volr = m_pan[0] * 100 / 0x1f;
+	voll = m_pan[1] * 100 / 0x1f;
+	flt_volume_set_volume(m_2610_1l, voll / 100.0);
+	flt_volume_set_volume(m_2610_1r, volr / 100.0);
 
 	/* CH2 */
-	volr = state->m_pan[2] * 100 / 0x1f;
-	voll = state->m_pan[3] * 100 / 0x1f;
-	flt_volume_set_volume(state->m_2610_2l, voll / 100.0);
-	flt_volume_set_volume(state->m_2610_2r, volr / 100.0);
+	volr = m_pan[2] * 100 / 0x1f;
+	voll = m_pan[3] * 100 / 0x1f;
+	flt_volume_set_volume(m_2610_2l, voll / 100.0);
+	flt_volume_set_volume(m_2610_2r, volr / 100.0);
 }
 
 
@@ -462,16 +455,16 @@ static WRITE8_HANDLER( othunder_TC0310FAM_w )
 static ADDRESS_MAP_START( othunder_map, AS_PROGRAM, 16, othunder_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x090000, 0x09000f) AM_READWRITE_LEGACY(othunder_tc0220ioc_r, othunder_tc0220ioc_w)
+	AM_RANGE(0x090000, 0x09000f) AM_READWRITE(othunder_tc0220ioc_r, othunder_tc0220ioc_w)
 //  AM_RANGE(0x090006, 0x090007) AM_WRITE_LEGACY(eeprom_w)
 //  AM_RANGE(0x09000c, 0x09000d) AM_WRITENOP   /* ?? (keeps writing 0x77) */
 	AM_RANGE(0x100000, 0x100007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_step1_rbswap_word_w)	/* palette */
 	AM_RANGE(0x200000, 0x20ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
 	AM_RANGE(0x220000, 0x22000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
-	AM_RANGE(0x300000, 0x300003) AM_READWRITE_LEGACY(othunder_sound_r, othunder_sound_w)
+	AM_RANGE(0x300000, 0x300003) AM_READWRITE(othunder_sound_r, othunder_sound_w)
 	AM_RANGE(0x400000, 0x4005ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x500000, 0x500007) AM_READWRITE_LEGACY(othunder_lightgun_r, othunder_lightgun_w)
-	AM_RANGE(0x600000, 0x600003) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x500000, 0x500007) AM_READWRITE(othunder_lightgun_r, othunder_lightgun_w)
+	AM_RANGE(0x600000, 0x600003) AM_WRITE(irq_ack_w)
 ADDRESS_MAP_END
 
 
@@ -484,12 +477,12 @@ static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, othunder_state )
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE_LEGACY(othunder_TC0310FAM_w) /* pan */
+	AM_RANGE(0xe400, 0xe403) AM_WRITE(othunder_TC0310FAM_w) /* pan */
 	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
 	AM_RANGE(0xea00, 0xea00) AM_READ_PORT(ROTARY_PORT_TAG)	/* rotary input */
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(sound_bankswitch_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
 

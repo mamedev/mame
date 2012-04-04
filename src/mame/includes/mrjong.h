@@ -16,6 +16,7 @@ public:
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
+	DECLARE_READ8_MEMBER(io_0x03_r);
 };
 
 

@@ -29,6 +29,7 @@ public:
 	device_t *m_k007121;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(labyrunr_bankswitch_w);
 };
 
 

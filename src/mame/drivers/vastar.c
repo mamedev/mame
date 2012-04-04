@@ -72,36 +72,33 @@ static MACHINE_RESET( vastar )
 	cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( vastar_hold_cpu2_w )
+WRITE8_MEMBER(vastar_state::vastar_hold_cpu2_w)
 {
 	/* I'm not sure that this works exactly like this */
-	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static READ8_HANDLER( vastar_sharedram_r )
+READ8_MEMBER(vastar_state::vastar_sharedram_r)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	return state->m_sharedram[offset];
+	return m_sharedram[offset];
 }
 
-static WRITE8_HANDLER( vastar_sharedram_w )
+WRITE8_MEMBER(vastar_state::vastar_sharedram_w)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	state->m_sharedram[offset] = data;
+	m_sharedram[offset] = data;
 }
 
-static WRITE8_HANDLER( flip_screen_w )
+WRITE8_MEMBER(vastar_state::flip_screen_w)
 {
-	flip_screen_set(space->machine(), data);
+	flip_screen_set(machine(), data);
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(vastar_state::nmi_mask_w)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 
@@ -114,7 +111,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0xc000, 0xc000) AM_WRITEONLY AM_BASE(m_sprite_priority)	/* sprite/BG priority */
 	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE_LEGACY(vastar_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE_LEGACY(watchdog_reset_r, watchdog_reset_w)
-	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE_LEGACY(vastar_sharedram_r, vastar_sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0xf100, 0xf7ff) AM_RAM
 
 	/* in hidden portions of video RAM: (fallthrough) */
@@ -127,15 +124,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_port_map, AS_IO, 8, vastar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nmi_mask_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(flip_screen_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(vastar_hold_cpu2_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(nmi_mask_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(flip_screen_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(vastar_hold_cpu2_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x40ff) AM_READWRITE_LEGACY(vastar_sharedram_r, vastar_sharedram_w)
+	AM_RANGE(0x4000, 0x40ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
 	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("P1")
 	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")

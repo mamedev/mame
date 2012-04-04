@@ -313,74 +313,71 @@ Notes:
     ---- ---- ---- ---x coin counter 0
 */
 
-static WRITE16_HANDLER( terraf_io_w )
+WRITE16_MEMBER(armedf_state::terraf_io_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		nb_1414m4_exec(space,(state->m_text_videoram[0] << 8) | (state->m_text_videoram[1] & 0xff),state->m_text_videoram,state->m_fg_scrollx,state->m_fg_scrolly,state->m_tx_tilemap);
+	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
+		nb_1414m4_exec(&space,(m_text_videoram[0] << 8) | (m_text_videoram[1] & 0xff),m_text_videoram,m_fg_scrollx,m_fg_scrolly,m_tx_tilemap);
 
 
-	COMBINE_DATA(&state->m_vreg);
+	COMBINE_DATA(&m_vreg);
 
-	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
-	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
+	coin_counter_w(machine(), 0, (data & 1) >> 0);
+	coin_counter_w(machine(), 1, (data & 2) >> 1);
 
-	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
+	flip_screen_set(machine(), m_vreg & 0x1000);
 }
 
-static WRITE16_HANDLER( terrafb_io_w )
+WRITE16_MEMBER(armedf_state::terrafb_io_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
-		cputag_set_input_line(space->machine(), "extra", 0, HOLD_LINE);
+	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
+		cputag_set_input_line(machine(), "extra", 0, HOLD_LINE);
 
-	COMBINE_DATA(&state->m_vreg);
+	COMBINE_DATA(&m_vreg);
 
-	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
-	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
+	coin_counter_w(machine(), 0, (data & 1) >> 0);
+	coin_counter_w(machine(), 1, (data & 2) >> 1);
 
-	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
+	flip_screen_set(machine(), m_vreg & 0x1000);
 }
 
-static WRITE16_HANDLER( bootleg_io_w )
+WRITE16_MEMBER(armedf_state::bootleg_io_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	if(data & 0x4000 && ((state->m_vreg & 0x4000) == 0)) //0 -> 1 transition
+	if(data & 0x4000 && ((m_vreg & 0x4000) == 0)) //0 -> 1 transition
 	{
 		// NOP
 	}
 
-	COMBINE_DATA(&state->m_vreg);
+	COMBINE_DATA(&m_vreg);
 
-	coin_counter_w(space->machine(), 0, (data & 1) >> 0);
-	coin_counter_w(space->machine(), 1, (data & 2) >> 1);
+	coin_counter_w(machine(), 0, (data & 1) >> 0);
+	coin_counter_w(machine(), 1, (data & 2) >> 1);
 
-	flip_screen_set(space->machine(), state->m_vreg & 0x1000);
+	flip_screen_set(machine(), m_vreg & 0x1000);
 }
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(armedf_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 		soundlatch_w(space, 0, ((data & 0x7f) << 1) | 1);
 }
 
-static READ8_HANDLER( soundlatch_clear_r )
+READ8_MEMBER(armedf_state::soundlatch_clear_r)
 {
 	soundlatch_clear_w(space, 0, 0);
 	return 0;
 }
 
-static WRITE16_HANDLER( irq_lv1_ack_w )
+WRITE16_MEMBER(armedf_state::irq_lv1_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( irq_lv2_ack_w )
+WRITE16_MEMBER(armedf_state::irq_lv2_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
 }
 
 
@@ -405,12 +402,12 @@ static ADDRESS_MAP_START( terraf_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE_LEGACY(terraf_io_w) handled in DRIVER_INIT
+//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(terraf_io_w) handled in DRIVER_INIT
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE_LEGACY(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE_LEGACY(armedf_bg_scrolly_w)
-	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
 	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP					/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE_LEGACY(irq_lv1_ack_w)
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv1_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kozure_map, AS_PROGRAM, 16, armedf_state )
@@ -439,9 +436,9 @@ static ADDRESS_MAP_START( cclimbr2_map, AS_PROGRAM, 16, armedf_state )
 //  AM_RANGE(0x07c000, 0x07c001) AM_WRITE_LEGACY(io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE_LEGACY(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE_LEGACY(armedf_bg_scrolly_w)
-	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
 	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE_LEGACY(irq_lv2_ack_w)
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16, armedf_state )
@@ -461,24 +458,23 @@ static ADDRESS_MAP_START( legion_map, AS_PROGRAM, 16, armedf_state )
 //  AM_RANGE(0x07c000, 0x07c001) AM_WRITE_LEGACY(legion_io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE_LEGACY(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE_LEGACY(armedf_bg_scrolly_w)
-	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
 	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP		/* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE_LEGACY(irq_lv2_ack_w)
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( legiono_fg_scroll_w )
+WRITE8_MEMBER(armedf_state::legiono_fg_scroll_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
 	if(offset >= 0xb && offset < 0xf)
-		state->m_legion_cmd[offset-0xb] = data & 0xff;
+		m_legion_cmd[offset-0xb] = data & 0xff;
 
-	state->m_fg_scrollx = (state->m_legion_cmd[0x02] & 0xff) | ((state->m_legion_cmd[0x03] & 0x3) << 8);
-	state->m_fg_scrolly = (state->m_legion_cmd[0x00] & 0xff) | ((state->m_legion_cmd[0x01] & 0x3) << 8);
+	m_fg_scrollx = (m_legion_cmd[0x02] & 0xff) | ((m_legion_cmd[0x03] & 0x3) << 8);
+	m_fg_scrolly = (m_legion_cmd[0x00] & 0xff) | ((m_legion_cmd[0x01] & 0x3) << 8);
 }
 
 static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16, armedf_state )
-	AM_RANGE(0x040000, 0x04003f) AM_WRITE8_LEGACY(legiono_fg_scroll_w,0x00ff)
+	AM_RANGE(0x040000, 0x04003f) AM_WRITE8(legiono_fg_scroll_w,0x00ff)
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x061000, 0x063fff) AM_RAM
@@ -492,12 +488,12 @@ static ADDRESS_MAP_START( legiono_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x078002, 0x078003) AM_READ_PORT("P2")
 	AM_RANGE(0x078004, 0x078005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x078006, 0x078007) AM_READ_PORT("DSW2")
-//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE_LEGACY(bootleg_io_w)
+//  AM_RANGE(0x07c000, 0x07c001) AM_WRITE(bootleg_io_w)
 	AM_RANGE(0x07c002, 0x07c003) AM_WRITE_LEGACY(armedf_bg_scrollx_w)
 	AM_RANGE(0x07c004, 0x07c005) AM_WRITE_LEGACY(armedf_bg_scrolly_w)
-	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x07c00a, 0x07c00b) AM_WRITE(sound_command_w)
 	AM_RANGE(0x07c00c, 0x07c00d) AM_WRITENOP      /* Watchdog ? cycle 0000 -> 0100 -> 0200 back to 0000 */
-	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE_LEGACY(irq_lv2_ack_w)
+	AM_RANGE(0x07c00e, 0x07c00f) AM_WRITE(irq_lv2_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16, armedf_state )
@@ -514,90 +510,87 @@ static ADDRESS_MAP_START( armedf_map, AS_PROGRAM, 16, armedf_state )
 	AM_RANGE(0x06c004, 0x06c005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x06c006, 0x06c007) AM_READ_PORT("DSW2")
 	AM_RANGE(0x06c000, 0x06c7ff) AM_RAM
-	AM_RANGE(0x06d000, 0x06d001) AM_WRITE_LEGACY(terraf_io_w)
+	AM_RANGE(0x06d000, 0x06d001) AM_WRITE(terraf_io_w)
 	AM_RANGE(0x06d002, 0x06d003) AM_WRITE_LEGACY(armedf_bg_scrollx_w)
 	AM_RANGE(0x06d004, 0x06d005) AM_WRITE_LEGACY(armedf_bg_scrolly_w)
 	AM_RANGE(0x06d006, 0x06d007) AM_WRITE_LEGACY(armedf_fg_scrollx_w)
 	AM_RANGE(0x06d008, 0x06d009) AM_WRITE_LEGACY(armedf_fg_scrolly_w)
-	AM_RANGE(0x06d00a, 0x06d00b) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x06d00a, 0x06d00b) AM_WRITE(sound_command_w)
 	AM_RANGE(0x06d00c, 0x06d00d) AM_WRITENOP //watchdog
-	AM_RANGE(0x06d00e, 0x06d00f) AM_WRITE_LEGACY(irq_lv1_ack_w)
+	AM_RANGE(0x06d00e, 0x06d00f) AM_WRITE(irq_lv1_ack_w)
 ADDRESS_MAP_END
 
-static READ16_HANDLER( latch_r )
+READ16_MEMBER(bigfghtr_state::latch_r)
 {
-	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 
-	state->m_read_latch = 1;
+	m_read_latch = 1;
 	return 0;
 }
 
-static WRITE16_HANDLER( sharedram_w )
+WRITE16_MEMBER(bigfghtr_state::sharedram_w)
 {
-	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
-	COMBINE_DATA(&state->m_sharedram[offset]);
+	COMBINE_DATA(&m_sharedram[offset]);
 
 	switch(offset)
 	{
 		case 0x40/2:
-			state->m_mcu_input_snippet = (data == 0x100);
-			state->m_mcu_jsr_snippet = (data == 0x300);
+			m_mcu_input_snippet = (data == 0x100);
+			m_mcu_jsr_snippet = (data == 0x300);
 			break;
 	}
 }
 
-static READ16_HANDLER(sharedram_r)
+READ16_MEMBER(bigfghtr_state::sharedram_r)
 {
-	bigfghtr_state *state = space->machine().driver_data<bigfghtr_state>();
 
-	if(state->m_mcu_input_snippet)
+	if(m_mcu_input_snippet)
 	{
 		switch(offset+0x600/2)
 		{
 			case 0x640/2:
-				if(state->m_read_latch)
+				if(m_read_latch)
 				{
-					state->m_read_latch = 0;
-					return space->machine().rand(); // TODO
+					m_read_latch = 0;
+					return machine().rand(); // TODO
 				}
 				break;
 
 			case 0x642/2:
-				return (input_port_read(space->machine(), "DSW0") & 0xffff) ^ 0xffff;
+				return (input_port_read(machine(), "DSW0") & 0xffff) ^ 0xffff;
 
 			case 0x644/2:
-				return (input_port_read(space->machine(), "DSW1") & 0xffff) ^ 0xffff;
+				return (input_port_read(machine(), "DSW1") & 0xffff) ^ 0xffff;
 
 			case 0x646/2:
-				return (input_port_read(space->machine(), "P1") & 0xffff) ^ 0xffff;
+				return (input_port_read(machine(), "P1") & 0xffff) ^ 0xffff;
 
 			case 0x648/2:
-				return (input_port_read(space->machine(), "P2") & 0xffff) ^ 0xffff;
+				return (input_port_read(machine(), "P2") & 0xffff) ^ 0xffff;
 		}
 	}
 
-	if(state->m_mcu_jsr_snippet)
+	if(m_mcu_jsr_snippet)
 	{
 		switch(offset+0x600/2)
 		{
 			case 0x640/2:
-				if(state->m_read_latch)
+				if(m_read_latch)
 				{
-					state->m_read_latch = 0;
-					return space->machine().rand(); // TODO
+					m_read_latch = 0;
+					return machine().rand(); // TODO
 				}
 				break;
 			case 0x642/2:
-				return (input_port_read(space->machine(), "DSW0") & 0xffff) ^ 0xffff;
+				return (input_port_read(machine(), "DSW0") & 0xffff) ^ 0xffff;
 
 			case 0x644/2:
-				return (input_port_read(space->machine(), "DSW1") & 0xffff) ^ 0xffff;
+				return (input_port_read(machine(), "DSW1") & 0xffff) ^ 0xffff;
 
 			case 0x646/2:
-				return (input_port_read(space->machine(), "P1") & 0xffff) ^ 0xffff;
+				return (input_port_read(machine(), "P1") & 0xffff) ^ 0xffff;
 
 			case 0x648/2:
-				return (input_port_read(space->machine(), "P2") & 0xffff) ^ 0xffff;
+				return (input_port_read(machine(), "P2") & 0xffff) ^ 0xffff;
 
 			/*
             protection controls where the program code should jump to.
@@ -674,13 +667,13 @@ static READ16_HANDLER(sharedram_r)
 		}
 	}
 
-	return state->m_sharedram[offset];
+	return m_sharedram[offset];
 }
 
 static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x080600, 0x083fff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x080600, 0x083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0x084000, 0x085fff) AM_RAM //work ram
 	AM_RANGE(0x086000, 0x086fff) AM_RAM_WRITE_LEGACY(armedf_bg_videoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0x087000, 0x087fff) AM_RAM_WRITE_LEGACY(armedf_fg_videoram_w) AM_BASE(m_fg_videoram)
@@ -691,16 +684,16 @@ static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
 	AM_RANGE(0x08c002, 0x08c003) AM_READ_PORT("P2")
 	AM_RANGE(0x08c004, 0x08c005) AM_READ_PORT("DSW0")
 	AM_RANGE(0x08c006, 0x08c007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x08d000, 0x08d001) AM_WRITE_LEGACY(terraf_io_w)	//807b0
+	AM_RANGE(0x08d000, 0x08d001) AM_WRITE(terraf_io_w)	//807b0
 	AM_RANGE(0x08d002, 0x08d003) AM_WRITE_LEGACY(armedf_bg_scrollx_w)
 	AM_RANGE(0x08d004, 0x08d005) AM_WRITE_LEGACY(armedf_bg_scrolly_w)
 	AM_RANGE(0x08d006, 0x08d007) AM_WRITE_LEGACY(armedf_fg_scrollx_w)
 	AM_RANGE(0x08d008, 0x08d009) AM_WRITE_LEGACY(armedf_fg_scrolly_w)
-	AM_RANGE(0x08d00a, 0x08d00b) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x08d00a, 0x08d00b) AM_WRITE(sound_command_w)
 	AM_RANGE(0x08d00c, 0x08d00d) AM_WRITENOP //watchdog
-	AM_RANGE(0x08d00e, 0x08d00f) AM_WRITE_LEGACY(irq_lv1_ack_w)
+	AM_RANGE(0x08d00e, 0x08d00f) AM_WRITE(irq_lv1_ack_w)
 
-	AM_RANGE(0x400000, 0x400001) AM_READ_LEGACY(latch_r)
+	AM_RANGE(0x400000, 0x400001) AM_READ(latch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, armedf_state )
@@ -713,55 +706,50 @@ static ADDRESS_MAP_START( cclimbr2_soundmap, AS_PROGRAM, 8, armedf_state )
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER( blitter_txram_r )
+READ8_MEMBER(armedf_state::blitter_txram_r)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	return state->m_text_videoram[offset] & 0xff;
+	return m_text_videoram[offset] & 0xff;
 }
 
-static WRITE8_HANDLER( blitter_txram_w )
+WRITE8_MEMBER(armedf_state::blitter_txram_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	state->m_text_videoram[offset] = (data & 0xff) | (state->m_text_videoram[offset] & 0xff00);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_text_videoram[offset] = (data & 0xff) | (m_text_videoram[offset] & 0xff00);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( fg_scrollx_w )
+WRITE8_MEMBER(armedf_state::fg_scrollx_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	state->m_fg_scrollx = (data & 0xff) | (state->m_fg_scrollx & 0x300);
+	m_fg_scrollx = (data & 0xff) | (m_fg_scrollx & 0x300);
 }
 
-static WRITE8_HANDLER( fg_scrolly_w )
+WRITE8_MEMBER(armedf_state::fg_scrolly_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	state->m_fg_scrolly = (data & 0xff) | (state->m_fg_scrolly & 0x300);
+	m_fg_scrolly = (data & 0xff) | (m_fg_scrolly & 0x300);
 }
 
-static WRITE8_HANDLER( fg_scroll_msb_w )
+WRITE8_MEMBER(armedf_state::fg_scroll_msb_w)
 {
-	armedf_state *state = space->machine().driver_data<armedf_state>();
 
-	state->m_fg_scrolly = (((data & 0x03) >> 0) << 8) | (state->m_fg_scrolly & 0xff);
-	state->m_fg_scrollx = (((data & 0x0c) >> 2) << 8) | (state->m_fg_scrollx & 0xff);
+	m_fg_scrolly = (((data & 0x03) >> 0) << 8) | (m_fg_scrolly & 0xff);
+	m_fg_scrollx = (((data & 0x0c) >> 2) << 8) | (m_fg_scrollx & 0xff);
 }
 
 
 static ADDRESS_MAP_START( terrafb_extraz80_map, AS_PROGRAM, 8, armedf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE_LEGACY(blitter_txram_r,blitter_txram_w)
+	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(blitter_txram_r,blitter_txram_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( terrafb_extraz80_portmap, AS_IO, 8, armedf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00,0x00) AM_WRITE_LEGACY(fg_scrollx_w)
-	AM_RANGE(0x01,0x01) AM_WRITE_LEGACY(fg_scrolly_w)
-	AM_RANGE(0x02,0x02) AM_WRITE_LEGACY(fg_scroll_msb_w)
+	AM_RANGE(0x00,0x00) AM_WRITE(fg_scrollx_w)
+	AM_RANGE(0x01,0x01) AM_WRITE(fg_scrolly_w)
+	AM_RANGE(0x02,0x02) AM_WRITE(fg_scroll_msb_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
@@ -769,7 +757,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
 	AM_RANGE(0x0, 0x1) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
 	AM_RANGE(0x3, 0x3) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
-	AM_RANGE(0x4, 0x4) AM_READ_LEGACY(soundlatch_clear_r)
+	AM_RANGE(0x4, 0x4) AM_READ(soundlatch_clear_r)
 	AM_RANGE(0x6, 0x6) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -2053,7 +2041,7 @@ static DRIVER_INIT( terraf )
 	armedf_state *state = machine.driver_data<armedf_state>();
 	state->m_scroll_type = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(bootleg_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c006, 0x07c007, FUNC(terraf_fg_scrolly_w) );
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c008, 0x07c009, FUNC(terraf_fg_scrollx_w) );
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0c0000, 0x0c0001, FUNC(terraf_fg_scroll_msb_arm_w) );
@@ -2064,7 +2052,7 @@ static DRIVER_INIT( terrafu )
 	armedf_state *state = machine.driver_data<armedf_state>();
 	state->m_scroll_type = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(terraf_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),state));
 }
 
 static DRIVER_INIT( terrafb )
@@ -2072,7 +2060,7 @@ static DRIVER_INIT( terrafb )
 	armedf_state *state = machine.driver_data<armedf_state>();
 	state->m_scroll_type = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(terrafb_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terrafb_io_w),state));
 }
 
 static DRIVER_INIT( armedf )
@@ -2087,7 +2075,7 @@ static DRIVER_INIT( kozure )
 	armedf_state *state = machine.driver_data<armedf_state>();
 	state->m_scroll_type = 0;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(terraf_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),state));
 
 }
 
@@ -2103,7 +2091,7 @@ static DRIVER_INIT( legion )
 	RAM[0x000488 / 2] = 0x4e71;
 #endif
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(terraf_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),state));
 
 	state->m_scroll_type = 2;
 }
@@ -2119,7 +2107,7 @@ static DRIVER_INIT( legiono )
 	/* No need to patch the checksum routine (see notes) ! */
 #endif
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(bootleg_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::bootleg_io_w),state));
 
 	state->m_scroll_type = 2;
 }
@@ -2128,7 +2116,7 @@ static DRIVER_INIT( cclimbr2 )
 {
 	armedf_state *state = machine.driver_data<armedf_state>();
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07c000, 0x07c001, FUNC(terraf_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07c000, 0x07c001, write16_delegate(FUNC(armedf_state::terraf_io_w),state));
 
 	state->m_scroll_type = 3;
 }

@@ -135,22 +135,20 @@ HT-01B
 #define VBSTART				(224+16)
 
 
-static READ8_HANDLER( thepit_colorram_r )
+READ8_MEMBER(thepit_state::thepit_colorram_r)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
-	return state->m_colorram[offset];
+	return m_colorram[offset];
 }
 
-static WRITE8_HANDLER( thepit_sound_enable_w )
+WRITE8_MEMBER(thepit_state::thepit_sound_enable_w)
 {
-	space->machine().sound().system_enable(data);
+	machine().sound().system_enable(data);
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(thepit_state::nmi_mask_w)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 
@@ -164,10 +162,10 @@ static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(thepit_input_port_0_r) AM_WRITENOP // Not hooked up according to the schematics
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP // coin_lockout_w
-	AM_RANGE(0xb003, 0xb003) AM_WRITE_LEGACY(thepit_sound_enable_w)
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
 	AM_RANGE(0xb004, 0xb005) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(thepit_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(thepit_flip_screen_y_w)
@@ -177,7 +175,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8c00, 0x8fff) AM_READWRITE_LEGACY(thepit_colorram_r, thepit_colorram_w) /* mirror for intrepi2 */
+	AM_RANGE(0x8c00, 0x8fff) AM_READ(thepit_colorram_r) AM_WRITE_LEGACY(thepit_colorram_w) /* mirror for intrepi2 */
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(thepit_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(thepit_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE(m_attributesram)
@@ -185,10 +183,10 @@ static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(thepit_input_port_0_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb002, 0xb002) AM_WRITENOP // coin_lockout_w
-	AM_RANGE(0xb003, 0xb003) AM_WRITE_LEGACY(thepit_sound_enable_w)
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(thepit_sound_enable_w)
 	AM_RANGE(0xb004, 0xb004) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb005, 0xb005) AM_WRITE_LEGACY(intrepid_graphics_bank_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(thepit_flip_screen_x_w)
@@ -1066,27 +1064,26 @@ ROM_END
 */
 
 
-static READ8_HANDLER( rtriv_question_r )
+READ8_MEMBER(thepit_state::rtriv_question_r)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
 	// Set-up the remap table for every 16 bytes
 	if((offset & 0xc00) == 0x800)
 	{
-		state->m_remap_address[offset & 0x0f] = ((offset & 0xf0) >> 4) ^ 0x0f;
+		m_remap_address[offset & 0x0f] = ((offset & 0xf0) >> 4) ^ 0x0f;
 	}
 	// Select which rom to read and the high 5 bits of address
 	else if((offset & 0xc00) == 0x400)
 	{
-		state->m_question_rom = (offset & 0x70) >> 4;
-		state->m_question_address = ((offset & 0x80) << 3) | ((offset & 0x0f) << 11);
+		m_question_rom = (offset & 0x70) >> 4;
+		m_question_address = ((offset & 0x80) << 3) | ((offset & 0x0f) << 11);
 	}
 	// Read the actual byte from question roms
 	else if((offset & 0xc00) == 0xc00)
 	{
-		UINT8 *ROM = space->machine().region("user1")->base();
+		UINT8 *ROM = machine().region("user1")->base();
 		int real_address;
 
-		real_address = (0x8000 * state->m_question_rom) | state->m_question_address | (offset & 0x3f0) | state->m_remap_address[offset & 0x0f];
+		real_address = (0x8000 * m_question_rom) | m_question_address | (offset & 0x3f0) | m_remap_address[offset & 0x0f];
 
 		return ROM[real_address];
 	}
@@ -1097,7 +1094,8 @@ static READ8_HANDLER( rtriv_question_r )
 static DRIVER_INIT( rtriv )
 {
 	// Set-up the weirdest questions read ever done
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x4fff, FUNC(rtriv_question_r));
+	thepit_state *state = machine.driver_data<thepit_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(thepit_state::rtriv_question_r),state));
 }
 
 

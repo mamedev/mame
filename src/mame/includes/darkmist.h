@@ -14,6 +14,7 @@ public:
 	tilemap_t *m_txtilemap;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(darkmist_hw_w);
 };
 
 

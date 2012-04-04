@@ -35,6 +35,9 @@ public:
 
 	required_device<buffered_spriteram8_device> m_spriteram;
 	required_device<buffered_spriteram8_device> m_spriteram2;
+	DECLARE_WRITE8_MEMBER(hcastle_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(hcastle_soundirq_w);
+	DECLARE_WRITE8_MEMBER(hcastle_coin_w);
 };
 
 

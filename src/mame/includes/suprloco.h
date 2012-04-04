@@ -10,6 +10,7 @@ public:
 	int m_control;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(suprloco_soundport_w);
 };
 
 

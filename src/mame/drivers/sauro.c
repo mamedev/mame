@@ -128,34 +128,34 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "machine/nvram.h"
 
 
-static WRITE8_HANDLER( sauro_sound_command_w )
+WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
 {
 	data |= 0x80;
 	soundlatch_w(space, offset, data);
 }
 
-static READ8_HANDLER( sauro_sound_command_r )
+READ8_MEMBER(sauro_state::sauro_sound_command_r)
 {
 	int ret	= soundlatch_r(space, offset);
 	soundlatch_clear_w(space, offset, 0);
 	return ret;
 }
 
-static WRITE8_HANDLER( sauro_coin1_w )
+WRITE8_MEMBER(sauro_state::sauro_coin1_w)
 {
-	coin_counter_w(space->machine(), 0, data);
-	coin_counter_w(space->machine(), 0, 0); // to get the coin counter working in sauro, as it doesn't write 0
+	coin_counter_w(machine(), 0, data);
+	coin_counter_w(machine(), 0, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
-static WRITE8_HANDLER( sauro_coin2_w )
+WRITE8_MEMBER(sauro_state::sauro_coin2_w)
 {
-	coin_counter_w(space->machine(), 1, data);
-	coin_counter_w(space->machine(), 1, 0); // to get the coin counter working in sauro, as it doesn't write 0
+	coin_counter_w(machine(), 1, data);
+	coin_counter_w(machine(), 1, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
-static WRITE8_HANDLER( flip_screen_w )
+WRITE8_MEMBER(sauro_state::flip_screen_w)
 {
-	flip_screen_set(space->machine(), data);
+	flip_screen_set(machine(), data);
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_w )
@@ -179,14 +179,14 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW2")
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("P1")
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("P2")
-	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(sauro_sound_command_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(sauro_sound_command_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE_LEGACY(tecfri_scroll_bg_w)
 	AM_RANGE(0xa1, 0xa1) AM_WRITE_LEGACY(sauro_scroll_fg_w)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(flip_screen_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xc2, 0xc2) AM_WRITENOP		/* coin reset */
-	AM_RANGE(0xc3, 0xc3) AM_WRITE_LEGACY(sauro_coin1_w)
+	AM_RANGE(0xc3, 0xc3) AM_WRITE(sauro_coin1_w)
 	AM_RANGE(0xc4, 0xc4) AM_WRITENOP		/* coin reset */
-	AM_RANGE(0xc5, 0xc5) AM_WRITE_LEGACY(sauro_coin2_w)
+	AM_RANGE(0xc5, 0xc5) AM_WRITE(sauro_coin2_w)
 	AM_RANGE(0xc6, 0xc7) AM_WRITENOP		/* same as 0x80 - verified with debugger */
 	AM_RANGE(0xc8, 0xc8) AM_WRITENOP		/* written every int: 0 written at end   of isr */
 	AM_RANGE(0xc9, 0xc9) AM_WRITENOP		/* written every int: 1 written at start of isr */
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("speech", adpcm_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(sauro_sound_command_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
 	AM_RANGE(0xe000, 0xe006) AM_WRITENOP	/* echo from write to e0000 */
 	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP
 ADDRESS_MAP_END
@@ -223,9 +223,9 @@ static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0xf828, 0xf828) AM_READ_LEGACY(watchdog_reset_r)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE_LEGACY(tecfri_scroll_bg_w)
 	AM_RANGE(0xf838, 0xf838) AM_WRITENOP				/* only written at startup */
-	AM_RANGE(0xf839, 0xf839) AM_WRITE_LEGACY(flip_screen_w)
-	AM_RANGE(0xf83a, 0xf83a) AM_WRITE_LEGACY(sauro_coin1_w)
-	AM_RANGE(0xf83b, 0xf83b) AM_WRITE_LEGACY(sauro_coin2_w)
+	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)
+	AM_RANGE(0xf83a, 0xf83a) AM_WRITE(sauro_coin1_w)
+	AM_RANGE(0xf83b, 0xf83b) AM_WRITE(sauro_coin2_w)
 	AM_RANGE(0xf83c, 0xf83c) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP				/* only written at startup */
 ADDRESS_MAP_END

@@ -60,34 +60,31 @@ Notes:
  * a code reflecting the direction (8 angles) from one point to the other.
  */
 
-static WRITE8_HANDLER( avengers_adpcm_w )
+WRITE8_MEMBER(lwings_state::avengers_adpcm_w)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
-	state->m_adpcm = data;
+	m_adpcm = data;
 }
 
-static READ8_HANDLER( avengers_adpcm_r )
+READ8_MEMBER(lwings_state::avengers_adpcm_r)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
-	return state->m_adpcm;
+	return m_adpcm;
 }
 
-static WRITE8_HANDLER( lwings_bankswitch_w )
+WRITE8_MEMBER(lwings_state::lwings_bankswitch_w)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
 
 	/* bit 0 is flip screen */
-	flip_screen_set(space->machine(), ~data & 0x01);
+	flip_screen_set(machine(), ~data & 0x01);
 
 	/* bits 1 and 2 select ROM bank */
-	memory_set_bank(space->machine(), "bank1", (data & 0x06) >> 1);
+	memory_set_bank(machine(), "bank1", (data & 0x06) >> 1);
 
 	/* bit 3 enables NMI */
-	state->m_nmi_mask = data & 8;
+	m_nmi_mask = data & 8;
 
 	/* bits 6 and 7 are coin counters */
-	coin_counter_w(space->machine(), 1, data & 0x40);
-	coin_counter_w(space->machine(), 0, data & 0x80);
+	coin_counter_w(machine(), 1, data & 0x40);
+	coin_counter_w(machine(), 0, data & 0x80);
 }
 
 static INTERRUPT_GEN( lwings_interrupt )
@@ -107,38 +104,36 @@ static INTERRUPT_GEN( avengers_interrupt )
 }
 
 
-static WRITE8_HANDLER( avengers_protection_w )
+WRITE8_MEMBER(lwings_state::avengers_protection_w)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
-	int pc = cpu_get_pc(&space->device());
+	int pc = cpu_get_pc(&space.device());
 
 	if (pc == 0x2eeb)
 	{
-		state->m_param[0] = data;
+		m_param[0] = data;
 	}
 	else if (pc == 0x2f09)
 	{
-		state->m_param[1] = data;
+		m_param[1] = data;
 	}
 	else if(pc == 0x2f26)
 	{
-		state->m_param[2] = data;
+		m_param[2] = data;
 	}
 	else if (pc == 0x2f43)
 	{
-		state->m_param[3] = data;
+		m_param[3] = data;
 	}
 	else if (pc == 0x0445)
 	{
-		state->m_soundstate = 0x80;
+		m_soundstate = 0x80;
 		soundlatch_w(space, 0, data);
 	}
 }
 
-static WRITE8_HANDLER( avengers_prot_bank_w )
+WRITE8_MEMBER(lwings_state::avengers_prot_bank_w)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
-	state->m_palette_pen = data * 64;
+	m_palette_pen = data * 64;
 }
 
 static int avengers_fetch_paldata( running_machine &machine )
@@ -234,9 +229,8 @@ static int avengers_fetch_paldata( running_machine &machine )
 	return result;
 }
 
-static READ8_HANDLER( avengers_protection_r )
+READ8_MEMBER(lwings_state::avengers_protection_r)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
 	static const int xpos[8] = { 10, 7,  0, -7, -10, -7,   0,  7 };
 	static const int ypos[8] = {  0, 7, 10,  7,   0, -7, -10, -7 };
 	int best_dist = 0;
@@ -244,10 +238,10 @@ static READ8_HANDLER( avengers_protection_r )
 	int x, y;
 	int dx, dy, dist, dir;
 
-	if (cpu_get_pc(&space->device()) == 0x7c7)
+	if (cpu_get_pc(&space.device()) == 0x7c7)
 	{
 		/* palette data */
-		return avengers_fetch_paldata(space->machine());
+		return avengers_fetch_paldata(machine());
 	}
 
 	/*  Point to Angle Function
@@ -255,8 +249,8 @@ static READ8_HANDLER( avengers_protection_r )
         Input: two cartesian points
         Output: direction code (north,northeast,east,...)
      */
-	x = state->m_param[0] - state->m_param[2];
-	y = state->m_param[1] - state->m_param[3];
+	x = m_param[0] - m_param[2];
+	y = m_param[1] - m_param[3];
 	for (dir = 0; dir < 8; dir++)
 	{
 		dx = xpos[dir] - x;
@@ -271,11 +265,10 @@ static READ8_HANDLER( avengers_protection_r )
 	return best_dir << 5;
 }
 
-static READ8_HANDLER( avengers_soundlatch2_r )
+READ8_MEMBER(lwings_state::avengers_soundlatch2_r)
 {
-	lwings_state *state = space->machine().driver_data<lwings_state>();
-	UINT8 data = *state->m_soundlatch2 | state->m_soundstate;
-	state->m_soundstate = 0;
+	UINT8 data = *m_soundlatch2 | m_soundstate;
+	m_soundstate = 0;
 	return(data);
 }
 
@@ -303,12 +296,12 @@ static ADDRESS_MAP_START( avengers_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf805, 0xf805) AM_WRITE_LEGACY(trojan_bg2_image_w)
 
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("SERVICE") AM_WRITENOP /* ? */
-	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1") AM_WRITE_LEGACY(avengers_protection_w)
+	AM_RANGE(0xf809, 0xf809) AM_READ_PORT("P1") AM_WRITE(avengers_protection_w)
 	AM_RANGE(0xf80a, 0xf80a) AM_READ_PORT("P2")
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWB")
-	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWA") AM_WRITE_LEGACY(avengers_prot_bank_w)
-	AM_RANGE(0xf80d, 0xf80d) AM_READWRITE_LEGACY(avengers_protection_r,avengers_adpcm_w)
-	AM_RANGE(0xf80e, 0xf80e) AM_WRITE_LEGACY(lwings_bankswitch_w)
+	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWA") AM_WRITE(avengers_prot_bank_w)
+	AM_RANGE(0xf80d, 0xf80d) AM_READWRITE(avengers_protection_r,avengers_adpcm_w)
+	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
@@ -329,7 +322,7 @@ static ADDRESS_MAP_START( lwings_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80a, 0xf80b) AM_WRITE_LEGACY(lwings_bg1_scrolly_w)
 	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xf80d, 0xf80d) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0xf80e, 0xf80e) AM_WRITE_LEGACY(lwings_bankswitch_w)
+	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8, lwings_state )
@@ -353,7 +346,7 @@ static ADDRESS_MAP_START( trojan_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xf80b, 0xf80b) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf80c, 0xf80c) AM_READ_PORT("DSWB") AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xf80d, 0xf80d) AM_WRITE_LEGACY(soundlatch2_w)
-	AM_RANGE(0xf80e, 0xf80e) AM_WRITE_LEGACY(lwings_bankswitch_w)
+	AM_RANGE(0xf80e, 0xf80e) AM_WRITE(lwings_bankswitch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lwings_sound_map, AS_PROGRAM, 8, lwings_state )
@@ -362,7 +355,7 @@ static ADDRESS_MAP_START( lwings_sound_map, AS_PROGRAM, 8, lwings_state )
 	AM_RANGE(0xc800, 0xc800) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("2203a", ym2203_w)
 	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE_LEGACY("2203b", ym2203_w)
-	AM_RANGE(0xe006, 0xe006) AM_READ_LEGACY(avengers_soundlatch2_r) //AT: (avengers061gre)
+	AM_RANGE(0xe006, 0xe006) AM_READ(avengers_soundlatch2_r) //AT: (avengers061gre)
 	AM_RANGE(0xe006, 0xe006) AM_WRITEONLY AM_BASE(m_soundlatch2)
 ADDRESS_MAP_END
 
@@ -373,7 +366,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avengers_adpcm_io_map, AS_IO, 8, lwings_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(avengers_adpcm_r)
+	AM_RANGE(0x00, 0x00) AM_READ(avengers_adpcm_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("5205", msm5205_w)
 ADDRESS_MAP_END
 

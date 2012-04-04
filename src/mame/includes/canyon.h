@@ -28,6 +28,9 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
+	DECLARE_READ8_MEMBER(canyon_switches_r);
+	DECLARE_READ8_MEMBER(canyon_options_r);
+	DECLARE_WRITE8_MEMBER(canyon_led_w);
 };
 
 

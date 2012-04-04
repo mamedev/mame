@@ -31,6 +31,13 @@ public:
 	UINT8    m_nmi_mask;
 
 	required_device<buffered_spriteram8_device> m_spriteram;
+	DECLARE_WRITE8_MEMBER(avengers_adpcm_w);
+	DECLARE_READ8_MEMBER(avengers_adpcm_r);
+	DECLARE_WRITE8_MEMBER(lwings_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(avengers_protection_w);
+	DECLARE_WRITE8_MEMBER(avengers_prot_bank_w);
+	DECLARE_READ8_MEMBER(avengers_protection_r);
+	DECLARE_READ8_MEMBER(avengers_soundlatch2_r);
 };
 
 

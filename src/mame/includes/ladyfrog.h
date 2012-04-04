@@ -32,6 +32,13 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_READ8_MEMBER(from_snd_r);
+	DECLARE_WRITE8_MEMBER(to_main_w);
+	DECLARE_WRITE8_MEMBER(sound_cpu_reset_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_READ8_MEMBER(snd_flag_r);
 };
 
 

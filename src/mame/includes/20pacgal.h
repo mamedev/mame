@@ -37,6 +37,14 @@ public:
 	UINT8 m_sprite_pal_base;
 
 	UINT8 m_irq_mask;
+	DECLARE_WRITE8_MEMBER(irqack_w);
+	DECLARE_WRITE8_MEMBER(timer_pulse_w);
+	DECLARE_WRITE8_MEMBER(_20pacgal_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(ram_bank_select_w);
+	DECLARE_WRITE8_MEMBER(ram_48000_w);
+	DECLARE_WRITE8_MEMBER(sprite_gfx_w);
+	DECLARE_WRITE8_MEMBER(sprite_ram_w);
+	DECLARE_WRITE8_MEMBER(sprite_lookup_w);
 };
 
 

@@ -17,24 +17,21 @@
 #include "sound/dac.h"
 #include "includes/flstory.h"
 
-static READ8_HANDLER( from_snd_r )
+READ8_MEMBER(flstory_state::from_snd_r)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->m_snd_flag = 0;
-	return state->m_snd_data;
+	m_snd_flag = 0;
+	return m_snd_data;
 }
 
-static READ8_HANDLER( snd_flag_r )
+READ8_MEMBER(flstory_state::snd_flag_r)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	return state->m_snd_flag | 0xfd;
+	return m_snd_flag | 0xfd;
 }
 
-static WRITE8_HANDLER( to_main_w )
+WRITE8_MEMBER(flstory_state::to_main_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->m_snd_data = data;
-	state->m_snd_flag = 2;
+	m_snd_data = data;
+	m_snd_flag = 2;
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -46,27 +43,25 @@ static TIMER_CALLBACK( nmi_callback )
 		state->m_pending_nmi = 1;
 }
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(flstory_state::sound_command_w)
 {
 	soundlatch_w(space, 0, data);
-	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
 
-static WRITE8_HANDLER( nmi_disable_w )
+WRITE8_MEMBER(flstory_state::nmi_disable_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->m_sound_nmi_enable = 0;
+	m_sound_nmi_enable = 0;
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(flstory_state::nmi_enable_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->m_sound_nmi_enable = 1;
-	if (state->m_pending_nmi)
+	m_sound_nmi_enable = 1;
+	if (m_pending_nmi)
 	{
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->m_pending_nmi = 0;
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_pending_nmi = 0;
 	}
 }
 
@@ -77,8 +72,8 @@ static ADDRESS_MAP_START( flstory_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(flstory_mcu_r, flstory_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP	/* coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_NOP	/* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
@@ -103,8 +98,8 @@ static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(onna34ro_mcu_r, onna34ro_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
 	AM_RANGE(0xd002, 0xd002) AM_WRITENOP	/* coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_NOP	/* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
@@ -137,8 +132,8 @@ static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(victnine_mcu_r, victnine_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
 	AM_RANGE(0xd002, 0xd002) AM_NOP	/* unknown read & coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 	AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
@@ -158,26 +153,25 @@ static ADDRESS_MAP_START( victnine_map, AS_PROGRAM, 8, flstory_state )
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( rumba_mcu_r )
+READ8_MEMBER(flstory_state::rumba_mcu_r)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	//printf("PC=%04x R %02x\n",cpu_get_pc(&space->device()),state->m_mcu_cmd);
+	//printf("PC=%04x R %02x\n",cpu_get_pc(&space.device()),m_mcu_cmd);
 
-	if((state->m_mcu_cmd & 0xf0) == 0x00) // end packet cmd, value returned is meaningless (probably used for main <-> mcu comms syncronization)
+	if((m_mcu_cmd & 0xf0) == 0x00) // end packet cmd, value returned is meaningless (probably used for main <-> mcu comms syncronization)
 		return 0;
 
-	switch(state->m_mcu_cmd)
+	switch(m_mcu_cmd)
 	{
 		case 0x73: return 0xa4; //initial MCU check
-		case 0x33: return state->m_mcu_b2_res; //0xb2 result
-		case 0x31: return state->m_mcu_b1_res; //0xb1 result
+		case 0x33: return m_mcu_b2_res; //0xb2 result
+		case 0x31: return m_mcu_b1_res; //0xb1 result
 
-		case 0x35: state->m_mcu_b5_res = 1; state->m_mcu_b6_res = 1; return 0;
-		case 0x36: return state->m_mcu_b4_cmd; //0xb4 command, extra protection for lives (first play only), otherwise game gives one extra life at start-up (!)
-		case 0x37: return state->m_mcu_b5_res; //0xb4 / 0xb5 / 0xb6 result y value
-		case 0x38: return state->m_mcu_b6_res; //x value
+		case 0x35: m_mcu_b5_res = 1; m_mcu_b6_res = 1; return 0;
+		case 0x36: return m_mcu_b4_cmd; //0xb4 command, extra protection for lives (first play only), otherwise game gives one extra life at start-up (!)
+		case 0x37: return m_mcu_b5_res; //0xb4 / 0xb5 / 0xb6 result y value
+		case 0x38: return m_mcu_b6_res; //x value
 
-		case 0x3b: return state->m_mcu_bb_res; //0xbb result
+		case 0x3b: return m_mcu_bb_res; //0xbb result
 		case 0x40: return 0;
 		case 0x41: return 0;
 		case 0x42:
@@ -194,7 +188,7 @@ static READ8_HANDLER( rumba_mcu_r )
             */
 			//static UINT8 level_val;
 
-			//level_val = space->read_byte(0xe247);
+			//level_val = read_byte(0xe247);
 
 			//popmessage("%02x",level_val);
 
@@ -204,28 +198,27 @@ static READ8_HANDLER( rumba_mcu_r )
 			return 0;
 		}
 		//case 0x42: return 0x06;
-		//default:  printf("PC=%04x R %02x\n",cpu_get_pc(&space->device()),state->m_mcu_cmd); break;
+		//default:  printf("PC=%04x R %02x\n",cpu_get_pc(&space.device()),m_mcu_cmd); break;
 	}
 
 	return 0;
 }
 
-static WRITE8_HANDLER( rumba_mcu_w )
+WRITE8_MEMBER(flstory_state::rumba_mcu_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	//if((state->m_mcu_cmd & 0xf0) == 0xc0)
+	//if((m_mcu_cmd & 0xf0) == 0xc0)
 	//  printf("%02x ",data);
 
-	//if(state->m_mcu_cmd == 0x42)
+	//if(m_mcu_cmd == 0x42)
 	//  printf("\n");
 
-	if(state->m_mcu_param)
+	if(m_mcu_param)
 	{
-		state->m_mcu_param = 0; // clear param
+		m_mcu_param = 0; // clear param
 
-		//printf("%02x %02x\n",state->m_mcu_cmd,data);
+		//printf("%02x %02x\n",m_mcu_cmd,data);
 
-		switch(state->m_mcu_cmd)
+		switch(m_mcu_cmd)
 		{
 			case 0xb0: // counter, used by command 0xb1 (and something else?
 			{
@@ -233,21 +226,21 @@ static WRITE8_HANDLER( rumba_mcu_w )
                 sends 0xb0 -> param then 0xb1 -> param -> 0x01 (end of cmd packet?) finally 0x31 for reply
                 */
 
-				state->m_mcu_counter = data;
+				m_mcu_counter = data;
 
 				break;
 			}
 			case 0xb1: // player death sequence, controls X position
 			{
-				state->m_mcu_b1_res = data;
+				m_mcu_b1_res = data;
 
 				/* TODO: this is pretty hard to simulate ... */
-				if(state->m_mcu_counter >= 0x10)
-					state->m_mcu_b1_res++; // left
-				else if(state->m_mcu_counter >= 0x08)
-					state->m_mcu_b1_res--; // right
+				if(m_mcu_counter >= 0x10)
+					m_mcu_b1_res++; // left
+				else if(m_mcu_counter >= 0x08)
+					m_mcu_b1_res--; // right
 				else
-					state->m_mcu_b1_res++; // left again
+					m_mcu_b1_res++; // left again
 
 				break;
 			}
@@ -259,10 +252,10 @@ static WRITE8_HANDLER( rumba_mcu_w )
 
 				switch(data)
 				{
-					case 1: state->m_mcu_b2_res = 0xaa; break; //left
-					case 2: state->m_mcu_b2_res = 0xaa; break; //right
-					case 4: state->m_mcu_b2_res = 0xab; break; //down
-					case 8: state->m_mcu_b2_res = 0xa9; break; //up
+					case 1: m_mcu_b2_res = 0xaa; break; //left
+					case 2: m_mcu_b2_res = 0xaa; break; //right
+					case 4: m_mcu_b2_res = 0xab; break; //down
+					case 8: m_mcu_b2_res = 0xa9; break; //up
 				}
 				break;
 			}
@@ -272,15 +265,15 @@ static WRITE8_HANDLER( rumba_mcu_w )
                 sends 0xbb -> param -> 0x04 (end of cmd packet?) then 0x3b for reply
                 */
 
-				state->m_mcu_bb_res = data;
-				//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(&space->device()),state->m_mcu_cmd,data);
+				m_mcu_bb_res = data;
+				//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(&space.device()),m_mcu_cmd,data);
 				break;
 			}
 			case 0xb4: // when the bird touches the top / bottom / left / right of the screen, for correct repositioning
 			{
-				state->m_mcu_b4_cmd = data;
+				m_mcu_b4_cmd = data;
 
-				//popmessage("%02x",state->m_mcu_b4_cmd);
+				//popmessage("%02x",m_mcu_b4_cmd);
 
 				/*
                 sends 0xb4 -> param -> 0xb5 -> param (bird X coord) -> 0xb6 -> param (bird Y coord) ->
@@ -300,54 +293,54 @@ static WRITE8_HANDLER( rumba_mcu_w )
 			case 0xb5: // bird X coord
 			{
 				/* TODO: values might be off by one */
-				state->m_mcu_b5_res = data;
+				m_mcu_b5_res = data;
 
-				if(state->m_mcu_b4_cmd == 3) // from right to left
-					state->m_mcu_b5_res = 0x0d;
+				if(m_mcu_b4_cmd == 3) // from right to left
+					m_mcu_b5_res = 0x0d;
 
-				if(state->m_mcu_b4_cmd == 2) // from left to right
-					state->m_mcu_b5_res = 0xe4;
+				if(m_mcu_b4_cmd == 2) // from left to right
+					m_mcu_b5_res = 0xe4;
 
 				break;
 			}
 			case 0xb6: // bird Y coord
 			{
-				state->m_mcu_b6_res = data;
+				m_mcu_b6_res = data;
 
-				if(state->m_mcu_b4_cmd == 1) // from up to down
-					state->m_mcu_b6_res = 0x04;
+				if(m_mcu_b4_cmd == 1) // from up to down
+					m_mcu_b6_res = 0x04;
 
-				if(state->m_mcu_b4_cmd == 4) // from down to up
-					state->m_mcu_b6_res = 0xdc;
+				if(m_mcu_b4_cmd == 4) // from down to up
+					m_mcu_b6_res = 0xdc;
 
 				break;
 			}
 		}
 
-		//if((state->m_mcu_cmd & 0xf0) == 0xc0)
+		//if((m_mcu_cmd & 0xf0) == 0xc0)
 		//  printf("%02x ",data);
 
-		//if(state->m_mcu_cmd == 0xc7)
+		//if(m_mcu_cmd == 0xc7)
 		//  printf("\n");
 
 		return;
 	}
 
-	state->m_mcu_cmd = data;
+	m_mcu_cmd = data;
 
-	if(((data & 0xf0) == 0xb0 || (data & 0xf0) == 0xc0) && state->m_mcu_param == 0)
-		state->m_mcu_param = 1;
+	if(((data & 0xf0) == 0xb0 || (data & 0xf0) == 0xc0) && m_mcu_param == 0)
+		m_mcu_param = 1;
 }
 
 static ADDRESS_MAP_START( rumba_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(flstory_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 //  AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
-	AM_RANGE(0xd000, 0xd000) AM_READWRITE_LEGACY(rumba_mcu_r, rumba_mcu_w)
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE(rumba_mcu_r, rumba_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
 //  AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE_LEGACY(from_snd_r, sound_command_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ_LEGACY(snd_flag_r)
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
 //  AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
@@ -452,9 +445,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_DEVWRITE_LEGACY("msm", sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_DEVWRITE_LEGACY("msm", sound_control_1_w)
-	AM_RANGE(0xd800, 0xd800) AM_READWRITE_LEGACY(soundlatch_r, to_main_w)
-	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE_LEGACY(nmi_enable_w)			/* unknown read*/
-	AM_RANGE(0xdc00, 0xdc00) AM_WRITE_LEGACY(nmi_disable_w)
+	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(soundlatch_r) AM_WRITE(to_main_w)
+	AM_RANGE(0xda00, 0xda00) AM_READNOP AM_WRITE(nmi_enable_w)			/* unknown read*/
+	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE_LEGACY("dac", dac_w)	/* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM											/* space for diagnostics ROM */
 ADDRESS_MAP_END

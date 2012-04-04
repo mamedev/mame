@@ -30,23 +30,23 @@ TODO:
 #include "sound/dac.h"
 #include "includes/tagteam.h"
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(tagteam_state::sound_command_w)
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( irq_clear_w )
+WRITE8_MEMBER(tagteam_state::irq_clear_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P2") AM_WRITE_LEGACY(tagteam_flipscreen_w)
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE_LEGACY(tagteam_control_w)
-	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(sound_command_w)
-	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(irq_clear_w)
+	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("DSW1") AM_WRITE(sound_command_w)
+	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("DSW2") AM_WRITE(irq_clear_w)
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE_LEGACY(tagteam_mirrorvideoram_r, tagteam_mirrorvideoram_w)
 	AM_RANGE(0x4400, 0x47ff) AM_READWRITE_LEGACY(tagteam_mirrorcolorram_r, tagteam_mirrorcolorram_w)
 	AM_RANGE(0x4800, 0x4fff) AM_READONLY
@@ -55,11 +55,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( sound_nmi_mask_w )
+WRITE8_MEMBER(tagteam_state::sound_nmi_mask_w)
 {
-	tagteam_state *state = space->machine().driver_data<tagteam_state>();
 
-	state->m_sound_nmi_mask = data & 1;
+	m_sound_nmi_mask = data & 1;
 }
 
 /* Same as Syusse Oozumou */
@@ -68,7 +67,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(0x2005, 0x2005) AM_WRITE_LEGACY(sound_nmi_mask_w)
+	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
 	AM_RANGE(0x2007, 0x2007) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END

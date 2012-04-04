@@ -25,9 +25,9 @@ TODO:
 #include "includes/xyonix.h"
 
 
-static WRITE8_HANDLER( xyonix_irqack_w )
+WRITE8_MEMBER(xyonix_state::xyonix_irqack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -72,64 +72,62 @@ static void handle_coins(running_machine &machine, int coin)
 }
 
 
-static READ8_HANDLER ( xyonix_io_r )
+READ8_MEMBER(xyonix_state::xyonix_io_r)
 {
-	xyonix_state *state = space->machine().driver_data<xyonix_state>();
-	int regPC = cpu_get_pc(&space->device());
+	int regPC = cpu_get_pc(&space.device());
 
 	if (regPC == 0x27ba)
 		return 0x88;
 
 	if (regPC == 0x27c2)
-		return state->m_e0_data;
+		return m_e0_data;
 
 	if (regPC == 0x27c7)
 	{
 		int coin;
 
-		switch (state->m_e0_data)
+		switch (m_e0_data)
 		{
 			case 0x81 :
-				return input_port_read(space->machine(), "P1") & 0x7f;
+				return input_port_read(machine(), "P1") & 0x7f;
 			case 0x82 :
-				return input_port_read(space->machine(), "P2") & 0x7f;
+				return input_port_read(machine(), "P2") & 0x7f;
 			case 0x91:
 				/* check coin inputs */
-				coin = ((input_port_read(space->machine(), "P1") & 0x80) >> 7) | ((input_port_read(space->machine(), "P2") & 0x80) >> 6);
-				if (coin ^ state->m_prev_coin && coin != 3)
+				coin = ((input_port_read(machine(), "P1") & 0x80) >> 7) | ((input_port_read(machine(), "P2") & 0x80) >> 6);
+				if (coin ^ m_prev_coin && coin != 3)
 				{
-					if (state->m_credits < 9) handle_coins(space->machine(), coin);
+					if (m_credits < 9) handle_coins(machine(), coin);
 				}
-				state->m_prev_coin = coin;
-				return state->m_credits;
+				m_prev_coin = coin;
+				return m_credits;
 			case 0x92:
-				return ((input_port_read(space->machine(), "P1") & 0x80) >> 7) | ((input_port_read(space->machine(), "P2") & 0x80) >> 6);
+				return ((input_port_read(machine(), "P1") & 0x80) >> 7) | ((input_port_read(machine(), "P2") & 0x80) >> 6);
 			case 0xe0:	/* reset? */
-				state->m_coins = 0;
-				state->m_credits = 0;
+				m_coins = 0;
+				m_credits = 0;
 				return 0xff;
 			case 0xe1:
-				state->m_credits--;
+				m_credits--;
 				return 0xff;
 			case 0xfe:	/* Dip Switches 1 to 4 */
-				return input_port_read(space->machine(), "DSW") & 0x0f;
+				return input_port_read(machine(), "DSW") & 0x0f;
 			case 0xff:	/* Dip Switches 5 to 8 */
-				return input_port_read(space->machine(), "DSW") >> 4;
+				return input_port_read(machine(), "DSW") >> 4;
 		}
 	}
 
-	//logerror ("xyonix_port_e0_r - PC = %04x - port = %02x\n", regPC, state->m_e0_data);
-	//popmessage("%02x",state->m_e0_data);
+	//logerror ("xyonix_port_e0_r - PC = %04x - port = %02x\n", regPC, m_e0_data);
+	//popmessage("%02x",m_e0_data);
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER ( xyonix_io_w )
+WRITE8_MEMBER(xyonix_state::xyonix_io_w)
 {
-	xyonix_state *state = space->machine().driver_data<xyonix_state>();
 
-	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, cpu_get_pc(&space->device()));
-	state->m_e0_data = data;
+	//logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, cpu_get_pc(&space.device()));
+	m_e0_data = data;
 }
 
 /* Mem / Port Maps ***********************************************************/
@@ -145,9 +143,9 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, xyonix_state )
 	AM_RANGE(0x20, 0x20) AM_READNOP AM_DEVWRITE_LEGACY("sn1", sn76496_w)	/* SN76496 ready signal */
 	AM_RANGE(0x21, 0x21) AM_READNOP AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 	AM_RANGE(0x40, 0x40) AM_WRITENOP		/* NMI ack? */
-	AM_RANGE(0x50, 0x50) AM_WRITE_LEGACY(xyonix_irqack_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(xyonix_irqack_w)
 	AM_RANGE(0x60, 0x61) AM_WRITENOP		/* mc6845 */
-	AM_RANGE(0xe0, 0xe0) AM_READWRITE_LEGACY(xyonix_io_r, xyonix_io_w)
+	AM_RANGE(0xe0, 0xe0) AM_READWRITE(xyonix_io_r, xyonix_io_w)
 ADDRESS_MAP_END
 
 /* Inputs Ports **************************************************************/

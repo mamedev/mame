@@ -19,6 +19,7 @@ public:
 
 	/* misc */
 	int      m_counter;
+	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
 };
 
 

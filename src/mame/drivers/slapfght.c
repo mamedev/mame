@@ -353,14 +353,14 @@ static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static READ8_HANDLER(tigerh_status_r)
+READ8_MEMBER(slapfght_state::tigerh_status_r)
 {
-	return (slapfight_port_00_r(space, 0) & 0xf9)| ((tigerh_mcu_status_r(space, 0)));
+	return (slapfight_port_00_r(&space, 0) & 0xf9)| ((tigerh_mcu_status_r(&space, 0)));
 }
 
 static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(tigerh_status_r, slapfight_port_00_w)	/* status register */
+	AM_RANGE(0x00, 0x00) AM_READ(tigerh_status_r) AM_WRITE_LEGACY(slapfight_port_00_w)	/* status register */
 	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(slapfight_port_01_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(slapfight_flipscreen_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(slapfight_port_06_w)
@@ -1749,7 +1749,7 @@ static DRIVER_INIT( tigerhb )
 }
 
 
-static READ8_HANDLER( gtstarb1_port_0_read )
+READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
 {
 	/* The bootleg has it's own 'protection' on startup ?
         6D1A: 06 04         ld   b,$04
@@ -1770,10 +1770,10 @@ static READ8_HANDLER( gtstarb1_port_0_read )
         6D38: 20 F8         jr   nz,$6D32
         6D3A: 10 E0         djnz $6D1C
     */
-	if (cpu_get_pc(&space->device()) == 0x6d1e) return 0;
-	if (cpu_get_pc(&space->device()) == 0x6d24) return 6;
-	if (cpu_get_pc(&space->device()) == 0x6d2c) return 2;
-	if (cpu_get_pc(&space->device()) == 0x6d34) return 4;
+	if (cpu_get_pc(&space.device()) == 0x6d1e) return 0;
+	if (cpu_get_pc(&space.device()) == 0x6d24) return 6;
+	if (cpu_get_pc(&space.device()) == 0x6d2c) return 2;
+	if (cpu_get_pc(&space.device()) == 0x6d34) return 4;
 
 	/* The bootleg hangs in the "test mode" before diplaying (wrong) lives settings :
         6AD4: DB 00         in   a,($00)
@@ -1794,11 +1794,11 @@ static READ8_HANDLER( gtstarb1_port_0_read )
         6AF7: 20 FA         jr   nz,$6AF3
        This seems to be what used to be the MCU status.
     */
-	if (cpu_get_pc(&space->device()) == 0x6ad6) return 2; /* bit 1 must be ON */
-	if (cpu_get_pc(&space->device()) == 0x6ae4) return 2; /* bit 1 must be ON */
-	if (cpu_get_pc(&space->device()) == 0x6af5) return 0; /* bit 2 must be OFF */
+	if (cpu_get_pc(&space.device()) == 0x6ad6) return 2; /* bit 1 must be ON */
+	if (cpu_get_pc(&space.device()) == 0x6ae4) return 2; /* bit 1 must be ON */
+	if (cpu_get_pc(&space.device()) == 0x6af5) return 0; /* bit 2 must be OFF */
 
-	logerror("Port Read PC=%04x\n",cpu_get_pc(&space->device()));
+	logerror("Port Read PC=%04x\n",cpu_get_pc(&space.device()));
 
 	return 0;
 }
@@ -1832,7 +1832,7 @@ static DRIVER_INIT( gtstarb1 )
 	getstar_init(machine);
 
 	/* specific handlers for this bootleg */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x0, 0x0, FUNC(gtstarb1_port_0_read) );
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),state));
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
        that the bootleg simply shouldn't execute the code due to the modified roms */

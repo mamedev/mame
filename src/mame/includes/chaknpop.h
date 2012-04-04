@@ -31,6 +31,7 @@ public:
 	UINT8    m_gfxmode;
 	UINT8    m_flip_x;
 	UINT8    m_flip_y;
+	DECLARE_WRITE8_MEMBER(coinlock_w);
 };
 
 

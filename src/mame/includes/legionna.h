@@ -23,6 +23,7 @@ public:
 	UINT16 m_fore_gfx_bank;
 	UINT16 m_mid_gfx_bank;
 	required_shared_ptr<UINT16> m_spriteram;
+	DECLARE_WRITE16_MEMBER(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w);
 };
 
 

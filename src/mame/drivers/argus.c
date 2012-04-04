@@ -174,13 +174,13 @@ static const ym2203_interface ym2203_config =
 
 ***************************************************************************/
 
-static WRITE8_HANDLER( argus_bankselect_w )
+WRITE8_MEMBER(argus_state::argus_bankselect_w)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + ((data & 7) * 0x4000);
-	memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
+	memory_set_bankptr(machine(), "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
 }
 
 
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( argus_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc200, 0xc200) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE_LEGACY(argus_flipscreen_w)
-	AM_RANGE(0xc202, 0xc202) AM_WRITE_LEGACY(argus_bankselect_w)
+	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
 	AM_RANGE(0xc300, 0xc301) AM_RAM AM_BASE(m_bg0_scrollx)
 	AM_RANGE(0xc302, 0xc303) AM_RAM AM_BASE(m_bg0_scrolly)
 	AM_RANGE(0xc308, 0xc309) AM_RAM AM_BASE(m_bg1_scrollx)
@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( valtric_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc200, 0xc200) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE_LEGACY(argus_flipscreen_w)
-	AM_RANGE(0xc202, 0xc202) AM_WRITE_LEGACY(argus_bankselect_w)
+	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE_LEGACY(valtric_unknown_w)
 	AM_RANGE(0xc308, 0xc309) AM_RAM AM_BASE(m_bg1_scrollx)
 	AM_RANGE(0xc30a, 0xc30b) AM_RAM AM_BASE(m_bg1_scrolly)
@@ -249,7 +249,7 @@ static ADDRESS_MAP_START( butasan_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc100, 0xc100) AM_WRITE_LEGACY(butasan_unknown_w)
 	AM_RANGE(0xc200, 0xc200) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE_LEGACY(argus_flipscreen_w)
-	AM_RANGE(0xc202, 0xc202) AM_WRITE_LEGACY(argus_bankselect_w)
+	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
 	AM_RANGE(0xc203, 0xc203) AM_WRITE_LEGACY(butasan_pageselect_w)
 	AM_RANGE(0xc300, 0xc301) AM_RAM AM_BASE(m_bg0_scrollx)
 	AM_RANGE(0xc302, 0xc303) AM_RAM AM_BASE(m_bg0_scrolly)

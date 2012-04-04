@@ -347,58 +347,55 @@ static TIMER_DEVICE_CALLBACK( psychic5_scanline )
 
 ***************************************************************************/
 
-static READ8_HANDLER( psychic5_bankselect_r )
+READ8_MEMBER(psychic5_state::psychic5_bankselect_r)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	return state->m_bank_latch;
+	return m_bank_latch;
 }
 
-static WRITE8_HANDLER( psychic5_bankselect_w )
+WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 	int bankaddress;
 
-	if (state->m_bank_latch != data)
+	if (m_bank_latch != data)
 	{
-		state->m_bank_latch = data;
+		m_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 3) * 0x4000);
-		memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);	 /* Select 4 banks of 16k */
+		memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);	 /* Select 4 banks of 16k */
 	}
 }
 
-static WRITE8_HANDLER( bombsa_bankselect_w )
+WRITE8_MEMBER(psychic5_state::bombsa_bankselect_w)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 	int bankaddress;
 
-	if (state->m_bank_latch != data)
+	if (m_bank_latch != data)
 	{
-		state->m_bank_latch = data;
+		m_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 7) * 0x4000);
-		memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
+		memory_set_bankptr(machine(), "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
 	}
 }
 
-static WRITE8_HANDLER( psychic5_coin_counter_w )
+WRITE8_MEMBER(psychic5_state::psychic5_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(space->machine(), !flip_screen_get(space->machine()));
+		flip_screen_set(machine(), !flip_screen_get(machine()));
 	}
 }
 
-static WRITE8_HANDLER( bombsa_flipscreen_w )
+WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
 {
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(space->machine(), !flip_screen_get(space->machine()));
+		flip_screen_set(machine(), !flip_screen_get(machine()));
 	}
 }
 
@@ -415,8 +412,8 @@ static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(psychic5_paged_ram_r, psychic5_paged_ram_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_RAM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0xf001, 0xf001) AM_READNOP AM_WRITE_LEGACY(psychic5_coin_counter_w)
-	AM_RANGE(0xf002, 0xf002) AM_READWRITE_LEGACY(psychic5_bankselect_r, psychic5_bankselect_w)
+	AM_RANGE(0xf001, 0xf001) AM_READNOP AM_WRITE(psychic5_coin_counter_w)
+	AM_RANGE(0xf002, 0xf002) AM_READWRITE(psychic5_bankselect_r, psychic5_bankselect_w)
 	AM_RANGE(0xf003, 0xf003) AM_READWRITE_LEGACY(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
 	AM_RANGE(0xf004, 0xf004) AM_NOP	// ???
 	AM_RANGE(0xf005, 0xf005) AM_READNOP AM_WRITE_LEGACY(psychic5_title_screen_w)
@@ -445,8 +442,8 @@ static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
 
 	/* ports look like the other games */
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(soundlatch_w) // confirmed
-	AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(bombsa_flipscreen_w)
-	AM_RANGE(0xd002, 0xd002) AM_READWRITE_LEGACY(psychic5_bankselect_r, bombsa_bankselect_w)
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(bombsa_flipscreen_w)
+	AM_RANGE(0xd002, 0xd002) AM_READWRITE(psychic5_bankselect_r, bombsa_bankselect_w)
 	AM_RANGE(0xd003, 0xd003) AM_READWRITE_LEGACY(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
 	AM_RANGE(0xd005, 0xd005) AM_WRITE_LEGACY(bombsa_unknown_w) // ?
 

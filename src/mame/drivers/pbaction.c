@@ -70,18 +70,16 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "includes/pbaction.h"
 
 
-static WRITE8_HANDLER( pbaction_sh_command_w )
+WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
 {
-	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0x00);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0x00);
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(pbaction_state::nmi_mask_w)
 {
-	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
@@ -94,13 +92,13 @@ static ADDRESS_MAP_START( pbaction_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE_LEGACY(pbaction_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
 	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe604, 0xe604) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(pbaction_flipscreen_w)
 	AM_RANGE(0xe605, 0xe605) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe606, 0xe606) AM_READNOP	/* ??? */ AM_WRITE_LEGACY(pbaction_scroll_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(pbaction_sh_command_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(pbaction_sh_command_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8, pbaction_state )
@@ -470,15 +468,14 @@ ROM_START( pbaction5 )
 	ROM_LOAD( "p13.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
 ROM_END
 
-static READ8_HANDLER( pbactio3_prot_kludge_r )
+READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 {
-	pbaction_state *state = space->machine().driver_data<pbaction_state>();
 
 	/* on startup, the game expect this location to NOT act as RAM */
-	if (cpu_get_pc(&space->device()) == 0xab80)
+	if (cpu_get_pc(&space.device()) == 0xab80)
 		return 0;
 
-	return state->m_work_ram[0];
+	return m_work_ram[0];
 }
 
 static DRIVER_INIT( pbactio3 )
@@ -496,7 +493,8 @@ static DRIVER_INIT( pbactio3 )
 	pbaction_decode(machine, "maincpu");
 
 	/* install a protection (?) workaround */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc000, 0xc000, FUNC(pbactio3_prot_kludge_r) );
+	pbaction_state *state = machine.driver_data<pbaction_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbactio3_prot_kludge_r),state) );
 }
 
 static DRIVER_INIT( pbactio4 )

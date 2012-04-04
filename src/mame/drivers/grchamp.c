@@ -115,11 +115,10 @@ static INTERRUPT_GEN( grchamp_cpu1_interrupt )
  *
  *************************************/
 
-static WRITE8_HANDLER( cpu0_outputs_w )
+WRITE8_MEMBER(grchamp_state::cpu0_outputs_w)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	UINT8 diff = data ^ state->m_cpu0_out[offset];
-	state->m_cpu0_out[offset] = data;
+	UINT8 diff = data ^ m_cpu0_out[offset];
+	m_cpu0_out[offset] = data;
 
 	switch (offset)
 	{
@@ -132,14 +131,14 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			/* bit 6: FOG OUT */
 			/* bit 7: RADARON */
 			if ((diff & 0x01) && !(data & 0x01))
-				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			if ((diff & 0x02) && !(data & 0x02))
-				state->m_collide = state->m_collmode = 0;
+				m_collide = m_collmode = 0;
 			break;
 
 		case 0x01:	/* OUT1 */
 			/* connects to pc3259, pin 23 (read collision data?) */
-			state->m_collmode++;
+			m_collmode++;
 			break;
 
 		case 0x02:	/* OUT2 */
@@ -168,7 +167,7 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			/* bit 4:   coin lockout */
 			/* bit 5:   Game Over lamp */
 			/* bit 6-7: n/c */
-			coin_lockout_global_w(space->machine(), (data >> 4) & 1);
+			coin_lockout_global_w(machine(), (data >> 4) & 1);
 			output_set_value("led0", (~data >> 5) & 1);
 			break;
 
@@ -185,41 +184,40 @@ static WRITE8_HANDLER( cpu0_outputs_w )
 			break;
 
 		case 0x0d:	/* OUT13 */
-			watchdog_reset(space->machine());
+			watchdog_reset(machine());
 			break;
 
 		case 0x0e:	/* OUT14 */
 			/* O-21 connector */
 			soundlatch_w(space, 0, data);
-			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
 	}
 }
 
 
-static WRITE8_HANDLER( led_board_w )
+WRITE8_MEMBER(grchamp_state::led_board_w)
 {
 	static const UINT8 ls247_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x58,0x4c,0x62,0x69,0x78,0x00 };
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
 
 	switch (offset)
 	{
 		case 0x00:
-			state->m_ledlatch = (state->m_ledlatch & 0xff00) | (data << 0);
+			m_ledlatch = (m_ledlatch & 0xff00) | (data << 0);
 			break;
 
 		case 0x04:
-			state->m_ledlatch = (state->m_ledlatch & 0x00ff) | (data << 8);
+			m_ledlatch = (m_ledlatch & 0x00ff) | (data << 8);
 			break;
 
 		case 0x08:
-			state->m_ledaddr = data & 0x0f;
+			m_ledaddr = data & 0x0f;
 			break;
 
 		case 0x0c:
-			state->m_ledram[state->m_ledaddr & 0x07] = state->m_ledlatch;
-			output_set_digit_value(state->m_ledaddr & 0x07, ls247_map[state->m_ledram[state->m_ledaddr & 0x07] & 0x0f]);
+			m_ledram[m_ledaddr & 0x07] = m_ledlatch;
+			output_set_digit_value(m_ledaddr & 0x07, ls247_map[m_ledram[m_ledaddr & 0x07] & 0x0f]);
 			/*
                 ledram[0] & 0x0f = score LSD
                 ledram[1] & 0x0f = score
@@ -242,12 +240,11 @@ static WRITE8_HANDLER( led_board_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( cpu1_outputs_w )
+WRITE8_MEMBER(grchamp_state::cpu1_outputs_w)
 {
-	device_t *discrete = space->machine().device("discrete");
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	UINT8 diff = data ^ state->m_cpu1_out[offset];
-	state->m_cpu1_out[offset] = data;
+	device_t *discrete = machine().device("discrete");
+	UINT8 diff = data ^ m_cpu1_out[offset];
+	m_cpu1_out[offset] = data;
 
 	switch (offset)
 	{
@@ -272,7 +269,7 @@ static WRITE8_HANDLER( cpu1_outputs_w )
 		case 0x04:	/* OUT4 */
 			/* bit 0:   interrupt enable for CPU 1 */
 			if ((diff & 0x01) && !(data & 0x01))
-				cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x05:	/* OUT5 - unused */
@@ -287,7 +284,7 @@ static WRITE8_HANDLER( cpu1_outputs_w )
 
 		case 0x08:	/* OUT8 */
 			/* bit 0-7: latches data to main CPU input port 2 */
-			state->m_comm_latch = data;
+			m_comm_latch = data;
 			break;
 
 		case 0x09:	/* OUT9 */
@@ -337,46 +334,42 @@ static WRITE8_HANDLER( cpu1_outputs_w )
  *
  *************************************/
 
-INLINE UINT8 get_pc3259_bits(running_machine &machine, grchamp_state *state, int offs)
+UINT8 grchamp_state::get_pc3259_bits(int offs)
 {
 	int bits;
 
 	/* force a partial update to the current position */
-	machine.primary_screen->update_partial(machine.primary_screen->vpos());
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 
 	/* get the relevant 4 bits */
-	bits = (state->m_collide >> (offs*4)) & 0x0f;
+	bits = (m_collide >> (offs*4)) & 0x0f;
 
 	/* replicate to both nibbles */
 	return bits | (bits << 4);
 }
 
 
-static READ8_HANDLER( pc3259_0_r )
+READ8_MEMBER(grchamp_state::pc3259_0_r)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	return get_pc3259_bits(space->machine(), state, 0);
+	return get_pc3259_bits(0);
 }
 
 
-static READ8_HANDLER( pc3259_1_r )
+READ8_MEMBER(grchamp_state::pc3259_1_r)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	return get_pc3259_bits(space->machine(), state, 1);
+	return get_pc3259_bits(1);
 }
 
 
-static READ8_HANDLER( pc3259_2_r )
+READ8_MEMBER(grchamp_state::pc3259_2_r)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	return get_pc3259_bits(space->machine(), state, 2);
+	return get_pc3259_bits(2);
 }
 
 
-static READ8_HANDLER( pc3259_3_r )
+READ8_MEMBER(grchamp_state::pc3259_3_r)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	return get_pc3259_bits(space->machine(), state, 3);
+	return get_pc3259_bits(3);
 }
 
 
@@ -387,10 +380,9 @@ static READ8_HANDLER( pc3259_3_r )
  *
  *************************************/
 
-static READ8_HANDLER( sub_to_main_comm_r )
+READ8_MEMBER(grchamp_state::sub_to_main_comm_r)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	return state->m_comm_latch;
+	return m_comm_latch;
 }
 
 
@@ -402,16 +394,15 @@ static TIMER_CALLBACK( main_to_sub_comm_sync_w )
 }
 
 
-static WRITE8_HANDLER( main_to_sub_comm_w )
+WRITE8_MEMBER(grchamp_state::main_to_sub_comm_w)
 {
-	space->machine().scheduler().synchronize(FUNC(main_to_sub_comm_sync_w), data | (offset << 8));
+	machine().scheduler().synchronize(FUNC(main_to_sub_comm_sync_w), data | (offset << 8));
 }
 
 
-static READ8_HANDLER( main_to_sub_comm_r )
+READ8_MEMBER(grchamp_state::main_to_sub_comm_r)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	return state->m_comm_latch2[offset];
+	return m_comm_latch2[offset];
 }
 
 
@@ -529,18 +520,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, grchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x78) AM_READ_PORT("ACCEL")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x78) AM_READ_LEGACY(sub_to_main_comm_r)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x78) AM_READ(sub_to_main_comm_r)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x78) AM_READ_PORT("WHEEL")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x78) AM_READ_PORT("DSWA")
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_READ_PORT("DSWB")
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x78) AM_READ_PORT("TILT")
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x60) AM_READ_LEGACY(pc3259_0_r)
-	AM_RANGE(0x09, 0x09) AM_MIRROR(0x60) AM_READ_LEGACY(pc3259_1_r)
-	AM_RANGE(0x11, 0x11) AM_MIRROR(0x60) AM_READ_LEGACY(pc3259_2_r)
-	AM_RANGE(0x19, 0x19) AM_MIRROR(0x60) AM_READ_LEGACY(pc3259_3_r)
-	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x40) AM_WRITE_LEGACY(cpu0_outputs_w)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0x40) AM_WRITE_LEGACY(main_to_sub_comm_w)
-	AM_RANGE(0x20, 0x2f) AM_MIRROR(0x53) AM_WRITE_LEGACY(led_board_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x60) AM_READ(pc3259_0_r)
+	AM_RANGE(0x09, 0x09) AM_MIRROR(0x60) AM_READ(pc3259_1_r)
+	AM_RANGE(0x11, 0x11) AM_MIRROR(0x60) AM_READ(pc3259_2_r)
+	AM_RANGE(0x19, 0x19) AM_MIRROR(0x60) AM_READ(pc3259_3_r)
+	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x40) AM_WRITE(cpu0_outputs_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x40) AM_WRITE(main_to_sub_comm_w)
+	AM_RANGE(0x20, 0x2f) AM_MIRROR(0x53) AM_WRITE(led_board_w)
 ADDRESS_MAP_END
 
 
@@ -557,8 +548,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_portmap, AS_IO, 8, grchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_READ_LEGACY(main_to_sub_comm_r)
-	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x70) AM_WRITE_LEGACY(cpu1_outputs_w)
+	AM_RANGE(0x00, 0x03) AM_READ(main_to_sub_comm_r)
+	AM_RANGE(0x00, 0x0f) AM_MIRROR(0x70) AM_WRITE(cpu1_outputs_w)
 ADDRESS_MAP_END
 
 

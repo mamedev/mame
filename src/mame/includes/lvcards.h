@@ -10,6 +10,9 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_colorram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(control_port_2_w);
+	DECLARE_WRITE8_MEMBER(control_port_2a_w);
+	DECLARE_READ8_MEMBER(payout_r);
 };
 
 

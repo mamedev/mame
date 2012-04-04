@@ -33,6 +33,36 @@ public:
 	UINT8 *m_characterram;
 	UINT8 m_samurai_protection_data;
 	UINT8 m_palette_bank;
+	DECLARE_WRITE8_MEMBER(vicdual_videoram_w);
+	DECLARE_WRITE8_MEMBER(vicdual_characterram_w);
+	DECLARE_READ8_MEMBER(depthch_io_r);
+	DECLARE_WRITE8_MEMBER(depthch_io_w);
+	DECLARE_READ8_MEMBER(safari_io_r);
+	DECLARE_WRITE8_MEMBER(safari_io_w);
+	DECLARE_READ8_MEMBER(frogs_io_r);
+	DECLARE_WRITE8_MEMBER(frogs_io_w);
+	DECLARE_READ8_MEMBER(headon_io_r);
+	DECLARE_READ8_MEMBER(sspaceat_io_r);
+	DECLARE_WRITE8_MEMBER(headon_io_w);
+	DECLARE_READ8_MEMBER(headon2_io_r);
+	DECLARE_WRITE8_MEMBER(headon2_io_w);
+	DECLARE_WRITE8_MEMBER(digger_io_w);
+	DECLARE_WRITE8_MEMBER(invho2_io_w);
+	DECLARE_WRITE8_MEMBER(invds_io_w);
+	DECLARE_WRITE8_MEMBER(sspacaho_io_w);
+	DECLARE_WRITE8_MEMBER(tranqgun_io_w);
+	DECLARE_WRITE8_MEMBER(spacetrk_io_w);
+	DECLARE_WRITE8_MEMBER(carnival_io_w);
+	DECLARE_WRITE8_MEMBER(brdrline_io_w);
+	DECLARE_WRITE8_MEMBER(pulsar_io_w);
+	DECLARE_WRITE8_MEMBER(heiankyo_io_w);
+	DECLARE_WRITE8_MEMBER(alphaho_io_w);
+	DECLARE_WRITE8_MEMBER(samurai_protection_w);
+	DECLARE_WRITE8_MEMBER(samurai_io_w);
+	DECLARE_READ8_MEMBER(nsub_io_r);
+	DECLARE_WRITE8_MEMBER(nsub_io_w);
+	DECLARE_READ8_MEMBER(invinco_io_r);
+	DECLARE_WRITE8_MEMBER(invinco_io_w);
 };
 
 

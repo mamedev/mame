@@ -14,6 +14,9 @@ public:
 
 	/* memory */
 	UINT8      m_banked_vram[0x2000];
+	DECLARE_WRITE8_MEMBER(funybubl_vidram_bank_w);
+	DECLARE_WRITE8_MEMBER(funybubl_cpurombank_w);
+	DECLARE_WRITE8_MEMBER(funybubl_soundcommand_w);
 };
 
 

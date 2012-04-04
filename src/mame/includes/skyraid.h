@@ -16,6 +16,10 @@ public:
 	UINT8* m_obj_ram;
 
 	bitmap_ind16 m_helper;
+	DECLARE_READ8_MEMBER(skyraid_port_0_r);
+	DECLARE_WRITE8_MEMBER(skyraid_range_w);
+	DECLARE_WRITE8_MEMBER(skyraid_offset_w);
+	DECLARE_WRITE8_MEMBER(skyraid_scroll_w);
 };
 
 

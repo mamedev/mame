@@ -25,6 +25,10 @@ public:
 
 	/* misc */
 	int          m_toggle;
+	DECLARE_READ16_MEMBER(othldrby_scanline_r);
+	DECLARE_WRITE16_MEMBER(coinctrl_w);
+	DECLARE_WRITE16_MEMBER(calendar_w);
+	DECLARE_READ16_MEMBER(calendar_r);
 };
 
 

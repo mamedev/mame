@@ -509,7 +509,7 @@ static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(device->machi
 static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(device->machine(), 4); }
 
 
-static READ16_HANDLER( video_count_r )
+READ16_MEMBER(toaplan2_state::video_count_r)
 {
 	/* +---------+---------+--------+---------------------------+ */
 	/* | /H-Sync | /V-Sync | /Blank |       Scanline Count      | */
@@ -517,11 +517,10 @@ static READ16_HANDLER( video_count_r )
 	/* +---------+---------+--------+---------------------------+ */
 	/*************** Control Signals are active low ***************/
 
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
-	int hpos = space->machine().primary_screen->hpos();
-	int vpos = space->machine().primary_screen->vpos();
+	int hpos = machine().primary_screen->hpos();
+	int vpos = machine().primary_screen->vpos();
 
-	state->m_video_status = 0xff00;	// Set signals inactive
+	m_video_status = 0xff00;	// Set signals inactive
 
 	vpos = (vpos + 15) % 262;
 
@@ -531,23 +530,23 @@ static READ16_HANDLER( video_count_r )
 	vblank = (vpos >= 247) && (vpos <= 250);
 
 	if (hblank)
-		state->m_video_status &= ~0x8000;
+		m_video_status &= ~0x8000;
 	if (vblank)
-		state->m_video_status &= ~0x4000;
+		m_video_status &= ~0x4000;
 	if (vblank || hblank) // ?? Dogyuun is too slow if this is wrong
-		state->m_video_status &= ~0x0100;
+		m_video_status &= ~0x0100;
 	if (vpos < 256)
-		state->m_video_status |= (vpos & 0xff);
+		m_video_status |= (vpos & 0xff);
 	else
-		state->m_video_status |= 0xff;
+		m_video_status |= 0xff;
 
-//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,space->machine().primary_screen->vblank());
+//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,machine().primary_screen->vblank());
 
-	return state->m_video_status;
+	return m_video_status;
 }
 
 
-static WRITE8_HANDLER( toaplan2_coin_w )
+WRITE8_MEMBER(toaplan2_state::toaplan2_coin_w)
 {
 	/* +----------------+------ Bits 7-5 not used ------+--------------+ */
 	/* | Coin Lockout 2 | Coin Lockout 1 | Coin Count 2 | Coin Count 1 | */
@@ -555,14 +554,14 @@ static WRITE8_HANDLER( toaplan2_coin_w )
 
 	if (data & 0x0f)
 	{
-		coin_lockout_w( space->machine(), 0, ((data & 4) ? 0 : 1) );
-		coin_lockout_w( space->machine(), 1, ((data & 8) ? 0 : 1) );
-		coin_counter_w( space->machine(), 0, (data & 1) );
-		coin_counter_w( space->machine(), 1, (data & 2) );
+		coin_lockout_w( machine(), 0, ((data & 4) ? 0 : 1) );
+		coin_lockout_w( machine(), 1, ((data & 8) ? 0 : 1) );
+		coin_counter_w( machine(), 0, (data & 1) );
+		coin_counter_w( machine(), 1, (data & 2) );
 	}
 	else
 	{
-		coin_lockout_global_w(space->machine(), 1);	// Lock all coin slots
+		coin_lockout_global_w(machine(), 1);	// Lock all coin slots
 	}
 	if (data & 0xe0)
 	{
@@ -571,7 +570,7 @@ static WRITE8_HANDLER( toaplan2_coin_w )
 }
 
 
-static WRITE16_HANDLER( toaplan2_coin_word_w )
+WRITE16_MEMBER(toaplan2_state::toaplan2_coin_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -584,17 +583,16 @@ static WRITE16_HANDLER( toaplan2_coin_word_w )
 }
 
 
-static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
+WRITE16_MEMBER(toaplan2_state::toaplan2_v25_coin_word_w)
 {
 	logerror("toaplan2_v25_coin_word_w %04x\n",data);
 
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		toaplan2_coin_w(space, offset, data & 0x0f);
 
-		device_set_input_line(state->m_sub_cpu, INPUT_LINE_RESET,  (data & state->m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(m_sub_cpu, INPUT_LINE_RESET,  (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -603,12 +601,12 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 }
 
 
-static WRITE16_HANDLER( shippumd_coin_word_w )
+WRITE16_MEMBER(toaplan2_state::shippumd_coin_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		toaplan2_coin_w(space, offset, data & 0xff);
-		space->machine().device<okim6295_device>("oki")->set_bank_base(((data & 0x10) >> 4) * 0x40000);
+		machine().device<okim6295_device>("oki")->set_bank_base(((data & 0x10) >> 4) * 0x40000);
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -617,36 +615,33 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 }
 
 
-static READ16_HANDLER( shared_ram_r )
+READ16_MEMBER(toaplan2_state::shared_ram_r)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
-	return state->m_shared_ram[offset];
+	return m_shared_ram[offset];
 }
 
 
-static WRITE16_HANDLER( shared_ram_w )
+WRITE16_MEMBER(toaplan2_state::shared_ram_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
-		state->m_shared_ram[offset] = data;
+		m_shared_ram[offset] = data;
 	}
 }
 
 
-static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
+WRITE16_MEMBER(toaplan2_state::toaplan2_hd647180_cpu_w)
 {
 	// Command sent to secondary CPU. Support for HD647180 will be
 	// required when a ROM dump becomes available for this hardware
 
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
-		state->m_mcu_data = data & 0xff;
-		logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n", cpu_get_previouspc(&space->device()), state->m_mcu_data);
+		m_mcu_data = data & 0xff;
+		logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n", cpu_get_previouspc(&space.device()), m_mcu_data);
 	}
 }
 
@@ -664,46 +659,43 @@ static CUSTOM_INPUT( c2map_r )
 }
 
 
-static READ16_HANDLER( ghox_p1_h_analog_r )
+READ16_MEMBER(toaplan2_state::ghox_p1_h_analog_r)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 	INT8 value, new_value;
 
-	new_value = input_port_read(space->machine(), "PAD1");
-	if (new_value == state->m_old_p1_paddle_h) return 0;
-	value = new_value - state->m_old_p1_paddle_h;
-	state->m_old_p1_paddle_h = new_value;
+	new_value = input_port_read(machine(), "PAD1");
+	if (new_value == m_old_p1_paddle_h) return 0;
+	value = new_value - m_old_p1_paddle_h;
+	m_old_p1_paddle_h = new_value;
 	return value;
 }
 
 
-static READ16_HANDLER( ghox_p2_h_analog_r )
+READ16_MEMBER(toaplan2_state::ghox_p2_h_analog_r)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 	INT8 value, new_value;
 
-	new_value = input_port_read(space->machine(), "PAD2");
-	if (new_value == state->m_old_p2_paddle_h) return 0;
-	value = new_value - state->m_old_p2_paddle_h;
-	state->m_old_p2_paddle_h = new_value;
+	new_value = input_port_read(machine(), "PAD2");
+	if (new_value == m_old_p2_paddle_h) return 0;
+	value = new_value - m_old_p2_paddle_h;
+	m_old_p2_paddle_h = new_value;
 	return value;
 }
 
 
-static READ16_HANDLER( ghox_mcu_r )
+READ16_MEMBER(toaplan2_state::ghox_mcu_r)
 {
 	return 0xff;
 }
 
 
-static WRITE16_HANDLER( ghox_mcu_w )
+WRITE16_MEMBER(toaplan2_state::ghox_mcu_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
-		UINT16 *toaplan2_shared_ram16 = state->m_shared_ram16;
+		UINT16 *toaplan2_shared_ram16 = m_shared_ram16;
 
-		state->m_mcu_data = data;
+		m_mcu_data = data;
 		if ((data >= 0xd0) && (data < 0xe0))
 		{
 			offset = ((data & 0x0f) * 2) + (0x38 / 2);
@@ -712,7 +704,7 @@ static WRITE16_HANDLER( ghox_mcu_w )
 		}
 		else
 		{
-			logerror("PC:%08x Writing %08x to HD647180 cpu shared ram status port\n", cpu_get_previouspc(&space->device()), state->m_mcu_data);
+			logerror("PC:%08x Writing %08x to HD647180 cpu shared ram status port\n", cpu_get_previouspc(&space.device()), m_mcu_data);
 		}
 		toaplan2_shared_ram16[0x56 / 2] = 0x004e;	// Return a RTS instruction
 		toaplan2_shared_ram16[0x58 / 2] = 0x0075;
@@ -740,7 +732,7 @@ static WRITE16_HANDLER( ghox_mcu_w )
 }
 
 
-static READ16_HANDLER( ghox_shared_ram_r )
+READ16_MEMBER(toaplan2_state::ghox_shared_ram_r)
 {
 	// Ghox 68K reads data from MCU shared RAM and writes it to main RAM.
 	// It then subroutine jumps to main RAM and executes this code.
@@ -754,28 +746,25 @@ static READ16_HANDLER( ghox_shared_ram_r )
 	// Offset $44 and $42 are accessed from around PC:0FB52
 	// Offset $48 and $46 are accessed from around PC:06776
 
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
-	return state->m_shared_ram16[offset] & 0xff;
+	return m_shared_ram16[offset] & 0xff;
 }
 
 
-static WRITE16_HANDLER( ghox_shared_ram_w )
+WRITE16_MEMBER(toaplan2_state::ghox_shared_ram_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
-		state->m_shared_ram16[offset] = data & 0xff;
+		m_shared_ram16[offset] = data & 0xff;
 	}
 }
 
 
-static WRITE16_HANDLER( fixeight_subcpu_ctrl_w )
+WRITE16_MEMBER(toaplan2_state::fixeight_subcpu_ctrl_w)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
-	device_set_input_line(state->m_sub_cpu, INPUT_LINE_RESET, (data & state->m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_sub_cpu, INPUT_LINE_RESET, (data & m_v25_reset_line) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -788,35 +777,35 @@ static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 }
 
 
-static WRITE16_HANDLER( fixeightbl_oki_bankswitch_w )
+WRITE16_MEMBER(toaplan2_state::fixeightbl_oki_bankswitch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 7;
-		if (data <= 4) memory_set_bank(space->machine(), "bank1", data);
+		if (data <= 4) memory_set_bank(machine(), "bank1", data);
 	}
 }
 
 
-static READ8_HANDLER( v25_dswa_r )
+READ8_MEMBER(toaplan2_state::v25_dswa_r)
 {
-	return input_port_read(space->machine(), "DSWA") ^ 0xff;
+	return input_port_read(machine(), "DSWA") ^ 0xff;
 }
 
 
-static READ8_HANDLER( v25_dswb_r )
+READ8_MEMBER(toaplan2_state::v25_dswb_r)
 {
-	return input_port_read(space->machine(), "DSWB") ^ 0xff;
+	return input_port_read(machine(), "DSWB") ^ 0xff;
 }
 
 
-static READ8_HANDLER( v25_jmpr_r )
+READ8_MEMBER(toaplan2_state::v25_jmpr_r)
 {
-	return input_port_read(space->machine(), "JMPR") ^ 0xff;
+	return input_port_read(machine(), "JMPR") ^ 0xff;
 }
 
 
-static READ8_HANDLER( fixeight_region_r )
+READ8_MEMBER(toaplan2_state::fixeight_region_r)
 {
 	// this must match the eeprom!
 	// however there is no valid value that makes the dumped eeprom boot
@@ -824,22 +813,22 @@ static READ8_HANDLER( fixeight_region_r )
 	// this code, and the default eeproms use should be considered subject
 	// to change
 
-	if (!strcmp(space->machine().system().name,"fixeightkt"))	return 0x00;
-	if (!strcmp(space->machine().system().name,"fixeightk"))	return 0x01;
-	if (!strcmp(space->machine().system().name,"fixeightht"))	return 0x02;
-	if (!strcmp(space->machine().system().name,"fixeighth"))	return 0x03;
-	if (!strcmp(space->machine().system().name,"fixeighttwt"))	return 0x04;
-	if (!strcmp(space->machine().system().name,"fixeighttw"))	return 0x05;
-	if (!strcmp(space->machine().system().name,"fixeightat"))	return 0x06;
-	if (!strcmp(space->machine().system().name,"fixeighta"))	return 0x07;
-	if (!strcmp(space->machine().system().name,"fixeightt"))	return 0x08;
-	if (!strcmp(space->machine().system().name,"fixeight9"))	return 0x09;
-	if (!strcmp(space->machine().system().name,"fixeighta"))	return 0x0a;
-	if (!strcmp(space->machine().system().name,"fixeightu"))	return 0x0b;
-//  if (!strcmp(space->machine().system().name,"fixeightc")) return 0x0c; // invalid
-//  if (!strcmp(space->machine().system().name,"fixeightd")) return 0x0d; // invalid
-	if (!strcmp(space->machine().system().name,"fixeightj"))	return 0x0e;
-	if (!strcmp(space->machine().system().name,"fixeightjt"))	return 0x0f;
+	if (!strcmp(machine().system().name,"fixeightkt"))	return 0x00;
+	if (!strcmp(machine().system().name,"fixeightk"))	return 0x01;
+	if (!strcmp(machine().system().name,"fixeightht"))	return 0x02;
+	if (!strcmp(machine().system().name,"fixeighth"))	return 0x03;
+	if (!strcmp(machine().system().name,"fixeighttwt"))	return 0x04;
+	if (!strcmp(machine().system().name,"fixeighttw"))	return 0x05;
+	if (!strcmp(machine().system().name,"fixeightat"))	return 0x06;
+	if (!strcmp(machine().system().name,"fixeighta"))	return 0x07;
+	if (!strcmp(machine().system().name,"fixeightt"))	return 0x08;
+	if (!strcmp(machine().system().name,"fixeight9"))	return 0x09;
+	if (!strcmp(machine().system().name,"fixeighta"))	return 0x0a;
+	if (!strcmp(machine().system().name,"fixeightu"))	return 0x0b;
+//  if (!strcmp(machine().system().name,"fixeightc")) return 0x0c; // invalid
+//  if (!strcmp(machine().system().name,"fixeightd")) return 0x0d; // invalid
+	if (!strcmp(machine().system().name,"fixeightj"))	return 0x0e;
+	if (!strcmp(machine().system().name,"fixeightjt"))	return 0x0f;
 
 	return 0x00;
 }
@@ -850,9 +839,9 @@ static READ8_HANDLER( fixeight_region_r )
 ***************************************************************************/
 
 
-static WRITE8_HANDLER( raizing_z80_bankswitch_w )
+WRITE8_MEMBER(toaplan2_state::raizing_z80_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
 
@@ -861,28 +850,27 @@ static WRITE8_HANDLER( raizing_z80_bankswitch_w )
 // it may not be a coincidence that the composer and sound designer for
 // these two games, Manabu "Santaruru" Namiki, came to Raizing from NMK...
 
-static WRITE8_HANDLER( raizing_oki_bankswitch_w )
+WRITE8_MEMBER(toaplan2_state::raizing_oki_bankswitch_w)
 {
-	nmk112_device *nmk112 = space->machine().device<nmk112_device>("nmk112");
+	nmk112_device *nmk112 = machine().device<nmk112_device>("nmk112");
 
 	nmk112_okibank_w(nmk112, offset,     data        & 0x0f);
 	nmk112_okibank_w(nmk112, offset + 1, (data >> 4) & 0x0f);
 }
 
 
-static WRITE16_HANDLER( bgaregga_soundlatch_w )
+WRITE16_MEMBER(toaplan2_state::bgaregga_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->m_sub_cpu, 0, HOLD_LINE);
+		device_set_input_line(m_sub_cpu, 0, HOLD_LINE);
 	}
 }
 
 
-static READ8_HANDLER( bgaregga_E01D_r )
+READ8_MEMBER(toaplan2_state::bgaregga_E01D_r)
 {
 	// the Z80 reads this address during its IRQ routine,
 	// and reads the soundlatch only if the lowest bit is clear.
@@ -890,7 +878,7 @@ static READ8_HANDLER( bgaregga_E01D_r )
 }
 
 
-static WRITE8_HANDLER( bgaregga_E00C_w )
+WRITE8_MEMBER(toaplan2_state::bgaregga_E00C_w)
 {
 	// the Z80 writes here after reading the soundlatch.
 	// I would think that this was an acknowledge latch like
@@ -899,93 +887,86 @@ static WRITE8_HANDLER( bgaregga_E00C_w )
 }
 
 
-static READ16_HANDLER( batrider_z80_busack_r )
+READ16_MEMBER(toaplan2_state::batrider_z80_busack_r)
 {
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// These accesses are made when the 68K wants to read the Z80
 	// ROM code. Failure to return the correct status incurrs a Sound Error.
 
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
-	return state->m_z80_busreq;	// Loop BUSRQ to BUSAK
+	return m_z80_busreq;	// Loop BUSRQ to BUSAK
 }
 
 
-static WRITE16_HANDLER( batrider_z80_busreq_w )
+WRITE16_MEMBER(toaplan2_state::batrider_z80_busreq_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
-		state->m_z80_busreq = (data & 0x01);	// see batrider_z80_busack_r above
+		m_z80_busreq = (data & 0x01);	// see batrider_z80_busack_r above
 	}
 }
 
 
-static READ16_HANDLER( batrider_z80rom_r )
+READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
 {
-	UINT8 *Z80 = space->machine().region("audiocpu")->base();
+	UINT8 *Z80 = machine().region("audiocpu")->base();
 
 	return Z80[offset];
 }
 
 
 // these two latches are always written together, via a single move.l instruction
-static WRITE16_HANDLER( batrider_soundlatch_w )
+WRITE16_MEMBER(toaplan2_state::batrider_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->m_sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(m_sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
 
-static WRITE16_HANDLER( batrider_soundlatch2_w )
+WRITE16_MEMBER(toaplan2_state::batrider_soundlatch2_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 		soundlatch2_w(space, offset, data & 0xff);
-		device_set_input_line(state->m_sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
+		device_set_input_line(m_sub_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
 
-static WRITE16_HANDLER( batrider_unknown_sound_w )
+WRITE16_MEMBER(toaplan2_state::batrider_unknown_sound_w)
 {
 	// the 68K writes here when it wants a sound acknowledge IRQ from the Z80
 	// for bbakraid this is on every sound command; for batrider, only on certain commands
 }
 
 
-static WRITE16_HANDLER( batrider_clear_sndirq_w )
+WRITE16_MEMBER(toaplan2_state::batrider_clear_sndirq_w)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	device_set_input_line(state->m_main_cpu, state->m_sndirq_line, CLEAR_LINE);
+	device_set_input_line(m_main_cpu, m_sndirq_line, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( batrider_sndirq_w )
+WRITE8_MEMBER(toaplan2_state::batrider_sndirq_w)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	// if batrider_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	device_set_input_line(state->m_main_cpu, state->m_sndirq_line, HOLD_LINE);
+	device_set_input_line(m_main_cpu, m_sndirq_line, HOLD_LINE);
 }
 
 
-static WRITE8_HANDLER( batrider_clear_nmi_w )
+WRITE8_MEMBER(toaplan2_state::batrider_clear_nmi_w)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
-	device_set_input_line(state->m_sub_cpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(m_sub_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1006,10 +987,9 @@ static const eeprom_interface bbakraid_93C66_intf =
 };
 
 
-static READ16_HANDLER( bbakraid_eeprom_r )
+READ16_MEMBER(toaplan2_state::bbakraid_eeprom_r)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
-	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 
 	// Bit 0x01 returns the status of BUSAK from the Z80.
 	// BUSRQ is activated via bit 0x10 on the EEPROM write port.
@@ -1018,23 +998,22 @@ static READ16_HANDLER( bbakraid_eeprom_r )
 
 	int data;
 	data  = ((eeprom->read_bit() & 0x01) << 4);
-	data |= ((state->m_z80_busreq >> 4) & 0x01);	// Loop BUSRQ to BUSAK
+	data |= ((m_z80_busreq >> 4) & 0x01);	// Loop BUSRQ to BUSAK
 
 	return data;
 }
 
 
-static WRITE16_HANDLER( bbakraid_eeprom_w )
+WRITE16_MEMBER(toaplan2_state::bbakraid_eeprom_w)
 {
-	toaplan2_state *state = space->machine().driver_data<toaplan2_state>();
 
 	if (data & ~0x001f)
-		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",cpu_get_pc(&space->device()),data);
+		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",cpu_get_pc(&space.device()),data);
 
 	if ( ACCESSING_BITS_0_7 )
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+		input_port_write(machine(), "EEPROMOUT", data, 0xff);
 
-	state->m_z80_busreq = data & 0x10;	// see bbakraid_eeprom_r above
+	m_z80_busreq = data & 0x10;	// see bbakraid_eeprom_r above
 }
 
 
@@ -1055,28 +1034,28 @@ static ADDRESS_MAP_START( tekipaki_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x180010, 0x180011) AM_READ_PORT("DSWB")
 	AM_RANGE(0x180020, 0x180021) AM_READ_PORT("SYS")
 	AM_RANGE(0x180030, 0x180031) AM_READ_PORT("JMPR")			// CPU 2 busy and Region Jumper block
-	AM_RANGE(0x180040, 0x180041) AM_WRITE_LEGACY(toaplan2_coin_word_w)
+	AM_RANGE(0x180040, 0x180041) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x180050, 0x180051) AM_READ_PORT("IN1")
 	AM_RANGE(0x180060, 0x180061) AM_READ_PORT("IN2")
-	AM_RANGE(0x180070, 0x180071) AM_WRITE_LEGACY(toaplan2_hd647180_cpu_w)
+	AM_RANGE(0x180070, 0x180071) AM_WRITE(toaplan2_hd647180_cpu_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ghox_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_READ_LEGACY(ghox_p2_h_analog_r)
+	AM_RANGE(0x040000, 0x040001) AM_READ(ghox_p2_h_analog_r)
 	AM_RANGE(0x080000, 0x083fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x100000, 0x100001) AM_READ_LEGACY(ghox_p1_h_analog_r)
+	AM_RANGE(0x100000, 0x100001) AM_READ(ghox_p1_h_analog_r)
 	AM_RANGE(0x140000, 0x14000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
-	AM_RANGE(0x180000, 0x180001) AM_READWRITE_LEGACY(ghox_mcu_r, ghox_mcu_w)	// really part of shared RAM
+	AM_RANGE(0x180000, 0x180001) AM_READWRITE(ghox_mcu_r, ghox_mcu_w)	// really part of shared RAM
 	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("DSWA")
 	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("DSWB")
 	AM_RANGE(0x180010, 0x180011) AM_READ_PORT("SYS")
 	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("IN1")
 	AM_RANGE(0x18000e, 0x18000f) AM_READ_PORT("IN2")
-	AM_RANGE(0x180500, 0x180fff) AM_READWRITE_LEGACY(ghox_shared_ram_r, ghox_shared_ram_w) AM_BASE(m_shared_ram16)
-	AM_RANGE(0x181000, 0x181001) AM_WRITE_LEGACY(toaplan2_coin_word_w)
+	AM_RANGE(0x180500, 0x180fff) AM_READWRITE(ghox_shared_ram_r, ghox_shared_ram_w) AM_BASE(m_shared_ram16)
+	AM_RANGE(0x181000, 0x181001) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x18100c, 0x18100d) AM_READ_PORT("JMPR")
 ADDRESS_MAP_END
 
@@ -1087,26 +1066,26 @@ static ADDRESS_MAP_START( dogyuun_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE_LEGACY(toaplan2_v25_coin_word_w)	// Coin count/lock + v25 reset line
-	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w )
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	// Coin count/lock + v25 reset line
+	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE(shared_ram_r, shared_ram_w )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x50000d) AM_DEVREADWRITE_LEGACY("gp9001vdp1", gp9001_vdp_r, gp9001_vdp_w)
-	AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(video_count_r)			// test bit 8
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)			// test bit 8
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( kbash_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200000, 0x200fff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w )
+	AM_RANGE(0x200000, 0x200fff) AM_READWRITE(shared_ram_r, shared_ram_w )
 	AM_RANGE(0x208010, 0x208011) AM_READ_PORT("IN1")
 	AM_RANGE(0x208014, 0x208015) AM_READ_PORT("IN2")
 	AM_RANGE(0x208018, 0x208019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20801c, 0x20801d) AM_WRITE_LEGACY(toaplan2_coin_word_w)
+	AM_RANGE(0x20801c, 0x20801d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(video_count_r)			// test bit 8
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)			// test bit 8
 ADDRESS_MAP_END
 
 
@@ -1125,7 +1104,7 @@ static ADDRESS_MAP_START( kbash2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x200020, 0x200021) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x200024, 0x200025) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x200028, 0x200029) AM_DEVWRITE_LEGACY("oki1", oki_bankswitch_w)
-	AM_RANGE(0x20002c, 0x20002d) AM_READ_LEGACY(video_count_r)
+	AM_RANGE(0x20002c, 0x20002d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
@@ -1142,7 +1121,7 @@ static ADDRESS_MAP_START( truxton2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x403000, 0x4031ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x403200, 0x403fff) AM_RAM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM_WRITE_LEGACY(toaplan2_tx_gfxram16_w) AM_BASE(m_tx_gfxram16)
-	AM_RANGE(0x600000, 0x600001) AM_READ_LEGACY(video_count_r)
+	AM_RANGE(0x600000, 0x600001) AM_READ(video_count_r)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("JMPR")
@@ -1151,7 +1130,7 @@ static ADDRESS_MAP_START( truxton2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("SYS")
 	AM_RANGE(0x700010, 0x700011) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x700014, 0x700017) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff)
-	AM_RANGE(0x70001e, 0x70001f) AM_WRITE_LEGACY(toaplan2_coin_word_w)
+	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(toaplan2_coin_word_w)
 ADDRESS_MAP_END
 
 
@@ -1160,8 +1139,8 @@ static ADDRESS_MAP_START( pipibibs_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x080000, 0x082fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x14000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
-	AM_RANGE(0x190000, 0x190fff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w)
-	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE_LEGACY(toaplan2_coin_word_w)
+	AM_RANGE(0x190000, 0x190fff) AM_READWRITE(shared_ram_r, shared_ram_w)
+	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x19c020, 0x19c021) AM_READ_PORT("DSWA")
 	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSWB")
 	AM_RANGE(0x19c028, 0x19c029) AM_READ_PORT("JMPR")
@@ -1181,9 +1160,9 @@ static ADDRESS_MAP_START( pipibibi_bootleg_68k_mem, AS_PROGRAM, 16, toaplan2_sta
 //  AM_RANGE(0x13f000, 0x13f001) AM_WRITENOP        // ???
 	AM_RANGE(0x180000, 0x182fff) AM_DEVREADWRITE_LEGACY("gp9001vdp0", pipibibi_bootleg_videoram16_r, pipibibi_bootleg_videoram16_w)	// TileRAM
 	AM_RANGE(0x188000, 0x18800f) AM_DEVWRITE_LEGACY("gp9001vdp0", pipibibi_bootleg_scroll_w)
-	AM_RANGE(0x190002, 0x190003) AM_READ_LEGACY(shared_ram_r)	// Z80 ready ?
-	AM_RANGE(0x190010, 0x190011) AM_WRITE_LEGACY(shared_ram_w)	// Z80 task to perform
-	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE_LEGACY(toaplan2_coin_word_w)
+	AM_RANGE(0x190002, 0x190003) AM_READ(shared_ram_r)	// Z80 ready ?
+	AM_RANGE(0x190010, 0x190011) AM_WRITE(shared_ram_w)	// Z80 task to perform
+	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x19c020, 0x19c021) AM_READ_PORT("DSWA")
 	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSWB")
 	AM_RANGE(0x19c028, 0x19c029) AM_READ_PORT("JMPR")
@@ -1200,16 +1179,16 @@ static ADDRESS_MAP_START( fixeight_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("IN2")
 	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("IN3")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE_LEGACY(toaplan2_coin_word_w)
-	AM_RANGE(0x280000, 0x28ffff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w )
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_coin_word_w)
+	AM_RANGE(0x280000, 0x28ffff) AM_READWRITE(shared_ram_r, shared_ram_w )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
 	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
 	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE_LEGACY(toaplan2_tx_gfxram16_w) AM_BASE(m_tx_gfxram16)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE_LEGACY(fixeight_subcpu_ctrl_w)
-	AM_RANGE(0x800000, 0x800001) AM_READ_LEGACY(video_count_r)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(fixeight_subcpu_ctrl_w)
+	AM_RANGE(0x800000, 0x800001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
 
@@ -1221,7 +1200,7 @@ static ADDRESS_MAP_START( fixeightbl_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x200008, 0x200009) AM_READ_PORT("IN3")
 	AM_RANGE(0x20000c, 0x20000d) AM_READ_PORT("DSWB")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("SYS")
-	AM_RANGE(0x200014, 0x200015) AM_WRITE_LEGACY(fixeightbl_oki_bankswitch_w)	// Sound banking. Code at $4084c, $5070
+	AM_RANGE(0x200014, 0x200015) AM_WRITE(fixeightbl_oki_bankswitch_w)	// Sound banking. Code at $4084c, $5070
 	AM_RANGE(0x200018, 0x200019) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x20001c, 0x20001d) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
@@ -1229,7 +1208,7 @@ static ADDRESS_MAP_START( fixeightbl_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
 	AM_RANGE(0x502000, 0x5021ff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_offs_w) AM_BASE_SIZE(m_txvideoram16_offs, m_tx_offs_vram_size)
 	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
-	AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(video_count_r)
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("maincpu", 0x80000)
 ADDRESS_MAP_END
 
@@ -1241,11 +1220,11 @@ static ADDRESS_MAP_START( vfive_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE_LEGACY(toaplan2_v25_coin_word_w)	// Coin count/lock + v25 reset line
-	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w )
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	// Coin count/lock + v25 reset line
+	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE(shared_ram_r, shared_ram_w )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(video_count_r)
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
 
@@ -1255,12 +1234,12 @@ static ADDRESS_MAP_START( batsugun_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("IN1")
 	AM_RANGE(0x200014, 0x200015) AM_READ_PORT("IN2")
 	AM_RANGE(0x200018, 0x200019) AM_READ_PORT("SYS")
-	AM_RANGE(0x20001c, 0x20001d) AM_WRITE_LEGACY(toaplan2_v25_coin_word_w)	// Coin count/lock + v25 reset line
-	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w )
+	AM_RANGE(0x20001c, 0x20001d) AM_WRITE(toaplan2_v25_coin_word_w)	// Coin count/lock + v25 reset line
+	AM_RANGE(0x210000, 0x21ffff) AM_READWRITE(shared_ram_r, shared_ram_w )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x50000d) AM_DEVREADWRITE_LEGACY("gp9001vdp1", gp9001_vdp_r, gp9001_vdp_w)
-	AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(video_count_r)
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
 ADDRESS_MAP_END
 
 
@@ -1280,22 +1259,22 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("IN4")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYS")
 	AM_RANGE(0x700030, 0x700031) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
-	AM_RANGE(0x700034, 0x700035) AM_WRITE_LEGACY(toaplan2_coin_word_w)
+	AM_RANGE(0x700034, 0x700035) AM_WRITE(toaplan2_coin_word_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mahoudai_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w)
-	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE_LEGACY(toaplan2_coin_word_w)
+	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(shared_ram_r, shared_ram_w)
+	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
 	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
 	AM_RANGE(0x21c028, 0x21c029) AM_READ_PORT("SYS")
 	AM_RANGE(0x21c02c, 0x21c02d) AM_READ_PORT("DSWA")
 	AM_RANGE(0x21c030, 0x21c031) AM_READ_PORT("DSWB")
 	AM_RANGE(0x21c034, 0x21c035) AM_READ_PORT("JMPR")
-	AM_RANGE(0x21c03c, 0x21c03d) AM_READ_LEGACY(video_count_r)
+	AM_RANGE(0x21c03c, 0x21c03d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x401000, 0x4017ff) AM_RAM							// Unused palette RAM
@@ -1310,16 +1289,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shippumd_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w)
+	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(shared_ram_r, shared_ram_w)
 //  AM_RANGE(0x21c008, 0x21c009) AM_WRITENOP                    // ???
-	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE_LEGACY(shippumd_coin_word_w)	// Coin count/lock + oki bankswitch
+	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(shippumd_coin_word_w)	// Coin count/lock + oki bankswitch
 	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
 	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
 	AM_RANGE(0x21c028, 0x21c029) AM_READ_PORT("SYS")
 	AM_RANGE(0x21c02c, 0x21c02d) AM_READ_PORT("DSWA")
 	AM_RANGE(0x21c030, 0x21c031) AM_READ_PORT("DSWB")
 	AM_RANGE(0x21c034, 0x21c035) AM_READ_PORT("JMPR")
-	AM_RANGE(0x21c03c, 0x21c03d) AM_READ_LEGACY(video_count_r)
+	AM_RANGE(0x21c03c, 0x21c03d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x401000, 0x4017ff) AM_RAM							// Unused palette RAM
@@ -1334,15 +1313,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bgaregga_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w)
-	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE_LEGACY(toaplan2_coin_word_w)
+	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(shared_ram_r, shared_ram_w)
+	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
 	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
 	AM_RANGE(0x21c028, 0x21c029) AM_READ_PORT("SYS")
 	AM_RANGE(0x21c02c, 0x21c02d) AM_READ_PORT("DSWA")
 	AM_RANGE(0x21c030, 0x21c031) AM_READ_PORT("DSWB")
 	AM_RANGE(0x21c034, 0x21c035) AM_READ_PORT("JMPR")
-	AM_RANGE(0x21c03c, 0x21c03d) AM_READ_LEGACY(video_count_r)
+	AM_RANGE(0x21c03c, 0x21c03d) AM_READ(video_count_r)
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(toaplan2_txvideoram16_w) AM_BASE_SIZE(m_txvideoram16, m_tx_vram_size)
@@ -1350,7 +1329,7 @@ static ADDRESS_MAP_START( bgaregga_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x502200, 0x502fff) AM_RAM
 	AM_RANGE(0x503000, 0x5031ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x503200, 0x503fff) AM_RAM
-	AM_RANGE(0x600000, 0x600001) AM_WRITE_LEGACY(bgaregga_soundlatch_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(bgaregga_soundlatch_w)
 ADDRESS_MAP_END
 
 
@@ -1363,21 +1342,21 @@ static ADDRESS_MAP_START( batrider_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x203400, 0x207fff) AM_RAM AM_BASE_SIZE(m_mainram16, m_mainram_overlap_size)
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x37ffff) AM_READ_LEGACY(batrider_z80rom_r)
+	AM_RANGE(0x300000, 0x37ffff) AM_READ(batrider_z80rom_r)
 	AM_RANGE(0x400000, 0x40000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_alt_r, gp9001_vdp_alt_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("SYS-DSW")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("DSW")
-	AM_RANGE(0x500006, 0x500007) AM_READ_LEGACY(video_count_r)
+	AM_RANGE(0x500006, 0x500007) AM_READ(video_count_r)
 	AM_RANGE(0x500008, 0x500009) AM_READ_LEGACY(soundlatch3_word_r)
 	AM_RANGE(0x50000a, 0x50000b) AM_READ_LEGACY(soundlatch4_word_r)
-	AM_RANGE(0x50000c, 0x50000d) AM_READ_LEGACY(batrider_z80_busack_r)
-	AM_RANGE(0x500010, 0x500011) AM_WRITE_LEGACY(toaplan2_coin_word_w)
-	AM_RANGE(0x500020, 0x500021) AM_WRITE_LEGACY(batrider_soundlatch_w)
-	AM_RANGE(0x500022, 0x500023) AM_WRITE_LEGACY(batrider_soundlatch2_w)
-	AM_RANGE(0x500024, 0x500025) AM_WRITE_LEGACY(batrider_unknown_sound_w)
-	AM_RANGE(0x500026, 0x500027) AM_WRITE_LEGACY(batrider_clear_sndirq_w)
-	AM_RANGE(0x500060, 0x500061) AM_WRITE_LEGACY(batrider_z80_busreq_w)
+	AM_RANGE(0x50000c, 0x50000d) AM_READ(batrider_z80_busack_r)
+	AM_RANGE(0x500010, 0x500011) AM_WRITE(toaplan2_coin_word_w)
+	AM_RANGE(0x500020, 0x500021) AM_WRITE(batrider_soundlatch_w)
+	AM_RANGE(0x500022, 0x500023) AM_WRITE(batrider_soundlatch2_w)
+	AM_RANGE(0x500024, 0x500025) AM_WRITE(batrider_unknown_sound_w)
+	AM_RANGE(0x500026, 0x500027) AM_WRITE(batrider_clear_sndirq_w)
+	AM_RANGE(0x500060, 0x500061) AM_WRITE(batrider_z80_busreq_w)
 	AM_RANGE(0x500080, 0x500081) AM_WRITE_LEGACY(batrider_textdata_dma_w)
 	AM_RANGE(0x500082, 0x500083) AM_WRITE_LEGACY(batrider_unknown_dma_w)
 	AM_RANGE(0x5000c0, 0x5000cf) AM_WRITE_LEGACY(batrider_objectbank_w)
@@ -1393,21 +1372,21 @@ static ADDRESS_MAP_START( bbakraid_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x203200, 0x2033ff) AM_RAM_WRITE_LEGACY(toaplan2_txscrollram16_w) AM_BASE_SIZE(m_txscrollram16, m_tx_scroll_vram_size)
 	AM_RANGE(0x203400, 0x207fff) AM_RAM AM_BASE_SIZE(m_mainram16, m_mainram_overlap_size)
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x33ffff) AM_READ_LEGACY(batrider_z80rom_r)
+	AM_RANGE(0x300000, 0x33ffff) AM_READ(batrider_z80rom_r)
 	AM_RANGE(0x400000, 0x40000d) AM_DEVREADWRITE_LEGACY("gp9001vdp0", gp9001_vdp_alt_r, gp9001_vdp_alt_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("SYS-DSW")
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("DSW")
-	AM_RANGE(0x500006, 0x500007) AM_READ_LEGACY(video_count_r)
-	AM_RANGE(0x500008, 0x500009) AM_WRITE_LEGACY(toaplan2_coin_word_w)
+	AM_RANGE(0x500006, 0x500007) AM_READ(video_count_r)
+	AM_RANGE(0x500008, 0x500009) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x500010, 0x500011) AM_READ_LEGACY(soundlatch3_word_r)
 	AM_RANGE(0x500012, 0x500013) AM_READ_LEGACY(soundlatch4_word_r)
-	AM_RANGE(0x500014, 0x500015) AM_WRITE_LEGACY(batrider_soundlatch_w)
-	AM_RANGE(0x500016, 0x500017) AM_WRITE_LEGACY(batrider_soundlatch2_w)
-	AM_RANGE(0x500018, 0x500019) AM_READ_LEGACY(bbakraid_eeprom_r)
-	AM_RANGE(0x50001a, 0x50001b) AM_WRITE_LEGACY(batrider_unknown_sound_w)
-	AM_RANGE(0x50001c, 0x50001d) AM_WRITE_LEGACY(batrider_clear_sndirq_w)
-	AM_RANGE(0x50001e, 0x50001f) AM_WRITE_LEGACY(bbakraid_eeprom_w)
+	AM_RANGE(0x500014, 0x500015) AM_WRITE(batrider_soundlatch_w)
+	AM_RANGE(0x500016, 0x500017) AM_WRITE(batrider_soundlatch2_w)
+	AM_RANGE(0x500018, 0x500019) AM_READ(bbakraid_eeprom_r)
+	AM_RANGE(0x50001a, 0x50001b) AM_WRITE(batrider_unknown_sound_w)
+	AM_RANGE(0x50001c, 0x50001d) AM_WRITE(batrider_clear_sndirq_w)
+	AM_RANGE(0x50001e, 0x50001f) AM_WRITE(bbakraid_eeprom_w)
 	AM_RANGE(0x500080, 0x500081) AM_WRITE_LEGACY(batrider_textdata_dma_w)
 	AM_RANGE(0x500082, 0x500083) AM_WRITE_LEGACY(batrider_unknown_dma_w)
 	AM_RANGE(0x5000c0, 0x5000cf) AM_WRITE_LEGACY(batrider_objectbank_w)
@@ -1427,7 +1406,7 @@ static ADDRESS_MAP_START( raizing_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(m_shared_ram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe00e, 0xe00e) AM_WRITE_LEGACY(toaplan2_coin_w)
+	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(toaplan2_coin_w)
 ADDRESS_MAP_END
 
 
@@ -1437,11 +1416,11 @@ static ADDRESS_MAP_START( bgaregga_sound_z80_mem, AS_PROGRAM, 8, toaplan2_state 
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(m_shared_ram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe006, 0xe008) AM_WRITE_LEGACY(raizing_oki_bankswitch_w)
-	AM_RANGE(0xe00a, 0xe00a) AM_WRITE_LEGACY(raizing_z80_bankswitch_w)
-	AM_RANGE(0xe00c, 0xe00c) AM_WRITE_LEGACY(bgaregga_E00C_w)
+	AM_RANGE(0xe006, 0xe008) AM_WRITE(raizing_oki_bankswitch_w)
+	AM_RANGE(0xe00a, 0xe00a) AM_WRITE(raizing_z80_bankswitch_w)
+	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(bgaregga_E00C_w)
 	AM_RANGE(0xe01c, 0xe01c) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xe01d, 0xe01d) AM_READ_LEGACY(bgaregga_E01D_r)
+	AM_RANGE(0xe01d, 0xe01d) AM_READ(bgaregga_E01D_r)
 ADDRESS_MAP_END
 
 
@@ -1456,15 +1435,15 @@ static ADDRESS_MAP_START( batrider_sound_z80_port, AS_IO, 8, toaplan2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(soundlatch3_w)
 	AM_RANGE(0x42, 0x42) AM_WRITE_LEGACY(soundlatch4_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE_LEGACY(batrider_sndirq_w)
-	AM_RANGE(0x46, 0x46) AM_WRITE_LEGACY(batrider_clear_nmi_w)
+	AM_RANGE(0x44, 0x44) AM_WRITE(batrider_sndirq_w)
+	AM_RANGE(0x46, 0x46) AM_WRITE(batrider_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ_LEGACY(soundlatch2_r)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x82, 0x82) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x88, 0x88) AM_WRITE_LEGACY(raizing_z80_bankswitch_w)
-	AM_RANGE(0xc0, 0xc6) AM_WRITE_LEGACY(raizing_oki_bankswitch_w)
+	AM_RANGE(0x88, 0x88) AM_WRITE(raizing_z80_bankswitch_w)
+	AM_RANGE(0xc0, 0xc6) AM_WRITE(raizing_oki_bankswitch_w)
 ADDRESS_MAP_END
 
 
@@ -1478,8 +1457,8 @@ static ADDRESS_MAP_START( bbakraid_sound_z80_port, AS_IO, 8, toaplan2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(soundlatch3_w)
 	AM_RANGE(0x42, 0x42) AM_WRITE_LEGACY(soundlatch4_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE_LEGACY(batrider_sndirq_w)
-	AM_RANGE(0x46, 0x46) AM_WRITE_LEGACY(batrider_clear_nmi_w)
+	AM_RANGE(0x44, 0x44) AM_WRITE(batrider_sndirq_w)
+	AM_RANGE(0x46, 0x46) AM_WRITE(batrider_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ_LEGACY(soundlatch2_r)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ymz", ymz280b_r, ymz280b_w)
@@ -1510,7 +1489,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( fixeight_v25_mem, AS_PROGRAM, 8, toaplan2_state )
-	AM_RANGE(0x00004, 0x00004) AM_READ_LEGACY(fixeight_region_r)
+	AM_RANGE(0x00004, 0x00004) AM_READ(fixeight_region_r)
 	AM_RANGE(0x0000a, 0x0000b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x0000c, 0x0000c) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x80000, 0x87fff) AM_MIRROR(0x78000) AM_RAM AM_BASE(m_shared_ram)
@@ -1524,17 +1503,17 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( v25_port, AS_IO, 8, toaplan2_state )
-	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ_LEGACY(v25_dswa_r)
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ_LEGACY(v25_dswb_r)
-	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ_LEGACY(v25_jmpr_r)
+	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswa_r)
+	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswb_r)
+	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_r)
 	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP	// bit 0 is FAULT according to kbash schematic
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( dogyuun_v25_port, AS_IO, 8, toaplan2_state )
-	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ_LEGACY(v25_dswb_r)
-	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ_LEGACY(v25_dswa_r)
-	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ_LEGACY(v25_jmpr_r)
+	AM_RANGE(V25_PORT_PT, V25_PORT_PT) AM_READ(v25_dswb_r)
+	AM_RANGE(V25_PORT_P0, V25_PORT_P0) AM_READ(v25_dswa_r)
+	AM_RANGE(V25_PORT_P1, V25_PORT_P1) AM_READ(v25_jmpr_r)
 	AM_RANGE(V25_PORT_P2, V25_PORT_P2) AM_WRITENOP	// bit 0 is FAULT according to kbash schematic
 ADDRESS_MAP_END
 

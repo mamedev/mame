@@ -32,12 +32,11 @@ static INTERRUPT_GEN( popeye_interrupt )
 /* the protection device simply returns the last two values written shifted left */
 /* by a variable amount. */
 
-static READ8_HANDLER( protection_r )
+READ8_MEMBER(popeye_state::protection_r)
 {
-	popeye_state *state = space->machine().driver_data<popeye_state>();
 	if (offset == 0)
 	{
-		return ((state->m_prot1 << state->m_prot_shift) | (state->m_prot0 >> (8-state->m_prot_shift))) & 0xff;
+		return ((m_prot1 << m_prot_shift) | (m_prot0 >> (8-m_prot_shift))) & 0xff;
 	}
 	else	/* offset == 1 */
 	{
@@ -46,18 +45,17 @@ static READ8_HANDLER( protection_r )
 	}
 }
 
-static WRITE8_HANDLER( protection_w )
+WRITE8_MEMBER(popeye_state::protection_w)
 {
-	popeye_state *state = space->machine().driver_data<popeye_state>();
 	if (offset == 0)
 	{
 		/* this is the same as the level number (1-3) */
-		state->m_prot_shift = data & 0x07;
+		m_prot_shift = data & 0x07;
 	}
 	else	/* offset == 1 */
 	{
-		state->m_prot0 = state->m_prot1;
-		state->m_prot1 = data;
+		m_prot0 = m_prot1;
+		m_prot1 = data;
 	}
 }
 
@@ -74,7 +72,7 @@ static ADDRESS_MAP_START( skyskipr_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE_LEGACY(popeye_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE_LEGACY(popeye_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE_LEGACY(skyskipr_bitmap_w)
-	AM_RANGE(0xe000, 0xe001) AM_READWRITE_LEGACY(protection_r,protection_w)
+	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popeye_map, AS_PROGRAM, 8, popeye_state )
@@ -88,7 +86,7 @@ static ADDRESS_MAP_START( popeye_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0xa000, 0xa3ff) AM_WRITE_LEGACY(popeye_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xa400, 0xa7ff) AM_WRITE_LEGACY(popeye_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE_LEGACY(popeye_bitmap_w)
-	AM_RANGE(0xe000, 0xe001) AM_READWRITE_LEGACY(protection_r,protection_w)
+	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( popeyebl_map, AS_PROGRAM, 8, popeye_state )

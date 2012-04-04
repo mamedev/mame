@@ -30,22 +30,21 @@
 #include "sound/ay8910.h"
 #include "includes/hanaawas.h"
 
-static READ8_HANDLER( hanaawas_input_port_0_r )
+READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 {
-	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
 	int i, ordinal = 0;
 	UINT16 buttons = 0;
 
-	switch (state->m_mux)
+	switch (m_mux)
 	{
 	case 1: /* start buttons */
-		buttons = input_port_read(space->machine(), "START");
+		buttons = input_port_read(machine(), "START");
 		break;
 	case 2: /* player 1 buttons */
-		buttons = input_port_read(space->machine(), "P1");
+		buttons = input_port_read(machine(), "P1");
 		break;
 	case 4: /* player 2 buttons */
-		buttons = input_port_read(space->machine(), "P2");
+		buttons = input_port_read(machine(), "P2");
 		break;
 	}
 
@@ -61,13 +60,12 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 		}
 	}
 
-	return (input_port_read(space->machine(), "IN0") & 0xf0) | ordinal;
+	return (input_port_read(machine(), "IN0") & 0xf0) | ordinal;
 }
 
-static WRITE8_HANDLER( hanaawas_inputs_mux_w )
+WRITE8_MEMBER(hanaawas_state::hanaawas_inputs_mux_w)
 {
-	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
-	state->m_mux = data;
+	m_mux = data;
 }
 
 static ADDRESS_MAP_START( hanaawas_map, AS_PROGRAM, 8, hanaawas_state )
@@ -82,7 +80,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, hanaawas_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(hanaawas_input_port_0_r, hanaawas_inputs_mux_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(hanaawas_input_port_0_r, hanaawas_inputs_mux_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP /* it must return 0 */
 	AM_RANGE(0x10, 0x10) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)

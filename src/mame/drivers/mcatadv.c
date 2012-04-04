@@ -144,28 +144,27 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 /*** Main CPU ***/
 
-static WRITE16_HANDLER( mcat_soundlatch_w )
+WRITE16_MEMBER(mcatadv_state::mcat_soundlatch_w)
 {
-	mcatadv_state *state = space->machine().driver_data<mcatadv_state>();
 
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
-static WRITE16_HANDLER( mcat_coin_w )
+WRITE16_MEMBER(mcatadv_state::mcat_coin_w)
 {
 	if(ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x1000);
-		coin_counter_w(space->machine(), 1, data & 0x2000);
-		coin_lockout_w(space->machine(), 0, ~data & 0x4000);
-		coin_lockout_w(space->machine(), 1, ~data & 0x8000);
+		coin_counter_w(machine(), 0, data & 0x1000);
+		coin_counter_w(machine(), 1, data & 0x2000);
+		coin_lockout_w(machine(), 0, ~data & 0x4000);
+		coin_lockout_w(machine(), 1, ~data & 0x8000);
 	}
 }
 #endif
 
-static READ16_HANDLER( mcat_wd_r )
+READ16_MEMBER(mcatadv_state::mcat_wd_r)
 {
 	watchdog_reset_r(space, 0);
 	return 0xc00;
@@ -192,22 +191,22 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
 
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("P2")
-//  AM_RANGE(0x900000, 0x900001) AM_WRITE_LEGACY(mcat_coin_w) // Lockout / Counter MCAT Only
+//  AM_RANGE(0x900000, 0x900001) AM_WRITE(mcat_coin_w) // Lockout / Counter MCAT Only
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0xb00000, 0xb0000f) AM_RAM AM_BASE(m_vidregs)
 
 	AM_RANGE(0xb00018, 0xb00019) AM_WRITE_LEGACY(watchdog_reset16_w) // NOST Only
-	AM_RANGE(0xb0001e, 0xb0001f) AM_READ_LEGACY(mcat_wd_r) // MCAT Only
-	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE_LEGACY(soundlatch2_word_r, mcat_soundlatch_w)
+	AM_RANGE(0xb0001e, 0xb0001f) AM_READ(mcat_wd_r) // MCAT Only
+	AM_RANGE(0xc00000, 0xc00001) AM_READ_LEGACY(soundlatch2_word_r) AM_WRITE(mcat_soundlatch_w)
 ADDRESS_MAP_END
 
 /*** Sound ***/
 
-static WRITE8_HANDLER ( mcatadv_sound_bw_w )
+WRITE8_MEMBER(mcatadv_state::mcatadv_sound_bw_w)
 {
-	memory_set_bank(space->machine(), "bank1", data);
+	memory_set_bank(machine(), "bank1", data);
 }
 
 
@@ -216,7 +215,7 @@ static ADDRESS_MAP_START( mcatadv_sound_map, AS_PROGRAM, 8, mcatadv_state )
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank1")				// ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM						// RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r,ym2610_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(mcatadv_sound_bw_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcatadv_sound_bw_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcatadv_sound_io_map, AS_IO, 8, mcatadv_state )
@@ -235,7 +234,7 @@ static ADDRESS_MAP_START( nost_sound_io_map, AS_IO, 8, mcatadv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2610_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREAD_LEGACY("ymsnd", ym2610_r)
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(mcatadv_sound_bw_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(mcatadv_sound_bw_w)
 	AM_RANGE(0x80, 0x80) AM_READWRITE_LEGACY(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 

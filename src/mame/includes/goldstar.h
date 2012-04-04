@@ -37,6 +37,37 @@ public:
 	UINT8 m_lucky8_nmi_enable;
 	int m_tile_bank;
 
+	DECLARE_WRITE8_MEMBER(protection_w);
+	DECLARE_READ8_MEMBER(protection_r);
+	DECLARE_WRITE8_MEMBER(ncb3_port81_w);
+	DECLARE_WRITE8_MEMBER(cm_outport1_w);
+	DECLARE_WRITE8_MEMBER(lucky8_outport_w);
+	DECLARE_WRITE8_MEMBER(magodds_outb850_w);
+	DECLARE_WRITE8_MEMBER(magodds_outb860_w);
+	DECLARE_WRITE8_MEMBER(ladylinr_outport_w);
+	DECLARE_READ8_MEMBER(unkch_unk_r);
+	DECLARE_WRITE8_MEMBER(unkcm_0x02_w);
+	DECLARE_WRITE8_MEMBER(unkcm_0x03_w);
+	DECLARE_WRITE8_MEMBER(unkcm_0x11_w);
+	DECLARE_WRITE8_MEMBER(unkcm_0x12_w);
+	DECLARE_READ8_MEMBER(fixedvalb4_r);
+	DECLARE_READ8_MEMBER(fixedvala8_r);
+	DECLARE_READ8_MEMBER(fixedval38_r);
+	DECLARE_READ8_MEMBER(fixedvalea_r);
+	DECLARE_READ8_MEMBER(fixedval68_r);
+	DECLARE_READ8_MEMBER(fixedval58_r);
+	DECLARE_READ8_MEMBER(fixedval80_r);
+	DECLARE_READ8_MEMBER(fixedval96_r);
+	DECLARE_READ8_MEMBER(fixedvalaa_r);
+	DECLARE_READ8_MEMBER(fixedvalbe_r);
+	DECLARE_READ8_MEMBER(fixedval90_r);
+	DECLARE_READ8_MEMBER(fixedval84_r);
+	DECLARE_READ8_MEMBER(fixedvalb2_r);
+	DECLARE_READ8_MEMBER(fixedval48_r);
+	DECLARE_READ8_MEMBER(fixedval09_r);
+	DECLARE_READ8_MEMBER(fixedval74_r);
+	DECLARE_READ8_MEMBER(fixedvale4_r);
+	DECLARE_READ8_MEMBER(fixedvalc7_r);
 };
 
 

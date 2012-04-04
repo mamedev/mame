@@ -43,6 +43,7 @@ public:
 	bitmap_ind16 m_motion_object_1_vid;
 	bitmap_ind16 m_motion_object_2_vid;
 	bitmap_ind16 m_motion_object_2_clip;
+	DECLARE_WRITE8_MEMBER(fax_bank_select_w);
 };
 
 

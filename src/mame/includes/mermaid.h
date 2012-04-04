@@ -48,6 +48,12 @@ public:
 	device_t *m_ay2;
 
 	UINT8    m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(mermaid_ay8910_write_port_w);
+	DECLARE_WRITE8_MEMBER(mermaid_ay8910_control_port_w);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(rougien_sample_rom_lo_w);
+	DECLARE_WRITE8_MEMBER(rougien_sample_rom_hi_w);
+	DECLARE_WRITE8_MEMBER(rougien_sample_playback_w);
 };
 
 

@@ -29,6 +29,7 @@ public:
 	UINT8 *m_videoram;
 	tilemap_t *m_bg_tilemap;
 	int m_width;
+	DECLARE_WRITE8_MEMBER(skydiver_nmion_w);
 };
 
 

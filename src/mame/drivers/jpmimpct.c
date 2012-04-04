@@ -158,14 +158,14 @@ static MACHINE_RESET( jpmimpct )
  *
  *************************************/
 
-static WRITE16_HANDLER( m68k_tms_w )
+WRITE16_MEMBER(jpmimpct_state::m68k_tms_w)
 {
-	tms34010_host_w(space->machine().device("dsp"), offset, data);
+	tms34010_host_w(machine().device("dsp"), offset, data);
 }
 
-static READ16_HANDLER( m68k_tms_r )
+READ16_MEMBER(jpmimpct_state::m68k_tms_r)
 {
-	return tms34010_host_r(space->machine().device("dsp"), offset);
+	return tms34010_host_r(machine().device("dsp"), offset);
 }
 
 
@@ -207,10 +207,9 @@ static TIMER_DEVICE_CALLBACK( duart_1_timer_event )
 	update_irqs(timer.machine());
 }
 
-static READ16_HANDLER( duart_1_r )
+READ16_MEMBER(jpmimpct_state::duart_1_r)
 {
-	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
-	struct duart_t &duart_1 = state->m_duart_1;
+	struct duart_t &duart_1 = m_duart_1;
 	UINT16 val = 0xffff;
 	switch (offset)
 	{
@@ -251,20 +250,20 @@ static READ16_HANDLER( duart_1_r )
 		}
 		case 0xd:
 		{
-			val = input_port_read(space->machine(), "TEST/DEMO");
+			val = input_port_read(machine(), "TEST/DEMO");
 			break;
 		}
 		case 0xe:
 		{
 			attotime rate = attotime::from_hz(MC68681_1_CLOCK) * (16 * duart_1.CT);
-			timer_device *duart_timer = space->machine().device<timer_device>("duart_1_timer");
+			timer_device *duart_timer = machine().device<timer_device>("duart_1_timer");
 			duart_timer->adjust(rate, 0, rate);
 			break;
 		}
 		case 0xf:
 		{
-			state->m_duart_1_irq = 0;
-			update_irqs(space->machine());
+			m_duart_1_irq = 0;
+			update_irqs(machine());
 			duart_1.ISR |= ~0x8;
 			break;
 		}
@@ -273,10 +272,9 @@ static READ16_HANDLER( duart_1_r )
 	return val;
 }
 
-static WRITE16_HANDLER( duart_1_w )
+WRITE16_MEMBER(jpmimpct_state::duart_1_w)
 {
-	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
-	struct duart_t &duart_1 = state->m_duart_1;
+	struct duart_t &duart_1 = m_duart_1;
 	//int old_val;
 	switch (offset)
 	{
@@ -360,20 +358,19 @@ static WRITE16_HANDLER( duart_1_w )
     Communication with a touchscreen interface PCB
     is handled via UART B.
 */
-static READ16_HANDLER( duart_2_r )
+READ16_MEMBER(jpmimpct_state::duart_2_r)
 {
-	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
 	switch (offset)
 	{
 		case 0x9:
 		{
-			if (state->m_touch_cnt == 0)
+			if (m_touch_cnt == 0)
 			{
-				if ( input_port_read(space->machine(), "TOUCH") & 0x1 )
+				if ( input_port_read(machine(), "TOUCH") & 0x1 )
 				{
-					state->m_touch_data[0] = 0x2a;
-					state->m_touch_data[1] = 0x7 - (input_port_read(space->machine(), "TOUCH_Y") >> 5) + 0x30;
-					state->m_touch_data[2] = (input_port_read(space->machine(), "TOUCH_X") >> 5) + 0x30;
+					m_touch_data[0] = 0x2a;
+					m_touch_data[1] = 0x7 - (input_port_read(machine(), "TOUCH_Y") >> 5) + 0x30;
+					m_touch_data[2] = (input_port_read(machine(), "TOUCH_X") >> 5) + 0x30;
 
 					/* Return RXRDY */
 					return 0x1;
@@ -387,10 +384,10 @@ static READ16_HANDLER( duart_2_r )
 		}
 		case 0xb:
 		{
-			UINT16 val = state->m_touch_data[state->m_touch_cnt];
+			UINT16 val = m_touch_data[m_touch_cnt];
 
-			if (state->m_touch_cnt++ == 3)
-				state->m_touch_cnt = 0;
+			if (m_touch_cnt++ == 3)
+				m_touch_cnt = 0;
 
 			return val;
 		}
@@ -402,7 +399,7 @@ static READ16_HANDLER( duart_2_r )
 /*
     Nothing important here?
 */
-static WRITE16_HANDLER( duart_2_w )
+WRITE16_MEMBER(jpmimpct_state::duart_2_w)
 {
 }
 
@@ -429,7 +426,7 @@ static WRITE16_HANDLER( duart_2_w )
  *  9: Coin mechanism
  */
 
-static READ16_HANDLER( inputs1_r )
+READ16_MEMBER(jpmimpct_state::inputs1_r)
 {
 	UINT16 val = 0x00ff;
 
@@ -437,22 +434,22 @@ static READ16_HANDLER( inputs1_r )
 	{
 		case 0:
 		{
-			val = input_port_read(space->machine(), "DSW");
+			val = input_port_read(machine(), "DSW");
 			break;
 		}
 		case 2:
 		{
-			val = input_port_read(space->machine(), "SW2");
+			val = input_port_read(machine(), "SW2");
 			break;
 		}
 		case 4:
 		{
-			val = input_port_read(space->machine(), "SW1");
+			val = input_port_read(machine(), "SW1");
 			break;
 		}
 		case 9:
 		{
-			val = input_port_read(space->machine(), "COINS");
+			val = input_port_read(machine(), "COINS");
 			break;
 		}
 	}
@@ -501,34 +498,33 @@ static READ16_DEVICE_HANDLER( upd7759_r )
  *
  *************************************/
 
-static READ16_HANDLER( unk_r )
+READ16_MEMBER(jpmimpct_state::unk_r)
 {
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( unk_w )
+WRITE16_MEMBER(jpmimpct_state::unk_w)
 {
 }
 
-static void jpm_draw_lamps(jpmimpct_state *state, int data, int lamp_strobe)
+void jpmimpct_state::jpm_draw_lamps(int data, int lamp_strobe)
 {
 	int i;
 	for (i=0; i<16; i++)
 	{
-		state->m_Lamps[16*(state->m_lamp_strobe+i)] = data & 1;
-		output_set_lamp_value((16*lamp_strobe)+i, (state->m_Lamps[(16*lamp_strobe)+i]));
+		m_Lamps[16*(m_lamp_strobe+i)] = data & 1;
+		output_set_lamp_value((16*lamp_strobe)+i, (m_Lamps[(16*lamp_strobe)+i]));
 		data = data >> 1;
 	}
 }
 
-static READ16_HANDLER( jpmio_r )
+READ16_MEMBER(jpmimpct_state::jpmio_r)
 {
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( jpmio_w )
+WRITE16_MEMBER(jpmimpct_state::jpmio_w)
 {
-	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
 	switch (offset)
 	{
 		case 0x02:
@@ -557,26 +553,26 @@ static WRITE16_HANDLER( jpmio_w )
 			else
 //          slide = 0;
 			MechMtr_update(0, data >> 10);
-			state->m_duart_1.IP &= ~0x10;
+			m_duart_1.IP &= ~0x10;
 			break;
 		}
 
 		case 0x08:
 		{
-			jpm_draw_lamps(state, data, state->m_lamp_strobe);
+			jpm_draw_lamps(data, m_lamp_strobe);
 			break;
 		}
 
 		case 0x0b:
 		{
-			output_set_digit_value(state->m_lamp_strobe,data);
+			output_set_digit_value(m_lamp_strobe,data);
 			break;
 		}
 		case 0x0f:
 		{
 			if (data & 0x10)
 			{
-				state->m_lamp_strobe = (data +1) & 0x0f;
+				m_lamp_strobe = (data +1) & 0x0f;
 			}
 			break;
 		}
@@ -592,19 +588,19 @@ static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
 	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE_LEGACY(duart_1_r, duart_1_w)
-	AM_RANGE(0x00480020, 0x00480033) AM_READ_LEGACY(inputs1_r)
-	AM_RANGE(0x00480034, 0x00480035) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0x00480060, 0x00480067) AM_READWRITE_LEGACY(unk_r, unk_w)//PPI
-	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE_LEGACY(jpmio_r, jpmio_w)
-	AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE_LEGACY(unk_w)
-	AM_RANGE(0x004801dc, 0x004801dd) AM_READ_LEGACY(unk_r)
-	AM_RANGE(0x004801de, 0x004801df) AM_READ_LEGACY(unk_r)
+	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
+	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1_r)
+	AM_RANGE(0x00480034, 0x00480035) AM_READ(unk_r)
+	AM_RANGE(0x00480060, 0x00480067) AM_READWRITE(unk_r, unk_w)//PPI
+	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmio_w)
+	AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
+	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
+	AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
 	AM_RANGE(0x00480080, 0x00480081) AM_DEVWRITE_LEGACY("upd", upd7759_w)
 	AM_RANGE(0x00480082, 0x00480083) AM_DEVWRITE_LEGACY("upd", volume_w)
 	AM_RANGE(0x00480084, 0x00480085) AM_DEVREAD_LEGACY("upd", upd7759_r)
-	AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE_LEGACY(duart_2_r, duart_2_w)
-	AM_RANGE(0x00800000, 0x00800007) AM_READWRITE_LEGACY(m68k_tms_r, m68k_tms_w)
+	AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
+	AM_RANGE(0x00800000, 0x00800007) AM_READWRITE(m68k_tms_r, m68k_tms_w)
 	AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
 	AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
 	AM_RANGE(0x00e00000, 0x00efffff) AM_ROM
@@ -1033,7 +1029,7 @@ static MACHINE_RESET( impctawp )
  *  8: Payslides
  *  9: Coin mechanism
  */
-static READ16_HANDLER( inputs1awp_r )
+READ16_MEMBER(jpmimpct_state::inputs1awp_r)
 {
 	UINT16 val = 0x00;
 
@@ -1042,47 +1038,47 @@ static READ16_HANDLER( inputs1awp_r )
 		{
 			case 0:
 			{
-				val = input_port_read(space->machine(), "DSW");
+				val = input_port_read(machine(), "DSW");
 				break;
 			}
 			case 1:
 			{
-				val = input_port_read(space->machine(), "PERCENT");
+				val = input_port_read(machine(), "PERCENT");
 				break;
 			}
 			case 2:
 			{
-				val = input_port_read(space->machine(), "KEYS");
+				val = input_port_read(machine(), "KEYS");
 				break;
 			}
 			case 3:
 			{
-				val = input_port_read(space->machine(), "SW2");
+				val = input_port_read(machine(), "SW2");
 				break;
 			}
 			case 4:
 			{
-				val = input_port_read(space->machine(), "SW1");
+				val = input_port_read(machine(), "SW1");
 				break;
 			}
 			case 5:
 			{
-				val = (input_port_read(space->machine(), "SW3") );
+				val = (input_port_read(machine(), "SW3") );
 				break;
 			}
 			case 6:
 			{
-				val = (input_port_read(space->machine(), "SW4") );
+				val = (input_port_read(machine(), "SW4") );
 				break;
 			}
 			case 7://5
 			{
-				val = (input_port_read(space->machine(), "SW5") );
+				val = (input_port_read(machine(), "SW5") );
 				break;
 			}
 			case 9:
 			{
-				val = input_port_read(space->machine(), "COINS");
+				val = input_port_read(machine(), "COINS");
 				break;
 			}
 		}
@@ -1090,32 +1086,30 @@ static READ16_HANDLER( inputs1awp_r )
 	}
 }
 
-static READ16_HANDLER( optos_r )
+READ16_MEMBER(jpmimpct_state::optos_r)
 {
-	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
 	int i;
 
 	for (i=0; i<6; i++)
 	{
-		if ( stepper_optic_state(i) ) state->m_optic_pattern |= (1 << i);
-		else                          state->m_optic_pattern &= ~(1 << i);
+		if ( stepper_optic_state(i) ) m_optic_pattern |= (1 << i);
+		else                          m_optic_pattern &= ~(1 << i);
 	}
-	return state->m_optic_pattern;
+	return m_optic_pattern;
 }
 
-static READ16_HANDLER( prot_1_r )
+READ16_MEMBER(jpmimpct_state::prot_1_r)
 {
 	return 0x01;
 }
 
-static READ16_HANDLER( prot_0_r )
+READ16_MEMBER(jpmimpct_state::prot_0_r)
 {
 	return 0x00;
 }
 
-static WRITE16_HANDLER( jpmioawp_w )
+WRITE16_MEMBER(jpmimpct_state::jpmioawp_w)
 {
-	jpmimpct_state *state = space->machine().driver_data<jpmimpct_state>();
 	int i,metno;
 	switch (offset)
 	{
@@ -1150,11 +1144,11 @@ static WRITE16_HANDLER( jpmioawp_w )
 			//Slides
 			if ((data & 0xff)!=0x00)
 			{
-				state->m_slidesout=2;
+				m_slidesout=2;
 			}
-			if (((data & 0xff)==0x00) && (state->m_slidesout==2))
+			if (((data & 0xff)==0x00) && (m_slidesout==2))
 			{
-				state->m_slidesout=1;
+				m_slidesout=1;
 			}
 	      // Meters
 			metno=(data >>8) & 0xff;
@@ -1182,38 +1176,38 @@ static WRITE16_HANDLER( jpmioawp_w )
 
 			if(combined_meter)
 			{
-				state->m_duart_1.IP &= ~0x10;
+				m_duart_1.IP &= ~0x10;
 			}
 			else
 			{
-				state->m_duart_1.IP |= 0x10;
+				m_duart_1.IP |= 0x10;
 			}
 			break;
 		}
 
 		case 0x08:
 		{
-			jpm_draw_lamps(state, data, state->m_lamp_strobe);
+			jpm_draw_lamps(data, m_lamp_strobe);
 			break;
 		}
 
 		case 0x0b:
 		{
-			output_set_digit_value(state->m_lamp_strobe,data);
+			output_set_digit_value(m_lamp_strobe,data);
 			break;
 		}
 		case 0x0f:
 		{
 			if (data & 0x10)
 			{
-				state->m_lamp_strobe = (data & 0x0f);
+				m_lamp_strobe = (data & 0x0f);
 			}
 			break;
 		}
 	}
 }
 
-static READ16_HANDLER( ump_r )
+READ16_MEMBER(jpmimpct_state::ump_r)
 {
 	return 0xff;//0xffff;
 }
@@ -1227,28 +1221,28 @@ static ADDRESS_MAP_START( awp68k_program_map, AS_PROGRAM, 16, jpmimpct_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
 	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE_LEGACY(duart_1_r, duart_1_w)
-	AM_RANGE(0x00480020, 0x00480033) AM_READ_LEGACY(inputs1awp_r)
-	AM_RANGE(0x00480034, 0x00480035) AM_READ_LEGACY(ump_r)
-	AM_RANGE(0x00480040, 0x00480041) AM_READ_LEGACY(optos_r)
+	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
+	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1awp_r)
+	AM_RANGE(0x00480034, 0x00480035) AM_READ(ump_r)
+	AM_RANGE(0x00480040, 0x00480041) AM_READ(optos_r)
 	AM_RANGE(0x00480060, 0x00480067) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write,0x00ff)
 	AM_RANGE(0x00480080, 0x00480081) AM_DEVWRITE_LEGACY("upd", upd7759_w)
 	AM_RANGE(0x00480082, 0x00480083) AM_DEVWRITE_LEGACY("upd",volume_w)
 	AM_RANGE(0x00480084, 0x00480085) AM_DEVREAD_LEGACY("upd", upd7759_r)
-	AM_RANGE(0x00480086, 0x0048009f) AM_READ_LEGACY(prot_1_r)
-	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE_LEGACY(jpmio_r, jpmioawp_w)
-//  AM_RANGE(0x004800b0, 0x004800df) AM_READ_LEGACY(prot_1_r)
-//  AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE_LEGACY(unk_w)
-//  AM_RANGE(0x00480086, 0x006576ff) AM_READ_LEGACY(prot_1_r)
-	AM_RANGE(0x004801dc, 0x004801dd) AM_READ_LEGACY(prot_1_r)
-	AM_RANGE(0x004801de, 0x006575ff) AM_READ_LEGACY(prot_1_r)
-	AM_RANGE(0x00657600, 0x00657601) AM_READ_LEGACY(prot_0_r)
-	AM_RANGE(0x00657602, 0x00ffffff) AM_READ_LEGACY(prot_1_r)
+	AM_RANGE(0x00480086, 0x0048009f) AM_READ(prot_1_r)
+	AM_RANGE(0x004800a0, 0x004800af) AM_READWRITE(jpmio_r, jpmioawp_w)
+//  AM_RANGE(0x004800b0, 0x004800df) AM_READ(prot_1_r)
+//  AM_RANGE(0x004800e0, 0x004800e1) AM_WRITE(unk_w)
+//  AM_RANGE(0x00480086, 0x006576ff) AM_READ(prot_1_r)
+	AM_RANGE(0x004801dc, 0x004801dd) AM_READ(prot_1_r)
+	AM_RANGE(0x004801de, 0x006575ff) AM_READ(prot_1_r)
+	AM_RANGE(0x00657600, 0x00657601) AM_READ(prot_0_r)
+	AM_RANGE(0x00657602, 0x00ffffff) AM_READ(prot_1_r)
 
-//  AM_RANGE(0x004801dc, 0x004801dd) AM_READ_LEGACY(unk_r)
-//  AM_RANGE(0x004801de, 0x004801df) AM_READ_LEGACY(unk_r)
-	//AM_RANGE(0x00657602, 0x00bfffff) AM_READ_LEGACY(prot_1_r)
-//  AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE_LEGACY(duart_2_r, duart_2_w)
+//  AM_RANGE(0x004801dc, 0x004801dd) AM_READ(unk_r)
+//  AM_RANGE(0x004801de, 0x004801df) AM_READ(unk_r)
+	//AM_RANGE(0x00657602, 0x00bfffff) AM_READ(prot_1_r)
+//  AM_RANGE(0x004801e0, 0x004801ff) AM_READWRITE(duart_2_r, duart_2_w)
 //  AM_RANGE(0x00c00000, 0x00cfffff) AM_ROM
 //  AM_RANGE(0x00d00000, 0x00dfffff) AM_ROM
 //  AM_RANGE(0x00e00000, 0x00efffff) AM_ROM

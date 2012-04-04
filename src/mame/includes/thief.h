@@ -17,6 +17,8 @@ public:
 	UINT8 m_write_mask;
 	UINT8 m_video_control;
 	coprocessor_t m_coprocessor;
+	DECLARE_WRITE8_MEMBER(thief_input_select_w);
+	DECLARE_READ8_MEMBER(thief_io_r);
 };
 
 

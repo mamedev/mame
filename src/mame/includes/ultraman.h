@@ -27,6 +27,8 @@ public:
 	device_t *m_k051316_2;
 	device_t *m_k051316_3;
 	device_t *m_k051960;
+	DECLARE_WRITE16_MEMBER(sound_cmd_w);
+	DECLARE_WRITE16_MEMBER(sound_irq_trigger_w);
 };
 
 

@@ -104,32 +104,30 @@ static TIMER_CALLBACK( nmi_callback )
 		state->m_pending_nmi = 1;
 }
 
-static WRITE8_HANDLER( lkage_sound_command_w )
+WRITE8_MEMBER(lkage_state::lkage_sound_command_w)
 {
 	soundlatch_w(space, offset, data);
-	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
-static WRITE8_HANDLER( lkage_sh_nmi_disable_w )
+WRITE8_MEMBER(lkage_state::lkage_sh_nmi_disable_w)
 {
-	lkage_state *state = space->machine().driver_data<lkage_state>();
-	state->m_sound_nmi_enable = 0;
+	m_sound_nmi_enable = 0;
 }
 
-static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
+WRITE8_MEMBER(lkage_state::lkage_sh_nmi_enable_w)
 {
-	lkage_state *state = space->machine().driver_data<lkage_state>();
 
-	state->m_sound_nmi_enable = 1;
-	if (state->m_pending_nmi)
+	m_sound_nmi_enable = 1;
+	if (m_pending_nmi)
 	{
 		/* probably wrong but commands may go lost otherwise */
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->m_pending_nmi = 0;
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_pending_nmi = 0;
 	}
 }
 
-static READ8_HANDLER(sound_status_r)
+READ8_MEMBER(lkage_state::sound_status_r)
 {
 	return 0xff;
 }
@@ -139,8 +137,8 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE(m_vreg) /* video registers */
-	AM_RANGE(0xf060, 0xf060) AM_WRITE_LEGACY(lkage_sound_command_w)
-	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ_LEGACY(sound_status_r)
+	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
+	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ(sound_status_r)
 	AM_RANGE(0xf062, 0xf062) AM_READWRITE_LEGACY(lkage_mcu_r,lkage_mcu_w)
 	AM_RANGE(0xf063, 0xf063) AM_WRITENOP /* pulsed; nmi on sound cpu? */
 	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
@@ -159,13 +157,13 @@ static ADDRESS_MAP_START( lkage_map, AS_PROGRAM, 8, lkage_state )
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( port_fetch_r )
+READ8_MEMBER(lkage_state::port_fetch_r)
 {
-	return space->machine().region("user1")->base()[offset];
+	return machine().region("user1")->base()[offset];
 }
 
 static ADDRESS_MAP_START( lkage_io_map, AS_IO, 8, lkage_state )
-	AM_RANGE(0x4000, 0x7fff) AM_READ_LEGACY(port_fetch_r)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(port_fetch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lkage_m68705_map, AS_PROGRAM, 8, lkage_state )
@@ -190,8 +188,8 @@ static ADDRESS_MAP_START( lkage_sound_map, AS_PROGRAM, 8, lkage_state )
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP	/* ??? */
-	AM_RANGE(0xb001, 0xb001) AM_READNOP	/* ??? */ AM_WRITE_LEGACY(lkage_sh_nmi_enable_w)
-	AM_RANGE(0xb002, 0xb002) AM_WRITE_LEGACY(lkage_sh_nmi_disable_w)
+	AM_RANGE(0xb001, 0xb001) AM_READNOP	/* ??? */ AM_WRITE(lkage_sh_nmi_enable_w)
+	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)
 	AM_RANGE(0xb003, 0xb003) AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostic ROM? */
 ADDRESS_MAP_END
@@ -918,52 +916,49 @@ ROM_END
 
 /*Note: This probably uses another MCU dump,which is undumped.*/
 
-static READ8_HANDLER( fake_mcu_r )
+READ8_MEMBER(lkage_state::fake_mcu_r)
 {
-	lkage_state *state = space->machine().driver_data<lkage_state>();
 	int result = 0;
 
-	switch (state->m_mcu_val)
+	switch (m_mcu_val)
 	{
 		/*These are for the attract mode*/
 		case 0x01:
-			result = state->m_mcu_val - 1;
+			result = m_mcu_val - 1;
 			break;
 
 		case 0x90:
-			result = state->m_mcu_val + 0x43;
+			result = m_mcu_val + 0x43;
 			break;
 
 		/*Gameplay Protection,checked in this order at a start of a play*/
 		case 0xa6:
-			result = state->m_mcu_val + 0x27;
+			result = m_mcu_val + 0x27;
 			break;
 
 		case 0x34:
-			result = state->m_mcu_val + 0x7f;
+			result = m_mcu_val + 0x7f;
 			break;
 
 		case 0x48:
-			result = state->m_mcu_val + 0xb7;
+			result = m_mcu_val + 0xb7;
 			break;
 
 		default:
-			result = state->m_mcu_val;
+			result = m_mcu_val;
 			break;
 	}
 	return result;
 }
 
-static WRITE8_HANDLER( fake_mcu_w )
+WRITE8_MEMBER(lkage_state::fake_mcu_w)
 {
-	lkage_state *state = space->machine().driver_data<lkage_state>();
-	state->m_mcu_val = data;
+	m_mcu_val = data;
 }
 
-static READ8_HANDLER( fake_status_r )
+READ8_MEMBER(lkage_state::fake_status_r)
 {
-	lkage_state *state = space->machine().driver_data<lkage_state>();
-	return state->m_mcu_ready;
+	return m_mcu_ready;
 }
 
 static DRIVER_INIT( lkage )
@@ -975,9 +970,9 @@ static DRIVER_INIT( lkage )
 static DRIVER_INIT( lkageb )
 {
 	lkage_state *state = machine.driver_data<lkage_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf062, 0xf062, FUNC(fake_mcu_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf087, 0xf087, FUNC(fake_status_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xf062, 0xf062, FUNC(fake_mcu_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf062, 0xf062, read8_delegate(FUNC(lkage_state::fake_mcu_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf087, 0xf087, read8_delegate(FUNC(lkage_state::fake_status_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xf062, 0xf062, write8_delegate(FUNC(lkage_state::fake_mcu_w),state));
 	state->m_sprite_dx=0;
 }
 

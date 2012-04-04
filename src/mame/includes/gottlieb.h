@@ -240,6 +240,14 @@ public:
 	tilemap_t *m_bg_tilemap;
 	double m_weights[4];
 	UINT8 *m_spriteram;
+	DECLARE_WRITE8_MEMBER(gottlieb_analog_reset_w);
+	DECLARE_WRITE8_MEMBER(general_output_w);
+	DECLARE_WRITE8_MEMBER(reactor_output_w);
+	DECLARE_WRITE8_MEMBER(stooges_output_w);
+	DECLARE_READ8_MEMBER(laserdisc_status_r);
+	DECLARE_WRITE8_MEMBER(laserdisc_select_w);
+	DECLARE_WRITE8_MEMBER(laserdisc_command_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_sh_w);
 };
 
 

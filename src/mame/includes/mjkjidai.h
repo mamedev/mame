@@ -17,6 +17,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	UINT8 m_nmi_mask;
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(keyboard_select_w);
 };
 
 

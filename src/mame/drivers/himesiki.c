@@ -89,19 +89,18 @@ A                                                   12.000MHz
 
 #define MCLK	XTAL_12MHz
 
-static WRITE8_HANDLER( himesiki_rombank_w )
+WRITE8_MEMBER(himesiki_state::himesiki_rombank_w)
 {
-	memory_set_bank(space->machine(), "bank1", ((data & 0x08) >> 3));
+	memory_set_bank(machine(), "bank1", ((data & 0x08) >> 3));
 
 	if (data & 0xf7)
 		logerror("p06_w %02x\n", data);
 }
 
-static WRITE8_HANDLER( himesiki_sound_w )
+WRITE8_MEMBER(himesiki_state::himesiki_sound_w)
 {
-	himesiki_state *state = space->machine().driver_data<himesiki_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /****************************************************************************/
@@ -123,11 +122,11 @@ static ADDRESS_MAP_START( himesiki_iom0, AS_IO, 8, himesiki_state )
 	AM_RANGE(0x03, 0x03) AM_WRITENOP // 8255 cw
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW2")
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(himesiki_rombank_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(himesiki_rombank_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // 8255 cw
 	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(himesiki_flip_w)
 	AM_RANGE(0x09, 0x0a) AM_WRITE_LEGACY(himesiki_scrollx_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE_LEGACY(himesiki_sound_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(himesiki_sound_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( himesiki_prm1, AS_PROGRAM, 8, himesiki_state )

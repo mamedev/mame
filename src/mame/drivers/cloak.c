@@ -126,34 +126,33 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( cloak_led_w )
+WRITE8_MEMBER(cloak_state::cloak_led_w)
 {
-	set_led_status(space->machine(), 1 - offset, ~data & 0x80);
+	set_led_status(machine(), 1 - offset, ~data & 0x80);
 }
 
-static WRITE8_HANDLER( cloak_coin_counter_w )
+WRITE8_MEMBER(cloak_state::cloak_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 1 - offset, data & 0x80);
+	coin_counter_w(machine(), 1 - offset, data & 0x80);
 }
 
-static WRITE8_HANDLER( cloak_custom_w )
+WRITE8_MEMBER(cloak_state::cloak_custom_w)
 {
 }
 
-static WRITE8_HANDLER( cloak_irq_reset_0_w )
+WRITE8_MEMBER(cloak_state::cloak_irq_reset_0_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( cloak_irq_reset_1_w )
+WRITE8_MEMBER(cloak_state::cloak_irq_reset_1_w)
 {
-	cputag_set_input_line(space->machine(), "slave", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "slave", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( cloak_nvram_enable_w )
+WRITE8_MEMBER(cloak_state::cloak_nvram_enable_w)
 {
-	cloak_state *state = space->machine().driver_data<cloak_state>();
-	state->m_nvram_enabled = data & 0x01;
+	m_nvram_enabled = data & 0x01;
 }
 
 
@@ -173,18 +172,18 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, cloak_state )
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P1")
 	AM_RANGE(0x2200, 0x2200) AM_READ_PORT("P2")
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x2600, 0x2600) AM_WRITE_LEGACY(cloak_custom_w)
+	AM_RANGE(0x2600, 0x2600) AM_WRITE(cloak_custom_w)
 	AM_RANGE(0x2800, 0x29ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2f00, 0x2fff) AM_NOP
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x3200, 0x327f) AM_WRITE_LEGACY(cloak_paletteram_w)
-	AM_RANGE(0x3800, 0x3801) AM_WRITE_LEGACY(cloak_coin_counter_w)
+	AM_RANGE(0x3800, 0x3801) AM_WRITE(cloak_coin_counter_w)
 	AM_RANGE(0x3803, 0x3803) AM_WRITE_LEGACY(cloak_flipscreen_w)
 	AM_RANGE(0x3805, 0x3805) AM_WRITENOP	// ???
-	AM_RANGE(0x3806, 0x3807) AM_WRITE_LEGACY(cloak_led_w)
+	AM_RANGE(0x3806, 0x3807) AM_WRITE(cloak_led_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE_LEGACY(cloak_irq_reset_0_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE_LEGACY(cloak_nvram_enable_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(cloak_irq_reset_0_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(cloak_nvram_enable_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -200,9 +199,9 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, cloak_state )
 	AM_RANGE(0x0008, 0x000f) AM_READWRITE_LEGACY(graph_processor_r, graph_processor_w)
 	AM_RANGE(0x0010, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(cloak_irq_reset_1_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(cloak_irq_reset_1_w)
 	AM_RANGE(0x1200, 0x1200) AM_WRITE_LEGACY(cloak_clearbmp_w)
-	AM_RANGE(0x1400, 0x1400) AM_WRITE_LEGACY(cloak_custom_w)
+	AM_RANGE(0x1400, 0x1400) AM_WRITE(cloak_custom_w)
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

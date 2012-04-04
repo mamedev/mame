@@ -337,121 +337,111 @@ static TIMER_DEVICE_CALLBACK( vbl_interrupt )
 	}
 }
 
-static WRITE8_HANDLER( irq_adr_w )
+WRITE8_MEMBER(taitol_state::irq_adr_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 	//logerror("irq_adr_table[%d] = %02x\n", offset, data);
-	state->m_irq_adr_table[offset] = data;
+	m_irq_adr_table[offset] = data;
 }
 
-static READ8_HANDLER( irq_adr_r )
+READ8_MEMBER(taitol_state::irq_adr_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->m_irq_adr_table[offset];
+	return m_irq_adr_table[offset];
 }
 
-static WRITE8_HANDLER( irq_enable_w )
+WRITE8_MEMBER(taitol_state::irq_enable_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 	//logerror("irq_enable = %02x\n",data);
-	state->m_irq_enable = data;
+	m_irq_enable = data;
 
 	// fix Plotting test mode
-	if ((state->m_irq_enable & (1 << state->m_last_irq_level)) == 0)
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	if ((m_irq_enable & (1 << m_last_irq_level)) == 0)
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
-static READ8_HANDLER( irq_enable_r )
+READ8_MEMBER(taitol_state::irq_enable_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->m_irq_enable;
+	return m_irq_enable;
 }
 
 
-static WRITE8_HANDLER( rombankswitch_w )
+WRITE8_MEMBER(taitol_state::rombankswitch_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	if (state->m_cur_rombank != data)
+	if (m_cur_rombank != data)
 	{
-		if (data > state->m_high)
+		if (data > m_high)
 		{
-			state->m_high = data;
-			logerror("New rom size : %x\n", (state->m_high + 1) * 0x2000);
+			m_high = data;
+			logerror("New rom size : %x\n", (m_high + 1) * 0x2000);
 		}
 
-		//logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
-		state->m_cur_rombank = data;
-		memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x10000 + 0x2000 * state->m_cur_rombank);
+		//logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
+		m_cur_rombank = data;
+		memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x10000 + 0x2000 * m_cur_rombank);
 	}
 }
 
-static WRITE8_HANDLER( rombank2switch_w )
+WRITE8_MEMBER(taitol_state::rombank2switch_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
 	data &= 0xf;
 
-	if (state->m_cur_rombank2 != data)
+	if (m_cur_rombank2 != data)
 	{
-		if (data > state->m_high2)
+		if (data > m_high2)
 		{
-			state->m_high2 = data;
-			logerror("New rom2 size : %x\n", (state->m_high2 + 1) * 0x4000);
+			m_high2 = data;
+			logerror("New rom2 size : %x\n", (m_high2 + 1) * 0x4000);
 		}
 
-		//logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(&space->device()));
+		//logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(&space.device()));
 
-		state->m_cur_rombank2 = data;
-		memory_set_bankptr(space->machine(), "bank6", space->machine().region("slave")->base() + 0x10000 + 0x4000 * state->m_cur_rombank2);
+		m_cur_rombank2 = data;
+		memory_set_bankptr(machine(), "bank6", machine().region("slave")->base() + 0x10000 + 0x4000 * m_cur_rombank2);
 	}
 }
 
-static READ8_HANDLER( rombankswitch_r )
+READ8_MEMBER(taitol_state::rombankswitch_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->m_cur_rombank;
+	return m_cur_rombank;
 }
 
-static READ8_HANDLER( rombank2switch_r )
+READ8_MEMBER(taitol_state::rombank2switch_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->m_cur_rombank2;
+	return m_cur_rombank2;
 }
 
-static WRITE8_HANDLER( rambankswitch_w )
+WRITE8_MEMBER(taitol_state::rambankswitch_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	if (state->m_cur_rambank[offset] != data)
+	if (m_cur_rambank[offset] != data)
 	{
-		state->m_cur_rambank[offset] = data;
-//logerror("rabs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
+		m_cur_rambank[offset] = data;
+//logerror("rabs %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
 		if (data >= 0x14 && data <= 0x1f)
 		{
 			data -= 0x14;
-			state->m_current_notifier[offset] = rambank_modify_notifiers[data].notifier;
-			state->m_current_base[offset] = state->m_rambanks + rambank_modify_notifiers[data].offset;
+			m_current_notifier[offset] = rambank_modify_notifiers[data].notifier;
+			m_current_base[offset] = m_rambanks + rambank_modify_notifiers[data].offset;
 		}
 		else if (data == 0x80)
 		{
-			state->m_current_notifier[offset] = palette_notifier;
-			state->m_current_base[offset] = state->m_palette_ram;
+			m_current_notifier[offset] = palette_notifier;
+			m_current_base[offset] = m_palette_ram;
 		}
 		else
 		{
-			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space->device()));
-			state->m_current_notifier[offset] = 0;
-			state->m_current_base[offset] = state->m_empty_ram;
+			logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(&space.device()));
+			m_current_notifier[offset] = 0;
+			m_current_base[offset] = m_empty_ram;
 		}
-		memory_set_bankptr(space->machine(), bankname[offset], state->m_current_base[offset]);
+		memory_set_bankptr(machine(), bankname[offset], m_current_base[offset]);
 	}
 }
 
-static READ8_HANDLER( rambankswitch_r )
+READ8_MEMBER(taitol_state::rambankswitch_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return state->m_cur_rambank[offset];
+	return m_cur_rambank[offset];
 }
 
 static void bank_w(address_space *space, offs_t offset, UINT8 data, int banknum )
@@ -466,32 +456,32 @@ static void bank_w(address_space *space, offs_t offset, UINT8 data, int banknum 
 	}
 }
 
-static WRITE8_HANDLER( bank0_w )
+WRITE8_MEMBER(taitol_state::bank0_w)
 {
-	bank_w(space, offset, data, 0);
+	bank_w(&space, offset, data, 0);
 }
 
-static WRITE8_HANDLER( bank1_w )
+WRITE8_MEMBER(taitol_state::bank1_w)
 {
-	bank_w(space, offset, data, 1);
+	bank_w(&space, offset, data, 1);
 }
 
-static WRITE8_HANDLER( bank2_w )
+WRITE8_MEMBER(taitol_state::bank2_w)
 {
-	bank_w(space, offset, data, 2);
+	bank_w(&space, offset, data, 2);
 }
 
-static WRITE8_HANDLER( bank3_w )
+WRITE8_MEMBER(taitol_state::bank3_w)
 {
-	bank_w(space, offset, data, 3);
+	bank_w(&space, offset, data, 3);
 }
 
-static WRITE8_HANDLER( control2_w )
+WRITE8_MEMBER(taitol_state::control2_w)
 {
-	coin_lockout_w(space->machine(), 0, ~data & 0x01);
-	coin_lockout_w(space->machine(), 1, ~data & 0x02);
-	coin_counter_w(space->machine(), 0, data & 0x04);
-	coin_counter_w(space->machine(), 1, data & 0x08);
+	coin_lockout_w(machine(), 0, ~data & 0x01);
+	coin_lockout_w(machine(), 1, ~data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x04);
+	coin_counter_w(machine(), 1, data & 0x08);
 }
 
 static READ8_DEVICE_HANDLER( portA_r )
@@ -513,90 +503,85 @@ static READ8_DEVICE_HANDLER( extport_select_and_ym2203_r )
 	return ym2203_r(device, offset & 1);
 }
 
-static WRITE8_HANDLER( mcu_data_w )
+WRITE8_MEMBER(taitol_state::mcu_data_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->m_last_data = data;
-	state->m_last_data_adr = cpu_get_pc(&space->device());
-//  logerror("mcu write %02x (%04x)\n", data, cpu_get_pc(&space->device()));
+	m_last_data = data;
+	m_last_data_adr = cpu_get_pc(&space.device());
+//  logerror("mcu write %02x (%04x)\n", data, cpu_get_pc(&space.device()));
 	switch (data)
 	{
 	case 0x43:
-		state->m_mcu_pos = 0;
-		state->m_mcu_reply_len = ARRAY_LENGTH(puzznic_mcu_reply);
+		m_mcu_pos = 0;
+		m_mcu_reply_len = ARRAY_LENGTH(puzznic_mcu_reply);
 		break;
 	}
 }
 
-static WRITE8_HANDLER( mcu_control_w )
+WRITE8_MEMBER(taitol_state::mcu_control_w)
 {
-//  logerror("mcu control %02x (%04x)\n", data, cpu_get_pc(&space->device()));
+//  logerror("mcu control %02x (%04x)\n", data, cpu_get_pc(&space.device()));
 }
 
-static READ8_HANDLER( mcu_data_r )
+READ8_MEMBER(taitol_state::mcu_data_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-//  logerror("mcu read (%04x) [%02x, %04x]\n", cpu_get_pc(&space->device()), last_data, last_data_adr);
-	if (state->m_mcu_pos == state->m_mcu_reply_len)
+//  logerror("mcu read (%04x) [%02x, %04x]\n", cpu_get_pc(&space.device()), last_data, last_data_adr);
+	if (m_mcu_pos == m_mcu_reply_len)
 		return 0;
 
-	return state->m_mcu_reply[state->m_mcu_pos++];
+	return m_mcu_reply[m_mcu_pos++];
 }
 
-static READ8_HANDLER( mcu_control_r )
+READ8_MEMBER(taitol_state::mcu_control_r)
 {
-//  logerror("mcu control read (%04x)\n", cpu_get_pc(&space->device()));
+//  logerror("mcu control read (%04x)\n", cpu_get_pc(&space.device()));
 	return 0x1;
 }
 
 #if 0
-static WRITE8_HANDLER( sound_w )
+WRITE8_MEMBER(taitol_state::sound_w)
 {
-	logerror("Sound_w %02x (%04x)\n", data, cpu_get_pc(&space->device()));
+	logerror("Sound_w %02x (%04x)\n", data, cpu_get_pc(&space.device()));
 }
 #endif
 
-static READ8_HANDLER( mux_r )
+READ8_MEMBER(taitol_state::mux_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	switch (state->m_mux_ctrl)
+	switch (m_mux_ctrl)
 	{
 	case 0:
-		return input_port_read(space->machine(), "DSWA");
+		return input_port_read(machine(), "DSWA");
 	case 1:
-		return input_port_read(space->machine(), "DSWB");
+		return input_port_read(machine(), "DSWB");
 	case 2:
-		return input_port_read(space->machine(), "IN0");
+		return input_port_read(machine(), "IN0");
 	case 3:
-		return input_port_read(space->machine(), "IN1");
+		return input_port_read(machine(), "IN1");
 	case 7:
-		return input_port_read(space->machine(), "IN2");
+		return input_port_read(machine(), "IN2");
 	default:
-		logerror("Mux read from unknown port %d (%04x)\n", state->m_mux_ctrl, cpu_get_pc(&space->device()));
+		logerror("Mux read from unknown port %d (%04x)\n", m_mux_ctrl, cpu_get_pc(&space.device()));
 		return 0xff;
 	}
 }
 
-static WRITE8_HANDLER( mux_w )
+WRITE8_MEMBER(taitol_state::mux_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
-	switch (state->m_mux_ctrl)
+	switch (m_mux_ctrl)
 	{
 	case 4:
 		control2_w(space, 0, data);
 		break;
 	default:
-		logerror("Mux write to unknown port %d, %02x (%04x)\n", state->m_mux_ctrl, data, cpu_get_pc(&space->device()));
+		logerror("Mux write to unknown port %d, %02x (%04x)\n", m_mux_ctrl, data, cpu_get_pc(&space.device()));
 	}
 }
 
-static WRITE8_HANDLER( mux_ctrl_w )
+WRITE8_MEMBER(taitol_state::mux_ctrl_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->m_mux_ctrl = data;
+	m_mux_ctrl = data;
 }
 
 
@@ -617,16 +602,14 @@ static void champwr_msm5205_vck( device_t *device )
 	}
 }
 
-static WRITE8_HANDLER( champwr_msm5205_lo_w )
+WRITE8_MEMBER(taitol_state::champwr_msm5205_lo_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->m_adpcm_pos = (state->m_adpcm_pos & 0xff00ff) | (data << 8);
+	m_adpcm_pos = (m_adpcm_pos & 0xff00ff) | (data << 8);
 }
 
-static WRITE8_HANDLER( champwr_msm5205_hi_w )
+WRITE8_MEMBER(taitol_state::champwr_msm5205_hi_w)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	state->m_adpcm_pos = ((state->m_adpcm_pos & 0x00ffff) | (data << 16)) & 0x1ffff;
+	m_adpcm_pos = ((m_adpcm_pos & 0x00ffff) | (data << 16)) & 0x1ffff;
 }
 
 static WRITE8_DEVICE_HANDLER( champwr_msm5205_start_w )
@@ -649,62 +632,56 @@ static WRITE8_DEVICE_HANDLER( champwr_msm5205_volume_w )
 	sound->set_output_gain(0, data / 255.0);
 }
 
-static READ8_HANDLER( horshoes_tracky_reset_r )
+READ8_MEMBER(taitol_state::horshoes_tracky_reset_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
 	/* reset the trackball counter */
-	state->m_tracky = input_port_read(space->machine(), "AN0");
+	m_tracky = input_port_read(machine(), "AN0");
 	return 0;
 }
 
-static READ8_HANDLER( horshoes_trackx_reset_r )
+READ8_MEMBER(taitol_state::horshoes_trackx_reset_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
 
 	/* reset the trackball counter */
-	state->m_trackx = input_port_read(space->machine(), "AN1");
+	m_trackx = input_port_read(machine(), "AN1");
 	return 0;
 }
 
-static READ8_HANDLER( horshoes_tracky_lo_r )
+READ8_MEMBER(taitol_state::horshoes_tracky_lo_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return (input_port_read(space->machine(), "AN0") - state->m_tracky) & 0xff;
+	return (input_port_read(machine(), "AN0") - m_tracky) & 0xff;
 }
 
-static READ8_HANDLER( horshoes_tracky_hi_r )
+READ8_MEMBER(taitol_state::horshoes_tracky_hi_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return (input_port_read(space->machine(), "AN0") - state->m_tracky) >> 8;
+	return (input_port_read(machine(), "AN0") - m_tracky) >> 8;
 }
 
-static READ8_HANDLER( horshoes_trackx_lo_r )
+READ8_MEMBER(taitol_state::horshoes_trackx_lo_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return (input_port_read(space->machine(), "AN1") - state->m_trackx) & 0xff;
+	return (input_port_read(machine(), "AN1") - m_trackx) & 0xff;
 }
 
-static READ8_HANDLER( horshoes_trackx_hi_r )
+READ8_MEMBER(taitol_state::horshoes_trackx_hi_r)
 {
-	taitol_state *state = space->machine().driver_data<taitol_state>();
-	return (input_port_read(space->machine(), "AN1") - state->m_trackx) >> 8;
+	return (input_port_read(machine(), "AN1") - m_trackx) >> 8;
 }
 
 
 #define COMMON_BANKS_MAP \
 	AM_RANGE(0x0000, 0x5fff) AM_ROM			\
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")			\
-	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE_LEGACY(bank0_w) \
-	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE_LEGACY(bank1_w) \
-	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE_LEGACY(bank2_w) \
-	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE_LEGACY(bank3_w) \
+	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank2") AM_WRITE(bank0_w) \
+	AM_RANGE(0xd000, 0xdfff) AM_ROMBANK("bank3") AM_WRITE(bank1_w) \
+	AM_RANGE(0xe000, 0xefff) AM_ROMBANK("bank4") AM_WRITE(bank2_w) \
+	AM_RANGE(0xf000, 0xfdff) AM_ROMBANK("bank5") AM_WRITE(bank3_w) \
 	AM_RANGE(0xfe00, 0xfe03) AM_READWRITE_LEGACY(taitol_bankc_r, taitol_bankc_w)		\
 	AM_RANGE(0xfe04, 0xfe04) AM_READWRITE_LEGACY(taitol_control_r, taitol_control_w)	\
-	AM_RANGE(0xff00, 0xff02) AM_READWRITE_LEGACY(irq_adr_r, irq_adr_w)			\
-	AM_RANGE(0xff03, 0xff03) AM_READWRITE_LEGACY(irq_enable_r, irq_enable_w)		\
-	AM_RANGE(0xff04, 0xff07) AM_READWRITE_LEGACY(rambankswitch_r, rambankswitch_w)	\
-	AM_RANGE(0xff08, 0xff08) AM_READWRITE_LEGACY(rombankswitch_r, rombankswitch_w)
+	AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)			\
+	AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)		\
+	AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w)	\
+	AM_RANGE(0xff08, 0xff08) AM_READWRITE(rombankswitch_r, rombankswitch_w)
 
 #define COMMON_SINGLE_MAP \
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ymsnd", extport_select_and_ym2203_r, ym2203_w)	\
@@ -721,14 +698,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fhawk_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank6")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(rombank2switch_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_port_w)
 	AM_RANGE(0xc801, 0xc801) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA") AM_WRITENOP	// Direct copy of input port 0
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
 	AM_RANGE(0xd003, 0xd003) AM_READ_PORT("IN1")
-	AM_RANGE(0xd004, 0xd004) AM_WRITE_LEGACY(control2_w)
+	AM_RANGE(0xd004, 0xd004) AM_WRITE(control2_w)
 	AM_RANGE(0xd005, 0xd006) AM_WRITENOP	// Always 0
 	AM_RANGE(0xd007, 0xd007) AM_READ_PORT("IN2")
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
@@ -747,8 +724,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( raimais_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE_LEGACY(mux_r, mux_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE_LEGACY(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE(mux_r, mux_w)
+	AM_RANGE(0x8801, 0x8801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 	AM_RANGE(0x8c00, 0x8c00) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_port_w)
 	AM_RANGE(0x8c01, 0x8c01) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
@@ -761,12 +738,12 @@ static ADDRESS_MAP_START( raimais_2_map, AS_PROGRAM, 8, taitol_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(taitol_state::sound_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("audiocpu")->base();
+	UINT8 *RAM = machine().region("audiocpu")->base();
 	int banknum = (data - 1) & 3;
 
-	memory_set_bankptr (space->machine(), "bank7", &RAM [0x10000 + (banknum * 0x4000)]);
+	memory_set_bankptr (machine(), "bank7", &RAM [0x10000 + (banknum * 0x4000)]);
 }
 
 static ADDRESS_MAP_START( raimais_3_map, AS_PROGRAM, 8, taitol_state )
@@ -780,7 +757,7 @@ static ADDRESS_MAP_START( raimais_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xe600, 0xe600) AM_WRITENOP /* ? */
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(sound_bankswitch_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
 
@@ -798,12 +775,12 @@ static ADDRESS_MAP_START( champwr_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("IN0")
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("IN1")
-	AM_RANGE(0xe004, 0xe004) AM_WRITE_LEGACY(control2_w)
+	AM_RANGE(0xe004, 0xe004) AM_WRITE(control2_w)
 	AM_RANGE(0xe007, 0xe007) AM_READ_PORT("IN2")
 	AM_RANGE(0xe008, 0xe00f) AM_READNOP
 	AM_RANGE(0xe800, 0xe800) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_port_w)
 	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE_LEGACY(rombank2switch_r, rombank2switch_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(rombank2switch_r, rombank2switch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( champwr_3_map, AS_PROGRAM, 8, taitol_state )
@@ -813,8 +790,8 @@ static ADDRESS_MAP_START( champwr_3_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa000) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(champwr_msm5205_hi_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(champwr_msm5205_lo_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(champwr_msm5205_hi_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(champwr_msm5205_lo_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("msm", champwr_msm5205_start_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", champwr_msm5205_stop_w)
 ADDRESS_MAP_END
@@ -825,8 +802,8 @@ static ADDRESS_MAP_START( kurikint_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xa800, 0xa800) AM_READWRITE_LEGACY(mux_r, mux_w)
-	AM_RANGE(0xa801, 0xa801) AM_WRITE_LEGACY(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
+	AM_RANGE(0xa800, 0xa800) AM_READWRITE(mux_r, mux_w)
+	AM_RANGE(0xa801, 0xa801) AM_WRITE(mux_ctrl_w) AM_READNOP	// Watchdog or interrupt ack (value ignored)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_state )
@@ -835,7 +812,7 @@ static ADDRESS_MAP_START( kurikint_2_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 #if 0
-	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(rombank2switch_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(rombank2switch_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xd002, 0xd002) AM_READ_PORT("IN0")
@@ -851,8 +828,8 @@ static ADDRESS_MAP_START( puzznic_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READNOP	// Watchdog
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM		// Wrong, used to overcome protection
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE_LEGACY(mcu_data_r, mcu_data_w)
-	AM_RANGE(0xb801, 0xb801) AM_READWRITE_LEGACY(mcu_control_r, mcu_control_w)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
+	AM_RANGE(0xb801, 0xb801) AM_READWRITE(mcu_control_r, mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// Control register, function unknown
 ADDRESS_MAP_END
 
@@ -862,9 +839,9 @@ static ADDRESS_MAP_START( puzznici_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_SINGLE_MAP
 	AM_RANGE(0xa800, 0xa800) AM_READNOP	// Watchdog
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM		// Wrong, used to overcome protection
-//  AM_RANGE(0xb800, 0xb800) AM_READWRITE_LEGACY(mcu_data_r, mcu_data_w)
-	AM_RANGE(0xb801, 0xb801) AM_READ_LEGACY(mcu_control_r)
-//  AM_RANGE(0xb801, 0xb801) AM_WRITE_LEGACY(mcu_control_w)
+//  AM_RANGE(0xb800, 0xb800) AM_READWRITE(mcu_data_r, mcu_data_w)
+	AM_RANGE(0xb801, 0xb801) AM_READ(mcu_control_r)
+//  AM_RANGE(0xb801, 0xb801) AM_WRITE(mcu_control_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// Control register, function unknown
 ADDRESS_MAP_END
 
@@ -898,19 +875,19 @@ static ADDRESS_MAP_START( cachat_map, AS_PROGRAM, 8, taitol_state )
 	AM_RANGE(0xa803, 0xa803) AM_WRITENOP	// Control register, function unknown
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP	// Control register, function unknown
 	AM_RANGE(0xb001, 0xb001) AM_READNOP	// Watchdog or interrupt ack (value ignored)
-	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE_LEGACY(rombankswitch_r, rombankswitch_w)
+	AM_RANGE(0xfff8, 0xfff8) AM_READWRITE(rombankswitch_r, rombankswitch_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( horshoes_map, AS_PROGRAM, 8, taitol_state )
 	COMMON_BANKS_MAP
 	COMMON_SINGLE_MAP
-	AM_RANGE(0xa800, 0xa800) AM_READ_LEGACY(horshoes_tracky_lo_r)
-	AM_RANGE(0xa802, 0xa802) AM_READ_LEGACY(horshoes_tracky_reset_r)
-	AM_RANGE(0xa803, 0xa803) AM_READ_LEGACY(horshoes_trackx_reset_r)
-	AM_RANGE(0xa804, 0xa804) AM_READ_LEGACY(horshoes_tracky_hi_r)
-	AM_RANGE(0xa808, 0xa808) AM_READ_LEGACY(horshoes_trackx_lo_r)
-	AM_RANGE(0xa80c, 0xa80c) AM_READ_LEGACY(horshoes_trackx_hi_r)
+	AM_RANGE(0xa800, 0xa800) AM_READ(horshoes_tracky_lo_r)
+	AM_RANGE(0xa802, 0xa802) AM_READ(horshoes_tracky_reset_r)
+	AM_RANGE(0xa803, 0xa803) AM_READ(horshoes_trackx_reset_r)
+	AM_RANGE(0xa804, 0xa804) AM_READ(horshoes_tracky_hi_r)
+	AM_RANGE(0xa808, 0xa808) AM_READ(horshoes_trackx_lo_r)
+	AM_RANGE(0xa80c, 0xa80c) AM_READ(horshoes_trackx_hi_r)
 	AM_RANGE(0xb801, 0xb801) AM_READNOP	// Watchdog or interrupt ack
 	AM_RANGE(0xb802, 0xb802) AM_WRITE_LEGACY(horshoes_bankg_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP

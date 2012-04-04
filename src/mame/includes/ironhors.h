@@ -28,6 +28,7 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_soundcpu;
+	DECLARE_WRITE8_MEMBER(ironhors_sh_irqtrigger_w);
 };
 
 

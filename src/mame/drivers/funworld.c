@@ -865,9 +865,9 @@ ADDRESS_MAP_END
 
 static UINT8 funquiz_question_bank = 0x80;
 
-static READ8_HANDLER( questions_r )
+READ8_MEMBER(funworld_state::questions_r)
 {
-	UINT8* quiz = space->machine().region("questions")->base();
+	UINT8* quiz = machine().region("questions")->base();
 	int extraoffset = ((funquiz_question_bank & 0x1f) * 0x8000);
 
 	// if 0x80 is set, read the 2nd half of the question rom (contains header info)
@@ -876,7 +876,7 @@ static READ8_HANDLER( questions_r )
 	return quiz[offset + extraoffset];
 }
 
-static WRITE8_HANDLER( question_bank_w )
+WRITE8_MEMBER(funworld_state::question_bank_w)
 {
 //  printf("question bank write %02x\n", data);
 	funquiz_question_bank = data;
@@ -891,11 +891,11 @@ static ADDRESS_MAP_START( funquiz_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(question_bank_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(question_bank_w)
 
 	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE_LEGACY(funworld_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE_LEGACY(funworld_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0x4000, 0x7fff) AM_READ_LEGACY(questions_r)
+	AM_RANGE(0x4000, 0x7fff) AM_READ(questions_r)
 
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END

@@ -32,6 +32,9 @@ public:
 	UINT8 m_main_irq_mask;
 	UINT8 m_sub_irq_mask;
 	UINT8 m_sub2_nmi_mask;
+	DECLARE_READ8_MEMBER(bosco_dsw_r);
+	DECLARE_WRITE8_MEMBER(galaga_flip_screen_w);
+	DECLARE_WRITE8_MEMBER(bosco_latch_w);	
 };
 
 class xevious_state : public galaga_state
@@ -69,6 +72,7 @@ public:
 	UINT8 *m_spriteram;
 	UINT8 *m_spriteram2;
 	UINT32 m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(bosco_flip_screen_w);
 };
 
 class digdug_state : public galaga_state

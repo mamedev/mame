@@ -12,6 +12,7 @@ public:
 	tilemap_t *m_tilemap_1;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_READ8_MEMBER(clshroad_input_r);
 };
 
 

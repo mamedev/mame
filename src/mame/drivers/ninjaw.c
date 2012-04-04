@@ -335,17 +335,16 @@ static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched 
 
 }
 
-static WRITE16_HANDLER( cpua_ctrl_w )
+WRITE16_MEMBER(ninjaw_state::cpua_ctrl_w)
 {
-	ninjaw_state *state = space->machine().driver_data<ninjaw_state>();
 
 	if ((data &0xff00) && ((data &0xff) == 0))
 		data = data >> 8;
-	state->m_cpua_ctrl = data;
+	m_cpua_ctrl = data;
 
-	parse_control(space->machine());
+	parse_control(machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space->device()), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
 }
 
 
@@ -359,22 +358,20 @@ static void reset_sound_region( running_machine &machine )
 	memory_set_bank(machine, "bank10", state->m_banknum);
 }
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(ninjaw_state::sound_bankswitch_w)
 {
-	ninjaw_state *state = space->machine().driver_data<ninjaw_state>();
 
-	state->m_banknum = data & 7;
-	reset_sound_region(space->machine());
+	m_banknum = data & 7;
+	reset_sound_region(machine());
 }
 
-static WRITE16_HANDLER( ninjaw_sound_w )
+WRITE16_MEMBER(ninjaw_state::ninjaw_sound_w)
 {
-	ninjaw_state *state = space->machine().driver_data<ninjaw_state>();
 
 	if (offset == 0)
-		tc0140syt_port_w(state->m_tc0140syt, 0, data & 0xff);
+		tc0140syt_port_w(m_tc0140syt, 0, data & 0xff);
 	else if (offset == 1)
-		tc0140syt_comm_w(state->m_tc0140syt, 0, data & 0xff);
+		tc0140syt_comm_w(m_tc0140syt, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff00)
@@ -382,12 +379,11 @@ static WRITE16_HANDLER( ninjaw_sound_w )
 #endif
 }
 
-static READ16_HANDLER( ninjaw_sound_r )
+READ16_MEMBER(ninjaw_state::ninjaw_sound_r)
 {
-	ninjaw_state *state = space->machine().driver_data<ninjaw_state>();
 
 	if (offset == 1)
-		return ((tc0140syt_comm_r(state->m_tc0140syt, 0) & 0xff));
+		return ((tc0140syt_comm_r(m_tc0140syt, 0) & 0xff));
 	else
 		return 0;
 }
@@ -395,33 +391,31 @@ static READ16_HANDLER( ninjaw_sound_r )
 
 /**** sound pan control ****/
 
-static WRITE8_HANDLER( ninjaw_pancontrol )
+WRITE8_MEMBER(ninjaw_state::ninjaw_pancontrol)
 {
-	ninjaw_state *state = space->machine().driver_data<ninjaw_state>();
 	device_t *flt = NULL;
 	offset &= 3;
 
 	switch (offset)
 	{
-		case 0: flt = state->m_2610_1l; break;
-		case 1: flt = state->m_2610_1r; break;
-		case 2: flt = state->m_2610_2l; break;
-		case 3: flt = state->m_2610_2r; break;
+		case 0: flt = m_2610_1l; break;
+		case 1: flt = m_2610_1r; break;
+		case 2: flt = m_2610_2l; break;
+		case 3: flt = m_2610_2r; break;
 	}
 
-	state->m_pandata[offset] = (float)data * (100.f / 255.0f);
-	//popmessage(" pan %02x %02x %02x %02x", state->m_pandata[0], state->m_pandata[1], state->m_pandata[2], state->m_pandata[3] );
-	flt_volume_set_volume(flt, state->m_pandata[offset] / 100.0);
+	m_pandata[offset] = (float)data * (100.f / 255.0f);
+	//popmessage(" pan %02x %02x %02x %02x", m_pandata[0], m_pandata[1], m_pandata[2], m_pandata[3] );
+	flt_volume_set_volume(flt, m_pandata[offset] / 100.0);
 }
 
 
-static WRITE16_HANDLER( tc0100scn_triple_screen_w )
+WRITE16_MEMBER(ninjaw_state::tc0100scn_triple_screen_w)
 {
-	ninjaw_state *state = space->machine().driver_data<ninjaw_state>();
 
-	tc0100scn_word_w(state->m_tc0100scn_1, offset, data, mem_mask);
-	tc0100scn_word_w(state->m_tc0100scn_2, offset, data, mem_mask);
-	tc0100scn_word_w(state->m_tc0100scn_3, offset, data, mem_mask);
+	tc0100scn_word_w(m_tc0100scn_1, offset, data, mem_mask);
+	tc0100scn_word_w(m_tc0100scn_2, offset, data, mem_mask);
+	tc0100scn_word_w(m_tc0100scn_3, offset, data, mem_mask);
 }
 
 /***********************************************************
@@ -433,11 +427,11 @@ static ADDRESS_MAP_START( ninjaw_master_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM														/* main ram */
 	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
-	AM_RANGE(0x210000, 0x210001) AM_WRITE_LEGACY(cpua_ctrl_w)
-	AM_RANGE(0x220000, 0x220003) AM_READWRITE_LEGACY(ninjaw_sound_r,ninjaw_sound_w)
+	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
+	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE_LEGACY(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE_LEGACY("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (2nd screen) */
 	AM_RANGE(0x2e0000, 0x2e000f) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
@@ -458,7 +452,7 @@ static ADDRESS_MAP_START( ninjaw_slave_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE_LEGACY(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 	AM_RANGE(0x340000, 0x340007) AM_DEVREADWRITE_LEGACY("tc0110pcr_1", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (1st screen) */
 	AM_RANGE(0x350000, 0x350007) AM_DEVREADWRITE_LEGACY("tc0110pcr_2", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (2nd screen) */
 	AM_RANGE(0x360000, 0x360007) AM_DEVREADWRITE_LEGACY("tc0110pcr_3", tc0110pcr_word_r, tc0110pcr_step1_word_w)		/* palette (3rd screen) */
@@ -469,11 +463,11 @@ static ADDRESS_MAP_START( darius2_master_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM							/* main ram */
 	AM_RANGE(0x200000, 0x200001) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_portreg_r, tc0220ioc_portreg_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
-	AM_RANGE(0x210000, 0x210001) AM_WRITE_LEGACY(cpua_ctrl_w)
-	AM_RANGE(0x220000, 0x220003) AM_READWRITE_LEGACY(ninjaw_sound_r,ninjaw_sound_w)
+	AM_RANGE(0x210000, 0x210001) AM_WRITE(cpua_ctrl_w)
+	AM_RANGE(0x220000, 0x220003) AM_READWRITE(ninjaw_sound_r,ninjaw_sound_w)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2") AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE_LEGACY(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 	AM_RANGE(0x2a0000, 0x2a000f) AM_DEVREADWRITE_LEGACY("tc0100scn_1", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
 	AM_RANGE(0x2c0000, 0x2d3fff) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_word_r, tc0100scn_word_w)		/* tilemaps (2nd screen) */
 	AM_RANGE(0x2e0000, 0x2e000f) AM_DEVREADWRITE_LEGACY("tc0100scn_2", tc0100scn_ctrl_word_r, tc0100scn_ctrl_word_w)
@@ -491,7 +485,7 @@ static ADDRESS_MAP_START( darius2_slave_map, AS_PROGRAM, 16, ninjaw_state )
 	AM_RANGE(0x200002, 0x200003) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_port_r, tc0220ioc_port_w, 0x00ff)
 	AM_RANGE(0x240000, 0x24ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x260000, 0x263fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE_LEGACY(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
+	AM_RANGE(0x280000, 0x293fff) AM_DEVREAD_LEGACY("tc0100scn_1", tc0100scn_word_r) AM_WRITE(tc0100scn_triple_screen_w)	/* tilemaps (1st screen/all screens) */
 ADDRESS_MAP_END
 
 
@@ -504,11 +498,11 @@ static ADDRESS_MAP_START( ninjaw_sound_map, AS_PROGRAM, 8, ninjaw_state )
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r,ym2610_w)
 	AM_RANGE(0xe200, 0xe200) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
 	AM_RANGE(0xe201, 0xe201) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r,tc0140syt_slave_comm_w)
-	AM_RANGE(0xe400, 0xe403) AM_WRITE_LEGACY(ninjaw_pancontrol) /* pan */
+	AM_RANGE(0xe400, 0xe403) AM_WRITE(ninjaw_pancontrol) /* pan */
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(sound_bankswitch_w)
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
 

@@ -30,6 +30,9 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(inufuku_soundcommand_w);
+	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
+	DECLARE_WRITE8_MEMBER(inufuku_soundrombank_w);
 };
 
 

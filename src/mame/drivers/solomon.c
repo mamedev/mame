@@ -11,38 +11,37 @@ driver by Mirko Buffoni
 #include "sound/ay8910.h"
 #include "includes/solomon.h"
 
-static WRITE8_HANDLER( solomon_sh_command_w )
+WRITE8_MEMBER(solomon_state::solomon_sh_command_w)
 {
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* this is checked on the title screen and when you reach certain scores in the game
    it could be a form of protection.  the real board needs to be analysed to find out
    what really lives here */
 
-static READ8_HANDLER( solomon_0xe603_r )
+READ8_MEMBER(solomon_state::solomon_0xe603_r)
 {
-	if (cpu_get_pc(&space->device()) == 0x161) // all the time .. return 0 to act as before  for coin / startup etc.
+	if (cpu_get_pc(&space.device()) == 0x161) // all the time .. return 0 to act as before  for coin / startup etc.
 	{
 		return 0;
 	}
-	else if (cpu_get_pc(&space->device()) == 0x4cf0) // stop it clearing the screen at certain scores
+	else if (cpu_get_pc(&space.device()) == 0x4cf0) // stop it clearing the screen at certain scores
 	{
-		return (cpu_get_reg(&space->device(), Z80_BC) & 0x08);
+		return (cpu_get_reg(&space.device(), Z80_BC) & 0x08);
 	}
 	else
 	{
-		mame_printf_debug("unhandled solomon_0xe603_r %04x\n", cpu_get_pc(&space->device()));
+		mame_printf_debug("unhandled solomon_0xe603_r %04x\n", cpu_get_pc(&space.device()));
 		return 0;
 	}
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(solomon_state::nmi_mask_w)
 {
-	solomon_state *state = space->machine().driver_data<solomon_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, solomon_state )
@@ -57,13 +56,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, solomon_state )
 	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1")
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
 	AM_RANGE(0xe602, 0xe602) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe603, 0xe603) AM_READ_LEGACY(solomon_0xe603_r)
+	AM_RANGE(0xe603, 0xe603) AM_READ(solomon_0xe603_r)
 	AM_RANGE(0xe604, 0xe604) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe605, 0xe605) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe606, 0xe606) AM_READNOP	/* watchdog? */
-	AM_RANGE(0xe600, 0xe600) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xe600, 0xe600) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xe604, 0xe604) AM_WRITE_LEGACY(solomon_flipscreen_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(solomon_sh_command_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(solomon_sh_command_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

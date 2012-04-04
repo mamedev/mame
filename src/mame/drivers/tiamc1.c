@@ -124,10 +124,10 @@ static MACHINE_RESET( tiamc1 )
 	tiamc1_bankswitch_w(space, 0, 0);
 }
 
-static WRITE8_HANDLER( tiamc1_control_w )
+WRITE8_MEMBER(tiamc1_state::tiamc1_control_w)
 {
-	coin_lockout_w(space->machine(), 0, ~data & 0x02);
-	coin_counter_w(space->machine(), 0, data & 0x04);
+	coin_lockout_w(machine(), 0, ~data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x04);
 }
 
 
@@ -152,7 +152,7 @@ static ADDRESS_MAP_START( tiamc1_io_map, AS_IO, 8, tiamc1_state )
 	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("IN0")
 	AM_RANGE(0xd1, 0xd1) AM_READ_PORT("IN1")
 	AM_RANGE(0xd2, 0xd2) AM_READ_PORT("IN2")
-	AM_RANGE(0xd2, 0xd2) AM_WRITE_LEGACY(tiamc1_control_w)  /* coin counter and lockout */
+	AM_RANGE(0xd2, 0xd2) AM_WRITE(tiamc1_control_w)  /* coin counter and lockout */
 	AM_RANGE(0xd3, 0xd3) AM_WRITENOP                 /* 8255 ctrl. Used for i/o ports */
 	AM_RANGE(0xd4, 0xd7) AM_DEVWRITE_LEGACY("2x8253", tiamc1_timer1_w)   /* timer 1 */
 	AM_RANGE(0xda, 0xda) AM_DEVWRITE_LEGACY("2x8253", tiamc1_timer1_gate_w) /* timer 1 gate control */

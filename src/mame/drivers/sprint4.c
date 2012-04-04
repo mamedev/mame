@@ -128,66 +128,62 @@ static MACHINE_RESET( sprint4 )
 }
 
 
-static READ8_HANDLER( sprint4_wram_r )
+READ8_MEMBER(sprint4_state::sprint4_wram_r)
 {
-	sprint4_state *state = space->machine().driver_data<sprint4_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	return videoram[0x380 + offset];
 }
 
 
-static READ8_HANDLER( sprint4_analog_r )
+READ8_MEMBER(sprint4_state::sprint4_analog_r)
 {
-	return (input_port_read(space->machine(), "ANALOG") << (~offset & 7)) & 0x80;
+	return (input_port_read(machine(), "ANALOG") << (~offset & 7)) & 0x80;
 }
-static READ8_HANDLER( sprint4_coin_r )
+READ8_MEMBER(sprint4_state::sprint4_coin_r)
 {
-	return (input_port_read(space->machine(), "COIN") << (~offset & 7)) & 0x80;
+	return (input_port_read(machine(), "COIN") << (~offset & 7)) & 0x80;
 }
-static READ8_HANDLER( sprint4_collision_r )
+READ8_MEMBER(sprint4_state::sprint4_collision_r)
 {
-	return (input_port_read(space->machine(), "COLLISION") << (~offset & 7)) & 0x80;
-}
-
-
-static READ8_HANDLER( sprint4_options_r )
-{
-	return (input_port_read(space->machine(), "DIP") >> (2 * (offset & 3))) & 3;
+	return (input_port_read(machine(), "COLLISION") << (~offset & 7)) & 0x80;
 }
 
 
-static WRITE8_HANDLER( sprint4_wram_w )
+READ8_MEMBER(sprint4_state::sprint4_options_r)
 {
-	sprint4_state *state = space->machine().driver_data<sprint4_state>();
-	UINT8 *videoram = state->m_videoram;
+	return (input_port_read(machine(), "DIP") >> (2 * (offset & 3))) & 3;
+}
+
+
+WRITE8_MEMBER(sprint4_state::sprint4_wram_w)
+{
+	UINT8 *videoram = m_videoram;
 	videoram[0x380 + offset] = data;
 }
 
 
-static WRITE8_HANDLER( sprint4_collision_reset_w )
+WRITE8_MEMBER(sprint4_state::sprint4_collision_reset_w)
 {
-	sprint4_state *state = space->machine().driver_data<sprint4_state>();
-	state->m_collision[(offset >> 1) & 3] = 0;
+	m_collision[(offset >> 1) & 3] = 0;
 }
 
 
-static WRITE8_HANDLER( sprint4_da_latch_w )
+WRITE8_MEMBER(sprint4_state::sprint4_da_latch_w)
 {
-	sprint4_state *state = space->machine().driver_data<sprint4_state>();
-	state->m_da_latch = data & 15;
+	m_da_latch = data & 15;
 }
 
 
-static WRITE8_HANDLER( sprint4_lamp_w )
+WRITE8_MEMBER(sprint4_state::sprint4_lamp_w)
 {
-	set_led_status(space->machine(), (offset >> 1) & 3, offset & 1);
+	set_led_status(machine(), (offset >> 1) & 3, offset & 1);
 }
 
 
 #ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( sprint4_lockout_w )
+WRITE8_MEMBER(sprint4_state::sprint4_lockout_w)
 {
-	coin_lockout_global_w(space->machine(), ~offset & 1);
+	coin_lockout_global_w(machine(), ~offset & 1);
 }
 #endif
 
@@ -234,23 +230,23 @@ static ADDRESS_MAP_START( sprint4_cpu_map, AS_PROGRAM, 8, sprint4_state )
 
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE_LEGACY(sprint4_wram_r, sprint4_wram_w)
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(sprint4_wram_r, sprint4_wram_w)
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(sprint4_video_ram_w) AM_BASE(m_videoram)
 
-	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x718) AM_READ_LEGACY(sprint4_analog_r)
-	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_READ_LEGACY(sprint4_coin_r)
-	AM_RANGE(0x0040, 0x0047) AM_MIRROR(0x718) AM_READ_LEGACY(sprint4_collision_r)
-	AM_RANGE(0x0060, 0x0063) AM_MIRROR(0x71c) AM_READ_LEGACY(sprint4_options_r)
+	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x718) AM_READ(sprint4_analog_r)
+	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_READ(sprint4_coin_r)
+	AM_RANGE(0x0040, 0x0047) AM_MIRROR(0x718) AM_READ(sprint4_collision_r)
+	AM_RANGE(0x0060, 0x0063) AM_MIRROR(0x71c) AM_READ(sprint4_options_r)
 
 	AM_RANGE(0x1000, 0x17ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x1800, 0x1fff) AM_READ_PORT("IN1")
 
 	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x71f) AM_DEVWRITE_LEGACY("discrete", sprint4_attract_w)
-	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_WRITE_LEGACY(sprint4_collision_reset_w)
-	AM_RANGE(0x0040, 0x0041) AM_MIRROR(0x718) AM_WRITE_LEGACY(sprint4_da_latch_w)
+	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_WRITE(sprint4_collision_reset_w)
+	AM_RANGE(0x0040, 0x0041) AM_MIRROR(0x718) AM_WRITE(sprint4_da_latch_w)
 	AM_RANGE(0x0042, 0x0043) AM_MIRROR(0x718) AM_DEVWRITE_LEGACY("discrete", sprint4_bang_w)
 	AM_RANGE(0x0044, 0x0045) AM_MIRROR(0x718) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x0060, 0x0067) AM_MIRROR(0x710) AM_WRITE_LEGACY(sprint4_lamp_w)
+	AM_RANGE(0x0060, 0x0067) AM_MIRROR(0x710) AM_WRITE(sprint4_lamp_w)
 	AM_RANGE(0x0068, 0x0069) AM_MIRROR(0x710) AM_DEVWRITE_LEGACY("discrete", sprint4_screech_1_w)
 	AM_RANGE(0x006a, 0x006b) AM_MIRROR(0x710) AM_DEVWRITE_LEGACY("discrete", sprint4_screech_2_w)
 	AM_RANGE(0x006c, 0x006d) AM_MIRROR(0x710) AM_DEVWRITE_LEGACY("discrete", sprint4_screech_3_w)

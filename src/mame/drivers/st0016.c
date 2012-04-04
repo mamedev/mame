@@ -38,36 +38,34 @@ static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, st0016_state )
 	AM_RANGE(0xf000, 0xffff) AM_RAM /* work ram */
 ADDRESS_MAP_END
 
-static READ8_HANDLER(mux_r)
+READ8_MEMBER(st0016_state::mux_r)
 {
 /*
     76543210
         xxxx - input port #2
     xxxx     - dip switches (2x8 bits) (multiplexed)
 */
-	st0016_state *state = space->machine().driver_data<st0016_state>();
-	int retval = input_port_read(space->machine(), "SYSTEM") & 0x0f;
+	int retval = input_port_read(machine(), "SYSTEM") & 0x0f;
 
-	switch(state->mux_port & 0x30)
+	switch(mux_port & 0x30)
 	{
-		case 0x00: retval |= ((input_port_read(space->machine(), "DSW1") & 1) << 4) | ((input_port_read(space->machine(), "DSW1") & 0x10) << 1)
-								| ((input_port_read(space->machine(), "DSW2") & 1) << 6) | ((input_port_read(space->machine(), "DSW2") & 0x10) <<3); break;
-		case 0x10: retval |= ((input_port_read(space->machine(), "DSW1") & 2) << 3) | ((input_port_read(space->machine(), "DSW1") & 0x20)   )
-								| ((input_port_read(space->machine(), "DSW2") & 2) << 5) | ((input_port_read(space->machine(), "DSW2") & 0x20) <<2); break;
-		case 0x20: retval |= ((input_port_read(space->machine(), "DSW1") & 4) << 2) | ((input_port_read(space->machine(), "DSW1") & 0x40) >> 1)
-								| ((input_port_read(space->machine(), "DSW2") & 4) << 4) | ((input_port_read(space->machine(), "DSW2") & 0x40) <<1); break;
-		case 0x30: retval |= ((input_port_read(space->machine(), "DSW1") & 8) << 1) | ((input_port_read(space->machine(), "DSW1") & 0x80) >> 2)
-								| ((input_port_read(space->machine(), "DSW2") & 8) << 3) | ((input_port_read(space->machine(), "DSW2") & 0x80)    ); break;
+		case 0x00: retval |= ((input_port_read(machine(), "DSW1") & 1) << 4) | ((input_port_read(machine(), "DSW1") & 0x10) << 1)
+								| ((input_port_read(machine(), "DSW2") & 1) << 6) | ((input_port_read(machine(), "DSW2") & 0x10) <<3); break;
+		case 0x10: retval |= ((input_port_read(machine(), "DSW1") & 2) << 3) | ((input_port_read(machine(), "DSW1") & 0x20)   )
+								| ((input_port_read(machine(), "DSW2") & 2) << 5) | ((input_port_read(machine(), "DSW2") & 0x20) <<2); break;
+		case 0x20: retval |= ((input_port_read(machine(), "DSW1") & 4) << 2) | ((input_port_read(machine(), "DSW1") & 0x40) >> 1)
+								| ((input_port_read(machine(), "DSW2") & 4) << 4) | ((input_port_read(machine(), "DSW2") & 0x40) <<1); break;
+		case 0x30: retval |= ((input_port_read(machine(), "DSW1") & 8) << 1) | ((input_port_read(machine(), "DSW1") & 0x80) >> 2)
+								| ((input_port_read(machine(), "DSW2") & 8) << 3) | ((input_port_read(machine(), "DSW2") & 0x80)    ); break;
 	}
 
 	return retval;
 }
 
-static WRITE8_HANDLER(mux_select_w)
+WRITE8_MEMBER(st0016_state::mux_select_w)
 {
-	st0016_state *state = space->machine().driver_data<st0016_state>();
 
-	state->mux_port=data;
+	mux_port=data;
 }
 
 WRITE8_HANDLER(st0016_rom_bank_w)
@@ -79,9 +77,9 @@ WRITE8_HANDLER(st0016_rom_bank_w)
 static ADDRESS_MAP_START( st0016_io, AS_IO, 8, st0016_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ_LEGACY(st0016_vregs_r) AM_WRITE_LEGACY(st0016_vregs_w) /* video/crt regs ? */
-	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P1") AM_WRITE_LEGACY(mux_select_w)
+	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P1") AM_WRITE(mux_select_w)
 	AM_RANGE(0xc1, 0xc1) AM_READ_PORT("P2") AM_WRITENOP
-	AM_RANGE(0xc2, 0xc2) AM_READ_LEGACY(mux_r) AM_WRITENOP
+	AM_RANGE(0xc2, 0xc2) AM_READ(mux_r) AM_WRITENOP
 	AM_RANGE(0xc3, 0xc3) AM_READ_PORT("P2") AM_WRITENOP
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP /* renju = $40, neratte = 0 */
 	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)
@@ -102,51 +100,51 @@ ADDRESS_MAP_END
 
 static UINT32 latches[8];
 
-static READ32_HANDLER(latch32_r)
+READ32_MEMBER(st0016_state::latch32_r)
 {
 	if(!offset)
 		latches[2]&=~2;
 	return latches[offset];
 }
 
-static WRITE32_HANDLER(latch32_w)
+WRITE32_MEMBER(st0016_state::latch32_w)
 {
 	if(!offset)
 		latches[2]|=1;
 	COMBINE_DATA(&latches[offset]);
-	space->machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 }
 
-static READ8_HANDLER(latch8_r)
+READ8_MEMBER(st0016_state::latch8_r)
 {
 	if(!offset)
 		latches[2]&=~1;
 	return latches[offset];
 }
 
-static WRITE8_HANDLER(latch8_w)
+WRITE8_MEMBER(st0016_state::latch8_w)
 {
 	if(!offset)
 		latches[2]|=2;
 	latches[offset]=data;
-	space->machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 }
 
 static ADDRESS_MAP_START( v810_mem,AS_PROGRAM, 32, st0016_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM
 	AM_RANGE(0xc0000000, 0xc001ffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4000000f) AM_READ_LEGACY(latch32_r) AM_WRITE_LEGACY(latch32_w)
+	AM_RANGE(0x40000000, 0x4000000f) AM_READ(latch32_r) AM_WRITE(latch32_w)
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( st0016_m2_io, AS_IO, 8, st0016_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ_LEGACY(st0016_vregs_r) AM_WRITE_LEGACY(st0016_vregs_w)
-	AM_RANGE(0xc0, 0xc3) AM_READ_LEGACY(latch8_r) AM_WRITE_LEGACY(latch8_w)
-	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("P1") AM_WRITE_LEGACY(mux_select_w)
+	AM_RANGE(0xc0, 0xc3) AM_READ(latch8_r) AM_WRITE(latch8_w)
+	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("P1") AM_WRITE(mux_select_w)
 	AM_RANGE(0xd1, 0xd1) AM_READ_PORT("P2") AM_WRITENOP
-	AM_RANGE(0xd2, 0xd2) AM_READ_LEGACY(mux_r) AM_WRITENOP
+	AM_RANGE(0xd2, 0xd2) AM_READ(mux_r) AM_WRITENOP
 	AM_RANGE(0xd3, 0xd3) AM_READ_PORT("P2") AM_WRITENOP
 	AM_RANGE(0xe0, 0xe0) AM_WRITENOP
 	AM_RANGE(0xe1, 0xe1) AM_WRITE_LEGACY(st0016_rom_bank_w)

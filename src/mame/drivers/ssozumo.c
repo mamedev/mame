@@ -14,10 +14,10 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 #include "sound/dac.h"
 #include "includes/ssozumo.h"
 
-static WRITE8_HANDLER( ssozumo_sh_command_w )
+WRITE8_MEMBER(ssozumo_state::ssozumo_sh_command_w)
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -31,7 +31,7 @@ static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x3400, 0x35ff) AM_RAM
 	AM_RANGE(0x3600, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITE_LEGACY(ssozumo_flipscreen_w)
-	AM_RANGE(0x4010, 0x4010) AM_READ_PORT("P2") AM_WRITE_LEGACY(ssozumo_sh_command_w)
+	AM_RANGE(0x4010, 0x4010) AM_READ_PORT("P2") AM_WRITE(ssozumo_sh_command_w)
 	AM_RANGE(0x4020, 0x4020) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(ssozumo_scroll_w)
 	AM_RANGE(0x4030, 0x4030) AM_READ_PORT("DSW1")
 //  AM_RANGE(0x4030, 0x4030) AM_WRITEONLY
@@ -40,11 +40,10 @@ static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8, ssozumo_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( sound_nmi_mask_w )
+WRITE8_MEMBER(ssozumo_state::sound_nmi_mask_w)
 {
-	ssozumo_state *state = space->machine().driver_data<ssozumo_state>();
 
-	state->m_sound_nmi_mask = data & 1;
+	m_sound_nmi_mask = data & 1;
 }
 
 /* Same as Tag Team */
@@ -53,7 +52,7 @@ static ADDRESS_MAP_START( ssozumo_sound_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
-	AM_RANGE(0x2005, 0x2005) AM_WRITE_LEGACY(sound_nmi_mask_w)
+	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
 	AM_RANGE(0x2007, 0x2007) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END

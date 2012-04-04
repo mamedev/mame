@@ -54,47 +54,44 @@ static TIMER_DEVICE_CALLBACK( bladestl_scanline )
  *
  *************************************/
 
-static READ8_HANDLER( trackball_r )
+READ8_MEMBER(bladestl_state::trackball_r)
 {
-	bladestl_state *state = space->machine().driver_data<bladestl_state>();
 	static const char *const port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P1_2" };
 	int curr, delta;
 
-	curr = input_port_read(space->machine(), port[offset]);
-	delta = (curr - state->m_last_track[offset]) & 0xff;
-	state->m_last_track[offset] = curr;
+	curr = input_port_read(machine(), port[offset]);
+	delta = (curr - m_last_track[offset]) & 0xff;
+	m_last_track[offset] = curr;
 
 	return (delta & 0x80) | (curr >> 1);
 }
 
-static WRITE8_HANDLER( bladestl_bankswitch_w )
+WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 {
-	bladestl_state *state = space->machine().driver_data<bladestl_state>();
 
 	/* bits 0 & 1 = coin counters */
-	coin_counter_w(space->machine(), 0,data & 0x01);
-	coin_counter_w(space->machine(), 1,data & 0x02);
+	coin_counter_w(machine(), 0,data & 0x01);
+	coin_counter_w(machine(), 1,data & 0x02);
 
 	/* bits 2 & 3 = lamps */
-	set_led_status(space->machine(), 0,data & 0x04);
-	set_led_status(space->machine(), 1,data & 0x08);
+	set_led_status(machine(), 0,data & 0x04);
+	set_led_status(machine(), 1,data & 0x08);
 
 	/* bit 4 = relay (???) */
 
 	/* bits 5-6 = bank number */
-	memory_set_bank(space->machine(), "bank1", (data & 0x60) >> 5);
+	memory_set_bank(machine(), "bank1", (data & 0x60) >> 5);
 
 	/* bit 7 = select sprite bank */
-	state->m_spritebank = (data & 0x80) << 3;
+	m_spritebank = (data & 0x80) << 3;
 
 }
 
-static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
+WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
 {
-	bladestl_state *state = space->machine().driver_data<bladestl_state>();
 
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 
@@ -132,10 +129,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bladestl_state )
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P2")					/* 2P controls */
 	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")				/* DISPW #2 */
 	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")				/* DIPSW #1 */
-	AM_RANGE(0x2e80, 0x2e80) AM_WRITE_LEGACY(bladestl_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
+	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(bladestl_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
 	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE_LEGACY(watchdog_reset_w)			/* watchdog reset */
-	AM_RANGE(0x2f00, 0x2f03) AM_READ_LEGACY(trackball_r)				/* Trackballs */
-	AM_RANGE(0x2f40, 0x2f40) AM_WRITE_LEGACY(bladestl_bankswitch_w)	/* bankswitch control */
+	AM_RANGE(0x2f00, 0x2f03) AM_READ(trackball_r)				/* Trackballs */
+	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(bladestl_bankswitch_w)	/* bankswitch control */
 	AM_RANGE(0x2f80, 0x2f9f) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)	/* Protection: 051733 */
 	AM_RANGE(0x2fc0, 0x2fc0) AM_WRITENOP						/* ??? */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM								/* Work RAM */

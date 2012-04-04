@@ -44,16 +44,15 @@ To Do:
 ***************************************************************************/
 
 
-static WRITE8_HANDLER( yunsung8_bankswitch_w )
+WRITE8_MEMBER(yunsung8_state::yunsung8_bankswitch_w)
 {
-	yunsung8_state *state = space->machine().driver_data<yunsung8_state>();
 
-	state->m_layers_ctrl = data & 0x30;	// Layers enable
+	m_layers_ctrl = data & 0x30;	// Layers enable
 
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	memory_set_bank(machine(), "bank1", data & 0x07);
 
 	if (data & ~0x37)
-		logerror("CPU #0 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
+		logerror("CPU #0 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 }
 
 /*
@@ -66,7 +65,7 @@ static WRITE8_HANDLER( yunsung8_bankswitch_w )
 */
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, yunsung8_state )
-	AM_RANGE(0x0001, 0x0001) AM_WRITE_LEGACY(yunsung8_bankswitch_w)	// ROM Bank (again?)
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(yunsung8_bankswitch_w)	// ROM Bank (again?)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	// Banked ROM
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(yunsung8_videoram_r, yunsung8_videoram_w)	// Video RAM (Banked)
@@ -77,7 +76,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( port_map, AS_IO, 8, yunsung8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(yunsung8_videobank_w)	// video RAM bank
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE_LEGACY(yunsung8_bankswitch_w)	// ROM Bank + Layers Enable
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(yunsung8_bankswitch_w)	// ROM Bank + Layers Enable
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_WRITE_LEGACY(soundlatch_w)	// To Sound CPU
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
@@ -105,12 +104,11 @@ static WRITE8_DEVICE_HANDLER( yunsung8_sound_bankswitch_w )
 		logerror("%s: Bank %02X\n", device->machine().describe_context(), data);
 }
 
-static WRITE8_HANDLER( yunsung8_adpcm_w )
+WRITE8_MEMBER(yunsung8_state::yunsung8_adpcm_w)
 {
-	yunsung8_state *state = space->machine().driver_data<yunsung8_state>();
 
 	/* Swap the nibbles */
-	state->m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
+	m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
 }
 
 
@@ -119,7 +117,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, yunsung8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")	// Banked ROM
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", yunsung8_sound_bankswitch_w	)	// ROM Bank
-	AM_RANGE(0xe400, 0xe400) AM_WRITE_LEGACY(yunsung8_adpcm_w)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r)	// From Main CPU

@@ -46,6 +46,31 @@ public:
 
 	/* dblaxle motor flag */
 	int	    m_dblaxle_vibration;
+	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_READ16_MEMBER(eep_latch_r);
+	DECLARE_WRITE16_MEMBER(spacegun_output_bypass_w);
+	DECLARE_READ8_MEMBER(contcirc_input_bypass_r);
+	DECLARE_READ8_MEMBER(chasehq_input_bypass_r);
+	DECLARE_READ16_MEMBER(bshark_stick_r);
+	DECLARE_READ16_MEMBER(nightstr_stick_r);
+	DECLARE_WRITE16_MEMBER(bshark_stick_w);
+	DECLARE_READ16_MEMBER(sci_steer_input_r);
+	DECLARE_READ16_MEMBER(spacegun_input_bypass_r);
+	DECLARE_READ16_MEMBER(spacegun_lightgun_r);
+	DECLARE_WRITE16_MEMBER(spacegun_lightgun_w);
+	DECLARE_WRITE16_MEMBER(spacegun_gun_output_w);
+	DECLARE_READ16_MEMBER(dblaxle_steer_input_r);
+	DECLARE_READ16_MEMBER(chasehq_motor_r);
+	DECLARE_WRITE16_MEMBER(chasehq_motor_w);
+	DECLARE_WRITE16_MEMBER(nightstr_motor_w);
+	DECLARE_READ16_MEMBER(aquajack_unknown_r);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(taitoz_sound_w);
+	DECLARE_READ16_MEMBER(taitoz_sound_r);
+	DECLARE_WRITE16_MEMBER(taitoz_msb_sound_w);
+	DECLARE_READ16_MEMBER(taitoz_msb_sound_r);
+	DECLARE_WRITE8_MEMBER(taitoz_pancontrol);
+	DECLARE_WRITE16_MEMBER(spacegun_pancontrol);
 };
 
 /*----------- defined in video/taito_z.c -----------*/

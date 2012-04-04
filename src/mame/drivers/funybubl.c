@@ -54,22 +54,21 @@ Note: SW2, SW3 & SW4 not populated
 #include "includes/funybubl.h"
 
 
-static WRITE8_HANDLER ( funybubl_vidram_bank_w )
+WRITE8_MEMBER(funybubl_state::funybubl_vidram_bank_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 1);
+	memory_set_bank(machine(), "bank1", data & 1);
 }
 
-static WRITE8_HANDLER ( funybubl_cpurombank_w )
+WRITE8_MEMBER(funybubl_state::funybubl_cpurombank_w)
 {
-	memory_set_bank(space->machine(), "bank2", data & 0x3f);	// should we add a check that (data&0x3f) < #banks?
+	memory_set_bank(machine(), "bank2", data & 0x3f);	// should we add a check that (data&0x3f) < #banks?
 }
 
 
-static WRITE8_HANDLER( funybubl_soundcommand_w )
+WRITE8_MEMBER(funybubl_state::funybubl_soundcommand_w)
 {
-	funybubl_state *state = space->machine().driver_data<funybubl_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( funybubl_oki_bank_sw )
@@ -89,10 +88,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, funybubl_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(funybubl_vidram_bank_w)	// vidram bank
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE_LEGACY(funybubl_cpurombank_w)		// rom bank?
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(funybubl_vidram_bank_w)	// vidram bank
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(funybubl_cpurombank_w)		// rom bank?
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE_LEGACY(funybubl_soundcommand_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(funybubl_soundcommand_w)
 	AM_RANGE(0x06, 0x06) AM_READNOP		/* Nothing is done with the data read */
 	AM_RANGE(0x06, 0x06) AM_WRITENOP		/* Written directly after IO port 0 */
 	AM_RANGE(0x07, 0x07) AM_WRITENOP		/* Reset something on startup - Sound CPU ?? */

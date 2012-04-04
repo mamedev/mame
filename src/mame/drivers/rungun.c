@@ -65,28 +65,27 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static READ16_HANDLER( rng_sysregs_r )
+READ16_MEMBER(rungun_state::rng_sysregs_r)
 {
-	rungun_state *state = space->machine().driver_data<rungun_state>();
 	UINT16 data = 0;
 
 	switch (offset)
 	{
 		case 0x00/2:
-			if (input_port_read(space->machine(), "DSW") & 0x20)
-				return (input_port_read(space->machine(), "P1") | input_port_read(space->machine(), "P3") << 8);
+			if (input_port_read(machine(), "DSW") & 0x20)
+				return (input_port_read(machine(), "P1") | input_port_read(machine(), "P3") << 8);
 			else
 			{
-				data = input_port_read(space->machine(), "P1") & input_port_read(space->machine(), "P3");
+				data = input_port_read(machine(), "P1") & input_port_read(machine(), "P3");
 				return (data << 8 | data);
 			}
 
 		case 0x02/2:
-			if (input_port_read(space->machine(), "DSW") & 0x20)
-				return (input_port_read(space->machine(), "P2") | input_port_read(space->machine(), "P4") << 8);
+			if (input_port_read(machine(), "DSW") & 0x20)
+				return (input_port_read(machine(), "P2") | input_port_read(machine(), "P4") << 8);
 			else
 			{
-				data = input_port_read(space->machine(), "P2") & input_port_read(space->machine(), "P4");
+				data = input_port_read(machine(), "P2") & input_port_read(machine(), "P4");
 				return (data << 8 | data);
 			}
 
@@ -96,24 +95,23 @@ static READ16_HANDLER( rng_sysregs_r )
                 bit8 : freeze
                 bit9 : joysticks layout(auto detect???)
             */
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = input_port_read(space->machine(), "DSW");
+				data = input_port_read(machine(), "DSW");
 			}
-			return ((state->m_sysreg[0x06 / 2] & 0xff00) | data);
+			return ((m_sysreg[0x06 / 2] & 0xff00) | data);
 	}
 
-	return state->m_sysreg[offset];
+	return m_sysreg[offset];
 }
 
-static WRITE16_HANDLER( rng_sysregs_w )
+WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 {
-	rungun_state *state = space->machine().driver_data<rungun_state>();
 
-	COMBINE_DATA(state->m_sysreg + offset);
+	COMBINE_DATA(m_sysreg + offset);
 
 	switch (offset)
 	{
@@ -127,10 +125,10 @@ static WRITE16_HANDLER( rng_sysregs_w )
                 bit10 : IRQ5 ACK
             */
 			if (ACCESSING_BITS_0_7)
-				input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+				input_port_write(machine(), "EEPROMOUT", data, 0xff);
 
 			if (!(data & 0x40))
-				device_set_input_line(state->m_maincpu, M68K_IRQ_5, CLEAR_LINE);
+				device_set_input_line(m_maincpu, M68K_IRQ_5, CLEAR_LINE);
 		break;
 
 		case 0x0c/2:
@@ -140,37 +138,35 @@ static WRITE16_HANDLER( rng_sysregs_w )
                 bit 2 : OBJCHA
                 bit 3 : enable IRQ 5
             */
-			k053246_set_objcha_line(state->m_k055673, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			k053246_set_objcha_line(m_k055673, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
 
-static WRITE16_HANDLER( sound_cmd1_w )
+WRITE16_MEMBER(rungun_state::sound_cmd1_w)
 {
 	if (ACCESSING_BITS_8_15)
 		soundlatch_w(space, 0, data >> 8);
 }
 
-static WRITE16_HANDLER( sound_cmd2_w )
+WRITE16_MEMBER(rungun_state::sound_cmd2_w)
 {
 	if (ACCESSING_BITS_8_15)
 		soundlatch2_w(space, 0, data >> 8);
 }
 
-static WRITE16_HANDLER( sound_irq_w )
+WRITE16_MEMBER(rungun_state::sound_irq_w)
 {
-	rungun_state *state = space->machine().driver_data<rungun_state>();
 
 	if (ACCESSING_BITS_8_15)
-		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static READ16_HANDLER( sound_status_msb_r )
+READ16_MEMBER(rungun_state::sound_status_msb_r)
 {
-	rungun_state *state = space->machine().driver_data<rungun_state>();
 
 	if (ACCESSING_BITS_8_15)
-		return(state->m_sound_status << 8);
+		return(m_sound_status << 8);
 
 	return 0;
 }
@@ -188,12 +184,12 @@ static ADDRESS_MAP_START( rungun_map, AS_PROGRAM, 16, rungun_state )
 	AM_RANGE(0x300000, 0x3007ff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x380000, 0x39ffff) AM_RAM											// work RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_READNOP	// AM_READ_LEGACY(K053936_0_rom_r )       // '936 ROM readback window
-	AM_RANGE(0x480000, 0x48001f) AM_READWRITE_LEGACY(rng_sysregs_r, rng_sysregs_w) AM_BASE(m_sysreg)
+	AM_RANGE(0x480000, 0x48001f) AM_READWRITE(rng_sysregs_r, rng_sysregs_w) AM_BASE(m_sysreg)
 	AM_RANGE(0x4c0000, 0x4c001f) AM_DEVREADWRITE8_LEGACY("k053252", k053252_r, k053252_w,0x00ff)						// CCU (for scanline and vblank polling)
-	AM_RANGE(0x540000, 0x540001) AM_WRITE_LEGACY(sound_irq_w)
-	AM_RANGE(0x58000c, 0x58000d) AM_WRITE_LEGACY(sound_cmd1_w)
-	AM_RANGE(0x58000e, 0x58000f) AM_WRITE_LEGACY(sound_cmd2_w)
-	AM_RANGE(0x580014, 0x580015) AM_READ_LEGACY(sound_status_msb_r)
+	AM_RANGE(0x540000, 0x540001) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x58000c, 0x58000d) AM_WRITE(sound_cmd1_w)
+	AM_RANGE(0x58000e, 0x58000f) AM_WRITE(sound_cmd2_w)
+	AM_RANGE(0x580014, 0x580015) AM_READ(sound_status_msb_r)
 	AM_RANGE(0x580000, 0x58001f) AM_RAM											// sound regs read/write fall-through
 	AM_RANGE(0x5c0000, 0x5c000d) AM_DEVREAD_LEGACY("k055673", k053246_word_r)						// 246A ROM readback window
 	AM_RANGE(0x5c0010, 0x5c001f) AM_DEVWRITE_LEGACY("k055673", k053247_reg_word_w)
@@ -214,22 +210,20 @@ ADDRESS_MAP_END
 
 /**********************************************************************************/
 
-static WRITE8_HANDLER( sound_status_w )
+WRITE8_MEMBER(rungun_state::sound_status_w)
 {
-	rungun_state *state = space->machine().driver_data<rungun_state>();
-	state->m_sound_status = data;
+	m_sound_status = data;
 }
 
-static WRITE8_HANDLER( z80ctrl_w )
+WRITE8_MEMBER(rungun_state::z80ctrl_w)
 {
-	rungun_state *state = space->machine().driver_data<rungun_state>();
 
-	state->m_z80_control = data;
+	m_z80_control = data;
 
-	memory_set_bank(space->machine(), "bank2", data & 0x07);
+	memory_set_bank(machine(), "bank2", data & 0x07);
 
 	if (data & 0x10)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN(audio_interrupt)
@@ -252,10 +246,10 @@ static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(sound_status_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ_LEGACY(soundlatch2_r)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(z80ctrl_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(z80ctrl_w)
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END
 

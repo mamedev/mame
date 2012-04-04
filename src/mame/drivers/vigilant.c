@@ -23,40 +23,40 @@ Buccaneers has a 5.6888 Mhz and a 18.432 Mhz OSC
 #include "includes/vigilant.h"
 #include "includes/iremipt.h"
 
-static WRITE8_HANDLER( vigilant_bank_select_w )
+WRITE8_MEMBER(vigilant_state::vigilant_bank_select_w)
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);
 }
 
 /***************************************************************************
  vigilant_out2_w
  **************************************************************************/
-static WRITE8_HANDLER( vigilant_out2_w )
+WRITE8_MEMBER(vigilant_state::vigilant_out2_w)
 {
 	/* D0 = FILP = Flip screen? */
 	/* D1 = COA1 = Coin Counter A? */
 	/* D2 = COB1 = Coin Counter B? */
 
 	/* The hardware has both coin counters hooked up to a single meter. */
-	coin_counter_w(space->machine(), 0,data & 0x02);
-	coin_counter_w(space->machine(), 1,data & 0x04);
+	coin_counter_w(machine(), 0,data & 0x02);
+	coin_counter_w(machine(), 1,data & 0x04);
 
 //  data & 0x01 cocktail mode
 }
 
-static WRITE8_HANDLER( kikcubic_coin_w )
+WRITE8_MEMBER(vigilant_state::kikcubic_coin_w)
 {
 	/* bits 0 is flip screen */
 
 	/* bit 1 is used but unknown */
 
 	/* bits 4/5 are coin counters */
-	coin_counter_w(space->machine(), 0,data & 0x10);
-	coin_counter_w(space->machine(), 1,data & 0x20);
+	coin_counter_w(machine(), 0,data & 0x10);
+	coin_counter_w(machine(), 1,data & 0x20);
 }
 
 
@@ -73,10 +73,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vigilant_io_map, AS_IO, 8, vigilant_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE_LEGACY("m72", m72_sound_command_byte_w)	/* SD */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE_LEGACY(vigilant_out2_w)			/* OUT2 */
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w)			/* OUT2 */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(vigilant_bank_select_w)	/* PBANK */
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(vigilant_bank_select_w)	/* PBANK */
 	AM_RANGE(0x80, 0x81) AM_WRITE_LEGACY(vigilant_horiz_scroll_w)		/* HSPL, HSPH */
 	AM_RANGE(0x82, 0x83) AM_WRITE_LEGACY(vigilant_rear_horiz_scroll_w) /* RHSPL, RHSPH */
 	AM_RANGE(0x84, 0x84) AM_WRITE_LEGACY(vigilant_rear_color_w)		/* RCOD */
@@ -93,11 +93,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kikcubic_io_map, AS_IO, 8, vigilant_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(kikcubic_coin_w)	/* also flip screen, and...? */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(kikcubic_coin_w)	/* also flip screen, and...? */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE_LEGACY(vigilant_bank_select_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(vigilant_bank_select_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("m72", m72_sound_command_byte_w)
 //  AM_RANGE(0x07, 0x07) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END

@@ -37,25 +37,25 @@ TODO:
 
 static const int clear_hack = 1;
 
-static WRITE16_HANDLER(io_w)
+WRITE16_MEMBER(taitoo_state::io_w)
 {
 	switch(offset)
 	{
-		case 2: watchdog_reset(space->machine()); break;
+		case 2: watchdog_reset(machine()); break;
 
 		default: logerror("IO W %x %x %x\n", offset, data, mem_mask);
 	}
 }
 
-static READ16_HANDLER(io_r)
+READ16_MEMBER(taitoo_state::io_r)
 {
 	int retval = 0;
 
 	switch(offset)
 	{
-		case 0: retval = input_port_read(space->machine(), "IN0") & (clear_hack ? 0xf7ff : 0xffff); break;
-		case 1: retval = input_port_read(space->machine(), "IN1") & (clear_hack ? 0xfff7 : 0xffff); break;
-		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, cpu_get_pc(&space->device()));
+		case 0: retval = input_port_read(machine(), "IN0") & (clear_hack ? 0xf7ff : 0xffff); break;
+		case 1: retval = input_port_read(machine(), "IN1") & (clear_hack ? 0xfff7 : 0xffff); break;
+		default: logerror("IO R %x %x = %x @ %x\n", offset, mem_mask, retval, cpu_get_pc(&space.device()));
 	}
 	return retval;
 }
@@ -63,7 +63,7 @@ static READ16_HANDLER(io_r)
 static ADDRESS_MAP_START( parentj_map, AS_PROGRAM, 16, taitoo_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_MIRROR(0x010000) AM_RAM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE_LEGACY(io_r, io_w) /* TC0220IOC ? */
+	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(io_r, io_w) /* TC0220IOC ? */
 	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2203_r, ym2203_w, 0x00ff)
 	AM_RANGE(0x400000, 0x420fff) AM_DEVREADWRITE_LEGACY("tc0080vco", tc0080vco_word_r, tc0080vco_word_w)
 	AM_RANGE(0x500800, 0x500fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)

@@ -41,6 +41,13 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_WRITE32_MEMBER(paletteram32_macrossp_w);
+	DECLARE_READ32_MEMBER(macrossp_soundstatus_r);
+	DECLARE_WRITE32_MEMBER(macrossp_soundcmd_w);
+	DECLARE_READ16_MEMBER(macrossp_soundcmd_r);
+	DECLARE_WRITE32_MEMBER(macrossp_palette_fade_w);
+	DECLARE_WRITE32_MEMBER(macrossp_speedup_w);
+	DECLARE_WRITE32_MEMBER(quizmoon_speedup_w);
 };
 
 /*----------- defined in video/macrossp.c -----------*/

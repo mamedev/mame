@@ -17,6 +17,9 @@ public:
 
 	UINT8 m_analog_data;
 	UINT8 m_rb_input_select;
+	DECLARE_WRITE8_MEMBER(bzone_coin_counter_w);
+	DECLARE_READ8_MEMBER(analog_data_r);
+	DECLARE_WRITE8_MEMBER(analog_select_w);
 };
 
 

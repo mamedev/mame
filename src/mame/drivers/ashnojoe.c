@@ -79,19 +79,18 @@ Coin B is not used
 #include "sound/msm5205.h"
 #include "includes/ashnojoe.h"
 
-static READ16_HANDLER(fake_4a00a_r)
+READ16_MEMBER(ashnojoe_state::fake_4a00a_r)
 {
 	/* If it returns 1 there's no sound. Is it used to sync the game and sound?
     or just a debug enable/disable register? */
 	return 0;
 }
 
-static WRITE16_HANDLER( ashnojoe_soundlatch_w )
+WRITE16_MEMBER(ashnojoe_state::ashnojoe_soundlatch_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_soundlatch_status = 1;
+		m_soundlatch_status = 1;
 		soundlatch_w(space, 0, data & 0xff);
 	}
 }
@@ -110,8 +109,8 @@ static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
 	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")
 	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
 	AM_RANGE(0x04a006, 0x04a007) AM_WRITEONLY AM_BASE(m_tilemap_reg)
-	AM_RANGE(0x04a008, 0x04a009) AM_WRITE_LEGACY(ashnojoe_soundlatch_w)
-	AM_RANGE(0x04a00a, 0x04a00b) AM_READ_LEGACY(fake_4a00a_r)	// ??
+	AM_RANGE(0x04a008, 0x04a009) AM_WRITE(ashnojoe_soundlatch_w)
+	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r)	// ??
 	AM_RANGE(0x04a010, 0x04a019) AM_WRITE_LEGACY(joe_tilemaps_xscroll_w)
 	AM_RANGE(0x04a020, 0x04a029) AM_WRITE_LEGACY(joe_tilemaps_yscroll_w)
 	AM_RANGE(0x04c000, 0x04ffff) AM_RAM
@@ -119,23 +118,20 @@ static ADDRESS_MAP_START( ashnojoe_map, AS_PROGRAM, 16, ashnojoe_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( adpcm_w )
+WRITE8_MEMBER(ashnojoe_state::adpcm_w)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
-	state->m_adpcm_byte = data;
+	m_adpcm_byte = data;
 }
 
-static READ8_HANDLER( sound_latch_r )
+READ8_MEMBER(ashnojoe_state::sound_latch_r)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
-	state->m_soundlatch_status = 0;
+	m_soundlatch_status = 0;
 	return soundlatch_r(space, 0);
 }
 
-static READ8_HANDLER( sound_latch_status_r )
+READ8_MEMBER(ashnojoe_state::sound_latch_status_r)
 {
-	ashnojoe_state *state = space->machine().driver_data<ashnojoe_state>();
-	return state->m_soundlatch_status;
+	return m_soundlatch_status;
 }
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ashnojoe_state )
@@ -147,9 +143,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, ashnojoe_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(adpcm_w)
-	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(sound_latch_r)
-	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(sound_latch_status_r)
+	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
+	AM_RANGE(0x04, 0x04) AM_READ(sound_latch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(sound_latch_status_r)
 ADDRESS_MAP_END
 
 

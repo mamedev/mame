@@ -25,6 +25,9 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(sonson_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(sonson_coin1_counter_w);
+	DECLARE_WRITE8_MEMBER(sonson_coin2_counter_w);
 };
 
 

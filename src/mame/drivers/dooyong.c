@@ -84,9 +84,9 @@ be verified on real PCB.
 #include "sound/okim6295.h"
 #include "includes/dooyong.h"
 
-static WRITE8_HANDLER( lastday_bankswitch_w )
+WRITE8_MEMBER(dooyong_state::lastday_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	memory_set_bank(machine(), "bank1", data & 0x07);
 
 	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }
@@ -96,9 +96,9 @@ static MACHINE_START( lastday )
 	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
 }
 
-static WRITE8_HANDLER( flip_screen_w )
+WRITE8_MEMBER(dooyong_state::flip_screen_w)
 {
-	flip_screen_set(space->machine(), data);
+	flip_screen_set(machine(), data);
 }
 
 static MACHINE_RESET( sound_ym2203 )
@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xc010, 0xc010) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc010, 0xc010) AM_WRITE_LEGACY(lastday_ctrl_w)	/* coin counter, flip screen */
 	AM_RANGE(0xc011, 0xc011) AM_READ_PORT("P1")
-	AM_RANGE(0xc011, 0xc011) AM_WRITE_LEGACY(lastday_bankswitch_w)
+	AM_RANGE(0xc011, 0xc011) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xc012, 0xc012) AM_READ_PORT("P2")
 	AM_RANGE(0xc012, 0xc012) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc013, 0xc013) AM_READ_PORT("DSWA")
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE(m_txvideoram)
-	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA") AM_WRITE_LEGACY(lastday_bankswitch_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA") AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("P1")
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("P2")
@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE_LEGACY(dooyong_txvideoram8_w) AM_BASE(m_txvideoram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA")
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(lastday_bankswitch_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("P2")
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("P1")
@@ -175,12 +175,12 @@ static ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSWA")
-	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(flip_screen_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P1")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc008, 0xc008) AM_WRITE_LEGACY(lastday_bankswitch_w)
+	AM_RANGE(0xc008, 0xc008) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xc010, 0xc010) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc018, 0xc01f) AM_WRITE_LEGACY(dooyong_fg2scroll8_w)
 	AM_RANGE(0xc040, 0xc047) AM_WRITE_LEGACY(dooyong_bgscroll8_w)
@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("P1")
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(lastday_bankswitch_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P2")
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe006, 0xe006) AM_READ_PORT("DSWA")

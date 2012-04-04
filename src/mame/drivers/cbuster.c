@@ -26,14 +26,13 @@
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 
-static WRITE16_HANDLER( twocrude_control_w )
+WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 {
-	cbuster_state *state = space->machine().driver_data<cbuster_state>();
 
 	switch (offset << 1)
 	{
 	case 0: /* DMA flag */
-		memcpy(state->m_spriteram16_buffer, state->m_spriteram16, 0x800);
+		memcpy(m_spriteram16_buffer, m_spriteram16, 0x800);
 		return;
 
 	case 6: /* IRQ ack */
@@ -41,7 +40,7 @@ static WRITE16_HANDLER( twocrude_control_w )
 
     case 2: /* Sound CPU write */
 		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
     	return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?
@@ -61,42 +60,41 @@ static WRITE16_HANDLER( twocrude_control_w )
             protection?!
 
         */
-		if ((data & 0xffff) == 0x9a00) state->m_prot = 0;
-		if ((data & 0xffff) == 0xaa)   state->m_prot = 0x74;
-		if ((data & 0xffff) == 0x0200) state->m_prot = 0x63 << 8;
-		if ((data & 0xffff) == 0x9a)   state->m_prot = 0xe;
-		if ((data & 0xffff) == 0x55)   state->m_prot = 0x1e;
-		if ((data & 0xffff) == 0x0e)  {state->m_prot = 0x0e; state->m_pri = 0;} /* start */
-		if ((data & 0xffff) == 0x00)  {state->m_prot = 0x0e; state->m_pri = 0;} /* level 0 */
-		if ((data & 0xffff) == 0xf1)  {state->m_prot = 0x36; state->m_pri = 1;} /* level 1 */
-		if ((data & 0xffff) == 0x80)  {state->m_prot = 0x2e; state->m_pri = 1;} /* level 2 */
-		if ((data & 0xffff) == 0x40)  {state->m_prot = 0x1e; state->m_pri = 1;} /* level 3 */
-		if ((data & 0xffff) == 0xc0)  {state->m_prot = 0x3e; state->m_pri = 0;} /* level 4 */
-		if ((data & 0xffff) == 0xff)  {state->m_prot = 0x76; state->m_pri = 1;} /* level 5 */
+		if ((data & 0xffff) == 0x9a00) m_prot = 0;
+		if ((data & 0xffff) == 0xaa)   m_prot = 0x74;
+		if ((data & 0xffff) == 0x0200) m_prot = 0x63 << 8;
+		if ((data & 0xffff) == 0x9a)   m_prot = 0xe;
+		if ((data & 0xffff) == 0x55)   m_prot = 0x1e;
+		if ((data & 0xffff) == 0x0e)  {m_prot = 0x0e; m_pri = 0;} /* start */
+		if ((data & 0xffff) == 0x00)  {m_prot = 0x0e; m_pri = 0;} /* level 0 */
+		if ((data & 0xffff) == 0xf1)  {m_prot = 0x36; m_pri = 1;} /* level 1 */
+		if ((data & 0xffff) == 0x80)  {m_prot = 0x2e; m_pri = 1;} /* level 2 */
+		if ((data & 0xffff) == 0x40)  {m_prot = 0x1e; m_pri = 1;} /* level 3 */
+		if ((data & 0xffff) == 0xc0)  {m_prot = 0x3e; m_pri = 0;} /* level 4 */
+		if ((data & 0xffff) == 0xff)  {m_prot = 0x76; m_pri = 1;} /* level 5 */
 
 		break;
 	}
-	logerror("Warning %04x- %02x written to control %02x\n", cpu_get_pc(&space->device()), data, offset);
+	logerror("Warning %04x- %02x written to control %02x\n", cpu_get_pc(&space.device()), data, offset);
 }
 
-static READ16_HANDLER( twocrude_control_r )
+READ16_MEMBER(cbuster_state::twocrude_control_r)
 {
-	cbuster_state *state = space->machine().driver_data<cbuster_state>();
 
 	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(space->machine(), "P1_P2");
+			return input_port_read(machine(), "P1_P2");
 
 		case 2: /* Dip Switches */
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 
 		case 4: /* Protection */
-			logerror("%04x : protection control read at 30c000 %d\n", cpu_get_pc(&space->device()), offset);
-			return state->m_prot;
+			logerror("%04x : protection control read at 30c000 %d\n", cpu_get_pc(&space.device()), offset);
+			return m_prot;
 
 		case 6: /* Credits, VBL in byte 7 */
-			return input_port_read(space->machine(), "COINS");
+			return input_port_read(machine(), "COINS");
 	}
 
 	return ~0;
@@ -124,7 +122,7 @@ static ADDRESS_MAP_START( twocrude_map, AS_PROGRAM, 16, cbuster_state )
 	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
 	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_WRITE_LEGACY(twocrude_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_WRITE_LEGACY(twocrude_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE_LEGACY(twocrude_control_r, twocrude_control_w)
+	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE(twocrude_control_r, twocrude_control_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

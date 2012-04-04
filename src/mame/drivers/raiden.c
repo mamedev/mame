@@ -512,19 +512,18 @@ ROM_END
 //#define SYNC_HACK
 
 #ifdef SYNC_HACK
-static READ16_HANDLER( sub_cpu_spin_r )
+READ16_MEMBER(raiden_state::sub_cpu_spin_r)
 {
-	raiden_state *state = space->machine().driver_data<raiden_state>();
-	int pc=cpu_get_pc(&space->device());
-	int ret=state->m_shared_ram[0x4];
+	int pc=cpu_get_pc(&space.device());
+	int ret=m_shared_ram[0x4];
 
 	// main set
 	if (pc==0xfcde6 && ret!=0x40)
-		device_spin(&space->device());
+		device_spin(&space.device());
 
 	// alt sets
 	if (pc==0xfcde8 && ret!=0x40)
-		device_spin(&space->device());
+		device_spin(&space.device());
 
 	return ret;
 }

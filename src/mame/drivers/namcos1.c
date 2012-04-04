@@ -350,35 +350,35 @@ C - uses sub board with support for player 3 and 4 controls
 
 /**********************************************************************/
 
-static WRITE8_HANDLER( namcos1_sub_firq_w )
+WRITE8_MEMBER(namcos1_state::namcos1_sub_firq_w)
 {
-	cputag_set_input_line(space->machine(), "sub", M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine(), "sub", M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( irq_ack_w )
+WRITE8_MEMBER(namcos1_state::irq_ack_w)
 {
-	device_set_input_line(&space->device(), 0, CLEAR_LINE);
+	device_set_input_line(&space.device(), 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( firq_ack_w )
+WRITE8_MEMBER(namcos1_state::firq_ack_w)
 {
-	device_set_input_line(&space->device(), M6809_FIRQ_LINE, CLEAR_LINE);
+	device_set_input_line(&space.device(), M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
 
-static READ8_HANDLER( dsw_r )
+READ8_MEMBER(namcos1_state::dsw_r)
 {
-	int ret = input_port_read(space->machine(), "DIPSW");
+	int ret = input_port_read(machine(), "DIPSW");
 	if (!(offset & 2)) ret >>= 4;
 	return 0xf0 | ret;
 }
 
-static WRITE8_HANDLER( namcos1_coin_w )
+WRITE8_MEMBER(namcos1_state::namcos1_coin_w)
 {
-	coin_lockout_global_w(space->machine(), ~data & 1);
-	coin_counter_w(space->machine(), 0,data & 2);
-	coin_counter_w(space->machine(), 1,data & 4);
+	coin_lockout_global_w(machine(), ~data & 1);
+	coin_counter_w(machine(), 0,data & 2);
+	coin_counter_w(machine(), 1,data & 4);
 }
 
 static void namcos1_update_DACs(running_machine &machine)
@@ -396,34 +396,31 @@ void namcos1_init_DACs(running_machine &machine)
 	state->m_dac1_gain=0x80;
 }
 
-static WRITE8_HANDLER( namcos1_dac_gain_w )
+WRITE8_MEMBER(namcos1_state::namcos1_dac_gain_w)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
 	int value;
 
 	/* DAC0 (bits 0,2) */
 	value = (data & 1) | ((data >> 1) & 2); /* GAIN0,GAIN1 */
-	state->m_dac0_gain = 0x20 * (value+1);
+	m_dac0_gain = 0x20 * (value+1);
 
 	/* DAC1 (bits 3,4) */
 	value = (data >> 3) & 3; /* GAIN2,GAIN3 */
-	state->m_dac1_gain = 0x20 * (value+1);
+	m_dac1_gain = 0x20 * (value+1);
 
-	namcos1_update_DACs(space->machine());
+	namcos1_update_DACs(machine());
 }
 
-static WRITE8_HANDLER( namcos1_dac0_w )
+WRITE8_MEMBER(namcos1_state::namcos1_dac0_w)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-	state->m_dac0_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs(space->machine());
+	m_dac0_value = data - 0x80; /* shift zero point */
+	namcos1_update_DACs(machine());
 }
 
-static WRITE8_HANDLER( namcos1_dac1_w )
+WRITE8_MEMBER(namcos1_state::namcos1_dac1_w)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-	state->m_dac1_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs(space->machine());
+	m_dac1_value = data - 0x80; /* shift zero point */
+	namcos1_update_DACs(machine());
 }
 
 
@@ -440,9 +437,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(namcos1_cpu_control_w)
 	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(namcos1_watchdog_w)
 //  AM_RANGE(0xf400, 0xf400) AM_WRITENOP // unknown
-	AM_RANGE(0xf600, 0xf600) AM_WRITE_LEGACY(irq_ack_w)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(firq_ack_w)
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(namcos1_sub_firq_w) // asserts FIRQ on CPU1
+	AM_RANGE(0xf600, 0xf600) AM_WRITE(irq_ack_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(firq_ack_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(namcos1_sub_firq_w) // asserts FIRQ on CPU1
 	AM_RANGE(0xfc00, 0xfc01) AM_WRITE_LEGACY(namcos1_subcpu_bank_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank8")
 ADDRESS_MAP_END
@@ -460,8 +457,8 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, namcos1_state )
 //  AM_RANGE(0xf000, 0xf000) AM_WRITENOP // IO Chip
 	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(namcos1_watchdog_w)
 //  AM_RANGE(0xf400, 0xf400) AM_WRITENOP // ?
-	AM_RANGE(0xf600, 0xf600) AM_WRITE_LEGACY(irq_ack_w)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(firq_ack_w)
+	AM_RANGE(0xf600, 0xf600) AM_WRITE(irq_ack_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(firq_ack_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROMBANK("bank16")
 ADDRESS_MAP_END
 
@@ -475,7 +472,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x8000, 0x9fff) AM_RAM	/* Sound RAM 3 */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE_LEGACY(namcos1_sound_bankswitch_w) /* ROM bank selector */
 	AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(namcos1_watchdog_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(irq_ack_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -483,23 +480,23 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM /* built in RAM */
-	AM_RANGE(0x1000, 0x1003) AM_READ_LEGACY(dsw_r)
+	AM_RANGE(0x1000, 0x1003) AM_READ(dsw_r)
 	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("CONTROL0")
 	AM_RANGE(0x1401, 0x1401) AM_READ_PORT("CONTROL1")
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank20") /* banked ROM */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(namcos1_mcu_patch_w)	/* kludge! see notes */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAMBANK("bank19")	/* TRIRAM (shared) */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("nvram") /* EEPROM */
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(namcos1_dac0_w)
-	AM_RANGE(0xd400, 0xd400) AM_WRITE_LEGACY(namcos1_dac1_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(namcos1_dac0_w)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(namcos1_dac1_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE_LEGACY(namcos1_mcu_bankswitch_w) /* ROM bank selector */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(irq_ack_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos1_state )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("COIN") AM_WRITE_LEGACY(namcos1_coin_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READNOP AM_WRITE_LEGACY(namcos1_dac_gain_w)
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("COIN") AM_WRITE(namcos1_coin_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READNOP AM_WRITE(namcos1_dac_gain_w)
 ADDRESS_MAP_END
 
 

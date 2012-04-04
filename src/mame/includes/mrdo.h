@@ -20,6 +20,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	int       m_flipscreen;
+	DECLARE_READ8_MEMBER(mrdo_SECRE_r);
 };
 
 

@@ -29,6 +29,11 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_READ16_MEMBER(oneshot_in0_word_r);
+	DECLARE_READ16_MEMBER(oneshot_gun_x_p1_r);
+	DECLARE_READ16_MEMBER(oneshot_gun_y_p1_r);
+	DECLARE_READ16_MEMBER(oneshot_gun_x_p2_r);
+	DECLARE_READ16_MEMBER(oneshot_gun_y_p2_r);
 };
 
 /*----------- defined in video/oneshot.c -----------*/

@@ -90,6 +90,22 @@ public:
 	UINT16 *m_paletteram16;
 	UINT32 *m_poly_rom;
 	UINT32 *m_poly_ram;
+	DECLARE_READ16_MEMBER(io_r);
+	DECLARE_READ16_MEMBER(fifoin_status_r);
+	DECLARE_WRITE16_MEMBER(bank_w);
+	DECLARE_READ16_MEMBER(network_ctl_r);
+	DECLARE_WRITE16_MEMBER(network_ctl_w);
+	DECLARE_WRITE16_MEMBER(md1_w);
+	DECLARE_WRITE16_MEMBER(md0_w);
+	DECLARE_WRITE16_MEMBER(p_w);
+	DECLARE_WRITE16_MEMBER(mr_w);
+	DECLARE_WRITE16_MEMBER(mr2_w);
+	DECLARE_READ16_MEMBER(snd_68k_ready_r);
+	DECLARE_WRITE16_MEMBER(snd_latch_to_68k_w);
+	DECLARE_READ16_MEMBER(m1_snd_68k_latch_r);
+	DECLARE_READ16_MEMBER(m1_snd_v60_ready_r);
+	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch1_w);
+	DECLARE_WRITE16_MEMBER(m1_snd_68k_latch2_w);
 };
 
 

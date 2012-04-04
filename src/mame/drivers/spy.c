@@ -34,51 +34,49 @@ static INTERRUPT_GEN( spy_interrupt )
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
-static READ8_HANDLER( spy_bankedram1_r )
+READ8_MEMBER(spy_state::spy_bankedram1_r)
 {
-	spy_state *state = space->machine().driver_data<spy_state>();
 
-	if (state->m_rambank & 1)
+	if (m_rambank & 1)
 	{
-		return space->machine().generic.paletteram.u8[offset];
+		return machine().generic.paletteram.u8[offset];
 	}
-	else if (state->m_rambank & 2)
+	else if (m_rambank & 2)
 	{
-		if (state->m_pmcbank)
+		if (m_pmcbank)
 		{
-			//logerror("%04x read pmcram %04x\n", cpu_get_pc(&space->device()), offset);
-			return state->m_pmcram[offset];
+			//logerror("%04x read pmcram %04x\n", cpu_get_pc(&space.device()), offset);
+			return m_pmcram[offset];
 		}
 		else
 		{
-			//logerror("%04x read pmc internal ram %04x\n", cpu_get_pc(&space->device()), offset);
+			//logerror("%04x read pmc internal ram %04x\n", cpu_get_pc(&space.device()), offset);
 			return 0;
 		}
 	}
 	else
-		return state->m_ram[offset];
+		return m_ram[offset];
 }
 
-static WRITE8_HANDLER( spy_bankedram1_w )
+WRITE8_MEMBER(spy_state::spy_bankedram1_w)
 {
-	spy_state *state = space->machine().driver_data<spy_state>();
 
-	if (state->m_rambank & 1)
+	if (m_rambank & 1)
 	{
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	}
-	else if (state->m_rambank & 2)
+	else if (m_rambank & 2)
 	{
-		if (state->m_pmcbank)
+		if (m_pmcbank)
 		{
-			//logerror("%04x pmcram %04x = %02x\n", cpu_get_pc(&space->device()), offset, data);
-			state->m_pmcram[offset] = data;
+			//logerror("%04x pmcram %04x = %02x\n", cpu_get_pc(&space.device()), offset, data);
+			m_pmcram[offset] = data;
 		}
 		//else
-			//logerror("%04x pmc internal ram %04x = %02x\n", cpu_get_pc(&space->device()), offset, data);
+			//logerror("%04x pmc internal ram %04x = %02x\n", cpu_get_pc(&space.device()), offset, data);
 	}
 	else
-		state->m_ram[offset] = data;
+		m_ram[offset] = data;
 }
 
 /*
@@ -149,7 +147,7 @@ this is the data written to internal ram on startup:
 3f: 5f 7e 00 ce 08
 */
 
-static WRITE8_HANDLER( bankswitch_w )
+WRITE8_MEMBER(spy_state::bankswitch_w)
 {
 	int bank;
 
@@ -163,7 +161,7 @@ static WRITE8_HANDLER( bankswitch_w )
 	else
 		bank = ((data & 0x0e) >> 1);
 
-	memory_set_bank(space->machine(), "bank1", bank);
+	memory_set_bank(machine(), "bank1", bank);
 }
 
 static void spy_collision( running_machine &machine )
@@ -249,9 +247,8 @@ static void spy_collision( running_machine &machine )
 }
 
 
-static WRITE8_HANDLER( spy_3f90_w )
+WRITE8_MEMBER(spy_state::spy_3f90_w)
 {
-	spy_state *state = space->machine().driver_data<spy_state>();
 
 	/*********************************************************************
     *
@@ -292,24 +289,24 @@ static WRITE8_HANDLER( spy_3f90_w )
     ********************************************************************/
 
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 2 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->m_k052109, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(m_k052109, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 3 = disable video */
-	state->m_video_enable = ~(data & 0x08);
+	m_video_enable = ~(data & 0x08);
 
 	/* bit 4 = read RAM at 0000 (if set) else read color palette RAM */
 	/* bit 5 = PMCBK */
-	state->m_rambank = (data & 0x30) >> 4;
+	m_rambank = (data & 0x30) >> 4;
 	/* bit 7 = PMC-BK */
-	state->m_pmcbank = (data & 0x80) >> 7;
+	m_pmcbank = (data & 0x80) >> 7;
 
-//logerror("%04x: 3f90_w %02x\n", cpu_get_pc(&space->device()), data);
+//logerror("%04x: 3f90_w %02x\n", cpu_get_pc(&space.device()), data);
 	/* bit 6 = PMC-START */
-	if ((data & 0x40) && !(state->m_old_3f90 & 0x40))
+	if ((data & 0x40) && !(m_old_3f90 & 0x40))
 	{
 		/* we should handle collision here */
 //AT
@@ -320,84 +317,80 @@ static WRITE8_HANDLER( spy_3f90_w )
 			logerror("collision test:\n");
 			for (i = 0; i < 0xfe; i++)
 			{
-				logerror("%02x ", state->m_pmcram[i]);
+				logerror("%02x ", m_pmcram[i]);
 				if (i == 0x0f || (i > 0x10 && (i - 0x10) % 14 == 13))
 				logerror("\n");
 			}
 		}
-		spy_collision(space->machine());
+		spy_collision(machine());
 //ZT
-		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+		device_set_input_line(m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
-	state->m_old_3f90 = data;
+	m_old_3f90 = data;
 }
 
 
-static WRITE8_HANDLER( spy_sh_irqtrigger_w )
+WRITE8_MEMBER(spy_state::spy_sh_irqtrigger_w)
 {
-	spy_state *state = space->machine().driver_data<spy_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( sound_bank_w )
+WRITE8_MEMBER(spy_state::sound_bank_w)
 {
-	spy_state *state = space->machine().driver_data<spy_state>();
 	int bank_A, bank_B;
 
 	bank_A = (data >> 0) & 0x03;
 	bank_B = (data >> 2) & 0x03;
-	k007232_set_bank(state->m_k007232_1, bank_A, bank_B);
+	k007232_set_bank(m_k007232_1, bank_A, bank_B);
 
 	bank_A = (data >> 4) & 0x03;
 	bank_B = (data >> 6) & 0x03;
-	k007232_set_bank(state->m_k007232_2, bank_A, bank_B);
+	k007232_set_bank(m_k007232_2, bank_A, bank_B);
 }
 
 
-static READ8_HANDLER( k052109_051960_r )
+READ8_MEMBER(spy_state::k052109_051960_r)
 {
-	spy_state *state = space->machine().driver_data<spy_state>();
 
-	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->m_k051960, offset - 0x3800);
+			return k051937_r(m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->m_k052109, offset);
+			return k052109_r(m_k052109, offset);
 		else
-			return k051960_r(state->m_k051960, offset - 0x3c00);
+			return k051960_r(m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->m_k052109, offset);
+		return k052109_r(m_k052109, offset);
 }
 
-static WRITE8_HANDLER( k052109_051960_w )
+WRITE8_MEMBER(spy_state::k052109_051960_w)
 {
-	spy_state *state = space->machine().driver_data<spy_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->m_k051960, offset - 0x3800, data);
+		k051937_w(m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->m_k052109, offset, data);
+		k052109_w(m_k052109, offset, data);
 	else
-		k051960_w(state->m_k051960, offset - 0x3c00, data);
+		k051960_w(m_k051960, offset - 0x3c00, data);
 }
 
 static ADDRESS_MAP_START( spy_map, AS_PROGRAM, 8, spy_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(spy_bankedram1_r, spy_bankedram1_w) AM_BASE(m_ram)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(spy_bankedram1_r, spy_bankedram1_w) AM_BASE(m_ram)
 	AM_RANGE(0x0800, 0x1aff) AM_RAM
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITE_LEGACY(bankswitch_w)
-	AM_RANGE(0x3f90, 0x3f90) AM_WRITE_LEGACY(spy_3f90_w)
+	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(bankswitch_w)
+	AM_RANGE(0x3f90, 0x3f90) AM_WRITE(spy_3f90_w)
 	AM_RANGE(0x3fa0, 0x3fa0) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x3fb0, 0x3fb0) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x3fc0, 0x3fc0) AM_WRITE_LEGACY(spy_sh_irqtrigger_w)
+	AM_RANGE(0x3fc0, 0x3fc0) AM_WRITE(spy_sh_irqtrigger_w)
 	AM_RANGE(0x3fd0, 0x3fd0) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3fd1, 0x3fd1) AM_READ_PORT("P1")
 	AM_RANGE(0x3fd2, 0x3fd2) AM_READ_PORT("P2")
 	AM_RANGE(0x3fd3, 0x3fd3) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3fe0, 0x3fe0) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x5fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)
+	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -405,7 +398,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spy_sound_map, AS_PROGRAM, 8, spy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(sound_bank_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
 	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE_LEGACY("k007232_1", k007232_r, k007232_w)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)

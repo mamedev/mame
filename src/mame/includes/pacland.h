@@ -17,6 +17,14 @@ public:
 	UINT16 m_scroll1;
 	UINT8 m_main_irq_mask;
 	UINT8 m_mcu_irq_mask;
+	DECLARE_WRITE8_MEMBER(pacland_subreset_w);
+	DECLARE_WRITE8_MEMBER(pacland_flipscreen_w);
+	DECLARE_READ8_MEMBER(pacland_input_r);
+	DECLARE_WRITE8_MEMBER(pacland_coin_w);
+	DECLARE_WRITE8_MEMBER(pacland_led_w);
+	DECLARE_WRITE8_MEMBER(pacland_irq_1_ctrl_w);
+	DECLARE_WRITE8_MEMBER(pacland_irq_2_ctrl_w);
+	DECLARE_READ8_MEMBER(readFF);
 };
 
 

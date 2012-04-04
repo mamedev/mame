@@ -12,6 +12,8 @@ public:
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_fg2_tilemap;
 	tilemap_t *m_fg3_tilemap;
+	DECLARE_WRITE32_MEMBER(paletteram32_xRRRRRGGGGGBBBBB_dword_w);
+	DECLARE_WRITE32_MEMBER(silk_coin_counter_w);
 };
 
 

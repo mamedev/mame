@@ -23,6 +23,8 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_deco_tilegen1;
+	DECLARE_READ16_MEMBER(pckgaldx_unknown_r);
+	DECLARE_READ16_MEMBER(pckgaldx_protection_r);
 };
 
 

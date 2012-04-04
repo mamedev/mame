@@ -45,6 +45,8 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_mcu;
+	DECLARE_WRITE8_MEMBER(matmania_sh_command_w);
+	DECLARE_WRITE8_MEMBER(maniach_sh_command_w);
 };
 
 /*----------- defined in machine/maniach.c -----------*/

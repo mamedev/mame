@@ -17,6 +17,11 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(vball_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(vb_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(cpu_sound_command_w);
+	DECLARE_WRITE8_MEMBER(vb_scrollx_hi_w);
+	DECLARE_WRITE8_MEMBER(vb_scrollx_lo_w);
 };
 
 

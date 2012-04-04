@@ -86,15 +86,14 @@ static void update_misc_flags(running_machine &machine, UINT8 val)
 }
 
 
-static WRITE8_HANDLER( orbit_misc_w )
+WRITE8_MEMBER(orbit_state::orbit_misc_w)
 {
-	orbit_state *state = space->machine().driver_data<orbit_state>();
 	UINT8 bit = offset >> 1;
 
 	if (offset & 1)
-		update_misc_flags(space->machine(), state->m_misc_flags | (1 << bit));
+		update_misc_flags(machine(), m_misc_flags | (1 << bit));
 	else
-		update_misc_flags(space->machine(), state->m_misc_flags & ~(1 << bit));
+		update_misc_flags(machine(), m_misc_flags & ~(1 << bit));
 }
 
 
@@ -118,7 +117,7 @@ static ADDRESS_MAP_START( orbit_map, AS_PROGRAM, 8, orbit_state )
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("discrete", orbit_note_w)
 	AM_RANGE(0x3900, 0x3900) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("discrete", orbit_noise_amp_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("discrete", orbit_note_amp_w)
-	AM_RANGE(0x3c00, 0x3c0f) AM_MIRROR(0x00f0) AM_WRITE_LEGACY(orbit_misc_w)
+	AM_RANGE(0x3c00, 0x3c0f) AM_MIRROR(0x00f0) AM_WRITE(orbit_misc_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("discrete", orbit_noise_rst_w)
 	AM_RANGE(0x3f00, 0x3f00) AM_MIRROR(0x00ff) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM

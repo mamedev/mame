@@ -15,6 +15,14 @@ public:
 	UINT16 m_scroll_y;
 	UINT8 m_main_irq_mask;
 	UINT8 m_mcu_irq_mask;
+	DECLARE_WRITE8_MEMBER(inputport_select_w);
+	DECLARE_READ8_MEMBER(inputport_r);
+	DECLARE_WRITE8_MEMBER(skykid_led_w);
+	DECLARE_WRITE8_MEMBER(skykid_subreset_w);
+	DECLARE_WRITE8_MEMBER(skykid_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(skykid_irq_1_ctrl_w);
+	DECLARE_WRITE8_MEMBER(skykid_irq_2_ctrl_w);
+	DECLARE_READ8_MEMBER(readFF);
 };
 
 

@@ -90,38 +90,35 @@ EB26IC73.BIN    27C240      /  Main Program
 
 /*** SOUND *******************************************************************/
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(suprslam_state::sound_command_w)
 {
-	suprslam_state *state = space->machine().driver_data<suprslam_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_pending_command = 1;
+		m_pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 #if 0
-static READ16_HANDLER( pending_command_r )
+READ16_MEMBER(suprslam_state::pending_command_r)
 {
-	suprslam_state *state = space->machine().driver_data<suprslam_state>();
 	return pending_command;
 }
 #endif
 
-static WRITE8_HANDLER( pending_command_clear_w )
+WRITE8_MEMBER(suprslam_state::pending_command_clear_w)
 {
-	suprslam_state *state = space->machine().driver_data<suprslam_state>();
-	state->m_pending_command = 0;
+	m_pending_command = 0;
 }
 
-static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
+WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("audiocpu")->base();
+	UINT8 *RAM = machine().region("audiocpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;
-	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);
 }
 
 /*** MEMORY MAPS *************************************************************/
@@ -136,7 +133,7 @@ static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
 	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_BASE(m_screen_vregs)
 //  AM_RANGE(0xff3000, 0xff3001) AM_WRITENOP // sprite buffer trigger?
 	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)
-	AM_RANGE(0xff9000, 0xff9001) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
 	AM_RANGE(0xffa000, 0xffafff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xffd000, 0xffd01f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
 	AM_RANGE(0xffe000, 0xffe001) AM_WRITE_LEGACY(suprslam_bank_w)
@@ -156,8 +153,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, suprslam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(suprslam_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(soundlatch_r, pending_command_clear_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(soundlatch_r) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 

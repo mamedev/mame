@@ -22,6 +22,8 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_k007342;
 	device_t *m_k007420;
+	DECLARE_WRITE8_MEMBER(battlnts_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(battlnts_bankswitch_w);
 };
 
 /*----------- defined in video/battlnts.c -----------*/

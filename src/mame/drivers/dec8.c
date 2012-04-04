@@ -55,72 +55,69 @@ To do:
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( dec8_mxc06_karn_buffer_spriteram_w)
+WRITE8_MEMBER(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	UINT8* spriteram = state->m_spriteram->live();
+	UINT8* spriteram = m_spriteram->live();
 	// copy to a 16-bit region for the sprite chip
 	for (int i=0;i<0x800/2;i++)
 	{
-		state->m_buffered_spriteram16[i] = spriteram[(i*2)+1] | (spriteram[(i*2)+0] <<8);
+		m_buffered_spriteram16[i] = spriteram[(i*2)+1] | (spriteram[(i*2)+0] <<8);
 	}
 }
 
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
 static SCREEN_VBLANK( dec8 )
 {
+	dec8_state *state = screen.machine().driver_data<dec8_state>();
 	// rising edge
 	if (vblank_on)
 	{
 		address_space *space = screen.machine().device("maincpu")->memory().space(AS_PROGRAM);
-		dec8_mxc06_karn_buffer_spriteram_w(space, 0, 0);
+		state->dec8_mxc06_karn_buffer_spriteram_w(*space, 0, 0);
 	}
 }
 
-static READ8_HANDLER( i8751_h_r )
+READ8_MEMBER(dec8_state::i8751_h_r)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	return state->m_i8751_return >> 8; /* MSB */
+	return m_i8751_return >> 8; /* MSB */
 }
 
-static READ8_HANDLER( i8751_l_r )
+READ8_MEMBER(dec8_state::i8751_l_r)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	return state->m_i8751_return & 0xff; /* LSB */
+	return m_i8751_return & 0xff; /* LSB */
 }
 
-static WRITE8_HANDLER( i8751_reset_w )
+WRITE8_MEMBER(dec8_state::i8751_reset_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->m_i8751_return = 0;
+	m_i8751_return = 0;
 }
 
 /******************************************************************************/
 
-static READ8_HANDLER( gondo_player_1_r )
+READ8_MEMBER(dec8_state::gondo_player_1_r)
 {
-	int val = 1 << input_port_read(space->machine(), "AN0");
+	int val = 1 << input_port_read(machine(), "AN0");
 
 	switch (offset)
 	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
-			return ((~val >> 4) & 0xf0) | (input_port_read(space->machine(), "IN0") & 0xf);
+			return ((~val >> 4) & 0xf0) | (input_port_read(machine(), "IN0") & 0xf);
 	}
 	return 0xff;
 }
 
-static READ8_HANDLER( gondo_player_2_r )
+READ8_MEMBER(dec8_state::gondo_player_2_r)
 {
-	int val = 1 << input_port_read(space->machine(), "AN1");
+	int val = 1 << input_port_read(machine(), "AN1");
 
 	switch (offset)
 	{
 		case 0: /* Rotary low byte */
 			return ~(val & 0xff);
 		case 1: /* Joystick = bottom 4 bits, rotary = top 4 */
-			return ((~val >> 4) & 0xf0) | (input_port_read(space->machine(), "IN1") & 0xf);
+			return ((~val >> 4) & 0xf0) | (input_port_read(machine(), "IN1") & 0xf);
 	}
 	return 0xff;
 }
@@ -141,19 +138,18 @@ static TIMER_CALLBACK( dec8_i8751_timer_callback )
 	device_set_input_line(state->m_mcu, MCS51_INT1_LINE, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( dec8_i8751_w )
+WRITE8_MEMBER(dec8_state::dec8_i8751_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	switch (offset)
 	{
 	case 0: /* High byte - SECIRQ is trigged on activating this latch */
-		state->m_i8751_value = (state->m_i8751_value & 0xff) | (data << 8);
-		device_set_input_line(state->m_mcu, MCS51_INT1_LINE, ASSERT_LINE);
-		space->machine().scheduler().timer_set(state->m_mcu->clocks_to_attotime(64), FUNC(dec8_i8751_timer_callback)); // 64 clocks not confirmed
+		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
+		device_set_input_line(m_mcu, MCS51_INT1_LINE, ASSERT_LINE);
+		machine().scheduler().timer_set(m_mcu->clocks_to_attotime(64), FUNC(dec8_i8751_timer_callback)); // 64 clocks not confirmed
 		break;
 	case 1: /* Low byte */
-		state->m_i8751_value = (state->m_i8751_value & 0xff00) | data;
+		m_i8751_value = (m_i8751_value & 0xff00) | data;
 		break;
 	}
 }
@@ -164,9 +160,8 @@ static WRITE8_HANDLER( dec8_i8751_w )
 *
 ********************************/
 
-static WRITE8_HANDLER( lastmisn_i8751_w )
+WRITE8_MEMBER(dec8_state::lastmisn_i8751_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
 	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
@@ -174,102 +169,100 @@ static WRITE8_HANDLER( lastmisn_i8751_w )
 	int lneed2[2][4] = {{1, 1, 1, 2}, {1, 2, 3, 4}};   /* slot 2 : coins needed */
 	int lcred2[2][4] = {{1, 2, 3, 1}, {1, 1, 1, 1}};   /* slot 2 : credits awarded */
 
-	state->m_i8751_return = 0;
+	m_i8751_return = 0;
 
 	switch (offset)
 	{
 	case 0: /* High byte */
-		state->m_i8751_value = (state->m_i8751_value & 0xff) | (data << 8);
-		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
+		device_set_input_line(m_maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
-		state->m_i8751_value = (state->m_i8751_value & 0xff00) | data;
+		m_i8751_value = (m_i8751_value & 0xff00) | data;
 		break;
 	}
 
 	/* Coins are controlled by the i8751 */
-	if ((input_port_read(space->machine(), "IN2") & 3) == 3) state->m_latch = 1;
-	if ((input_port_read(space->machine(), "IN2") & 1) != 1 && state->m_latch)
+	if ((input_port_read(machine(), "IN2") & 3) == 3) m_latch = 1;
+	if ((input_port_read(machine(), "IN2") & 1) != 1 && m_latch)
 	{
-		state->m_coin1++;
-		state->m_latch = 0;
-		state->m_snd = 0x400;
-		state->m_i8751_return = 0x400;
-		if (state->m_coin1>=state->m_need1)
+		m_coin1++;
+		m_latch = 0;
+		m_snd = 0x400;
+		m_i8751_return = 0x400;
+		if (m_coin1>=m_need1)
 		{
-			state->m_coin1-=state->m_need1;
-			state->m_credits+=state->m_cred1;
+			m_coin1-=m_need1;
+			m_credits+=m_cred1;
 		}
 	}
-	if ((input_port_read(space->machine(), "IN2") & 2) != 2 && state->m_latch)
+	if ((input_port_read(machine(), "IN2") & 2) != 2 && m_latch)
 	{
-		state->m_coin2++;
-		state->m_latch = 0;
-		state->m_snd = 0x400;
-		state->m_i8751_return = 0x400;
-		if (state->m_coin2>=state->m_need2)
+		m_coin2++;
+		m_latch = 0;
+		m_snd = 0x400;
+		m_i8751_return = 0x400;
+		if (m_coin2>=m_need2)
 		{
-			state->m_coin2-=state->m_need2;
-			state->m_credits+=state->m_cred2;
+			m_coin2-=m_need2;
+			m_credits+=m_cred2;
 		}
 	}
-	if (state->m_credits>99) state->m_credits=99; /* not handled by main CPU */
+	if (m_credits>99) m_credits=99; /* not handled by main CPU */
 
-	if (state->m_i8751_value == 0x0401) state->m_i8751_return = 0;    /* ??? */
+	if (m_i8751_value == 0x0401) m_i8751_return = 0;    /* ??? */
 
-	if (state->m_i8751_value == 0x007a) { state->m_i8751_return = 0x85; state->m_coinage_id = 0; }  /* Japanese version ID */
-	if (state->m_i8751_value == 0x007b) { state->m_i8751_return = 0x84; state->m_coinage_id = 0; }  /* US version ID */
+	if (m_i8751_value == 0x007a) { m_i8751_return = 0x85; m_coinage_id = 0; }  /* Japanese version ID */
+	if (m_i8751_value == 0x007b) { m_i8751_return = 0x84; m_coinage_id = 0; }  /* US version ID */
 
 	if (offset == 0)
 	{
-		if ((state->m_i8751_value >> 8) == 0x01) /* Coinage settings */
+		if ((m_i8751_value >> 8) == 0x01) /* Coinage settings */
 		{
-			state->m_i8751_return = state->m_i8751_value;
-			state->m_need1 = lneed1[state->m_coinage_id][(state->m_i8751_value & 0x03) >> 0];
-			state->m_need2 = lneed2[state->m_coinage_id][(state->m_i8751_value & 0x0c) >> 2];
-			state->m_cred1 = lcred1[state->m_coinage_id][(state->m_i8751_value & 0x03) >> 0];
-			state->m_cred2 = lcred2[state->m_coinage_id][(state->m_i8751_value & 0x0c) >> 2];
+			m_i8751_return = m_i8751_value;
+			m_need1 = lneed1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
+			m_need2 = lneed2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
+			m_cred1 = lcred1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
+			m_cred2 = lcred2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
 		}
-		if ((state->m_i8751_value >> 8) == 0x02) { state->m_i8751_return = state->m_snd | ((state->m_credits / 10) << 4) | (state->m_credits % 10); state->m_snd = 0; }   /* Credits request */
-		if ((state->m_i8751_value >> 8) == 0x03 && state->m_credits) { state->m_i8751_return = 0; state->m_credits--; } /* Credits clear */
+		if ((m_i8751_value >> 8) == 0x02) { m_i8751_return = m_snd | ((m_credits / 10) << 4) | (m_credits % 10); m_snd = 0; }   /* Credits request */
+		if ((m_i8751_value >> 8) == 0x03 && m_credits) { m_i8751_return = 0; m_credits--; } /* Credits clear */
 	}
 }
 
-static WRITE8_HANDLER( shackled_i8751_w )
+WRITE8_MEMBER(dec8_state::shackled_i8751_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->m_i8751_return = 0;
+	m_i8751_return = 0;
 
 	switch (offset)
 	{
 	case 0: /* High byte */
-		state->m_i8751_value = (state->m_i8751_value & 0xff) | (data << 8);
-		device_set_input_line(state->m_subcpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal sub cpu */
+		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
+		device_set_input_line(m_subcpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal sub cpu */
 		break;
 	case 1: /* Low byte */
-		state->m_i8751_value = (state->m_i8751_value & 0xff00) | data;
+		m_i8751_value = (m_i8751_value & 0xff00) | data;
 		break;
 	}
 
 	/* Coins are controlled by the i8751 */
-	if (/*(input_port_read(space->machine(), "IN2") & 3) == 3*/!state->m_latch) { state->m_latch = 1; state->m_coin1 = state->m_coin2 = 0; }
-	if ((input_port_read(space->machine(), "IN2") & 1) != 1 && state->m_latch)  { state->m_coin1 = 1; state->m_latch = 0; }
-	if ((input_port_read(space->machine(), "IN2") & 2) != 2 && state->m_latch)  { state->m_coin2 = 1; state->m_latch = 0; }
+	if (/*(input_port_read(machine(), "IN2") & 3) == 3*/!m_latch) { m_latch = 1; m_coin1 = m_coin2 = 0; }
+	if ((input_port_read(machine(), "IN2") & 1) != 1 && m_latch)  { m_coin1 = 1; m_latch = 0; }
+	if ((input_port_read(machine(), "IN2") & 2) != 2 && m_latch)  { m_coin2 = 1; m_latch = 0; }
 
-	if (state->m_i8751_value == 0x0102) state->m_i8751_return = 0;    /* ??? */
-	if (state->m_i8751_value == 0x0101) state->m_i8751_return = 0;    /* ??? */
-	if (state->m_i8751_value == 0x0400) state->m_i8751_return = 0;    /* ??? */
+	if (m_i8751_value == 0x0102) m_i8751_return = 0;    /* ??? */
+	if (m_i8751_value == 0x0101) m_i8751_return = 0;    /* ??? */
+	if (m_i8751_value == 0x0400) m_i8751_return = 0;    /* ??? */
 
-	if (state->m_i8751_value == 0x0050) state->m_i8751_return = 0; /* Japanese version (Breywood) ID */
-	if (state->m_i8751_value == 0x0051) state->m_i8751_return = 0; /* US version (Shackled) ID */
+	if (m_i8751_value == 0x0050) m_i8751_return = 0; /* Japanese version (Breywood) ID */
+	if (m_i8751_value == 0x0051) m_i8751_return = 0; /* US version (Shackled) ID */
 
-	if (state->m_i8751_value == 0x8101) state->m_i8751_return = ((((state->m_coin2 / 10) << 4) | (state->m_coin2 % 10)) << 0) |
-																((((state->m_coin1 / 10) << 4) | (state->m_coin1 % 10)) << 8);    /* Coins */
+	if (m_i8751_value == 0x8101) m_i8751_return = ((((m_coin2 / 10) << 4) | (m_coin2 % 10)) << 0) |
+																((((m_coin1 / 10) << 4) | (m_coin1 % 10)) << 8);    /* Coins */
 }
 
-static WRITE8_HANDLER( csilver_i8751_w )
+WRITE8_MEMBER(dec8_state::csilver_i8751_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
 	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
@@ -277,68 +270,67 @@ static WRITE8_HANDLER( csilver_i8751_w )
 	int lneed2[2][4] = {{1, 1, 1, 2}, {1, 2, 3, 4}};   /* slot 2 : coins needed */
 	int lcred2[2][4] = {{1, 2, 3, 1}, {1, 1, 1, 1}};   /* slot 2 : credits awarded */
 
-	state->m_i8751_return = 0;
+	m_i8751_return = 0;
 
 	switch (offset)
 	{
 	case 0: /* High byte */
-		state->m_i8751_value = (state->m_i8751_value & 0xff) | (data << 8);
-		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
+		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
+		device_set_input_line(m_maincpu, M6809_FIRQ_LINE, HOLD_LINE); /* Signal main cpu */
 		break;
 	case 1: /* Low byte */
-		state->m_i8751_value = (state->m_i8751_value & 0xff00) | data;
+		m_i8751_value = (m_i8751_value & 0xff00) | data;
 		break;
 	}
 
 	/* Coins are controlled by the i8751 */
-	if ((input_port_read(space->machine(), "IN2") & 3) == 3) state->m_latch = 1;
-	if ((input_port_read(space->machine(), "IN2") & 1) != 1 && state->m_latch)
+	if ((input_port_read(machine(), "IN2") & 3) == 3) m_latch = 1;
+	if ((input_port_read(machine(), "IN2") & 1) != 1 && m_latch)
 	{
-		state->m_coin1++;
-		state->m_latch = 0;
-		state->m_snd = 0x1200;
-		state->m_i8751_return = 0x1200;
-		if (state->m_coin1>=state->m_need1)
+		m_coin1++;
+		m_latch = 0;
+		m_snd = 0x1200;
+		m_i8751_return = 0x1200;
+		if (m_coin1>=m_need1)
 		{
-			state->m_coin1-=state->m_need1;
-			state->m_credits+=state->m_cred1;
+			m_coin1-=m_need1;
+			m_credits+=m_cred1;
 		}
 	}
-	if ((input_port_read(space->machine(), "IN2") & 2) != 2 && state->m_latch)
+	if ((input_port_read(machine(), "IN2") & 2) != 2 && m_latch)
 	{
-		state->m_coin2++;
-		state->m_latch = 0;
-		state->m_snd = 0x1200;
-		state->m_i8751_return = 0x1200;
-		if (state->m_coin2>=state->m_need2)
+		m_coin2++;
+		m_latch = 0;
+		m_snd = 0x1200;
+		m_i8751_return = 0x1200;
+		if (m_coin2>=m_need2)
 		{
-			state->m_coin2-=state->m_need2;
-			state->m_credits+=state->m_cred2;
+			m_coin2-=m_need2;
+			m_credits+=m_cred2;
 		}
 	}
-	if (state->m_credits>99) state->m_credits=99; /* not handled by main CPU */
+	if (m_credits>99) m_credits=99; /* not handled by main CPU */
 
-	if (state->m_i8751_value == 0x054a) { state->m_i8751_return = 0xb5; state->m_coinage_id = 0; }  /* Japanese version ID */
-	if (state->m_i8751_value == 0x054c) { state->m_i8751_return = 0xb3; state->m_coinage_id = 1; }  /* World version ID */
+	if (m_i8751_value == 0x054a) { m_i8751_return = 0xb5; m_coinage_id = 0; }  /* Japanese version ID */
+	if (m_i8751_value == 0x054c) { m_i8751_return = 0xb3; m_coinage_id = 1; }  /* World version ID */
 
 	if (offset == 0)
 	{
-		if ((state->m_i8751_value >> 8) == 0x01) /* Coinage settings */
+		if ((m_i8751_value >> 8) == 0x01) /* Coinage settings */
 		{
-			state->m_i8751_return = state->m_i8751_value;
-			state->m_need1 = lneed1[state->m_coinage_id][(state->m_i8751_value & 0x03) >> 0];
-			state->m_need2 = lneed2[state->m_coinage_id][(state->m_i8751_value & 0x0c) >> 2];
-			state->m_cred1 = lcred1[state->m_coinage_id][(state->m_i8751_value & 0x03) >> 0];
-			state->m_cred2 = lcred2[state->m_coinage_id][(state->m_i8751_value & 0x0c) >> 2];
+			m_i8751_return = m_i8751_value;
+			m_need1 = lneed1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
+			m_need2 = lneed2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
+			m_cred1 = lcred1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
+			m_cred2 = lcred2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
 		}
-		if ((state->m_i8751_value >> 8) == 0x02) { state->m_i8751_return = state->m_snd | state->m_credits; state->m_snd = 0; }   /* Credits request */
-		if ((state->m_i8751_value >> 8) == 0x03 && state->m_credits) { state->m_i8751_return = 0; state->m_credits--; } /* Credits clear */
+		if ((m_i8751_value >> 8) == 0x02) { m_i8751_return = m_snd | m_credits; m_snd = 0; }   /* Credits request */
+		if ((m_i8751_value >> 8) == 0x03 && m_credits) { m_i8751_return = 0; m_credits--; } /* Credits clear */
 	}
 }
 
-static WRITE8_HANDLER( srdarwin_i8751_w )
+WRITE8_MEMBER(dec8_state::srdarwin_i8751_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	/* Japan coinage first, then World coinage - US coinage shall be the same as the Japan one */
 	int lneed1[2][4] = {{1, 1, 1, 2}, {1, 1, 1, 1}};   /* slot 1 : coins needed */
@@ -346,57 +338,57 @@ static WRITE8_HANDLER( srdarwin_i8751_w )
 	int lneed2[2][4] = {{1, 1, 1, 2}, {1, 2, 3, 4}};   /* slot 2 : coins needed */
 	int lcred2[2][4] = {{1, 2, 3, 1}, {1, 1, 1, 1}};   /* slot 2 : credits awarded */
 
-	state->m_i8751_return = 0;
+	m_i8751_return = 0;
 
 	switch (offset)
 	{
 	case 0: /* High byte */
-		state->m_i8751_value = (state->m_i8751_value & 0xff) | (data << 8);
+		m_i8751_value = (m_i8751_value & 0xff) | (data << 8);
 		break;
 	case 1: /* Low byte */
-		state->m_i8751_value = (state->m_i8751_value & 0xff00) | data;
+		m_i8751_value = (m_i8751_value & 0xff00) | data;
 		break;
 	}
 
 	/* Coins are controlled by the i8751 */
-	if ((input_port_read(space->machine(), "I8751") & 3) == 3) state->m_latch = 1;
-	if ((input_port_read(space->machine(), "I8751") & 1) != 1 && state->m_latch)
+	if ((input_port_read(machine(), "I8751") & 3) == 3) m_latch = 1;
+	if ((input_port_read(machine(), "I8751") & 1) != 1 && m_latch)
 	{
-		state->m_coin1++;
-		state->m_latch = 0;
-		if (state->m_coin1>=state->m_need1)
+		m_coin1++;
+		m_latch = 0;
+		if (m_coin1>=m_need1)
 		{
-			state->m_coin1-=state->m_need1;
-			state->m_credits+=state->m_cred1;
+			m_coin1-=m_need1;
+			m_credits+=m_cred1;
 		}
 	}
-	if ((input_port_read(space->machine(), "I8751") & 2) != 2 && state->m_latch)
+	if ((input_port_read(machine(), "I8751") & 2) != 2 && m_latch)
 	{
-		state->m_coin2++;
-		state->m_latch = 0;
-		if (state->m_coin2>=state->m_need2)
+		m_coin2++;
+		m_latch = 0;
+		if (m_coin2>=m_need2)
 		{
-			state->m_coin2-=state->m_need2;
-			state->m_credits+=state->m_cred2;
+			m_coin2-=m_need2;
+			m_credits+=m_cred2;
 		}
 	}
-	if (state->m_credits>99) state->m_credits=99; /* not handled by main CPU */
+	if (m_credits>99) m_credits=99; /* not handled by main CPU */
 
-	if (state->m_i8751_value == 0x0000) state->m_i8751_return = 0;    /* ??? */
+	if (m_i8751_value == 0x0000) m_i8751_return = 0;    /* ??? */
 
-	if (state->m_i8751_value == 0x3063)	{ state->m_i8751_return = 0x9c; state->m_coinage_id = 0; }  /* Japanese version ID */
-	if (state->m_i8751_value == 0x306b)	{ state->m_i8751_return = 0x94; state->m_coinage_id = 1; }  /* World version ID */
+	if (m_i8751_value == 0x3063)	{ m_i8751_return = 0x9c; m_coinage_id = 0; }  /* Japanese version ID */
+	if (m_i8751_value == 0x306b)	{ m_i8751_return = 0x94; m_coinage_id = 1; }  /* World version ID */
 
-	if ((state->m_i8751_value >> 8) == 0x40) /* Coinage settings */
+	if ((m_i8751_value >> 8) == 0x40) /* Coinage settings */
 	{
-		state->m_i8751_return = state->m_i8751_value;
-		state->m_need1 = lneed1[state->m_coinage_id][(state->m_i8751_value & 0x03) >> 0];
-		state->m_need2 = lneed2[state->m_coinage_id][(state->m_i8751_value & 0x0c) >> 2];
-		state->m_cred1 = lcred1[state->m_coinage_id][(state->m_i8751_value & 0x03) >> 0];
-		state->m_cred2 = lcred2[state->m_coinage_id][(state->m_i8751_value & 0x0c) >> 2];
+		m_i8751_return = m_i8751_value;
+		m_need1 = lneed1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
+		m_need2 = lneed2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
+		m_cred1 = lcred1[m_coinage_id][(m_i8751_value & 0x03) >> 0];
+		m_cred2 = lcred2[m_coinage_id][(m_i8751_value & 0x0c) >> 2];
 	}
-	if (state->m_i8751_value == 0x5000) { state->m_i8751_return = ((state->m_credits / 10) << 4) | (state->m_credits % 10); } /* Credits request */
-	if (state->m_i8751_value == 0x6000 && state->m_credits) { state->m_i8751_value = -1; state->m_credits--; }     /* Credits clear */
+	if (m_i8751_value == 0x5000) { m_i8751_return = ((m_credits / 10) << 4) | (m_credits % 10); } /* Credits request */
+	if (m_i8751_value == 0x6000 && m_credits) { m_i8751_value = -1; m_credits--; }     /* Credits clear */
 
 /*
     This next value is the index to a series of tables,
@@ -434,30 +426,29 @@ bb63           = Square things again
     The table below is hopefully correct thanks to Jose Miguel Morales Farreras,
     but Boss #6 is uncomfirmed as correct.
 */
-	if (state->m_i8751_value == 0x8000) state->m_i8751_return = 0xf580 +  0; /* Boss #1: Snake + Bees */
-	if (state->m_i8751_value == 0x8001) state->m_i8751_return = 0xf580 + 30; /* Boss #2: 4 Corners */
-	if (state->m_i8751_value == 0x8002) state->m_i8751_return = 0xf580 + 26; /* Boss #3: Clock */
-	if (state->m_i8751_value == 0x8003) state->m_i8751_return = 0xf580 +  2; /* Boss #4: Pyramid */
-	if (state->m_i8751_value == 0x8004) state->m_i8751_return = 0xf580 +  6; /* Boss #5: Snake + Head Combo */
-	if (state->m_i8751_value == 0x8005) state->m_i8751_return = 0xf580 + 24; /* Boss #6: LED Panels */
-	if (state->m_i8751_value == 0x8006) state->m_i8751_return = 0xf580 + 28; /* Boss #7: Dragon */
-	if (state->m_i8751_value == 0x8007) state->m_i8751_return = 0xf580 + 32; /* Boss #8: Teleport */
-	if (state->m_i8751_value == 0x8008) state->m_i8751_return = 0xf580 + 38; /* Boss #9: Octopus (Pincer) */
-	if (state->m_i8751_value == 0x8009) state->m_i8751_return = 0xf580 + 40; /* Boss #10: Bird */
-	if (state->m_i8751_value == 0x800a) state->m_i8751_return = 0xf580 + 42; /* End Game(bad address?) */
+	if (m_i8751_value == 0x8000) m_i8751_return = 0xf580 +  0; /* Boss #1: Snake + Bees */
+	if (m_i8751_value == 0x8001) m_i8751_return = 0xf580 + 30; /* Boss #2: 4 Corners */
+	if (m_i8751_value == 0x8002) m_i8751_return = 0xf580 + 26; /* Boss #3: Clock */
+	if (m_i8751_value == 0x8003) m_i8751_return = 0xf580 +  2; /* Boss #4: Pyramid */
+	if (m_i8751_value == 0x8004) m_i8751_return = 0xf580 +  6; /* Boss #5: Snake + Head Combo */
+	if (m_i8751_value == 0x8005) m_i8751_return = 0xf580 + 24; /* Boss #6: LED Panels */
+	if (m_i8751_value == 0x8006) m_i8751_return = 0xf580 + 28; /* Boss #7: Dragon */
+	if (m_i8751_value == 0x8007) m_i8751_return = 0xf580 + 32; /* Boss #8: Teleport */
+	if (m_i8751_value == 0x8008) m_i8751_return = 0xf580 + 38; /* Boss #9: Octopus (Pincer) */
+	if (m_i8751_value == 0x8009) m_i8751_return = 0xf580 + 40; /* Boss #10: Bird */
+	if (m_i8751_value == 0x800a) m_i8751_return = 0xf580 + 42; /* End Game(bad address?) */
 }
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( dec8_bank_w )
+WRITE8_MEMBER(dec8_state::dec8_bank_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
 /* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
-static WRITE8_HANDLER( ghostb_bank_w )
+WRITE8_MEMBER(dec8_state::ghostb_bank_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	/* Bit 0: SECCLR - acknowledge interrupt from I8751
        Bit 1: NMI enable/disable
@@ -466,14 +457,14 @@ static WRITE8_HANDLER( ghostb_bank_w )
        Bits 4-7: Bank switch
     */
 
-	memory_set_bank(space->machine(), "bank1", data >> 4);
+	memory_set_bank(machine(), "bank1", data >> 4);
 
-	if ((data&1)==0) device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
-	if (data & 2) state->m_nmi_enable =1; else state->m_nmi_enable = 0;
-	flip_screen_set(space->machine(), data & 0x08);
+	if ((data&1)==0) device_set_input_line(m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+	if (data & 2) m_nmi_enable =1; else m_nmi_enable = 0;
+	flip_screen_set(machine(), data & 0x08);
 }
 
-static WRITE8_HANDLER( csilver_control_w )
+WRITE8_MEMBER(dec8_state::csilver_control_w)
 {
 	/*
         Bit 0x0f - ROM bank switch.
@@ -482,14 +473,13 @@ static WRITE8_HANDLER( csilver_control_w )
         Bit 0x40 - Unused.
         Bit 0x80 - Hold subcpu reset line high if clear, else low?  (Not needed anyway)
     */
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
-static WRITE8_HANDLER( dec8_sound_w )
+WRITE8_MEMBER(dec8_state::dec8_sound_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void csilver_adpcm_int( device_t *device )
@@ -509,44 +499,41 @@ static READ8_DEVICE_HANDLER( csilver_adpcm_reset_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( csilver_adpcm_data_w )
+WRITE8_MEMBER(dec8_state::csilver_adpcm_data_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->m_msm5205next = data;
+	m_msm5205next = data;
 }
 
-static WRITE8_HANDLER( csilver_sound_bank_w )
+WRITE8_MEMBER(dec8_state::csilver_sound_bank_w)
 {
-	memory_set_bank(space->machine(), "bank3", (data & 0x08) >> 3);
+	memory_set_bank(machine(), "bank3", (data & 0x08) >> 3);
 }
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( oscar_int_w )
+WRITE8_MEMBER(dec8_state::oscar_int_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 	/* Deal with interrupts, coins also generate NMI to CPU 0 */
 	switch (offset)
 	{
 	case 0: /* IRQ2 */
-		device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	case 1: /* IRC 1 */
-		device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 2: /* IRQ 1 */
-		device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	case 3: /* IRC 2 */
-		device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	}
 }
 
 /* Used by Shackled, Last Mission, Captain Silver */
-static WRITE8_HANDLER( shackled_int_w )
+WRITE8_MEMBER(dec8_state::shackled_int_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 #if 0
 /* This is correct, but the cpus in Shackled need an interleave of about 5000!
     With lower interleave CPU 0 misses an interrupt at the start of the game
@@ -554,18 +541,18 @@ static WRITE8_HANDLER( shackled_int_w )
 	switch (offset)
 	{
 	case 0: /* CPU 2 - IRQ acknowledge */
-		device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 1: /* CPU 1 - IRQ acknowledge */
-		device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+		device_set_input_line(m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
 		return;
 	case 2: /* i8751 - FIRQ acknowledge */
 		return;
 	case 3: /* IRQ 1 */
-		device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	case 4: /* IRQ 2 */
-		device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(m_subcpu, M6809_IRQ_LINE, ASSERT_LINE);
 		return;
 	}
 #endif
@@ -579,17 +566,17 @@ static WRITE8_HANDLER( shackled_int_w )
 	case 2: /* i8751 - FIRQ acknowledge */
 		return;
 	case 3: /* IRQ 1 */
-		device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
 		return;
 	case 4: /* IRQ 2 */
-		device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, HOLD_LINE);
+		device_set_input_line(m_subcpu, M6809_IRQ_LINE, HOLD_LINE);
 		return;
 	}
 }
 
 /******************************************************************************/
 
-static WRITE8_HANDLER( flip_screen_w ) { flip_screen_set(space->machine(), data); }
+WRITE8_MEMBER(dec8_state::flip_screen_w){ flip_screen_set(machine(), data); }
 
 /******************************************************************************/
 
@@ -603,15 +590,15 @@ static ADDRESS_MAP_START( lastmisn_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x1800, 0x1804) AM_WRITE_LEGACY(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE_LEGACY(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x1806, 0x1806) AM_READ_LEGACY(i8751_h_r)
-	AM_RANGE(0x1807, 0x1807) AM_READWRITE_LEGACY(i8751_l_r, flip_screen_w)
+	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
+	AM_RANGE(0x1805, 0x1805) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
+	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
+	AM_RANGE(0x1807, 0x1807) AM_READWRITE(i8751_l_r, flip_screen_w)
 	AM_RANGE(0x1809, 0x1809) AM_WRITE_LEGACY(lastmisn_scrollx_w) /* Scroll LSB */
 	AM_RANGE(0x180b, 0x180b) AM_WRITE_LEGACY(lastmisn_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE_LEGACY(dec8_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE_LEGACY(lastmisn_control_w) /* Bank switch + Scroll MSB */
-	AM_RANGE(0x180e, 0x180f) AM_WRITE_LEGACY(lastmisn_i8751_w)
+	AM_RANGE(0x180e, 0x180f) AM_WRITE(lastmisn_i8751_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(dec8_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
@@ -629,10 +616,10 @@ static ADDRESS_MAP_START( lastmisn_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x1800, 0x1804) AM_WRITE_LEGACY(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE_LEGACY(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x1807, 0x1807) AM_WRITE_LEGACY(flip_screen_w)
-	AM_RANGE(0x180c, 0x180c) AM_WRITE_LEGACY(dec8_sound_w)
+	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
+	AM_RANGE(0x1805, 0x1805) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
+	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
@@ -649,12 +636,12 @@ static ADDRESS_MAP_START( shackled_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1804) AM_WRITE_LEGACY(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE_LEGACY(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x1807, 0x1807) AM_WRITE_LEGACY(flip_screen_w)
+	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
+	AM_RANGE(0x1805, 0x1805) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
+	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x1809, 0x1809) AM_WRITE_LEGACY(lastmisn_scrollx_w) /* Scroll LSB */
 	AM_RANGE(0x180b, 0x180b) AM_WRITE_LEGACY(lastmisn_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE_LEGACY(dec8_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE_LEGACY(shackled_control_w) /* Bank switch + Scroll MSB */
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
@@ -673,15 +660,15 @@ static ADDRESS_MAP_START( shackled_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW0")
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1804) AM_WRITE_LEGACY(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_WRITE_LEGACY(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x1806, 0x1806) AM_READ_LEGACY(i8751_h_r)
-	AM_RANGE(0x1807, 0x1807) AM_READWRITE_LEGACY(i8751_l_r, flip_screen_w)
+	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
+	AM_RANGE(0x1805, 0x1805) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
+	AM_RANGE(0x1806, 0x1806) AM_READ(i8751_h_r)
+	AM_RANGE(0x1807, 0x1807) AM_READWRITE(i8751_l_r, flip_screen_w)
 	AM_RANGE(0x1809, 0x1809) AM_WRITE_LEGACY(lastmisn_scrollx_w) /* Scroll LSB */
 	AM_RANGE(0x180b, 0x180b) AM_WRITE_LEGACY(lastmisn_scrolly_w) /* Scroll LSB */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE_LEGACY(dec8_sound_w)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x180d, 0x180d) AM_WRITE_LEGACY(shackled_control_w) /* Bank switch + Scroll MSB */
-	AM_RANGE(0x180e, 0x180f) AM_WRITE_LEGACY(shackled_i8751_w)
+	AM_RANGE(0x180e, 0x180f) AM_WRITE(shackled_i8751_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(dec8_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
@@ -698,16 +685,16 @@ static ADDRESS_MAP_START( gondo_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")	/* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")		/* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")		/* Dip 2 */
-	AM_RANGE(0x380a, 0x380b) AM_READ_LEGACY(gondo_player_1_r)	/* Player 1 rotary */
-	AM_RANGE(0x380c, 0x380d) AM_READ_LEGACY(gondo_player_2_r)	/* Player 2 rotary */
+	AM_RANGE(0x380a, 0x380b) AM_READ(gondo_player_1_r)	/* Player 1 rotary */
+	AM_RANGE(0x380c, 0x380d) AM_READ(gondo_player_2_r)	/* Player 2 rotary */
 	AM_RANGE(0x380e, 0x380e) AM_READ_PORT("IN3")		/* VBL */
 	AM_RANGE(0x380f, 0x380f) AM_READ_PORT("IN2")		/* Fire buttons */
-	AM_RANGE(0x3810, 0x3810) AM_WRITE_LEGACY(dec8_sound_w)
+	AM_RANGE(0x3810, 0x3810) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x3818, 0x382f) AM_WRITE_LEGACY(gondo_scroll_w)
-	AM_RANGE(0x3830, 0x3830) AM_WRITE_LEGACY(ghostb_bank_w) /* Bank + NMI enable */
-	AM_RANGE(0x3838, 0x3838) AM_READ_LEGACY(i8751_h_r)
-	AM_RANGE(0x3839, 0x3839) AM_READ_LEGACY(i8751_l_r)
-	AM_RANGE(0x383a, 0x383b) AM_WRITE_LEGACY(dec8_i8751_w)
+	AM_RANGE(0x3830, 0x3830) AM_WRITE(ghostb_bank_w) /* Bank + NMI enable */
+	AM_RANGE(0x3838, 0x3838) AM_READ(i8751_h_r)
+	AM_RANGE(0x3839, 0x3839) AM_READ(i8751_l_r)
+	AM_RANGE(0x383a, 0x383b) AM_WRITE(dec8_i8751_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -724,12 +711,12 @@ static ADDRESS_MAP_START( garyoret_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x3808, 0x3808) AM_READNOP		/* ? */
 	AM_RANGE(0x380a, 0x380a) AM_READ_PORT("IN1")	/* Player 2 + VBL */
 	AM_RANGE(0x380b, 0x380b) AM_READ_PORT("IN0")	/* Player 1 */
-	AM_RANGE(0x3810, 0x3810) AM_WRITE_LEGACY(dec8_sound_w)
+	AM_RANGE(0x3810, 0x3810) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x3818, 0x382f) AM_WRITE_LEGACY(gondo_scroll_w)
-	AM_RANGE(0x3830, 0x3830) AM_WRITE_LEGACY(ghostb_bank_w) /* Bank + NMI enable */
-	AM_RANGE(0x3838, 0x3839) AM_WRITE_LEGACY(dec8_i8751_w)
-	AM_RANGE(0x383a, 0x383a) AM_READ_LEGACY(i8751_h_r)
-	AM_RANGE(0x383b, 0x383b) AM_READ_LEGACY(i8751_l_r)
+	AM_RANGE(0x3830, 0x3830) AM_WRITE(ghostb_bank_w) /* Bank + NMI enable */
+	AM_RANGE(0x3838, 0x3839) AM_WRITE(dec8_i8751_w)
+	AM_RANGE(0x383a, 0x383a) AM_READ(i8751_h_r)
+	AM_RANGE(0x383b, 0x383b) AM_READ(i8751_l_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -743,17 +730,17 @@ static ADDRESS_MAP_START( meikyuh_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x2c00, 0x2fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_8bit_r, deco_bac06_pf_rowscroll_8bit_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
-	AM_RANGE(0x3800, 0x3800) AM_WRITE_LEGACY(dec8_sound_w)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN2")	/* Player 3 */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW0")	/* Start buttons + VBL */
 	AM_RANGE(0x3820, 0x3820) AM_READ_PORT("DSW1")	/* Dip */
 	AM_RANGE(0x3820, 0x3827) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x3830, 0x383f) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_r, deco_bac06_pf_control1_8bit_w)
-	AM_RANGE(0x3840, 0x3840) AM_READ_LEGACY(i8751_h_r)
-	AM_RANGE(0x3840, 0x3840) AM_WRITE_LEGACY(ghostb_bank_w)
-	AM_RANGE(0x3860, 0x3860) AM_READ_LEGACY(i8751_l_r)
-	AM_RANGE(0x3860, 0x3861) AM_WRITE_LEGACY(dec8_i8751_w)
+	AM_RANGE(0x3840, 0x3840) AM_READ(i8751_h_r)
+	AM_RANGE(0x3840, 0x3840) AM_WRITE(ghostb_bank_w)
+	AM_RANGE(0x3860, 0x3860) AM_READ(i8751_l_r)
+	AM_RANGE(0x3860, 0x3861) AM_WRITE(dec8_i8751_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -766,15 +753,15 @@ static ADDRESS_MAP_START( csilver_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN0")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")	/* Dip 2 */
-	AM_RANGE(0x1800, 0x1804) AM_WRITE_LEGACY(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(dec8_mxc06_karn_buffer_spriteram_w) /* Dip 1, DMA */
-	AM_RANGE(0x1807, 0x1807) AM_WRITE_LEGACY(flip_screen_w)
+	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
+	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* Dip 1, DMA */
+	AM_RANGE(0x1807, 0x1807) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x1808, 0x180b) AM_WRITE_LEGACY(dec8_scroll2_w)
-	AM_RANGE(0x180c, 0x180c) AM_WRITE_LEGACY(dec8_sound_w)
-	AM_RANGE(0x180d, 0x180d) AM_WRITE_LEGACY(csilver_control_w)
-	AM_RANGE(0x180e, 0x180f) AM_WRITE_LEGACY(csilver_i8751_w)
-	AM_RANGE(0x1c00, 0x1c00) AM_READ_LEGACY(i8751_h_r)
-	AM_RANGE(0x1e00, 0x1e00) AM_READ_LEGACY(i8751_l_r)
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
+	AM_RANGE(0x180d, 0x180d) AM_WRITE(csilver_control_w)
+	AM_RANGE(0x180e, 0x180f) AM_WRITE(csilver_i8751_w)
+	AM_RANGE(0x1c00, 0x1c00) AM_READ(i8751_h_r)
+	AM_RANGE(0x1e00, 0x1e00) AM_READ(i8751_l_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(dec8_videoram_w)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
@@ -789,9 +776,9 @@ static ADDRESS_MAP_START( csilver_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1804) AM_WRITE_LEGACY(shackled_int_w)
-	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x180c, 0x180c) AM_WRITE_LEGACY(dec8_sound_w)
+	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
+	AM_RANGE(0x1805, 0x1805) AM_READ_PORT("DSW0") AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
+	AM_RANGE(0x180c, 0x180c) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(dec8_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("share2")
@@ -814,11 +801,11 @@ static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x3c04, 0x3c04) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3c00, 0x3c07) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x3c10, 0x3c1f) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control1_8bit_w)
-	AM_RANGE(0x3c80, 0x3c80) AM_WRITE_LEGACY(dec8_mxc06_karn_buffer_spriteram_w)	/* DMA */
-	AM_RANGE(0x3d00, 0x3d00) AM_WRITE_LEGACY(dec8_bank_w)  		/* BNKS */
-	AM_RANGE(0x3d80, 0x3d80) AM_WRITE_LEGACY(dec8_sound_w) 		/* SOUN */
+	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w)	/* DMA */
+	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(dec8_bank_w)  		/* BNKS */
+	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(dec8_sound_w) 		/* SOUN */
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITENOP			/* COINCL */
-	AM_RANGE(0x3e80, 0x3e83) AM_WRITE_LEGACY(oscar_int_w)
+	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -827,7 +814,7 @@ static ADDRESS_MAP_START( oscar_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0eff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0f00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0x3e80, 0x3e83) AM_WRITE_LEGACY(oscar_int_w)
+	AM_RANGE(0x3e80, 0x3e83) AM_WRITE(oscar_int_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -837,13 +824,13 @@ static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE_LEGACY(srdarwin_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 	AM_RANGE(0x1400, 0x17ff) AM_READWRITE_LEGACY(dec8_bg_data_r, dec8_bg_data_w) AM_BASE(m_bg_data)
-	AM_RANGE(0x1800, 0x1801) AM_WRITE_LEGACY(srdarwin_i8751_w)
-	AM_RANGE(0x1802, 0x1802) AM_WRITE_LEGACY(i8751_reset_w)		/* Maybe.. */
+	AM_RANGE(0x1800, 0x1801) AM_WRITE(srdarwin_i8751_w)
+	AM_RANGE(0x1802, 0x1802) AM_WRITE(i8751_reset_w)		/* Maybe.. */
 	AM_RANGE(0x1803, 0x1803) AM_WRITENOP			/* NMI ack */
 	AM_RANGE(0x1804, 0x1804) AM_DEVWRITE("spriteram", buffered_spriteram8_device, write) /* DMA */
 	AM_RANGE(0x1805, 0x1806) AM_WRITE_LEGACY(srdarwin_control_w) /* Scroll & Bank */
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE_LEGACY(i8751_h_r, dec8_sound_w)	/* Sound */
-	AM_RANGE(0x2001, 0x2001) AM_READWRITE_LEGACY(i8751_l_r, flip_screen_w)		/* Flipscreen */
+	AM_RANGE(0x2000, 0x2000) AM_READWRITE(i8751_h_r, dec8_sound_w)	/* Sound */
+	AM_RANGE(0x2001, 0x2001) AM_READWRITE(i8751_l_r, flip_screen_w)		/* Flipscreen */
 	AM_RANGE(0x2800, 0x288f) AM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3000, 0x308f) AM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")	/* Dip 1 */
@@ -872,9 +859,9 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x3a00, 0x3a00) AM_READ_PORT("IN2")	/* VBL & coins */
 	AM_RANGE(0x3a00, 0x3a07) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control0_8bit_w)
 	AM_RANGE(0x3a10, 0x3a1f) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control1_8bit_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE_LEGACY(dec8_bank_w)
-	AM_RANGE(0x3c02, 0x3c02) AM_WRITE_LEGACY(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
-	AM_RANGE(0x3e00, 0x3e00) AM_WRITE_LEGACY(dec8_sound_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(dec8_bank_w)
+	AM_RANGE(0x3c02, 0x3c02) AM_WRITE(dec8_mxc06_karn_buffer_spriteram_w) /* DMA */
+	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(dec8_sound_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -913,8 +900,8 @@ static ADDRESS_MAP_START( csilver_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3526_w)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(csilver_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(csilver_sound_bank_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x3400, 0x3400) AM_DEVREAD_LEGACY("msm", csilver_adpcm_reset_r)	/* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
@@ -935,50 +922,48 @@ ADDRESS_MAP_END
 
 */
 
-static READ8_HANDLER( dec8_mcu_from_main_r )
+READ8_MEMBER(dec8_state::dec8_mcu_from_main_r)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	switch (offset)
 	{
 		case 0:
-			return state->m_i8751_port0;
+			return m_i8751_port0;
 		case 1:
-			return state->m_i8751_port1;
+			return m_i8751_port1;
 		case 2:
 			return 0xff;
 		case 3:
-			return input_port_read(space->machine(), "I8751");
+			return input_port_read(machine(), "I8751");
 	}
 
 	return 0xff; //compile safe.
 }
 
-static WRITE8_HANDLER( dec8_mcu_to_main_w )
+WRITE8_MEMBER(dec8_state::dec8_mcu_to_main_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	// Outputs P0 and P1 are latched
-	if (offset==0) state->m_i8751_port0=data;
-	else if (offset==1) state->m_i8751_port1=data;
+	if (offset==0) m_i8751_port0=data;
+	else if (offset==1) m_i8751_port1=data;
 
 	// P2 - controls latches for main CPU communication
 	if (offset==2 && (data&0x10)==0)
-		state->m_i8751_port0 = state->m_i8751_value>>8;
+		m_i8751_port0 = m_i8751_value>>8;
 	if (offset==2 && (data&0x20)==0)
-		state->m_i8751_port1 = state->m_i8751_value&0xff;
+		m_i8751_port1 = m_i8751_value&0xff;
 	if (offset==2 && (data&0x40)==0)
-		state->m_i8751_return = (state->m_i8751_return & 0xff) | (state->m_i8751_port0 << 8);
+		m_i8751_return = (m_i8751_return & 0xff) | (m_i8751_port0 << 8);
 	if (offset==2 && (data&0x80)==0)
-		state->m_i8751_return = (state->m_i8751_return & 0xff00) | state->m_i8751_port1;
+		m_i8751_return = (m_i8751_return & 0xff00) | m_i8751_port1;
 
 	// P2 - IRQ to main CPU
 	if (offset==2 && (data&4)==0)
-		device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
+		device_set_input_line(m_maincpu, M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( dec8_mcu_io_map, AS_IO, 8, dec8_state )
-	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P3) AM_READWRITE_LEGACY(dec8_mcu_from_main_r, dec8_mcu_to_main_w)
+	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P3) AM_READWRITE(dec8_mcu_from_main_r, dec8_mcu_to_main_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

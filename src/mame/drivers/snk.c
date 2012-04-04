@@ -271,32 +271,32 @@ TODO:
 /*********************************************************************/
 // Interrupt handlers common to all SNK triple Z80 games
 
-static READ8_HANDLER ( snk_cpuA_nmi_trigger_r )
+READ8_MEMBER(snk_state::snk_cpuA_nmi_trigger_r)
 {
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 	{
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	return 0xff;
 }
 
-static WRITE8_HANDLER( snk_cpuA_nmi_ack_w )
+WRITE8_MEMBER(snk_state::snk_cpuA_nmi_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static READ8_HANDLER ( snk_cpuB_nmi_trigger_r )
+READ8_MEMBER(snk_state::snk_cpuB_nmi_trigger_r)
 {
-	if(!space->debugger_access())
+	if(!space.debugger_access())
 	{
-		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, ASSERT_LINE);
+		cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, ASSERT_LINE);
 	}
 	return 0xff;
 }
 
-static WRITE8_HANDLER( snk_cpuB_nmi_ack_w )
+WRITE8_MEMBER(snk_state::snk_cpuB_nmi_ack_w)
 {
-	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 /*********************************************************************/
@@ -314,20 +314,18 @@ enum
 
 /*********************************************************************/
 
-static WRITE8_HANDLER( marvins_soundlatch_w )
+WRITE8_MEMBER(snk_state::marvins_soundlatch_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_marvins_sound_busy_flag = 1;
+	m_marvins_sound_busy_flag = 1;
 	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
-static READ8_HANDLER( marvins_soundlatch_r )
+READ8_MEMBER(snk_state::marvins_soundlatch_r)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_marvins_sound_busy_flag = 0;
+	m_marvins_sound_busy_flag = 0;
 	return soundlatch_r(space, 0);
 }
 
@@ -338,9 +336,9 @@ static CUSTOM_INPUT( marvins_sound_busy )
 	return state->m_marvins_sound_busy_flag;
 }
 
-static READ8_HANDLER( marvins_sound_nmi_ack_r )
+READ8_MEMBER(snk_state::marvins_sound_nmi_ack_r)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -369,27 +367,27 @@ static TIMER_CALLBACK( sgladiat_sndirq_update_callback )
 }
 
 
-static WRITE8_HANDLER( sgladiat_soundlatch_w )
+WRITE8_MEMBER(snk_state::sgladiat_soundlatch_w)
 {
 	soundlatch_w(space, offset, data);
-	space->machine().scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), CMDIRQ_BUSY_ASSERT);
+	machine().scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), CMDIRQ_BUSY_ASSERT);
 }
 
-static READ8_HANDLER( sgladiat_soundlatch_r )
+READ8_MEMBER(snk_state::sgladiat_soundlatch_r)
 {
-	space->machine().scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), BUSY_CLEAR);
+	machine().scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), BUSY_CLEAR);
 	return soundlatch_r(space,0);
 }
 
-static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
+READ8_MEMBER(snk_state::sgladiat_sound_nmi_ack_r)
 {
-	space->machine().scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), CMDIRQ_CLEAR);
+	machine().scheduler().synchronize(FUNC(sgladiat_sndirq_update_callback), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
-static READ8_HANDLER( sgladiat_sound_irq_ack_r )
+READ8_MEMBER(snk_state::sgladiat_sound_irq_ack_r)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -492,10 +490,10 @@ static const y8950_interface y8950_config_2 =
 
 
 
-static WRITE8_HANDLER( snk_soundlatch_w )
+WRITE8_MEMBER(snk_state::snk_soundlatch_w)
 {
 	soundlatch_w(space, offset, data);
-	space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_BUSY_ASSERT);
+	machine().scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_BUSY_ASSERT);
 }
 
 static CUSTOM_INPUT( snk_sound_busy )
@@ -507,47 +505,46 @@ static CUSTOM_INPUT( snk_sound_busy )
 
 
 
-static READ8_HANDLER( snk_sound_status_r )
+READ8_MEMBER(snk_state::snk_sound_status_r)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	return state->m_sound_status;
+	return m_sound_status;
 }
 
-static WRITE8_HANDLER( snk_sound_status_w )
+WRITE8_MEMBER(snk_state::snk_sound_status_w)
 {
 	if (~data & 0x10)	// ack YM1 irq
-		space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_CLEAR);
+		machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_CLEAR);
 
 	if (~data & 0x20)	// ack YM2 irq
-		space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM2IRQ_CLEAR);
+		machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM2IRQ_CLEAR);
 
 	if (~data & 0x40)	// clear busy flag
-		space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), BUSY_CLEAR);
+		machine().scheduler().synchronize(FUNC(sndirq_update_callback), BUSY_CLEAR);
 
 	if (~data & 0x80)	// ack command from main cpu
-		space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_CLEAR);
+		machine().scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_CLEAR);
 }
 
 
 
-static READ8_HANDLER( tnk3_cmdirq_ack_r )
+READ8_MEMBER(snk_state::tnk3_cmdirq_ack_r)
 {
-	space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_CLEAR);
+	machine().scheduler().synchronize(FUNC(sndirq_update_callback), CMDIRQ_CLEAR);
 	return 0xff;
 }
 
-static READ8_HANDLER( tnk3_ymirq_ack_r )
+READ8_MEMBER(snk_state::tnk3_ymirq_ack_r)
 {
-	space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_CLEAR);
+	machine().scheduler().synchronize(FUNC(sndirq_update_callback), YM1IRQ_CLEAR);
 	return 0xff;
 }
 
-static READ8_HANDLER( tnk3_busy_clear_r )
+READ8_MEMBER(snk_state::tnk3_busy_clear_r)
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
 	soundlatch_clear_w(space, 0, 0);
-	space->machine().scheduler().synchronize(FUNC(sndirq_update_callback), BUSY_CLEAR);
+	machine().scheduler().synchronize(FUNC(sndirq_update_callback), BUSY_CLEAR);
 	return 0xff;
 }
 
@@ -571,23 +568,20 @@ A trojan could be used on the board to verify the exact behaviour.
 *****************************************************************************/
 
 
-static WRITE8_HANDLER( hardflags_scrollx_w )
+WRITE8_MEMBER(snk_state::hardflags_scrollx_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
-	state->m_hf_posx = (state->m_hf_posx & ~0xff) | data;
+	m_hf_posx = (m_hf_posx & ~0xff) | data;
 }
 
-static WRITE8_HANDLER( hardflags_scrolly_w )
+WRITE8_MEMBER(snk_state::hardflags_scrolly_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
-	state->m_hf_posy = (state->m_hf_posy & ~0xff) | data;
+	m_hf_posy = (m_hf_posy & ~0xff) | data;
 }
 
-static WRITE8_HANDLER( hardflags_scroll_msb_w )
+WRITE8_MEMBER(snk_state::hardflags_scroll_msb_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
-	state->m_hf_posx = (state->m_hf_posx & 0xff) | ((data & 0x80) << 1);
-	state->m_hf_posy = (state->m_hf_posy & 0xff) | ((data & 0x40) << 2);
+	m_hf_posx = (m_hf_posx & 0xff) | ((data & 0x80) << 1);
+	m_hf_posy = (m_hf_posy & 0xff) | ((data & 0x40) << 2);
 
 	// low 6 bits might indicate radius, but it's not clear
 }
@@ -621,20 +615,20 @@ static int hardflags_check8(running_machine &machine, int num)
 		(hardflags_check(machine, num + 7) << 7);
 }
 
-static READ8_HANDLER( hardflags1_r )	{ return hardflags_check8(space->machine(), 0*8); }
-static READ8_HANDLER( hardflags2_r )	{ return hardflags_check8(space->machine(), 1*8); }
-static READ8_HANDLER( hardflags3_r )	{ return hardflags_check8(space->machine(), 2*8); }
-static READ8_HANDLER( hardflags4_r )	{ return hardflags_check8(space->machine(), 3*8); }
-static READ8_HANDLER( hardflags5_r )	{ return hardflags_check8(space->machine(), 4*8); }
-static READ8_HANDLER( hardflags6_r )	{ return hardflags_check8(space->machine(), 5*8); }
-static READ8_HANDLER( hardflags7_r )
+READ8_MEMBER(snk_state::hardflags1_r){ return hardflags_check8(machine(), 0*8); }
+READ8_MEMBER(snk_state::hardflags2_r){ return hardflags_check8(machine(), 1*8); }
+READ8_MEMBER(snk_state::hardflags3_r){ return hardflags_check8(machine(), 2*8); }
+READ8_MEMBER(snk_state::hardflags4_r){ return hardflags_check8(machine(), 3*8); }
+READ8_MEMBER(snk_state::hardflags5_r){ return hardflags_check8(machine(), 4*8); }
+READ8_MEMBER(snk_state::hardflags6_r){ return hardflags_check8(machine(), 5*8); }
+READ8_MEMBER(snk_state::hardflags7_r)
 {
 	// apparently the startup tests use bits 0&1 while the game uses bits 4&5
 	return
-		(hardflags_check(space->machine(), 6*8 + 0) << 0) |
-		(hardflags_check(space->machine(), 6*8 + 1) << 1) |
-		(hardflags_check(space->machine(), 6*8 + 0) << 4) |
-		(hardflags_check(space->machine(), 6*8 + 1) << 5);
+		(hardflags_check(machine(), 6*8 + 0) << 0) |
+		(hardflags_check(machine(), 6*8 + 1) << 1) |
+		(hardflags_check(machine(), 6*8 + 0) << 4) |
+		(hardflags_check(machine(), 6*8 + 1) << 5);
 }
 
 
@@ -655,37 +649,32 @@ A trojan could be used on the board to verify the exact behaviour.
 *****************************************************************************/
 
 
-static WRITE8_HANDLER( turbocheck16_1_w )
+WRITE8_MEMBER(snk_state::turbocheck16_1_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
-	state->m_tc16_posy = (state->m_tc16_posy & ~0xff) | data;
+	m_tc16_posy = (m_tc16_posy & ~0xff) | data;
 }
 
-static WRITE8_HANDLER( turbocheck16_2_w )
+WRITE8_MEMBER(snk_state::turbocheck16_2_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
-	state->m_tc16_posx = (state->m_tc16_posx & ~0xff) | data;
+	m_tc16_posx = (m_tc16_posx & ~0xff) | data;
 }
 
-static WRITE8_HANDLER( turbocheck32_1_w )
+WRITE8_MEMBER(snk_state::turbocheck32_1_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
-	state->m_tc32_posy = (state->m_tc32_posy & ~0xff) | data;
+	m_tc32_posy = (m_tc32_posy & ~0xff) | data;
 }
 
-static WRITE8_HANDLER( turbocheck32_2_w )
+WRITE8_MEMBER(snk_state::turbocheck32_2_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
-	state->m_tc32_posx = (state->m_tc32_posx & ~0xff) | data;
+	m_tc32_posx = (m_tc32_posx & ~0xff) | data;
 }
 
-static WRITE8_HANDLER( turbocheck_msb_w )
+WRITE8_MEMBER(snk_state::turbocheck_msb_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
-	state->m_tc16_posx = (state->m_tc16_posx & 0xff) | ((data & 0x80) << 1);
-	state->m_tc16_posy = (state->m_tc16_posy & 0xff) | ((data & 0x40) << 2);
-	state->m_tc32_posx = (state->m_tc32_posx & 0xff) | ((data & 0x80) << 1);
-	state->m_tc32_posy = (state->m_tc32_posy & 0xff) | ((data & 0x40) << 2);
+	m_tc16_posx = (m_tc16_posx & 0xff) | ((data & 0x80) << 1);
+	m_tc16_posy = (m_tc16_posy & 0xff) | ((data & 0x40) << 2);
+	m_tc32_posx = (m_tc32_posx & 0xff) | ((data & 0x80) << 1);
+	m_tc32_posy = (m_tc32_posy & 0xff) | ((data & 0x40) << 2);
 
 	// low 6 bits might indicate radius, but it's not clear
 }
@@ -719,18 +708,18 @@ static int turbofront_check8(running_machine &machine, int small, int num)
 		(turbofront_check(machine, small, num + 7) << 7);
 }
 
-static READ8_HANDLER( turbocheck16_1_r )	{ return turbofront_check8(space->machine(), 1, 0*8); }
-static READ8_HANDLER( turbocheck16_2_r )	{ return turbofront_check8(space->machine(), 1, 1*8); }
-static READ8_HANDLER( turbocheck16_3_r )	{ return turbofront_check8(space->machine(), 1, 2*8); }
-static READ8_HANDLER( turbocheck16_4_r )	{ return turbofront_check8(space->machine(), 1, 3*8); }
-static READ8_HANDLER( turbocheck16_5_r )	{ return turbofront_check8(space->machine(), 1, 4*8); }
-static READ8_HANDLER( turbocheck16_6_r )	{ return turbofront_check8(space->machine(), 1, 5*8); }
-static READ8_HANDLER( turbocheck16_7_r )	{ return turbofront_check8(space->machine(), 1, 6*8); }
-static READ8_HANDLER( turbocheck16_8_r )	{ return turbofront_check8(space->machine(), 1, 7*8); }
-static READ8_HANDLER( turbocheck32_1_r )	{ return turbofront_check8(space->machine(), 0, 0*8); }
-static READ8_HANDLER( turbocheck32_2_r )	{ return turbofront_check8(space->machine(), 0, 1*8); }
-static READ8_HANDLER( turbocheck32_3_r )	{ return turbofront_check8(space->machine(), 0, 2*8); }
-static READ8_HANDLER( turbocheck32_4_r )	{ return turbofront_check8(space->machine(), 0, 3*8); }
+READ8_MEMBER(snk_state::turbocheck16_1_r){ return turbofront_check8(machine(), 1, 0*8); }
+READ8_MEMBER(snk_state::turbocheck16_2_r){ return turbofront_check8(machine(), 1, 1*8); }
+READ8_MEMBER(snk_state::turbocheck16_3_r){ return turbofront_check8(machine(), 1, 2*8); }
+READ8_MEMBER(snk_state::turbocheck16_4_r){ return turbofront_check8(machine(), 1, 3*8); }
+READ8_MEMBER(snk_state::turbocheck16_5_r){ return turbofront_check8(machine(), 1, 4*8); }
+READ8_MEMBER(snk_state::turbocheck16_6_r){ return turbofront_check8(machine(), 1, 5*8); }
+READ8_MEMBER(snk_state::turbocheck16_7_r){ return turbofront_check8(machine(), 1, 6*8); }
+READ8_MEMBER(snk_state::turbocheck16_8_r){ return turbofront_check8(machine(), 1, 7*8); }
+READ8_MEMBER(snk_state::turbocheck32_1_r){ return turbofront_check8(machine(), 0, 0*8); }
+READ8_MEMBER(snk_state::turbocheck32_2_r){ return turbofront_check8(machine(), 0, 1*8); }
+READ8_MEMBER(snk_state::turbocheck32_3_r){ return turbofront_check8(machine(), 0, 2*8); }
+READ8_MEMBER(snk_state::turbocheck32_4_r){ return turbofront_check8(machine(), 0, 3*8); }
 
 
 
@@ -783,38 +772,37 @@ static CUSTOM_INPUT( gwarb_rotary )
 /************************************************************************/
 
 
-static WRITE8_HANDLER( athena_coin_counter_w )
+WRITE8_MEMBER(snk_state::athena_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, ~data & 2);
-	coin_counter_w(space->machine(), 1, ~data & 1);
+	coin_counter_w(machine(), 0, ~data & 2);
+	coin_counter_w(machine(), 1, ~data & 1);
 }
 
-static WRITE8_HANDLER( ikari_coin_counter_w )
+WRITE8_MEMBER(snk_state::ikari_coin_counter_w)
 {
 	if (~data & 0x80)
 	{
-		coin_counter_w(space->machine(), 0, 1);
-		coin_counter_w(space->machine(), 0, 0);
+		coin_counter_w(machine(), 0, 1);
+		coin_counter_w(machine(), 0, 0);
 	}
 
 	if (~data & 0x40)
 	{
-		coin_counter_w(space->machine(), 1, 1);
-		coin_counter_w(space->machine(), 1, 0);
+		coin_counter_w(machine(), 1, 1);
+		coin_counter_w(machine(), 1, 0);
 	}
 }
 
-static WRITE8_HANDLER( tdfever_coin_counter_w )
+WRITE8_MEMBER(snk_state::tdfever_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 }
 
-static WRITE8_HANDLER( countryc_trackball_w )
+WRITE8_MEMBER(snk_state::countryc_trackball_w)
 {
-	snk_state *state = space->machine().driver_data<snk_state>();
 
-	state->m_countryc_trackball = data & 1;
+	m_countryc_trackball = data & 1;
 }
 
 static CUSTOM_INPUT( countryc_trackball_x )
@@ -864,11 +852,11 @@ static ADDRESS_MAP_START( marvins_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN1")
 	AM_RANGE(0x8200, 0x8200) AM_READ_PORT("IN2")
-	AM_RANGE(0x8300, 0x8300) AM_WRITE_LEGACY(marvins_soundlatch_w)
+	AM_RANGE(0x8300, 0x8300) AM_WRITE(marvins_soundlatch_w)
 	AM_RANGE(0x8400, 0x8400) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8600, 0x8600) AM_WRITE_LEGACY(marvins_flipscreen_w)
-	AM_RANGE(0x8700, 0x8700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share1")	// + work ram
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share2") AM_BASE(m_fg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
@@ -887,7 +875,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( marvins_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8700, 0x8700) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share2")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
@@ -911,11 +899,11 @@ static ADDRESS_MAP_START( madcrash_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN1")
 	AM_RANGE(0x8200, 0x8200) AM_READ_PORT("IN2")
-	AM_RANGE(0x8300, 0x8300) AM_WRITE_LEGACY(marvins_soundlatch_w)
+	AM_RANGE(0x8300, 0x8300) AM_WRITE(marvins_soundlatch_w)
 	AM_RANGE(0x8400, 0x8400) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0xff) AM_WRITE_LEGACY(marvins_flipscreen_w)
-	AM_RANGE(0x8700, 0x8700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share1")	// + work ram
 	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0xff) AM_WRITE_LEGACY(marvins_palette_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2") AM_BASE(m_bg_videoram)
@@ -934,9 +922,9 @@ static ADDRESS_MAP_START( madcrash_cpuA_map, AS_PROGRAM, 8, snk_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( madcrash_cpuB_map, AS_PROGRAM, 8, snk_state )
-	AM_RANGE(0x8700, 0x8700) AM_WRITE_LEGACY(snk_cpuB_nmi_ack_w)	// vangrd2
+	AM_RANGE(0x8700, 0x8700) AM_WRITE(snk_cpuB_nmi_ack_w)	// vangrd2
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(snk_cpuB_nmi_ack_w)	// madcrash
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)	// madcrash
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share4")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share5")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share6")
@@ -958,11 +946,11 @@ static ADDRESS_MAP_START( madcrush_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN1")
 	AM_RANGE(0x8200, 0x8200) AM_READ_PORT("IN2")
-	AM_RANGE(0x8300, 0x8300) AM_WRITE_LEGACY(marvins_soundlatch_w)
+	AM_RANGE(0x8300, 0x8300) AM_WRITE(marvins_soundlatch_w)
 	AM_RANGE(0x8400, 0x8400) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0xff) AM_WRITE_LEGACY(marvins_flipscreen_w)
-	AM_RANGE(0x8700, 0x8700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share1")	// + work ram
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share4") AM_BASE(m_fg_videoram)
 	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0xff) AM_WRITE_LEGACY(marvins_palette_bank_w)
@@ -982,7 +970,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( madcrush_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")	// + work ram
 	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0xff) AM_WRITE_LEGACY(marvins_palette_bank_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_fg_videoram_w) AM_SHARE("share4")
@@ -1006,11 +994,11 @@ static ADDRESS_MAP_START( jcross_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN1")
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("IN2")
-	AM_RANGE(0xa300, 0xa300) AM_WRITE_LEGACY(sgladiat_soundlatch_w)
+	AM_RANGE(0xa300, 0xa300) AM_WRITE(sgladiat_soundlatch_w)
 	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa500, 0xa500) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa600, 0xa600) AM_WRITE_LEGACY(sgladiat_flipscreen_w)	// flip screen, bg palette bank
-	AM_RANGE(0xa700, 0xa700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE_LEGACY(jcross_scroll_msb_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE_LEGACY(snk_sp16_scrolly_w)
 	AM_RANGE(0xd500, 0xd500) AM_WRITE_LEGACY(snk_sp16_scrollx_w)
@@ -1024,7 +1012,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jcross_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa700, 0xa700) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc800, 0xd7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share3")
@@ -1036,11 +1024,11 @@ static ADDRESS_MAP_START( sgladiat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN1")
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("IN2")
-	AM_RANGE(0xa300, 0xa300) AM_WRITE_LEGACY(sgladiat_soundlatch_w)
+	AM_RANGE(0xa300, 0xa300) AM_WRITE(sgladiat_soundlatch_w)
 	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa500, 0xa500) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa600, 0xa600) AM_WRITE_LEGACY(sgladiat_flipscreen_w)	// flip screen, bg palette bank
-	AM_RANGE(0xa700, 0xa700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITENOP	// unknown
 	AM_RANGE(0xd300, 0xd300) AM_WRITE_LEGACY(sgladiat_scroll_msb_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE_LEGACY(snk_sp16_scrolly_w)
@@ -1055,7 +1043,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sgladiat_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xa600, 0xa600) AM_WRITE_LEGACY(sgladiat_flipscreen_w)	// flip screen, bg palette bank
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2")
@@ -1074,11 +1062,11 @@ static ADDRESS_MAP_START( hal21_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
-	AM_RANGE(0xc300, 0xc300) AM_WRITE_LEGACY(sgladiat_soundlatch_w)
+	AM_RANGE(0xc300, 0xc300) AM_WRITE(sgladiat_soundlatch_w)
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc600, 0xc600) AM_WRITE_LEGACY(hal21_flipscreen_w)	// flip screen, bg tile and palette bank
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE_LEGACY(jcross_scroll_msb_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE_LEGACY(snk_sp16_scrolly_w)
 	AM_RANGE(0xd500, 0xd500) AM_WRITE_LEGACY(snk_sp16_scrollx_w)
@@ -1091,7 +1079,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hal21_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share2")
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share3")
@@ -1103,10 +1091,10 @@ static ADDRESS_MAP_START( aso_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
-	AM_RANGE(0xc400, 0xc400) AM_WRITE_LEGACY(snk_soundlatch_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(aso_videoattrs_w)	// flip screen, scroll msb
 	AM_RANGE(0xc900, 0xc900) AM_WRITE_LEGACY(snk_sp16_scrolly_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITE_LEGACY(snk_sp16_scrollx_w)
@@ -1122,7 +1110,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aso_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xd800, 0xe7ff) AM_RAM_WRITE_LEGACY(marvins_bg_videoram_w) AM_SHARE("share3")
@@ -1137,11 +1125,11 @@ static ADDRESS_MAP_START( tnk3_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
 	// c300 is an input in tnk3, output in athena/fitegolf (coin counter)
 	// and in countryc (trackball select) (see DRIVER_INIT).
-	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE_LEGACY(athena_coin_counter_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE_LEGACY(snk_soundlatch_w)
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(athena_coin_counter_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(tnk3_videoattrs_w)	// flip screen, char bank, scroll msb
 	AM_RANGE(0xc900, 0xc900) AM_WRITE_LEGACY(snk_sp16_scrolly_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITE_LEGACY(snk_sp16_scrollx_w)
@@ -1155,8 +1143,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnk3_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tnk3, athena
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fitegolf
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tnk3, athena
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fitegolf
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xefff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share2")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
@@ -1169,11 +1157,11 @@ static ADDRESS_MAP_START( ikari_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
-	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE_LEGACY(ikari_coin_counter_w)	// ikarijp doesn't use the coin counter
-	AM_RANGE(0xc400, 0xc400) AM_WRITE_LEGACY(snk_soundlatch_w)
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)	// ikarijp doesn't use the coin counter
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xc880, 0xc880) AM_WRITE_LEGACY(snk_bg_scrollx_w)
 	AM_RANGE(0xc900, 0xc900) AM_WRITE_LEGACY(ikari_bg_scroll_msb_w)
@@ -1182,17 +1170,17 @@ static ADDRESS_MAP_START( ikari_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xca80, 0xca80) AM_WRITE_LEGACY(snk_sp16_scrollx_w)
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITE_LEGACY(snk_sp32_scrolly_w)
 	AM_RANGE(0xcb80, 0xcb80) AM_WRITE_LEGACY(snk_sp32_scrollx_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE_LEGACY(hardflags_scrolly_w)
-	AM_RANGE(0xcc80, 0xcc80) AM_WRITE_LEGACY(hardflags_scrollx_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(hardflags_scrolly_w)
+	AM_RANGE(0xcc80, 0xcc80) AM_WRITE(hardflags_scrollx_w)
 	AM_RANGE(0xcd00, 0xcd00) AM_WRITE_LEGACY(ikari_sp_scroll_msb_w)
-	AM_RANGE(0xcd80, 0xcd80) AM_WRITE_LEGACY(hardflags_scroll_msb_w)
-	AM_RANGE(0xce00, 0xce00) AM_READ_LEGACY(hardflags1_r)
-	AM_RANGE(0xce20, 0xce20) AM_READ_LEGACY(hardflags2_r)
-	AM_RANGE(0xce40, 0xce40) AM_READ_LEGACY(hardflags3_r)
-	AM_RANGE(0xce60, 0xce60) AM_READ_LEGACY(hardflags4_r)
-	AM_RANGE(0xce80, 0xce80) AM_READ_LEGACY(hardflags5_r)
-	AM_RANGE(0xcea0, 0xcea0) AM_READ_LEGACY(hardflags6_r)
-	AM_RANGE(0xcee0, 0xcee0) AM_READ_LEGACY(hardflags7_r)
+	AM_RANGE(0xcd80, 0xcd80) AM_WRITE(hardflags_scroll_msb_w)
+	AM_RANGE(0xce00, 0xce00) AM_READ(hardflags1_r)
+	AM_RANGE(0xce20, 0xce20) AM_READ(hardflags2_r)
+	AM_RANGE(0xce40, 0xce40) AM_READ(hardflags3_r)
+	AM_RANGE(0xce60, 0xce60) AM_READ(hardflags4_r)
+	AM_RANGE(0xce80, 0xce80) AM_READ(hardflags5_r)
+	AM_RANGE(0xcea0, 0xcea0) AM_READ(hardflags6_r)
+	AM_RANGE(0xcee0, 0xcee0) AM_READ(hardflags7_r)
 	// note the mirror. ikari and victroad use d800, ikarijp uses d000
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_MIRROR(0x0800) AM_SHARE("share2") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share3") AM_BASE(m_spriteram)	// + work ram
@@ -1201,18 +1189,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ikari_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc980, 0xc980) AM_WRITE_LEGACY(ikari_unknown_video_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE_LEGACY(hardflags_scrolly_w)
-	AM_RANGE(0xcc80, 0xcc80) AM_WRITE_LEGACY(hardflags_scrollx_w)
-	AM_RANGE(0xcd80, 0xcd80) AM_WRITE_LEGACY(hardflags_scroll_msb_w)
-	AM_RANGE(0xce00, 0xce00) AM_READ_LEGACY(hardflags1_r)
-	AM_RANGE(0xce20, 0xce20) AM_READ_LEGACY(hardflags2_r)
-	AM_RANGE(0xce40, 0xce40) AM_READ_LEGACY(hardflags3_r)
-	AM_RANGE(0xce60, 0xce60) AM_READ_LEGACY(hardflags4_r)
-	AM_RANGE(0xce80, 0xce80) AM_READ_LEGACY(hardflags5_r)
-	AM_RANGE(0xcea0, 0xcea0) AM_READ_LEGACY(hardflags6_r)
-	AM_RANGE(0xcee0, 0xcee0) AM_READ_LEGACY(hardflags7_r)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(hardflags_scrolly_w)
+	AM_RANGE(0xcc80, 0xcc80) AM_WRITE(hardflags_scrollx_w)
+	AM_RANGE(0xcd80, 0xcd80) AM_WRITE(hardflags_scroll_msb_w)
+	AM_RANGE(0xce00, 0xce00) AM_READ(hardflags1_r)
+	AM_RANGE(0xce20, 0xce20) AM_READ(hardflags2_r)
+	AM_RANGE(0xce40, 0xce40) AM_READ(hardflags3_r)
+	AM_RANGE(0xce60, 0xce60) AM_READ(hardflags4_r)
+	AM_RANGE(0xce80, 0xce80) AM_READ(hardflags5_r)
+	AM_RANGE(0xcea0, 0xcea0) AM_READ(hardflags6_r)
+	AM_RANGE(0xcee0, 0xcee0) AM_READ(hardflags7_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_MIRROR(0x0800) AM_SHARE("share2")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share4")
@@ -1224,11 +1212,11 @@ static ADDRESS_MAP_START( bermudat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
-	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE_LEGACY(ikari_coin_counter_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE_LEGACY(snk_soundlatch_w)
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xc840, 0xc840) AM_WRITE_LEGACY(snk_bg_scrollx_w)
 	AM_RANGE(0xc880, 0xc880) AM_WRITE_LEGACY(gwara_videoattrs_w)	// flip screen, scroll msb
@@ -1238,25 +1226,25 @@ static ADDRESS_MAP_START( bermudat_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc980, 0xc980) AM_WRITE_LEGACY(snk_sp32_scrolly_w)
 	AM_RANGE(0xc9c0, 0xc9c0) AM_WRITE_LEGACY(snk_sp32_scrollx_w)
 	// the "turbo check" addresses are only used by bermudat/bermudaj, not bermudaa/worldwar or the other games
-	AM_RANGE(0xca00, 0xca00) AM_WRITE_LEGACY(turbocheck16_1_w)
-	AM_RANGE(0xca40, 0xca40) AM_WRITE_LEGACY(turbocheck16_2_w)
+	AM_RANGE(0xca00, 0xca00) AM_WRITE(turbocheck16_1_w)
+	AM_RANGE(0xca40, 0xca40) AM_WRITE(turbocheck16_2_w)
 	AM_RANGE(0xca80, 0xca80) AM_WRITE_LEGACY(gwara_sp_scroll_msb_w)
 	AM_RANGE(0xcac0, 0xcac0) AM_WRITE_LEGACY(snk_sprite_split_point_w)
-	AM_RANGE(0xcb00, 0xcb00) AM_READ_LEGACY(turbocheck16_1_r)
-	AM_RANGE(0xcb10, 0xcb10) AM_READ_LEGACY(turbocheck16_2_r)
-	AM_RANGE(0xcb20, 0xcb20) AM_READ_LEGACY(turbocheck16_3_r)
-	AM_RANGE(0xcb30, 0xcb30) AM_READ_LEGACY(turbocheck16_4_r)
-	AM_RANGE(0xcb40, 0xcb40) AM_READ_LEGACY(turbocheck16_5_r)
-	AM_RANGE(0xcb50, 0xcb50) AM_READ_LEGACY(turbocheck16_6_r)
-	AM_RANGE(0xcb60, 0xcb60) AM_READ_LEGACY(turbocheck16_7_r)
-	AM_RANGE(0xcb70, 0xcb70) AM_READ_LEGACY(turbocheck16_8_r)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE_LEGACY(turbocheck32_1_w)
-	AM_RANGE(0xcc40, 0xcc40) AM_WRITE_LEGACY(turbocheck32_2_w)
-	AM_RANGE(0xcc80, 0xcc80) AM_WRITE_LEGACY(turbocheck_msb_w)
-	AM_RANGE(0xccc0, 0xccc0) AM_READ_LEGACY(turbocheck32_1_r)
-	AM_RANGE(0xccd0, 0xccd0) AM_READ_LEGACY(turbocheck32_2_r)
-	AM_RANGE(0xcce0, 0xcce0) AM_READ_LEGACY(turbocheck32_3_r)
-	AM_RANGE(0xccf0, 0xccf0) AM_READ_LEGACY(turbocheck32_4_r)
+	AM_RANGE(0xcb00, 0xcb00) AM_READ(turbocheck16_1_r)
+	AM_RANGE(0xcb10, 0xcb10) AM_READ(turbocheck16_2_r)
+	AM_RANGE(0xcb20, 0xcb20) AM_READ(turbocheck16_3_r)
+	AM_RANGE(0xcb30, 0xcb30) AM_READ(turbocheck16_4_r)
+	AM_RANGE(0xcb40, 0xcb40) AM_READ(turbocheck16_5_r)
+	AM_RANGE(0xcb50, 0xcb50) AM_READ(turbocheck16_6_r)
+	AM_RANGE(0xcb60, 0xcb60) AM_READ(turbocheck16_7_r)
+	AM_RANGE(0xcb70, 0xcb70) AM_READ(turbocheck16_8_r)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(turbocheck32_1_w)
+	AM_RANGE(0xcc40, 0xcc40) AM_WRITE(turbocheck32_2_w)
+	AM_RANGE(0xcc80, 0xcc80) AM_WRITE(turbocheck_msb_w)
+	AM_RANGE(0xccc0, 0xccc0) AM_READ(turbocheck32_1_r)
+	AM_RANGE(0xccd0, 0xccd0) AM_READ(turbocheck32_2_r)
+	AM_RANGE(0xcce0, 0xcce0) AM_READ(turbocheck32_3_r)
+	AM_RANGE(0xccf0, 0xccf0) AM_READ(turbocheck32_4_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share1") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share3") AM_BASE(m_spriteram)	// + work ram
@@ -1265,7 +1253,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bermudat_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xc840, 0xc840) AM_WRITE_LEGACY(snk_bg_scrollx_w)
 	AM_RANGE(0xc880, 0xc880) AM_WRITE_LEGACY(gwara_videoattrs_w)	// flip screen, scroll msb
@@ -1287,11 +1275,11 @@ static ADDRESS_MAP_START( gwar_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
-	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE_LEGACY(ikari_coin_counter_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE_LEGACY(snk_soundlatch_w)
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xc840, 0xc840) AM_WRITE_LEGACY(snk_bg_scrollx_w)
 	AM_RANGE(0xc880, 0xc880) AM_WRITE_LEGACY(gwar_videoattrs_w)	// flip screen, scroll msb
@@ -1311,7 +1299,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gwar_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE_LEGACY(gwar_tx_bank_w)	// char and palette bank
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
@@ -1325,11 +1313,11 @@ static ADDRESS_MAP_START( gwara_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
-	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE_LEGACY(ikari_coin_counter_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE_LEGACY(snk_soundlatch_w)
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share1") AM_BASE(m_tx_videoram)	// + work RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share2") AM_BASE(m_bg_videoram)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
@@ -1348,7 +1336,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gwara_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE_LEGACY(snk_tx_videoram_w) AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share2")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share3")
@@ -1369,11 +1357,11 @@ static ADDRESS_MAP_START( tdfever_cpuA_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xc380, 0xc380) AM_READ_PORT("IN7")
 	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("IN8")
 	AM_RANGE(0xc480, 0xc480) AM_READ_PORT("IN9")
-	AM_RANGE(0xc500, 0xc500) AM_WRITE_LEGACY(snk_soundlatch_w)
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc580, 0xc580) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc680, 0xc680) AM_WRITE_LEGACY(tdfever_coin_counter_w)
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc680, 0xc680) AM_WRITE(tdfever_coin_counter_w)
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(snk_bg_scrolly_w)
 	AM_RANGE(0xc840, 0xc840) AM_WRITE_LEGACY(snk_bg_scrollx_w)
 	AM_RANGE(0xc880, 0xc880) AM_WRITE_LEGACY(gwara_videoattrs_w)	// flip screen, scroll msb
@@ -1389,8 +1377,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tdfever_cpuB_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tdfever, tdfever2
-	AM_RANGE(0xc700, 0xc700) AM_READWRITE_LEGACY(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fsoccer
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tdfever, tdfever2
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fsoccer
 	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE_LEGACY(gwar_tx_bank_w)	// char and palette bank
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(snk_bg_videoram_w) AM_SHARE("share1")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("share2")
@@ -1402,11 +1390,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( marvins_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(marvins_soundlatch_r)
+	AM_RANGE(0x4000, 0x4000) AM_READ(marvins_soundlatch_r)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x8002, 0x8007) AM_DEVWRITE_LEGACY("wave", snkwave_w)
 	AM_RANGE(0x8008, 0x8009) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(marvins_sound_nmi_ack_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(marvins_sound_nmi_ack_r)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1419,8 +1407,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jcross_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(sgladiat_soundlatch_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(sgladiat_sound_nmi_ack_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0xe002, 0xe003) AM_WRITENOP	// ? always FFFF, snkwave leftover?
 	AM_RANGE(0xe004, 0xe005) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
@@ -1428,15 +1416,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jcross_sound_portmap, AS_IO, 8, snk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(sgladiat_sound_irq_ack_r)
+	AM_RANGE(0x00, 0x00) AM_READ(sgladiat_sound_irq_ack_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hal21_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(sgladiat_soundlatch_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(sgladiat_sound_nmi_ack_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 //  AM_RANGE(0xe002, 0xe002) AM_WRITENOP    // bitfielded(0-5) details unknown. Filter enable?
 	AM_RANGE(0xe008, 0xe009) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
@@ -1452,21 +1440,21 @@ static ADDRESS_MAP_START( tnk3_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(tnk3_busy_clear_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(tnk3_busy_clear_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ym1", ym3526_r, ym3526_w)
-	AM_RANGE(0xe004, 0xe004) AM_READ_LEGACY(tnk3_cmdirq_ack_r)
-	AM_RANGE(0xe006, 0xe006) AM_READ_LEGACY(tnk3_ymirq_ack_r)
+	AM_RANGE(0xe004, 0xe004) AM_READ(tnk3_cmdirq_ack_r)
+	AM_RANGE(0xe006, 0xe006) AM_READ(tnk3_ymirq_ack_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aso_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(tnk3_busy_clear_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(tnk3_busy_clear_r)
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ym1", ym3526_r, ym3526_w)
 //  AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
-	AM_RANGE(0xf004, 0xf004) AM_READ_LEGACY(tnk3_cmdirq_ack_r)
-	AM_RANGE(0xf006, 0xf006) AM_READ_LEGACY(tnk3_ymirq_ack_r)
+	AM_RANGE(0xf004, 0xf004) AM_READ(tnk3_cmdirq_ack_r)
+	AM_RANGE(0xf006, 0xf006) AM_READ(tnk3_ymirq_ack_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( YM3526_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
@@ -1477,7 +1465,7 @@ static ADDRESS_MAP_START( YM3526_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE_LEGACY("ym1", ym3526_write_port_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE_LEGACY("ym2", ym3526_status_port_r, ym3526_control_port_w)
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("ym2", ym3526_write_port_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE_LEGACY(snk_sound_status_r, snk_sound_status_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( YM3812_sound_map, AS_PROGRAM, 8, snk_state )
@@ -1486,7 +1474,7 @@ static ADDRESS_MAP_START( YM3812_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE_LEGACY("ym1", ym3812_status_port_r, ym3812_control_port_w)
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE_LEGACY("ym1", ym3812_write_port_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE_LEGACY(snk_sound_status_r, snk_sound_status_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( YM3526_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
@@ -1497,7 +1485,7 @@ static ADDRESS_MAP_START( YM3526_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE_LEGACY("ym1", ym3526_write_port_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE_LEGACY("ym2", y8950_status_port_r, y8950_control_port_w)
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("ym2", y8950_write_port_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE_LEGACY(snk_sound_status_r, snk_sound_status_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( YM3812_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
@@ -1508,7 +1496,7 @@ static ADDRESS_MAP_START( YM3812_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE_LEGACY("ym1", ym3812_write_port_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE_LEGACY("ym2", y8950_status_port_r, y8950_control_port_w)
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("ym2", y8950_write_port_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE_LEGACY(snk_sound_status_r, snk_sound_status_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( Y8950_sound_map, AS_PROGRAM, 8, snk_state )
@@ -1517,7 +1505,7 @@ static ADDRESS_MAP_START( Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE_LEGACY("ym2", y8950_status_port_r, y8950_control_port_w)
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("ym2", y8950_write_port_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE_LEGACY(snk_sound_status_r, snk_sound_status_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
 /*********************************************************************/
@@ -6283,7 +6271,8 @@ ROM_END
 static DRIVER_INIT( countryc )
 {
 	// replace coin counter with trackball select
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc300, 0xc300, FUNC(countryc_trackball_w));
+	snk_state *state = machine.driver_data<snk_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc300, 0xc300, write8_delegate(FUNC(snk_state::countryc_trackball_w),state));
 }
 
 

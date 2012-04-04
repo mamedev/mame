@@ -14,6 +14,8 @@ public:
 	int m_deadangle_tilebank;
 	int m_deadangle_oldtilebank;
 	UINT16 *m_spriteram;
+	DECLARE_READ16_MEMBER(ghunter_trackball_low_r);
+	DECLARE_READ16_MEMBER(ghunter_trackball_high_r);
 };
 
 

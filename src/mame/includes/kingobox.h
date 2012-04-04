@@ -31,6 +31,10 @@ public:
 	device_t *m_video_cpu;
 	device_t *m_sprite_cpu;
 	device_t *m_audio_cpu;
+	DECLARE_WRITE8_MEMBER(video_interrupt_w);
+	DECLARE_WRITE8_MEMBER(sprite_interrupt_w);
+	DECLARE_WRITE8_MEMBER(scroll_interrupt_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
 };
 
 

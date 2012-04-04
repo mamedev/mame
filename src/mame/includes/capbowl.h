@@ -26,6 +26,11 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(capbowl_rom_select_w);
+	DECLARE_READ8_MEMBER(track_0_r);
+	DECLARE_READ8_MEMBER(track_1_r);
+	DECLARE_WRITE8_MEMBER(track_reset_w);
+	DECLARE_WRITE8_MEMBER(capbowl_sndcmd_w);
 };
 
 /*----------- defined in video/capbowl.c -----------*/

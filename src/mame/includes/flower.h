@@ -17,6 +17,12 @@ public:
 	tilemap_t *m_bg1_tilemap;
 	tilemap_t *m_text_tilemap;
 	tilemap_t *m_text_right_tilemap;
+	DECLARE_WRITE8_MEMBER(flower_maincpu_irq_ack);
+	DECLARE_WRITE8_MEMBER(flower_subcpu_irq_ack);
+	DECLARE_WRITE8_MEMBER(flower_soundcpu_irq_ack);
+	DECLARE_WRITE8_MEMBER(flower_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(flower_coin_lockout_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
 };
 
 

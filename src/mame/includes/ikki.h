@@ -28,6 +28,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	DECLARE_READ8_MEMBER(ikki_e000_r);
+	DECLARE_WRITE8_MEMBER(ikki_coin_counters);
 };
 
 

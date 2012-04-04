@@ -42,76 +42,75 @@ write    read
 20    -> 8
 40    -> 0
 */
-static READ16_HANDLER( shangha3_prot_r )
+READ16_MEMBER(shangha3_state::shangha3_prot_r)
 {
-	shangha3_state *state = space->machine().driver_data<shangha3_state>();
 	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
-	logerror("PC %04x: read 20004e\n",cpu_get_pc(&space->device()));
+	logerror("PC %04x: read 20004e\n",cpu_get_pc(&space.device()));
 
-	return result[state->m_prot_count++ % 9];
+	return result[m_prot_count++ % 9];
 }
-static WRITE16_HANDLER( shangha3_prot_w )
+WRITE16_MEMBER(shangha3_state::shangha3_prot_w)
 {
-	logerror("PC %04x: write %02x to 20004e\n",cpu_get_pc(&space->device()),data);
+	logerror("PC %04x: write %02x to 20004e\n",cpu_get_pc(&space.device()),data);
 }
 
 
-static READ16_HANDLER( heberpop_gfxrom_r )
+READ16_MEMBER(shangha3_state::heberpop_gfxrom_r)
 {
-	UINT8 *ROM = space->machine().region("gfx1")->base();
+	UINT8 *ROM = machine().region("gfx1")->base();
 
 	return ROM[2*offset] | (ROM[2*offset+1] << 8);
 }
 
 
 
-static WRITE16_HANDLER( shangha3_coinctrl_w )
+WRITE16_MEMBER(shangha3_state::shangha3_coinctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(space->machine(), 0,~data & 0x0400);
-		coin_lockout_w(space->machine(), 1,~data & 0x0400);
-		coin_counter_w(space->machine(), 0,data & 0x0100);
-		coin_counter_w(space->machine(), 1,data & 0x0200);
+		coin_lockout_w(machine(), 0,~data & 0x0400);
+		coin_lockout_w(machine(), 1,~data & 0x0400);
+		coin_counter_w(machine(), 0,data & 0x0100);
+		coin_counter_w(machine(), 1,data & 0x0200);
 	}
 }
 
-static WRITE16_HANDLER( heberpop_coinctrl_w )
+WRITE16_MEMBER(shangha3_state::heberpop_coinctrl_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
-		space->machine().device<okim6295_device>("oki")->set_bank_base((data & 0x08) ? 0x40000 : 0x00000);
+		machine().device<okim6295_device>("oki")->set_bank_base((data & 0x08) ? 0x40000 : 0x00000);
 
-		coin_lockout_w(space->machine(), 0,~data & 0x04);
-		coin_lockout_w(space->machine(), 1,~data & 0x04);
-		coin_counter_w(space->machine(), 0,data & 0x01);
-		coin_counter_w(space->machine(), 1,data & 0x02);
+		coin_lockout_w(machine(), 0,~data & 0x04);
+		coin_lockout_w(machine(), 1,~data & 0x04);
+		coin_counter_w(machine(), 0,data & 0x01);
+		coin_counter_w(machine(), 1,data & 0x02);
 	}
 }
 
-static WRITE16_HANDLER( blocken_coinctrl_w )
+WRITE16_MEMBER(shangha3_state::blocken_coinctrl_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
-		space->machine().device<okim6295_device>("oki")->set_bank_base(((data >> 4) & 3) * 0x40000);
+		machine().device<okim6295_device>("oki")->set_bank_base(((data >> 4) & 3) * 0x40000);
 
-		coin_lockout_w(space->machine(), 0,~data & 0x04);
-		coin_lockout_w(space->machine(), 1,~data & 0x04);
-		coin_counter_w(space->machine(), 0,data & 0x01);
-		coin_counter_w(space->machine(), 1,data & 0x02);
+		coin_lockout_w(machine(), 0,~data & 0x04);
+		coin_lockout_w(machine(), 1,~data & 0x04);
+		coin_counter_w(machine(), 0,data & 0x01);
+		coin_counter_w(machine(), 1,data & 0x02);
 	}
 }
 
 
-static WRITE16_HANDLER( heberpop_sound_command_w )
+WRITE16_MEMBER(shangha3_state::heberpop_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line_and_vector(space->machine(), "audiocpu", 0, HOLD_LINE, 0xff);	/* RST 38h */
+		cputag_set_input_line_and_vector(machine(), "audiocpu", 0, HOLD_LINE, 0xff);	/* RST 38h */
 	}
 }
 
@@ -124,11 +123,11 @@ static ADDRESS_MAP_START( shangha3_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x200008, 0x200009) AM_WRITE_LEGACY(shangha3_blitter_go_w)
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITENOP	/* irq ack? */
-	AM_RANGE(0x20000c, 0x20000d) AM_WRITE_LEGACY(shangha3_coinctrl_w)
+	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(shangha3_coinctrl_w)
 	AM_RANGE(0x20001e, 0x20001f) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0x20002e, 0x20002f) AM_DEVWRITE8_LEGACY("aysnd", ay8910_data_w, 0x00ff)
 	AM_RANGE(0x20003e, 0x20003f) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_w, 0x00ff)
-	AM_RANGE(0x20004e, 0x20004f) AM_READWRITE_LEGACY(shangha3_prot_r,shangha3_prot_w)
+	AM_RANGE(0x20004e, 0x20004f) AM_READWRITE(shangha3_prot_r,shangha3_prot_w)
 	AM_RANGE(0x20006e, 0x20006f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE(m_ram, m_ram_size)	/* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE_LEGACY(shangha3_flipscreen_w)
@@ -143,12 +142,12 @@ static ADDRESS_MAP_START( heberpop_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x200004, 0x200005) AM_READ_PORT("DSW")
 	AM_RANGE(0x200008, 0x200009) AM_WRITE_LEGACY(shangha3_blitter_go_w)
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITENOP	/* irq ack? */
-	AM_RANGE(0x20000c, 0x20000d) AM_WRITE_LEGACY(heberpop_coinctrl_w)
-	AM_RANGE(0x20000e, 0x20000f) AM_WRITE_LEGACY(heberpop_sound_command_w)
+	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(heberpop_coinctrl_w)
+	AM_RANGE(0x20000e, 0x20000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE(m_ram, m_ram_size)	/* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE_LEGACY(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE_LEGACY(shangha3_gfxlist_addr_w)
-	AM_RANGE(0x800000, 0xb7ffff) AM_READ_LEGACY(heberpop_gfxrom_r)
+	AM_RANGE(0x800000, 0xb7ffff) AM_READ(heberpop_gfxrom_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
@@ -158,13 +157,13 @@ static ADDRESS_MAP_START( blocken_map, AS_PROGRAM, 16, shangha3_state )
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("DSW")
 	AM_RANGE(0x100008, 0x100009) AM_WRITE_LEGACY(shangha3_blitter_go_w)
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITENOP	/* irq ack? */
-	AM_RANGE(0x10000c, 0x10000d) AM_WRITE_LEGACY(blocken_coinctrl_w)
-	AM_RANGE(0x10000e, 0x10000f) AM_WRITE_LEGACY(heberpop_sound_command_w)
+	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
+	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE(m_ram, m_ram_size)	/* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE_LEGACY(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE_LEGACY(shangha3_gfxlist_addr_w)
-	AM_RANGE(0x800000, 0xb7ffff) AM_READ_LEGACY(heberpop_gfxrom_r)
+	AM_RANGE(0x800000, 0xb7ffff) AM_READ(heberpop_gfxrom_r)
 ADDRESS_MAP_END
 
 

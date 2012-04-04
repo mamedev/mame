@@ -23,6 +23,13 @@ public:
 	rectangle m_hack_cliprect;
 	UINT32 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE32_MEMBER(color_ram_w);
+	DECLARE_WRITE32_MEMBER(groundfx_input_w);
+	DECLARE_READ32_MEMBER(groundfx_adc_r);
+	DECLARE_WRITE32_MEMBER(groundfx_adc_w);
+	DECLARE_WRITE32_MEMBER(rotate_control_w);
+	DECLARE_WRITE32_MEMBER(motor_control_w);
+	DECLARE_READ32_MEMBER(irq_speedup_r_groundfx);
 };
 
 

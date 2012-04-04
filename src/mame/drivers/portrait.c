@@ -90,32 +90,30 @@ DM81LS95 = TriState buffer
 #include "machine/nvram.h"
 #include "includes/portrait.h"
 
-static WRITE8_HANDLER( portrait_ctrl_w )
+WRITE8_MEMBER(portrait_state::portrait_ctrl_w)
 {
 	/* bits 4 and 5 are unknown */
 
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
-	coin_counter_w(space->machine(), 2, data & 0x04);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 2, data & 0x04);
 
 	/* the 2 lamps near the camera */
-	set_led_status(space->machine(), 0, data & 0x08);
-	set_led_status(space->machine(), 1, data & 0x40);
+	set_led_status(machine(), 0, data & 0x08);
+	set_led_status(machine(), 1, data & 0x40);
 
 	/* shows the black and white photo from the camera */
 	output_set_value("photo", (data >> 7) & 1);
 }
 
-static WRITE8_HANDLER( portrait_positive_scroll_w )
+WRITE8_MEMBER(portrait_state::portrait_positive_scroll_w)
 {
-	portrait_state *state = space->machine().driver_data<portrait_state>();
-	state->m_scroll = data;
+	m_scroll = data;
 }
 
-static WRITE8_HANDLER( portrait_negative_scroll_w )
+WRITE8_MEMBER(portrait_state::portrait_negative_scroll_w)
 {
-	portrait_state *state = space->machine().driver_data<portrait_state>();
-	state->m_scroll = - (data ^ 0xff);
+	m_scroll = - (data ^ 0xff);
 }
 
 static ADDRESS_MAP_START( portrait_map, AS_PROGRAM, 8, portrait_state )
@@ -128,10 +126,10 @@ static ADDRESS_MAP_START( portrait_map, AS_PROGRAM, 8, portrait_state )
 	AM_RANGE(0xa010, 0xa010) AM_WRITENOP // ?
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa004, 0xa004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa008, 0xa008) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(portrait_ctrl_w)
+	AM_RANGE(0xa008, 0xa008) AM_READ_PORT("SYSTEM") AM_WRITE(portrait_ctrl_w)
 	AM_RANGE(0xa010, 0xa010) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xa018, 0xa018) AM_READNOP AM_WRITE_LEGACY(portrait_positive_scroll_w)
-	AM_RANGE(0xa019, 0xa019) AM_WRITE_LEGACY(portrait_negative_scroll_w)
+	AM_RANGE(0xa018, 0xa018) AM_READNOP AM_WRITE(portrait_positive_scroll_w)
+	AM_RANGE(0xa019, 0xa019) AM_WRITE(portrait_negative_scroll_w)
 	AM_RANGE(0xa800, 0xa83f) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xffff, 0xffff) AM_READNOP
 ADDRESS_MAP_END

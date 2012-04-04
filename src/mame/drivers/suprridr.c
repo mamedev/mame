@@ -93,10 +93,9 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(suprridr_state::nmi_enable_w)
 {
-	suprridr_state *state = space->machine().driver_data<suprridr_state>();
-	state->m_nmi_enable = data;
+	m_nmi_enable = data;
 }
 
 
@@ -123,9 +122,9 @@ static TIMER_CALLBACK( delayed_sound_w )
 }
 
 
-static WRITE8_HANDLER( sound_data_w )
+WRITE8_MEMBER(suprridr_state::sound_data_w)
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_sound_w), data);
+	machine().scheduler().synchronize(FUNC(delayed_sound_w), data);
 }
 
 
@@ -136,9 +135,9 @@ static READ8_DEVICE_HANDLER( sound_data_r )
 }
 
 
-static WRITE8_HANDLER( sound_irq_ack_w )
+WRITE8_MEMBER(suprridr_state::sound_irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 
@@ -149,10 +148,10 @@ static WRITE8_HANDLER( sound_irq_ack_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( coin_lock_w )
+WRITE8_MEMBER(suprridr_state::coin_lock_w)
 {
 	/* cleared when 9 credits are hit, but never reset! */
-/*  coin_lockout_global_w(space->machine(), ~data & 1); */
+/*  coin_lockout_global_w(machine(), ~data & 1); */
 }
 
 
@@ -173,11 +172,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(nmi_enable_w)
-	AM_RANGE(0xb002, 0xb003) AM_WRITE_LEGACY(coin_lock_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_enable_w)
+	AM_RANGE(0xb002, 0xb003) AM_WRITE(coin_lock_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(suprridr_flipx_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(suprridr_flipy_w)
-	AM_RANGE(0xb800, 0xb800) AM_WRITE_LEGACY(sound_data_w)
+	AM_RANGE(0xb800, 0xb800) AM_WRITE(sound_data_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE_LEGACY(suprridr_fgdisable_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITE_LEGACY(suprridr_fgscrolly_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(suprridr_bgscrolly_w)
@@ -206,7 +205,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, suprridr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(sound_irq_ack_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x8d, 0x8d) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)

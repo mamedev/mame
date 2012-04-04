@@ -18,6 +18,13 @@ public:
 	UINT8 m_bgscroll[3];
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(tecmo_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(tecmo_sound_command_w);
+	DECLARE_WRITE8_MEMBER(tecmo_adpcm_end_w);
+	DECLARE_READ8_MEMBER(tecmo_dswa_l_r);
+	DECLARE_READ8_MEMBER(tecmo_dswa_h_r);
+	DECLARE_READ8_MEMBER(tecmo_dswb_l_r);
+	DECLARE_READ8_MEMBER(tecmo_dswb_h_r);
 };
 
 

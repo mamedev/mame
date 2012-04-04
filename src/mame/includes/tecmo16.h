@@ -25,6 +25,7 @@ public:
 	UINT16 m_scroll_char_y_w;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE16_MEMBER(tecmo16_sound_command_w);
 };
 
 

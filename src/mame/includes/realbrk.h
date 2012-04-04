@@ -19,6 +19,12 @@ public:
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
 	UINT16 *m_spriteram;
+	DECLARE_READ16_MEMBER(realbrk_dsw_r);
+	DECLARE_READ16_MEMBER(pkgnsh_input_r);
+	DECLARE_READ16_MEMBER(pkgnshdx_input_r);
+	DECLARE_READ16_MEMBER(backup_ram_r);
+	DECLARE_READ16_MEMBER(backup_ram_dx_r);
+	DECLARE_WRITE16_MEMBER(backup_ram_w);
 };
 
 

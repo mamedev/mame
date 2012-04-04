@@ -97,16 +97,15 @@ static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 	}
 }
 
-static WRITE8_HANDLER( bagman_coin_counter_w )
+WRITE8_MEMBER(bagman_state::bagman_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset,data);
+	coin_counter_w(machine(), offset,data);
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(bagman_state::irq_mask_w)
 {
-	bagman_state *state = space->machine().driver_data<bagman_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bagman_state )
@@ -117,7 +116,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(bagman_pal16r6_r)
 	//AM_RANGE(0xa800, 0xa805) AM_READ_LEGACY(bagman_ls259_r) /*just for debugging purposes*/
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_mask_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE_LEGACY(bagman_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE(m_video_enable)
 	AM_RANGE(0xc000, 0xffff) AM_ROM /* Super Bagman only */
@@ -125,7 +124,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bagman_state )
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0xa800, 0xa805) AM_DEVWRITE_LEGACY("tmsprom", bagman_ls259_w) /* TMS5110 driving state machine */
-	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(bagman_coin_counter_w)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb800, 0xb800) AM_READNOP								/* looks like watchdog from schematics */
 
@@ -147,10 +146,10 @@ static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8, bagman_state )
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_mask_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE_LEGACY(bagman_flipscreen_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE(m_video_enable)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(bagman_coin_counter_w)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW")
 
 

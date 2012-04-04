@@ -29,6 +29,9 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_slave;
+	DECLARE_READ8_MEMBER(exprraid_protection_r);
+	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
+	DECLARE_READ8_MEMBER(vblank_r);
 };
 
 

@@ -33,44 +33,40 @@ static INTERRUPT_GEN( ddribble_interrupt_1 )
 }
 
 
-static WRITE8_HANDLER( ddribble_bankswitch_w )
+WRITE8_MEMBER(ddribble_state::ddribble_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
 
-static READ8_HANDLER( ddribble_sharedram_r )
+READ8_MEMBER(ddribble_state::ddribble_sharedram_r)
 {
-	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	return state->m_sharedram[offset];
+	return m_sharedram[offset];
 }
 
-static WRITE8_HANDLER( ddribble_sharedram_w )
+WRITE8_MEMBER(ddribble_state::ddribble_sharedram_w)
 {
-	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	state->m_sharedram[offset] = data;
+	m_sharedram[offset] = data;
 }
 
-static READ8_HANDLER( ddribble_snd_sharedram_r )
+READ8_MEMBER(ddribble_state::ddribble_snd_sharedram_r)
 {
-	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	return state->m_snd_sharedram[offset];
+	return m_snd_sharedram[offset];
 }
 
-static WRITE8_HANDLER( ddribble_snd_sharedram_w )
+WRITE8_MEMBER(ddribble_state::ddribble_snd_sharedram_w)
 {
-	ddribble_state *state = space->machine().driver_data<ddribble_state>();
-	state->m_snd_sharedram[offset] = data;
+	m_snd_sharedram[offset] = data;
 }
 
-static WRITE8_HANDLER( ddribble_coin_counter_w )
+WRITE8_MEMBER(ddribble_state::ddribble_coin_counter_w)
 {
 	/* b4-b7: unused */
 	/* b2-b3: unknown */
 	/* b1: coin counter 2 */
 	/* b0: coin counter 1 */
-	coin_counter_w(space->machine(), 0,(data) & 0x01);
-	coin_counter_w(space->machine(), 1,(data >> 1) & 0x01);
+	coin_counter_w(machine(), 0,(data) & 0x01);
+	coin_counter_w(machine(), 1,(data >> 1) & 0x01);
 }
 
 static READ8_DEVICE_HANDLER( ddribble_vlm5030_busy_r )
@@ -122,21 +118,21 @@ static ADDRESS_MAP_START( cpu0_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_sharedram)									/* shared RAM with CPU #1 */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE_LEGACY(ddribble_bg_videoram_w) AM_BASE(m_bg_videoram)	/* Video RAM 2 */
 	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(m_spriteram_2)								/* Object RAM 2 */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(ddribble_bankswitch_w)										/* bankswitch control */
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(ddribble_bankswitch_w)										/* bankswitch control */
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")														/* banked ROM */
 	AM_RANGE(0xa000, 0xffff) AM_ROM																/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, ddribble_state )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE_LEGACY(ddribble_sharedram_r, ddribble_sharedram_w)			/* shared RAM with CPU #0 */
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE_LEGACY(ddribble_snd_sharedram_r, ddribble_snd_sharedram_w)	/* shared RAM with CPU #2 */
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ddribble_sharedram_r, ddribble_sharedram_w)			/* shared RAM with CPU #0 */
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(ddribble_snd_sharedram_r, ddribble_snd_sharedram_w)	/* shared RAM with CPU #2 */
 	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2801, 0x2801) AM_READ_PORT("P1")
 	AM_RANGE(0x2802, 0x2802) AM_READ_PORT("P2")
 	AM_RANGE(0x2803, 0x2803) AM_READ_PORT("SYSTEM")											/* coinsw & start */
 	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW3")
-	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(ddribble_coin_counter_w)								/* coin counters */
+	AM_RANGE(0x3400, 0x3400) AM_WRITE(ddribble_coin_counter_w)								/* coin counters */
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE_LEGACY(watchdog_reset_w)										/* watchdog reset */
 	AM_RANGE(0x8000, 0xffff) AM_ROM															/* ROM */
 ADDRESS_MAP_END

@@ -48,6 +48,16 @@ public:
 	/* devices */
 	okim6295_device *m_oki;
 	eeprom_device *m_eeprom;
+	DECLARE_WRITE16_MEMBER(coinctrl_w);
+	DECLARE_WRITE16_MEMBER(wbeachvl_coin_eeprom_w);
+	DECLARE_WRITE16_MEMBER(hotmind_coin_eeprom_w);
+	DECLARE_WRITE16_MEMBER(hrdtimes_coin_w);
+	DECLARE_WRITE16_MEMBER(playmark_snd_command_w);
+	DECLARE_READ8_MEMBER(playmark_snd_command_r);
+	DECLARE_READ8_MEMBER(playmark_snd_flag_r);
+	DECLARE_WRITE8_MEMBER(playmark_oki_w);
+	DECLARE_WRITE8_MEMBER(playmark_snd_control_w);
+	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
 };
 
 /*----------- defined in video/playmark.c -----------*/

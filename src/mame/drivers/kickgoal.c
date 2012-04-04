@@ -446,32 +446,30 @@ static const UINT16 kickgoal_default_eeprom_type1[64] = {
 
 
 
-static READ16_HANDLER( kickgoal_eeprom_r )
+READ16_MEMBER(kickgoal_state::kickgoal_eeprom_r)
 {
-	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		return state->m_eeprom->read_bit();
+		return m_eeprom->read_bit();
 	}
 	return 0;
 }
 
 
-static WRITE16_HANDLER( kickgoal_eeprom_w )
+WRITE16_MEMBER(kickgoal_state::kickgoal_eeprom_w)
 {
-	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
 		{
 			case 0:
-				state->m_eeprom->set_cs_line((data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->set_cs_line((data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 			case 1:
-				state->m_eeprom->set_clock_line((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->set_clock_line((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
 				break;
 			case 2:
-				state->m_eeprom->write_bit(data & 0x0001);
+				m_eeprom->write_bit(data & 0x0001);
 				break;
 		}
 	}
@@ -487,8 +485,8 @@ static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16, kickgoal_state )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("SYSTEM")
 /// AM_RANGE(0x800004, 0x800005) AM_WRITE_LEGACY(soundlatch_word_w)
 	AM_RANGE(0x800004, 0x800005) AM_DEVWRITE_LEGACY("oki", actionhw_snd_w)
-	AM_RANGE(0x900000, 0x900005) AM_WRITE_LEGACY(kickgoal_eeprom_w)
-	AM_RANGE(0x900006, 0x900007) AM_READ_LEGACY(kickgoal_eeprom_r)
+	AM_RANGE(0x900000, 0x900005) AM_WRITE(kickgoal_eeprom_w)
+	AM_RANGE(0x900006, 0x900007) AM_READ(kickgoal_eeprom_r)
 	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE_LEGACY(kickgoal_fgram_w) AM_BASE(m_fgram) /* FG Layer */
 	AM_RANGE(0xa04000, 0xa07fff) AM_RAM_WRITE_LEGACY(kickgoal_bgram_w) AM_BASE(m_bgram) /* Higher BG Layer */
 	AM_RANGE(0xa08000, 0xa0bfff) AM_RAM_WRITE_LEGACY(kickgoal_bg2ram_w) AM_BASE(m_bg2ram) /* Lower BG Layer */

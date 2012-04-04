@@ -10,6 +10,7 @@ public:
 	tilemap_t *m_fg_tilemap;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(speedbal_coincounter_w);
 };
 
 

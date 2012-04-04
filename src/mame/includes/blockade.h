@@ -15,6 +15,8 @@ public:
 	/* input-related */
 	UINT8 m_coin_latch;  /* Active Low */
 	UINT8 m_just_been_reset;
+	DECLARE_READ8_MEMBER(blockade_input_port_0_r);
+	DECLARE_WRITE8_MEMBER(blockade_coin_latch_w);
 };
 
 

@@ -26,6 +26,7 @@ public:
 	device_t *m_k052109;
 	device_t *m_k051960;
 	device_t *m_k051316;
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
 };
 
 

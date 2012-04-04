@@ -217,13 +217,12 @@ Stephh's notes (based on the games M6502 code and some tests) :
 /* Emulate Protection ( only for original express raider, code is cracked on the bootleg */
 /*****************************************************************************************/
 
-static READ8_HANDLER( exprraid_protection_r )
+READ8_MEMBER(exprraid_state::exprraid_protection_r)
 {
-	exprraid_state *state = space->machine().driver_data<exprraid_state>();
 	switch (offset)
 	{
 	case 0:
-		return state->m_main_ram[0x02a9];
+		return m_main_ram[0x02a9];
 	case 1:
 		return 0x02;
 	}
@@ -231,16 +230,15 @@ static READ8_HANDLER( exprraid_protection_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( sound_cpu_command_w )
+WRITE8_MEMBER(exprraid_state::sound_cpu_command_w)
 {
-	exprraid_state *state = space->machine().driver_data<exprraid_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_slave, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static READ8_HANDLER( vblank_r )
+READ8_MEMBER(exprraid_state::vblank_r)
 {
-	return input_port_read(space->machine(), "IN0");
+	return input_port_read(machine(), "IN0");
 }
 
 static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
@@ -255,10 +253,10 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")	/* Coins */
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("DSW1")	/* DSW 1 */
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP // ???
-	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(sound_cpu_command_w)
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE_LEGACY(exprraid_flipscreen_w)
 	AM_RANGE(0x2003, 0x2003) AM_WRITENOP // ???
-	AM_RANGE(0x2800, 0x2801) AM_READ_LEGACY(exprraid_protection_r)
+	AM_RANGE(0x2800, 0x2801) AM_READ(exprraid_protection_r)
 	AM_RANGE(0x2800, 0x2803) AM_WRITE_LEGACY(exprraid_bgselect_w)
 	AM_RANGE(0x2804, 0x2804) AM_WRITE_LEGACY(exprraid_scrolly_w)
 	AM_RANGE(0x2805, 0x2806) AM_WRITE_LEGACY(exprraid_scrollx_w)
@@ -777,13 +775,15 @@ static DRIVER_INIT( exprraid )
 
 static DRIVER_INIT( wexpressb )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3800, 0x3800, FUNC(vblank_r));
+	exprraid_state *state = machine.driver_data<exprraid_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),state));
 	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( wexpressb2 )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xFFC0, 0xFFC0, FUNC(vblank_r));
+	exprraid_state *state = machine.driver_data<exprraid_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),state));
 	exprraid_gfx_expand(machine);
 }
 

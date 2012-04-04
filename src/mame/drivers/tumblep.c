@@ -62,40 +62,38 @@ static WRITE16_DEVICE_HANDLER( tumblep_oki_w )
     /* STUFF IN OTHER BYTE TOO..*/
 }
 
-static READ16_HANDLER( tumblep_prot_r )
+READ16_MEMBER(tumblep_state::tumblep_prot_r)
 {
 	return ~0;
 }
 #endif
 
-static WRITE16_HANDLER( tumblep_sound_w )
+WRITE16_MEMBER(tumblep_state::tumblep_sound_w)
 {
-	tumblep_state *state = space->machine().driver_data<tumblep_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
-static WRITE16_HANDLER( jumppop_sound_w )
+WRITE16_MEMBER(tumblep_state::jumppop_sound_w)
 {
-	tumblep_state *state = space->machine().driver_data<tumblep_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(state->m_audiocpu, 0, ASSERT_LINE );
+	cputag_set_input_line(m_audiocpu, 0, ASSERT_LINE );
 }
 #endif
 
 /******************************************************************************/
 
-static READ16_HANDLER( tumblepop_controls_r )
+READ16_MEMBER(tumblep_state::tumblepop_controls_r)
 {
 	switch (offset << 1)
 	{
 		case 0:
-			return input_port_read(space->machine(), "PLAYERS");
+			return input_port_read(machine(), "PLAYERS");
 		case 2:
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 		case 8:
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 		case 10: /* ? */
 		case 12:
         	return 0;
@@ -113,10 +111,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tumblep_state )
 #else
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 #endif
-	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(tumblep_sound_w)
+	AM_RANGE(0x100000, 0x100001) AM_WRITE(tumblep_sound_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x180000, 0x18000f) AM_READ_LEGACY(tumblepop_controls_r)
+	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepop_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
 	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)

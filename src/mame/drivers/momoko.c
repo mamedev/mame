@@ -47,9 +47,9 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "includes/momoko.h"
 
 
-static WRITE8_HANDLER( momoko_bg_read_bank_w )
+WRITE8_MEMBER(momoko_state::momoko_bg_read_bank_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x1f);
+	memory_set_bank(machine(), "bank1", data & 0x1f);
 }
 
 /****************************************************************************/
@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( momoko_map, AS_PROGRAM, 8, momoko_state )
 	AM_RANGE(0xf000, 0xffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf000, 0xf001) AM_WRITE_LEGACY(momoko_bg_scrolly_w) AM_BASE(m_bg_scrolly)
 	AM_RANGE(0xf002, 0xf003) AM_WRITE_LEGACY(momoko_bg_scrollx_w) AM_BASE(m_bg_scrollx)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(momoko_bg_read_bank_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE(momoko_bg_read_bank_w)
 	AM_RANGE(0xf006, 0xf006) AM_WRITE_LEGACY(momoko_bg_select_w)
 	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(momoko_bg_priority_w)
 ADDRESS_MAP_END

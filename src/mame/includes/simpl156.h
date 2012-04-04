@@ -31,6 +31,24 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_device<eeprom_device> m_eeprom;
 	required_device<okim6295_device> m_okimusic;
+	DECLARE_READ32_MEMBER(simpl156_inputs_read);
+	DECLARE_READ32_MEMBER(simpl156_palette_r);
+	DECLARE_WRITE32_MEMBER(simpl156_palette_w);
+	DECLARE_READ32_MEMBER(simpl156_system_r);
+	DECLARE_WRITE32_MEMBER(simpl156_eeprom_w);
+	DECLARE_READ32_MEMBER(simpl156_spriteram_r);
+	DECLARE_WRITE32_MEMBER(simpl156_spriteram_w);
+	DECLARE_READ32_MEMBER(simpl156_mainram_r);
+	DECLARE_WRITE32_MEMBER(simpl156_mainram_w);
+	DECLARE_READ32_MEMBER(simpl156_pf1_rowscroll_r);
+	DECLARE_WRITE32_MEMBER(simpl156_pf1_rowscroll_w);
+	DECLARE_READ32_MEMBER(simpl156_pf2_rowscroll_r);
+	DECLARE_WRITE32_MEMBER(simpl156_pf2_rowscroll_w);
+	DECLARE_READ32_MEMBER(joemacr_speedup_r);
+	DECLARE_READ32_MEMBER(chainrec_speedup_r);
+	DECLARE_READ32_MEMBER(prtytime_speedup_r);
+	DECLARE_READ32_MEMBER(charlien_speedup_r);
+	DECLARE_READ32_MEMBER(osman_speedup_r);
 };
 
 

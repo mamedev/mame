@@ -55,41 +55,39 @@ starfira has one less rom in total than starfire but everything passes as
  *
  *************************************/
 
-static WRITE8_HANDLER( starfire_scratch_w )
+WRITE8_MEMBER(starfire_state::starfire_scratch_w)
 {
-	starfire_state *state = space->machine().driver_data<starfire_state>();
 
     /* A12 and A3 select video control registers */
 	if ((offset & 0x1008) == 0x1000)
 	{
 		switch (offset & 7)
 		{
-			case 0:	state->m_starfire_vidctrl = data; break;
-			case 1:	state->m_starfire_vidctrl1 = data; break;
+			case 0:	m_starfire_vidctrl = data; break;
+			case 1:	m_starfire_vidctrl1 = data; break;
 			case 2:
 				/* Sounds */
-				state->m_fireone_select = (data & 0x8) ? 0 : 1;
+				m_fireone_select = (data & 0x8) ? 0 : 1;
 				break;
 		}
 	}
 
 	/* convert to a videoram offset */
 	offset = (offset & 0x31f) | ((offset & 0xe0) << 5);
-    state->m_starfire_videoram[offset] = data;
+    m_starfire_videoram[offset] = data;
 }
 
 
-static READ8_HANDLER( starfire_scratch_r )
+READ8_MEMBER(starfire_state::starfire_scratch_r)
 {
-	starfire_state *state = space->machine().driver_data<starfire_state>();
 
     /* A11 selects input ports */
 	if (offset & 0x800)
-		return (*state->m_input_read)(space, offset);
+		return m_input_read(space, offset, 0xff);
 
 	/* convert to a videoram offset */
 	offset = (offset & 0x31f) | ((offset & 0xe0) << 5);
-    return state->m_starfire_videoram[offset];
+    return m_starfire_videoram[offset];
 }
 
 
@@ -100,21 +98,21 @@ static READ8_HANDLER( starfire_scratch_r )
  *
  *************************************/
 
-static READ8_HANDLER( starfire_input_r )
+READ8_MEMBER(starfire_state::starfire_input_r)
 {
 	switch (offset & 15)
 	{
-		case 0:	return input_port_read(space->machine(), "DSW");
-		case 1:	return input_port_read(space->machine(), "SYSTEM");	/* Note: need to loopback sounds lengths on that one */
-		case 5: return input_port_read(space->machine(), "STICKZ");
-		case 6:	return input_port_read(space->machine(), "STICKX");
-		case 7:	return input_port_read(space->machine(), "STICKY");
+		case 0:	return input_port_read(machine(), "DSW");
+		case 1:	return input_port_read(machine(), "SYSTEM");	/* Note: need to loopback sounds lengths on that one */
+		case 5: return input_port_read(machine(), "STICKZ");
+		case 6:	return input_port_read(machine(), "STICKX");
+		case 7:	return input_port_read(machine(), "STICKY");
 		default: return 0xff;
 	}
 }
 
 
-static READ8_HANDLER( fireone_input_r )
+READ8_MEMBER(starfire_state::fireone_input_r)
 {
 	static const UINT8 fireone_paddle_map[64] =
 	{
@@ -129,14 +127,13 @@ static READ8_HANDLER( fireone_input_r )
 	};
 	int temp;
 
-    starfire_state *state = space->machine().driver_data<starfire_state>();
 
 	switch (offset & 15)
 	{
-		case 0:	return input_port_read(space->machine(), "DSW");
-		case 1:	return input_port_read(space->machine(), "SYSTEM");
+		case 0:	return input_port_read(machine(), "DSW");
+		case 1:	return input_port_read(machine(), "SYSTEM");
 		case 2:
-			temp = state->m_fireone_select ? input_port_read(space->machine(), "P1") : input_port_read(space->machine(), "P2");
+			temp = m_fireone_select ? input_port_read(machine(), "P1") : input_port_read(machine(), "P2");
 			temp = (temp & 0xc0) | fireone_paddle_map[temp & 0x3f];
 			return temp;
 		default: return 0xff;
@@ -153,7 +150,7 @@ static READ8_HANDLER( fireone_input_r )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starfire_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_READWRITE_LEGACY(starfire_scratch_r, starfire_scratch_w)
+	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(starfire_scratch_r, starfire_scratch_w)
 	AM_RANGE(0xa000, 0xbfff) AM_READWRITE_LEGACY(starfire_colorram_r, starfire_colorram_w) AM_BASE(m_starfire_colorram)
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE_LEGACY(starfire_videoram_r, starfire_videoram_w) AM_BASE(m_starfire_videoram)
 ADDRESS_MAP_END
@@ -377,14 +374,14 @@ static DRIVER_INIT( starfire )
 {
 	starfire_state *state = machine.driver_data<starfire_state>();
 
-	state->m_input_read = starfire_input_r;
+	state->m_input_read = read8_delegate(FUNC(starfire_state::starfire_input_r),state);
 }
 
 static DRIVER_INIT( fireone )
 {
 	starfire_state *state = machine.driver_data<starfire_state>();
 
-	state->m_input_read = fireone_input_r;
+	state->m_input_read = read8_delegate(FUNC(starfire_state::fireone_input_r),state);
 
 	/* register for state saving */
 	state->save_item(NAME(state->m_fireone_select));

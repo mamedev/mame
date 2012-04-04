@@ -29,6 +29,13 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_WRITE32_MEMBER(ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w);
+	DECLARE_WRITE32_MEMBER(ps4_bgpen_1_dword_w);
+	DECLARE_WRITE32_MEMBER(ps4_bgpen_2_dword_w);
+	DECLARE_WRITE32_MEMBER(ps4_screen1_brt_w);
+	DECLARE_WRITE32_MEMBER(ps4_screen2_brt_w);
+	DECLARE_WRITE32_MEMBER(ps4_vidregs_w);
+	DECLARE_WRITE32_MEMBER(hotgmck_pcm_bank_w);
 };
 
 

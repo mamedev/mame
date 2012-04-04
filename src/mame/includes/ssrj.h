@@ -14,6 +14,7 @@ public:
 	UINT8 *m_vram4;
 	UINT8 *m_scrollram;
 	UINT8 *m_buffer_spriteram;
+	DECLARE_READ8_MEMBER(ssrj_wheel_r);
 };
 
 

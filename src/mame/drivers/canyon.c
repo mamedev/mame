@@ -63,23 +63,23 @@ static PALETTE_INIT( canyon )
  *
  *************************************/
 
-static READ8_HANDLER( canyon_switches_r )
+READ8_MEMBER(canyon_state::canyon_switches_r)
 {
 	UINT8 val = 0;
 
-	if ((input_port_read(space->machine(), "IN2") >> (offset & 7)) & 1)
+	if ((input_port_read(machine(), "IN2") >> (offset & 7)) & 1)
 		val |= 0x80;
 
-	if ((input_port_read(space->machine(), "IN1") >> (offset & 3)) & 1)
+	if ((input_port_read(machine(), "IN1") >> (offset & 3)) & 1)
 		val |= 0x01;
 
 	return val;
 }
 
 
-static READ8_HANDLER( canyon_options_r )
+READ8_MEMBER(canyon_state::canyon_options_r)
 {
-	return (input_port_read(space->machine(), "DSW") >> (2 * (~offset & 3))) & 3;
+	return (input_port_read(machine(), "DSW") >> (2 * (~offset & 3))) & 3;
 }
 
 
@@ -91,9 +91,9 @@ static READ8_HANDLER( canyon_options_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( canyon_led_w )
+WRITE8_MEMBER(canyon_state::canyon_led_w)
 {
-	set_led_status(space->machine(), offset & 0x01, offset & 0x02);
+	set_led_status(machine(), offset & 0x01, offset & 0x02);
 }
 
 
@@ -112,11 +112,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, canyon_state )
 	AM_RANGE(0x0500, 0x0500) AM_DEVWRITE_LEGACY("discrete", canyon_explode_w)
 	AM_RANGE(0x0501, 0x0501) AM_WRITE_LEGACY(watchdog_reset_w) /* watchdog, disabled in service mode */
 	AM_RANGE(0x0600, 0x0603) AM_DEVWRITE_LEGACY("discrete", canyon_whistle_w)
-	AM_RANGE(0x0680, 0x0683) AM_WRITE_LEGACY(canyon_led_w)
+	AM_RANGE(0x0680, 0x0683) AM_WRITE(canyon_led_w)
 	AM_RANGE(0x0700, 0x0703) AM_DEVWRITE_LEGACY("discrete", canyon_attract_w)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(canyon_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x1000, 0x17ff) AM_READ_LEGACY(canyon_switches_r) AM_WRITENOP  /* sloppy code writes here */
-	AM_RANGE(0x1800, 0x1fff) AM_READ_LEGACY(canyon_options_r)
+	AM_RANGE(0x1000, 0x17ff) AM_READ(canyon_switches_r) AM_WRITENOP  /* sloppy code writes here */
+	AM_RANGE(0x1800, 0x1fff) AM_READ(canyon_options_r)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 

@@ -115,21 +115,19 @@
 #include "video/decocomn.h"
 #include "video/decospr.h"
 
-static READ16_HANDLER( rohga_irq_ack_r )
+READ16_MEMBER(rohga_state::rohga_irq_ack_r)
 {
-	rohga_state *state = space->machine().driver_data<rohga_state>();
 
-	device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 6, CLEAR_LINE);
 	return 0;
 }
 
-static WRITE16_HANDLER( wizdfire_irq_ack_w )
+WRITE16_MEMBER(rohga_state::wizdfire_irq_ack_w)
 {
 	/* This might actually do more, nitrobal for example sets 0xca->0xffff->0x80 at startup then writes 7 all the time
        except when a credit is inserted (writes 6 twice).
        Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
-	rohga_state *state = space->machine().driver_data<rohga_state>();
-	device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 6, CLEAR_LINE);
 }
 
 /**********************************************************************************/
@@ -149,7 +147,7 @@ static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE_LEGACY("deco_common", decocomn_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* ? */
 	AM_RANGE(0x322000, 0x322001) AM_DEVWRITE_LEGACY("deco_common", decocomn_priority_w)
-	AM_RANGE(0x321100, 0x321101) AM_READ_LEGACY(rohga_irq_ack_r) /* Irq ack?  Value not used */
+	AM_RANGE(0x321100, 0x321101) AM_READ(rohga_irq_ack_r) /* Irq ack?  Value not used */
 
 	AM_RANGE(0x3c0000, 0x3c1fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x3c2000, 0x3c2fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
@@ -183,7 +181,7 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
 
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE_LEGACY("deco_common", decocomn_priority_w) /* Priority */
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
-	AM_RANGE(0x320004, 0x320005) AM_WRITE_LEGACY(wizdfire_irq_ack_w) /* VBL IRQ ack */
+	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
@@ -215,7 +213,7 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("DSW3") AM_DEVWRITE_LEGACY("deco_common", decocomn_priority_w) /* Priority */
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
-	AM_RANGE(0x320004, 0x320005) AM_WRITE_LEGACY(wizdfire_irq_ack_w) /* VBL IRQ ack */
+	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
 	AM_RANGE(0x340000, 0x3407ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x350000, 0x350001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
@@ -243,7 +241,7 @@ static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE_LEGACY("deco_common", decocomn_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* ? */
 	AM_RANGE(0x322000, 0x322001) AM_DEVWRITE_LEGACY("deco_common", decocomn_priority_w)
-	AM_RANGE(0x321100, 0x321101) AM_WRITE_LEGACY(wizdfire_irq_ack_w)  /* Irq ack?  Value not used */
+	AM_RANGE(0x321100, 0x321101) AM_WRITE(wizdfire_irq_ack_w)  /* Irq ack?  Value not used */
 
 	AM_RANGE(0x3c0000, 0x3c1fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x3c2000, 0x3c2fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)

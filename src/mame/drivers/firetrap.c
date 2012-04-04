@@ -176,28 +176,26 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #define FIRETRAP_XTAL XTAL_12MHz
 
 
-static WRITE8_HANDLER( firetrap_nmi_disable_w )
+WRITE8_MEMBER(firetrap_state::firetrap_nmi_disable_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->m_nmi_enable = ~data & 1;
+	m_nmi_enable = ~data & 1;
 }
 
-static WRITE8_HANDLER( firetrap_bankselect_w )
+WRITE8_MEMBER(firetrap_state::firetrap_bankselect_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	memory_set_bank(machine(), "bank1", data & 0x03);
 }
 
-static READ8_HANDLER( firetrap_8751_bootleg_r )
+READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 {
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
 	/* 8751 - the real thing is much more complicated than that. */
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	UINT8 coin = 0;
-	UINT8 port = input_port_read(space->machine(), "IN2") & 0x70;
+	UINT8 port = input_port_read(machine(), "IN2") & 0x70;
 
-	if (cpu_get_pc(&space->device()) == 0x1188)
-		return ~state->m_coin_command_pending;
+	if (cpu_get_pc(&space.device()) == 0x1188)
+		return ~m_coin_command_pending;
 
 	if (port != 0x70)
 	{
@@ -207,21 +205,20 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 			coin = 2;
 		if (!(port & 0x10)) /* SERVICE1 */
 			coin = 3;
-		state->m_coin_command_pending = coin;
+		m_coin_command_pending = coin;
 		return 0xff;
 	}
 
 	return 0;
 }
 
-static READ8_HANDLER( firetrap_8751_r )
+READ8_MEMBER(firetrap_state::firetrap_8751_r)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	//logerror("PC:%04x read from 8751\n",cpu_get_pc(&space->device()));
-	return state->m_i8751_return;
+	//logerror("PC:%04x read from 8751\n",cpu_get_pc(&space.device()));
+	return m_i8751_return;
 }
 
-static WRITE8_HANDLER( firetrap_8751_w )
+WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 {
 	static const UINT8 i8751_init_data[]={
 		0xf5,0xd5,0xdd,0x21,0x05,0xc1,0x87,0x5f,0x87,0x83,0x5f,0x16,0x00,0xdd,0x19,0xd1,
@@ -243,85 +240,82 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	};
 	static const int i8751_coin_data[]={ 0x00, 0xb7 };
 	static const int i8751_36_data[]={ 0x00, 0xbc };
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 
 	/* End of command - important to note, as coin input is supressed while commands are pending */
 	if (data == 0x26)
 	{
-		state->m_i8751_current_command = 0;
-		state->m_i8751_return = 0xff; /* This value is XOR'd and must equal 0 */
-		device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xff);
+		m_i8751_current_command = 0;
+		m_i8751_return = 0xff; /* This value is XOR'd and must equal 0 */
+		device_set_input_line_and_vector(m_maincpu, 0, HOLD_LINE, 0xff);
 		return;
 	}
 
 	/* Init sequence command (0x13 : US - 0xf5 : Japan) */
 	else if ((data == 0x13) || (data == 0xf5))
 	{
-		if (!state->m_i8751_current_command)
-			state->m_i8751_init_ptr = 0;
-		state->m_i8751_return = i8751_init_data[state->m_i8751_init_ptr++];
+		if (!m_i8751_current_command)
+			m_i8751_init_ptr = 0;
+		m_i8751_return = i8751_init_data[m_i8751_init_ptr++];
 	}
 
 	/* Used to calculate a jump address when coins are inserted */
 	else if (data == 0xbd)
 	{
-		if (!state->m_i8751_current_command)
-			state->m_i8751_init_ptr = 0;
-		state->m_i8751_return = i8751_coin_data[state->m_i8751_init_ptr++];
+		if (!m_i8751_current_command)
+			m_i8751_init_ptr = 0;
+		m_i8751_return = i8751_coin_data[m_i8751_init_ptr++];
 	}
 
 	else if (data == 0x36)
 	{
-		if (!state->m_i8751_current_command)
-			state->m_i8751_init_ptr = 0;
-		state->m_i8751_return = i8751_36_data[state->m_i8751_init_ptr++];
+		if (!m_i8751_current_command)
+			m_i8751_init_ptr = 0;
+		m_i8751_return = i8751_36_data[m_i8751_init_ptr++];
 	}
 
 	/* Static value commands */
 	else if (data == 0x14)
-		state->m_i8751_return = 1;
+		m_i8751_return = 1;
 	else if (data == 0x02)
-		state->m_i8751_return = 0;
+		m_i8751_return = 0;
 	else if (data == 0x72)
-		state->m_i8751_return = 3;
+		m_i8751_return = 3;
 	else if (data == 0x69)
-		state->m_i8751_return = 2;
+		m_i8751_return = 2;
 	else if (data == 0xcb)
-		state->m_i8751_return = 0;
+		m_i8751_return = 0;
 	else if (data == 0x49)
-		state->m_i8751_return = 1;
+		m_i8751_return = 1;
 	else if (data == 0x17)
-		state->m_i8751_return = 2;
+		m_i8751_return = 2;
 	else if (data == 0x88)
-		state->m_i8751_return = 3;
+		m_i8751_return = 3;
 	else
 	{
-		state->m_i8751_return = 0xff;
-		logerror("%04x: Unknown i8751 command %02x!\n",cpu_get_pc(&space->device()),data);
+		m_i8751_return = 0xff;
+		logerror("%04x: Unknown i8751 command %02x!\n",cpu_get_pc(&space.device()),data);
 	}
 
 	/* Signal main cpu task is complete */
-	device_set_input_line_and_vector(state->m_maincpu, 0, HOLD_LINE, 0xff);
-	state->m_i8751_current_command=data;
+	device_set_input_line_and_vector(m_maincpu, 0, HOLD_LINE, 0xff);
+	m_i8751_current_command=data;
 }
 
-static WRITE8_HANDLER( firetrap_sound_command_w )
+WRITE8_MEMBER(firetrap_state::firetrap_sound_command_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( firetrap_sound_2400_w )
+WRITE8_MEMBER(firetrap_state::firetrap_sound_2400_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	msm5205_reset_w(state->m_msm, ~data & 0x01);
-	state->m_sound_irq_enable = data & 0x02;
+	msm5205_reset_w(m_msm, ~data & 0x01);
+	m_sound_irq_enable = data & 0x02;
 }
 
-static WRITE8_HANDLER( firetrap_sound_bankselect_w )
+WRITE8_MEMBER(firetrap_state::firetrap_sound_bankselect_w)
 {
-	memory_set_bank(space->machine(), "bank2", data & 0x01);
+	memory_set_bank(machine(), "bank2", data & 0x01);
 }
 
 static void firetrap_adpcm_int( device_t *device )
@@ -336,15 +330,14 @@ static void firetrap_adpcm_int( device_t *device )
 		device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( firetrap_adpcm_data_w )
+WRITE8_MEMBER(firetrap_state::firetrap_adpcm_data_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->m_msm5205next = data;
+	m_msm5205next = data;
 }
 
-static WRITE8_HANDLER( flip_screen_w )
+WRITE8_MEMBER(firetrap_state::flip_screen_w)
 {
-	flip_screen_set(space->machine(), data);
+	flip_screen_set(machine(), data);
 }
 
 
@@ -357,11 +350,11 @@ static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(firetrap_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* IRQ acknowledge */
-	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(firetrap_sound_command_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(firetrap_bankselect_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(flip_screen_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(firetrap_nmi_disable_w)
-	AM_RANGE(0xf005, 0xf005) AM_WRITE_LEGACY(firetrap_8751_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE(flip_screen_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE(firetrap_nmi_disable_w)
+	AM_RANGE(0xf005, 0xf005) AM_WRITE(firetrap_8751_w)
 	AM_RANGE(0xf008, 0xf009) AM_WRITE_LEGACY(firetrap_bg1_scrollx_w)
 	AM_RANGE(0xf00a, 0xf00b) AM_WRITE_LEGACY(firetrap_bg1_scrolly_w)
 	AM_RANGE(0xf00c, 0xf00d) AM_WRITE_LEGACY(firetrap_bg2_scrollx_w)
@@ -371,7 +364,7 @@ static ADDRESS_MAP_START( firetrap_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0xf012, 0xf012) AM_READ_PORT("IN2")
 	AM_RANGE(0xf013, 0xf013) AM_READ_PORT("DSW0")
 	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf016, 0xf016) AM_READ_LEGACY(firetrap_8751_r)
+	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( firetrap_bootleg_map, AS_PROGRAM, 8, firetrap_state )
@@ -383,10 +376,10 @@ static ADDRESS_MAP_START( firetrap_bootleg_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(firetrap_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0xe800, 0xe97f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP	/* IRQ acknowledge */
-	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(firetrap_sound_command_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE_LEGACY(firetrap_bankselect_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE_LEGACY(flip_screen_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE_LEGACY(firetrap_nmi_disable_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(firetrap_sound_command_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE(firetrap_bankselect_w)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE(flip_screen_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE(firetrap_nmi_disable_w)
 	AM_RANGE(0xf005, 0xf005) AM_WRITENOP
 	AM_RANGE(0xf008, 0xf009) AM_WRITE_LEGACY(firetrap_bg1_scrollx_w)
 	AM_RANGE(0xf00a, 0xf00b) AM_WRITE_LEGACY(firetrap_bg1_scrolly_w)
@@ -397,16 +390,16 @@ static ADDRESS_MAP_START( firetrap_bootleg_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0xf012, 0xf012) AM_READ_PORT("IN2")
 	AM_RANGE(0xf013, 0xf013) AM_READ_PORT("DSW0")
 	AM_RANGE(0xf014, 0xf014) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf016, 0xf016) AM_READ_LEGACY(firetrap_8751_bootleg_r)
+	AM_RANGE(0xf016, 0xf016) AM_READ(firetrap_8751_bootleg_r)
 	AM_RANGE(0xf800, 0xf8ff) AM_ROM /* extra ROM in the bootleg with unprotection code */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(firetrap_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
-	AM_RANGE(0x2400, 0x2400) AM_WRITE_LEGACY(firetrap_sound_2400_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE_LEGACY(firetrap_sound_bankselect_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
+	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)
 	AM_RANGE(0x3400, 0x3400) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM

@@ -28,6 +28,12 @@ public:
 	UINT8* m_robokid_bg1_videoram;
 	UINT8* m_robokid_bg2_videoram;
 	UINT8 *m_spriteram;
+	DECLARE_WRITE8_MEMBER(ninjakd2_bankselect_w);
+	DECLARE_WRITE8_MEMBER(robokid_bankselect_w);
+	DECLARE_WRITE8_MEMBER(ninjakd2_soundreset_w);
+	DECLARE_WRITE8_MEMBER(ninjakd2_pcm_play_w);
+	DECLARE_READ8_MEMBER(omegaf_io_protection_r);
+	DECLARE_WRITE8_MEMBER(omegaf_io_protection_w);
 };
 
 

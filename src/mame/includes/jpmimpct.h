@@ -72,6 +72,24 @@ public:
 	int m_motor[3];
 	UINT16 *m_vram;
 	struct bt477_t m_bt477;
+	DECLARE_WRITE16_MEMBER(m68k_tms_w);
+	DECLARE_READ16_MEMBER(m68k_tms_r);
+	DECLARE_READ16_MEMBER(duart_1_r);
+	DECLARE_WRITE16_MEMBER(duart_1_w);
+	DECLARE_READ16_MEMBER(duart_2_r);
+	DECLARE_WRITE16_MEMBER(duart_2_w);
+	DECLARE_READ16_MEMBER(inputs1_r);
+	DECLARE_READ16_MEMBER(unk_r);
+	DECLARE_WRITE16_MEMBER(unk_w);
+	DECLARE_READ16_MEMBER(jpmio_r);
+	DECLARE_WRITE16_MEMBER(jpmio_w);
+	DECLARE_READ16_MEMBER(inputs1awp_r);
+	DECLARE_READ16_MEMBER(optos_r);
+	DECLARE_READ16_MEMBER(prot_1_r);
+	DECLARE_READ16_MEMBER(prot_0_r);
+	DECLARE_WRITE16_MEMBER(jpmioawp_w);
+	DECLARE_READ16_MEMBER(ump_r);
+	void jpm_draw_lamps(int data, int lamp_strobe);
 };
 
 

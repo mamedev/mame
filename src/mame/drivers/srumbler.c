@@ -17,7 +17,7 @@
 #include "includes/srumbler.h"
 
 
-static WRITE8_HANDLER( srumbler_bankswitch_w )
+WRITE8_MEMBER(srumbler_state::srumbler_bankswitch_w)
 {
 	/*
       banking is controlled by two PROMs. 0000-4fff is mapped to the same
@@ -28,9 +28,9 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
       that as well to be 100% accurate.
      */
 	int i;
-	UINT8 *ROM = space->machine().region("user1")->base();
-	UINT8 *prom1 = space->machine().region("proms")->base() + (data & 0xf0);
-	UINT8 *prom2 = space->machine().region("proms")->base() + 0x100 + ((data & 0x0f) << 4);
+	UINT8 *ROM = machine().region("user1")->base();
+	UINT8 *prom1 = machine().region("proms")->base() + (data & 0xf0);
+	UINT8 *prom2 = machine().region("proms")->base() + 0x100 + ((data & 0x0f) << 4);
 
 	for (i = 0x05;i < 0x10;i++)
 	{
@@ -39,7 +39,7 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
 		/* bit 2 of prom1 selects ROM or RAM - not supported */
 
 		sprintf(bankname, "%04x", i*0x1000);
-		memory_set_bankptr(space->machine(), bankname,&ROM[bank*0x1000]);
+		memory_set_bankptr(machine(), bankname,&ROM[bank*0x1000]);
 	}
 }
 
@@ -47,7 +47,8 @@ static MACHINE_START( srumbler )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	/* initialize banked ROM pointers */
-	srumbler_bankswitch_w(space,0,0);
+	srumbler_state *state = machine.driver_data<srumbler_state>();
+	state->srumbler_bankswitch_w(*space,0,0);
 }
 
 static TIMER_DEVICE_CALLBACK( srumbler_interrupt )
@@ -76,7 +77,7 @@ static ADDRESS_MAP_START( srumbler_map, AS_PROGRAM, 8, srumbler_state )
 	AM_RANGE(0x0000, 0x1dff) AM_RAM  /* RAM (of 1 sort or another) */
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE_LEGACY(srumbler_background_w) AM_BASE(m_backgroundram)
-	AM_RANGE(0x4008, 0x4008) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(srumbler_bankswitch_w)
+	AM_RANGE(0x4008, 0x4008) AM_READ_PORT("SYSTEM") AM_WRITE(srumbler_bankswitch_w)
 	AM_RANGE(0x4009, 0x4009) AM_READ_PORT("P1") AM_WRITE_LEGACY(srumbler_4009_w)
 	AM_RANGE(0x400a, 0x400a) AM_READ_PORT("P2")
 	AM_RANGE(0x400b, 0x400b) AM_READ_PORT("DSW1")

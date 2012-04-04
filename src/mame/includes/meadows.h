@@ -29,6 +29,12 @@ public:
 	UINT8 m_0c03;
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_spriteram;
+	DECLARE_READ8_MEMBER(hsync_chain_r);
+	DECLARE_READ8_MEMBER(vsync_chain_hi_r);
+	DECLARE_READ8_MEMBER(vsync_chain_lo_r);
+	DECLARE_WRITE8_MEMBER(meadows_audio_w);
+	DECLARE_WRITE8_MEMBER(audio_hardware_w);
+	DECLARE_READ8_MEMBER(audio_hardware_r);
 };
 
 

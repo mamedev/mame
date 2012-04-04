@@ -31,6 +31,13 @@ public:
 	device_t *m_k051316_2;
 	device_t *m_k053246;
 	device_t *m_k053251;
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_WRITE16_MEMBER(cpuA_ctrl_w);
+	DECLARE_READ16_MEMBER(cpuB_ctrl_r);
+	DECLARE_WRITE16_MEMBER(cpuB_ctrl_w);
+	DECLARE_WRITE16_MEMBER(overdriv_soundirq_w);
+	DECLARE_WRITE16_MEMBER(overdriv_cpuB_irq5_w);
+	DECLARE_WRITE16_MEMBER(overdriv_cpuB_irq6_w);
 };
 
 /*----------- defined in video/overdriv.c -----------*/

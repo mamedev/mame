@@ -35,6 +35,12 @@ public:
 	device_t *m_tc0220ioc;
 
 	UINT8 m_dislayer[5];
+	DECLARE_READ16_MEMBER(sharedram_r);
+	DECLARE_WRITE16_MEMBER(sharedram_w);
+	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_READ8_MEMBER(topspeed_input_bypass_r);
+	DECLARE_READ16_MEMBER(topspeed_motor_r);
+	DECLARE_WRITE16_MEMBER(topspeed_motor_w);
 };
 
 

@@ -27,6 +27,7 @@ public:
 	/* misc */
 	UINT8        m_irq_enable;
 	UINT8        m_nmi_enable;
+	DECLARE_WRITE8_MEMBER(ctrl_w);
 };
 
 

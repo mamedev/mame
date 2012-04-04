@@ -48,13 +48,12 @@ Notes:
 #include "includes/deniam.h"
 
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(deniam_state::sound_command_w)
 {
-	deniam_state *state = space->machine().driver_data<deniam_state>();
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(space,offset, (data >> 8) & 0xff);
-		device_set_input_line(state->m_audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_audio_cpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -73,9 +72,9 @@ static WRITE16_DEVICE_HANDLER( deniam16c_oki_rom_bank_w )
 	}
 }
 
-static WRITE16_HANDLER( deniam_irq_ack_w )
+WRITE16_MEMBER(deniam_state::deniam_irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 4, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16, deniam_state )
@@ -84,9 +83,9 @@ static ADDRESS_MAP_START( deniam16b_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(deniam_textram_w) AM_BASE(m_textram)
 	AM_RANGE(0x440000, 0x4407ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x840000, 0x840fff) AM_WRITE_LEGACY(deniam_palette_w) AM_BASE(m_paletteram)
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(sound_command_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE_LEGACY(deniam_coinctrl_r, deniam_coinctrl_w)
-	AM_RANGE(0xc40004, 0xc40005) AM_WRITE_LEGACY(deniam_irq_ack_w)
+	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
 	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP
@@ -117,7 +116,7 @@ static ADDRESS_MAP_START( deniam16c_map, AS_PROGRAM, 16, deniam_state )
 	AM_RANGE(0x840000, 0x840fff) AM_WRITE_LEGACY(deniam_palette_w) AM_BASE(m_paletteram)
 	AM_RANGE(0xc40000, 0xc40001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xc40002, 0xc40003) AM_READWRITE_LEGACY(deniam_coinctrl_r, deniam_coinctrl_w)
-	AM_RANGE(0xc40004, 0xc40005) AM_WRITE_LEGACY(deniam_irq_ack_w)
+	AM_RANGE(0xc40004, 0xc40005) AM_WRITE(deniam_irq_ack_w)
 	AM_RANGE(0xc44000, 0xc44001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc44002, 0xc44003) AM_READ_PORT("P1")
 	AM_RANGE(0xc44004, 0xc44005) AM_READ_PORT("P2") AM_WRITENOP

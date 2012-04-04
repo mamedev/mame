@@ -49,18 +49,18 @@ static TIMER_DEVICE_CALLBACK(targeth_interrupt )
 	}
 }
 
-static WRITE16_HANDLER( OKIM6295_bankswitch_w )
+WRITE16_MEMBER(targeth_state::OKIM6295_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("oki")->base();
+	UINT8 *RAM = machine().region("oki")->base();
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
 	}
 }
 
-static WRITE16_HANDLER( targeth_coin_counter_w )
+WRITE16_MEMBER(targeth_state::targeth_coin_counter_w)
 {
-	coin_counter_w( space->machine(), (offset >> 3) & 0x01, data & 0x01);
+	coin_counter_w( machine(), (offset >> 3) & 0x01, data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
@@ -79,10 +79,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("SYSTEM")				/* Coins, Start & Fire buttons */
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SERVICE")			/* Service & Guns Reload? */
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE_LEGACY(OKIM6295_bankswitch_w)	/* OKI6295 bankswitch */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)	/* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	/* OKI6295 status register */
 	AM_RANGE(0x700010, 0x70001b) AM_WRITENOP						/* ??? Guns reload related? */
-	AM_RANGE(0x70002a, 0x70003b) AM_WRITE_LEGACY(targeth_coin_counter_w)	/* Coin counters */
+	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(targeth_coin_counter_w)	/* Coin counters */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM								/* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END
 

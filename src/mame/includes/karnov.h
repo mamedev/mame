@@ -38,6 +38,8 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	DECLARE_WRITE16_MEMBER(karnov_control_w);
+	DECLARE_READ16_MEMBER(karnov_control_r);
 };
 
 enum {

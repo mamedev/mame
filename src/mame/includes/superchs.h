@@ -22,6 +22,16 @@ public:
 	UINT32 m_mem[2];
 	UINT32 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_READ16_MEMBER(shared_ram_r);
+	DECLARE_WRITE16_MEMBER(shared_ram_w);
+	DECLARE_WRITE32_MEMBER(cpua_ctrl_w);
+	DECLARE_WRITE32_MEMBER(superchs_palette_w);
+	DECLARE_READ32_MEMBER(superchs_input_r);
+	DECLARE_WRITE32_MEMBER(superchs_input_w);
+	DECLARE_READ32_MEMBER(superchs_stick_r);
+	DECLARE_WRITE32_MEMBER(superchs_stick_w);
+	DECLARE_READ32_MEMBER(main_cycle_r);
+	DECLARE_READ16_MEMBER(sub_cycle_r);
 };
 
 

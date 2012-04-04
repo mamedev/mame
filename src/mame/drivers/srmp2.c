@@ -119,7 +119,7 @@ static MACHINE_START( rmgoldyh )
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( srmp2_flags_w )
+WRITE16_MEMBER(srmp2_state::srmp2_flags_w)
 {
 /*
     ---- ---x : Coin Counter
@@ -128,38 +128,36 @@ static WRITE16_HANDLER( srmp2_flags_w )
     x--- ---- : Palette Bank
 */
 
-	srmp2_state *state = space->machine().driver_data<srmp2_state>();
 
-	coin_counter_w( space->machine(), 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( space->machine(), 0, (((~data) & 0x10) >> 4) );
-	state->m_adpcm_bank = ( (data & 0x20) >> 5 );
-	state->m_color_bank = ( (data & 0x80) >> 7 );
+	coin_counter_w( machine(), 0, ((data & 0x01) >> 0) );
+	coin_lockout_w( machine(), 0, (((~data) & 0x10) >> 4) );
+	m_adpcm_bank = ( (data & 0x20) >> 5 );
+	m_color_bank = ( (data & 0x80) >> 7 );
 }
 
 
-static WRITE16_HANDLER( mjyuugi_flags_w )
+WRITE16_MEMBER(srmp2_state::mjyuugi_flags_w)
 {
 /*
     ---- ---x : Coin Counter
     ---x ---- : Coin Lock Out
 */
 
-	coin_counter_w( space->machine(), 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( space->machine(), 0, (((~data) & 0x10) >> 4) );
+	coin_counter_w( machine(), 0, ((data & 0x01) >> 0) );
+	coin_lockout_w( machine(), 0, (((~data) & 0x10) >> 4) );
 }
 
 
-static WRITE16_HANDLER( mjyuugi_adpcm_bank_w )
+WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
 {
 /*
     ---- xxxx : ADPCM Bank
     --xx ---- : GFX Bank
 */
 
-	srmp2_state *state = space->machine().driver_data<srmp2_state>();
 
-	state->m_adpcm_bank = (data & 0x0f);
-	state->m_gfx_bank = ((data >> 4) & 0x03);
+	m_adpcm_bank = (data & 0x0f);
+	m_gfx_bank = ((data >> 4) & 0x03);
 }
 
 
@@ -246,7 +244,7 @@ static void srmp2_adpcm_int(device_t *device)
 	}
 }
 
-static READ8_HANDLER( vox_status_r )
+READ8_MEMBER(srmp2_state::vox_status_r)
 {
 	return 1;
 }
@@ -273,10 +271,9 @@ static UINT8 iox_key_matrix_calc(running_machine &machine,UINT8 p_side)
 	return 0;
 }
 
-static READ8_HANDLER( iox_mux_r )
+READ8_MEMBER(srmp2_state::iox_mux_r)
 {
-	srmp2_state *state = space->machine().driver_data<srmp2_state>();
-	iox_t &iox = state->m_iox;
+	iox_t &iox = m_iox;
 
 	/* first off check any pending protection value */
 	{
@@ -303,8 +300,8 @@ static READ8_HANDLER( iox_mux_r )
 		/* both side checks */
 		if(iox.mux == 1)
 		{
-			UINT8 p1_side = iox_key_matrix_calc(space->machine(),0);
-			UINT8 p2_side = iox_key_matrix_calc(space->machine(),4);
+			UINT8 p1_side = iox_key_matrix_calc(machine(),0);
+			UINT8 p2_side = iox_key_matrix_calc(machine(),4);
 
 			if(p1_side != 0)
 				return p1_side;
@@ -313,21 +310,20 @@ static READ8_HANDLER( iox_mux_r )
 		}
 
 		/* check individual input side */
-		return iox_key_matrix_calc(space->machine(),(iox.mux == 2) ? 0 : 4);
+		return iox_key_matrix_calc(machine(),(iox.mux == 2) ? 0 : 4);
 	}
 
-	return input_port_read(space->machine(),"SERVICE") & 0xff;
+	return input_port_read(machine(),"SERVICE") & 0xff;
 }
 
-static READ8_HANDLER( iox_status_r )
+READ8_MEMBER(srmp2_state::iox_status_r)
 {
 	return 1;
 }
 
-static WRITE8_HANDLER( iox_command_w )
+WRITE8_MEMBER(srmp2_state::iox_command_w)
 {
-	srmp2_state *state = space->machine().driver_data<srmp2_state>();
-	iox_t &iox = state->m_iox;
+	iox_t &iox = m_iox;
 	/*
     bit wise command port apparently
     0x01: selects both sides
@@ -339,10 +335,9 @@ static WRITE8_HANDLER( iox_command_w )
 	iox.ff = 0; // this also set flip flop back to 0
 }
 
-static WRITE8_HANDLER( iox_data_w )
+WRITE8_MEMBER(srmp2_state::iox_data_w)
 {
-	srmp2_state *state = space->machine().driver_data<srmp2_state>();
-	iox_t &iox = state->m_iox;
+	iox_t &iox = m_iox;
 	iox.data = data;
 
 	if(data == iox.reset && iox.reset != -1) //resets device
@@ -355,23 +350,22 @@ static WRITE8_HANDLER( iox_data_w )
 		iox.ff = 1;
 }
 
-static WRITE8_HANDLER( srmp3_rombank_w )
+WRITE8_MEMBER(srmp2_state::srmp3_rombank_w)
 {
 /*
     ---x xxxx : MAIN ROM bank
     xxx- ---- : ADPCM ROM bank
 */
 
-	srmp2_state *state = space->machine().driver_data<srmp2_state>();
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = machine().region("maincpu")->base();
 	int addr;
 
-	state->m_adpcm_bank = ((data & 0xe0) >> 5);
+	m_adpcm_bank = ((data & 0xe0) >> 5);
 
 	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x0f))) - 0x8000);
 	else addr = 0x10000;
 
-	memory_set_bankptr(space->machine(), "bank1", &ROM[addr]);
+	memory_set_bankptr(machine(), "bank1", &ROM[addr]);
 }
 
 /**************************************************************************
@@ -380,14 +374,14 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 
 **************************************************************************/
 
-static WRITE8_HANDLER( srmp2_irq2_ack_w )
+WRITE8_MEMBER(srmp2_state::srmp2_irq2_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( srmp2_irq4_ack_w )
+WRITE8_MEMBER(srmp2_state::srmp2_irq4_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 4, CLEAR_LINE);
 }
 
 
@@ -398,48 +392,48 @@ static ADDRESS_MAP_START( srmp2_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0x180000, 0x1805ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		/* Sprites Y */
 	AM_RANGE(0x180600, 0x180607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP						/* ??? */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(srmp2_flags_w)			/* ADPCM bank, Color bank, etc. */
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(srmp2_flags_w)			/* ADPCM bank, Color bank, etc. */
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("SYSTEM")				/* Coinage */
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP						/* ??? */
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE8_LEGACY(iox_mux_r, iox_command_w,0x00ff)	/* key matrix | I/O */
-	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8_LEGACY(iox_status_r,iox_data_w,0x00ff)
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff)	/* key matrix | I/O */
+	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE_LEGACY("msm", srmp2_adpcm_code_w)	/* ADPCM number */
-	AM_RANGE(0xb00002, 0xb00003) AM_READ8_LEGACY(vox_status_r,0x00ff)		/* ADPCM voice status */
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE8_LEGACY(srmp2_irq2_ack_w,0x00ff)			/* irq ack lv 2 */
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE8_LEGACY(srmp2_irq4_ack_w,0x00ff)			/* irq ack lv 4 */
+	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)		/* ADPCM voice status */
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE8(srmp2_irq2_ack_w,0x00ff)			/* irq ack lv 2 */
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE8(srmp2_irq4_ack_w,0x00ff)			/* irq ack lv 4 */
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP						/* watchdog */
 	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0xf00000, 0xf00003) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( mjyuugi_irq2_ack_r )
+READ8_MEMBER(srmp2_state::mjyuugi_irq2_ack_r)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
 	return 0xff; // value returned doesn't matter
 }
 
-static READ8_HANDLER( mjyuugi_irq4_ack_r )
+READ8_MEMBER(srmp2_state::mjyuugi_irq4_ack_r)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 4, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 4, CLEAR_LINE);
 	return 0xff; // value returned doesn't matter
 }
 
 static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("SYSTEM")				/* Coinage */
-	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(mjyuugi_flags_w)			/* Coin Counter */
+	AM_RANGE(0x100000, 0x100001) AM_WRITE(mjyuugi_flags_w)			/* Coin Counter */
 	AM_RANGE(0x100010, 0x100011) AM_READNOP							/* ??? */
-	AM_RANGE(0x100010, 0x100011) AM_WRITE_LEGACY(mjyuugi_adpcm_bank_w)		/* ADPCM bank, GFX bank */
-	AM_RANGE(0x200000, 0x200001) AM_READ8_LEGACY(mjyuugi_irq2_ack_r,0x00ff) /* irq ack lv 2? */
-	AM_RANGE(0x300000, 0x300001) AM_READ8_LEGACY(mjyuugi_irq4_ack_r,0x00ff) /* irq ack lv 4? */
+	AM_RANGE(0x100010, 0x100011) AM_WRITE(mjyuugi_adpcm_bank_w)		/* ADPCM bank, GFX bank */
+	AM_RANGE(0x200000, 0x200001) AM_READ8(mjyuugi_irq2_ack_r,0x00ff) /* irq ack lv 2? */
+	AM_RANGE(0x300000, 0x300001) AM_READ8(mjyuugi_irq4_ack_r,0x00ff) /* irq ack lv 4? */
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3-1")				/* DSW 3-1 */
 	AM_RANGE(0x500010, 0x500011) AM_READ_PORT("DSW3-2")				/* DSW 3-2 */
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x800000, 0x800001) AM_READNOP				/* ??? */
-	AM_RANGE(0x900000, 0x900001) AM_READWRITE8_LEGACY(iox_mux_r, iox_command_w,0x00ff)	/* key matrix | I/O */
-	AM_RANGE(0x900002, 0x900003) AM_READWRITE8_LEGACY(iox_status_r,iox_data_w,0x00ff)
+	AM_RANGE(0x900000, 0x900001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff)	/* key matrix | I/O */
+	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE_LEGACY("msm", srmp2_adpcm_code_w)			/* ADPCM number */
-	AM_RANGE(0xb00002, 0xb00003) AM_READ8_LEGACY(vox_status_r,0x00ff)		/* ADPCM voice status */
+	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)		/* ADPCM voice status */
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP					/* ??? */
@@ -451,7 +445,7 @@ static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( srmp3_flags_w )
+WRITE8_MEMBER(srmp2_state::srmp3_flags_w)
 {
 /*
     ---- ---x : Coin Counter
@@ -459,16 +453,15 @@ static WRITE8_HANDLER( srmp3_flags_w )
     xx-- ---- : GFX Bank
 */
 
-	srmp2_state *state = space->machine().driver_data<srmp2_state>();
 
-	coin_counter_w( space->machine(), 0, ((data & 0x01) >> 0) );
-	coin_lockout_w( space->machine(), 0, (((~data) & 0x10) >> 4) );
-	state->m_gfx_bank = (data >> 6) & 0x03;
+	coin_counter_w( machine(), 0, ((data & 0x01) >> 0) );
+	coin_lockout_w( machine(), 0, (((~data) & 0x10) >> 4) );
+	m_gfx_bank = (data >> 6) & 0x03;
 }
 
-static WRITE8_HANDLER( srmp3_irq_ack_w )
+WRITE8_MEMBER(srmp2_state::srmp3_irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( srmp3_map, AS_PROGRAM, 8, srmp2_state )
@@ -485,13 +478,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( srmp3_io_map, AS_IO, 8, srmp2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(srmp3_irq_ack_w)								/* interrupt acknowledge */
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")	AM_WRITE_LEGACY(srmp3_flags_w)			/* coin, service | GFX bank, counter, lockout */
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(srmp3_rombank_w)								/* ROM bank select */
+	AM_RANGE(0x20, 0x20) AM_WRITE(srmp3_irq_ack_w)								/* interrupt acknowledge */
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")	AM_WRITE(srmp3_flags_w)			/* coin, service | GFX bank, counter, lockout */
+	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)								/* ROM bank select */
 	AM_RANGE(0xa0, 0xa0) AM_DEVWRITE_LEGACY("msm", srmp3_adpcm_code_w)					/* ADPCM number */
-	AM_RANGE(0xa1, 0xa1) AM_READ_LEGACY(vox_status_r)									/* ADPCM voice status */
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE_LEGACY(iox_mux_r, iox_command_w)					/* key matrix | I/O */
-	AM_RANGE(0xc1, 0xc1) AM_READWRITE_LEGACY(iox_status_r,iox_data_w)
+	AM_RANGE(0xa1, 0xa1) AM_READ(vox_status_r)									/* ADPCM voice status */
+	AM_RANGE(0xc0, 0xc0) AM_READWRITE(iox_mux_r, iox_command_w)					/* key matrix | I/O */
+	AM_RANGE(0xc1, 0xc1) AM_READWRITE(iox_status_r,iox_data_w)
 	AM_RANGE(0xe0, 0xe1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xe2, 0xe2) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END
@@ -507,29 +500,28 @@ static ADDRESS_MAP_START( rmgoldyh_map, AS_PROGRAM, 8, srmp2_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( rmgoldyh_rombank_w )
+WRITE8_MEMBER(srmp2_state::rmgoldyh_rombank_w)
 {
 /*
     ---x xxxx : MAIN ROM bank
     xxx- ---- : ADPCM ROM bank
 */
 
-	srmp2_state *state = space->machine().driver_data<srmp2_state>();
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = machine().region("maincpu")->base();
 	int addr;
 
-	state->m_adpcm_bank = ((data & 0xe0) >> 5);
+	m_adpcm_bank = ((data & 0xe0) >> 5);
 
 	if (data & 0x1f) addr = ((0x10000 + (0x2000 * (data & 0x1f))) - 0x8000);
 	else addr = 0x10000;
 
-	memory_set_bankptr(space->machine(), "bank1", &ROM[addr]);
+	memory_set_bankptr(machine(), "bank1", &ROM[addr]);
 }
 
 static ADDRESS_MAP_START( rmgoldyh_io_map, AS_IO, 8, srmp2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP /* watchdog */
-	AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(rmgoldyh_rombank_w)						/* ROM bank select */
+	AM_RANGE(0x60, 0x60) AM_WRITE(rmgoldyh_rombank_w)						/* ROM bank select */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW4")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("DSW3")
 	AM_IMPORT_FROM(srmp3_io_map)

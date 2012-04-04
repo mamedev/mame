@@ -22,6 +22,8 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_tc0080vco;
 	device_t *m_tc0220ioc;
+	DECLARE_READ8_MEMBER(syvalion_input_bypass_r);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 /*----------- defined in video/taito_h.c -----------*/

@@ -50,66 +50,64 @@ To Do:
 
 
 /* Read 4 ten bit dip switches */
-static READ16_HANDLER( realbrk_dsw_r )
+READ16_MEMBER(realbrk_state::realbrk_dsw_r)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
-	UINT16 sel = ~state->m_dsw_select[0];
-	if (sel & 0x01)	return	(input_port_read(space->machine(), "SW1") & 0x00ff) << 8;		// DSW1 low bits
-	if (sel & 0x02)	return	(input_port_read(space->machine(), "SW2") & 0x00ff) << 8;		// DSW2 low bits
-	if (sel & 0x04)	return	(input_port_read(space->machine(), "SW3") & 0x00ff) << 8;		// DSW3 low bits
-	if (sel & 0x08)	return	(input_port_read(space->machine(), "SW4") & 0x00ff) << 8;		// DSW4 low bits
+	UINT16 sel = ~m_dsw_select[0];
+	if (sel & 0x01)	return	(input_port_read(machine(), "SW1") & 0x00ff) << 8;		// DSW1 low bits
+	if (sel & 0x02)	return	(input_port_read(machine(), "SW2") & 0x00ff) << 8;		// DSW2 low bits
+	if (sel & 0x04)	return	(input_port_read(machine(), "SW3") & 0x00ff) << 8;		// DSW3 low bits
+	if (sel & 0x08)	return	(input_port_read(machine(), "SW4") & 0x00ff) << 8;		// DSW4 low bits
 
-	if (sel & 0x10)	return	((input_port_read(space->machine(), "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
-							((input_port_read(space->machine(), "SW2") & 0x0300) << 2) |
-							((input_port_read(space->machine(), "SW3") & 0x0300) << 4) |
-							((input_port_read(space->machine(), "SW4") & 0x0300) << 6) ;
+	if (sel & 0x10)	return	((input_port_read(machine(), "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
+							((input_port_read(machine(), "SW2") & 0x0300) << 2) |
+							((input_port_read(machine(), "SW3") & 0x0300) << 4) |
+							((input_port_read(machine(), "SW4") & 0x0300) << 6) ;
 
-	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",cpu_get_pc(&space->device()),state->m_dsw_select[0]);
+	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",cpu_get_pc(&space.device()),m_dsw_select[0]);
 	return 0xffff;
 }
 
-static READ16_HANDLER( pkgnsh_input_r )
+READ16_MEMBER(realbrk_state::pkgnsh_input_r)
 {
 	switch(offset)
 	{
 		case 0x00/2: return 0xffff;
 		case 0x02/2: return 0xffff;
-		case 0x04/2: return input_port_read(space->machine(), "IN0");		/*Service buttons*/
-		case 0x06/2: return input_port_read(space->machine(), "SW1");		/*DIP 2*/
-		case 0x08/2: return input_port_read(space->machine(), "SW2");		/*DIP 1*/
-		case 0x0a/2: return input_port_read(space->machine(), "SW3");		/*DIP 1+2 Hi-Bits*/
-		case 0x0c/2: return input_port_read(space->machine(), "PADDLE1");	/*Handle 1p*/
-		case 0x0e/2: return input_port_read(space->machine(), "P1");			/*Buttons 1p*/
-		case 0x10/2: return input_port_read(space->machine(), "PADDLE2");	/*Handle 2p*/
-		case 0x12/2: return input_port_read(space->machine(), "P2");			/*Buttons 2p*/
+		case 0x04/2: return input_port_read(machine(), "IN0");		/*Service buttons*/
+		case 0x06/2: return input_port_read(machine(), "SW1");		/*DIP 2*/
+		case 0x08/2: return input_port_read(machine(), "SW2");		/*DIP 1*/
+		case 0x0a/2: return input_port_read(machine(), "SW3");		/*DIP 1+2 Hi-Bits*/
+		case 0x0c/2: return input_port_read(machine(), "PADDLE1");	/*Handle 1p*/
+		case 0x0e/2: return input_port_read(machine(), "P1");			/*Buttons 1p*/
+		case 0x10/2: return input_port_read(machine(), "PADDLE2");	/*Handle 2p*/
+		case 0x12/2: return input_port_read(machine(), "P2");			/*Buttons 2p*/
 	}
 	return 0xffff;
 }
 
-static READ16_HANDLER( pkgnshdx_input_r )
+READ16_MEMBER(realbrk_state::pkgnshdx_input_r)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
-	UINT16 sel = ~state->m_dsw_select[0];
+	UINT16 sel = ~m_dsw_select[0];
 
 	switch(offset)
 	{
 		case 0x00/2: return 0xffff;
-		case 0x02/2: return input_port_read(space->machine(), "IN0");	/*Service buttons*/
+		case 0x02/2: return input_port_read(machine(), "IN0");	/*Service buttons*/
 		/*DSW,same handling as realbrk*/
 		case 0x04/2:
-			if (sel & 0x01)	return	(input_port_read(space->machine(), "SW1") & 0x00ff) << 8;		// DSW1 low bits
-			if (sel & 0x02)	return	(input_port_read(space->machine(), "SW2") & 0x00ff) << 8;		// DSW2 low bits
-			if (sel & 0x04)	return	(input_port_read(space->machine(), "SW3") & 0x00ff) << 8;		// DSW3 low bits
-			if (sel & 0x08)	return	(input_port_read(space->machine(), "SW4") & 0x00ff) << 8;		// DSW4 low bits
+			if (sel & 0x01)	return	(input_port_read(machine(), "SW1") & 0x00ff) << 8;		// DSW1 low bits
+			if (sel & 0x02)	return	(input_port_read(machine(), "SW2") & 0x00ff) << 8;		// DSW2 low bits
+			if (sel & 0x04)	return	(input_port_read(machine(), "SW3") & 0x00ff) << 8;		// DSW3 low bits
+			if (sel & 0x08)	return	(input_port_read(machine(), "SW4") & 0x00ff) << 8;		// DSW4 low bits
 
-			if (sel & 0x10)	return	((input_port_read(space->machine(), "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
-									((input_port_read(space->machine(), "SW2") & 0x0300) << 2) |
-									((input_port_read(space->machine(), "SW3") & 0x0300) << 4) |
-									((input_port_read(space->machine(), "SW4") & 0x0300) << 6) ;
+			if (sel & 0x10)	return	((input_port_read(machine(), "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
+									((input_port_read(machine(), "SW2") & 0x0300) << 2) |
+									((input_port_read(machine(), "SW3") & 0x0300) << 4) |
+									((input_port_read(machine(), "SW4") & 0x0300) << 6) ;
 
 			return 0xffff;
-		case 0x06/2: return input_port_read(space->machine(), "P2");/*Buttons+Handle 2p*/
-		case 0x08/2: return input_port_read(space->machine(), "P1");/*Buttons+Handle 1p*/
+		case 0x06/2: return input_port_read(machine(), "P2");/*Buttons+Handle 2p*/
+		case 0x08/2: return input_port_read(machine(), "P1");/*Buttons+Handle 1p*/
 		case 0x0a/2: return 0xffff;
 		case 0x0c/2: return 0xffff;
 		case 0x0e/2: return 0xffff;
@@ -121,33 +119,30 @@ static READ16_HANDLER( pkgnshdx_input_r )
 }
 
 
-static READ16_HANDLER( backup_ram_r )
+READ16_MEMBER(realbrk_state::backup_ram_r)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
             unemulated tmp68301 feature?*/
-	if(cpu_get_previouspc(&space->device()) == 0x02c08e)
+	if(cpu_get_previouspc(&space.device()) == 0x02c08e)
 		return 0xffff;
 	else
-		return state->m_backup_ram[offset];
+		return m_backup_ram[offset];
 }
 
 
-static READ16_HANDLER( backup_ram_dx_r )
+READ16_MEMBER(realbrk_state::backup_ram_dx_r)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
             unemulated tmp68301 feature?*/
-	if(cpu_get_previouspc(&space->device()) == 0x02f046)
+	if(cpu_get_previouspc(&space.device()) == 0x02f046)
 		return 0xffff;
 	else
-		return state->m_backup_ram[offset];
+		return m_backup_ram[offset];
 }
 
-static WRITE16_HANDLER( backup_ram_w )
+WRITE16_MEMBER(realbrk_state::backup_ram_w)
 {
-	realbrk_state *state = space->machine().driver_data<realbrk_state>();
-	COMBINE_DATA(&state->m_backup_ram[offset]);
+	COMBINE_DATA(&m_backup_ram[offset]);
 }
 
 /***************************************************************************
@@ -177,7 +172,7 @@ static ADDRESS_MAP_START( realbrk_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)	//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")							// P1 & P2 (Inputs)
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")							// Coins
-	AM_RANGE(0xc00004, 0xc00005) AM_RAM_READ_LEGACY(realbrk_dsw_r) AM_BASE(m_dsw_select)	// DSW select
+	AM_RANGE(0xc00004, 0xc00005) AM_RAM_READ(realbrk_dsw_r) AM_BASE(m_dsw_select)	// DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM											// RAM
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE_LEGACY(realbrk_flipscreen_w				)	// Hack! Parallel port data register
 ADDRESS_MAP_END
@@ -185,17 +180,17 @@ ADDRESS_MAP_END
 /*pkgnsh specific memory map*/
 static ADDRESS_MAP_START( pkgnsh_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0xff00	)	// YM2413
-	AM_RANGE(0xc00000, 0xc00013) AM_READ_LEGACY(pkgnsh_input_r		        )	// P1 & P2 (Inputs)
-	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE_LEGACY(backup_ram_r,backup_ram_w) AM_BASE(m_backup_ram)	// RAM
+	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnsh_input_r		        )	// P1 & P2 (Inputs)
+	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_r,backup_ram_w) AM_BASE(m_backup_ram)	// RAM
 	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
 /*pkgnshdx specific memory map*/
 static ADDRESS_MAP_START( pkgnshdx_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)	//
-	AM_RANGE(0xc00000, 0xc00013) AM_READ_LEGACY(pkgnshdx_input_r		        )	// P1 & P2 (Inputs)
+	AM_RANGE(0xc00000, 0xc00013) AM_READ(pkgnshdx_input_r		        )	// P1 & P2 (Inputs)
 	AM_RANGE(0xc00004, 0xc00005) AM_WRITEONLY AM_BASE(m_dsw_select) // DSW select
-	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE_LEGACY(backup_ram_dx_r,backup_ram_w) AM_BASE(m_backup_ram)	// RAM
+	AM_RANGE(0xff0000, 0xfffbff) AM_READWRITE(backup_ram_dx_r,backup_ram_w) AM_BASE(m_backup_ram)	// RAM
 	AM_IMPORT_FROM(base_mem)
 ADDRESS_MAP_END
 
@@ -206,7 +201,7 @@ static ADDRESS_MAP_START( dai2kaku_mem, AS_PROGRAM, 16, realbrk_state )
 	AM_RANGE(0x800008, 0x80000b) AM_DEVWRITE8_LEGACY("ymsnd", ym2413_w, 0x00ff)	//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")							// P1 & P2 (Inputs)
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")							// Coins
-	AM_RANGE(0xc00004, 0xc00005) AM_RAM_READ_LEGACY(realbrk_dsw_r) AM_BASE(m_dsw_select)	// DSW select
+	AM_RANGE(0xc00004, 0xc00005) AM_RAM_READ(realbrk_dsw_r) AM_BASE(m_dsw_select)	// DSW select
 	AM_RANGE(0xff0000, 0xfffbff) AM_RAM											// RAM
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_WRITE_LEGACY(dai2kaku_flipscreen_w				)	// Hack! Parallel port data register
 	AM_IMPORT_FROM(base_mem)

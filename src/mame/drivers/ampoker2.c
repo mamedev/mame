@@ -469,7 +469,7 @@
 
 */
 
-static WRITE8_HANDLER( ampoker2_port30_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port30_w)
 /*-------------------------------------------------
     PORT_30 C000H         ;OUTPUT PORT 30H
 ---------------------------------------------------
@@ -483,7 +483,7 @@ static WRITE8_HANDLER( ampoker2_port30_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port31_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port31_w)
 /*-------------------------------------------------
     PORT_31 C001H         ;OUTPUT PORT 31H
 ---------------------------------------------------
@@ -501,7 +501,7 @@ static WRITE8_HANDLER( ampoker2_port31_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port32_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port32_w)
 /*-------------------------------------------------
     PORT_32 C002H         ;OUTPUT PORT 32H
 ---------------------------------------------------
@@ -516,7 +516,7 @@ static WRITE8_HANDLER( ampoker2_port32_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port33_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port33_w)
 /*-------------------------------------------------
     PORT_33 C003H         ;OUTPUT PORT 33H
 ---------------------------------------------------
@@ -530,7 +530,7 @@ static WRITE8_HANDLER( ampoker2_port33_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port34_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port34_w)
 /*-------------------------------------------------
     PORT_34 C004H         ;OUTPUT PORT 34H
 ---------------------------------------------------
@@ -545,7 +545,7 @@ static WRITE8_HANDLER( ampoker2_port34_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port35_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port35_w)
 /*-------------------------------------------------
     PORT_35 C005H         ;OUTPUT PORT 35H
 ---------------------------------------------------
@@ -559,7 +559,7 @@ static WRITE8_HANDLER( ampoker2_port35_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port36_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port36_w)
 /*-------------------------------------------------
     PORT_36 C006H         ;OUTPUT PORT 36H
 ---------------------------------------------------
@@ -577,7 +577,7 @@ static WRITE8_HANDLER( ampoker2_port36_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_watchdog_reset_w)
 /*-------------------------------------------------
     PORT_37 C007H         ;OUTPUT PORT 37H
 ---------------------------------------------------
@@ -588,7 +588,7 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 
 	if (((data >> 3) & 0x01) == 0)		/* check for refresh value (0x08) */
 	{
-		watchdog_reset(space->machine());
+		watchdog_reset(machine());
 //      popmessage("%02x", data);
 	}
 	else
@@ -620,14 +620,14 @@ static ADDRESS_MAP_START( ampoker2_io_map, AS_IO, 8, ampoker2_state )
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("IN6")
 	AM_RANGE(0x17, 0x17) AM_READ_PORT("IN7")
 //  AM_RANGE(0x21, 0x21) AM_WRITENOP                    /* undocumented, write 0x1a after each reset */
-	AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(ampoker2_port30_w)	/* see write handlers */
-	AM_RANGE(0x31, 0x31) AM_WRITE_LEGACY(ampoker2_port31_w)	/* see write handlers */
-	AM_RANGE(0x32, 0x32) AM_WRITE_LEGACY(ampoker2_port32_w)	/* see write handlers */
-	AM_RANGE(0x33, 0x33) AM_WRITE_LEGACY(ampoker2_port33_w)	/* see write handlers */
-	AM_RANGE(0x34, 0x34) AM_WRITE_LEGACY(ampoker2_port34_w)	/* see write handlers */
-	AM_RANGE(0x35, 0x35) AM_WRITE_LEGACY(ampoker2_port35_w)	/* see write handlers */
-	AM_RANGE(0x36, 0x36) AM_WRITE_LEGACY(ampoker2_port36_w)	/* see write handlers */
-	AM_RANGE(0x37, 0x37) AM_WRITE_LEGACY(ampoker2_watchdog_reset_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(ampoker2_port30_w)	/* see write handlers */
+	AM_RANGE(0x31, 0x31) AM_WRITE(ampoker2_port31_w)	/* see write handlers */
+	AM_RANGE(0x32, 0x32) AM_WRITE(ampoker2_port32_w)	/* see write handlers */
+	AM_RANGE(0x33, 0x33) AM_WRITE(ampoker2_port33_w)	/* see write handlers */
+	AM_RANGE(0x34, 0x34) AM_WRITE(ampoker2_port34_w)	/* see write handlers */
+	AM_RANGE(0x35, 0x35) AM_WRITE(ampoker2_port35_w)	/* see write handlers */
+	AM_RANGE(0x36, 0x36) AM_WRITE(ampoker2_port36_w)	/* see write handlers */
+	AM_RANGE(0x37, 0x37) AM_WRITE(ampoker2_watchdog_reset_w)
 	AM_RANGE(0x38, 0x39) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x3A, 0x3A) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END

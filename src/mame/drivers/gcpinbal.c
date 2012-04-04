@@ -74,39 +74,37 @@ static INTERRUPT_GEN( gcpinbal_interrupt )
                           IOC
 ***********************************************************/
 
-static READ16_HANDLER( ioc_r )
+READ16_MEMBER(gcpinbal_state::ioc_r)
 {
-	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
 
 	/* 20 (only once), 76, a0 are read in log */
 
 	switch (offset)
 	{
 		case 0x80/2:
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 
 		case 0x84/2:
-			return input_port_read(space->machine(), "IN0");
+			return input_port_read(machine(), "IN0");
 
 		case 0x86/2:
-			return input_port_read(space->machine(), "IN1");
+			return input_port_read(machine(), "IN1");
 
 		case 0x50:
 		case 0x51:
-			return state->m_oki->read(*space, 0) << 8;
+			return m_oki->read(*&space, 0) << 8;
 
 	}
 
-//logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(&space->device()),offset);
+//logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(&space.device()),offset);
 
-	return state->m_ioc_ram[offset];
+	return m_ioc_ram[offset];
 }
 
 
-static WRITE16_HANDLER( ioc_w )
+WRITE16_MEMBER(gcpinbal_state::ioc_w)
 {
-	gcpinbal_state *state = space->machine().driver_data<gcpinbal_state>();
-	COMBINE_DATA(&state->m_ioc_ram[offset]);
+	COMBINE_DATA(&m_ioc_ram[offset]);
 
 //  switch (offset)
 //  {
@@ -114,8 +112,8 @@ static WRITE16_HANDLER( ioc_w )
 //          return;
 //
 //      case 0x88/2:    /* coin control (+ others) ??? */
-//          coin_lockout_w(space->machine(), 0, ~data & 0x01);
-//          coin_lockout_w(space->machine(), 1, ~data & 0x02);
+//          coin_lockout_w(machine(), 0, ~data & 0x01);
+//          coin_lockout_w(machine(), 1, ~data & 0x02);
 //popmessage(" address %04x value %04x", offset, data);
 //  }
 
@@ -135,61 +133,61 @@ static WRITE16_HANDLER( ioc_w )
 
 		// MSM6585 bank, coin LEDs, maybe others?
 		case 0x44:
-			state->m_msm_bank = data & 0x1000 ? 0x100000 : 0;
-			state->m_oki->set_bank_base(0x40000 * ((data & 0x800 )>> 11));
+			m_msm_bank = data & 0x1000 ? 0x100000 : 0;
+			m_oki->set_bank_base(0x40000 * ((data & 0x800 )>> 11));
 			break;
 
 		case 0x45:
-			//state->m_adpcm_idle = 1;
+			//m_adpcm_idle = 1;
 			break;
 
 		// OKIM6295
 		case 0x50:
 		case 0x51:
-			state->m_oki->write(*space, 0, data >> 8);
+			m_oki->write(*&space, 0, data >> 8);
 			break;
 
 		// MSM6585 ADPCM - mini emulation
 		case 0x60:
-			state->m_msm_start &= 0xffff00;
-			state->m_msm_start |= (data >> 8);
+			m_msm_start &= 0xffff00;
+			m_msm_start |= (data >> 8);
 			break;
 		case 0x61:
-			state->m_msm_start &= 0xff00ff;
-			state->m_msm_start |= data;
+			m_msm_start &= 0xff00ff;
+			m_msm_start |= data;
 			break;
 		case 0x62:
-			state->m_msm_start &= 0x00ffff;
-			state->m_msm_start |= (data << 8);
+			m_msm_start &= 0x00ffff;
+			m_msm_start |= (data << 8);
 			break;
 		case 0x63:
-			state->m_msm_end &= 0xffff00;
-			state->m_msm_end |= (data >> 8);
+			m_msm_end &= 0xffff00;
+			m_msm_end |= (data >> 8);
 			break;
 		case 0x64:
-			state->m_msm_end &= 0xff00ff;
-			state->m_msm_end |= data;
+			m_msm_end &= 0xff00ff;
+			m_msm_end |= data;
 			break;
 		case 0x65:
-			state->m_msm_end &= 0x00ffff;
-			state->m_msm_end |= (data << 8);
+			m_msm_end &= 0x00ffff;
+			m_msm_end |= (data << 8);
 			break;
 		case 0x66:
-			if (state->m_msm_start < state->m_msm_end)
+			if (m_msm_start < m_msm_end)
 			{
 				/* data written here is adpcm param? */
-				//popmessage("%08x %08x", state->m_msm_start + state->m_msm_bank, state->m_msm_end);
-				state->m_adpcm_idle = 0;
-				msm5205_reset_w(state->m_msm, 0);
-				state->m_adpcm_start = state->m_msm_start + state->m_msm_bank;
-				state->m_adpcm_end = state->m_msm_end;
+				//popmessage("%08x %08x", m_msm_start + m_msm_bank, m_msm_end);
+				m_adpcm_idle = 0;
+				msm5205_reset_w(m_msm, 0);
+				m_adpcm_start = m_msm_start + m_msm_bank;
+				m_adpcm_end = m_msm_end;
 //              ADPCM_stop(0);
 //              ADPCM_play(0, start+bank, end-start);
 			}
 			break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", cpu_get_pc(&space->device()), offset, data);
+			logerror("CPU #0 PC %06x: warning - write ioc offset %06x with %04x\n", cpu_get_pc(&space.device()), offset, data);
 			break;
 	}
 
@@ -236,7 +234,7 @@ static ADDRESS_MAP_START( gcpinbal_map, AS_PROGRAM, 16, gcpinbal_state )
 	AM_RANGE(0xc00000, 0xc03fff) AM_READWRITE_LEGACY(gcpinbal_tilemaps_word_r, gcpinbal_tilemaps_word_w) AM_BASE(m_tilemapram)
 	AM_RANGE(0xc80000, 0xc80fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	/* sprite ram */
 	AM_RANGE(0xd00000, 0xd00fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE_LEGACY(ioc_r, ioc_w) AM_BASE(m_ioc_ram)
+	AM_RANGE(0xd80000, 0xd800ff) AM_READWRITE(ioc_r, ioc_w) AM_BASE(m_ioc_ram)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM	/* RAM */
 ADDRESS_MAP_END
 

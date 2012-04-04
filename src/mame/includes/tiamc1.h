@@ -18,6 +18,7 @@ public:
 	tilemap_t *m_bg_tilemap1;
 	tilemap_t *m_bg_tilemap2;
 	rgb_t *m_palette;
+	DECLARE_WRITE8_MEMBER(tiamc1_control_w);
 };
 
 

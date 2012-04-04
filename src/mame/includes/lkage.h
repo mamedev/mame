@@ -48,6 +48,14 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_mcu;
+	DECLARE_WRITE8_MEMBER(lkage_sound_command_w);
+	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_enable_w);
+	DECLARE_READ8_MEMBER(sound_status_r);
+	DECLARE_READ8_MEMBER(port_fetch_r);
+	DECLARE_READ8_MEMBER(fake_mcu_r);
+	DECLARE_WRITE8_MEMBER(fake_mcu_w);
+	DECLARE_READ8_MEMBER(fake_status_r);
 };
 
 /*----------- defined in machine/lkage.c -----------*/

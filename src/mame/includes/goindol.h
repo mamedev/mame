@@ -29,6 +29,12 @@ public:
 
 	/* misc */
 	int         m_prot_toggle;
+	DECLARE_WRITE8_MEMBER(goindol_bankswitch_w);
+	DECLARE_READ8_MEMBER(prot_f422_r);
+	DECLARE_WRITE8_MEMBER(prot_fc44_w);
+	DECLARE_WRITE8_MEMBER(prot_fd99_w);
+	DECLARE_WRITE8_MEMBER(prot_fc66_w);
+	DECLARE_WRITE8_MEMBER(prot_fcb0_w);
 };
 
 

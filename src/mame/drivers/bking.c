@@ -23,22 +23,19 @@ DIP Locations verified for:
 #include "machine/buggychl.h"
 #include "includes/bking.h"
 
-static READ8_HANDLER( bking_sndnmi_disable_r )
+READ8_MEMBER(bking_state::bking_sndnmi_disable_r)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_sound_nmi_enable = 0;
+	m_sound_nmi_enable = 0;
 	return 0;
 }
 
-static WRITE8_HANDLER( bking_sndnmi_enable_w )
+WRITE8_MEMBER(bking_state::bking_sndnmi_enable_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_sound_nmi_enable = 1;
+	m_sound_nmi_enable = 1;
 }
 
-static WRITE8_HANDLER( bking_soundlatch_w )
+WRITE8_MEMBER(bking_state::bking_soundlatch_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
 	int i, code = 0;
 
 	for (i = 0;i < 8;i++)
@@ -46,27 +43,24 @@ static WRITE8_HANDLER( bking_soundlatch_w )
 			code |= 0x80 >> i;
 
 	soundlatch_w(space, offset, code);
-	if (state->m_sound_nmi_enable)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	if (m_sound_nmi_enable)
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( bking3_addr_l_w )
+WRITE8_MEMBER(bking_state::bking3_addr_l_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_addr_l = data;
+	m_addr_l = data;
 }
 
-static WRITE8_HANDLER( bking3_addr_h_w )
+WRITE8_MEMBER(bking_state::bking3_addr_h_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_addr_h = data;
+	m_addr_h = data;
 }
 
-static READ8_HANDLER( bking3_extrarom_r )
+READ8_MEMBER(bking_state::bking3_extrarom_r)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	UINT8 *rom = space->machine().region("user2")->base();
-	return rom[state->m_addr_h * 256 + state->m_addr_l];
+	UINT8 *rom = machine().region("user2")->base();
+	return rom[m_addr_h * 256 + m_addr_l];
 }
 
 static WRITE8_DEVICE_HANDLER( unk_w )
@@ -77,7 +71,7 @@ static WRITE8_DEVICE_HANDLER( unk_w )
 */
 }
 
-static READ8_HANDLER( bking3_ext_check_r )
+READ8_MEMBER(bking_state::bking3_ext_check_r)
 {
 	return 0x31; //no "bad rom.", no "bad ext."
 }
@@ -101,7 +95,7 @@ static ADDRESS_MAP_START( bking_io_map, AS_IO, 8, bking_state )
 	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(bking_cont1_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(bking_cont2_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(bking_cont3_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE_LEGACY(bking_soundlatch_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(bking_soundlatch_w)
 //  AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(bking_eport2_w)   this is not shown to be connected anywhere
 	AM_RANGE(0x0d, 0x0d) AM_WRITE_LEGACY(bking_hitclr_w)
 	AM_RANGE(0x07, 0x1f) AM_READ_LEGACY(bking_pos_r)
@@ -120,15 +114,15 @@ static ADDRESS_MAP_START( bking3_io_map, AS_IO, 8, bking_state )
 	AM_RANGE(0x08, 0x08) AM_WRITE_LEGACY(bking_cont1_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(bking_cont2_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(bking_cont3_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE_LEGACY(bking_soundlatch_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(bking_soundlatch_w)
 //  AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(bking_eport2_w)   this is not shown to be connected anywhere
 	AM_RANGE(0x0d, 0x0d) AM_WRITE_LEGACY(bking_hitclr_w)
 	AM_RANGE(0x07, 0x1f) AM_READ_LEGACY(bking_pos_r)
 	AM_RANGE(0x2f, 0x2f) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_mcu_r, buggychl_mcu_w)
 	AM_RANGE(0x4f, 0x4f) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_mcu_status_r, unk_w)
-	AM_RANGE(0x60, 0x60) AM_READ_LEGACY(bking3_extrarom_r)
-	AM_RANGE(0x6f, 0x6f) AM_READWRITE_LEGACY(bking3_ext_check_r, bking3_addr_h_w)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE_LEGACY(bking3_addr_l_w)
+	AM_RANGE(0x60, 0x60) AM_READ(bking3_extrarom_r)
+	AM_RANGE(0x6f, 0x6f) AM_READWRITE(bking3_ext_check_r, bking3_addr_h_w)
+	AM_RANGE(0x8f, 0x8f) AM_WRITE(bking3_addr_l_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bking_audio_map, AS_PROGRAM, 8, bking_state )
@@ -140,75 +134,69 @@ static ADDRESS_MAP_START( bking_audio_map, AS_PROGRAM, 8, bking_state )
 	AM_RANGE(0x4402, 0x4403) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x4403, 0x4403) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0x4800, 0x4800) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0x4802, 0x4802) AM_READWRITE_LEGACY(bking_sndnmi_disable_r, bking_sndnmi_enable_w)
+	AM_RANGE(0x4802, 0x4802) AM_READWRITE(bking_sndnmi_disable_r, bking_sndnmi_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM   /* Space for diagnostic ROM */
 ADDRESS_MAP_END
 
 #if 0
-static READ8_HANDLER( bking3_68705_port_a_r )
+READ8_MEMBER(bking_state::bking3_68705_port_a_r)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	//printf("port_a_r = %02X\n",(state->m_port_a_out & state->m_ddr_a) | (state->m_port_a_in & ~state->m_ddr_a));
-	return (state->m_port_a_out & state->m_ddr_a) | (state->m_port_a_in & ~state->m_ddr_a);
+	//printf("port_a_r = %02X\n",(m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a));
+	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-static WRITE8_HANDLER( bking3_68705_port_a_w )
+WRITE8_MEMBER(bking_state::bking3_68705_port_a_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_port_a_out = data;
+	m_port_a_out = data;
 //  printf("port_a_out = %02X\n",data);
 }
 
-static WRITE8_HANDLER( bking3_68705_ddr_a_w )
+WRITE8_MEMBER(bking_state::bking3_68705_ddr_a_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_ddr_a = data;
+	m_ddr_a = data;
 }
 
-static READ8_HANDLER( bking3_68705_port_b_r )
+READ8_MEMBER(bking_state::bking3_68705_port_b_r)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	return (state->m_port_b_out & state->m_ddr_b) | (state->m_port_b_in & ~state->m_ddr_b);
+	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-static WRITE8_HANDLER( bking3_68705_port_b_w )
+WRITE8_MEMBER(bking_state::bking3_68705_port_b_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
 //  if(data != 0xff)
 //      printf("port_b_out = %02X\n",data);
 
 	if (~data & 0x02)
 	{
-		state->m_port_a_in = from_main;
-		if (main_sent) cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
+		m_port_a_in = from_main;
+		if (main_sent) cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
 		main_sent = 0;
 	}
 
 	if (~data & 0x04)
 	{
 		/* 68705 is writing data for the Z80 */
-		from_mcu = state->m_port_a_out;
+		from_mcu = m_port_a_out;
 		mcu_sent = 1;
 	}
 
 	if(data != 0xff && data != 0xfb && data != 0xfd)
 		printf("port_b_w = %X\n",data);
 
-	state->m_port_b_out = data;
+	m_port_b_out = data;
 }
 
-static WRITE8_HANDLER( bking3_68705_ddr_b_w )
+WRITE8_MEMBER(bking_state::bking3_68705_ddr_b_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_ddr_b = data;
+	m_ddr_b = data;
 }
 
-static READ8_HANDLER( bking3_68705_port_c_r )
+READ8_MEMBER(bking_state::bking3_68705_port_c_r)
 {
 	int port_c_in = 0;
 	if (main_sent) port_c_in |= 0x01;
 	if (!mcu_sent) port_c_in |= 0x02;
-//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(&space->device()),port_c_in);
+//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(&space.device()),port_c_in);
 	return port_c_in;
 }
 #endif

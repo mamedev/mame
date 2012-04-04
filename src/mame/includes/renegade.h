@@ -39,6 +39,13 @@ public:
 	UINT8 *m_spriteram;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_READ8_MEMBER(mcu_reset_r);
+	DECLARE_WRITE8_MEMBER(mcu_w);
+	DECLARE_READ8_MEMBER(mcu_r);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(renegade_coin_counter_w);
+	void mcu_process_command();
 };
 
 

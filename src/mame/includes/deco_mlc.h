@@ -17,6 +17,16 @@ public:
 	UINT32 *m_mlc_buffered_spriteram;
 	UINT32 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_READ32_MEMBER(test2_r);
+	DECLARE_READ32_MEMBER(test3_r);
+	DECLARE_WRITE32_MEMBER(avengrs_palette_w);
+	DECLARE_READ32_MEMBER(decomlc_vbl_r);
+	DECLARE_READ32_MEMBER(mlc_scanline_r);
+	DECLARE_WRITE32_MEMBER(mlc_irq_w);
+	DECLARE_READ32_MEMBER(mlc_spriteram_r);
+	DECLARE_READ32_MEMBER(mlc_vram_r);
+	DECLARE_READ32_MEMBER(stadhr96_prot_146_r);
+	DECLARE_READ32_MEMBER(avengrgs_speedup_r);
 };
 
 

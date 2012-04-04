@@ -17,6 +17,10 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
+	DECLARE_READ8_MEMBER(strnskil_d800_r);
+	DECLARE_READ8_MEMBER(pettanp_protection_r);
+	DECLARE_READ8_MEMBER(banbam_protection_r);
+	DECLARE_WRITE8_MEMBER(protection_w);
 };
 
 

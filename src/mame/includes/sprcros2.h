@@ -18,6 +18,8 @@ public:
 
 	required_device<cpu_device> m_master;
 	required_device<cpu_device> m_slave;
+	DECLARE_WRITE8_MEMBER(sprcros2_m_port7_w);
+	DECLARE_WRITE8_MEMBER(sprcros2_s_port3_w);
 };
 
 

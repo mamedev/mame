@@ -20,6 +20,8 @@ public:
 	UINT8 m_lastflip;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_READ8_MEMBER(protection_r);
+	DECLARE_WRITE8_MEMBER(protection_w);
 };
 
 

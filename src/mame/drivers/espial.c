@@ -66,10 +66,9 @@ static MACHINE_START( espial )
 }
 
 
-static WRITE8_HANDLER( espial_master_interrupt_mask_w )
+WRITE8_MEMBER(espial_state::espial_master_interrupt_mask_w)
 {
-	espial_state *state = space->machine().driver_data<espial_state>();
-	state->m_main_nmi_enabled = ~(data & 1);
+	m_main_nmi_enabled = ~(data & 1);
 }
 
 
@@ -101,11 +100,10 @@ INTERRUPT_GEN( espial_sound_nmi_gen )
 }
 
 
-static WRITE8_HANDLER( espial_master_soundlatch_w )
+WRITE8_MEMBER(espial_state::espial_master_soundlatch_w)
 {
-	espial_state *state = space->machine().driver_data<espial_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
 
@@ -116,9 +114,9 @@ static ADDRESS_MAP_START( espial_map, AS_PROGRAM, 8, espial_state )
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN1")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
-	AM_RANGE(0x6090, 0x6090) AM_READWRITE_LEGACY(soundlatch2_r, espial_master_soundlatch_w)
+	AM_RANGE(0x6090, 0x6090) AM_READ_LEGACY(soundlatch2_r) AM_WRITE(espial_master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE_LEGACY(watchdog_reset_r, watchdog_reset_w)
-	AM_RANGE(0x7100, 0x7100) AM_WRITE_LEGACY(espial_master_interrupt_mask_w)
+	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE_LEGACY(espial_flipscreen_w)
 	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE(m_spriteram_1)
 	AM_RANGE(0x8020, 0x803f) AM_READONLY
@@ -141,9 +139,9 @@ static ADDRESS_MAP_START( netwars_map, AS_PROGRAM, 8, espial_state )
 	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
 	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN1")
 	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN2")
-	AM_RANGE(0x6090, 0x6090) AM_READWRITE_LEGACY(soundlatch2_r, espial_master_soundlatch_w)
+	AM_RANGE(0x6090, 0x6090) AM_READ_LEGACY(soundlatch2_r) AM_WRITE(espial_master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE_LEGACY(watchdog_reset_r, watchdog_reset_w)
-	AM_RANGE(0x7100, 0x7100) AM_WRITE_LEGACY(espial_master_interrupt_mask_w)
+	AM_RANGE(0x7100, 0x7100) AM_WRITE(espial_master_interrupt_mask_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE_LEGACY(espial_flipscreen_w)
 	AM_RANGE(0x8000, 0x801f) AM_RAM AM_BASE(m_spriteram_1)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(espial_videoram_w) AM_BASE(m_videoram)

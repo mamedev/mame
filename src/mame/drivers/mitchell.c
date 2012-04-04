@@ -110,9 +110,8 @@ static NVRAM_HANDLER( mitchell )
 	}
 }
 
-static READ8_HANDLER( pang_port5_r )
+READ8_MEMBER(mitchell_state::pang_port5_r)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
         bit 3 is checked before updating the palette so it really seems to be vblank.
@@ -121,7 +120,7 @@ static READ8_HANDLER( pang_port5_r )
         otherwise music doesn't work.
     */
 
-	return (input_port_read(space->machine(), "SYS0") & 0xfe) | (state->m_irq_source & 1);
+	return (input_port_read(machine(), "SYS0") & 0xfe) | (m_irq_source & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
@@ -149,9 +148,9 @@ static WRITE8_DEVICE_HANDLER( eeprom_serial_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( pang_bankswitch_w )
+WRITE8_MEMBER(mitchell_state::pang_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
 /*************************************
@@ -160,32 +159,31 @@ static WRITE8_HANDLER( pang_bankswitch_w )
  *
  *************************************/
 
-static READ8_HANDLER( block_input_r )
+READ8_MEMBER(mitchell_state::block_input_r)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
 	static const char *const portnames[] = { "IN1", "IN2" };
 
-	if (state->m_dial_selected)
+	if (m_dial_selected)
 	{
-		int delta = (input_port_read(space->machine(), dialnames[offset]) - state->m_dial[offset]) & 0xff;
+		int delta = (input_port_read(machine(), dialnames[offset]) - m_dial[offset]) & 0xff;
 
 		if (delta & 0x80)
 		{
 			delta = (-delta) & 0xff;
-			if (state->m_dir[offset])
+			if (m_dir[offset])
 			{
 			/* don't report movement on a direction change, otherwise it will stutter */
-				state->m_dir[offset] = 0;
+				m_dir[offset] = 0;
 				delta = 0;
 			}
 		}
 		else if (delta > 0)
 		{
-			if (!state->m_dir[offset])
+			if (!m_dir[offset])
 			{
 			/* don't report movement on a direction change, otherwise it will stutter */
-				state->m_dir[offset] = 1;
+				m_dir[offset] = 1;
 				delta = 0;
 			}
 		}
@@ -196,35 +194,33 @@ static READ8_HANDLER( block_input_r )
 	}
 	else
 	{
-		int res = input_port_read(space->machine(), portnames[offset]) & 0xf7;
+		int res = input_port_read(machine(), portnames[offset]) & 0xf7;
 
-		if (state->m_dir[offset])
+		if (m_dir[offset])
 			res |= 0x08;
 
 		return res;
 	}
 }
 
-static WRITE8_HANDLER( block_dial_control_w )
+WRITE8_MEMBER(mitchell_state::block_dial_control_w)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
 	if (data == 0x08)
 	{
 		/* reset the dial counters */
-		state->m_dial[0] = input_port_read(space->machine(), "DIAL1");
-		state->m_dial[1] = input_port_read(space->machine(), "DIAL2");
+		m_dial[0] = input_port_read(machine(), "DIAL1");
+		m_dial[1] = input_port_read(machine(), "DIAL2");
 	}
 	else if (data == 0x80)
-		state->m_dial_selected = 0;
+		m_dial_selected = 0;
 	else
-		state->m_dial_selected = 1;
+		m_dial_selected = 1;
 }
 
 
-static READ8_HANDLER( mahjong_input_r )
+READ8_MEMBER(mitchell_state::mahjong_input_r)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 	int i;
 	static const char *const keynames[2][5] =
 			{
@@ -234,57 +230,54 @@ static READ8_HANDLER( mahjong_input_r )
 
 	for (i = 0; i < 5; i++)
 	{
-		if (state->m_keymatrix & (0x80 >> i))
-			return input_port_read(space->machine(), keynames[offset][i]);
+		if (m_keymatrix & (0x80 >> i))
+			return input_port_read(machine(), keynames[offset][i]);
 	}
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( mahjong_input_select_w )
+WRITE8_MEMBER(mitchell_state::mahjong_input_select_w)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
-	state->m_keymatrix = data;
+	m_keymatrix = data;
 }
 
 
-static READ8_HANDLER( input_r )
+READ8_MEMBER(mitchell_state::input_r)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
-	switch (state->m_input_type)
+	switch (m_input_type)
 	{
 		case 0:
 		default:
-			return input_port_read(space->machine(), portnames[offset]);
+			return input_port_read(machine(), portnames[offset]);
 		case 1:		/* Mahjong games */
 			if (offset)
 				return mahjong_input_r(space, offset - 1);
 			else
-				return input_port_read(space->machine(), "IN0");
+				return input_port_read(machine(), "IN0");
 			break;
 		case 2:		/* Block Block - dial control */
 			if (offset)
 				return block_input_r(space, offset - 1);
 			else
-				return input_port_read(space->machine(), "IN0");
+				return input_port_read(machine(), "IN0");
 			break;
 		case 3:		/* Super Pang - simulate START 1 press to initialize EEPROM */
-			return input_port_read(space->machine(), portnames[offset]);
+			return input_port_read(machine(), portnames[offset]);
 	}
 }
 
 
-static WRITE8_HANDLER( input_w )
+WRITE8_MEMBER(mitchell_state::input_w)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
-	switch (state->m_input_type)
+	switch (m_input_type)
 	{
 		case 0:
 		default:
-			logerror("PC %04x: write %02x to port 01\n", cpu_get_pc(&space->device()), data);
+			logerror("PC %04x: write %02x to port 01\n", cpu_get_pc(&space.device()), data);
 			break;
 		case 1:
 			mahjong_input_select_w(space, offset, data);
@@ -324,12 +317,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(pang_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x00, 0x02) AM_READ_LEGACY(input_r)			/* The Mahjong games and Block Block need special input treatment */
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(input_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(pang_bankswitch_w)	/* Code bank register */
+	AM_RANGE(0x00, 0x02) AM_READ(input_r)			/* The Mahjong games and Block Block need special input treatment */
+	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)	/* Code bank register */
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w)
-	AM_RANGE(0x05, 0x05) AM_READ_LEGACY(pang_port5_r) AM_DEVWRITE("oki", okim6295_device, write)
+	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP				/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(pang_video_bank_w)	/* Video RAM bank register */
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("eeprom", eeprom_cs_w)
@@ -349,9 +342,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x02) AM_READ_LEGACY(input_r)
+	AM_RANGE(0x00, 0x02) AM_READ(input_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(pang_bankswitch_w)      /* Code bank register */
+	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")
@@ -364,16 +357,15 @@ ADDRESS_MAP_END
 
 
 #ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( spangbl_msm5205_data_w )
+WRITE8_MEMBER(mitchell_state::spangbl_msm5205_data_w)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
-	state->m_sample_buffer = data;
+	m_sample_buffer = data;
 }
 #endif
 
 static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-//  AM_RANGE(0xec00, 0xec00) AM_WRITE_LEGACY(spangbl_msm5205_data_w )
+//  AM_RANGE(0xec00, 0xec00) AM_WRITE(spangbl_msm5205_data_w )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -397,19 +389,18 @@ static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER(mstworld_sound_w)
+WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE_LEGACY(mstworld_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE_LEGACY(pang_bankswitch_w)	/* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(mstworld_sound_w)	/* write to sound cpu */
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(pang_bankswitch_w)	/* Code bank register */
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(mstworld_sound_w)	/* write to sound cpu */
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	/* dips? */
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")	/* special? */
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")	/* dips? */

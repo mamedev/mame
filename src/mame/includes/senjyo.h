@@ -39,6 +39,10 @@ public:
 	tilemap_t *m_bg3_tilemap;
 
 	int m_bgstripes;
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(senjyo_paletteram_w);
+	DECLARE_WRITE8_MEMBER(starforb_scrolly2);
+	DECLARE_WRITE8_MEMBER(starforb_scrollx2);
 };
 
 

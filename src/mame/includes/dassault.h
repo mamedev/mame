@@ -41,6 +41,14 @@ public:
 	required_device<okim6295_device> m_oki2;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram2;
+	DECLARE_READ16_MEMBER(dassault_control_r);
+	DECLARE_WRITE16_MEMBER(dassault_control_w);
+	DECLARE_READ16_MEMBER(dassault_sub_control_r);
+	DECLARE_WRITE16_MEMBER(dassault_sound_w);
+	DECLARE_READ16_MEMBER(dassault_irq_r);
+	DECLARE_WRITE16_MEMBER(dassault_irq_w);
+	DECLARE_WRITE16_MEMBER(shared_ram_w);
+	DECLARE_READ16_MEMBER(shared_ram_r);
 };
 
 

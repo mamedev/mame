@@ -19,6 +19,8 @@ public:
 
 	size_t     m_videoram_size;
 	size_t     m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(ambush_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
 };
 
 

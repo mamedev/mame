@@ -108,6 +108,21 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_upd4990a;
+	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
+	DECLARE_WRITE16_MEMBER(io_control_w);
+	DECLARE_WRITE16_MEMBER(save_ram_w);
+	DECLARE_READ16_MEMBER(memcard_r);
+	DECLARE_WRITE16_MEMBER(memcard_w);
+	DECLARE_WRITE16_MEMBER(audio_command_w);
+	DECLARE_READ8_MEMBER(audio_command_r);
+	DECLARE_WRITE8_MEMBER(audio_result_w);
+	DECLARE_WRITE16_MEMBER(main_cpu_bank_select_w);
+	DECLARE_READ8_MEMBER(audio_cpu_bank_select_f000_f7ff_r);
+	DECLARE_READ8_MEMBER(audio_cpu_bank_select_e000_efff_r);
+	DECLARE_READ8_MEMBER(audio_cpu_bank_select_c000_dfff_r);
+	DECLARE_READ8_MEMBER(audio_cpu_bank_select_8000_bfff_r);
+	DECLARE_WRITE16_MEMBER(system_control_w);
+	DECLARE_WRITE16_MEMBER(watchdog_w);
 };
 
 

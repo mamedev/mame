@@ -202,9 +202,9 @@ There is not a rev 03 known or dumped. An Asteroids rev 03 is not mentioned in a
  *
  *************************************/
 
-static WRITE8_HANDLER( astdelux_coin_counter_w )
+WRITE8_MEMBER(asteroid_state::astdelux_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset,data);
+	coin_counter_w(machine(), offset,data);
 }
 
 
@@ -215,7 +215,7 @@ static WRITE8_HANDLER( astdelux_coin_counter_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( llander_led_w )
+WRITE8_MEMBER(asteroid_state::llander_led_w)
 {
 	static const char *const lampname[] =
 	{
@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( astdelux_map, AS_PROGRAM, 8, asteroid_state )
 	AM_RANGE(0x3c00, 0x3c01) AM_WRITE_LEGACY(astdelux_led_w)
 	AM_RANGE(0x3c03, 0x3c03) AM_DEVWRITE_LEGACY("discrete", astdelux_sounds_w)
 	AM_RANGE(0x3c04, 0x3c04) AM_WRITE_LEGACY(astdelux_bank_switch_w)
-	AM_RANGE(0x3c05, 0x3c07) AM_WRITE_LEGACY(astdelux_coin_counter_w)
+	AM_RANGE(0x3c05, 0x3c07) AM_WRITE(astdelux_coin_counter_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE_LEGACY("discrete", asteroid_noise_reset_w)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x4000)
 	AM_RANGE(0x4800, 0x57ff) AM_ROM						/* vector rom */
@@ -289,7 +289,7 @@ static ADDRESS_MAP_START( llander_map, AS_PROGRAM, 8, asteroid_state )
 	AM_RANGE(0x2800, 0x2803) AM_READ_LEGACY(asteroid_DSW1_r)	/* DSW1 */
 	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("THRUST")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(avgdvg_go_w)
-	AM_RANGE(0x3200, 0x3200) AM_WRITE_LEGACY(llander_led_w)
+	AM_RANGE(0x3200, 0x3200) AM_WRITE(llander_led_w)
 	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_DEVWRITE_LEGACY("discrete", llander_sounds_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_DEVWRITE_LEGACY("discrete", llander_snd_reset_w)

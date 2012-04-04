@@ -74,29 +74,26 @@
 #define MAIN_CLOCK XTAL_10MHz
 #define AUDIO_CLOCK XTAL_3_579545MHz
 
-static WRITE16_HANDLER( blockout_sound_command_w )
+WRITE16_MEMBER(blockout_state::blockout_sound_command_w)
 {
-	blockout_state *state = space->machine().driver_data<blockout_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-static WRITE16_HANDLER( blockout_irq6_ack_w )
+WRITE16_MEMBER(blockout_state::blockout_irq6_ack_w)
 {
-	blockout_state *state = space->machine().driver_data<blockout_state>();
 
-	device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 6, CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( blockout_irq5_ack_w )
+WRITE16_MEMBER(blockout_state::blockout_irq5_ack_w)
 {
-	blockout_state *state = space->machine().driver_data<blockout_state>();
 
-	device_set_input_line(state->m_maincpu, 5, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 5, CLEAR_LINE);
 }
 
 /*************************************
@@ -112,9 +109,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100010, 0x100011) AM_WRITE_LEGACY(blockout_irq6_ack_w)
-	AM_RANGE(0x100012, 0x100013) AM_WRITE_LEGACY(blockout_irq5_ack_w)
-	AM_RANGE(0x100014, 0x100015) AM_WRITE_LEGACY(blockout_sound_command_w)
+	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
+	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
+	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
 	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE_LEGACY(blockout_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */
@@ -132,9 +129,9 @@ static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("DSW1")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW2")
-	AM_RANGE(0x100010, 0x100011) AM_WRITE_LEGACY(blockout_irq6_ack_w)
-	AM_RANGE(0x100012, 0x100013) AM_WRITE_LEGACY(blockout_irq5_ack_w)
-	AM_RANGE(0x100014, 0x100015) AM_WRITE_LEGACY(blockout_sound_command_w)
+	AM_RANGE(0x100010, 0x100011) AM_WRITE(blockout_irq6_ack_w)
+	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
+	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
 	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE_LEGACY(blockout_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */

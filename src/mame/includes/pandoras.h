@@ -30,6 +30,12 @@ public:
 	cpu_device *m_subcpu;
 	cpu_device *m_audiocpu;
 	cpu_device *m_mcu;
+	DECLARE_WRITE8_MEMBER(pandoras_int_control_w);
+	DECLARE_WRITE8_MEMBER(pandoras_cpua_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(pandoras_cpub_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(pandoras_i8039_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
+	DECLARE_WRITE8_MEMBER(pandoras_z80_irqtrigger_w);
 };
 
 

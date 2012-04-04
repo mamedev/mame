@@ -23,6 +23,7 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_subcpu;
+	DECLARE_WRITE8_MEMBER(battlane_cpu_command_w);
 };
 
 

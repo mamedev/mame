@@ -84,18 +84,18 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
  *
  *************************************/
 
-static WRITE32_HANDLER( paletteram32_w )
+WRITE32_MEMBER(djmain_state::paletteram32_w)
 {
 	int r,g,b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	data = space->machine().generic.paletteram.u32[offset];
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	data = machine().generic.paletteram.u32[offset];
 
 	r = (data >>  0) & 0xff;
 	g = (data >>  8) & 0xff;
 	b = (data >> 16) & 0xff;
 
-	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -107,77 +107,71 @@ static void sndram_set_bank(running_machine &machine)
 	state->m_sndram = machine.region("shared")->base() + 0x80000 * state->m_sndram_bank;
 }
 
-static WRITE32_HANDLER( sndram_bank_w )
+WRITE32_MEMBER(djmain_state::sndram_bank_w)
 {
-	djmain_state *state = space->machine().driver_data<djmain_state>();
 	if (ACCESSING_BITS_16_31)
 	{
-		state->m_sndram_bank = (data >> 16) & 0x1f;
-		sndram_set_bank(space->machine());
+		m_sndram_bank = (data >> 16) & 0x1f;
+		sndram_set_bank(machine());
 	}
 }
 
-static READ32_HANDLER( sndram_r )
+READ32_MEMBER(djmain_state::sndram_r)
 {
-	djmain_state *state = space->machine().driver_data<djmain_state>();
 	UINT32 data = 0;
 
 	if (ACCESSING_BITS_24_31)
-		data |= state->m_sndram[offset * 4] << 24;
+		data |= m_sndram[offset * 4] << 24;
 
 	if (ACCESSING_BITS_16_23)
-		data |= state->m_sndram[offset * 4 + 1] << 16;
+		data |= m_sndram[offset * 4 + 1] << 16;
 
 	if (ACCESSING_BITS_8_15)
-		data |= state->m_sndram[offset * 4 + 2] << 8;
+		data |= m_sndram[offset * 4 + 2] << 8;
 
 	if (ACCESSING_BITS_0_7)
-		data |= state->m_sndram[offset * 4 + 3];
+		data |= m_sndram[offset * 4 + 3];
 
 	return data;
 }
 
-static WRITE32_HANDLER( sndram_w )
+WRITE32_MEMBER(djmain_state::sndram_w)
 {
-	djmain_state *state = space->machine().driver_data<djmain_state>();
 	if (ACCESSING_BITS_24_31)
-		state->m_sndram[offset * 4] = data >> 24;
+		m_sndram[offset * 4] = data >> 24;
 
 	if (ACCESSING_BITS_16_23)
-		state->m_sndram[offset * 4 + 1] = data >> 16;
+		m_sndram[offset * 4 + 1] = data >> 16;
 
 	if (ACCESSING_BITS_8_15)
-		state->m_sndram[offset * 4 + 2] = data >> 8;
+		m_sndram[offset * 4 + 2] = data >> 8;
 
 	if (ACCESSING_BITS_0_7)
-		state->m_sndram[offset * 4 + 3] = data;
+		m_sndram[offset * 4 + 3] = data;
 }
 
 
 //---------
 
-static READ32_HANDLER( obj_ctrl_r )
+READ32_MEMBER(djmain_state::obj_ctrl_r)
 {
-	djmain_state *state = space->machine().driver_data<djmain_state>();
-	// read state->m_obj_regs[0x0c/4]: unknown
-	// read state->m_obj_regs[0x24/4]: unknown
+	// read m_obj_regs[0x0c/4]: unknown
+	// read m_obj_regs[0x24/4]: unknown
 
-	return state->m_obj_regs[offset];
+	return m_obj_regs[offset];
 }
 
-static WRITE32_HANDLER( obj_ctrl_w )
+WRITE32_MEMBER(djmain_state::obj_ctrl_w)
 {
-	djmain_state *state = space->machine().driver_data<djmain_state>();
-	// write state->m_obj_regs[0x28/4]: bank for rom readthrough
+	// write m_obj_regs[0x28/4]: bank for rom readthrough
 
-	COMBINE_DATA(&state->m_obj_regs[offset]);
+	COMBINE_DATA(&m_obj_regs[offset]);
 }
 
-static READ32_HANDLER( obj_rom_r )
+READ32_MEMBER(djmain_state::obj_rom_r)
 {
-	djmain_state *state = space->machine().driver_data<djmain_state>();
-	UINT8 *mem8 = space->machine().region("gfx1")->base();
-	int bank = state->m_obj_regs[0x28/4] >> 16;
+	UINT8 *mem8 = machine().region("gfx1")->base();
+	int bank = m_obj_regs[0x28/4] >> 16;
 
 	offset += bank * 0x200;
 	offset *= 4;
@@ -194,28 +188,26 @@ static READ32_HANDLER( obj_rom_r )
 
 //---------
 
-static WRITE32_HANDLER( v_ctrl_w )
+WRITE32_MEMBER(djmain_state::v_ctrl_w)
 {
-	djmain_state *state = space->machine().driver_data<djmain_state>();
 	if (ACCESSING_BITS_16_31)
 	{
 		data >>= 16;
 		mem_mask >>= 16;
-		COMBINE_DATA(&state->m_v_ctrl);
+		COMBINE_DATA(&m_v_ctrl);
 
-		if (state->m_pending_vb_int && !DISABLE_VB_INT)
+		if (m_pending_vb_int && !(!(m_v_ctrl & 0x8000))) // #define DISABLE_VB_INT	(!(state->m_v_ctrl & 0x8000))
 		{
-			state->m_pending_vb_int = 0;
-			cputag_set_input_line(space->machine(), "maincpu", M68K_IRQ_4, HOLD_LINE);
+			m_pending_vb_int = 0;
+			cputag_set_input_line(machine(), "maincpu", M68K_IRQ_4, HOLD_LINE);
 		}
 	}
 }
 
-static READ32_HANDLER( v_rom_r )
+READ32_MEMBER(djmain_state::v_rom_r)
 {
-	djmain_state *state = space->machine().driver_data<djmain_state>();
-	device_t *k056832 = space->machine().device("k056832");
-	UINT8 *mem8 = space->machine().region("gfx2")->base();
+	device_t *k056832 = machine().device("k056832");
+	UINT8 *mem8 = machine().region("gfx2")->base();
 	int bank = k056832_word_r(k056832, 0x34/2, 0xffff);
 
 	offset *= 2;
@@ -225,7 +217,7 @@ static READ32_HANDLER( v_rom_r )
 
 	offset += bank * 0x800 * 4;
 
-	if (state->m_v_ctrl & 0x020)
+	if (m_v_ctrl & 0x020)
 		offset += 0x800 * 2;
 
 	return mem8[offset] * 0x01010000;
@@ -234,21 +226,20 @@ static READ32_HANDLER( v_rom_r )
 
 //---------
 
-static READ8_HANDLER( inp1_r )
+READ8_MEMBER(djmain_state::inp1_r)
 {
 	static const char *const portnames[] = { "DSW3", "BTN3", "BTN2", "BTN1" };
-	return input_port_read(space->machine(), portnames[ offset & 0x03 ]);
+	return input_port_read(machine(), portnames[ offset & 0x03 ]);
 }
 
-static READ8_HANDLER( inp2_r )
+READ8_MEMBER(djmain_state::inp2_r)
 {
 	static const char *const portnames[] = { "DSW1", "DSW2", "UNK2", "UNK1" };
-	return input_port_read(space->machine(), portnames[ offset & 0x03 ]);
+	return input_port_read(machine(), portnames[ offset & 0x03 ]);
 }
 
-static READ32_HANDLER( turntable_r )
+READ32_MEMBER(djmain_state::turntable_r)
 {
-	djmain_state *state = space->machine().driver_data<djmain_state>();
 	UINT32 result = 0;
 	static const char *const ttnames[] = { "TT1", "TT2" };
 
@@ -257,27 +248,26 @@ static READ32_HANDLER( turntable_r )
 		UINT8 pos;
 		int delta;
 
-		pos = input_port_read_safe(space->machine(), ttnames[state->m_turntable_select], 0);
-		delta = pos - state->m_turntable_last_pos[state->m_turntable_select];
+		pos = input_port_read_safe(machine(), ttnames[m_turntable_select], 0);
+		delta = pos - m_turntable_last_pos[m_turntable_select];
 		if (delta < -128)
 			delta += 256;
 		if (delta > 128)
 			delta -= 256;
 
-		state->m_turntable_pos[state->m_turntable_select] += delta * 70;
-		state->m_turntable_last_pos[state->m_turntable_select] = pos;
+		m_turntable_pos[m_turntable_select] += delta * 70;
+		m_turntable_last_pos[m_turntable_select] = pos;
 
-		result |= state->m_turntable_pos[state->m_turntable_select] & 0xff00;
+		result |= m_turntable_pos[m_turntable_select] & 0xff00;
 	}
 
 	return result;
 }
 
-static WRITE32_HANDLER( turntable_select_w )
+WRITE32_MEMBER(djmain_state::turntable_select_w)
 {
-	djmain_state *state = space->machine().driver_data<djmain_state>();
 	if (ACCESSING_BITS_16_23)
-		state->m_turntable_select = (data >> 19) & 1;
+		m_turntable_select = (data >> 19) & 1;
 }
 
 
@@ -351,7 +341,7 @@ static WRITE32_DEVICE_HANDLER( ide_alt_w )
        15: not used?        (always low)
 */
 
-static WRITE32_HANDLER( light_ctrl_1_w )
+WRITE32_MEMBER(djmain_state::light_ctrl_1_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
@@ -362,15 +352,15 @@ static WRITE32_HANDLER( light_ctrl_1_w )
 	}
 }
 
-static WRITE32_HANDLER( light_ctrl_2_w )
+WRITE32_MEMBER(djmain_state::light_ctrl_2_w)
 {
 	if (ACCESSING_BITS_16_31)
 	{
 		output_set_value("left-ssr",       !!(data & 0x08000000));	// SSR
 		output_set_value("right-ssr",      !!(data & 0x08000000));	// SSR
-		set_led_status(space->machine(), 0, data & 0x00010000);			// 1P START
-		set_led_status(space->machine(), 1, data & 0x00020000);			// 2P START
-		set_led_status(space->machine(), 2, data & 0x00040000);			// EFFECT
+		set_led_status(machine(), 0, data & 0x00010000);			// 1P START
+		set_led_status(machine(), 1, data & 0x00020000);			// 2P START
+		set_led_status(machine(), 2, data & 0x00040000);			// EFFECT
 	}
 }
 
@@ -379,19 +369,19 @@ static WRITE32_HANDLER( light_ctrl_2_w )
 
 // unknown ports :-(
 
-static WRITE32_HANDLER( unknown590000_w )
+WRITE32_MEMBER(djmain_state::unknown590000_w)
 {
-	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", cpu_get_previouspc(&space->device()), offset, data, mem_mask);
+	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", cpu_get_previouspc(&space.device()), offset, data, mem_mask);
 }
 
-static WRITE32_HANDLER( unknown802000_w )
+WRITE32_MEMBER(djmain_state::unknown802000_w)
 {
-	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", cpu_get_previouspc(&space->device()), offset, data, mem_mask);
+	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", cpu_get_previouspc(&space.device()), offset, data, mem_mask);
 }
 
-static WRITE32_HANDLER( unknownc02000_w )
+WRITE32_MEMBER(djmain_state::unknownc02000_w)
 {
-	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", cpu_get_previouspc(&space->device()), offset, data, mem_mask);
+	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", cpu_get_previouspc(&space.device()), offset, data, mem_mask);
 }
 
 
@@ -444,28 +434,28 @@ static void ide_interrupt(device_t *device, int state)
 static ADDRESS_MAP_START( memory_map, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM							// PRG ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM							// WORK RAM
-	AM_RANGE(0x480000, 0x48443f) AM_RAM_WRITE_LEGACY(paletteram32_w)		// COLOR RAM
+	AM_RANGE(0x480000, 0x48443f) AM_RAM_WRITE(paletteram32_w)		// COLOR RAM
 	                             AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE_LEGACY(sndram_r, sndram_w)				// SOUND RAM
+	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)				// SOUND RAM
 	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE_LEGACY("k056832", k056832_long_r, k056832_long_w)		// VIDEO REG (tilemap)
-	AM_RANGE(0x590000, 0x590007) AM_WRITE_LEGACY(unknown590000_w)					// ??
+	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)					// ??
 	AM_RANGE(0x5a0000, 0x5a005f) AM_DEVWRITE_LEGACY("k055555", k055555_long_w)					// 055555: priority encoder
 	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("konami1", k054539_device, read, write, 0xff00ff00)
 	AM_RANGE(0x5b0000, 0x5b04ff) AM_DEVREADWRITE8("konami2", k054539_device, read, write, 0x00ff00ff)
-	AM_RANGE(0x5c0000, 0x5c0003) AM_READ8_LEGACY(inp1_r, 0xffffffff)  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
-	AM_RANGE(0x5c8000, 0x5c8003) AM_READ8_LEGACY(inp2_r, 0xffffffff)  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
-	AM_RANGE(0x5d0000, 0x5d0003) AM_WRITE_LEGACY(light_ctrl_1_w)					// light/coin blocker control
-	AM_RANGE(0x5d2000, 0x5d2003) AM_WRITE_LEGACY(light_ctrl_2_w)					// light/coin blocker control
-	AM_RANGE(0x5d4000, 0x5d4003) AM_WRITE_LEGACY(v_ctrl_w)						// VIDEO control
-	AM_RANGE(0x5d6000, 0x5d6003) AM_WRITE_LEGACY(sndram_bank_w)					// SOUND RAM bank
-	AM_RANGE(0x5e0000, 0x5e0003) AM_READWRITE_LEGACY(turntable_r, turntable_select_w)		// input port control (turn tables)
-	AM_RANGE(0x600000, 0x601fff) AM_READ_LEGACY(v_rom_r)						// VIDEO ROM readthrough (for POST)
+	AM_RANGE(0x5c0000, 0x5c0003) AM_READ8(inp1_r, 0xffffffff)  //  DSW3,BTN3,BTN2,BTN1  // input port control (buttons and DIP switches)
+	AM_RANGE(0x5c8000, 0x5c8003) AM_READ8(inp2_r, 0xffffffff)  //  DSW1,DSW2,UNK2,UNK1  // input port control (DIP switches)
+	AM_RANGE(0x5d0000, 0x5d0003) AM_WRITE(light_ctrl_1_w)					// light/coin blocker control
+	AM_RANGE(0x5d2000, 0x5d2003) AM_WRITE(light_ctrl_2_w)					// light/coin blocker control
+	AM_RANGE(0x5d4000, 0x5d4003) AM_WRITE(v_ctrl_w)						// VIDEO control
+	AM_RANGE(0x5d6000, 0x5d6003) AM_WRITE(sndram_bank_w)					// SOUND RAM bank
+	AM_RANGE(0x5e0000, 0x5e0003) AM_READWRITE(turntable_r, turntable_select_w)		// input port control (turn tables)
+	AM_RANGE(0x600000, 0x601fff) AM_READ(v_rom_r)						// VIDEO ROM readthrough (for POST)
 	AM_RANGE(0x801000, 0x8017ff) AM_RAM AM_BASE(m_obj_ram)				// OBJECT RAM
-	AM_RANGE(0x802000, 0x802fff) AM_WRITE_LEGACY(unknown802000_w)					// ??
-	AM_RANGE(0x803000, 0x80309f) AM_READWRITE_LEGACY(obj_ctrl_r, obj_ctrl_w)			// OBJECT REGS
-	AM_RANGE(0x803800, 0x803fff) AM_READ_LEGACY(obj_rom_r)						// OBJECT ROM readthrough (for POST)
+	AM_RANGE(0x802000, 0x802fff) AM_WRITE(unknown802000_w)					// ??
+	AM_RANGE(0x803000, 0x80309f) AM_READWRITE(obj_ctrl_r, obj_ctrl_w)			// OBJECT REGS
+	AM_RANGE(0x803800, 0x803fff) AM_READ(obj_rom_r)						// OBJECT ROM readthrough (for POST)
 	AM_RANGE(0xc00000, 0xc01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)	// VIDEO RAM (tilemap) (beatmania)
-	AM_RANGE(0xc02000, 0xc02047) AM_WRITE_LEGACY(unknownc02000_w)					// ??
+	AM_RANGE(0xc02000, 0xc02047) AM_WRITE(unknownc02000_w)					// ??
 	AM_RANGE(0xd00000, 0xd0000f) AM_DEVREADWRITE_LEGACY("ide", ide_std_r, ide_std_w)				// IDE control regs (hiphopmania)
 	AM_RANGE(0xd4000c, 0xd4000f) AM_DEVREADWRITE_LEGACY("ide", ide_alt_r, ide_alt_w)				// IDE status control reg (hiphopmania)
 	AM_RANGE(0xe00000, 0xe01fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)	// VIDEO RAM (tilemap) (hiphopmania)

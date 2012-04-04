@@ -11,6 +11,7 @@ public:
 	int m_pmcbank;
 	int m_gfxrom_select;
 	tilemap_t *m_bg_tilemap[2];
+	DECLARE_WRITE8_MEMBER(coincntr_w);
 };
 
 

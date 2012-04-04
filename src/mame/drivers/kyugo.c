@@ -54,24 +54,22 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static WRITE8_HANDLER( kyugo_nmi_mask_w )
+WRITE8_MEMBER(kyugo_state::kyugo_nmi_mask_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
-static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
+WRITE8_MEMBER(kyugo_state::kyugo_sub_cpu_control_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
-	device_set_input_line(state->m_subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(kyugo_nmi_mask_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(kyugo_nmi_mask_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(kyugo_flipscreen_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(kyugo_sub_cpu_control_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(kyugo_sub_cpu_control_w)
 ADDRESS_MAP_END
 
 
@@ -134,9 +132,9 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static WRITE8_HANDLER( kyugo_coin_counter_w )
+WRITE8_MEMBER(kyugo_state::kyugo_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data & 1);
+	coin_counter_w(machine(), offset, data & 1);
 }
 
 static ADDRESS_MAP_START( gyrodine_sub_portmap, AS_IO, 8, kyugo_state )
@@ -152,7 +150,7 @@ static ADDRESS_MAP_START( repulse_sub_portmap, AS_IO, 8, kyugo_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE_LEGACY(kyugo_coin_counter_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
 
@@ -161,7 +159,7 @@ static ADDRESS_MAP_START( flashgala_sub_portmap, AS_IO, 8, kyugo_state )
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x42, 0x42) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0xc0, 0xc1) AM_WRITE_LEGACY(kyugo_coin_counter_w)
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
 
@@ -170,7 +168,7 @@ static ADDRESS_MAP_START( srdmissn_sub_portmap, AS_IO, 8, kyugo_state )
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x82, 0x82) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x84, 0x85) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x90, 0x91) AM_WRITE_LEGACY(kyugo_coin_counter_w)
+	AM_RANGE(0x90, 0x91) AM_WRITE(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
 
@@ -517,7 +515,7 @@ static MACHINE_RESET( kyugo )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	// must start with interrupts and sub CPU disabled
 	state->m_nmi_mask = 0;
-	kyugo_sub_cpu_control_w(space, 0, 0);
+	state->kyugo_sub_cpu_control_w(*space, 0, 0);
 
 	state->m_scroll_x_lo = 0;
 	state->m_scroll_x_hi = 0;

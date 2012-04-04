@@ -24,6 +24,9 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_k007342;
 	device_t *m_k007420;
+	DECLARE_READ8_MEMBER(trackball_r);
+	DECLARE_WRITE8_MEMBER(bladestl_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(bladestl_sh_irqtrigger_w);
 };
 
 

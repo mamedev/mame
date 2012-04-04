@@ -242,40 +242,39 @@ static MACHINE_RESET( ccastles )
  *
  *************************************/
 
-static WRITE8_HANDLER( irq_ack_w )
+WRITE8_MEMBER(ccastles_state::irq_ack_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	if (state->m_irq_state)
+	if (m_irq_state)
 	{
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
-		state->m_irq_state = 0;
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_irq_state = 0;
 	}
 }
 
 
-static WRITE8_HANDLER( led_w )
+WRITE8_MEMBER(ccastles_state::led_w)
 {
-	set_led_status(space->machine(), offset, ~data & 1);
+	set_led_status(machine(), offset, ~data & 1);
 }
 
 
-static WRITE8_HANDLER( ccounter_w )
+WRITE8_MEMBER(ccastles_state::ccounter_w)
 {
-	coin_counter_w(space->machine(), offset, data & 1);
+	coin_counter_w(machine(), offset, data & 1);
 }
 
 
-static WRITE8_HANDLER( bankswitch_w )
+WRITE8_MEMBER(ccastles_state::bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 1);
+	memory_set_bank(machine(), "bank1", data & 1);
 }
 
 
-static READ8_HANDLER( leta_r )
+READ8_MEMBER(ccastles_state::leta_r)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
-	return input_port_read(space->machine(), letanames[offset]);
+	return input_port_read(machine(), letanames[offset]);
 }
 
 
@@ -286,39 +285,35 @@ static READ8_HANDLER( leta_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( nvram_recall_w )
+WRITE8_MEMBER(ccastles_state::nvram_recall_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	state->m_nvram_4b->recall(0);
-	state->m_nvram_4b->recall(1);
-	state->m_nvram_4b->recall(0);
-	state->m_nvram_4a->recall(0);
-	state->m_nvram_4a->recall(1);
-	state->m_nvram_4a->recall(0);
+	m_nvram_4b->recall(0);
+	m_nvram_4b->recall(1);
+	m_nvram_4b->recall(0);
+	m_nvram_4a->recall(0);
+	m_nvram_4a->recall(1);
+	m_nvram_4a->recall(0);
 }
 
 
-static WRITE8_HANDLER( nvram_store_w )
+WRITE8_MEMBER(ccastles_state::nvram_store_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	state->m_nvram_store[offset] = data & 1;
-	state->m_nvram_4b->store(~state->m_nvram_store[0] & state->m_nvram_store[1]);
-	state->m_nvram_4a->store(~state->m_nvram_store[0] & state->m_nvram_store[1]);
+	m_nvram_store[offset] = data & 1;
+	m_nvram_4b->store(~m_nvram_store[0] & m_nvram_store[1]);
+	m_nvram_4a->store(~m_nvram_store[0] & m_nvram_store[1]);
 }
 
 
-static READ8_HANDLER( nvram_r )
+READ8_MEMBER(ccastles_state::nvram_r)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	return (state->m_nvram_4b->read(*space, offset) & 0x0f) | (state->m_nvram_4a->read(*space, offset) << 4);
+	return (m_nvram_4b->read(*&space, offset) & 0x0f) | (m_nvram_4a->read(*&space, offset) << 4);
 }
 
 
-static WRITE8_HANDLER( nvram_w )
+WRITE8_MEMBER(ccastles_state::nvram_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	state->m_nvram_4b->write(*space, offset, data);
-	state->m_nvram_4a->write(*space, offset, data >> 4);
+	m_nvram_4b->write(*&space, offset, data);
+	m_nvram_4a->write(*&space, offset, data >> 4);
 }
 
 
@@ -336,20 +331,20 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ccastles_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM_WRITE_LEGACY(ccastles_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x8e00, 0x8fff) AM_BASE(m_spriteram)
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_READWRITE_LEGACY(nvram_r, nvram_w)
-	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x01fc) AM_READ_LEGACY(leta_r)
+	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_READWRITE(nvram_r, nvram_w)
+	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x01fc) AM_READ(leta_r)
 	AM_RANGE(0x9600, 0x97ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x9a00, 0x9a0f) AM_MIRROR(0x01f0) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x9c00, 0x9c7f) AM_WRITE_LEGACY(nvram_recall_w)
+	AM_RANGE(0x9c00, 0x9c7f) AM_WRITE(nvram_recall_w)
 	AM_RANGE(0x9c80, 0x9cff) AM_WRITE_LEGACY(ccastles_hscroll_w)
 	AM_RANGE(0x9d00, 0x9d7f) AM_WRITE_LEGACY(ccastles_vscroll_w)
-	AM_RANGE(0x9d80, 0x9dff) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x9d80, 0x9dff) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x9e00, 0x9e7f) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x9e80, 0x9e81) AM_MIRROR(0x0078) AM_WRITE_LEGACY(led_w)
-	AM_RANGE(0x9e82, 0x9e83) AM_MIRROR(0x0078) AM_WRITE_LEGACY(nvram_store_w)
-	AM_RANGE(0x9e85, 0x9e86) AM_MIRROR(0x0078) AM_WRITE_LEGACY(ccounter_w)
-	AM_RANGE(0x9e87, 0x9e87) AM_MIRROR(0x0078) AM_WRITE_LEGACY(bankswitch_w)
+	AM_RANGE(0x9e80, 0x9e81) AM_MIRROR(0x0078) AM_WRITE(led_w)
+	AM_RANGE(0x9e82, 0x9e83) AM_MIRROR(0x0078) AM_WRITE(nvram_store_w)
+	AM_RANGE(0x9e85, 0x9e86) AM_MIRROR(0x0078) AM_WRITE(ccounter_w)
+	AM_RANGE(0x9e87, 0x9e87) AM_MIRROR(0x0078) AM_WRITE(bankswitch_w)
 	AM_RANGE(0x9f00, 0x9f07) AM_MIRROR(0x0078) AM_WRITE_LEGACY(ccastles_video_control_w)
 	AM_RANGE(0x9f80, 0x9fbf) AM_MIRROR(0x0040) AM_WRITE_LEGACY(ccastles_paletteram_w)
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")

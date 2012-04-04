@@ -16,6 +16,11 @@ public:
 	unsigned m_track_horz;
 	unsigned m_track_vert[2];
 	unsigned m_track_ice;
+	DECLARE_WRITE8_MEMBER(sspeedr_int_ack_w);
+	DECLARE_WRITE8_MEMBER(sspeedr_lamp_w);
+	DECLARE_WRITE8_MEMBER(sspeedr_time_w);
+	DECLARE_WRITE8_MEMBER(sspeedr_score_w);
+	DECLARE_WRITE8_MEMBER(sspeedr_sound_w);
 };
 
 

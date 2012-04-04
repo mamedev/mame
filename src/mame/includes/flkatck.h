@@ -25,6 +25,11 @@ public:
 	/* devices */
 	device_t *m_audiocpu;
 	device_t *m_k007121;
+	DECLARE_WRITE8_MEMBER(flkatck_bankswitch_w);
+	DECLARE_READ8_MEMBER(flkatck_ls138_r);
+	DECLARE_WRITE8_MEMBER(flkatck_ls138_w);
+	DECLARE_READ8_MEMBER(multiply_r);
+	DECLARE_WRITE8_MEMBER(multiply_w);
 };
 
 

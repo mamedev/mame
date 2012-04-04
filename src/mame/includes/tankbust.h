@@ -19,6 +19,11 @@ public:
 	size_t m_spriteram_size;
 
 	UINT8 m_irq_mask;
+	DECLARE_WRITE8_MEMBER(tankbust_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(tankbust_e0xx_w);
+	DECLARE_READ8_MEMBER(debug_output_area_r);
+	DECLARE_READ8_MEMBER(read_from_unmapped_memory);
+	DECLARE_READ8_MEMBER(some_changing_input);
 };
 
 

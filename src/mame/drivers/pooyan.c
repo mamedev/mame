@@ -33,13 +33,12 @@ static INTERRUPT_GEN( pooyan_interrupt )
 }
 
 
-static WRITE8_HANDLER( irq_enable_w )
+WRITE8_MEMBER(pooyan_state::irq_enable_w)
 {
-	pooyan_state *state = space->machine().driver_data<pooyan_state>();
 
-	state->m_irq_enable = data & 1;
-	if (!state->m_irq_enable)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_irq_enable = data & 1;
+	if (!m_irq_enable)
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -63,7 +62,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pooyan_state )
 	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x5e1f) AM_READ_PORT("DSW0")
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x5e7f) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x5e7f) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0xa180, 0xa180) AM_MIRROR(0x5e78) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xa180, 0xa180) AM_MIRROR(0x5e78) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa181, 0xa181) AM_MIRROR(0x5e78) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)
 	AM_RANGE(0xa183, 0xa183) AM_MIRROR(0x5e78) AM_WRITENOP // ???
 	AM_RANGE(0xa187, 0xa187) AM_MIRROR(0x5e78) AM_WRITE_LEGACY(pooyan_flipscreen_w)

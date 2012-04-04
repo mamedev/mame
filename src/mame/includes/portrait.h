@@ -11,6 +11,9 @@ public:
 	tilemap_t *m_background;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(portrait_ctrl_w);
+	DECLARE_WRITE8_MEMBER(portrait_positive_scroll_w);
+	DECLARE_WRITE8_MEMBER(portrait_negative_scroll_w);
 };
 
 

@@ -40,6 +40,8 @@ public:
 	required_device<okim6295_device> m_oki2;
 	required_device<buffered_spriteram16_device> m_spriteram;
 	optional_device<buffered_spriteram16_device> m_spriteram2;
+	DECLARE_READ16_MEMBER(rohga_irq_ack_r);
+	DECLARE_WRITE16_MEMBER(wizdfire_irq_ack_w);
 };
 
 

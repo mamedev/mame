@@ -24,6 +24,9 @@ public:
 
 	/* devices */
 	cpu_device *m_maincpu;
+	DECLARE_WRITE8_MEMBER(timeplt_nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(timeplt_coin_counter_w);
+	DECLARE_READ8_MEMBER(psurge_protection_r);
 };
 
 

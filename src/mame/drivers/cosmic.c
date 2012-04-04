@@ -38,9 +38,8 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 
 /* Schematics show 12 triggers for discrete sound circuits */
 
-static WRITE8_HANDLER( panic_sound_output_w )
+WRITE8_MEMBER(cosmic_state::panic_sound_output_w)
 {
-	cosmic_state *state = space->machine().driver_data<cosmic_state>();
 
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -48,59 +47,59 @@ static WRITE8_HANDLER( panic_sound_output_w )
 		int count;
 		if (data == 0)
 			for (count = 0; count < 9; count++)
-				state->m_samples->stop(count);
+				m_samples->stop(count);
 
-		state->m_sound_enabled = data;
+		m_sound_enabled = data;
 	}
 
-	if (state->m_sound_enabled)
+	if (m_sound_enabled)
 	{
 		switch (offset)
 		{
-		case 0:	if (data) state->m_samples->start(0, 0); break;	/* Walk */
-		case 1:	if (data) state->m_samples->start(0, 5); break;	/* Enemy Die 1 */
+		case 0:	if (data) m_samples->start(0, 0); break;	/* Walk */
+		case 1:	if (data) m_samples->start(0, 5); break;	/* Enemy Die 1 */
 		case 2:	if (data)									/* Drop 1 */
 				{
-					if (!state->m_samples->playing(1))
+					if (!m_samples->playing(1))
 					{
-						state->m_samples->stop(2);
-						state->m_samples->start(1, 3);
+						m_samples->stop(2);
+						m_samples->start(1, 3);
 					}
 				}
 				else
-					state->m_samples->stop(1);
+					m_samples->stop(1);
 				break;
 
-		case 3:	if (data && !state->m_samples->playing(6))			/* Oxygen */
-					state->m_samples->start(6, 9, true);
+		case 3:	if (data && !m_samples->playing(6))			/* Oxygen */
+					m_samples->start(6, 9, true);
 				break;
 
 		case 4:	break;										/* Drop 2 */
-		case 5:	if (data) state->m_samples->start(0, 5); break;	/* Enemy Die 2 (use same sample as 1) */
-		case 6:	if (data && !state->m_samples->playing(1) && !state->m_samples->playing(3))   /* Hang */
-					state->m_samples->start(2, 2);
+		case 5:	if (data) m_samples->start(0, 5); break;	/* Enemy Die 2 (use same sample as 1) */
+		case 6:	if (data && !m_samples->playing(1) && !m_samples->playing(3))   /* Hang */
+					m_samples->start(2, 2);
 				break;
 
 		case 7:	if (data)									/* Escape */
 				{
-					state->m_samples->stop(2);
-					state->m_samples->start(3, 4);
+					m_samples->stop(2);
+					m_samples->start(3, 4);
 				}
 				else
-					state->m_samples->stop(3);
+					m_samples->stop(3);
 				break;
 
-		case 8:	if (data) state->m_samples->start(0, 1); break;	/* Stairs */
+		case 8:	if (data) m_samples->start(0, 1); break;	/* Stairs */
 		case 9:	if (data)									/* Extend */
-					state->m_samples->start(4, 8);
+					m_samples->start(4, 8);
 				else
-					state->m_samples->stop(4);
+					m_samples->stop(4);
 				break;
 
-		case 10:	dac_data_w(state->m_dac, data); break;/* Bonus */
-		case 15:	if (data) state->m_samples->start(0, 6); break;	/* Player Die */
-		case 16:	if (data) state->m_samples->start(5, 7); break;	/* Enemy Laugh */
-		case 17:	if (data) state->m_samples->start(0, 10); break;	/* Coin - Not triggered by software */
+		case 10:	dac_data_w(m_dac, data); break;/* Bonus */
+		case 15:	if (data) m_samples->start(0, 6); break;	/* Player Die */
+		case 16:	if (data) m_samples->start(5, 7); break;	/* Enemy Laugh */
+		case 17:	if (data) m_samples->start(0, 10); break;	/* Coin - Not triggered by software */
 		}
 	}
 
@@ -109,27 +108,26 @@ static WRITE8_HANDLER( panic_sound_output_w )
 	#endif
 }
 
-static WRITE8_HANDLER( panic_sound_output2_w )
+WRITE8_MEMBER(cosmic_state::panic_sound_output2_w)
 {
 	panic_sound_output_w(space, offset + 15, data);
 }
 
-static WRITE8_HANDLER( cosmicg_output_w )
+WRITE8_MEMBER(cosmic_state::cosmicg_output_w)
 {
-	cosmic_state *state = space->machine().driver_data<cosmic_state>();
 
 	/* Sound Enable / Disable */
 	if (offset == 12)
 	{
 		int count;
 
-		state->m_sound_enabled = data;
+		m_sound_enabled = data;
 		if (data == 0)
 			for (count = 0; count < 9; count++)
-				state->m_samples->stop(count);
+				m_samples->stop(count);
 	}
 
-	if (state->m_sound_enabled)
+	if (m_sound_enabled)
 	{
 		switch (offset)
 		{
@@ -137,38 +135,38 @@ static WRITE8_HANDLER( cosmicg_output_w )
 		/* as other cosmic series games, but it never seems to */
 		/* be used for anything. It is implemented for sake of */
 		/* completness. Maybe it plays a tune if you win ?     */
-		case 1:	dac_data_w(state->m_dac, -data); break;
-		case 2:	if (data) state->m_samples->start(0, state->m_march_select); break;	/* March Sound */
-		case 3:	state->m_march_select = (state->m_march_select & 0xfe) | data; break;
-		case 4:	state->m_march_select = (state->m_march_select & 0xfd) | (data << 1); break;
-		case 5:	state->m_march_select = (state->m_march_select & 0xfb) | (data << 2); break;
+		case 1:	dac_data_w(m_dac, -data); break;
+		case 2:	if (data) m_samples->start(0, m_march_select); break;	/* March Sound */
+		case 3:	m_march_select = (m_march_select & 0xfe) | data; break;
+		case 4:	m_march_select = (m_march_select & 0xfd) | (data << 1); break;
+		case 5:	m_march_select = (m_march_select & 0xfb) | (data << 2); break;
 
 		case 6:	if (data)							/* Killer Attack (crawly thing at bottom of screen) */
-					state->m_samples->start(1, 8, true);
+					m_samples->start(1, 8, true);
 				else
-					state->m_samples->stop(1);
+					m_samples->stop(1);
 				break;
 
 		case 7:	if (data)								/* Bonus Chance & Got Bonus */
 				{
-					state->m_samples->stop(4);
-					state->m_samples->start(4, 10);
+					m_samples->stop(4);
+					m_samples->start(4, 10);
 				}
 				break;
 
 		case 8:	if (data)
 				{
-					if (!state->m_samples->playing(4)) state->m_samples->start(4, 9, true);
+					if (!m_samples->playing(4)) m_samples->start(4, 9, true);
 				}
 				else
-					state->m_samples->stop(4);
+					m_samples->stop(4);
 				break;
 
-		case 9:	if (data) state->m_samples->start(3, 11); break;	/* Got Ship */
+		case 9:	if (data) m_samples->start(3, 11); break;	/* Got Ship */
 //      case 11: watchdog_reset_w(0, 0); break;             /* Watchdog */
-		case 13:	if (data) state->m_samples->start(8, 13 - state->m_gun_die_select); break;  /* Got Monster / Gunshot */
-		case 14:	state->m_gun_die_select = data; break;
-		case 15:	if (data) state->m_samples->start(5, 14); break;	/* Coin Extend (extra base) */
+		case 13:	if (data) m_samples->start(8, 13 - m_gun_die_select); break;  /* Got Monster / Gunshot */
+		case 14:	m_gun_die_select = data; break;
+		case 15:	if (data) m_samples->start(5, 14); break;	/* Coin Extend (extra base) */
 		}
 	}
 
@@ -178,9 +176,8 @@ static WRITE8_HANDLER( cosmicg_output_w )
 }
 
 
-static WRITE8_HANDLER( cosmica_sound_output_w )
+WRITE8_MEMBER(cosmic_state::cosmica_sound_output_w)
 {
-	cosmic_state *state = space->machine().driver_data<cosmic_state>();
 
 	/* Sound Enable / Disable */
 	if (offset == 11)
@@ -188,119 +185,119 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 		int count;
 		if (data == 0)
 			for (count = 0; count < 12; count++)
-				state->m_samples->stop(count);
+				m_samples->stop(count);
 		else
 		{
-			state->m_samples->start(0, 0, true); /*Background Noise*/
+			m_samples->start(0, 0, true); /*Background Noise*/
 		}
 
-		state->m_sound_enabled = data;
+		m_sound_enabled = data;
 	}
 
-	if (state->m_sound_enabled)
+	if (m_sound_enabled)
 	{
 		switch (offset)
 		{
-		case 0:	if (data) state->m_samples->start(1, 2); break; /*Dive Bombing Type A*/
+		case 0:	if (data) m_samples->start(1, 2); break; /*Dive Bombing Type A*/
 
 		case 2:	/*Dive Bombing Type B (Main Control)*/
 			if (data)
 			{
-				switch (state->m_dive_bomb_b_select)
+				switch (m_dive_bomb_b_select)
 				{
 				case 2:
-					if (state->m_samples->playing(2))
+					if (m_samples->playing(2))
 					{
-						state->m_samples->stop(2);
-						state->m_samples->start(2, 3); break;
+						m_samples->stop(2);
+						m_samples->start(2, 3); break;
 					}
 					else
-						state->m_samples->start(2, 3); break;
+						m_samples->start(2, 3); break;
 
 				case 3:
-					if (state->m_samples->playing(3))
+					if (m_samples->playing(3))
 					{
-						state->m_samples->stop(3);
-						state->m_samples->start(3, 4); break;
+						m_samples->stop(3);
+						m_samples->start(3, 4); break;
 					}
 					else
-						state->m_samples->start(3, 4); break;
+						m_samples->start(3, 4); break;
 
 				case 4:
-					if (state->m_samples->playing(4))
+					if (m_samples->playing(4))
 					{
-						state->m_samples->stop(4);
-						state->m_samples->start(4, 5); break;
+						m_samples->stop(4);
+						m_samples->start(4, 5); break;
 					}
 					else
-						state->m_samples->start(4, 5); break;
+						m_samples->start(4, 5); break;
 
 				case 5:
-					if (state->m_samples->playing(5))
+					if (m_samples->playing(5))
 					{
-						state->m_samples->stop(5);
-						state->m_samples->start(5, 6); break;
+						m_samples->stop(5);
+						m_samples->start(5, 6); break;
 					}
 					else
-						state->m_samples->start(5, 6); break;
+						m_samples->start(5, 6); break;
 
 				case 6:
-					if (state->m_samples->playing(6))
+					if (m_samples->playing(6))
 					{
-						state->m_samples->stop(6);
-						state->m_samples->start(6, 7); break;
+						m_samples->stop(6);
+						m_samples->start(6, 7); break;
 					}
 					else
-						state->m_samples->start(6, 7); break;
+						m_samples->start(6, 7); break;
 
 				case 7:
-					if (state->m_samples->playing(7))
+					if (m_samples->playing(7))
 					{
-						state->m_samples->stop(7);
-						state->m_samples->start(7, 8); break;
+						m_samples->stop(7);
+						m_samples->start(7, 8); break;
 					}
 					else
-						state->m_samples->start(7, 8); break;
+						m_samples->start(7, 8); break;
 				}
 			}
 
 		case 3: /*Dive Bombing Type B (G.S.B)*/
 			if (data)
-				state->m_dive_bomb_b_select |= 0x04;
+				m_dive_bomb_b_select |= 0x04;
 			else
-				state->m_dive_bomb_b_select &= 0xfb;
+				m_dive_bomb_b_select &= 0xfb;
 			break;
 
 
 		case 4: /*Dive Bombing Type B (M.S.B)*/
 			if (data)
-				state->m_dive_bomb_b_select |= 0x02;
+				m_dive_bomb_b_select |= 0x02;
 			else
-				state->m_dive_bomb_b_select &= 0xfd;
+				m_dive_bomb_b_select &= 0xfd;
 			break;
 
 		case 5: /*Dive Bombing Type B (L.S.B)*/
 			if (data)
-				state->m_dive_bomb_b_select |= 0x01;
+				m_dive_bomb_b_select |= 0x01;
 			else
-				state->m_dive_bomb_b_select &= 0xfe;
+				m_dive_bomb_b_select &= 0xfe;
 			break;
 
 
-		case 6:	if (data) state->m_samples->start(8, 9); break; /*Fire Control*/
+		case 6:	if (data) m_samples->start(8, 9); break; /*Fire Control*/
 
-		case 7:	if (data) state->m_samples->start(9, 10); break; /*Small Explosion*/
+		case 7:	if (data) m_samples->start(9, 10); break; /*Small Explosion*/
 
-		case 8:	if (data) state->m_samples->start(10, 11); break; /*Loud Explosion*/
+		case 8:	if (data) m_samples->start(10, 11); break; /*Loud Explosion*/
 
 		case 9:
 			if (data)
-				state->m_samples->start(11, 1, true);
+				m_samples->start(11, 1, true);
 			else
-				state->m_samples->stop(11);
+				m_samples->stop(11);
 			break; /*Extend Sound control*/
 
-		case 12:	if (data) state->m_samples->start(11,12); break; /*Insert Coin*/
+		case 12:	if (data) m_samples->start(11,12); break; /*Insert Coin*/
 		}
 	}
 
@@ -310,29 +307,29 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 }
 
 
-static READ8_HANDLER( cosmica_pixel_clock_r )
+READ8_MEMBER(cosmic_state::cosmica_pixel_clock_r)
 {
-	return (space->machine().primary_screen->vpos() >> 2) & 0x3f;
+	return (machine().primary_screen->vpos() >> 2) & 0x3f;
 }
 
-static READ8_HANDLER( cosmicg_port_0_r )
+READ8_MEMBER(cosmic_state::cosmicg_port_0_r)
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-	return (input_port_read(space->machine(), "IN0") & 0xf0) | ((space->machine().primary_screen->vpos() & 0xf0) >> 4);
+	return (input_port_read(machine(), "IN0") & 0xf0) | ((machine().primary_screen->vpos() & 0xf0) >> 4);
 }
 
-static READ8_HANDLER( magspot_coinage_dip_r )
+READ8_MEMBER(cosmic_state::magspot_coinage_dip_r)
 {
-	return (input_port_read_safe(space->machine(), "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
+	return (input_port_read_safe(machine(), "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
 /* Has 8 way joystick, remap combinations to missing directions */
 
-static READ8_HANDLER( nomnlnd_port_0_1_r )
+READ8_MEMBER(cosmic_state::nomnlnd_port_0_1_r)
 {
-	int control = input_port_read(space->machine(), offset ? "IN1" : "IN0");
-	int fire = input_port_read(space->machine(), "IN3");
+	int control = input_port_read(machine(), offset ? "IN1" : "IN0");
+	int fire = input_port_read(machine(), "IN3");
 
 	/* If firing - stop tank */
 	if ((fire & 0xc0) == 0) return 0xff;
@@ -348,9 +345,9 @@ static READ8_HANDLER( nomnlnd_port_0_1_r )
 
 
 
-static WRITE8_HANDLER( flip_screen_w )
+WRITE8_MEMBER(cosmic_state::flip_screen_w)
 {
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(machine(), data & 0x80);
 }
 
 
@@ -362,10 +359,10 @@ static ADDRESS_MAP_START( panic_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
 	AM_RANGE(0x6803, 0x6803) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x7000, 0x700b) AM_WRITE_LEGACY(panic_sound_output_w)
+	AM_RANGE(0x7000, 0x700b) AM_WRITE(panic_sound_output_w)
 	AM_RANGE(0x700c, 0x700e) AM_WRITE_LEGACY(cosmic_color_register_w)
-	AM_RANGE(0x700f, 0x700f) AM_WRITE_LEGACY(flip_screen_w)
-	AM_RANGE(0x7800, 0x7801) AM_WRITE_LEGACY(panic_sound_output2_w)
+	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
+	AM_RANGE(0x7800, 0x7801) AM_WRITE(panic_sound_output2_w)
 ADDRESS_MAP_END
 
 
@@ -376,10 +373,10 @@ static ADDRESS_MAP_START( cosmica_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("P1")
 	AM_RANGE(0x6801, 0x6801) AM_READ_PORT("P2")
 	AM_RANGE(0x6802, 0x6802) AM_READ_PORT("DSW")
-	AM_RANGE(0x6803, 0x6803) AM_READ_LEGACY(cosmica_pixel_clock_r)
-	AM_RANGE(0x7000, 0x700b) AM_WRITE_LEGACY(cosmica_sound_output_w)
+	AM_RANGE(0x6803, 0x6803) AM_READ(cosmica_pixel_clock_r)
+	AM_RANGE(0x7000, 0x700b) AM_WRITE(cosmica_sound_output_w)
 	AM_RANGE(0x700c, 0x700d) AM_WRITE_LEGACY(cosmic_color_register_w)
-	AM_RANGE(0x700f, 0x700f) AM_WRITE_LEGACY(flip_screen_w)
+	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
 ADDRESS_MAP_END
 
 
@@ -389,20 +386,20 @@ static ADDRESS_MAP_START( cosmicg_map, AS_PROGRAM, 8, cosmic_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_io_map, AS_IO, 8, cosmic_state )
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(cosmicg_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x15) AM_WRITE_LEGACY(cosmicg_output_w)
+	AM_RANGE(0x00, 0x15) AM_WRITE(cosmicg_output_w)
 	AM_RANGE(0x16, 0x17) AM_WRITE_LEGACY(cosmic_color_register_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3800, 0x3807) AM_READ_LEGACY(magspot_coinage_dip_r)
+	AM_RANGE(0x3800, 0x3807) AM_READ(magspot_coinage_dip_r)
 	AM_RANGE(0x4000, 0x401f) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x4800, 0x4800) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0x480c, 0x480d) AM_WRITE_LEGACY(cosmic_color_register_w)
-	AM_RANGE(0x480f, 0x480f) AM_WRITE_LEGACY(flip_screen_w)
+	AM_RANGE(0x480f, 0x480f) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
 	AM_RANGE(0x5002, 0x5002) AM_READ_PORT("IN2")
@@ -414,7 +411,8 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( panic_coin_inserted )
 {
-	panic_sound_output_w(field.machine().device("maincpu")->memory().space(AS_PROGRAM), 17, newval == 0);
+	cosmic_state *state = field.machine().driver_data<cosmic_state>();
+	state->panic_sound_output_w(*field.machine().device("maincpu")->memory().space(AS_PROGRAM), 17, newval == 0);
 }
 
 static INPUT_PORTS_START( panic )
@@ -1551,8 +1549,9 @@ static DRIVER_INIT( devzone )
 
 static DRIVER_INIT( nomnlnd )
 {
+	cosmic_state *state = machine.driver_data<cosmic_state>();
 	device_t *dac = machine.device("dac");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x5000, 0x5001, FUNC(nomnlnd_port_0_1_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x5000, 0x5001, read8_delegate(FUNC(cosmic_state::nomnlnd_port_0_1_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x4800, 0x4800);
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4807, 0x4807, FUNC(cosmic_background_enable_w));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(*dac, 0x480a, 0x480a, FUNC(dac_w));

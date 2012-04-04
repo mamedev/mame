@@ -55,6 +55,34 @@ public:
 	device_t *m_deco_tilegen1;
 	device_t *m_deco_tilegen2;
 	UINT8 m_irq_source;
+	DECLARE_READ32_MEMBER(deco32_irq_controller_r);
+	DECLARE_WRITE32_MEMBER(deco32_irq_controller_w);
+	DECLARE_WRITE32_MEMBER(deco32_sound_w);
+	DECLARE_READ32_MEMBER(deco32_71_r);
+	DECLARE_READ32_MEMBER(captaven_prot_r);
+	DECLARE_READ32_MEMBER(captaven_soundcpu_r);
+	DECLARE_READ32_MEMBER(fghthist_control_r);
+	DECLARE_WRITE32_MEMBER(fghthist_eeprom_w);
+	DECLARE_READ32_MEMBER(dragngun_service_r);
+	DECLARE_READ32_MEMBER(lockload_gun_mirror_r);
+	DECLARE_READ32_MEMBER(dragngun_prot_r);
+	DECLARE_READ32_MEMBER(tattass_prot_r);
+	DECLARE_WRITE32_MEMBER(tattass_prot_w);
+	DECLARE_WRITE32_MEMBER(tattass_control_w);
+	DECLARE_READ32_MEMBER(nslasher_prot_r);
+	DECLARE_WRITE32_MEMBER(nslasher_eeprom_w);
+	DECLARE_WRITE32_MEMBER(nslasher_prot_w);
+	DECLARE_READ32_MEMBER(deco32_spriteram_r);
+	DECLARE_WRITE32_MEMBER(deco32_spriteram_w);
+	DECLARE_WRITE32_MEMBER(deco32_buffer_spriteram_w);
+	DECLARE_READ32_MEMBER(deco32_spriteram2_r);
+	DECLARE_WRITE32_MEMBER(deco32_spriteram2_w);
+	DECLARE_WRITE32_MEMBER(deco32_buffer_spriteram2_w);
+	DECLARE_WRITE32_MEMBER(deco32_pf1_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(deco32_pf2_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(deco32_pf3_rowscroll_w);
+	DECLARE_WRITE32_MEMBER(deco32_pf4_rowscroll_w);
+	DECLARE_READ8_MEMBER(latch_r);
 };
 
 class dragngun_state : public deco32_state
@@ -69,6 +97,8 @@ public:
 	UINT32 *m_dragngun_sprite_lookup_1_ram;
 	UINT32 m_dragngun_sprite_ctrl;
 	int m_dragngun_lightgun_port;
+	DECLARE_READ32_MEMBER(dragngun_lightgun_r);
+	DECLARE_WRITE32_MEMBER(dragngun_lightgun_w);
 };
 
 

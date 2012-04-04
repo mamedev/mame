@@ -28,6 +28,8 @@ public:
 	device_t *m_k052109;
 	device_t *m_k053246;
 	device_t *m_k053251;
+	DECLARE_WRITE8_MEMBER(z80_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(z80_arm_nmi_w);
 };
 
 /*----------- defined in machine/simpsons.c -----------*/

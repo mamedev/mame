@@ -39,12 +39,11 @@ Stephh's notes (based on the game M6502 code and some tests) :
 #include "includes/konamipt.h"
 #include "includes/scotrsht.h"
 
-static WRITE8_HANDLER( ctrl_w )
+WRITE8_MEMBER(scotrsht_state::ctrl_w)
 {
-	scotrsht_state *state = space->machine().driver_data<scotrsht_state>();
 
-	state->m_irq_enable = data & 0x02;
-	flip_screen_set(space->machine(), data & 0x08);
+	m_irq_enable = data & 0x02;
+	flip_screen_set(machine(), data & 0x08);
 }
 
 static INTERRUPT_GEN( scotrsht_interrupt )
@@ -55,10 +54,10 @@ static INTERRUPT_GEN( scotrsht_interrupt )
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( scotrsht_soundlatch_w )
+WRITE8_MEMBER(scotrsht_state::scotrsht_soundlatch_w)
 {
 	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )
@@ -71,9 +70,9 @@ static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )
 	AM_RANGE(0x2041, 0x2041) AM_WRITENOP
 	AM_RANGE(0x2042, 0x2042) AM_WRITENOP  /* it should be -> bit 2 = scroll direction like in jailbrek, but it's not used */
 	AM_RANGE(0x2043, 0x2043) AM_WRITE_LEGACY(scotrsht_charbank_w)
-	AM_RANGE(0x2044, 0x2044) AM_WRITE_LEGACY(ctrl_w)
+	AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(scotrsht_palettebank_w)
-	AM_RANGE(0x3100, 0x3100) AM_WRITE_LEGACY(scotrsht_soundlatch_w)
+	AM_RANGE(0x3100, 0x3100) AM_WRITE(scotrsht_soundlatch_w)
 	AM_RANGE(0x3200, 0x3200) AM_WRITENOP /* it writes 0, 1 */
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("DSW3")

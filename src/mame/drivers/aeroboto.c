@@ -28,15 +28,14 @@ Revisions:
 #include "includes/aeroboto.h"
 
 
-static READ8_HANDLER( aeroboto_201_r )
+READ8_MEMBER(aeroboto_state::aeroboto_201_r)
 {
-	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 	/* if you keep a button pressed during boot, the game will expect this */
 	/* serie of values to be returned from 3004, and display "PASS 201" if it is */
 	static const UINT8 res[4] = { 0xff, 0x9f, 0x1b, 0x03 };
 
-	logerror("PC %04x: read 3004\n", cpu_get_pc(&space->device()));
-	return res[(state->m_count++) & 3];
+	logerror("PC %04x: read 3004\n", cpu_get_pc(&space.device()));
+	return res[(m_count++) & 3];
 }
 
 
@@ -50,31 +49,29 @@ static INTERRUPT_GEN( aeroboto_interrupt )
 		state->m_disable_irq--;
 }
 
-static READ8_HANDLER( aeroboto_irq_ack_r )
+READ8_MEMBER(aeroboto_state::aeroboto_irq_ack_r)
 {
-	cputag_set_input_line(space->machine(),"maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(),"maincpu", 0, CLEAR_LINE);
 	return 0xff;
 }
 
-static READ8_HANDLER( aeroboto_2973_r )
+READ8_MEMBER(aeroboto_state::aeroboto_2973_r)
 {
-	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
-	state->m_mainram[0x02be] = 0;
+	m_mainram[0x02be] = 0;
 	return 0xff;
 }
 
-static WRITE8_HANDLER ( aeroboto_1a2_w )
+WRITE8_MEMBER(aeroboto_state::aeroboto_1a2_w)
 {
-	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
-	state->m_mainram[0x01a2] = data;
+	m_mainram[0x01a2] = data;
 	if (data)
-		state->m_disable_irq = 1;
+		m_disable_irq = 1;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aeroboto_state )
-	AM_RANGE(0x01a2, 0x01a2) AM_WRITE_LEGACY(aeroboto_1a2_w)			// affects IRQ line (more protection?)
+	AM_RANGE(0x01a2, 0x01a2) AM_WRITE(aeroboto_1a2_w)			// affects IRQ line (more protection?)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(m_mainram)	// main  RAM
 	AM_RANGE(0x0800, 0x08ff) AM_RAM								// tile color buffer; copied to 0x2000
 	AM_RANGE(0x0900, 0x09ff) AM_WRITEONLY						// a backup of default tile colors
@@ -84,15 +81,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aeroboto_state )
 	AM_RANGE(0x1840, 0x27ff) AM_WRITENOP					// cleared during custom LSI test
 	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// sprite RAM
 	AM_RANGE(0x2900, 0x2fff) AM_WRITENOP					// cleared along with sprite RAM
-	AM_RANGE(0x2973, 0x2973) AM_READ_LEGACY(aeroboto_2973_r)			// protection read
+	AM_RANGE(0x2973, 0x2973) AM_READ(aeroboto_2973_r)			// protection read
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(aeroboto_in0_r, aeroboto_3000_w)
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(soundlatch2_w)
 	AM_RANGE(0x3003, 0x3003) AM_WRITEONLY AM_BASE(m_vscroll)
-	AM_RANGE(0x3004, 0x3004) AM_READ_LEGACY(aeroboto_201_r) AM_WRITEONLY AM_BASE(m_starx)
+	AM_RANGE(0x3004, 0x3004) AM_READ(aeroboto_201_r) AM_WRITEONLY AM_BASE(m_starx)
 	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_BASE(m_stary)	// usable but probably wrong
 	AM_RANGE(0x3006, 0x3006) AM_WRITEONLY AM_BASE(m_bgcolor)
-	AM_RANGE(0x3800, 0x3800) AM_READ_LEGACY(aeroboto_irq_ack_r)		// watchdog or IRQ ack
+	AM_RANGE(0x3800, 0x3800) AM_READ(aeroboto_irq_ack_r)		// watchdog or IRQ ack
 	AM_RANGE(0x4000, 0xffff) AM_ROM								// main ROM
 ADDRESS_MAP_END
 

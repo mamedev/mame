@@ -61,6 +61,40 @@ public:
 	INT16      m_sampledata[0x40000];
 
 	UINT8      m_irq5_mask;
+	DECLARE_READ16_MEMBER(k052109_word_noA12_r);
+	DECLARE_WRITE16_MEMBER(k052109_word_noA12_w);
+	DECLARE_WRITE16_MEMBER(punkshot_k052109_word_w);
+	DECLARE_WRITE16_MEMBER(punkshot_k052109_word_noA12_w);
+	DECLARE_READ16_MEMBER(k053245_scattered_word_r);
+	DECLARE_WRITE16_MEMBER(k053245_scattered_word_w);
+	DECLARE_READ16_MEMBER(k053244_word_noA1_r);
+	DECLARE_WRITE16_MEMBER(k053244_word_noA1_w);
+	DECLARE_WRITE16_MEMBER(tmnt_sound_command_w);
+	DECLARE_READ16_MEMBER(prmrsocr_sound_r);
+	DECLARE_WRITE16_MEMBER(prmrsocr_sound_cmd_w);
+	DECLARE_WRITE16_MEMBER(prmrsocr_sound_irq_w);
+	DECLARE_WRITE8_MEMBER(prmrsocr_audio_bankswitch_w);
+	DECLARE_READ8_MEMBER(tmnt_sres_r);
+	DECLARE_WRITE8_MEMBER(tmnt_sres_w);
+	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
+	DECLARE_READ16_MEMBER(punkshot_kludge_r);
+	DECLARE_READ16_MEMBER(ssriders_protection_r);
+	DECLARE_WRITE16_MEMBER(ssriders_protection_w);
+	DECLARE_READ16_MEMBER(blswhstl_coin_r);
+	DECLARE_READ16_MEMBER(ssriders_eeprom_r);
+	DECLARE_READ16_MEMBER(sunsetbl_eeprom_r);
+	DECLARE_WRITE16_MEMBER(blswhstl_eeprom_w);
+	DECLARE_READ16_MEMBER(thndrx2_eeprom_r);
+	DECLARE_WRITE16_MEMBER(thndrx2_eeprom_w);
+	DECLARE_WRITE16_MEMBER(prmrsocr_eeprom_w);
+	DECLARE_READ16_MEMBER(cuebrick_nv_r);
+	DECLARE_WRITE16_MEMBER(cuebrick_nv_w);
+	DECLARE_WRITE16_MEMBER(cuebrick_nvbank_w);
+	DECLARE_WRITE16_MEMBER(ssriders_soundkludge_w);
+	DECLARE_WRITE16_MEMBER(k053251_glfgreat_w);
+	DECLARE_WRITE16_MEMBER(tmnt2_1c0800_w);
+	DECLARE_READ8_MEMBER(k054539_ctrl_r);
+	DECLARE_WRITE8_MEMBER(k054539_ctrl_w);
 };
 
 

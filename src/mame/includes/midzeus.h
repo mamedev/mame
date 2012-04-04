@@ -14,6 +14,25 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT32>	m_nvram;
+	DECLARE_WRITE32_MEMBER(cmos_w);
+	DECLARE_READ32_MEMBER(cmos_r);
+	DECLARE_WRITE32_MEMBER(cmos_protect_w);
+	DECLARE_READ32_MEMBER(zpram_r);
+	DECLARE_WRITE32_MEMBER(zpram_w);
+	DECLARE_READ32_MEMBER(bitlatches_r);
+	DECLARE_WRITE32_MEMBER(bitlatches_w);
+	DECLARE_READ32_MEMBER(crusnexo_leds_r);
+	DECLARE_WRITE32_MEMBER(crusnexo_leds_w);
+	DECLARE_READ32_MEMBER(linkram_r);
+	DECLARE_WRITE32_MEMBER(linkram_w);
+	DECLARE_READ32_MEMBER(tms32031_control_r);
+	DECLARE_WRITE32_MEMBER(tms32031_control_w);
+	DECLARE_WRITE32_MEMBER(keypad_select_w);
+	DECLARE_READ32_MEMBER(analog_r);
+	DECLARE_WRITE32_MEMBER(analog_w);
+	DECLARE_WRITE32_MEMBER(invasn_gun_w);
+	DECLARE_READ32_MEMBER(invasn_gun_r);
+	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
 };
 
 

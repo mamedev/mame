@@ -306,13 +306,11 @@ static INTERRUPT_GEN( vblank_int )
 }
 
 
-static WRITE8_HANDLER( int_enable_w )
+WRITE8_MEMBER(zaxxon_state::int_enable_w)
 {
-	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
-
-	state->m_int_enabled = data & 1;
-	if (!state->m_int_enabled)
-		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	m_int_enabled = data & 1;
+	if (!m_int_enabled)
+		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -341,15 +339,14 @@ static MACHINE_START( zaxxon )
  *
  *************************************/
 
-static READ8_HANDLER( razmataz_counter_r )
+READ8_MEMBER(zaxxon_state::razmataz_counter_r)
 {
-	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
 	/* it needs to be increasing at a reasonable rate but not too fast */
 	/* or else the sound will mess up */
-	return state->m_razmataz_counter++ >> 8;
+	return m_razmataz_counter++ >> 8;
 }
 
 
@@ -386,21 +383,20 @@ static CUSTOM_INPUT( razmataz_dial_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( zaxxon_coin_counter_w )
+WRITE8_MEMBER(zaxxon_state::zaxxon_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data & 0x01);
+	coin_counter_w(machine(), offset, data & 0x01);
 }
 
 
 // There is no external coin lockout circuitry; instead, the pcb simply latches
 // the coin input, which then needs to be explicitly cleared by the game.
-static WRITE8_HANDLER( zaxxon_coin_enable_w )
+WRITE8_MEMBER(zaxxon_state::zaxxon_coin_enable_w)
 {
-	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
-	state->m_coin_enable[offset] = data & 1;
-	if (!state->m_coin_enable[offset])
-		state->m_coin_status[offset] = 0;
+	m_coin_enable[offset] = data & 1;
+	if (!m_coin_enable[offset])
+		m_coin_status[offset] = 0;
 }
 
 
@@ -441,11 +437,11 @@ static ADDRESS_MAP_START( zaxxon_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x18fc) AM_READ_PORT("DSW03")
 	AM_RANGE(0xc100, 0xc100) AM_MIRROR(0x18ff) AM_READ_PORT("SW100")
-	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE_LEGACY(zaxxon_coin_enable_w)
-	AM_RANGE(0xc003, 0xc004) AM_MIRROR(0x18f8) AM_WRITE_LEGACY(zaxxon_coin_counter_w)
+	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_enable_w)
+	AM_RANGE(0xc003, 0xc004) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_counter_w)
 	AM_RANGE(0xc006, 0xc006) AM_MIRROR(0x18f8) AM_WRITE_LEGACY(zaxxon_flipscreen_w)
 	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xe0f0, 0xe0f0) AM_MIRROR(0x1f00) AM_WRITE_LEGACY(int_enable_w)
+	AM_RANGE(0xe0f0, 0xe0f0) AM_MIRROR(0x1f00) AM_WRITE(int_enable_w)
 	AM_RANGE(0xe0f1, 0xe0f1) AM_MIRROR(0x1f00) AM_WRITE_LEGACY(zaxxon_fg_color_w)
 	AM_RANGE(0xe0f8, 0xe0f9) AM_MIRROR(0x1f00) AM_WRITE_LEGACY(zaxxon_bg_position_w)
 	AM_RANGE(0xe0fa, 0xe0fa) AM_MIRROR(0x1f00) AM_WRITE_LEGACY(zaxxon_bg_color_w)
@@ -464,11 +460,11 @@ static ADDRESS_MAP_START( congo_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW02")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW03")
 	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x1fc7) AM_READ_PORT("SW100")
-	AM_RANGE(0xc018, 0xc01a) AM_MIRROR(0x1fc0) AM_WRITE_LEGACY(zaxxon_coin_enable_w)
-	AM_RANGE(0xc01b, 0xc01c) AM_MIRROR(0x1fc0) AM_WRITE_LEGACY(zaxxon_coin_counter_w)
+	AM_RANGE(0xc018, 0xc01a) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_coin_enable_w)
+	AM_RANGE(0xc01b, 0xc01c) AM_MIRROR(0x1fc0) AM_WRITE(zaxxon_coin_counter_w)
 	AM_RANGE(0xc01d, 0xc01d) AM_MIRROR(0x1fc0) AM_WRITE_LEGACY(zaxxon_bg_enable_w)
 	AM_RANGE(0xc01e, 0xc01e) AM_MIRROR(0x1fc0) AM_WRITE_LEGACY(zaxxon_flipscreen_w)
-	AM_RANGE(0xc01f, 0xc01f) AM_MIRROR(0x1fc0) AM_WRITE_LEGACY(int_enable_w)
+	AM_RANGE(0xc01f, 0xc01f) AM_MIRROR(0x1fc0) AM_WRITE(int_enable_w)
 	AM_RANGE(0xc021, 0xc021) AM_MIRROR(0x1fc0) AM_WRITE_LEGACY(zaxxon_fg_color_w)
 	AM_RANGE(0xc023, 0xc023) AM_MIRROR(0x1fc0) AM_WRITE_LEGACY(zaxxon_bg_color_w)
 	AM_RANGE(0xc026, 0xc026) AM_MIRROR(0x1fc0) AM_WRITE_LEGACY(congo_fg_bank_w)
@@ -1509,7 +1505,7 @@ static DRIVER_INIT( razmataz )
 	pgmspace->install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	pgmspace->install_legacy_read_handler(0xc80a, 0xc80a, FUNC(razmataz_counter_r));
+	pgmspace->install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),state));
 
 	/* connect the universal sound board */
 	pgmspace->install_legacy_readwrite_handler(*usbsnd, 0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));

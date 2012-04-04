@@ -20,6 +20,10 @@ public:
 	tilemap_t* m_tilemap2;
 	bitmap_ind16 m_helper1;
 	bitmap_ind16 m_helper2;
+	DECLARE_READ8_MEMBER(sprint8_collision_r);
+	DECLARE_READ8_MEMBER(sprint8_input_r);
+	DECLARE_WRITE8_MEMBER(sprint8_lockout_w);
+	DECLARE_WRITE8_MEMBER(sprint8_int_reset_w);
 };
 
 

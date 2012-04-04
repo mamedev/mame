@@ -59,6 +59,14 @@ public:
 	system_time  m_systime;
 
 
+	DECLARE_READ16_MEMBER(pgm_videoram_r);
+	DECLARE_WRITE16_MEMBER(pgm_videoram_w);
+	DECLARE_READ16_MEMBER(z80_ram_r);
+	DECLARE_WRITE16_MEMBER(z80_ram_w);
+	DECLARE_WRITE16_MEMBER(z80_reset_w);
+	DECLARE_WRITE16_MEMBER(z80_ctrl_w);
+	DECLARE_WRITE16_MEMBER(m68k_l1_w);
+	DECLARE_WRITE8_MEMBER(z80_l3_w);
 };
 
 

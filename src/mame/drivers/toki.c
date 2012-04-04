@@ -43,13 +43,13 @@ for now. Even at 12 this slowdown still happens a little.
 #include "sound/3812intf.h"
 #include "includes/toki.h"
 
-static WRITE16_HANDLER( tokib_soundcommand16_w )
+WRITE16_MEMBER(toki_state::tokib_soundcommand16_w)
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
-static READ16_HANDLER( pip16_r )
+READ16_MEMBER(toki_state::pip16_r)
 {
 	return ~0;
 }
@@ -81,10 +81,9 @@ static WRITE8_DEVICE_HANDLER( toki_adpcm_control_w )
 	msm5205_reset_w(device,data & 0x08);
 }
 
-static WRITE8_HANDLER( toki_adpcm_data_w )
+WRITE8_MEMBER(toki_state::toki_adpcm_data_w)
 {
-	toki_state *state = space->machine().driver_data<toki_state>();
-	state->m_msm5205next = data;
+	m_msm5205next = data;
 }
 
 
@@ -118,12 +117,12 @@ static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16, toki_state )
 	AM_RANGE(0x071804, 0x071807) AM_WRITENOP	/* sprite related, always 01be0100 */
 	AM_RANGE(0x07180e, 0x071e45) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x072000, 0x072001) AM_READ_LEGACY(watchdog_reset16_r)   /* probably */
-	AM_RANGE(0x075000, 0x075001) AM_WRITE_LEGACY(tokib_soundcommand16_w)
+	AM_RANGE(0x075000, 0x075001) AM_WRITE(tokib_soundcommand16_w)
 	AM_RANGE(0x075004, 0x07500b) AM_WRITEONLY AM_BASE(m_scrollram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c000e, 0x0c000f) AM_READ_LEGACY(pip16_r)  /* sound related, if we return 0 the code writes */
+	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(pip16_r)  /* sound related, if we return 0 the code writes */
 				/* the sound command quickly followed by 0 and the */
 				/* sound CPU often misses the command. */
 ADDRESS_MAP_END
@@ -134,7 +133,7 @@ static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", toki_adpcm_control_w)	/* MSM5205 + ROM bank */
-	AM_RANGE(0xe400, 0xe400) AM_WRITE_LEGACY(toki_adpcm_data_w)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)
 	AM_RANGE(0xec00, 0xec01) AM_MIRROR(0x0008) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r)

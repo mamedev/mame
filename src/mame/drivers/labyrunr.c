@@ -27,16 +27,16 @@ static TIMER_DEVICE_CALLBACK( labyrunr_scanline )
 		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( labyrunr_bankswitch_w )
+WRITE8_MEMBER(labyrunr_state::labyrunr_bankswitch_w)
 {
 	if (data & 0xe0) popmessage("bankswitch %02x", data);
 
 	/* bits 0-2 = bank number */
-	memory_set_bank(space->machine(), "bank1", data & 0x07);	// shall we check if data&7 > #banks?
+	memory_set_bank(machine(), "bank1", data & 0x07);	// shall we check if data&7 > #banks?
 
 	/* bits 3 and 4 are coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x08);
-	coin_counter_w(space->machine(), 1, data & 0x10);
+	coin_counter_w(machine(), 0, data & 0x08);
+	coin_counter_w(machine(), 1, data & 0x10);
 }
 
 static ADDRESS_MAP_START( labyrunr_map, AS_PROGRAM, 8, labyrunr_state )
@@ -49,7 +49,7 @@ static ADDRESS_MAP_START( labyrunr_map, AS_PROGRAM, 8, labyrunr_state )
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("P2")
 	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("P1")
 	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE_LEGACY(labyrunr_bankswitch_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(labyrunr_bankswitch_w)
 	AM_RANGE(0x0d00, 0x0d1f) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE(m_paletteram)

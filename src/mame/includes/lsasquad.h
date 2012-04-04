@@ -35,6 +35,7 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_mcu;
+	DECLARE_WRITE8_MEMBER(lsasquad_bankswitch_w);
 };
 
 /*----------- defined in machine/lsasquad.c -----------*/

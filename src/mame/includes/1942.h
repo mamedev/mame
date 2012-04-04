@@ -24,6 +24,7 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(c1942_bankswitch_w);
 };
 
 

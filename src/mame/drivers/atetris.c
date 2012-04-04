@@ -82,9 +82,9 @@ static TIMER_CALLBACK( interrupt_gen )
 }
 
 
-static WRITE8_HANDLER( irq_ack_w )
+WRITE8_MEMBER(atetris_state::irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -138,17 +138,16 @@ static MACHINE_RESET( atetris )
  *
  *************************************/
 
-static READ8_HANDLER( atetris_slapstic_r )
+READ8_MEMBER(atetris_state::atetris_slapstic_r)
 {
-	atetris_state *state = space->machine().driver_data<atetris_state>();
-	int result = state->m_slapstic_base[0x2000 + offset];
-	int new_bank = slapstic_tweak(space, offset) & 1;
+	int result = m_slapstic_base[0x2000 + offset];
+	int new_bank = slapstic_tweak(&space, offset) & 1;
 
 	/* update for the new bank */
-	if (new_bank != state->m_current_bank)
+	if (new_bank != m_current_bank)
 	{
-		state->m_current_bank = new_bank;
-		memcpy(state->m_slapstic_base, &state->m_slapstic_source[state->m_current_bank * 0x4000], 0x4000);
+		m_current_bank = new_bank;
+		memcpy(m_slapstic_base, &m_slapstic_source[m_current_bank * 0x4000], 0x4000);
 	}
 	return result;
 }
@@ -161,10 +160,10 @@ static READ8_HANDLER( atetris_slapstic_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( coincount_w )
+WRITE8_MEMBER(atetris_state::coincount_w)
 {
-	coin_counter_w(space->machine(), 0, (data >> 5) & 1);
-	coin_counter_w(space->machine(), 1, (data >> 4) & 1);
+	coin_counter_w(machine(), 0, (data >> 5) & 1);
+	coin_counter_w(machine(), 1, (data >> 4) & 1);
 }
 
 
@@ -175,21 +174,19 @@ static WRITE8_HANDLER( coincount_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( nvram_w )
+WRITE8_MEMBER(atetris_state::nvram_w)
 {
-	atetris_state *state = space->machine().driver_data<atetris_state>();
 
-	if (state->m_nvram_write_enable)
-		state->m_nvram[offset] = data;
-	state->m_nvram_write_enable = 0;
+	if (m_nvram_write_enable)
+		m_nvram[offset] = data;
+	m_nvram_write_enable = 0;
 }
 
 
-static WRITE8_HANDLER( nvram_enable_w )
+WRITE8_MEMBER(atetris_state::nvram_enable_w)
 {
-	atetris_state *state = space->machine().driver_data<atetris_state>();
 
-	state->m_nvram_write_enable = 1;
+	m_nvram_write_enable = 1;
 }
 
 
@@ -205,15 +202,15 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(atetris_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE_LEGACY(nvram_w) AM_SHARE("nvram")
+	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x2810, 0x281f) AM_MIRROR(0x03e0) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITE_LEGACY(nvram_enable_w)
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE_LEGACY(irq_ack_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE_LEGACY(coincount_w)
+	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITE(nvram_enable_w)
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_WRITE(irq_ack_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(coincount_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READ_LEGACY(atetris_slapstic_r)
+	AM_RANGE(0x6000, 0x7fff) AM_READ(atetris_slapstic_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -222,18 +219,18 @@ static ADDRESS_MAP_START( atetrisb2_map, AS_PROGRAM, 8, atetris_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(atetris_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE_LEGACY(nvram_w) AM_SHARE("nvram")
+	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0x2804, 0x2804) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 	AM_RANGE(0x2806, 0x2806) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
 	AM_RANGE(0x2808, 0x2808) AM_READ_PORT("IN0")
 	AM_RANGE(0x2818, 0x2818) AM_READ_PORT("IN1")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x3400, 0x3400) AM_WRITE_LEGACY(nvram_enable_w)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE_LEGACY(irq_ack_w)
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE_LEGACY(coincount_w)
+	AM_RANGE(0x3400, 0x3400) AM_WRITE(nvram_enable_w)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(irq_ack_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(coincount_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x7fff) AM_READ_LEGACY(atetris_slapstic_r)
+	AM_RANGE(0x6000, 0x7fff) AM_READ(atetris_slapstic_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -58,73 +58,71 @@ static CUSTOM_INPUT( f3_coin_r )
 	return state->m_coin_word[num];
 }
 
-static READ32_HANDLER( f3_control_r )
+READ32_MEMBER(taito_f3_state::f3_control_r)
 {
 	static const char *const iptnames[] = { "IN0", "IN1", "AN0", "AN1", "IN2", "IN3" };
 
 	if (offset < 6)
-		return input_port_read(space->machine(), iptnames[offset]);
+		return input_port_read(machine(), iptnames[offset]);
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(&space->device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(&space.device()), offset);
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER( f3_control_w )
+WRITE32_MEMBER(taito_f3_state::f3_control_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
 	switch (offset)
 	{
 		case 0x00: /* Watchdog */
-			watchdog_reset(space->machine());
+			watchdog_reset(machine());
 			return;
 
 		case 0x01: /* Coin counters & lockouts */
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(space->machine(), 0,~data & 0x01000000);
-				coin_lockout_w(space->machine(), 1,~data & 0x02000000);
-				coin_counter_w(space->machine(), 0, data & 0x04000000);
-				coin_counter_w(space->machine(), 1, data & 0x08000000);
-				state->m_coin_word[0]=(data>>16)&0xffff;
+				coin_lockout_w(machine(), 0,~data & 0x01000000);
+				coin_lockout_w(machine(), 1,~data & 0x02000000);
+				coin_counter_w(machine(), 0, data & 0x04000000);
+				coin_counter_w(machine(), 1, data & 0x08000000);
+				m_coin_word[0]=(data>>16)&0xffff;
 			}
 			return;
 
 		case 0x04: /* Eeprom */
 			if (ACCESSING_BITS_0_7)
 			{
-				input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+				input_port_write(machine(), "EEPROMOUT", data, 0xff);
 			}
 			return;
 
 		case 0x05:	/* Player 3 & 4 coin counters */
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(space->machine(), 2,~data & 0x01000000);
-				coin_lockout_w(space->machine(), 3,~data & 0x02000000);
-				coin_counter_w(space->machine(), 2, data & 0x04000000);
-				coin_counter_w(space->machine(), 3, data & 0x08000000);
-				state->m_coin_word[1]=(data>>16)&0xffff;
+				coin_lockout_w(machine(), 2,~data & 0x01000000);
+				coin_lockout_w(machine(), 3,~data & 0x02000000);
+				coin_counter_w(machine(), 2, data & 0x04000000);
+				coin_counter_w(machine(), 3, data & 0x08000000);
+				m_coin_word[1]=(data>>16)&0xffff;
 			}
 			return;
 	}
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",cpu_get_pc(&space->device()),offset,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",cpu_get_pc(&space.device()),offset,data);
 }
 
-static WRITE32_HANDLER( f3_sound_reset_0_w )
+WRITE32_MEMBER(taito_f3_state::f3_sound_reset_0_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-static WRITE32_HANDLER( f3_sound_reset_1_w )
+WRITE32_MEMBER(taito_f3_state::f3_sound_reset_1_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static WRITE32_HANDLER( f3_sound_bankswitch_w )
+WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 {
-	taito_f3_state *state = space->machine().driver_data<taito_f3_state>();
-	if (state->m_f3_game==KIRAMEKI) {
-		UINT16 *rom = (UINT16 *)space->machine().region("audiocpu")->base();
+	if (m_f3_game==KIRAMEKI) {
+		UINT16 *rom = (UINT16 *)machine().region("audiocpu")->base();
 		UINT32 idx;
 
 		idx = (offset << 1) & 0x1e;
@@ -136,14 +134,14 @@ static WRITE32_HANDLER( f3_sound_bankswitch_w )
 
 		/* Banks are 0x20000 bytes each, divide by two to get data16
         pointer rather than byte pointer */
-		memory_set_bankptr(space->machine(), "bank2", &rom[(idx*0x20000)/2 + 0x80000]);
+		memory_set_bankptr(machine(), "bank2", &rom[(idx*0x20000)/2 + 0x80000]);
 
 	} else {
 		logerror("Sound bankswitch in unsupported game\n");
 	}
 }
 
-static WRITE16_HANDLER( f3_unk_w )
+WRITE16_MEMBER(taito_f3_state::f3_unk_w)
 {
 	/*
     Several games writes a value here at POST, dunno what kind of config this is ...
@@ -191,11 +189,11 @@ static WRITE16_HANDLER( f3_unk_w )
 
 static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x300000, 0x30007f) AM_WRITE_LEGACY(f3_sound_bankswitch_w)
+	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_BASE(m_f3_ram)
 	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE_LEGACY(f3_palette_24bit_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE_LEGACY(f3_control_r,  f3_control_w)
-	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16_LEGACY(f3_unk_w,0xffffffff)
+	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
+	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
 	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16_LEGACY(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x610000, 0x61bfff) AM_READWRITE16_LEGACY(f3_pf_data_r,f3_pf_data_w,0xffffffff)		//AM_BASE(m_f3_pf_data)
 	AM_RANGE(0x61c000, 0x61dfff) AM_READWRITE16_LEGACY(f3_videoram_r,f3_videoram_w,0xffffffff)		//AM_BASE(m_videoram)
@@ -205,8 +203,8 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
 	AM_RANGE(0x660000, 0x66000f) AM_WRITE16_LEGACY(f3_control_0_w,0xffffffff)
 	AM_RANGE(0x660010, 0x66001f) AM_WRITE16_LEGACY(f3_control_1_w,0xffffffff)
 	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("f3_shared")
-	AM_RANGE(0xc80000, 0xc80003) AM_WRITE_LEGACY(f3_sound_reset_0_w)
-	AM_RANGE(0xc80100, 0xc80103) AM_WRITE_LEGACY(f3_sound_reset_1_w)
+	AM_RANGE(0xc80000, 0xc80003) AM_WRITE(f3_sound_reset_0_w)
+	AM_RANGE(0xc80100, 0xc80103) AM_WRITE(f3_sound_reset_1_w)
 ADDRESS_MAP_END
 
 
@@ -3860,18 +3858,18 @@ static DRIVER_INIT( bubsymph )
 }
 
 
-static READ32_HANDLER( bubsympb_oki_r )
+READ32_MEMBER(taito_f3_state::bubsympb_oki_r)
 {
-	return space->machine().device<okim6295_device>("oki")->read(*space,0);
+	return machine().device<okim6295_device>("oki")->read(*&space,0);
 }
-static WRITE32_HANDLER( bubsympb_oki_w )
+WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
 {
 	//printf("write %08x %08x\n",data,mem_mask);
-	if (ACCESSING_BITS_0_7) space->machine().device<okim6295_device>("oki")->write(*space, 0,data&0xff);
+	if (ACCESSING_BITS_0_7) machine().device<okim6295_device>("oki")->write(*&space, 0,data&0xff);
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT8 *snd = space->machine().region("oki")->base();
+		UINT8 *snd = machine().region("oki")->base();
 		int bank = (data & 0x000f0000) >> 16;
 		// almost certainly wrong
 		memcpy(snd+0x30000, snd+0x80000+0x30000+bank*0x10000, 0x10000);
@@ -3908,8 +3906,8 @@ static DRIVER_INIT( bubsympb )
 		}
 	}
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4a001c, 0x4a001f, FUNC(bubsympb_oki_r) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x4a001c, 0x4a001f, FUNC(bubsympb_oki_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x4a001c, 0x4a001f, read32_delegate(FUNC(taito_f3_state::bubsympb_oki_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x4a001c, 0x4a001f, write32_delegate(FUNC(taito_f3_state::bubsympb_oki_w),state));
 }
 
 

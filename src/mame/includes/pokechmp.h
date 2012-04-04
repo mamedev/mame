@@ -8,6 +8,10 @@ public:
 	tilemap_t *m_bg_tilemap;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(pokechmp_bank_w);
+	DECLARE_WRITE8_MEMBER(pokechmp_sound_bank_w);
+	DECLARE_WRITE8_MEMBER(pokechmp_sound_w);
+	DECLARE_WRITE8_MEMBER(pokechmp_paletteram_w);
 };
 
 

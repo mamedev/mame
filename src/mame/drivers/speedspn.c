@@ -54,18 +54,18 @@ TCH-SS9.u34     "     /               AB2Bh
 
 ******************************************************************************/
 
-static READ8_HANDLER(speedspn_irq_ack_r)
+READ8_MEMBER(speedspn_state::speedspn_irq_ack_r)
 {
 	// I think this simply acknowledges the IRQ #0, it's read within the handler and the
 	//  value is discarded
 	return 0;
 }
 
-static WRITE8_HANDLER(speedspn_banked_rom_change)
+WRITE8_MEMBER(speedspn_state::speedspn_banked_rom_change)
 {
 	/* is this weird banking some form of protection? */
 
-	UINT8 *rom = space->machine().region("maincpu")->base();
+	UINT8 *rom = machine().region("maincpu")->base();
 	int addr;
 
 	switch (data)
@@ -85,15 +85,15 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 			break;
 	}
 
-	memory_set_bankptr(space->machine(), "bank1",&rom[addr + 0x8000]);
+	memory_set_bankptr(machine(), "bank1",&rom[addr + 0x8000]);
 }
 
 /*** SOUND RELATED ***********************************************************/
 
-static WRITE8_HANDLER(speedspn_sound_w)
+WRITE8_MEMBER(speedspn_state::speedspn_sound_w)
 {
 	soundlatch_w(space, 1, data);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
@@ -121,10 +121,10 @@ static ADDRESS_MAP_START( speedspn_io_map, AS_IO, 8, speedspn_state )
 	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(speedspn_global_display_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("P1")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("P2") AM_WRITE_LEGACY(speedspn_banked_rom_change)
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(speedspn_sound_w)
+	AM_RANGE(0x12, 0x12) AM_READ_PORT("P2") AM_WRITE(speedspn_banked_rom_change)
+	AM_RANGE(0x13, 0x13) AM_READ_PORT("DSW1") AM_WRITE(speedspn_sound_w)
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("DSW2")
-	AM_RANGE(0x16, 0x16) AM_READ_LEGACY(speedspn_irq_ack_r) // @@@ could be watchdog, value is discarded
+	AM_RANGE(0x16, 0x16) AM_READ(speedspn_irq_ack_r) // @@@ could be watchdog, value is discarded
 	AM_RANGE(0x17, 0x17) AM_WRITE_LEGACY(speedspn_banked_vidram_change)
 ADDRESS_MAP_END
 

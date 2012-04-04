@@ -42,6 +42,27 @@ public:
 	device_t *m_audiocpu;
 	UINT8       m_sound_nmi_mask;
 	UINT8       m_sound_pa_latch;
+	DECLARE_WRITE16_MEMBER(tnextspc_coin_counters_w);
+	DECLARE_WRITE16_MEMBER(tnextspc_unknown_w);
+	DECLARE_WRITE16_MEMBER(alpha_microcontroller_w);
+	DECLARE_READ16_MEMBER(kyros_dip_r);
+	DECLARE_READ16_MEMBER(control_1_r);
+	DECLARE_READ16_MEMBER(control_2_r);
+	DECLARE_READ16_MEMBER(control_2_V_r);
+	DECLARE_READ16_MEMBER(control_3_r);
+	DECLARE_READ16_MEMBER(control_4_r);
+	DECLARE_READ16_MEMBER(jongbou_inputs_r);
+	DECLARE_WRITE16_MEMBER(kyros_sound_w);
+	DECLARE_WRITE16_MEMBER(alpha68k_II_sound_w);
+	DECLARE_WRITE16_MEMBER(alpha68k_V_sound_w);
+	DECLARE_WRITE16_MEMBER(paddlema_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(tnextspc_soundlatch_w);
+	DECLARE_READ16_MEMBER(kyros_alpha_trigger_r);
+	DECLARE_READ16_MEMBER(alpha_II_trigger_r);
+	DECLARE_READ16_MEMBER(alpha_V_trigger_r);
+	DECLARE_READ16_MEMBER(sound_cpu_r);
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	DECLARE_WRITE8_MEMBER(porta_w);
 };
 
 /* game_id - used to deal with a few game specific situations */

@@ -35,6 +35,10 @@ public:
 	cpu_device *m_daccpu;
 
 	UINT8         m_irq_mask;
+	DECLARE_WRITE8_MEMBER(megazone_i8039_irq_w);
+	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
+	DECLARE_WRITE8_MEMBER(megazone_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 

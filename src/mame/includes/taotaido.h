@@ -16,6 +16,10 @@ public:
 	UINT16 *m_spriteram_older;
 	UINT16 *m_spriteram2_old;
 	UINT16 *m_spriteram2_older;
+	DECLARE_READ16_MEMBER(pending_command_r);
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
+	DECLARE_WRITE8_MEMBER(taotaido_sh_bankswitch_w);
 };
 
 

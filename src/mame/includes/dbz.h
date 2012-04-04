@@ -33,6 +33,10 @@ public:
 	device_t *m_k056832;
 	device_t *m_k053936_1;
 	device_t *m_k053936_2;
+	DECLARE_READ16_MEMBER(dbzcontrol_r);
+	DECLARE_WRITE16_MEMBER(dbzcontrol_w);
+	DECLARE_WRITE16_MEMBER(dbz_sound_command_w);
+	DECLARE_WRITE16_MEMBER(dbz_sound_cause_nmi);
 };
 
 

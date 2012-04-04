@@ -19,6 +19,10 @@ public:
 	tilemap_t *m_tilemap;
 	UINT8 *m_dummy_tile;
 	UINT8 m_nmi_mask;
+	DECLARE_READ8_MEMBER(thepit_colorram_r);
+	DECLARE_WRITE8_MEMBER(thepit_sound_enable_w);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_READ8_MEMBER(rtriv_question_r);
 };
 
 

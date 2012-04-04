@@ -17,10 +17,10 @@
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( prehisle_sound16_w )
+WRITE16_MEMBER(prehisle_state::prehisle_sound16_w)
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /*******************************************************************************/
@@ -33,7 +33,7 @@ static ADDRESS_MAP_START( prehisle_map, AS_PROGRAM, 16, prehisle_state )
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE_LEGACY(prehisle_bg_videoram16_w) AM_BASE(m_bg_videoram16)
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0e0000, 0x0e00ff) AM_READ_LEGACY(prehisle_control16_r)
-	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE_LEGACY(prehisle_sound16_w)
+	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(prehisle_sound16_w)
 	AM_RANGE(0x0f0000, 0x0ff0ff) AM_WRITE_LEGACY(prehisle_control16_w)
 ADDRESS_MAP_END
 

@@ -24,9 +24,9 @@ Notes:
 
 
 /* Guess: reads when doing r/w to video device */
-static READ16_HANDLER( othldrby_scanline_r )
+READ16_MEMBER(othldrby_state::othldrby_scanline_r)
 {
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 
@@ -36,26 +36,26 @@ static WRITE16_DEVICE_HANDLER( oki_bankswitch_w )
 		downcast<okim6295_device *>(device)->set_bank_base((data & 1) * 0x40000);
 }
 
-static WRITE16_HANDLER( coinctrl_w )
+WRITE16_MEMBER(othldrby_state::coinctrl_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 1);
-		coin_counter_w(space->machine(), 1, data & 2);
-		coin_lockout_w(space->machine(), 0, ~data & 4);
-		coin_lockout_w(space->machine(), 1, ~data & 8);
+		coin_counter_w(machine(), 0, data & 1);
+		coin_counter_w(machine(), 1, data & 2);
+		coin_lockout_w(machine(), 0, ~data & 4);
+		coin_lockout_w(machine(), 1, ~data & 8);
 	}
 }
 
-static WRITE16_HANDLER( calendar_w )
+WRITE16_MEMBER(othldrby_state::calendar_w)
 {
 }
 
-static READ16_HANDLER( calendar_r )
+READ16_MEMBER(othldrby_state::calendar_r)
 {
 	system_time systime;
 
-	space->machine().base_datetime(systime);
+	machine().base_datetime(systime);
 
 	switch (offset)
 	{
@@ -83,7 +83,7 @@ static READ16_HANDLER( calendar_r )
 static ADDRESS_MAP_START( othldrby_map, AS_PROGRAM, 16, othldrby_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x20000f) AM_READWRITE_LEGACY(calendar_r, calendar_w)
+	AM_RANGE(0x200000, 0x20000f) AM_READWRITE(calendar_r, calendar_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(othldrby_videoram_addr_w)
 	AM_RANGE(0x300004, 0x300007) AM_READWRITE_LEGACY(othldrby_videoram_r, othldrby_videoram_w)
 	AM_RANGE(0x300008, 0x300009) AM_WRITE_LEGACY(othldrby_vreg_addr_w)
@@ -91,14 +91,14 @@ static ADDRESS_MAP_START( othldrby_map, AS_PROGRAM, 16, othldrby_state )
 	AM_RANGE(0x30000c, 0x30000f) AM_WRITE_LEGACY(othldrby_vreg_w)
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(othldrby_scanline_r)
+	AM_RANGE(0x700000, 0x700001) AM_READ(othldrby_scanline_r)
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("P1")
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("P2")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x700030, 0x700031) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
-	AM_RANGE(0x700034, 0x700035) AM_WRITE_LEGACY(coinctrl_w)
+	AM_RANGE(0x700034, 0x700035) AM_WRITE(coinctrl_w)
 ADDRESS_MAP_END
 
 

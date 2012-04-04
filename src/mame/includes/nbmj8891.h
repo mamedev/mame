@@ -28,6 +28,7 @@ public:
 	int m_param_old[0x10];
 	int m_param_cnt;
 	int m_flipscreen_old;
+	DECLARE_READ8_MEMBER(taiwanmb_unk_r);
 };
 
 

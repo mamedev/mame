@@ -74,38 +74,35 @@ static TIMER_DEVICE_CALLBACK( dbz_scanline )
 }
 
 #if 0
-static READ16_HANDLER( dbzcontrol_r )
+READ16_MEMBER(dbz_state::dbzcontrol_r)
 {
-	dbz_state *state = space->machine().driver_data<dbz_state>();
-	return state->m_control;
+	return m_control;
 }
 #endif
 
-static WRITE16_HANDLER( dbzcontrol_w )
+WRITE16_MEMBER(dbz_state::dbzcontrol_w)
 {
-	dbz_state *state = space->machine().driver_data<dbz_state>();
 	/* bit 10 = enable '246 readback */
 
-	COMBINE_DATA(&state->m_control);
+	COMBINE_DATA(&m_control);
 
 	if (data & 0x400)
-		k053246_set_objcha_line(state->m_k053246, ASSERT_LINE);
+		k053246_set_objcha_line(m_k053246, ASSERT_LINE);
 	else
-		k053246_set_objcha_line(state->m_k053246, CLEAR_LINE);
+		k053246_set_objcha_line(m_k053246, CLEAR_LINE);
 
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 }
 
-static WRITE16_HANDLER( dbz_sound_command_w )
+WRITE16_MEMBER(dbz_state::dbz_sound_command_w)
 {
 	soundlatch_w(space, 0, data >> 8);
 }
 
-static WRITE16_HANDLER( dbz_sound_cause_nmi )
+WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
 {
-	dbz_state *state = space->machine().driver_data<dbz_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void dbz_sound_irq( device_t *device, int irq )
@@ -135,9 +132,9 @@ static ADDRESS_MAP_START( dbz_map, AS_PROGRAM, 16, dbz_state )
 	AM_RANGE(0x4e0002, 0x4e0003) AM_READ_PORT("SYSTEM_DSW1")
 	AM_RANGE(0x4e4000, 0x4e4001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x4e8000, 0x4e8001) AM_WRITENOP
-	AM_RANGE(0x4ec000, 0x4ec001) AM_WRITE_LEGACY(dbzcontrol_w)
-	AM_RANGE(0x4f0000, 0x4f0001) AM_WRITE_LEGACY(dbz_sound_command_w)
-	AM_RANGE(0x4f4000, 0x4f4001) AM_WRITE_LEGACY(dbz_sound_cause_nmi)
+	AM_RANGE(0x4ec000, 0x4ec001) AM_WRITE(dbzcontrol_w)
+	AM_RANGE(0x4f0000, 0x4f0001) AM_WRITE(dbz_sound_command_w)
+	AM_RANGE(0x4f4000, 0x4f4001) AM_WRITE(dbz_sound_cause_nmi)
 	AM_RANGE(0x4f8000, 0x4f801f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0xff00)		// 251 #1
 	AM_RANGE(0x4fc000, 0x4fc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)	// 251 #2
 

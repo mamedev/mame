@@ -80,6 +80,20 @@ public:
 	device_t *m_tc0280grd;
 	device_t *m_tc0430grw;
 	device_t *m_tc0480scp;
+	DECLARE_WRITE16_MEMBER(growl_coin_word_w);
+	DECLARE_WRITE16_MEMBER(taitof2_4p_coin_word_w);
+	DECLARE_WRITE16_MEMBER(ninjak_coin_word_w);
+	DECLARE_READ16_MEMBER(ninjak_input_r);
+	DECLARE_READ16_MEMBER(cameltry_paddle_r);
+	DECLARE_READ16_MEMBER(mjnquest_dsw_r);
+	DECLARE_READ16_MEMBER(mjnquest_input_r);
+	DECLARE_WRITE16_MEMBER(mjnquest_inputselect_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_READ8_MEMBER(driveout_sound_command_r);
+	DECLARE_WRITE8_MEMBER(oki_bank_w);
+	DECLARE_WRITE16_MEMBER(driveout_sound_command_w);
+	DECLARE_WRITE16_MEMBER(cchip2_word_w);
+	DECLARE_READ16_MEMBER(cchip2_word_r);
 };
 
 /*----------- defined in video/taito_f2.c -----------*/

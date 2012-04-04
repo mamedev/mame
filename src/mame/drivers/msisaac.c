@@ -31,42 +31,40 @@ static TIMER_CALLBACK( nmi_callback )
 		state->m_pending_nmi = 1;
 }
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(msisaac_state::sound_command_w)
 {
 	soundlatch_w(space, 0, data);
-	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
-static WRITE8_HANDLER( nmi_disable_w )
+WRITE8_MEMBER(msisaac_state::nmi_disable_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_sound_nmi_enable = 0;
+	m_sound_nmi_enable = 0;
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(msisaac_state::nmi_enable_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_sound_nmi_enable = 1;
-	if (state->m_pending_nmi)
+	m_sound_nmi_enable = 1;
+	if (m_pending_nmi)
 	{
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->m_pending_nmi = 0;
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_pending_nmi = 0;
 	}
 }
 
 #if 0
-static WRITE8_HANDLER( flip_screen_w )
+WRITE8_MEMBER(msisaac_state::flip_screen_w)
 {
-	flip_screen_set(space->machine(), data);
+	flip_screen_set(machine(), data);
 }
 
-static WRITE8_HANDLER( msisaac_coin_counter_w )
+WRITE8_MEMBER(msisaac_state::msisaac_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset,data);
+	coin_counter_w(machine(), offset,data);
 }
 #endif
 
-static WRITE8_HANDLER( ms_unknown_w )
+WRITE8_MEMBER(msisaac_state::ms_unknown_w)
 {
 	if (data != 0x08)
 		popmessage("CPU #0 write to 0xf0a3 data=%2x", data);
@@ -81,7 +79,7 @@ static WRITE8_HANDLER( ms_unknown_w )
 
 
 
-static READ8_HANDLER( msisaac_mcu_r )
+READ8_MEMBER(msisaac_state::msisaac_mcu_r)
 {
 #ifdef USE_MCU
 	return buggychl_mcu_r(offset);
@@ -92,12 +90,11 @@ MCU simulation TODO:
 \-Fix some graphics imperfections(*not* confirmed if they are caused by unhandled
   commands or imperfect video emulation).
 */
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 
-	switch (state->m_mcu_val)
+	switch (m_mcu_val)
 	{
 		/*Start-up check*/
-		case 0x5f:  return (state->m_mcu_val + 0x6b);
+		case 0x5f:  return (m_mcu_val + 0x6b);
 		/*These interferes with RAM operations(setting them to non-zero you  *
          * will have unexpected results,such as infinite lives or score not  *
          * incremented properly).*/
@@ -119,7 +116,7 @@ MCU simulation TODO:
 			//6-down
 			//7-leftdwn
 
-			UINT8 val= (input_port_read(space->machine(), "IN1") >> 2) & 0x0f;
+			UINT8 val= (input_port_read(machine(), "IN1") >> 2) & 0x0f;
 			/* bit0 = left
                bit1 = right
                bit2 = down
@@ -138,9 +135,9 @@ MCU simulation TODO:
 			static const INT8 table[16] = { -1,    2,    6,     -1,       0,   1,      7,      0,       4,     3,     5,    4,     -1,     2,     6,    -1 };
 
 			if (table[val] >= 0)
-				state->m_direction = table[val];
+				m_direction = table[val];
 
-			return state->m_direction;
+			return m_direction;
 		}
 
 		/*This controls the arms when they return to the player.            */
@@ -148,13 +145,13 @@ MCU simulation TODO:
 			return 0x45;
 
 		default:
-			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(&space->device()), state->m_mcu_val);
-			return state->m_mcu_val;
+			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(&space.device()), m_mcu_val);
+			return m_mcu_val;
 	}
 #endif
 }
 
-static READ8_HANDLER( msisaac_mcu_status_r )
+READ8_MEMBER(msisaac_state::msisaac_mcu_status_r)
 {
 #ifdef USE_MCU
 	return buggychl_mcu_status_r(offset);
@@ -163,15 +160,14 @@ static READ8_HANDLER( msisaac_mcu_status_r )
 #endif
 }
 
-static WRITE8_HANDLER( msisaac_mcu_w )
+WRITE8_MEMBER(msisaac_state::msisaac_mcu_w)
 {
 #ifdef USE_MCU
 	buggychl_mcu_w(offset,data);
 #else
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
-	//  popmessage("PC = %04x %02x", cpu_get_pc(&space->device()), data);
-	state->m_mcu_val = data;
+	//  popmessage("PC = %04x %02x", cpu_get_pc(&space.device()), data);
+	m_mcu_val = data;
 #endif
 }
 
@@ -183,10 +179,10 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0xf001, 0xf001) AM_WRITENOP					//???
 	AM_RANGE(0xf002, 0xf002) AM_WRITENOP					//???
 
-	AM_RANGE(0xf060, 0xf060) AM_WRITE_LEGACY(sound_command_w)		//sound command
+	AM_RANGE(0xf060, 0xf060) AM_WRITE(sound_command_w)		//sound command
 	AM_RANGE(0xf061, 0xf061) AM_WRITENOP /*sound_reset*/	//????
 
-	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE_LEGACY(ms_unknown_w)			//???? written in interrupt routine
+	AM_RANGE(0xf0a3, 0xf0a3) AM_WRITE(ms_unknown_w)			//???? written in interrupt routine
 
 	AM_RANGE(0xf0c0, 0xf0c0) AM_WRITE_LEGACY(msisaac_fg_scrollx_w)
 	AM_RANGE(0xf0c1, 0xf0c1) AM_WRITE_LEGACY(msisaac_fg_scrolly_w)
@@ -195,8 +191,8 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0xf0c4, 0xf0c4) AM_WRITE_LEGACY(msisaac_bg_scrollx_w)
 	AM_RANGE(0xf0c5, 0xf0c5) AM_WRITE_LEGACY(msisaac_bg_scrolly_w)
 
-	AM_RANGE(0xf0e0, 0xf0e0) AM_READWRITE_LEGACY(msisaac_mcu_r, msisaac_mcu_w)
-	AM_RANGE(0xf0e1, 0xf0e1) AM_READ_LEGACY(msisaac_mcu_status_r)
+	AM_RANGE(0xf0e0, 0xf0e0) AM_READWRITE(msisaac_mcu_r, msisaac_mcu_w)
+	AM_RANGE(0xf0e1, 0xf0e1) AM_READ(msisaac_mcu_status_r)
 
 	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf081, 0xf081) AM_READ_PORT("DSW2")
@@ -210,8 +206,8 @@ static ADDRESS_MAP_START( msisaac_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE_LEGACY(msisaac_bg2_videoram_w) AM_BASE(m_videoram3)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE_LEGACY(msisaac_bg_videoram_w) AM_BASE(m_videoram2)
 //  AM_RANGE(0xf801, 0xf801) AM_WRITE_LEGACY(msisaac_bgcolor_w)
-//  AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(flip_screen_w)
-//  AM_RANGE(0xfc03, 0xfc04) AM_WRITE_LEGACY(msisaac_coin_counter_w)
+//  AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
+//  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( ta7630 )
@@ -257,11 +253,10 @@ static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 	sound->set_output_gain(6, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
 	sound->set_output_gain(7, state->m_vol_ctrl[(state->m_snd_ctrl0 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
 }
-static WRITE8_HANDLER( sound_control_1_w )
+WRITE8_MEMBER(msisaac_state::sound_control_1_w)
 {
-	msisaac_state *state = space->machine().driver_data<msisaac_state>();
-	state->m_snd_ctrl1 = data & 0xff;
-	//popmessage("SND1 0=%2x 1=%2x", state->m_snd_ctrl0, state->m_snd_ctrl1);
+	m_snd_ctrl1 = data & 0xff;
+	//popmessage("SND1 0=%2x 1=%2x", m_snd_ctrl0, m_snd_ctrl1);
 }
 
 static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8, msisaac_state )
@@ -271,10 +266,10 @@ static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x8010, 0x801d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0x8020, 0x8020) AM_DEVWRITE_LEGACY("msm", sound_control_0_w)
-	AM_RANGE(0x8030, 0x8030) AM_WRITE_LEGACY(sound_control_1_w)
+	AM_RANGE(0x8030, 0x8030) AM_WRITE(sound_control_1_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE_LEGACY(nmi_enable_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE_LEGACY(nmi_disable_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(nmi_enable_w)
+	AM_RANGE(0xc002, 0xc002) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /*???*/ /* this is NOT mixer_enable */
 	AM_RANGE(0xe000, 0xffff) AM_READNOP /*space for diagnostic ROM (not dumped, not reachable) */
 ADDRESS_MAP_END

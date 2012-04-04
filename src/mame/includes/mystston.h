@@ -30,6 +30,8 @@ public:
 	UINT8 *m_paletteram;
 	UINT8 *m_scroll;
 	UINT8 *m_video_control;
+	DECLARE_WRITE8_MEMBER(irq_clear_w);
+	DECLARE_WRITE8_MEMBER(mystston_ay8910_select_w);
 };
 
 

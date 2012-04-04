@@ -25,6 +25,8 @@ public:
 
 	/* devices */
 	device_t *m_msm;
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(pcm_set_w);
 };
 
 

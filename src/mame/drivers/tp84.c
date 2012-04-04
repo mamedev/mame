@@ -81,18 +81,17 @@ static MACHINE_START( tp84 )
 }
 
 
-static READ8_HANDLER( tp84_sh_timer_r )
+READ8_MEMBER(tp84_state::tp84_sh_timer_r)
 {
-	tp84_state *state = space->machine().driver_data<tp84_state>();
 	/* main xtal 14.318MHz, divided by 4 to get the CPU clock, further */
 	/* divided by 2048 to get this timer */
 	/* (divide by (2048/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	return (state->m_audiocpu->total_cycles() / (2048/2)) & 0x0f;
+	return (m_audiocpu->total_cycles() / (2048/2)) & 0x0f;
 }
 
 
-static WRITE8_HANDLER( tp84_filter_w )
+WRITE8_MEMBER(tp84_state::tp84_filter_w)
 {
 	int C;
 
@@ -100,28 +99,28 @@ static WRITE8_HANDLER( tp84_filter_w )
 	C = 0;
 	if (offset & 0x008) C +=  47000;	/*  47000pF = 0.047uF */
 	if (offset & 0x010) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(space->machine().device("filter1"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	filter_rc_set_RC(machine().device("filter1"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #1 (optional) */
 	C = 0;
 	if (offset & 0x020) C +=  47000;	/*  47000pF = 0.047uF */
 	if (offset & 0x040) C += 470000;	/* 470000pF = 0.47uF */
-//  filter_rc_set_RC(space->machine().device("filter2"),1000,2200,1000,C);
+//  filter_rc_set_RC(machine().device("filter2"),1000,2200,1000,C);
 
 	/* 76489 #2 */
 	C = 0;
 	if (offset & 0x080) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(space->machine().device("filter2"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	filter_rc_set_RC(machine().device("filter2"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 
 	/* 76489 #3 */
 	C = 0;
 	if (offset & 0x100) C += 470000;	/* 470000pF = 0.47uF */
-	filter_rc_set_RC(space->machine().device("filter3"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
+	filter_rc_set_RC(machine().device("filter3"),FLT_RC_LOWPASS,1000,2200,1000,CAP_P(C));
 }
 
-static WRITE8_HANDLER( tp84_sh_irqtrigger_w )
+WRITE8_MEMBER(tp84_state::tp84_sh_irqtrigger_w)
 {
-	cputag_set_input_line_and_vector(space->machine(), "audiocpu",0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(machine(), "audiocpu",0,HOLD_LINE,0xff);
 }
 
 
@@ -135,7 +134,7 @@ static ADDRESS_MAP_START( tp84_cpu1_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW2") AM_WRITEONLY
 	AM_RANGE(0x3004, 0x3004) AM_WRITEONLY AM_BASE(m_flipscreen_x)
 	AM_RANGE(0x3005, 0x3005) AM_WRITEONLY AM_BASE(m_flipscreen_y)
-	AM_RANGE(0x3800, 0x3800) AM_WRITE_LEGACY(tp84_sh_irqtrigger_w)
+	AM_RANGE(0x3800, 0x3800) AM_WRITE(tp84_sh_irqtrigger_w)
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITEONLY AM_BASE(m_scroll_x)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITEONLY AM_BASE(m_scroll_y)
@@ -161,7 +160,7 @@ static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2") AM_WRITENOP
 	AM_RANGE(0x1c04, 0x1c04) AM_WRITEONLY AM_BASE(m_flipscreen_x)
 	AM_RANGE(0x1c05, 0x1c05) AM_WRITEONLY AM_BASE(m_flipscreen_y)
-	AM_RANGE(0x1e00, 0x1e00) AM_WRITE_LEGACY(tp84_sh_irqtrigger_w)
+	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(tp84_sh_irqtrigger_w)
 	AM_RANGE(0x1e80, 0x1e80) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0x1f00, 0x1f00) AM_WRITEONLY AM_BASE(m_scroll_x)
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITEONLY AM_BASE(m_scroll_y)
@@ -169,18 +168,17 @@ static ADDRESS_MAP_START( tp84b_cpu1_map, AS_PROGRAM, 8, tp84_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( sub_irq_mask_w )
+WRITE8_MEMBER(tp84_state::sub_irq_mask_w)
 {
-	tp84_state *state = space->machine().driver_data<tp84_state>();
 
-	state->m_sub_irq_mask = data & 1;
+	m_sub_irq_mask = data & 1;
 }
 
 
 static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, tp84_state )
 //  AM_RANGE(0x0000, 0x0000) AM_RAM /* Watch dog ?*/
 	AM_RANGE(0x2000, 0x2000) AM_READ_LEGACY(tp84_scanline_r) /* beam position */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(sub_irq_mask_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irq_mask_w)
 	AM_RANGE(0x6000, 0x679f) AM_RAM
 	AM_RANGE(0x67a0, 0x67ff) AM_RAM_WRITE_LEGACY(tp84_spriteram_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
@@ -192,8 +190,8 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, tp84_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(tp84_sh_timer_r)
-	AM_RANGE(0xa000, 0xa1ff) AM_WRITE_LEGACY(tp84_filter_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ(tp84_sh_timer_r)
+	AM_RANGE(0xa000, 0xa1ff) AM_WRITE(tp84_filter_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP
 	AM_RANGE(0xc001, 0xc001) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0xc003, 0xc003) AM_DEVWRITE_LEGACY("sn2", sn76496_w)

@@ -29,6 +29,9 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(mnchmobl_nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(mnchmobl_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(sound_nmi_ack_w);
 };
 
 

@@ -41,29 +41,29 @@ Notes:
 #include "sound/2151intf.h"
 #include "includes/sidearms.h"
 
-static WRITE8_HANDLER( sidearms_bankswitch_w )
+WRITE8_MEMBER(sidearms_state::sidearms_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 
 	/* bits 0 and 1 select the ROM bank */
 	bankaddress = 0x10000 + (data & 0x0f) * 0x4000;
-	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);
 }
 
 
 
 
 /* Turtle Ship input ports are rotated 90 degrees */
-static READ8_HANDLER( turtship_ports_r )
+READ8_MEMBER(sidearms_state::turtship_ports_r)
 {
 	int i,res;
 	static const char *const portnames[] = { "SYSTEM", "P1", "P2", "DSW0", "DSW1", "NOT_PRESENT", "NOT_PRESENT", "NOT_PRESENT" };	// only inputs 0-4 are present
 
 	res = 0;
 	for (i = 0;i < 8;i++)
-		res |= ((input_port_read_safe(space->machine(), portnames[i], 0) >> offset) & 1) << i;
+		res |= ((input_port_read_safe(machine(), portnames[i], 0) >> offset) & 1) << i;
 
 	return res;
 }
@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( sidearms_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1") AM_WRITE_LEGACY(sidearms_bankswitch_w)
+	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("P1") AM_WRITE(sidearms_bankswitch_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("P2") AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("DSW0")
 	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(sidearms_c804_w)
@@ -97,9 +97,9 @@ static ADDRESS_MAP_START( turtship_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xe800, 0xe807) AM_READ_LEGACY(turtship_ports_r)
+	AM_RANGE(0xe800, 0xe807) AM_READ(turtship_ports_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0xe801, 0xe801) AM_WRITE_LEGACY(sidearms_bankswitch_w)
+	AM_RANGE(0xe801, 0xe801) AM_WRITE(sidearms_bankswitch_w)
 	AM_RANGE(0xe802, 0xe802) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xe804, 0xe804) AM_WRITE_LEGACY(sidearms_c804_w)
 	AM_RANGE(0xe805, 0xe805) AM_WRITE_LEGACY(sidearms_star_scrollx_w)
@@ -121,10 +121,10 @@ ADDRESS_MAP_END
 
 /* Whizz */
 
-static WRITE8_HANDLER( whizz_bankswitch_w )
+WRITE8_MEMBER(sidearms_state::whizz_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 	int bank = 0;
 
 	switch (data & 0xC0)
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( whizz_bankswitch_w )
 	}
 
 	bankaddress = 0x10000 + bank * 0x4000;
-	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
+	memory_set_bankptr(machine(), "bank1",&RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( whizz_map, AS_PROGRAM, 8, sidearms_state )
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xc800, 0xc800) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(whizz_bankswitch_w)
+	AM_RANGE(0xc801, 0xc801) AM_READ_PORT("DSW1") AM_WRITE(whizz_bankswitch_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xc803, 0xc803) AM_READ_PORT("IN0") AM_WRITENOP
 	AM_RANGE(0xc804, 0xc804) AM_READ_PORT("IN1") AM_WRITE_LEGACY(sidearms_c804_w)

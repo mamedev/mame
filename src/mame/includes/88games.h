@@ -33,6 +33,14 @@ public:
 	device_t *m_k051316;
 	device_t *m_upd_1;
 	device_t *m_upd_2;
+	DECLARE_READ8_MEMBER(bankedram_r);
+	DECLARE_WRITE8_MEMBER(bankedram_w);
+	DECLARE_WRITE8_MEMBER(k88games_5f84_w);
+	DECLARE_WRITE8_MEMBER(k88games_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(speech_control_w);
+	DECLARE_WRITE8_MEMBER(speech_msg_w);
+	DECLARE_READ8_MEMBER(k052109_051960_r);
+	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 };
 
 

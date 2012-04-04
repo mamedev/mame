@@ -33,6 +33,11 @@ public:
 	size_t m_spriteram_size;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(spd_adpcm_w);
+	DECLARE_READ8_MEMBER(mcu63701_r);
+	DECLARE_WRITE8_MEMBER(mcu63701_w);
+	DECLARE_READ8_MEMBER(port_0_r);
 };
 
 

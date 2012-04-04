@@ -33,6 +33,11 @@ public:
 	device_t *m_discrete;
 
 	UINT8          m_irq_mask;
+	DECLARE_READ8_MEMBER(circusc_sh_timer_r);
+	DECLARE_WRITE8_MEMBER(circusc_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(circusc_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(circusc_sound_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 

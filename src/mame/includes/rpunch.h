@@ -19,6 +19,9 @@ public:
 	UINT8 m_bins;
 	UINT8 m_gins;
 	UINT16 *m_spriteram;
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_READ8_MEMBER(sound_command_r);
+	DECLARE_READ16_MEMBER(sound_busy_r);
 };
 
 

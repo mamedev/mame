@@ -97,10 +97,9 @@ static unsigned video_ram_address( running_machine &machine )
 }
 
 
-static READ8_HANDLER( fgoal_analog_r )
+READ8_MEMBER(fgoal_state::fgoal_analog_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	return input_port_read(space->machine(), state->m_fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
+	return input_port_read(machine(), m_fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
 }
 
 
@@ -111,75 +110,68 @@ static CUSTOM_INPUT( fgoal_80_r )
 	return ret;
 }
 
-static READ8_HANDLER( fgoal_nmi_reset_r )
+READ8_MEMBER(fgoal_state::fgoal_nmi_reset_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
 
 
-static READ8_HANDLER( fgoal_irq_reset_r )
+READ8_MEMBER(fgoal_state::fgoal_irq_reset_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
 
 
-static READ8_HANDLER( fgoal_row_r )
+READ8_MEMBER(fgoal_state::fgoal_row_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	return state->m_row;
+	return m_row;
 }
 
 
-static WRITE8_HANDLER( fgoal_row_w )
+WRITE8_MEMBER(fgoal_state::fgoal_row_w)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
 
-	state->m_row = data;
-	mb14241_shift_data_w(state->m_mb14241, 0, 0);
+	m_row = data;
+	mb14241_shift_data_w(m_mb14241, 0, 0);
 }
 
-static WRITE8_HANDLER( fgoal_col_w )
+WRITE8_MEMBER(fgoal_state::fgoal_col_w)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
 
-	state->m_col = data;
-	mb14241_shift_count_w(state->m_mb14241, 0, data);
+	m_col = data;
+	mb14241_shift_count_w(m_mb14241, 0, data);
 }
 
-static READ8_HANDLER( fgoal_address_hi_r )
+READ8_MEMBER(fgoal_state::fgoal_address_hi_r)
 {
-	return video_ram_address(space->machine()) >> 8;
+	return video_ram_address(machine()) >> 8;
 }
 
-static READ8_HANDLER( fgoal_address_lo_r )
+READ8_MEMBER(fgoal_state::fgoal_address_lo_r)
 {
-	return video_ram_address(space->machine()) & 0xff;
+	return video_ram_address(machine()) & 0xff;
 }
 
-static READ8_HANDLER( fgoal_shifter_r )
+READ8_MEMBER(fgoal_state::fgoal_shifter_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	UINT8 v = mb14241_shift_result_r(state->m_mb14241, 0);
+	UINT8 v = mb14241_shift_result_r(m_mb14241, 0);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
-static READ8_HANDLER( fgoal_shifter_reverse_r )
+READ8_MEMBER(fgoal_state::fgoal_shifter_reverse_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	UINT8 v = mb14241_shift_result_r(state->m_mb14241, 0);
+	UINT8 v = mb14241_shift_result_r(m_mb14241, 0);
 
 	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 
-static WRITE8_HANDLER( fgoal_sound1_w )
+WRITE8_MEMBER(fgoal_state::fgoal_sound1_w)
 {
 	/* BIT0 => SX2 */
 	/* BIT1 => SX1 */
@@ -192,7 +184,7 @@ static WRITE8_HANDLER( fgoal_sound1_w )
 }
 
 
-static WRITE8_HANDLER( fgoal_sound2_w )
+WRITE8_MEMBER(fgoal_state::fgoal_sound2_w)
 {
 	/* BIT0 => CX0 */
 	/* BIT1 => SX6 */
@@ -200,8 +192,7 @@ static WRITE8_HANDLER( fgoal_sound2_w )
 	/* BIT3 => SX5 */
 	/* BIT4 => SX4 */
 	/* BIT5 => SX3 */
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	state->m_fgoal_player = data & 1;
+	m_fgoal_player = data & 1;
 }
 
 
@@ -209,24 +200,24 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, fgoal_state )
 
 	AM_RANGE(0x0000, 0x00ef) AM_RAM
 
-	AM_RANGE(0x00f0, 0x00f0) AM_READ_LEGACY(fgoal_row_r)
-	AM_RANGE(0x00f1, 0x00f1) AM_READ_LEGACY(fgoal_analog_r)
+	AM_RANGE(0x00f0, 0x00f0) AM_READ(fgoal_row_r)
+	AM_RANGE(0x00f1, 0x00f1) AM_READ(fgoal_analog_r)
 	AM_RANGE(0x00f2, 0x00f2) AM_READ_PORT("IN0")
 	AM_RANGE(0x00f3, 0x00f3) AM_READ_PORT("IN1")
-	AM_RANGE(0x00f4, 0x00f4) AM_READ_LEGACY(fgoal_address_hi_r)
-	AM_RANGE(0x00f5, 0x00f5) AM_READ_LEGACY(fgoal_address_lo_r)
-	AM_RANGE(0x00f6, 0x00f6) AM_READ_LEGACY(fgoal_shifter_r)
-	AM_RANGE(0x00f7, 0x00f7) AM_READ_LEGACY(fgoal_shifter_reverse_r)
-	AM_RANGE(0x00f8, 0x00fb) AM_READ_LEGACY(fgoal_nmi_reset_r)
-	AM_RANGE(0x00fc, 0x00ff) AM_READ_LEGACY(fgoal_irq_reset_r)
+	AM_RANGE(0x00f4, 0x00f4) AM_READ(fgoal_address_hi_r)
+	AM_RANGE(0x00f5, 0x00f5) AM_READ(fgoal_address_lo_r)
+	AM_RANGE(0x00f6, 0x00f6) AM_READ(fgoal_shifter_r)
+	AM_RANGE(0x00f7, 0x00f7) AM_READ(fgoal_shifter_reverse_r)
+	AM_RANGE(0x00f8, 0x00fb) AM_READ(fgoal_nmi_reset_r)
+	AM_RANGE(0x00fc, 0x00ff) AM_READ(fgoal_irq_reset_r)
 
-	AM_RANGE(0x00f0, 0x00f0) AM_WRITE_LEGACY(fgoal_row_w)
-	AM_RANGE(0x00f1, 0x00f1) AM_WRITE_LEGACY(fgoal_col_w)
-	AM_RANGE(0x00f2, 0x00f2) AM_WRITE_LEGACY(fgoal_row_w)
-	AM_RANGE(0x00f3, 0x00f3) AM_WRITE_LEGACY(fgoal_col_w)
+	AM_RANGE(0x00f0, 0x00f0) AM_WRITE(fgoal_row_w)
+	AM_RANGE(0x00f1, 0x00f1) AM_WRITE(fgoal_col_w)
+	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(fgoal_row_w)
+	AM_RANGE(0x00f3, 0x00f3) AM_WRITE(fgoal_col_w)
 	AM_RANGE(0x00f4, 0x00f7) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
-	AM_RANGE(0x00f8, 0x00fb) AM_WRITE_LEGACY(fgoal_sound1_w)
-	AM_RANGE(0x00fc, 0x00ff) AM_WRITE_LEGACY(fgoal_sound2_w)
+	AM_RANGE(0x00f8, 0x00fb) AM_WRITE(fgoal_sound1_w)
+	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(fgoal_sound2_w)
 
 	AM_RANGE(0x0100, 0x03ff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE(m_video_ram)

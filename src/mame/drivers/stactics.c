@@ -63,19 +63,17 @@ static CUSTOM_INPUT( get_motor_not_ready )
 }
 
 
-static READ8_HANDLER( vert_pos_r )
+READ8_MEMBER(stactics_state::vert_pos_r)
 {
-	stactics_state *state = space->machine().driver_data<stactics_state>();
 
-    return 0x70 - state->m_vert_pos;
+    return 0x70 - m_vert_pos;
 }
 
 
-static READ8_HANDLER( horiz_pos_r )
+READ8_MEMBER(stactics_state::horiz_pos_r)
 {
-	stactics_state *state = space->machine().driver_data<stactics_state>();
 
-    return state->m_horiz_pos + 0x88;
+    return m_horiz_pos + 0x88;
 }
 
 
@@ -141,9 +139,9 @@ static CUSTOM_INPUT( get_rng )
  *
  *************************************/
 
-static WRITE8_HANDLER( stactics_coin_lockout_w )
+WRITE8_MEMBER(stactics_state::stactics_coin_lockout_w)
 {
-	coin_lockout_w(space->machine(), offset, ~data & 0x01);
+	coin_lockout_w(machine(), offset, ~data & 0x01);
 }
 
 
@@ -176,7 +174,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, stactics_state )
     AM_RANGE(0x4000, 0x40ff) AM_MIRROR(0x0700) AM_RAM
     AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_READ_PORT("IN0")
     AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ_PORT("IN1")
-    AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0f08) AM_WRITE_LEGACY(stactics_coin_lockout_w)
+    AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0f08) AM_WRITE(stactics_coin_lockout_w)
     AM_RANGE(0x6002, 0x6005) AM_MIRROR(0x0f08) AM_WRITENOP
     AM_RANGE(0x6006, 0x6007) AM_MIRROR(0x0f08) AM_WRITEONLY AM_BASE(m_palette)
  /* AM_RANGE(0x6010, 0x6017) AM_MIRROR(0x0f08) AM_WRITE_LEGACY(stactics_sound_w) */
@@ -192,8 +190,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, stactics_state )
     AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_READ_PORT("IN2")
     AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_READ_PORT("IN3")
     AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_WRITE_LEGACY(stactics_scroll_ram_w)
-    AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_READ_LEGACY(vert_pos_r)
-    AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0fff) AM_READ_LEGACY(horiz_pos_r)
+    AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0fff) AM_READ(vert_pos_r)
+    AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0fff) AM_READ(horiz_pos_r)
     AM_RANGE(0xb000, 0xbfff) AM_RAM AM_BASE(m_videoram_b)
     AM_RANGE(0xc000, 0xcfff) AM_NOP
     AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(m_videoram_d)

@@ -28,6 +28,11 @@ public:
 	/* devices */
 	cpu_device *m_maincpu;
 	cpu_device *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(cop01_sound_command_w);
+	DECLARE_READ8_MEMBER(cop01_sound_command_r);
+	DECLARE_WRITE8_MEMBER(cop01_irq_ack_w);
+	DECLARE_READ8_MEMBER(cop01_sound_irq_ack_w);
+	DECLARE_READ8_MEMBER(kludge);
 };
 
 

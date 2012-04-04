@@ -19,6 +19,11 @@ public:
 	UINT8 m_nvram_write_enable;
 	emu_timer *m_interrupt_timer;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_READ8_MEMBER(atetris_slapstic_r);
+	DECLARE_WRITE8_MEMBER(coincount_w);
+	DECLARE_WRITE8_MEMBER(nvram_w);
+	DECLARE_WRITE8_MEMBER(nvram_enable_w);
 };
 
 /*----------- defined in video/atetris.c -----------*/

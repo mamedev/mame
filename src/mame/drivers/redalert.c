@@ -117,31 +117,31 @@ static INTERRUPT_GEN( redalert_vblank_interrupt )
 }
 
 
-static READ8_HANDLER( redalert_interrupt_clear_r )
+READ8_MEMBER(redalert_state::redalert_interrupt_clear_r)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 
 
-static WRITE8_HANDLER( redalert_interrupt_clear_w )
+WRITE8_MEMBER(redalert_state::redalert_interrupt_clear_w)
 {
 	redalert_interrupt_clear_r(space, 0);
 }
 
-static READ8_HANDLER( panther_interrupt_clear_r )
+READ8_MEMBER(redalert_state::panther_interrupt_clear_r)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 
-	return input_port_read(space->machine(), "STICK0");
+	return input_port_read(machine(), "STICK0");
 }
 
-static READ8_HANDLER( panther_unk_r )
+READ8_MEMBER(redalert_state::panther_unk_r)
 {
-	return ((space->machine().rand() & 0x01) | (input_port_read(space->machine(), "C020") & 0xfe));
+	return ((machine().rand() & 0x01) | (input_port_read(machine(), "C020") & 0xfe));
 }
 
 /*************************************
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( redalert_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_video_control)
 	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_bitmap_color)
 	AM_RANGE(0xc060, 0xc060) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITE_LEGACY(redalert_voice_command_w)
-	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE_LEGACY(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( ww3_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITE_LEGACY(redalert_audio_command_w)
 	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_video_control)
 	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_bitmap_color)
-	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE_LEGACY(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
@@ -188,11 +188,11 @@ static ADDRESS_MAP_START( panther_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0x5000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0f8f) AM_READ_PORT("C000") AM_WRITENOP
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0f8f) AM_READ_PORT("C010") AM_WRITENOP
-	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0f8f) AM_READ_LEGACY(panther_unk_r) /* vblank? */
+	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0f8f) AM_READ(panther_unk_r) /* vblank? */
 	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITE_LEGACY(redalert_audio_command_w)
 	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_video_control)
 	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READNOP AM_WRITEONLY AM_BASE(m_bitmap_color)
-	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE_LEGACY(panther_interrupt_clear_r, redalert_interrupt_clear_w)
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(panther_interrupt_clear_r, redalert_interrupt_clear_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( demoneye_main_map, AS_PROGRAM, 8, redalert_state )
 	AM_RANGE(0xc060, 0xc060) AM_MIRROR(0x0f80) AM_NOP	/* unknown */
 	AM_RANGE(0xc061, 0xc061) AM_MIRROR(0x0f80) AM_NOP	/* unknown */
 	AM_RANGE(0xc062, 0xc062) AM_MIRROR(0x0f80) AM_NOP	/* unknown */
-	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE_LEGACY(redalert_interrupt_clear_r, redalert_interrupt_clear_w)	/* probably not correct */
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)	/* probably not correct */
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 

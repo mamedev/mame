@@ -12,6 +12,8 @@ public:
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE16_MEMBER(pirates_out_w);
+	DECLARE_READ16_MEMBER(genix_prot_r);
 };
 
 

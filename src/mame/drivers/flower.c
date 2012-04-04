@@ -75,53 +75,52 @@ CHIP #  POSITION   TYPE
 #include "includes/flower.h"
 
 
-static WRITE8_HANDLER( flower_maincpu_irq_ack )
+WRITE8_MEMBER(flower_state::flower_maincpu_irq_ack)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( flower_subcpu_irq_ack )
+WRITE8_MEMBER(flower_state::flower_subcpu_irq_ack)
 {
-	cputag_set_input_line(space->machine(), "subcpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "subcpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( flower_soundcpu_irq_ack )
+WRITE8_MEMBER(flower_state::flower_soundcpu_irq_ack)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( flower_coin_counter_w )
+WRITE8_MEMBER(flower_state::flower_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(machine(), 0, data & 1);
 }
 
-static WRITE8_HANDLER( flower_coin_lockout_w )
+WRITE8_MEMBER(flower_state::flower_coin_lockout_w)
 {
-	coin_lockout_global_w(space->machine(), ~data & 1);
+	coin_lockout_global_w(machine(), ~data & 1);
 }
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(flower_state::sound_command_w)
 {
-	flower_state *state = space->machine().driver_data<flower_state>();
 	soundlatch_w(space, 0, data);
 
-	if (*state->m_sn_nmi_enable & 1)
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	if (*m_sn_nmi_enable & 1)
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( flower_cpu1_2, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(flower_coin_lockout_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(flower_coin_lockout_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE_LEGACY(flower_flipscreen_w)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(flower_maincpu_irq_ack)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(flower_subcpu_irq_ack)
-	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(flower_coin_counter_w)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(flower_maincpu_irq_ack)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(flower_subcpu_irq_ack)
+	AM_RANGE(0xa004, 0xa004) AM_WRITE(flower_coin_counter_w)
 	AM_RANGE(0xa005, 0xa005) AM_WRITENOP	// subcpu nmi (unused)
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN0CPU1")
 	AM_RANGE(0xa101, 0xa101) AM_READ_PORT("IN1CPU1")
 	AM_RANGE(0xa102, 0xa102) AM_READ_PORT("IN0CPU0")
 	AM_RANGE(0xa103, 0xa103) AM_READ_PORT("IN1CPU0")
-	AM_RANGE(0xa400, 0xa400) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xa400, 0xa400) AM_WRITE(sound_command_w)
 	AM_RANGE(0xc000, 0xddff) AM_SHARE("share1") AM_RAM
 	AM_RANGE(0xde00, 0xdfff) AM_SHARE("share2") AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0xe000, 0xe7ff) AM_SHARE("share3") AM_RAM_WRITE_LEGACY(flower_textram_w)  AM_BASE(m_textram)
@@ -134,7 +133,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( flower_sound_cpu, AS_PROGRAM, 8, flower_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(flower_soundcpu_irq_ack)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(flower_soundcpu_irq_ack)
 	AM_RANGE(0x4001, 0x4001) AM_WRITEONLY AM_BASE(m_sn_nmi_enable)
 	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE_LEGACY("flower", flower_sound1_w)

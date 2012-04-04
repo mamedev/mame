@@ -38,7 +38,7 @@
 #include "includes/crospang.h"
 #include "video/decospr.h"
 
-static WRITE16_HANDLER ( crospang_soundlatch_w )
+WRITE16_MEMBER(crospang_state::crospang_soundlatch_w)
 {
 	if(ACCESSING_BITS_0_7)
 	{
@@ -60,7 +60,7 @@ static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE_LEGACY(crospang_bg_videoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x270000, 0x270001) AM_WRITE_LEGACY(crospang_soundlatch_w)
+	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")
 	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("DSW")
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE_LEGACY(crospang_bg_videoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x270000, 0x270001) AM_WRITE_LEGACY(crospang_soundlatch_w)
+	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x270004, 0x270005) AM_WRITENOP
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")

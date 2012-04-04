@@ -15,6 +15,16 @@ public:
 	tilemap_t *m_fg_tilemap;
 	int m_flipscreen;
 	UINT32 m_fg_tile_offset;
+	DECLARE_READ16_MEMBER(sound_status_r);
+	DECLARE_WRITE8_MEMBER(sound_status_w);
+	DECLARE_READ16_MEMBER(control_1_r);
+	DECLARE_READ16_MEMBER(control_2_r);
+	DECLARE_READ16_MEMBER(rotary_1_r);
+	DECLARE_READ16_MEMBER(rotary_2_r);
+	DECLARE_READ16_MEMBER(rotary_lsb_r);
+	DECLARE_READ16_MEMBER(protcontrols_r);
+	DECLARE_WRITE16_MEMBER(protection_w);
+	DECLARE_WRITE16_MEMBER(sound_w);
 };
 
 

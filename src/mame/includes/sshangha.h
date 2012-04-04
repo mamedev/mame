@@ -25,6 +25,12 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen1;
 	required_shared_ptr<UINT16> m_spriteram;
 	optional_shared_ptr<UINT16> m_spriteram2;
+	DECLARE_WRITE16_MEMBER(sshangha_protection16_w);
+	DECLARE_READ16_MEMBER(sshangha_protection16_r);
+	DECLARE_READ16_MEMBER(sshanghb_protection16_r);
+	DECLARE_READ16_MEMBER(deco_71_r);
+	DECLARE_READ8_MEMBER(sshangha_sound_shared_r);
+	DECLARE_WRITE8_MEMBER(sshangha_sound_shared_w);
 };
 
 

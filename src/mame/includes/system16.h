@@ -98,6 +98,44 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_soundcpu;
+	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE16_MEMBER(sys16_coinctrl_w);
+	DECLARE_READ16_MEMBER(passht4b_service_r);
+	DECLARE_READ16_MEMBER(passht4b_io1_r);
+	DECLARE_READ16_MEMBER(passht4b_io2_r);
+	DECLARE_READ16_MEMBER(passht4b_io3_r);
+	DECLARE_WRITE16_MEMBER(sys16_tilebank_w);
+	DECLARE_WRITE8_MEMBER(tturfbl_msm5205_data_w);
+	DECLARE_READ8_MEMBER(tturfbl_soundbank_r);
+	DECLARE_WRITE8_MEMBER(tturfbl_soundbank_w);
+	DECLARE_WRITE16_MEMBER(s16bl_bgpage_w);
+	DECLARE_WRITE16_MEMBER(s16bl_fgpage_w);
+	DECLARE_WRITE16_MEMBER(s16bl_fgscrollx_bank_w);
+	DECLARE_WRITE16_MEMBER(s16bl_fgscrollx_w);
+	DECLARE_WRITE16_MEMBER(s16bl_fgscrolly_w);
+	DECLARE_WRITE16_MEMBER(s16bl_bgscrollx_w);
+	DECLARE_WRITE16_MEMBER(s16bl_bgscrolly_w);
+	DECLARE_WRITE16_MEMBER(datsu_page0_w);
+	DECLARE_WRITE16_MEMBER(datsu_page1_w);
+	DECLARE_WRITE16_MEMBER(datsu_page2_w);
+	DECLARE_WRITE16_MEMBER(datsu_page3_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgscrollx_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgscrollx_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgscrolly_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgscrolly_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgpage_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgpage_w);
+	DECLARE_WRITE16_MEMBER(eswat_tilebank0_w);
+	DECLARE_READ16_MEMBER(beautyb_unkx_r);
+	DECLARE_WRITE16_MEMBER(sys18_refreshenable_w);
+	DECLARE_WRITE16_MEMBER(sys18_tilebank_w);
+	DECLARE_READ8_MEMBER(system18_bank_r);
+	DECLARE_WRITE8_MEMBER(sys18_soundbank_w);
+	DECLARE_WRITE16_MEMBER(sound_command_irq_w);
+	DECLARE_WRITE8_MEMBER(shdancbl_msm5205_data_w);
+	DECLARE_READ8_MEMBER(shdancbl_soundbank_r);
+	DECLARE_WRITE8_MEMBER(shdancbl_bankctrl_w);
 };
 
 /*----------- defined in video/system16.c -----------*/

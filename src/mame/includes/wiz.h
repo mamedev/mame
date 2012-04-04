@@ -23,6 +23,11 @@ public:
 	size_t m_spriteram_size;
 	UINT8 m_main_nmi_mask;
 	UINT8 m_sound_nmi_mask;
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_READ8_MEMBER(wiz_protection_r);
+	DECLARE_WRITE8_MEMBER(wiz_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(wiz_main_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(wiz_sound_nmi_mask_w);
 };
 
 

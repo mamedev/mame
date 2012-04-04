@@ -31,6 +31,16 @@ public:
 	UINT8 m_palettebank_vis;
 	UINT8 *m_spriteram;
 	device_t *m_custom;
+	DECLARE_WRITE8_MEMBER(bankram_w);
+	DECLARE_READ8_MEMBER(exidy440_input_port_3_r);
+	DECLARE_READ8_MEMBER(sound_command_ack_r);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(exidy440_input_port_3_w);
+	DECLARE_WRITE8_MEMBER(exidy440_coin_counter_w);
+	DECLARE_READ8_MEMBER(showdown_bank0_r);
+	DECLARE_READ8_MEMBER(claypign_protection_r);
+	DECLARE_READ8_MEMBER(topsecex_input_port_5_r);
+	DECLARE_WRITE8_MEMBER(topsecex_yscroll_w);
 };
 
 

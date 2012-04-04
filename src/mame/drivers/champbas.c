@@ -115,10 +115,9 @@ static SCREEN_VBLANK( champbas )
  *
  *************************************/
 
-static WRITE8_HANDLER( champbas_watchdog_reset_w )
+WRITE8_MEMBER(champbas_state::champbas_watchdog_reset_w)
 {
-	champbas_state *state = space->machine().driver_data<champbas_state>();
-	state->m_watchdog_count = 0;
+	m_watchdog_count = 0;
 }
 
 static CUSTOM_INPUT( champbas_watchdog_bit2 )
@@ -128,14 +127,13 @@ static CUSTOM_INPUT( champbas_watchdog_bit2 )
 }
 
 
-static WRITE8_HANDLER( irq_enable_w )
+WRITE8_MEMBER(champbas_state::irq_enable_w)
 {
-	champbas_state *state = space->machine().driver_data<champbas_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 
-	if (!state->m_irq_mask)
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	if (!m_irq_mask)
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( exctsccr_fm_callback )
@@ -157,27 +155,26 @@ static WRITE8_DEVICE_HANDLER( champbas_dac_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( champbas_mcu_switch_w )
+WRITE8_MEMBER(champbas_state::champbas_mcu_switch_w)
 {
 	// switch shared RAM between CPU and MCU bus
 	// FIXME not implemented
 }
 
-static WRITE8_HANDLER( champbas_mcu_halt_w )
+WRITE8_MEMBER(champbas_state::champbas_mcu_halt_w)
 {
-	champbas_state *state = space->machine().driver_data<champbas_state>();
 
 	// MCU not present/not used in champbas
-	if (state->m_mcu == NULL)
+	if (m_mcu == NULL)
 		return;
 
 	data &= 1;
-	device_set_input_line(state->m_mcu, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_mcu, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 /* champbja another protection */
-static READ8_HANDLER( champbja_alt_protection_r )
+READ8_MEMBER(champbas_state::champbja_alt_protection_r)
 {
 	UINT8 data = 0;
 	/*
@@ -230,17 +227,17 @@ static ADDRESS_MAP_START( talbot_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// !WORK board output (no use?)
 	AM_RANGE(0xa002, 0xa002) AM_WRITENOP
 	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(champbas_flipscreen_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITENOP
 	AM_RANGE(0xa005, 0xa005) AM_WRITENOP
-	AM_RANGE(0xa006, 0xa006) AM_WRITE_LEGACY(champbas_mcu_halt_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITE_LEGACY(champbas_mcu_switch_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
+	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)
 
 	AM_RANGE(0xa060, 0xa06f) AM_WRITEONLY AM_BASE(m_spriteram_2)
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE_LEGACY(champbas_watchdog_reset_w)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
 ADDRESS_MAP_END
 
 
@@ -258,22 +255,22 @@ static ADDRESS_MAP_START( champbas_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// !WORK board output (no use?)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(champbas_gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(champbas_flipscreen_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(champbas_palette_bank_w)
 	AM_RANGE(0xa005, 0xa005) AM_WRITENOP	// n.c.
-	AM_RANGE(0xa006, 0xa006) AM_WRITE_LEGACY(champbas_mcu_halt_w)	// MCU not present/not used in champbas
-	AM_RANGE(0xa007, 0xa007) AM_WRITE_LEGACY(champbas_mcu_switch_w)	// MCU not present/not used in champbas
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)	// MCU not present/not used in champbas
+	AM_RANGE(0xa007, 0xa007) AM_WRITE(champbas_mcu_switch_w)	// MCU not present/not used in champbas
 
 	AM_RANGE(0xa060, 0xa06f) AM_RAM AM_BASE(m_spriteram_2)
 	AM_RANGE(0xa080, 0xa080) AM_WRITE_LEGACY(soundlatch_w)
 /*  AM_RANGE(0xa0a0, 0xa0a0)    ???? */
-	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE_LEGACY(champbas_watchdog_reset_w)
+	AM_RANGE(0xa0c0, 0xa0c0) AM_WRITE(champbas_watchdog_reset_w)
 
 	/* champbja only */
-	AM_RANGE(0x6800, 0x68ff) AM_READ_LEGACY(champbja_alt_protection_r)
+	AM_RANGE(0x6800, 0x68ff) AM_READ(champbja_alt_protection_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccrb_main_map, AS_PROGRAM, 8, champbas_state )
@@ -289,7 +286,7 @@ static ADDRESS_MAP_START( exctsccrb_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(champbas_gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(champbas_flipscreen_w)
@@ -314,11 +311,11 @@ static ADDRESS_MAP_START( exctsccr_main_map, AS_PROGRAM, 8, champbas_state )
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0c0, 0xa0c0) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_enable_w)
 //  AM_RANGE(0xa001, 0xa001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xa002, 0xa002) AM_WRITE_LEGACY(champbas_gfxbank_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(champbas_flipscreen_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITE_LEGACY(champbas_mcu_halt_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(champbas_mcu_halt_w)
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP /* This is also MCU control, but i dont need it */
 
 	AM_RANGE(0xa040, 0xa06f) AM_WRITEONLY AM_BASE(m_spriteram) /* Sprite pos */

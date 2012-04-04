@@ -30,6 +30,9 @@ public:
 	device_t *m_audiocpu;
 
 	UINT8      m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(pbaction_sh_command_w);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_READ8_MEMBER(pbactio3_prot_kludge_r);
 };
 
 

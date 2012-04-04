@@ -96,58 +96,55 @@ static MACHINE_RESET( lvpoker )
 	state->m_result = 0;
 }
 
-static WRITE8_HANDLER(control_port_2_w)
+WRITE8_MEMBER(lvcards_state::control_port_2_w)
 {
-	lvcards_state *state = space->machine().driver_data<lvcards_state>();
 	switch (data)
 	{
 		case 0x60:
-		state->m_payout = 1;
+		m_payout = 1;
 		break;
 		case 0xc0:
-		state->m_payout = 1;
+		m_payout = 1;
 		break;
 		default:
-		state->m_payout = 0;
+		m_payout = 0;
 		break;
 	}
 }
 
-static WRITE8_HANDLER(control_port_2a_w)
+WRITE8_MEMBER(lvcards_state::control_port_2a_w)
 {
-	lvcards_state *state = space->machine().driver_data<lvcards_state>();
 	switch (data)
 	{
 		case 0x60:
-		state->m_payout = 1;
+		m_payout = 1;
 		break;
 		case 0x80:
-		state->m_payout = 1;
+		m_payout = 1;
 		break;
 		default:
-		state->m_payout = 0;
+		m_payout = 0;
 		break;
 	}
 }
 
-static READ8_HANDLER( payout_r )
+READ8_MEMBER(lvcards_state::payout_r)
 {
-	lvcards_state *state = space->machine().driver_data<lvcards_state>();
-	state->m_result = input_port_read(space->machine(), "IN2");
+	m_result = input_port_read(machine(), "IN2");
 
-	if (state->m_payout)
+	if (m_payout)
 	{
-    	if ( state->m_pulse < 3 )
+    	if ( m_pulse < 3 )
 		{
-			state->m_result = state->m_result | 0x40;
-	        state->m_pulse++;
+			m_result = m_result | 0x40;
+	        m_pulse++;
         }
        else
     	{
-        	state->m_pulse = 0;
+        	m_pulse = 0;
         }
    }
-   return state->m_result;
+   return m_result;
 }
 
 static ADDRESS_MAP_START( ponttehk_map, AS_PROGRAM, 8, lvcards_state )
@@ -157,7 +154,7 @@ static ADDRESS_MAP_START( ponttehk_map, AS_PROGRAM, 8, lvcards_state )
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE_LEGACY(lvcards_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP // lamps
-	AM_RANGE(0xa002, 0xa002) AM_READ_LEGACY(payout_r) AM_WRITE_LEGACY(control_port_2a_w)//AM_WRITENOP // ???
+	AM_RANGE(0xa002, 0xa002) AM_READ(payout_r) AM_WRITE(control_port_2a_w)//AM_WRITENOP // ???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lvcards_map, AS_PROGRAM, 8, lvcards_state )
@@ -184,7 +181,7 @@ static ADDRESS_MAP_START( lvpoker_map, AS_PROGRAM, 8, lvcards_state )
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(lvcards_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP // lamps
-	AM_RANGE(0xa002, 0xa002) AM_READ_LEGACY(payout_r) AM_WRITE_LEGACY(control_port_2_w)
+	AM_RANGE(0xa002, 0xa002) AM_READ(payout_r) AM_WRITE(control_port_2_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 

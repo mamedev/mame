@@ -14,6 +14,14 @@ public:
 	UINT8 *m_objectram1;
 	size_t m_objectram_size0;
 	size_t m_objectram_size1;
+	DECLARE_WRITE8_MEMBER(exzisus_cpua_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(exzisus_cpub_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(exzisus_coincounter_w);
+	DECLARE_READ8_MEMBER(exzisus_sharedram_ab_r);
+	DECLARE_READ8_MEMBER(exzisus_sharedram_ac_r);
+	DECLARE_WRITE8_MEMBER(exzisus_sharedram_ab_w);
+	DECLARE_WRITE8_MEMBER(exzisus_sharedram_ac_w);
+	DECLARE_WRITE8_MEMBER(exzisus_cpub_reset_w);
 };
 
 

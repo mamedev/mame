@@ -214,46 +214,41 @@ Dip location verified from manual for: cclimber, guzzler, swimmer
 #define MASTER_CLOCK			XTAL_18_432MHz
 
 
-static WRITE8_HANDLER( swimmer_sh_soundlatch_w )
+WRITE8_MEMBER(cclimber_state::swimmer_sh_soundlatch_w)
 {
 	soundlatch_w(space,offset,data);
-	cputag_set_input_line_and_vector(space->machine(), "audiocpu", 0, HOLD_LINE, 0xff);
+	cputag_set_input_line_and_vector(machine(), "audiocpu", 0, HOLD_LINE, 0xff);
 }
 
 
-static WRITE8_HANDLER( yamato_p0_w )
+WRITE8_MEMBER(cclimber_state::yamato_p0_w)
 {
-	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	state->m_yamato_p0 = data;
+	m_yamato_p0 = data;
 }
 
-static WRITE8_HANDLER( yamato_p1_w )
+WRITE8_MEMBER(cclimber_state::yamato_p1_w)
 {
-	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	state->m_yamato_p1 = data;
+	m_yamato_p1 = data;
 }
 
-static READ8_HANDLER( yamato_p0_r )
+READ8_MEMBER(cclimber_state::yamato_p0_r)
 {
-	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	return state->m_yamato_p0;
+	return m_yamato_p0;
 }
 
-static READ8_HANDLER( yamato_p1_r )
+READ8_MEMBER(cclimber_state::yamato_p1_r)
 {
-	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	return state->m_yamato_p1;
+	return m_yamato_p1;
 }
 
 
-static WRITE8_HANDLER(toprollr_rombank_w)
+WRITE8_MEMBER(cclimber_state::toprollr_rombank_w)
 {
-	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	state->m_toprollr_rombank &= ~(1 << offset);
-	state->m_toprollr_rombank |= (data & 1) << offset;
+	m_toprollr_rombank &= ~(1 << offset);
+	m_toprollr_rombank |= (data & 1) << offset;
 
-	if (state->m_toprollr_rombank < 3)
-		memory_set_bank(space->machine(), "bank1", state->m_toprollr_rombank);
+	if (m_toprollr_rombank < 3)
+		memory_set_bank(machine(), "bank1", m_toprollr_rombank);
 }
 
 static MACHINE_RESET( cclimber )
@@ -267,11 +262,10 @@ static MACHINE_RESET( cclimber )
 }
 
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(cclimber_state::nmi_mask_w)
 {
-	cclimber_state *state = space->machine().driver_data<cclimber_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 
@@ -292,9 +286,9 @@ static ADDRESS_MAP_START( cclimber_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(m_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE_LEGACY(cclimber_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE(m_flip_screen)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE_LEGACY(nmi_mask_w) //used by Crazy Kong Bootleg with alt levels and speed up
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(nmi_mask_w) //used by Crazy Kong Bootleg with alt levels and speed up
 	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(cclimber_sample_trigger_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE_LEGACY(cclimber_sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(cclimber_sample_volume_w)
@@ -316,7 +310,7 @@ static ADDRESS_MAP_START( cannonb_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(m_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE_LEGACY(cclimber_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE_LEGACY(cannonb_flip_screen_w) AM_BASE(m_flip_screen)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(cclimber_sample_trigger_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE_LEGACY(cclimber_sample_rate_w)
@@ -333,11 +327,11 @@ static ADDRESS_MAP_START( swimmer_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x9880, 0x989f) AM_WRITEONLY AM_BASE(m_spriteram)
 	AM_RANGE(0x98fc, 0x98ff) AM_WRITEONLY AM_BASE(m_bigsprite_control)
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE_LEGACY(cclimber_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2") AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE(m_flip_screen)
 	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE(m_swimmer_side_background_enabled)
 	AM_RANGE(0xa004, 0xa004) AM_WRITEONLY AM_BASE(m_swimmer_palettebank)
-	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1") AM_WRITE_LEGACY(swimmer_sh_soundlatch_w)
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P1") AM_WRITE(swimmer_sh_soundlatch_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(m_swimmer_background_color)
 	AM_RANGE(0xb880, 0xb880) AM_READ_PORT("SYSTEM")
@@ -359,7 +353,7 @@ static ADDRESS_MAP_START( yamato_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_BASE(m_bigsprite_control)
 	AM_RANGE(0x9800, 0x9bff) AM_RAM  /* not used, but initialized */
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM_WRITE_LEGACY(cclimber_colorram_w) AM_BASE(m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE(m_flip_screen)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
@@ -378,10 +372,10 @@ static ADDRESS_MAP_START( toprollr_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x9880, 0x995f) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x99dc, 0x99df) AM_RAM AM_BASE(m_bigsprite_control)
 	AM_RANGE(0x9c00, 0x9fff) AM_RAM AM_BASE(m_colorram)
-	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_BASE(m_flip_screen)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(cclimber_sample_trigger_w)
-	AM_RANGE(0xa005, 0xa006) AM_WRITE_LEGACY(toprollr_rombank_w)
+	AM_RANGE(0xa005, 0xa006) AM_WRITE(toprollr_rombank_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_WRITE_LEGACY(cclimber_sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(cclimber_sample_volume_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM")
@@ -397,8 +391,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yamato_portmap, AS_IO, 8, cclimber_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(yamato_p0_w)	/* ??? */
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(yamato_p1_w)	/* ??? */
+	AM_RANGE(0x00, 0x00) AM_WRITE(yamato_p0_w)	/* ??? */
+	AM_RANGE(0x01, 0x01) AM_WRITE(yamato_p1_w)	/* ??? */
 ADDRESS_MAP_END
 
 
@@ -425,8 +419,8 @@ static ADDRESS_MAP_START( yamato_audio_portmap, AS_IO, 8, cclimber_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(yamato_p0_r)	/* ??? */
-	AM_RANGE(0x08, 0x08) AM_READ_LEGACY(yamato_p1_r)	/* ??? */
+	AM_RANGE(0x04, 0x04) AM_READ(yamato_p0_r)	/* ??? */
+	AM_RANGE(0x08, 0x08) AM_READ(yamato_p1_r)	/* ??? */
 ADDRESS_MAP_END
 
 

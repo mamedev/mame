@@ -15,6 +15,9 @@ public:
 	size_t m_spriteram_size;
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(cashquiz_question_bank_high_w);
+	DECLARE_WRITE8_MEMBER(cashquiz_question_bank_low_w);
+	DECLARE_WRITE8_MEMBER(coin_w);
 };
 
 

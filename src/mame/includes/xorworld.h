@@ -7,6 +7,8 @@ public:
 	UINT16 *m_videoram;
 	tilemap_t *m_bg_tilemap;
 	UINT16 *m_spriteram;
+	DECLARE_WRITE16_MEMBER(xorworld_irq2_ack_w);
+	DECLARE_WRITE16_MEMBER(xorworld_irq6_ack_w);
 };
 
 

@@ -76,20 +76,19 @@ static INTERRUPT_GEN( pitnrun_nmi_source )
 	if(state->m_nmi) device_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(pitnrun_state::nmi_enable_w)
 {
-	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
-        state->m_nmi = data & 1;
+        m_nmi = data & 1;
 }
 
-static WRITE8_HANDLER(pitnrun_hflip_w)
+WRITE8_MEMBER(pitnrun_state::pitnrun_hflip_w)
 {
-	flip_screen_x_set(space->machine(), data);
+	flip_screen_x_set(machine(), data);
 }
 
-static WRITE8_HANDLER(pitnrun_vflip_w)
+WRITE8_MEMBER(pitnrun_state::pitnrun_vflip_w)
 {
-	flip_screen_y_set(space->machine(), data);
+	flip_screen_y_set(machine(), data);
 }
 
 static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
@@ -100,12 +99,12 @@ static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa800, 0xa807) AM_WRITENOP /* Analog Sound */
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE_LEGACY(nmi_enable_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(pitnrun_color_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_WRITENOP/* COLOR SEL 2 - not used ?*/
 	AM_RANGE(0xb005, 0xb005) AM_WRITE_LEGACY(pitnrun_char_bank_select)
-	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(pitnrun_hflip_w)
-	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(pitnrun_vflip_w)
+	AM_RANGE(0xb006, 0xb006) AM_WRITE(pitnrun_hflip_w)
+	AM_RANGE(0xb007, 0xb007) AM_WRITE(pitnrun_vflip_w)
 	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc800, 0xc801) AM_WRITE_LEGACY(pitnrun_scroll_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITENOP/* VP(VF?)MCV - not used ?*/

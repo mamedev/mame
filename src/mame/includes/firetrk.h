@@ -59,6 +59,19 @@ public:
 	UINT32 m_color2_mask;
 	tilemap_t *m_tilemap1;
 	tilemap_t *m_tilemap2;
+	DECLARE_WRITE8_MEMBER(firetrk_output_w);
+	DECLARE_WRITE8_MEMBER(superbug_output_w);
+	DECLARE_WRITE8_MEMBER(montecar_output_1_w);
+	DECLARE_WRITE8_MEMBER(montecar_output_2_w);
+	DECLARE_READ8_MEMBER(firetrk_dip_r);
+	DECLARE_READ8_MEMBER(montecar_dip_r);
+	DECLARE_READ8_MEMBER(firetrk_input_r);
+	DECLARE_READ8_MEMBER(montecar_input_r);
+	DECLARE_WRITE8_MEMBER(blink_on_w);
+	DECLARE_WRITE8_MEMBER(montecar_car_reset_w);
+	DECLARE_WRITE8_MEMBER(montecar_drone_reset_w);
+	DECLARE_WRITE8_MEMBER(steer_reset_w);
+	DECLARE_WRITE8_MEMBER(crash_reset_w);
 };
 
 

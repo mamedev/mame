@@ -198,6 +198,23 @@ public:
 
 	/* reverse address lookup map - hunchbkd */
 	INT16             m_rev_map[0x200];
+	DECLARE_READ8_MEMBER(hb_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(hb_dma_write_byte);
+	DECLARE_WRITE8_MEMBER(dkong3_coin_counter_w);
+	DECLARE_READ8_MEMBER(dkong_in2_r);
+	DECLARE_READ8_MEMBER(dkongjr_in2_r);
+	DECLARE_READ8_MEMBER(s2650_mirror_r);
+	DECLARE_WRITE8_MEMBER(s2650_mirror_w);
+	DECLARE_READ8_MEMBER(epos_decrypt_rom);
+	DECLARE_WRITE8_MEMBER(s2650_data_w);
+	DECLARE_WRITE8_MEMBER(s2650_fo_w);
+	DECLARE_READ8_MEMBER(s2650_port0_r);
+	DECLARE_READ8_MEMBER(s2650_port1_r);
+	DECLARE_WRITE8_MEMBER(dkong3_2a03_reset_w);
+	DECLARE_READ8_MEMBER(strtheat_inputport_0_r);
+	DECLARE_READ8_MEMBER(strtheat_inputport_1_r);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(braze_a15_w);
 };
 
 /*----------- defined in video/dkong.c -----------*/

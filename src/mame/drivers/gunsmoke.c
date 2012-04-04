@@ -74,7 +74,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 /* Read/Write Handlers */
 
-static READ8_HANDLER( gunsmoke_protection_r )
+READ8_MEMBER(gunsmoke_state::gunsmoke_protection_r)
 {
     /*
         The routine at 0x0e69 tries to read data starting at 0xc4c9.
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8, gunsmoke_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc4c9, 0xc4cb) AM_READ_LEGACY(gunsmoke_protection_r)
+	AM_RANGE(0xc4c9, 0xc4cb) AM_READ(gunsmoke_protection_r)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(gunsmoke_c804_w)	// ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE_LEGACY(watchdog_reset_w)

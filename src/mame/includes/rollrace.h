@@ -20,6 +20,10 @@ public:
 
 	UINT8 m_nmi_mask;
 	UINT8 m_sound_nmi_mask;
+	DECLARE_READ8_MEMBER(ra_fake_d800_r);
+	DECLARE_WRITE8_MEMBER(ra_fake_d800_w);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
 };
 
 

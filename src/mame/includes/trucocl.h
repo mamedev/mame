@@ -11,6 +11,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 
 	UINT8 m_irq_mask;
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
 };
 
 

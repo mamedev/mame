@@ -172,10 +172,9 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #define STINGER_BOOM_EN2	NODE_04
 
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(wiz_state::sound_command_w)
 {
-	wiz_state *state = space->machine().driver_data<wiz_state>();
-	device_t *discrete = space->machine().device("discrete");
+	device_t *discrete = machine().device("discrete");
 
 	switch (offset)
 	{
@@ -186,47 +185,45 @@ static WRITE8_HANDLER( sound_command_w )
 
 		// explosion sound trigger(analog?)
 		case 0x08:
-			discrete_sound_w(discrete, STINGER_BOOM_EN1, state->m_dsc1);
-			discrete_sound_w(discrete, STINGER_BOOM_EN2, state->m_dsc1^=1);
+			discrete_sound_w(discrete, STINGER_BOOM_EN1, m_dsc1);
+			discrete_sound_w(discrete, STINGER_BOOM_EN2, m_dsc1^=1);
 		break;
 
 		// player shot sound trigger(analog?)
 		case 0x0a:
-			discrete_sound_w(discrete, STINGER_SHOT_EN1, state->m_dsc0);
-			discrete_sound_w(discrete, STINGER_SHOT_EN2, state->m_dsc0^=1);
+			discrete_sound_w(discrete, STINGER_SHOT_EN1, m_dsc0);
+			discrete_sound_w(discrete, STINGER_SHOT_EN2, m_dsc0^=1);
 		break;
 	}
 }
 
-static READ8_HANDLER( wiz_protection_r )
+READ8_MEMBER(wiz_state::wiz_protection_r)
 {
-	wiz_state *state = space->machine().driver_data<wiz_state>();
-	switch (state->m_colorram2[0])
+	switch (m_colorram2[0])
 	{
 	case 0x35: return 0x25;	/* FIX: sudden player death + free play afterwards   */
 	case 0x8f: return 0x1f;	/* FIX: early boss appearance with corrupt graphics  */
 	case 0xa0: return 0x00;	/* FIX: executing junk code after defeating the boss */
 	}
 
-	return state->m_colorram2[0];
+	return m_colorram2[0];
 }
 
-static WRITE8_HANDLER( wiz_coin_counter_w )
+WRITE8_MEMBER(wiz_state::wiz_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset,data);
+	coin_counter_w(machine(), offset,data);
 }
 
-static WRITE8_HANDLER( wiz_main_nmi_mask_w )
+WRITE8_MEMBER(wiz_state::wiz_main_nmi_mask_w)
 {
-	wiz_state *state = space->machine().driver_data<wiz_state>();
 
-	state->m_main_nmi_mask = data & 1;
+	m_main_nmi_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_WRITE_LEGACY(wiz_coin_counter_w)
+	AM_RANGE(0xc800, 0xc801) AM_WRITE(wiz_coin_counter_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_BASE(m_videoram2)					/* Fallthrough */
 	AM_RANGE(0xd400, 0xd7ff) AM_BASE(m_colorram2)
 	AM_RANGE(0xd800, 0xd83f) AM_BASE(m_attributesram2)
@@ -239,7 +236,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0xe000, 0xe85f) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW0")
 	AM_RANGE(0xf000, 0xf000) AM_RAM AM_BASE(m_sprite_bank)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE_LEGACY(wiz_main_nmi_mask_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(wiz_main_nmi_mask_w)
 	AM_RANGE(0xf002, 0xf003) AM_WRITE_LEGACY(wiz_palettebank_w)
 	AM_RANGE(0xf004, 0xf005) AM_WRITE_LEGACY(wiz_char_bank_select_w)
 	AM_RANGE(0xf006, 0xf006) AM_WRITE_LEGACY(wiz_flipx_w)
@@ -249,15 +246,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
 	AM_RANGE(0xf018, 0xf018) AM_READ_PORT("IN1")
 	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(watchdog_reset_r)
-	AM_RANGE(0xf800, 0xf80f) AM_WRITE_LEGACY(sound_command_w)	/* sound registers */
+	AM_RANGE(0xf800, 0xf80f) AM_WRITE(sound_command_w)	/* sound registers */
 	AM_RANGE(0xf818, 0xf818) AM_WRITE_LEGACY(wiz_bgcolor_w)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( wiz_sound_nmi_mask_w )
+WRITE8_MEMBER(wiz_state::wiz_sound_nmi_mask_w)
 {
-	wiz_state *state = space->machine().driver_data<wiz_state>();
 
-	state->m_sound_nmi_mask = data & 1;
+	m_sound_nmi_mask = data & 1;
 }
 
 
@@ -265,20 +261,20 @@ static WRITE8_HANDLER( wiz_sound_nmi_mask_w )
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(soundlatch_r,wiz_sound_nmi_mask_w)	/* Stinger/Scion */
+	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Stinger/Scion */
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("8910.3", ay8910_address_data_w)
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_data_w)		/* Wiz only */
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE_LEGACY(soundlatch_r,wiz_sound_nmi_mask_w)	/* Wiz */
+	AM_RANGE(0x7000, 0x7000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Wiz */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(soundlatch_r,wiz_sound_nmi_mask_w)	/* Stinger/Scion */
+	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Stinger/Scion */
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_data_w)		/* Wiz only */
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE_LEGACY(soundlatch_r,wiz_sound_nmi_mask_w)	/* Wiz */
+	AM_RANGE(0x7000, 0x7000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Wiz */
 ADDRESS_MAP_END
 
 
@@ -1116,7 +1112,8 @@ static DRIVER_INIT( scion )
 
 static DRIVER_INIT( wiz )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd400, 0xd400, FUNC(wiz_protection_r));
+	wiz_state *state = machine.driver_data<wiz_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd400, 0xd400, read8_delegate(FUNC(wiz_state::wiz_protection_r),state));
 }
 
 

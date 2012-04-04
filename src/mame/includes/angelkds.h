@@ -30,6 +30,12 @@ public:
 
 	/* devices */
 	device_t *m_subcpu;
+	DECLARE_WRITE8_MEMBER(angelkds_cpu_bank_write);
+	DECLARE_READ8_MEMBER(angelkds_input_r);
+	DECLARE_WRITE8_MEMBER(angelkds_main_sound_w);
+	DECLARE_READ8_MEMBER(angelkds_main_sound_r);
+	DECLARE_WRITE8_MEMBER(angelkds_sub_sound_w);
+	DECLARE_READ8_MEMBER(angelkds_sub_sound_r);
 };
 
 

@@ -34,6 +34,12 @@ public:
 	device_t *m_2610_1r;
 	device_t *m_2610_2l;
 	device_t *m_2610_2r;
+	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(ninjaw_sound_w);
+	DECLARE_READ16_MEMBER(ninjaw_sound_r);
+	DECLARE_WRITE8_MEMBER(ninjaw_pancontrol);
+	DECLARE_WRITE16_MEMBER(tc0100scn_triple_screen_w);
 };
 
 

@@ -28,6 +28,15 @@ public:
 	/* misc */
 	int                 m_ldrun2_bankswap;	//ldrun2
 	int                 m_bankcontrol[2];	//ldrun2
+	DECLARE_READ8_MEMBER(ldrun2_bankswitch_r);
+	DECLARE_WRITE8_MEMBER(ldrun2_bankswitch_w);
+	DECLARE_READ8_MEMBER(ldrun3_prot_5_r);
+	DECLARE_READ8_MEMBER(ldrun3_prot_7_r);
+	DECLARE_WRITE8_MEMBER(ldrun4_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(kidniki_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(spelunkr_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(spelunk2_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(youjyudn_bankswitch_w);
 };
 
 

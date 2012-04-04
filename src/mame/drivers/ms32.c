@@ -207,35 +207,34 @@ static CUSTOM_INPUT( mahjong_ctrl_r )
 }
 
 
-static READ32_HANDLER( ms32_read_inputs3 )
+READ32_MEMBER(ms32_state::ms32_read_inputs3)
 {
 	int a,b,c,d;
-	a = input_port_read(space->machine(), "AN2?"); // unused?
-	b = input_port_read(space->machine(), "AN2?"); // unused?
-	c = input_port_read(space->machine(), "AN1");
-	d = (input_port_read(space->machine(), "AN0") - 0xb0) & 0xff;
+	a = input_port_read(machine(), "AN2?"); // unused?
+	b = input_port_read(machine(), "AN2?"); // unused?
+	c = input_port_read(machine(), "AN1");
+	d = (input_port_read(machine(), "AN0") - 0xb0) & 0xff;
 	return a << 24 | b << 16 | c << 8 | d << 0;
 }
 
 
-static WRITE32_HANDLER( ms32_sound_w )
+WRITE32_MEMBER(ms32_state::ms32_sound_w)
 {
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	device_spin_until_time(&space->device(), attotime::from_usec(40));
+	device_spin_until_time(&space.device(), attotime::from_usec(40));
 }
 
-static READ32_HANDLER( ms32_sound_r )
+READ32_MEMBER(ms32_state::ms32_sound_r)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	return state->m_to_main^0xff;
+	return m_to_main^0xff;
 }
 
-static WRITE32_HANDLER( reset_sub_w )
+WRITE32_MEMBER(ms32_state::reset_sub_w)
 {
-	if(data) cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
+	if(data) cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
 }
 
 
@@ -244,110 +243,93 @@ static WRITE32_HANDLER( reset_sub_w )
 /********** MEMORY MAP **********/
 
 
-static READ8_HANDLER(   ms32_nvram_r8 )
+READ8_MEMBER(ms32_state::ms32_nvram_r8)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	return state->m_nvram_8[offset];
+	return m_nvram_8[offset];
 }
 
-static WRITE8_HANDLER(  ms32_nvram_w8 )
+WRITE8_MEMBER(ms32_state::ms32_nvram_w8)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	state->m_nvram_8[offset] = data;
+	m_nvram_8[offset] = data;
 }
 
-static READ8_HANDLER(   ms32_priram_r8 )
+READ8_MEMBER(ms32_state::ms32_priram_r8)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	return state->m_priram_8[offset];
+	return m_priram_8[offset];
 }
 
-static WRITE8_HANDLER(  ms32_priram_w8 )
+WRITE8_MEMBER(ms32_state::ms32_priram_w8)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	state->m_priram_8[offset] = data;
+	m_priram_8[offset] = data;
 }
 
-static READ16_HANDLER(  ms32_palram_r16 )
+READ16_MEMBER(ms32_state::ms32_palram_r16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	return state->m_palram_16[offset];
+	return m_palram_16[offset];
 }
 
-static WRITE16_HANDLER( ms32_palram_w16 )
+WRITE16_MEMBER(ms32_state::ms32_palram_w16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	COMBINE_DATA(&state->m_palram_16[offset]);
+	COMBINE_DATA(&m_palram_16[offset]);
 }
 
-static READ16_HANDLER(  ms32_rozram_r16 )
+READ16_MEMBER(ms32_state::ms32_rozram_r16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	return state->m_rozram_16[offset];
+	return m_rozram_16[offset];
 }
 
-static WRITE16_HANDLER( ms32_rozram_w16 )
+WRITE16_MEMBER(ms32_state::ms32_rozram_w16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	COMBINE_DATA(&state->m_rozram_16[offset]);
-	state->m_roz_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_rozram_16[offset]);
+	m_roz_tilemap->mark_tile_dirty(offset/2);
 }
 
-static READ16_HANDLER(  ms32_lineram_r16 )
+READ16_MEMBER(ms32_state::ms32_lineram_r16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	return state->m_lineram_16[offset];
+	return m_lineram_16[offset];
 }
 
-static WRITE16_HANDLER( ms32_lineram_w16 )
+WRITE16_MEMBER(ms32_state::ms32_lineram_w16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	COMBINE_DATA(&state->m_lineram_16[offset]);
+	COMBINE_DATA(&m_lineram_16[offset]);
 }
 
-static READ16_HANDLER(  ms32_sprram_r16 )
+READ16_MEMBER(ms32_state::ms32_sprram_r16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	return state->m_sprram_16[offset];
+	return m_sprram_16[offset];
 }
 
-static WRITE16_HANDLER( ms32_sprram_w16 )
+WRITE16_MEMBER(ms32_state::ms32_sprram_w16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	COMBINE_DATA(&state->m_sprram_16[offset]);
+	COMBINE_DATA(&m_sprram_16[offset]);
 }
 
-static READ16_HANDLER(  ms32_txram_r16 )
+READ16_MEMBER(ms32_state::ms32_txram_r16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	return state->m_txram_16[offset];
+	return m_txram_16[offset];
 }
 
-static WRITE16_HANDLER( ms32_txram_w16 )
+WRITE16_MEMBER(ms32_state::ms32_txram_w16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	COMBINE_DATA(&state->m_txram_16[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_txram_16[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset/2);
 }
 
-static READ16_HANDLER(  ms32_bgram_r16 )
+READ16_MEMBER(ms32_state::ms32_bgram_r16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	return state->m_bgram_16[offset];
+	return m_bgram_16[offset];
 }
 
-static WRITE16_HANDLER( ms32_bgram_w16 )
+WRITE16_MEMBER(ms32_state::ms32_bgram_w16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	COMBINE_DATA(&state->m_bgram_16[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
-	state->m_bg_tilemap_alt->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_bgram_16[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
+	m_bg_tilemap_alt->mark_tile_dirty(offset/2);
 }
 
-static WRITE32_HANDLER( pip_w )
+WRITE32_MEMBER(ms32_state::pip_w)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	state->m_tilemaplayoutcontrol = data;
+	m_tilemaplayoutcontrol = data;
 
 	if ((data) && (data != 1))
 		popmessage("fce00a7c = %02x",data);
@@ -356,31 +338,31 @@ static WRITE32_HANDLER( pip_w )
 
 static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 	/* RAM areas verified by testing on real hw - usually accessed at the 0xfc000000 + mirror */
-	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8_LEGACY(ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)	// nvram is 8-bit wide, 0x2000 in size */
+	AM_RANGE(0xc0000000, 0xc0007fff) AM_READWRITE8(ms32_nvram_r8,   ms32_nvram_w8,   0x000000ff) AM_MIRROR(0x3c1fe000)	// nvram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc0008000, 0xc01fffff) // mirrors of nvramram, handled above */
-	AM_RANGE(0xc1180000, 0xc1187fff) AM_READWRITE8_LEGACY(ms32_priram_r8,  ms32_priram_w8,  0x000000ff) AM_MIRROR(0x3c038000) /* priram is 8-bit wide, 0x2000 in size */
+	AM_RANGE(0xc1180000, 0xc1187fff) AM_READWRITE8(ms32_priram_r8,  ms32_priram_w8,  0x000000ff) AM_MIRROR(0x3c038000) /* priram is 8-bit wide, 0x2000 in size */
 /*  AM_RANGE(0xc1188000, 0xc11bffff) // mirrors of priram, handled above */
-	AM_RANGE(0xc1400000, 0xc143ffff) AM_READWRITE16_LEGACY(ms32_palram_r16, ms32_palram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* palram is 16-bit wide, 0x20000 in size */
+	AM_RANGE(0xc1400000, 0xc143ffff) AM_READWRITE16(ms32_palram_r16, ms32_palram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* palram is 16-bit wide, 0x20000 in size */
 /*  AM_RANGE(0xc1440000, 0xc145ffff) // mirrors of palram, handled above */
-	AM_RANGE(0xc2000000, 0xc201ffff) AM_READWRITE16_LEGACY(ms32_rozram_r16, ms32_rozram_w16, 0x0000ffff) AM_MIRROR(0x3c1e0000) /* rozram is 16-bit wide, 0x10000 in size */
+	AM_RANGE(0xc2000000, 0xc201ffff) AM_READWRITE16(ms32_rozram_r16, ms32_rozram_w16, 0x0000ffff) AM_MIRROR(0x3c1e0000) /* rozram is 16-bit wide, 0x10000 in size */
 /*  AM_RANGE(0xc2020000, 0xc21fffff) // mirrors of rozram, handled above */
-	AM_RANGE(0xc2200000, 0xc2201fff) AM_READWRITE16_LEGACY(ms32_lineram_r16,ms32_lineram_w16,0x0000ffff) AM_MIRROR(0x3c1fe000) /* lineram is 16-bit wide, 0x1000 in size */
+	AM_RANGE(0xc2200000, 0xc2201fff) AM_READWRITE16(ms32_lineram_r16,ms32_lineram_w16,0x0000ffff) AM_MIRROR(0x3c1fe000) /* lineram is 16-bit wide, 0x1000 in size */
 /*  AM_RANGE(0xc2202000, 0xc23fffff) // mirrors of lineram, handled above */
-	AM_RANGE(0xc2800000, 0xc283ffff) AM_READWRITE16_LEGACY(ms32_sprram_r16, ms32_sprram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* spriteram is 16-bit wide, 0x20000 in size */
+	AM_RANGE(0xc2800000, 0xc283ffff) AM_READWRITE16(ms32_sprram_r16, ms32_sprram_w16, 0x0000ffff) AM_MIRROR(0x3c1c0000) /* spriteram is 16-bit wide, 0x20000 in size */
 /*  AM_RANGE(0xc2840000, 0xc29fffff) // mirrors of sprram, handled above */
-	AM_RANGE(0xc2c00000, 0xc2c07fff) AM_READWRITE16_LEGACY(ms32_txram_r16,  ms32_txram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* txram is 16-bit wide, 0x4000 in size */
-	AM_RANGE(0xc2c08000, 0xc2c0ffff) AM_READWRITE16_LEGACY(ms32_bgram_r16,  ms32_bgram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* bgram is 16-bit wide, 0x4000 in size */
+	AM_RANGE(0xc2c00000, 0xc2c07fff) AM_READWRITE16(ms32_txram_r16,  ms32_txram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* txram is 16-bit wide, 0x4000 in size */
+	AM_RANGE(0xc2c08000, 0xc2c0ffff) AM_READWRITE16(ms32_bgram_r16,  ms32_bgram_w16,  0x0000ffff) AM_MIRROR(0x3c1f0000) /* bgram is 16-bit wide, 0x4000 in size */
 /*  AM_RANGE(0xc2c10000, 0xc2dfffff) // mirrors of txram / bg, handled above */
 	AM_RANGE(0xc2e00000, 0xc2e1ffff) AM_RAM AM_BASE(m_mainram)                                AM_MIRROR(0x3c0e0000) /* mainram is 32-bit wide, 0x20000 in size */
 	AM_RANGE(0xc3e00000, 0xc3ffffff) AM_ROMBANK("bank1")                                                AM_MIRROR(0x3c000000) // ROM is 32-bit wide, 0x200000 in size */
 
 	/* todo: clean up the mapping of these */
 	AM_RANGE(0xfc800000, 0xfc800003) AM_READNOP	/* sound? */
-	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE_LEGACY(ms32_sound_w) /* sound? */
+	AM_RANGE(0xfc800000, 0xfc800003) AM_WRITE(ms32_sound_w) /* sound? */
 	AM_RANGE(0xfcc00004, 0xfcc00007) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfcc00010, 0xfcc00013) AM_READ_PORT("DSW")
 	AM_RANGE(0xfce00034, 0xfce00037) AM_WRITENOP // irq ack?
-	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE_LEGACY(reset_sub_w)
+	AM_RANGE(0xfce00038, 0xfce0003b) AM_WRITE(reset_sub_w)
 	AM_RANGE(0xfce00050, 0xfce0005f) AM_WRITENOP	// watchdog? I haven't investigated
 //  AM_RANGE(0xfce00000, 0xfce0007f) AM_WRITEONLY AM_BASE_LEGACY(&ms32_fce00000) /* registers not ram? */
 	AM_RANGE(0xfce00000, 0xfce00003) AM_WRITE_LEGACY(ms32_gfxctrl_w)	/* flip screen + other unknown bits */
@@ -388,9 +370,9 @@ static ADDRESS_MAP_START( ms32_map, AS_PROGRAM, 32, ms32_state )
 /**/AM_RANGE(0xfce00600, 0xfce0065f) AM_RAM AM_BASE(m_roz_ctrl)		/* roz control registers */
 /**/AM_RANGE(0xfce00a00, 0xfce00a17) AM_RAM AM_BASE(m_tx_scroll)	/* tx layer scroll */
 /**/AM_RANGE(0xfce00a20, 0xfce00a37) AM_RAM AM_BASE(m_bg_scroll)	/* bg layer scroll */
-	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE_LEGACY(pip_w)	// ??? layer related? seems to be always 0
+	AM_RANGE(0xfce00a7c, 0xfce00a7f) AM_WRITE(pip_w)	// ??? layer related? seems to be always 0
 //  AM_RANGE(0xfce00e00, 0xfce00e03)    coin counters + something else
-	AM_RANGE(0xfd000000, 0xfd000003) AM_READ_LEGACY(ms32_sound_r)
+	AM_RANGE(0xfd000000, 0xfd000003) AM_READ(ms32_sound_r)
 	AM_RANGE(0xfd1c0000, 0xfd1c0003) AM_WRITEONLY AM_BASE(m_mahjong_input_select)
 ADDRESS_MAP_END
 
@@ -398,32 +380,30 @@ ADDRESS_MAP_END
 /* F1 Super Battle has an extra linemap for the road, and am unknown maths chip (mcu?) handling perspective calculations for the road / corners etc. */
 /* it should use it's own memory map */
 
-static WRITE16_HANDLER( ms32_extra_w16 )
+WRITE16_MEMBER(ms32_state::ms32_extra_w16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	COMBINE_DATA(&state->m_f1superb_extraram_16[offset]);
-	state->m_extra_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_f1superb_extraram_16[offset]);
+	m_extra_tilemap->mark_tile_dirty(offset/2);
 }
-static READ16_HANDLER( ms32_extra_r16 )
+READ16_MEMBER(ms32_state::ms32_extra_r16)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	return state->m_f1superb_extraram_16[offset];
+	return m_f1superb_extraram_16[offset];
 }
 
 static void irq_raise(running_machine &machine, int level);
 
-static WRITE32_HANDLER( ms32_irq2_guess_w )
+WRITE32_MEMBER(ms32_state::ms32_irq2_guess_w)
 {
-	irq_raise(space->machine(), 2);
+	irq_raise(machine(), 2);
 }
 
-static WRITE32_HANDLER( ms32_irq5_guess_w )
+WRITE32_MEMBER(ms32_state::ms32_irq5_guess_w)
 {
-	irq_raise(space->machine(), 5);
+	irq_raise(machine(), 5);
 }
 
 static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
-	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ_LEGACY(ms32_read_inputs3)
+	AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3)
 
 	AM_RANGE(0xfce00004, 0xfce00023) AM_RAM // regs?
 	AM_RANGE(0xfce00200, 0xfce0021f) AM_RAM // regs?
@@ -431,8 +411,8 @@ static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
 
 	/* these two are almost certainly wrong, they just let you see what
        happens if you generate the FPU ints without breaking other games */
-	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE_LEGACY(ms32_irq5_guess_w)
-	AM_RANGE(0xfd0f0000, 0xfd0f0003) AM_WRITE_LEGACY(ms32_irq2_guess_w)
+	AM_RANGE(0xfce00e00, 0xfce00e03) AM_WRITE(ms32_irq5_guess_w)
+	AM_RANGE(0xfd0f0000, 0xfd0f0003) AM_WRITE(ms32_irq2_guess_w)
 
 	AM_RANGE(0xfd100000, 0xfd103fff) AM_RAM // used when you start enabling fpu ints
 	AM_RANGE(0xfd104000, 0xfd105fff) AM_RAM // uploads data here
@@ -440,7 +420,7 @@ static ADDRESS_MAP_START( f1superb_map, AS_PROGRAM, 32, ms32_state )
 	AM_RANGE(0xfd140000, 0xfd143fff) AM_RAM // used when you start enabling fpu ints
 	AM_RANGE(0xfd144000, 0xfd145fff) AM_RAM // same data here
 
-	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_READWRITE16_LEGACY(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) // definitely line ram
+	AM_RANGE(0xfdc00000, 0xfdc007ff) AM_READWRITE16(ms32_extra_r16, ms32_extra_w16, 0x0000ffff) // definitely line ram
 	AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM // scroll info for lineram?
 
 	AM_IMPORT_FROM(ms32_map)
@@ -553,7 +533,7 @@ what the operations might be, my maths isn't up to much though...
 ///**/AM_RANGE(0xfdc00000, 0xfdc006ff) AM_RAM /* f1superb */
 ///**/AM_RANGE(0xfde00000, 0xfde01fff) AM_RAM /* f1superb lineram #2? */
 ///**/AM_RANGE(0xfe202000, 0xfe2fffff) AM_RAM /* f1superb vram */
-//  AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ_LEGACY(ms32_read_inputs3) /* analog controls in f1superb? */
+//  AM_RANGE(0xfd0e0000, 0xfd0e0003) AM_READ(ms32_read_inputs3) /* analog controls in f1superb? */
 
 /*************************************
  *
@@ -1365,34 +1345,33 @@ static TIMER_DEVICE_CALLBACK(ms32_interrupt)
  code at $38 reads the 2nd command latch ??
 */
 
-static READ8_HANDLER( latch_r )
+READ8_MEMBER(ms32_state::latch_r)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(space,0)^0xff;
 }
 
-static WRITE8_HANDLER( ms32_snd_bank_w )
+WRITE8_MEMBER(ms32_state::ms32_snd_bank_w)
 {
-	memory_set_bank(space->machine(), "bank4", (data >> 0) & 0x0F);
-	memory_set_bank(space->machine(), "bank5", (data >> 4) & 0x0F);
+	memory_set_bank(machine(), "bank4", (data >> 0) & 0x0F);
+	memory_set_bank(machine(), "bank5", (data >> 4) & 0x0F);
 }
 
-static WRITE8_HANDLER( to_main_w )
+WRITE8_MEMBER(ms32_state::to_main_w)
 {
-	ms32_state *state = space->machine().driver_data<ms32_state>();
-	state->m_to_main=data;
-	irq_raise(space->machine(), 1);
+	m_to_main=data;
+	irq_raise(machine(), 1);
 }
 
 static ADDRESS_MAP_START( ms32_sound_map, AS_PROGRAM, 8, ms32_state )
 	AM_RANGE(0x0000, 0x3eff) AM_ROM
 	AM_RANGE(0x3f00, 0x3f0f) AM_DEVREADWRITE_LEGACY("ymf", ymf271_r,ymf271_w)
-	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE_LEGACY(latch_r,to_main_w)
+	AM_RANGE(0x3f10, 0x3f10) AM_READWRITE(latch_r,to_main_w)
 	AM_RANGE(0x3f20, 0x3f20) AM_READNOP /* 2nd latch ? */
 	AM_RANGE(0x3f20, 0x3f20) AM_WRITENOP /* to_main2_w  ? */
 	AM_RANGE(0x3f40, 0x3f40) AM_WRITENOP   /* YMF271 pin 4 (bit 1) , YMF271 pin 39 (bit 4) */
 	AM_RANGE(0x3f70, 0x3f70) AM_WRITENOP   // watchdog? banking? very noisy
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITE_LEGACY(ms32_snd_bank_w)
+	AM_RANGE(0x3f80, 0x3f80) AM_WRITE(ms32_snd_bank_w)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank4")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank5")

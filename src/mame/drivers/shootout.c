@@ -41,35 +41,35 @@
 
 /*******************************************************************************/
 
-static WRITE8_HANDLER( shootout_bankswitch_w )
+WRITE8_MEMBER(shootout_state::shootout_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
-static WRITE8_HANDLER( sound_cpu_command_w )
+WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 {
 	soundlatch_w( space, offset, data );
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
-static WRITE8_HANDLER( shootout_flipscreen_w )
+WRITE8_MEMBER(shootout_state::shootout_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 }
 
-static WRITE8_HANDLER( shootout_coin_counter_w )
+WRITE8_MEMBER(shootout_state::shootout_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data);
+	coin_counter_w(machine(), 0, data);
 }
 
 /*******************************************************************************/
 
 static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(shootout_bankswitch_w)
-	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE_LEGACY(shootout_flipscreen_w)
-	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2") AM_WRITE_LEGACY(shootout_coin_counter_w)
-	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(sound_cpu_command_w)
+	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE(shootout_bankswitch_w)
+	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE(shootout_flipscreen_w)
+	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2") AM_WRITE(shootout_coin_counter_w)
+	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2") AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x1004, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(shootout_textram_w) AM_BASE(m_textram)
@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1")
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(shootout_coin_counter_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(shootout_coin_counter_w)
 	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE_LEGACY(shootout_textram_w) AM_BASE(m_textram)
@@ -255,8 +255,8 @@ static const ym2203_interface ym2203_interface2 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, shootout_bankswitch_w),
-		DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, shootout_flipscreen_w)
+		DEVCB_DRIVER_MEMBER(shootout_state, shootout_bankswitch_w),
+		DEVCB_DRIVER_MEMBER(shootout_state, shootout_flipscreen_w)
 	},
 	shootout_snd2_irq
 };

@@ -30,6 +30,12 @@ public:
 	UINT16 m_blitter_data[8];
 	UINT8 m_blitter_page;
 	attotime m_blitter_busy_until;
+	DECLARE_READ16_MEMBER(tms_host_r);
+	DECLARE_WRITE16_MEMBER(tms_host_w);
+	DECLARE_WRITE16_MEMBER(control_w);
+	DECLARE_READ16_MEMBER(ultennis_hack_r);
+	DECLARE_WRITE16_MEMBER(protection_bit_w);
+	DECLARE_READ16_MEMBER(unk_r);
 };
 
 

@@ -15,6 +15,10 @@ public:
 	int m_current_table;
 	int m_in_math;
 	int m_math_param;
+	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
+	DECLARE_READ8_MEMBER(sidepckt_i8751_r);
+	DECLARE_WRITE8_MEMBER(sidepckt_i8751_w);
+	DECLARE_WRITE8_MEMBER(sidepctj_i8751_w);
 };
 
 

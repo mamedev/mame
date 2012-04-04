@@ -46,15 +46,15 @@ static MACHINE_RESET( runaway )
 }
 
 
-static READ8_HANDLER( runaway_input_r )
+READ8_MEMBER(runaway_state::runaway_input_r)
 {
 	UINT8 val = 0;
 
-	if (input_port_read(space->machine(), "3000D7") & (1 << offset))
+	if (input_port_read(machine(), "3000D7") & (1 << offset))
 	{
 		val |= 0x80;
 	}
-	if (input_port_read(space->machine(), "3000D6") & (1 << offset))
+	if (input_port_read(machine(), "3000D6") & (1 << offset))
 	{
 		val |= 0x40;
 	}
@@ -69,15 +69,15 @@ static READ8_DEVICE_HANDLER( runaway_pot_r )
 }
 
 
-static WRITE8_HANDLER( runaway_led_w )
+WRITE8_MEMBER(runaway_state::runaway_led_w)
 {
-	set_led_status(space->machine(), offset, ~data & 1);
+	set_led_status(machine(), offset, ~data & 1);
 }
 
 
-static WRITE8_HANDLER( runaway_irq_ack_w )
+WRITE8_MEMBER(runaway_state::runaway_irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -85,16 +85,16 @@ static ADDRESS_MAP_START( runaway_map, AS_PROGRAM, 8, runaway_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE_LEGACY(runaway_video_ram_w) AM_BASE(m_video_ram)
 	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE(m_sprite_ram)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(runaway_irq_ack_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(runaway_irq_ack_w)
 	AM_RANGE(0x1400, 0x143f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_WRITE_LEGACY(runaway_paletteram_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP /* coin counter? */
 	AM_RANGE(0x2001, 0x2001) AM_WRITENOP /* coin counter? */
-	AM_RANGE(0x2003, 0x2004) AM_WRITE_LEGACY(runaway_led_w)
+	AM_RANGE(0x2003, 0x2004) AM_WRITE(runaway_led_w)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE_LEGACY(runaway_tile_bank_w)
 
-	AM_RANGE(0x3000, 0x3007) AM_READ_LEGACY(runaway_input_r)
+	AM_RANGE(0x3000, 0x3007) AM_READ(runaway_input_r)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("4000")
 	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("earom", atari_vg_earom_device, read)
 	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r,pokey_w)

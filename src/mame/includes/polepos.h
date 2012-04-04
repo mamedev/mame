@@ -34,6 +34,11 @@ public:
 	UINT16 m_scroll;
 	UINT8 m_main_irq_mask;
 	UINT8 m_sub_irq_mask;
+	DECLARE_READ16_MEMBER(polepos2_ic25_r);
+	DECLARE_READ8_MEMBER(polepos_adc_r);
+	DECLARE_READ8_MEMBER(polepos_ready_r);
+	DECLARE_WRITE8_MEMBER(polepos_latch_w);
+	DECLARE_WRITE16_MEMBER(polepos_z8002_nvi_enable_w);
 };
 
 

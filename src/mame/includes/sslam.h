@@ -27,6 +27,10 @@ public:
 	tilemap_t *m_md_tilemap;
 
 	int m_sprites_x_offset;
+	DECLARE_WRITE16_MEMBER(powerbls_sound_w);
+	DECLARE_READ8_MEMBER(playmark_snd_command_r);
+	DECLARE_WRITE8_MEMBER(playmark_oki_w);
+	DECLARE_WRITE8_MEMBER(playmark_snd_control_w);
 };
 
 

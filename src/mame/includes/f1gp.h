@@ -38,6 +38,15 @@ public:
 	/* devices */
 	device_t *m_audiocpu;
 	device_t *m_k053936;
+	DECLARE_READ16_MEMBER(sharedram_r);
+	DECLARE_WRITE16_MEMBER(sharedram_w);
+	DECLARE_READ16_MEMBER(extrarom_r);
+	DECLARE_READ16_MEMBER(extrarom2_r);
+	DECLARE_WRITE8_MEMBER(f1gp_sh_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_READ16_MEMBER(command_pending_r);
+	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
+	DECLARE_WRITE16_MEMBER(f1gpb_misc_w);
 };
 
 /*----------- defined in video/f1gp.c -----------*/

@@ -31,6 +31,9 @@ public:
 	device_t *m_audiocpu;
 
 	UINT8   m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(brkthru_1803_w);
+	DECLARE_WRITE8_MEMBER(darwin_0803_w);
+	DECLARE_WRITE8_MEMBER(brkthru_soundlatch_w);
 };
 
 

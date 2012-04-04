@@ -51,7 +51,7 @@ static INTERRUPT_GEN( pandoras_slave_interrupt )
 		device_set_input_line(device, M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( pandoras_int_control_w )
+WRITE8_MEMBER(pandoras_state::pandoras_int_control_w)
 {
 	/*  byte 0: irq enable (CPU A)
         byte 2: coin counter 1
@@ -62,74 +62,68 @@ static WRITE8_HANDLER( pandoras_int_control_w )
 
         other bytes unknown */
 
-	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
 	switch (offset)
 	{
 		case 0x00:	if (!data)
-					device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
-				state->m_irq_enable_a = data;
+					device_set_input_line(m_maincpu, M6809_IRQ_LINE, CLEAR_LINE);
+				m_irq_enable_a = data;
 				break;
-		case 0x02:	coin_counter_w(space->machine(), 0,data & 0x01);
+		case 0x02:	coin_counter_w(machine(), 0,data & 0x01);
 				break;
-		case 0x03:	coin_counter_w(space->machine(), 1,data & 0x01);
+		case 0x03:	coin_counter_w(machine(), 1,data & 0x01);
 				break;
-		case 0x05:	pandoras_flipscreen_w(space, 0, data);
+		case 0x05:	pandoras_flipscreen_w(&space, 0, data);
 				break;
 		case 0x06:	if (!data)
-					device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
-				state->m_irq_enable_b = data;
+					device_set_input_line(m_subcpu, M6809_IRQ_LINE, CLEAR_LINE);
+				m_irq_enable_b = data;
 				break;
-		case 0x07:	device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
+		case 0x07:	device_set_input_line(m_subcpu, INPUT_LINE_NMI, PULSE_LINE);
 				break;
 
-		default:	logerror("%04x: (irq_ctrl) write %02x to %02x\n",cpu_get_pc(&space->device()), data, offset);
+		default:	logerror("%04x: (irq_ctrl) write %02x to %02x\n",cpu_get_pc(&space.device()), data, offset);
 				break;
 	}
 }
 
-static WRITE8_HANDLER( pandoras_cpua_irqtrigger_w )
+WRITE8_MEMBER(pandoras_state::pandoras_cpua_irqtrigger_w)
 {
-	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	if (!state->m_firq_old_data_a && data)
-		device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
+	if (!m_firq_old_data_a && data)
+		device_set_input_line(m_maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 
-	state->m_firq_old_data_a = data;
+	m_firq_old_data_a = data;
 }
 
-static WRITE8_HANDLER( pandoras_cpub_irqtrigger_w )
+WRITE8_MEMBER(pandoras_state::pandoras_cpub_irqtrigger_w)
 {
-	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
-	if (!state->m_firq_old_data_b && data)
-		device_set_input_line(state->m_subcpu, M6809_FIRQ_LINE, HOLD_LINE);
+	if (!m_firq_old_data_b && data)
+		device_set_input_line(m_subcpu, M6809_FIRQ_LINE, HOLD_LINE);
 
-	state->m_firq_old_data_b = data;
+	m_firq_old_data_b = data;
 }
 
-static WRITE8_HANDLER( pandoras_i8039_irqtrigger_w )
+WRITE8_MEMBER(pandoras_state::pandoras_i8039_irqtrigger_w)
 {
-	pandoras_state *state = space->machine().driver_data<pandoras_state>();
-	device_set_input_line(state->m_mcu, 0, ASSERT_LINE);
+	device_set_input_line(m_mcu, 0, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( i8039_irqen_and_status_w )
+WRITE8_MEMBER(pandoras_state::i8039_irqen_and_status_w)
 {
-	pandoras_state *state = space->machine().driver_data<pandoras_state>();
 
 	/* bit 7 enables IRQ */
 	if ((data & 0x80) == 0)
-		device_set_input_line(state->m_mcu, 0, CLEAR_LINE);
+		device_set_input_line(m_mcu, 0, CLEAR_LINE);
 
 	/* bit 5 goes to 8910 port A */
-	state->m_i8039_status = (data & 0x20) >> 5;
+	m_i8039_status = (data & 0x20) >> 5;
 }
 
-static WRITE8_HANDLER( pandoras_z80_irqtrigger_w )
+WRITE8_MEMBER(pandoras_state::pandoras_z80_irqtrigger_w)
 {
-	pandoras_state *state = space->machine().driver_data<pandoras_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 
@@ -138,11 +132,11 @@ static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1") AM_BASE(m_spriteram)				/* Work RAM (Shared with CPU B) */
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(pandoras_cram_w) AM_SHARE("share2") AM_BASE(m_colorram)	/* Color RAM (shared with CPU B) */
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(pandoras_vram_w) AM_SHARE("share3") AM_BASE(m_videoram)	/* Video RAM (shared with CPU B) */
-	AM_RANGE(0x1800, 0x1807) AM_WRITE_LEGACY(pandoras_int_control_w)								/* INT control */
+	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)								/* INT control */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITE_LEGACY(pandoras_scrolly_w)									/* bg scroll */
-	AM_RANGE(0x1c00, 0x1c00) AM_WRITE_LEGACY(pandoras_z80_irqtrigger_w)							/* cause INT on the Z80 */
+	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pandoras_z80_irqtrigger_w)							/* cause INT on the Z80 */
 	AM_RANGE(0x1e00, 0x1e00) AM_WRITE_LEGACY(soundlatch_w)											/* sound command to the Z80 */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(pandoras_cpub_irqtrigger_w)							/* cause FIRQ on CPU B */
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(pandoras_cpub_irqtrigger_w)							/* cause FIRQ on CPU B */
 	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(watchdog_reset_w)										/* watchdog reset */
 	AM_RANGE(0x4000, 0x5fff) AM_ROM															/* space for diagnostic ROM */
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("share4")										/* Shared RAM with CPU B */
@@ -154,7 +148,7 @@ static ADDRESS_MAP_START( pandoras_slave_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(pandoras_cram_w) AM_SHARE("share2")				/* Color RAM (shared with CPU A) */
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(pandoras_vram_w) AM_SHARE("share3")				/* Video RAM (shared with CPU A) */
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1800, 0x1807) AM_WRITE_LEGACY(pandoras_int_control_w)								/* INT control */
+	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)								/* INT control */
 	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1a01, 0x1a01) AM_READ_PORT("P1")
 	AM_RANGE(0x1a02, 0x1a02) AM_READ_PORT("P2")
@@ -162,7 +156,7 @@ static ADDRESS_MAP_START( pandoras_slave_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2")
 //  AM_RANGE(0x1e00, 0x1e00) AM_READNOP                                                     /* ??? seems to be important */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(watchdog_reset_w)										/* watchdog reset */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(pandoras_cpua_irqtrigger_w)							/* cause FIRQ on CPU A */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(pandoras_cpua_irqtrigger_w)							/* cause FIRQ on CPU A */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share4")										/* Shared RAM with the CPU A */
 	AM_RANGE(0xe000, 0xffff) AM_ROM															/* ROM */
 ADDRESS_MAP_END
@@ -174,7 +168,7 @@ static ADDRESS_MAP_START( pandoras_sound_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)							/* AY-8910 */
 	AM_RANGE(0x6001, 0x6001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)									/* AY-8910 */
 	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)							/* AY-8910 */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(pandoras_i8039_irqtrigger_w)							/* cause INT on the 8039 */
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(pandoras_i8039_irqtrigger_w)							/* cause INT on the 8039 */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(soundlatch2_w)										/* sound command to the 8039 */
 ADDRESS_MAP_END
 
@@ -185,7 +179,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pandoras_i8039_io_map, AS_IO, 8, pandoras_state )
 	AM_RANGE(0x00, 0xff) AM_READ_LEGACY(soundlatch2_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE_LEGACY(i8039_irqen_and_status_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
 

@@ -15,6 +15,11 @@ public:
 	UINT8 m_h8_irq5_enabled;
 	UINT16 *m_shared_ram;
 	int m_p8;
+	DECLARE_WRITE16_MEMBER(sharedram_sub_w);
+	DECLARE_READ16_MEMBER(sharedram_sub_r);
+	DECLARE_READ8_MEMBER(mcu_p7_read);
+	DECLARE_READ8_MEMBER(mcu_pa_read);
+	DECLARE_WRITE8_MEMBER(mcu_pa_write);
 };
 
 

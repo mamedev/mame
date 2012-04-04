@@ -22,6 +22,9 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_clut;
 	int m_flipscreen_old;
+	DECLARE_WRITE8_MEMBER(nbmj8991_soundbank_w);
+	DECLARE_WRITE8_MEMBER(nbmj8991_sound_w);
+	DECLARE_READ8_MEMBER(nbmj8991_sound_r);
 };
 
 

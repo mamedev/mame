@@ -72,7 +72,7 @@ SRAM:
 #define MAIN_CLOCK XTAL_18_432MHz
 
 
-static WRITE8_HANDLER( bank_select_w )
+WRITE8_MEMBER(ksayakyu_state::bank_select_w)
 {
 	/*
         bits:
@@ -81,26 +81,23 @@ static WRITE8_HANDLER( bank_select_w )
         xxxxxxx  - unused ?
 
     */
-	memory_set_bank(space->machine(), "bank1", data & 0x01);
+	memory_set_bank(machine(), "bank1", data & 0x01);
 }
 
-static WRITE8_HANDLER( latch_w )
+WRITE8_MEMBER(ksayakyu_state::latch_w)
 {
-	ksayakyu_state *state = space->machine().driver_data<ksayakyu_state>();
-	state->m_sound_status &= ~0x80;
+	m_sound_status &= ~0x80;
 	soundlatch_w(space, 0, data | 0x80);
 }
 
-static READ8_HANDLER (sound_status_r)
+READ8_MEMBER(ksayakyu_state::sound_status_r)
 {
-	ksayakyu_state *state = space->machine().driver_data<ksayakyu_state>();
-	return state->m_sound_status | 4;
+	return m_sound_status | 4;
 }
 
-static WRITE8_HANDLER(tomaincpu_w)
+WRITE8_MEMBER(ksayakyu_state::tomaincpu_w)
 {
-	ksayakyu_state *state = space->machine().driver_data<ksayakyu_state>();
-	state->m_sound_status |= 0x80;
+	m_sound_status |= 0x80;
 	soundlatch_w(space, 0, data);
 }
 
@@ -114,10 +111,10 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0xa802, 0xa802) AM_READ_PORT("DSW")
 	AM_RANGE(0xa803, 0xa803) AM_READNOP /* watchdog ? */
 	AM_RANGE(0xa804, 0xa804) AM_WRITE_LEGACY(ksayakyu_videoctrl_w)
-	AM_RANGE(0xa805, 0xa805) AM_WRITE_LEGACY(latch_w)
-	AM_RANGE(0xa806, 0xa806) AM_READ_LEGACY(sound_status_r)
+	AM_RANGE(0xa805, 0xa805) AM_WRITE(latch_w)
+	AM_RANGE(0xa806, 0xa806) AM_READ(sound_status_r)
 	AM_RANGE(0xa807, 0xa807) AM_READNOP /* watchdog ? */
-	AM_RANGE(0xa808, 0xa808) AM_WRITE_LEGACY(bank_select_w)
+	AM_RANGE(0xa808, 0xa808) AM_WRITE(bank_select_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE_LEGACY(ksayakyu_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
@@ -129,7 +126,7 @@ static ADDRESS_MAP_START( soundcpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0xa006, 0xa007) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0xa008, 0xa008) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(0xa00c, 0xa00c) AM_WRITE_LEGACY(tomaincpu_w)
+	AM_RANGE(0xa00c, 0xa00c) AM_WRITE(tomaincpu_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITENOP //a timer of some sort?
 ADDRESS_MAP_END
 

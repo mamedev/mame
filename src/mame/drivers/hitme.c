@@ -38,13 +38,12 @@ static TILE_GET_INFO( get_hitme_tile_info )
 }
 
 
-static WRITE8_HANDLER( hitme_vidram_w )
+WRITE8_MEMBER(hitme_state::hitme_vidram_w)
 {
-	hitme_state *state = space->machine().driver_data<hitme_state>();
 
 	/* mark this tile dirty */
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -153,27 +152,27 @@ static UINT8 read_port_and_t0_and_hblank( running_machine &machine, int port )
 }
 
 
-static READ8_HANDLER( hitme_port_0_r )
+READ8_MEMBER(hitme_state::hitme_port_0_r)
 {
-	return read_port_and_t0_and_hblank(space->machine(), 0);
+	return read_port_and_t0_and_hblank(machine(), 0);
 }
 
 
-static READ8_HANDLER( hitme_port_1_r )
+READ8_MEMBER(hitme_state::hitme_port_1_r)
 {
-	return read_port_and_t0(space->machine(), 1);
+	return read_port_and_t0(machine(), 1);
 }
 
 
-static READ8_HANDLER( hitme_port_2_r )
+READ8_MEMBER(hitme_state::hitme_port_2_r)
 {
-	return read_port_and_t0_and_hblank(space->machine(), 2);
+	return read_port_and_t0_and_hblank(machine(), 2);
 }
 
 
-static READ8_HANDLER( hitme_port_3_r )
+READ8_MEMBER(hitme_state::hitme_port_3_r)
 {
-	return read_port_and_t0(space->machine(), 3);
+	return read_port_and_t0(machine(), 3);
 }
 
 
@@ -227,12 +226,12 @@ static WRITE8_DEVICE_HANDLER( output_port_1_w )
 static ADDRESS_MAP_START( hitme_map, AS_PROGRAM, 8, hitme_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE_LEGACY(hitme_vidram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x300) AM_RAM
-	AM_RANGE(0x1400, 0x14ff) AM_READ_LEGACY(hitme_port_0_r)
-	AM_RANGE(0x1500, 0x15ff) AM_READ_LEGACY(hitme_port_1_r)
-	AM_RANGE(0x1600, 0x16ff) AM_READ_LEGACY(hitme_port_2_r)
-	AM_RANGE(0x1700, 0x17ff) AM_READ_LEGACY(hitme_port_3_r)
+	AM_RANGE(0x1400, 0x14ff) AM_READ(hitme_port_0_r)
+	AM_RANGE(0x1500, 0x15ff) AM_READ(hitme_port_1_r)
+	AM_RANGE(0x1600, 0x16ff) AM_READ(hitme_port_2_r)
+	AM_RANGE(0x1700, 0x17ff) AM_READ(hitme_port_3_r)
 	AM_RANGE(0x1800, 0x18ff) AM_READ_PORT("IN4")
 	AM_RANGE(0x1900, 0x19ff) AM_READ_PORT("IN5")
 	AM_RANGE(0x1d00, 0x1dff) AM_DEVWRITE_LEGACY("discrete", output_port_0_w)
@@ -241,10 +240,10 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hitme_portmap, AS_IO, 8, hitme_state )
-	AM_RANGE(0x14, 0x14) AM_READ_LEGACY(hitme_port_0_r)
-	AM_RANGE(0x15, 0x15) AM_READ_LEGACY(hitme_port_1_r)
-	AM_RANGE(0x16, 0x16) AM_READ_LEGACY(hitme_port_2_r)
-	AM_RANGE(0x17, 0x17) AM_READ_LEGACY(hitme_port_3_r)
+	AM_RANGE(0x14, 0x14) AM_READ(hitme_port_0_r)
+	AM_RANGE(0x15, 0x15) AM_READ(hitme_port_1_r)
+	AM_RANGE(0x16, 0x16) AM_READ(hitme_port_2_r)
+	AM_RANGE(0x17, 0x17) AM_READ(hitme_port_3_r)
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("IN4")
 	AM_RANGE(0x19, 0x19) AM_READ_PORT("IN5")
 	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE_LEGACY("discrete", output_port_0_w)

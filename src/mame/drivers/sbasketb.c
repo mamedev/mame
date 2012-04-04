@@ -50,21 +50,20 @@ CPU/Video Board Parts:
 #include "includes/sbasketb.h"
 
 
-static WRITE8_HANDLER( sbasketb_sh_irqtrigger_w )
+WRITE8_MEMBER(sbasketb_state::sbasketb_sh_irqtrigger_w)
 {
-	device_set_input_line_and_vector(space->machine().device<cpu_device>("audiocpu"), 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(machine().device<cpu_device>("audiocpu"), 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( sbasketb_coin_counter_w )
+WRITE8_MEMBER(sbasketb_state::sbasketb_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data);
+	coin_counter_w(machine(), offset, data);
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(sbasketb_state::irq_mask_w)
 {
-	sbasketb_state *state = space->machine().driver_data<sbasketb_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 }
 
 static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
@@ -77,11 +76,11 @@ static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x3c10, 0x3c10) AM_READNOP    /* ???? */
 	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_BASE(m_palettebank)
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE_LEGACY(sbasketb_flipscreen_w)
-	AM_RANGE(0x3c81, 0x3c81) AM_WRITE_LEGACY(irq_mask_w)
-	AM_RANGE(0x3c83, 0x3c84) AM_WRITE_LEGACY(sbasketb_coin_counter_w)
+	AM_RANGE(0x3c81, 0x3c81) AM_WRITE(irq_mask_w)
+	AM_RANGE(0x3c83, 0x3c84) AM_WRITE(sbasketb_coin_counter_w)
 	AM_RANGE(0x3c85, 0x3c85) AM_WRITEONLY AM_BASE(m_spriteram_select)
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x3d80, 0x3d80) AM_WRITE_LEGACY(sbasketb_sh_irqtrigger_w)
+	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(sbasketb_sh_irqtrigger_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3e01, 0x3e01) AM_READ_PORT("P1")
 	AM_RANGE(0x3e02, 0x3e02) AM_READ_PORT("P2")

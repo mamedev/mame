@@ -101,12 +101,12 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( yunsun16_sound_bank_w )
+WRITE16_MEMBER(yunsun16_state::yunsun16_sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		int bank = data & 3;
-		UINT8 *dst	= space->machine().region("oki")->base();
+		UINT8 *dst	= machine().region("oki")->base();
 		UINT8 *src	= dst + 0x80000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 	}
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, yunsun16_state )
 	AM_RANGE(0x80010c, 0x80010f) AM_RAM AM_BASE(m_scrollram_1)	// Scrolling
 	AM_RANGE(0x800114, 0x800117) AM_RAM AM_BASE(m_scrollram_0)	// Scrolling
 	AM_RANGE(0x800154, 0x800155) AM_RAM AM_BASE(m_priorityram)	// Priority
-	AM_RANGE(0x800180, 0x800181) AM_WRITE_LEGACY(yunsun16_sound_bank_w)	// Sound
+	AM_RANGE(0x800180, 0x800181) AM_WRITE(yunsun16_sound_bank_w)	// Sound
 	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)	// Sound
 	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITENOP	// ? 0 (during int)
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
@@ -137,9 +137,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, yunsun16_state )
 ADDRESS_MAP_END
 
 
-static WRITE16_HANDLER( magicbub_sound_command_w )
+WRITE16_MEMBER(yunsun16_state::magicbub_sound_command_w)
 {
-	yunsun16_state *state = space->machine().driver_data<yunsun16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 /*
@@ -149,7 +148,7 @@ number 0 on each voice. That sample is 00000-00000.
 		if ((data & 0xff) != 0x3a)
 		{
 			soundlatch_w(space, 0, data & 0xff);
-			device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 }
@@ -157,7 +156,8 @@ number 0 on each voice. That sample is 00000-00000.
 static DRIVER_INIT( magicbub )
 {
 //  remove_mem_write16_handler (0, 0x800180, 0x800181 );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x800188, 0x800189, FUNC(magicbub_sound_command_w));
+	yunsun16_state *state = machine.driver_data<yunsun16_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x800188, 0x800189, write16_delegate(FUNC(yunsun16_state::magicbub_sound_command_w),state));
 }
 
 /***************************************************************************

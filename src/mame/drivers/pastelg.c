@@ -43,11 +43,11 @@ static DRIVER_INIT( pastelg )
 	nb1413m3_type = NB1413M3_PASTELG;
 }
 
-static READ8_HANDLER( pastelg_sndrom_r )
+READ8_MEMBER(pastelg_state::pastelg_sndrom_r)
 {
-	UINT8 *ROM = space->machine().region("voice")->base();
+	UINT8 *ROM = machine().region("voice")->base();
 
-	return ROM[pastelg_blitter_src_addr_r(space) & 0x7fff];
+	return ROM[pastelg_blitter_src_addr_r(&space) & 0x7fff];
 }
 
 static ADDRESS_MAP_START( pastelg_map, AS_PROGRAM, 8, pastelg_state )
@@ -55,9 +55,9 @@ static ADDRESS_MAP_START( pastelg_map, AS_PROGRAM, 8, pastelg_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static READ8_HANDLER( pastelg_irq_ack_r )
+READ8_MEMBER(pastelg_state::pastelg_irq_ack_r)
 {
-	device_set_input_line(&space->device(), 0, CLEAR_LINE);
+	device_set_input_line(&space.device(), 0, CLEAR_LINE);
 	return 0;
 }
 
@@ -71,47 +71,44 @@ static ADDRESS_MAP_START( pastelg_io_map, AS_IO, 8, pastelg_state )
 	AM_RANGE(0x90, 0x96) AM_WRITE_LEGACY(pastelg_blitter_w)
 	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r, nb1413m3_inputportsel_w)
 	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r, pastelg_romsel_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(pastelg_sndrom_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(pastelg_clut_w)
-	AM_RANGE(0xd0, 0xd0) AM_READ_LEGACY(pastelg_irq_ack_r) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
 	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( threeds_inputport1_r )
+READ8_MEMBER(pastelg_state::threeds_inputport1_r)
 {
-	pastelg_state *state = space->machine().driver_data<pastelg_state>();
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(space->machine(),"KEY0_PL1");
-		case 0x02: return input_port_read(space->machine(),"KEY1_PL1");
-		case 0x04: return input_port_read(space->machine(),"KEY2_PL1");
-		case 0x08: return input_port_read(space->machine(),"KEY3_PL1");
-		case 0x10: return input_port_read(space->machine(),"KEY4_PL1");
+		case 0x01: return input_port_read(machine(),"KEY0_PL1");
+		case 0x02: return input_port_read(machine(),"KEY1_PL1");
+		case 0x04: return input_port_read(machine(),"KEY2_PL1");
+		case 0x08: return input_port_read(machine(),"KEY3_PL1");
+		case 0x10: return input_port_read(machine(),"KEY4_PL1");
 	}
 
 	return 0xff;
 }
 
-static READ8_HANDLER( threeds_inputport2_r )
+READ8_MEMBER(pastelg_state::threeds_inputport2_r)
 {
-	pastelg_state *state = space->machine().driver_data<pastelg_state>();
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(space->machine(),"KEY0_PL2");
-		case 0x02: return input_port_read(space->machine(),"KEY1_PL2");
-		case 0x04: return input_port_read(space->machine(),"KEY2_PL2");
-		case 0x08: return input_port_read(space->machine(),"KEY3_PL2");
-		case 0x10: return input_port_read(space->machine(),"KEY4_PL2");
+		case 0x01: return input_port_read(machine(),"KEY0_PL2");
+		case 0x02: return input_port_read(machine(),"KEY1_PL2");
+		case 0x04: return input_port_read(machine(),"KEY2_PL2");
+		case 0x08: return input_port_read(machine(),"KEY3_PL2");
+		case 0x10: return input_port_read(machine(),"KEY4_PL2");
 	}
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( threeds_inputportsel_w )
+WRITE8_MEMBER(pastelg_state::threeds_inputportsel_w)
 {
-	pastelg_state *state = space->machine().driver_data<pastelg_state>();
-	state->m_mux_data = ~data;
+	m_mux_data = ~data;
 }
 
 static ADDRESS_MAP_START( threeds_io_map, AS_IO, 8, pastelg_state )
@@ -120,11 +117,11 @@ static ADDRESS_MAP_START( threeds_io_map, AS_IO, 8, pastelg_state )
 	AM_RANGE(0x82, 0x83) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(threeds_romsel_w )
 	AM_RANGE(0xf0, 0xf6) AM_WRITE_LEGACY(pastelg_blitter_w)
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(threeds_inputport1_r, threeds_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READ_LEGACY(threeds_inputport2_r) AM_WRITE_LEGACY(threeds_output_w)//writes: bit 3 is coin lockout, bit 1 is coin counter
+	AM_RANGE(0xa0, 0xa0) AM_READWRITE(threeds_inputport1_r, threeds_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_READ(threeds_inputport2_r) AM_WRITE_LEGACY(threeds_output_w)//writes: bit 3 is coin lockout, bit 1 is coin counter
 	AM_RANGE(0xc0, 0xcf) AM_WRITE_LEGACY(pastelg_clut_w)
 	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(threeds_rom_readback_r)
-	AM_RANGE(0xd0, 0xd0) AM_READ_LEGACY(pastelg_irq_ack_r) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_READ(pastelg_irq_ack_r) AM_DEVWRITE_LEGACY("dac", DAC_WRITE)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pastelg )

@@ -39,22 +39,21 @@ Memo:
 #include "machine/nvram.h"
 
 
-static WRITE8_HANDLER( ojankohs_rombank_w )
+WRITE8_MEMBER(ojankohs_state::ojankohs_rombank_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x3f);
+	memory_set_bank(machine(), "bank1", data & 0x3f);
 }
 
-static WRITE8_HANDLER( ojankoy_rombank_w )
+WRITE8_MEMBER(ojankohs_state::ojankoy_rombank_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 
-	memory_set_bank(space->machine(), "bank1", data & 0x1f);
+	memory_set_bank(machine(), "bank1", data & 0x1f);
 
-	state->m_adpcm_reset = BIT(data, 5);
-	if (!state->m_adpcm_reset)
-		state->m_vclk_left = 0;
+	m_adpcm_reset = BIT(data, 5);
+	if (!m_adpcm_reset)
+		m_vclk_left = 0;
 
-	msm5205_reset_w(state->m_msm, !state->m_adpcm_reset);
+	msm5205_reset_w(m_msm, !m_adpcm_reset);
 }
 
 static WRITE8_DEVICE_HANDLER( ojankohs_adpcm_reset_w )
@@ -66,11 +65,10 @@ static WRITE8_DEVICE_HANDLER( ojankohs_adpcm_reset_w )
 	msm5205_reset_w(device, !state->m_adpcm_reset);
 }
 
-static WRITE8_HANDLER( ojankohs_msm5205_w )
+WRITE8_MEMBER(ojankohs_state::ojankohs_msm5205_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
-	state->m_adpcm_data = data;
-	state->m_vclk_left = 2;
+	m_adpcm_data = data;
+	m_vclk_left = 2;
 }
 
 static void ojankohs_adpcm_int( device_t *device )
@@ -94,54 +92,50 @@ static void ojankohs_adpcm_int( device_t *device )
 		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( ojankoc_ctrl_w )
+WRITE8_MEMBER(ojankohs_state::ojankoc_ctrl_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 
-	state->m_adpcm_reset = BIT(data, 4);
-	msm5205_reset_w(state->m_msm, !BIT(data, 4));
-	ojankoc_flipscreen(space, data);
+	m_adpcm_reset = BIT(data, 4);
+	msm5205_reset_w(m_msm, !BIT(data, 4));
+	ojankoc_flipscreen(&space, data);
 }
 
-static WRITE8_HANDLER( ojankohs_portselect_w )
+WRITE8_MEMBER(ojankohs_state::ojankohs_portselect_w)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
-	state->m_portselect = data;
+	m_portselect = data;
 }
 
-static READ8_HANDLER( ojankohs_keymatrix_r )
+READ8_MEMBER(ojankohs_state::ojankohs_keymatrix_r)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int ret;
 
-	switch (state->m_portselect)
+	switch (m_portselect)
 	{
-		case 0x01:	ret = input_port_read(space->machine(), "KEY0");	break;
-		case 0x02:	ret = input_port_read(space->machine(), "KEY1"); break;
-		case 0x04:	ret = input_port_read(space->machine(), "KEY2"); break;
-		case 0x08:	ret = input_port_read(space->machine(), "KEY3"); break;
-		case 0x10:	ret = input_port_read(space->machine(), "KEY4"); break;
+		case 0x01:	ret = input_port_read(machine(), "KEY0");	break;
+		case 0x02:	ret = input_port_read(machine(), "KEY1"); break;
+		case 0x04:	ret = input_port_read(machine(), "KEY2"); break;
+		case 0x08:	ret = input_port_read(machine(), "KEY3"); break;
+		case 0x10:	ret = input_port_read(machine(), "KEY4"); break;
 		case 0x20:	ret = 0xff; break;
 		case 0x3f:	ret = 0xff;
-					ret &= input_port_read(space->machine(), "KEY0");
-					ret &= input_port_read(space->machine(), "KEY1");
-					ret &= input_port_read(space->machine(), "KEY2");
-					ret &= input_port_read(space->machine(), "KEY3");
-					ret &= input_port_read(space->machine(), "KEY4");
+					ret &= input_port_read(machine(), "KEY0");
+					ret &= input_port_read(machine(), "KEY1");
+					ret &= input_port_read(machine(), "KEY2");
+					ret &= input_port_read(machine(), "KEY3");
+					ret &= input_port_read(machine(), "KEY4");
 					break;
 		default:	ret = 0xff;
-					logerror("PC:%04X unknown %02X\n", cpu_get_pc(&space->device()), state->m_portselect);
+					logerror("PC:%04X unknown %02X\n", cpu_get_pc(&space.device()), m_portselect);
 					break;
 	}
 
 	return ret;
 }
 
-static READ8_HANDLER( ojankoc_keymatrix_r )
+READ8_MEMBER(ojankohs_state::ojankoc_keymatrix_r)
 {
-	ojankohs_state *state = space->machine().driver_data<ojankohs_state>();
 	int i;
 	int ret = 0;
 	static const char *const keynames[2][5] =
@@ -152,11 +146,11 @@ static READ8_HANDLER( ojankoc_keymatrix_r )
 
 	for (i = 0; i < 5; i++)
 	{
-		if (!BIT(state->m_portselect, i))
-			ret |= input_port_read(space->machine(), keynames[offset][i]);
+		if (!BIT(m_portselect, i))
+			ret |= input_port_read(machine(), keynames[offset][i]);
 	}
 
-	return (ret & 0x3f) | (input_port_read(space->machine(), offset ? "IN1" : "IN0") & 0xc0);
+	return (ret & 0x3f) | (input_port_read(machine(), offset ? "IN1" : "IN0") & 0xc0);
 }
 
 static READ8_DEVICE_HANDLER( ojankohs_ay8910_0_r )
@@ -177,24 +171,24 @@ static READ8_DEVICE_HANDLER( ojankohs_ay8910_1_r )
 	        ((input_port_read(device->machine(), "DSW2") & 0x40) >> 5) | ((input_port_read(device->machine(), "DSW2") & 0x80) >> 7));
 }
 
-static READ8_HANDLER( ccasino_dipsw3_r )
+READ8_MEMBER(ojankohs_state::ccasino_dipsw3_r)
 {
-	return (input_port_read(space->machine(), "DSW3") ^ 0xff);		// DIPSW 3
+	return (input_port_read(machine(), "DSW3") ^ 0xff);		// DIPSW 3
 }
 
-static READ8_HANDLER( ccasino_dipsw4_r )
+READ8_MEMBER(ojankohs_state::ccasino_dipsw4_r)
 {
-	return (input_port_read(space->machine(), "DSW4") ^ 0xff);		// DIPSW 4
+	return (input_port_read(machine(), "DSW4") ^ 0xff);		// DIPSW 4
 }
 
-static WRITE8_HANDLER( ojankoy_coinctr_w )
+WRITE8_MEMBER(ojankohs_state::ojankoy_coinctr_w)
 {
-	coin_counter_w(space->machine(), 0, BIT(data, 0));
+	coin_counter_w(machine(), 0, BIT(data, 0));
 }
 
-static WRITE8_HANDLER( ccasino_coinctr_w )
+WRITE8_MEMBER(ojankohs_state::ccasino_coinctr_w)
 {
-	coin_counter_w(space->machine(), 0, BIT(data, 1));
+	coin_counter_w(machine(), 0, BIT(data, 1));
 }
 
 
@@ -226,12 +220,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ojankohs_io_map, AS_IO, 8, ojankohs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE_LEGACY(ojankohs_portselect_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(ojankohs_keymatrix_r, ojankohs_rombank_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(ojankohs_portselect_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ojankohs_keymatrix_r, ojankohs_rombank_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE_LEGACY(ojankohs_gfxreg_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("msm", ojankohs_adpcm_reset_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(ojankohs_msm5205_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x10, 0x10) AM_WRITENOP				// unknown
@@ -240,23 +234,23 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ojankoy_io_map, AS_IO, 8, ojankohs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE_LEGACY(ojankohs_portselect_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(ojankohs_keymatrix_r, ojankoy_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE_LEGACY(ojankoy_coinctr_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(ojankohs_portselect_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ojankohs_keymatrix_r, ojankoy_rombank_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE(ojankoy_coinctr_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(ojankohs_msm5205_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ccasino_io_map, AS_IO, 8, ojankohs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE_LEGACY(ojankohs_portselect_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE_LEGACY(ojankohs_keymatrix_r, ojankohs_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE_LEGACY(ccasino_coinctr_w)
-	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(ccasino_dipsw3_r) AM_DEVWRITE_LEGACY("msm", ojankohs_adpcm_reset_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(ccasino_dipsw4_r, ojankohs_flipscreen_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(ojankohs_msm5205_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(ojankohs_portselect_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ojankohs_keymatrix_r, ojankohs_rombank_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN1") AM_WRITE(ccasino_coinctr_w)
+	AM_RANGE(0x03, 0x03) AM_READ(ccasino_dipsw3_r) AM_DEVWRITE_LEGACY("msm", ojankohs_adpcm_reset_w)
+	AM_RANGE(0x04, 0x04) AM_READ(ccasino_dipsw4_r) AM_WRITE_LEGACY(ojankohs_flipscreen_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x08, 0x0f) AM_WRITE_LEGACY(ccasino_palette_w) AM_BASE(m_paletteram)		// 16bit address access
@@ -267,10 +261,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ojankoc_io_map, AS_IO, 8, ojankohs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x1f) AM_WRITE_LEGACY(ojankoc_palette_w)
-	AM_RANGE(0xf9, 0xf9) AM_WRITE_LEGACY(ojankohs_msm5205_w)
-	AM_RANGE(0xfb, 0xfb) AM_WRITE_LEGACY(ojankoc_ctrl_w)
-	AM_RANGE(0xfc, 0xfd) AM_READ_LEGACY(ojankoc_keymatrix_r)
-	AM_RANGE(0xfd, 0xfd) AM_WRITE_LEGACY(ojankohs_portselect_w)
+	AM_RANGE(0xf9, 0xf9) AM_WRITE(ojankohs_msm5205_w)
+	AM_RANGE(0xfb, 0xfb) AM_WRITE(ojankoc_ctrl_w)
+	AM_RANGE(0xfc, 0xfd) AM_READ(ojankoc_keymatrix_r)
+	AM_RANGE(0xfd, 0xfd) AM_WRITE(ojankohs_portselect_w)
 	AM_RANGE(0xfe, 0xff) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0xff, 0xff) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END

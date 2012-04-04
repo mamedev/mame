@@ -165,26 +165,24 @@ static TIMER_CALLBACK( sound_command_w_callback )
 }
 
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(rpunch_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
-		space->machine().scheduler().synchronize(FUNC(sound_command_w_callback), data & 0xff);
+		machine().scheduler().synchronize(FUNC(sound_command_w_callback), data & 0xff);
 }
 
 
-static READ8_HANDLER( sound_command_r )
+READ8_MEMBER(rpunch_state::sound_command_r)
 {
-	rpunch_state *state = space->machine().driver_data<rpunch_state>();
-	state->m_sound_busy = 0;
-	cputag_set_input_line(space->machine(), "audiocpu", 0, (state->m_ym2151_irq | state->m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
-	return state->m_sound_data;
+	m_sound_busy = 0;
+	cputag_set_input_line(machine(), "audiocpu", 0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	return m_sound_data;
 }
 
 
-static READ16_HANDLER( sound_busy_r )
+READ16_MEMBER(rpunch_state::sound_busy_r)
 {
-	rpunch_state *state = space->machine().driver_data<rpunch_state>();
-	return state->m_sound_busy;
+	return m_sound_busy;
 }
 
 
@@ -233,12 +231,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE_LEGACY(rpunch_scrollreg_w)
 	AM_RANGE(0x0c0008, 0x0c0009) AM_WRITE_LEGACY(rpunch_crtc_data_w)
 	AM_RANGE(0x0c000c, 0x0c000d) AM_WRITE_LEGACY(rpunch_videoreg_w)
-	AM_RANGE(0x0c000e, 0x0c000f) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x0c000e, 0x0c000f) AM_WRITE(sound_command_w)
 	AM_RANGE(0x0c0010, 0x0c0013) AM_WRITE_LEGACY(rpunch_ins_w)
 	AM_RANGE(0x0c0018, 0x0c0019) AM_READ_PORT("P1")
 	AM_RANGE(0x0c001a, 0x0c001b) AM_READ_PORT("P2")
 	AM_RANGE(0x0c001c, 0x0c001d) AM_READ_PORT("DSW")
-	AM_RANGE(0x0c001e, 0x0c001f) AM_READ_LEGACY(sound_busy_r)
+	AM_RANGE(0x0c001e, 0x0c001f) AM_READ(sound_busy_r)
 	AM_RANGE(0x0c0028, 0x0c0029) AM_WRITE_LEGACY(rpunch_crtc_register_w)
 	AM_RANGE(0x0fc000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
@@ -254,7 +252,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, rpunch_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xf200, 0xf200) AM_READ_LEGACY(sound_command_r)
+	AM_RANGE(0xf200, 0xf200) AM_READ(sound_command_r)
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("upd", upd_control_w)
 	AM_RANGE(0xf600, 0xf600) AM_DEVWRITE_LEGACY("upd", upd_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM

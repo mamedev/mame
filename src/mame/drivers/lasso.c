@@ -47,36 +47,33 @@ static INPUT_CHANGED( coin_inserted )
 
 
 /* Write to the sound latch and generate an IRQ on the sound CPU */
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(lasso_state::sound_command_w)
 {
-	lasso_state *state = space->machine().driver_data<lasso_state>();
 	soundlatch_w(space, offset, data);
-	generic_pulse_irq_line(state->m_audiocpu, 0, 1);
+	generic_pulse_irq_line(m_audiocpu, 0, 1);
 }
 
-static WRITE8_HANDLER( pinbo_sound_command_w )
+WRITE8_MEMBER(lasso_state::pinbo_sound_command_w)
 {
-	lasso_state *state = space->machine().driver_data<lasso_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static READ8_HANDLER( sound_status_r )
+READ8_MEMBER(lasso_state::sound_status_r)
 {
 	/*  0x01: chip#0 ready; 0x02: chip#1 ready */
 	return 0x03;
 }
 
-static WRITE8_HANDLER( sound_select_w )
+WRITE8_MEMBER(lasso_state::sound_select_w)
 {
-	lasso_state *state = space->machine().driver_data<lasso_state>();
-	UINT8 to_write = BITSWAP8(*state->m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
+	UINT8 to_write = BITSWAP8(*m_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)	/* chip #0 */
-		sn76496_w(state->m_sn_1, 0, to_write);
+		sn76496_w(m_sn_1, 0, to_write);
 
 	if (~data & 0x02)	/* chip #1 */
-		sn76496_w(state->m_sn_2, 0, to_write);
+		sn76496_w(m_sn_2, 0, to_write);
 }
 
 
@@ -86,7 +83,7 @@ static ADDRESS_MAP_START( lasso_main_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(lasso_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x0c00, 0x0c7f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE(m_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE_LEGACY(lasso_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
@@ -101,8 +98,8 @@ static ADDRESS_MAP_START( lasso_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x5000, 0x7fff) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE(m_chip_data)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(sound_select_w)
-	AM_RANGE(0xb004, 0xb004) AM_READ_LEGACY(sound_status_r)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
+	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x7000)
 ADDRESS_MAP_END
@@ -122,7 +119,7 @@ static ADDRESS_MAP_START( chameleo_main_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x107f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1080, 0x10ff) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE(m_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE_LEGACY(lasso_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
@@ -139,8 +136,8 @@ static ADDRESS_MAP_START( chameleo_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0x1000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE(m_chip_data)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(sound_select_w)
-	AM_RANGE(0xb004, 0xb004) AM_READ_LEGACY(sound_status_r)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
+	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x7000)
 ADDRESS_MAP_END
@@ -151,7 +148,7 @@ static ADDRESS_MAP_START( wwjgtin_main_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(lasso_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE_LEGACY(lasso_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(sound_command_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE(m_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE_LEGACY(wwjgtin_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")
@@ -169,9 +166,9 @@ static ADDRESS_MAP_START( wwjgtin_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE(m_chip_data)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(sound_select_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(0xb004, 0xb004) AM_READ_LEGACY(sound_status_r)
+	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -181,7 +178,7 @@ static ADDRESS_MAP_START( pinbo_main_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE_LEGACY(lasso_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(lasso_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(pinbo_sound_command_w)
+	AM_RANGE(0x1800, 0x1800) AM_WRITE(pinbo_sound_command_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITEONLY AM_BASE(m_back_color)
 	AM_RANGE(0x1802, 0x1802) AM_WRITE_LEGACY(pinbo_video_control_w)
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("1804")

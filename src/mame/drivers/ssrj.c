@@ -43,13 +43,12 @@ static MACHINE_RESET(ssrj)
 	state->m_oldport = 0x80;
 }
 
-static READ8_HANDLER(ssrj_wheel_r)
+READ8_MEMBER(ssrj_state::ssrj_wheel_r)
 {
-	ssrj_state *state = space->machine().driver_data<ssrj_state>();
-	int port = input_port_read(space->machine(), "IN1") - 0x80;
-	int retval = port - state->m_oldport;
+	int port = input_port_read(machine(), "IN1") - 0x80;
+	int retval = port - m_oldport;
 
-	state->m_oldport = port;
+	m_oldport = port;
 	return retval;
 }
 
@@ -62,7 +61,7 @@ static ADDRESS_MAP_START( ssrj_map, AS_PROGRAM, 8, ssrj_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_scrollram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
-	AM_RANGE(0xf001, 0xf001) AM_READ_LEGACY(ssrj_wheel_r)
+	AM_RANGE(0xf001, 0xf001) AM_READ(ssrj_wheel_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")
 	AM_RANGE(0xf003, 0xf003) AM_WRITENOP /* unknown */
 	AM_RANGE(0xf401, 0xf401) AM_DEVREAD_LEGACY("aysnd", ay8910_r)

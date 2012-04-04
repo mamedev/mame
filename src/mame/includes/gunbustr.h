@@ -20,6 +20,12 @@ public:
 	UINT32 m_mem[2];
 	UINT32 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE32_MEMBER(gunbustr_palette_w);
+	DECLARE_WRITE32_MEMBER(gunbustr_input_w);
+	DECLARE_WRITE32_MEMBER(motor_control_w);
+	DECLARE_READ32_MEMBER(gunbustr_gun_r);
+	DECLARE_WRITE32_MEMBER(gunbustr_gun_w);
+	DECLARE_READ32_MEMBER(main_cycle_r);
 };
 
 

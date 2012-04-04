@@ -805,11 +805,10 @@ ADDRESS_MAP_END
 
 /* the later board is different, it has a third CPU (and of course no mcu) */
 
-static WRITE8_HANDLER( tnzsb_sound_command_w )
+WRITE8_MEMBER(tnzs_state::tnzsb_sound_command_w)
 {
-	tnzs_state *state = space->machine().driver_data<tnzs_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static ADDRESS_MAP_START( tnzsb_cpu1_map, AS_PROGRAM, 8, tnzs_state )
@@ -818,7 +817,7 @@ static ADDRESS_MAP_START( tnzsb_cpu1_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(tnzs_bankswitch1_w)
 	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("DSWA")
 	AM_RANGE(0xb003, 0xb003) AM_READ_PORT("DSWB")
-	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(tnzsb_sound_command_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(tnzsb_sound_command_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
@@ -834,7 +833,7 @@ static ADDRESS_MAP_START( kabukiz_cpu1_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(tnzs_bankswitch1_w)
 	AM_RANGE(0xb002, 0xb002) AM_READ_PORT("DSWA")
 	AM_RANGE(0xb003, 0xb003) AM_READ_PORT("DSWB")
-	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(tnzsb_sound_command_w)
+	AM_RANGE(0xb004, 0xb004) AM_WRITE(tnzsb_sound_command_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
@@ -868,22 +867,22 @@ static ADDRESS_MAP_START( i8742_io_map, AS_IO, 8, tnzs_state )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( jpopnics_palette_w )
+WRITE8_MEMBER(tnzs_state::jpopnics_palette_w)
 {
 	int r, g, b;
 	UINT16 paldata;
-	space->machine().generic.paletteram.u8[offset] = data;
+	machine().generic.paletteram.u8[offset] = data;
 
 	offset = offset >> 1;
 
-	paldata = (space->machine().generic.paletteram.u8[offset * 2] << 8) | space->machine().generic.paletteram.u8[(offset * 2 + 1)];
+	paldata = (machine().generic.paletteram.u8[offset * 2] << 8) | machine().generic.paletteram.u8[(offset * 2 + 1)];
 
 	g = (paldata >> 12) & 0x000f;
 	r = (paldata >> 4) & 0x000f;
 	b = (paldata >> 8) & 0x000f;
 	// the other bits seem to be used, and the colours are wrong..
 
-	palette_set_color_rgb(space->machine(), offset, r << 4, g << 4, b << 4);
+	palette_set_color_rgb(machine(), offset, r << 4, g << 4, b << 4);
 }
 
 
@@ -898,20 +897,20 @@ static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE_LEGACY(tnzs_bankswitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE_LEGACY(jpopnics_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_BASE_GENERIC(paletteram)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( jpopnics_subbankswitch_w )
+WRITE8_MEMBER(tnzs_state::jpopnics_subbankswitch_w)
 {
 	/* bits 0-1 select ROM bank */
-	memory_set_bank(space->machine(), "bank2", data & 0x03);
+	memory_set_bank(machine(), "bank2", data & 0x03);
 }
 
 static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(jpopnics_subbankswitch_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(jpopnics_subbankswitch_w)
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN2")

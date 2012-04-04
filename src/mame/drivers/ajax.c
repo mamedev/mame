@@ -21,7 +21,7 @@
 #include "includes/konamipt.h"
 
 static WRITE8_DEVICE_HANDLER( k007232_extvol_w );
-static WRITE8_HANDLER( sound_bank_w );
+
 
 /****************************************************************************/
 
@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ajax_sound_map, AS_PROGRAM, 8, ajax_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM F6 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM 2128SL at D16 */
-	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(sound_bank_w)				/* 007232 bankswitch */
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
 	AM_RANGE(0xa000, 0xa00d) AM_DEVREADWRITE_LEGACY("k007232_1", k007232_r, k007232_w)		/* 007232 registers (chip 1) */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232_2", k007232_r, k007232_w)		/* 007232 registers (chip 2) */
 	AM_RANGE(0xb80c, 0xb80c) AM_DEVWRITE_LEGACY("k007232_2", k007232_extvol_w)			/* extra volume, goes to the 007232 w/ A11 */
@@ -135,20 +135,19 @@ INPUT_PORTS_END
     0   / 2MBANK
 */
 
-static WRITE8_HANDLER( sound_bank_w )
+WRITE8_MEMBER(ajax_state::sound_bank_w)
 {
-	ajax_state *state = space->machine().driver_data<ajax_state>();
 	int bank_A, bank_B;
 
 	/* banks # for the 007232 (chip 1) */
 	bank_A = BIT(data, 1);
 	bank_B = BIT(data, 0);
-	k007232_set_bank(state->m_k007232_1, bank_A, bank_B);
+	k007232_set_bank(m_k007232_1, bank_A, bank_B);
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	k007232_set_bank(state->m_k007232_2, bank_A, bank_B);
+	k007232_set_bank(m_k007232_2, bank_A, bank_B);
 }
 
 static void volume_callback0(device_t *device, int v)

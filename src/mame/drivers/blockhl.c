@@ -38,76 +38,71 @@ static INTERRUPT_GEN( blockhl_interrupt )
 		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
-static READ8_HANDLER( bankedram_r )
+READ8_MEMBER(blockhl_state::bankedram_r)
 {
-	blockhl_state *state = space->machine().driver_data<blockhl_state>();
 
-	if (state->m_palette_selected)
-		return space->machine().generic.paletteram.u8[offset];
+	if (m_palette_selected)
+		return machine().generic.paletteram.u8[offset];
 	else
-		return state->m_ram[offset];
+		return m_ram[offset];
 }
 
-static WRITE8_HANDLER( bankedram_w )
+WRITE8_MEMBER(blockhl_state::bankedram_w)
 {
-	blockhl_state *state = space->machine().driver_data<blockhl_state>();
 
-	if (state->m_palette_selected)
+	if (m_palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
 	else
-		state->m_ram[offset] = data;
+		m_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( blockhl_sh_irqtrigger_w )
+WRITE8_MEMBER(blockhl_state::blockhl_sh_irqtrigger_w)
 {
-	blockhl_state *state = space->machine().driver_data<blockhl_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 
 /* special handlers to combine 052109 & 051960 */
-static READ8_HANDLER( k052109_051960_r )
+READ8_MEMBER(blockhl_state::k052109_051960_r)
 {
-	blockhl_state *state = space->machine().driver_data<blockhl_state>();
 
-	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->m_k051960, offset - 0x3800);
+			return k051937_r(m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->m_k052109, offset);
+			return k052109_r(m_k052109, offset);
 		else
-			return k051960_r(state->m_k051960, offset - 0x3c00);
+			return k051960_r(m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->m_k052109, offset);
+		return k052109_r(m_k052109, offset);
 }
 
-static WRITE8_HANDLER( k052109_051960_w )
+WRITE8_MEMBER(blockhl_state::k052109_051960_w)
 {
-	blockhl_state *state = space->machine().driver_data<blockhl_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->m_k051960, offset - 0x3800, data);
+		k051937_w(m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->m_k052109, offset, data);
+		k052109_w(m_k052109, offset, data);
 	else
-		k051960_w(state->m_k051960, offset - 0x3c00, data);
+		k051960_w(m_k051960, offset - 0x3c00, data);
 }
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, blockhl_state )
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE_LEGACY(blockhl_sh_irqtrigger_w)
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(blockhl_sh_irqtrigger_w)
 	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("P1")
 	AM_RANGE(0x1f96, 0x1f96) AM_READ_PORT("P2")
 	AM_RANGE(0x1f97, 0x1f97) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f98, 0x1f98) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x4000, 0x57ff) AM_RAM
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE(m_ram)
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(m_ram)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

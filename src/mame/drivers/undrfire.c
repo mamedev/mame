@@ -205,18 +205,18 @@ Extract a standard version of this
 ("taito_8bpg_palette_word_w"?) to Taitoic.c ?
 ***********************************************************/
 
-static WRITE32_HANDLER( color_ram_w )
+WRITE32_MEMBER(undrfire_state::color_ram_w)
 {
 	int a,r,g,b;
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
 
 	{
-		a = space->machine().generic.paletteram.u32[offset];
+		a = machine().generic.paletteram.u32[offset];
 		r = (a & 0xff0000) >> 16;
 		g = (a & 0xff00) >> 8;
 		b = (a & 0xff);
 
-		palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -257,40 +257,38 @@ static CUSTOM_INPUT(frame_counter_r)
 	return state->m_frame_counter;
 }
 
-static READ32_HANDLER( undrfire_input_r )
+READ32_MEMBER(undrfire_state::undrfire_input_r)
 {
-	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	switch (offset)
 	{
 		case 0x00:
 		{
-			return input_port_read(space->machine(), "INPUTS");
+			return input_port_read(machine(), "INPUTS");
 		}
 
 		case 0x01:
 		{
-			return input_port_read(space->machine(), "SYSTEM") | (state->m_coin_word << 16);
+			return input_port_read(machine(), "SYSTEM") | (m_coin_word << 16);
 		}
 	}
 
 	return 0xffffffff;
 }
 
-static WRITE32_HANDLER( undrfire_input_w )
+WRITE32_MEMBER(undrfire_state::undrfire_input_w)
 {
-	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	switch (offset)
 	{
 		case 0x00:
 		{
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
-				watchdog_reset(space->machine());
+				watchdog_reset(machine());
 			}
 
 			if (ACCESSING_BITS_0_7)
 			{
-				eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+				eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 				eeprom->set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 				eeprom->write_bit(data & 0x40);
 				eeprom->set_cs_line((data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
@@ -304,37 +302,35 @@ static WRITE32_HANDLER( undrfire_input_w )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(space->machine(), 0,~data & 0x01000000);
-				coin_lockout_w(space->machine(), 1,~data & 0x02000000);
-				coin_counter_w(space->machine(), 0, data & 0x04000000);
-				coin_counter_w(space->machine(), 1, data & 0x08000000);
-				state->m_coin_word = (data >> 16) &0xffff;
+				coin_lockout_w(machine(), 0,~data & 0x01000000);
+				coin_lockout_w(machine(), 1,~data & 0x02000000);
+				coin_counter_w(machine(), 0, data & 0x04000000);
+				coin_counter_w(machine(), 1, data & 0x08000000);
+				m_coin_word = (data >> 16) &0xffff;
 			}
 		}
 	}
 }
 
 
-static READ16_HANDLER( shared_ram_r )
+READ16_MEMBER(undrfire_state::shared_ram_r)
 {
-	undrfire_state *state = space->machine().driver_data<undrfire_state>();
-	if ((offset&1)==0) return (state->m_shared_ram[offset/2]&0xffff0000)>>16;
-	return (state->m_shared_ram[offset/2]&0x0000ffff);
+	if ((offset&1)==0) return (m_shared_ram[offset/2]&0xffff0000)>>16;
+	return (m_shared_ram[offset/2]&0x0000ffff);
 }
 
-static WRITE16_HANDLER( shared_ram_w )
+WRITE16_MEMBER(undrfire_state::shared_ram_w)
 {
-	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	if ((offset&1)==0) {
 		if (ACCESSING_BITS_8_15)
-			state->m_shared_ram[offset/2]=(state->m_shared_ram[offset/2]&0x00ffffff)|((data&0xff00)<<16);
+			m_shared_ram[offset/2]=(m_shared_ram[offset/2]&0x00ffffff)|((data&0xff00)<<16);
 		if (ACCESSING_BITS_0_7)
-			state->m_shared_ram[offset/2]=(state->m_shared_ram[offset/2]&0xff00ffff)|((data&0x00ff)<<16);
+			m_shared_ram[offset/2]=(m_shared_ram[offset/2]&0xff00ffff)|((data&0x00ff)<<16);
 	} else {
 		if (ACCESSING_BITS_8_15)
-			state->m_shared_ram[offset/2]=(state->m_shared_ram[offset/2]&0xffff00ff)|((data&0xff00)<< 0);
+			m_shared_ram[offset/2]=(m_shared_ram[offset/2]&0xffff00ff)|((data&0xff00)<< 0);
 		if (ACCESSING_BITS_0_7)
-			state->m_shared_ram[offset/2]=(state->m_shared_ram[offset/2]&0xffffff00)|((data&0x00ff)<< 0);
+			m_shared_ram[offset/2]=(m_shared_ram[offset/2]&0xffffff00)|((data&0x00ff)<< 0);
 	}
 }
 
@@ -342,7 +338,7 @@ static WRITE16_HANDLER( shared_ram_w )
 
 /* Some unknown hardware byte mapped at $600002-5 */
 
-static READ32_HANDLER( unknown_hardware_r )
+READ32_MEMBER(undrfire_state::unknown_hardware_r)
 {
 	switch (offset)	/* four single bytes are read in sequence at $156e */
 	{
@@ -361,14 +357,14 @@ static READ32_HANDLER( unknown_hardware_r )
 }
 
 
-static WRITE32_HANDLER( unknown_int_req_w )
+WRITE32_MEMBER(undrfire_state::unknown_int_req_w)
 {
 	/* 10000 cycle delay is arbitrary */
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(10000), FUNC(interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(10000), FUNC(interrupt5));
 }
 
 
-static READ32_HANDLER( undrfire_lightgun_r )
+READ32_MEMBER(undrfire_state::undrfire_lightgun_r)
 {
 	int x,y;
 
@@ -381,8 +377,8 @@ static READ32_HANDLER( undrfire_lightgun_r )
 
 		case 0x00:	/* P1 */
 		{
-			x = input_port_read(space->machine(), "GUNX1") << 6;
-			y = input_port_read(space->machine(), "GUNY1") << 6;
+			x = input_port_read(machine(), "GUNX1") << 6;
+			y = input_port_read(machine(), "GUNY1") << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -390,37 +386,36 @@ static READ32_HANDLER( undrfire_lightgun_r )
 
 		case 0x01:	/* P2 */
 		{
-			x = input_port_read(space->machine(), "GUNX2") << 6;
-			y = input_port_read(space->machine(), "GUNY2") << 6;
+			x = input_port_read(machine(), "GUNX2") << 6;
+			y = input_port_read(machine(), "GUNY2") << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
 		}
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",cpu_get_pc(&space->device()),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",cpu_get_pc(&space.device()),offset);
 
 	return 0x0;
 }
 
 
-static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
+WRITE32_MEMBER(undrfire_state::rotate_control_w)/* only a guess that it's rotation */
 {
-	undrfire_state *state = space->machine().driver_data<undrfire_state>();
 	if (ACCESSING_BITS_0_15)
 	{
-		state->m_rotate_ctrl[state->m_port_sel] = data;
+		m_rotate_ctrl[m_port_sel] = data;
 		return;
 	}
 
 	if (ACCESSING_BITS_16_31)
 	{
-		state->m_port_sel = (data &0x70000) >> 16;
+		m_port_sel = (data &0x70000) >> 16;
 	}
 }
 
 
-static WRITE32_HANDLER( motor_control_w )
+WRITE32_MEMBER(undrfire_state::motor_control_w)
 {
 /*
     Standard value poked is 0x00910200 (we ignore lsb and msb
@@ -444,7 +439,7 @@ static WRITE32_HANDLER( motor_control_w )
 	}
 }
 
-static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
+WRITE32_MEMBER(undrfire_state::cbombers_cpua_ctrl_w)
 {
 /*
     ........ ..xxxxxx   Lamp 1-6 enables
@@ -458,19 +453,19 @@ static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
 	output_set_value("Lamp_6", (data >> 5) & 1 );
 	output_set_value("Wheel_vibration", (data >> 6) & 1 );
 
-	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static READ32_HANDLER( cbombers_adc_r )
+READ32_MEMBER(undrfire_state::cbombers_adc_r)
 {
-	return (input_port_read(space->machine(), "STEER") << 24);
+	return (input_port_read(machine(), "STEER") << 24);
 }
 
-static WRITE32_HANDLER( cbombers_adc_w )
+WRITE32_MEMBER(undrfire_state::cbombers_adc_w)
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
         1000 cycle delay is arbitrary */
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(1000), FUNC(interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), FUNC(interrupt5));
 }
 
 /***********************************************************
@@ -483,18 +478,18 @@ static ADDRESS_MAP_START( undrfire_map, AS_PROGRAM, 32, undrfire_state )
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 //  AM_RANGE(0x304000, 0x304003) AM_RAM // debugging - doesn't change ???
 //  AM_RANGE(0x304400, 0x304403) AM_RAM // debugging - doesn't change ???
-	AM_RANGE(0x400000, 0x400003) AM_WRITE_LEGACY(motor_control_w)		/* gun vibration */
-	AM_RANGE(0x500000, 0x500007) AM_READWRITE_LEGACY(undrfire_input_r, undrfire_input_w)		/* eerom etc. */
-	AM_RANGE(0x600000, 0x600007) AM_READWRITE_LEGACY(unknown_hardware_r, unknown_int_req_w)	/* int request for unknown hardware */
+	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)		/* gun vibration */
+	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)		/* eerom etc. */
+	AM_RANGE(0x600000, 0x600007) AM_READWRITE(unknown_hardware_r, unknown_int_req_w)	/* int request for unknown hardware */
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("f3_shared")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)		/* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)		/* piv tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE_LEGACY(color_ram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM							/* single bytes, blending ??? */
-	AM_RANGE(0xd00000, 0xd00003) AM_WRITE_LEGACY(rotate_control_w)		/* perhaps port based rotate control? */
-	AM_RANGE(0xf00000, 0xf00007) AM_READ_LEGACY(undrfire_lightgun_r)	/* stick coords read at $11b2-bc */
+	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)		/* perhaps port based rotate control? */
+	AM_RANGE(0xf00000, 0xf00007) AM_READ(undrfire_lightgun_r)	/* stick coords read at $11b2-bc */
 ADDRESS_MAP_END
 
 
@@ -502,18 +497,18 @@ static ADDRESS_MAP_START( cbombers_cpua_map, AS_PROGRAM, 32, undrfire_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x400000, 0x400003) AM_WRITE_LEGACY(cbombers_cpua_ctrl_w)
-	AM_RANGE(0x500000, 0x500007) AM_READWRITE_LEGACY(undrfire_input_r, undrfire_input_w)
-	AM_RANGE(0x600000, 0x600007) AM_READWRITE_LEGACY(cbombers_adc_r, cbombers_adc_w)
+	AM_RANGE(0x400000, 0x400003) AM_WRITE(cbombers_cpua_ctrl_w)
+	AM_RANGE(0x500000, 0x500007) AM_READWRITE(undrfire_input_r, undrfire_input_w)
+	AM_RANGE(0x600000, 0x600007) AM_READWRITE(cbombers_adc_r, cbombers_adc_w)
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("f3_shared")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)		/* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)		/* piv tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE_LEGACY(color_ram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb00000, 0xb0000f) AM_RAM /* ? */
 	AM_RANGE(0xc00000, 0xc00007) AM_RAM /* LAN controller? */
-	AM_RANGE(0xd00000, 0xd00003) AM_WRITE_LEGACY(rotate_control_w)		/* perhaps port based rotate control? */
+	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)		/* perhaps port based rotate control? */
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_BASE(m_shared_ram)
 ADDRESS_MAP_END
 
@@ -521,7 +516,7 @@ static ADDRESS_MAP_START( cbombers_cpub_map, AS_PROGRAM, 16, undrfire_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM	/* local ram */
 //  AM_RANGE(0x600000, 0x60ffff) AM_DEVWRITE_LEGACY("tc0480scp", tc0480scp_word_w) /* Only written upon errors */
-	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE_LEGACY(shared_ram_r, shared_ram_w)
+	AM_RANGE(0x800000, 0x80ffff) AM_READWRITE(shared_ram_r, shared_ram_w)
 //  AM_RANGE(0xa00000, 0xa001ff) AM_RAM /* Extra road control?? */
 ADDRESS_MAP_END
 

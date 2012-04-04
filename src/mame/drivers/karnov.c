@@ -328,94 +328,92 @@ static void chelnov_i8751_w( running_machine &machine, int data )
  *
  *************************************/
 
-static WRITE16_HANDLER( karnov_control_w )
+WRITE16_MEMBER(karnov_state::karnov_control_w)
 {
-	karnov_state *state = space->machine().driver_data<karnov_state>();
 
 	/* Mnemonics filled in from the schematics, brackets are my comments */
 	switch (offset << 1)
 	{
 		case 0: /* SECLR (Interrupt ack for Level 6 i8751 interrupt) */
-			device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
+			device_set_input_line(m_maincpu, 6, CLEAR_LINE);
 
-			if (state->m_i8751_needs_ack)
+			if (m_i8751_needs_ack)
 			{
 				/* If a command and coin insert happen at once, then the i8751 will queue the coin command until the previous command is ACK'd */
-				if (state->m_i8751_coin_pending)
+				if (m_i8751_coin_pending)
 				{
-					state->m_i8751_return = state->m_i8751_coin_pending;
-					device_set_input_line(state->m_maincpu, 6, HOLD_LINE);
-					state->m_i8751_coin_pending = 0;
+					m_i8751_return = m_i8751_coin_pending;
+					device_set_input_line(m_maincpu, 6, HOLD_LINE);
+					m_i8751_coin_pending = 0;
 				}
-				else if (state->m_i8751_command_queue)
+				else if (m_i8751_command_queue)
 				{
 					/* Pending control command - just write it back as SECREQ */
-					state->m_i8751_needs_ack = 0;
-					karnov_control_w(space, 3, state->m_i8751_command_queue, 0xffff);
-					state->m_i8751_command_queue = 0;
+					m_i8751_needs_ack = 0;
+					karnov_control_w(space, 3, m_i8751_command_queue, 0xffff);
+					m_i8751_command_queue = 0;
 				}
 				else
 				{
-					state->m_i8751_needs_ack = 0;
+					m_i8751_needs_ack = 0;
 				}
 			}
 			return;
 
 		case 2: /* SONREQ (Sound CPU byte) */
 			soundlatch_w(space, 0, data & 0xff);
-			device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+			device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		case 4: /* DM (DMA to buffer spriteram) */
-			state->m_spriteram->copy();
+			m_spriteram->copy();
 			break;
 
 		case 6: /* SECREQ (Interrupt & Data to i8751) */
-			if (state->m_microcontroller_id == KARNOV || state->m_microcontroller_id == KARNOVJ)
-				karnov_i8751_w(space->machine(), data);
-			if (state->m_microcontroller_id == CHELNOV || state->m_microcontroller_id == CHELNOVU || state->m_microcontroller_id == CHELNOVJ)
-				chelnov_i8751_w(space->machine(), data);
-			if (state->m_microcontroller_id == WNDRPLNT)
-				wndrplnt_i8751_w(space->machine(), data);
+			if (m_microcontroller_id == KARNOV || m_microcontroller_id == KARNOVJ)
+				karnov_i8751_w(machine(), data);
+			if (m_microcontroller_id == CHELNOV || m_microcontroller_id == CHELNOVU || m_microcontroller_id == CHELNOVJ)
+				chelnov_i8751_w(machine(), data);
+			if (m_microcontroller_id == WNDRPLNT)
+				wndrplnt_i8751_w(machine(), data);
 			break;
 
 		case 8: /* HSHIFT (9 bits) - Top bit indicates video flip */
-			COMBINE_DATA(&state->m_scroll[0]);
-			karnov_flipscreen_w(space->machine(), data >> 15);
+			COMBINE_DATA(&m_scroll[0]);
+			karnov_flipscreen_w(machine(), data >> 15);
 			break;
 
 		case 0xa: /* VSHIFT */
-			COMBINE_DATA(&state->m_scroll[1]);
+			COMBINE_DATA(&m_scroll[1]);
 			break;
 
 		case 0xc: /* SECR (Reset i8751) */
 			logerror("Reset i8751\n");
-			state->m_i8751_needs_ack = 0;
-			state->m_i8751_coin_pending = 0;
-			state->m_i8751_command_queue = 0;
-			state->m_i8751_return = 0;
+			m_i8751_needs_ack = 0;
+			m_i8751_coin_pending = 0;
+			m_i8751_command_queue = 0;
+			m_i8751_return = 0;
 			break;
 
 		case 0xe: /* INTCLR (Interrupt ack for Level 7 vbl interrupt) */
-			device_set_input_line(state->m_maincpu, 7, CLEAR_LINE);
+			device_set_input_line(m_maincpu, 7, CLEAR_LINE);
 			break;
 	}
 }
 
-static READ16_HANDLER( karnov_control_r )
+READ16_MEMBER(karnov_state::karnov_control_r)
 {
-	karnov_state *state = space->machine().driver_data<karnov_state>();
 
 	switch (offset << 1)
 	{
 		case 0:
-			return input_port_read(space->machine(), "P1_P2");
+			return input_port_read(machine(), "P1_P2");
 		case 2: /* Start buttons & VBL */
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 		case 4:
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 		case 6: /* i8751 return values */
-			return state->m_i8751_return;
+			return m_i8751_return;
 	}
 
 	return ~0;
@@ -435,8 +433,8 @@ static ADDRESS_MAP_START( karnov_map, AS_PROGRAM, 16, karnov_state )
 	AM_RANGE(0x0a0800, 0x0a0fff) AM_WRITE_LEGACY(karnov_videoram_w) /* Wndrplnt Mirror */
 	AM_RANGE(0x0a1000, 0x0a17ff) AM_WRITEONLY AM_BASE(m_pf_data)
 	AM_RANGE(0x0a1800, 0x0a1fff) AM_WRITE_LEGACY(karnov_playfield_swap_w)
-	AM_RANGE(0x0c0000, 0x0c0007) AM_READ_LEGACY(karnov_control_r)
-	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE_LEGACY(karnov_control_w)
+	AM_RANGE(0x0c0000, 0x0c0007) AM_READ(karnov_control_r)
+	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(karnov_control_w)
 ADDRESS_MAP_END
 
 

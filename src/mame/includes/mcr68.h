@@ -40,6 +40,19 @@ public:
 	tilemap_t *m_fg_tilemap;
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_READ16_MEMBER(zwackery_6840_r);
+	DECLARE_WRITE16_MEMBER(xenophobe_control_w);
+	DECLARE_WRITE16_MEMBER(blasted_control_w);
+	DECLARE_READ16_MEMBER(spyhunt2_port_0_r);
+	DECLARE_READ16_MEMBER(spyhunt2_port_1_r);
+	DECLARE_WRITE16_MEMBER(spyhunt2_control_w);
+	DECLARE_READ16_MEMBER(archrivl_port_1_r);
+	DECLARE_WRITE16_MEMBER(archrivl_control_w);
+	DECLARE_WRITE16_MEMBER(pigskin_protection_w);
+	DECLARE_READ16_MEMBER(pigskin_protection_r);
+	DECLARE_READ16_MEMBER(pigskin_port_1_r);
+	DECLARE_READ16_MEMBER(pigskin_port_2_r);
+	DECLARE_READ16_MEMBER(trisport_port_1_r);
 };
 
 

@@ -62,66 +62,62 @@ Known issues:
 #include "includes/tankbatt.h"
 
 
-static WRITE8_HANDLER( tankbatt_led_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_led_w)
 {
-	set_led_status(space->machine(), offset,data & 1);
+	set_led_status(machine(), offset,data & 1);
 }
 
-static READ8_HANDLER( tankbatt_in0_r )
+READ8_MEMBER(tankbatt_state::tankbatt_in0_r)
 {
 	int val;
 
-	val = input_port_read(space->machine(), "P1");
+	val = input_port_read(machine(), "P1");
 	return ((val << (7 - offset)) & 0x80);
 }
 
-static READ8_HANDLER( tankbatt_in1_r )
+READ8_MEMBER(tankbatt_state::tankbatt_in1_r)
 {
 	int val;
 
-	val = input_port_read(space->machine(), "P2");
+	val = input_port_read(machine(), "P2");
 	return ((val << (7 - offset)) & 0x80);
 }
 
-static READ8_HANDLER( tankbatt_dsw_r )
+READ8_MEMBER(tankbatt_state::tankbatt_dsw_r)
 {
 	int val;
 
-	val = input_port_read(space->machine(), "DSW");
+	val = input_port_read(machine(), "DSW");
 	return ((val << (7 - offset)) & 0x80);
 }
 
-static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_interrupt_enable_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	state->m_nmi_enable = !data;
-	state->m_sound_enable = !data;
+	m_nmi_enable = !data;
+	m_sound_enable = !data;
 
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
-	if (data) space->machine().device<samples_device>("samples")->stop(2);
+	if (data) machine().device<samples_device>("samples")->stop(2);
 }
 
-static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_demo_interrupt_enable_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	state->m_nmi_enable = data;
+	m_nmi_enable = data;
 }
 
-static WRITE8_HANDLER( tankbatt_sh_expl_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_sh_expl_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	if (state->m_sound_enable)
+	if (m_sound_enable)
 	{
-		samples_device *samples = space->machine().device<samples_device>("samples");
+		samples_device *samples = machine().device<samples_device>("samples");
 		samples->start(1, 3);
 	}
 }
 
-static WRITE8_HANDLER( tankbatt_sh_engine_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_sh_engine_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	samples_device *samples = space->machine().device<samples_device>("samples");
-	if (state->m_sound_enable)
+	samples_device *samples = machine().device<samples_device>("samples");
+	if (m_sound_enable)
 	{
 		if (data)
 			samples->start(2, 2, true);
@@ -131,32 +127,31 @@ static WRITE8_HANDLER( tankbatt_sh_engine_w )
 	else samples->stop(2);
 }
 
-static WRITE8_HANDLER( tankbatt_sh_fire_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_sh_fire_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	if (state->m_sound_enable)
+	if (m_sound_enable)
 	{
-		samples_device *samples = space->machine().device<samples_device>("samples");
+		samples_device *samples = machine().device<samples_device>("samples");
 		samples->start(0, 0);
 	}
 }
 
-static WRITE8_HANDLER( tankbatt_irq_ack_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_irq_ack_w)
 {
 	/* 0x6e written at the end of the irq routine, could be either irq ack or a coin sample */
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( tankbatt_coin_counter_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0,data & 1);
-	coin_counter_w(space->machine(), 1,data & 1);
+	coin_counter_w(machine(), 0,data & 1);
+	coin_counter_w(machine(), 1,data & 1);
 }
 
-static WRITE8_HANDLER( tankbatt_coin_lockout_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_coin_lockout_w)
 {
-	coin_lockout_w(space->machine(), 0,data & 1);
-	coin_lockout_w(space->machine(), 1,data & 1);
+	coin_lockout_w(machine(), 0,data & 1);
+	coin_lockout_w(machine(), 1,data & 1);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
@@ -164,20 +159,20 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE_LEGACY(tankbatt_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x0c00, 0x0c07) AM_READ_LEGACY(tankbatt_in0_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_WRITE_LEGACY(tankbatt_led_w)
-	AM_RANGE(0x0c02, 0x0c02) AM_WRITE_LEGACY(tankbatt_coin_counter_w)
-	AM_RANGE(0x0c03, 0x0c03) AM_WRITE_LEGACY(tankbatt_coin_lockout_w)
-	AM_RANGE(0x0c08, 0x0c0f) AM_READ_LEGACY(tankbatt_in1_r)
+	AM_RANGE(0x0c00, 0x0c07) AM_READ(tankbatt_in0_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(tankbatt_led_w)
+	AM_RANGE(0x0c02, 0x0c02) AM_WRITE(tankbatt_coin_counter_w)
+	AM_RANGE(0x0c03, 0x0c03) AM_WRITE(tankbatt_coin_lockout_w)
+	AM_RANGE(0x0c08, 0x0c0f) AM_READ(tankbatt_in1_r)
 	AM_RANGE(0x0c08, 0x0c08) AM_WRITENOP //coin counter mirror?
-	AM_RANGE(0x0c0a, 0x0c0a) AM_WRITE_LEGACY(tankbatt_interrupt_enable_w)
-	AM_RANGE(0x0c0b, 0x0c0b) AM_WRITE_LEGACY(tankbatt_sh_engine_w)
-	AM_RANGE(0x0c0c, 0x0c0c) AM_WRITE_LEGACY(tankbatt_sh_fire_w)
-	AM_RANGE(0x0c0d, 0x0c0d) AM_WRITE_LEGACY(tankbatt_sh_expl_w) // bit 7 == led for the start 2 button
+	AM_RANGE(0x0c0a, 0x0c0a) AM_WRITE(tankbatt_interrupt_enable_w)
+	AM_RANGE(0x0c0b, 0x0c0b) AM_WRITE(tankbatt_sh_engine_w)
+	AM_RANGE(0x0c0c, 0x0c0c) AM_WRITE(tankbatt_sh_fire_w)
+	AM_RANGE(0x0c0d, 0x0c0d) AM_WRITE(tankbatt_sh_expl_w) // bit 7 == led for the start 2 button
 	AM_RANGE(0x0c0e, 0x0c0e) AM_WRITENOP //bit 7 == led for the start 1 button
-	AM_RANGE(0x0c0f, 0x0c0f) AM_WRITE_LEGACY(tankbatt_demo_interrupt_enable_w)
-	AM_RANGE(0x0c10, 0x0c10) AM_WRITE_LEGACY(tankbatt_irq_ack_w)
-	AM_RANGE(0x0c18, 0x0c1f) AM_READ_LEGACY(tankbatt_dsw_r)
+	AM_RANGE(0x0c0f, 0x0c0f) AM_WRITE(tankbatt_demo_interrupt_enable_w)
+	AM_RANGE(0x0c10, 0x0c10) AM_WRITE(tankbatt_irq_ack_w)
+	AM_RANGE(0x0c18, 0x0c1f) AM_READ(tankbatt_dsw_r)
 	AM_RANGE(0x0c18, 0x0c18) AM_WRITENOP	/* watchdog ?? */
 	AM_RANGE(0x6000, 0x7fff) AM_ROM AM_REGION("maincpu",0)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("maincpu",0) //mirror for the reset/irq vectors

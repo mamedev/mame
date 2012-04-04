@@ -49,26 +49,26 @@ static GFXDECODE_START( thoop2 )
 GFXDECODE_END
 
 
-static WRITE16_HANDLER( OKIM6295_bankswitch_w )
+WRITE16_MEMBER(thoop2_state::OKIM6295_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("oki")->base();
+	UINT8 *RAM = machine().region("oki")->base();
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
 	}
 }
 
-static WRITE16_HANDLER( thoop2_coin_w )
+WRITE16_MEMBER(thoop2_state::thoop2_coin_w)
 {
 	if (ACCESSING_BITS_0_7){
 		switch ((offset >> 3)){
 			case 0x00:	/* Coin Lockouts */
 			case 0x01:
-				coin_lockout_w(space->machine(), (offset >> 3) & 0x01, ~data & 0x01);
+				coin_lockout_w(machine(), (offset >> 3) & 0x01, ~data & 0x01);
 				break;
 			case 0x02:	/* Coin Counters */
 			case 0x03:
-				coin_counter_w(space->machine(), (offset >> 3) & 0x01, data & 0x01);
+				coin_counter_w(machine(), (offset >> 3) & 0x01, data & 0x01);
 				break;
 		}
 	}
@@ -79,7 +79,7 @@ static WRITE16_HANDLER( thoop2_coin_w )
 
 /* pretend that it's there */
 
-static READ16_HANDLER( DS5002FP_R )
+READ16_MEMBER(thoop2_state::DS5002FP_R)
 {
     return 0x55aa;
 }
@@ -96,10 +96,10 @@ static ADDRESS_MAP_START( thoop2_map, AS_PROGRAM, 16, thoop2_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE_LEGACY(OKIM6295_bankswitch_w)						/* OKI6295 bankswitch */
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)						/* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)					/* OKI6295 data register */
-	AM_RANGE(0x70000a, 0x70005b) AM_WRITE_LEGACY(thoop2_coin_w)								/* Coin Counters + Coin Lockout */
-	AM_RANGE(0xfeff00, 0xfeff01) AM_READ_LEGACY(DS5002FP_R)
+	AM_RANGE(0x70000a, 0x70005b) AM_WRITE(thoop2_coin_w)								/* Coin Counters + Coin Lockout */
+	AM_RANGE(0xfeff00, 0xfeff01) AM_READ(DS5002FP_R)
 	AM_RANGE(0xfeff02, 0xfeff03) AM_WRITENOP  /* pf: 0xfeff02 and 0xfeff03 need to remain zero always */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM													/* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END

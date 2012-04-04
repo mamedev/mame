@@ -25,6 +25,8 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(citycon_in_r);
+	DECLARE_READ8_MEMBER(citycon_irq_ack_r);
 };
 
 

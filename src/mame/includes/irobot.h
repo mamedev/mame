@@ -60,6 +60,9 @@ public:
 	int m_ir_ymin;
 	int m_ir_xmax;
 	int m_ir_ymax;
+	DECLARE_WRITE8_MEMBER(irobot_nvram_w);
+	DECLARE_WRITE8_MEMBER(irobot_clearirq_w);
+	DECLARE_WRITE8_MEMBER(irobot_clearfirq_w);
 };
 
 /*----------- defined in machine/irobot.c -----------*/

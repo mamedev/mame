@@ -35,6 +35,8 @@ public:
 	UINT8 m_gamma_irq_clock;
 	UINT8 m_has_gamma_cpu;
 	UINT8 m_speech_write_buffer;
+	DECLARE_READ8_MEMBER(dual_pokey_r);
+	DECLARE_WRITE8_MEMBER(dual_pokey_w);
 };
 
 

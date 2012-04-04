@@ -30,6 +30,21 @@ public:
 	device_t *m_eeprom;
 	device_t *m_left_screen;
 	device_t *m_right_screen;
+	DECLARE_WRITE16_MEMBER(fromanc2_sndcmd_w);
+	DECLARE_WRITE16_MEMBER(fromanc2_portselect_w);
+	DECLARE_READ16_MEMBER(fromanc2_keymatrix_r);
+	DECLARE_WRITE16_MEMBER(fromanc2_eeprom_w);
+	DECLARE_WRITE16_MEMBER(fromancr_eeprom_w);
+	DECLARE_WRITE16_MEMBER(fromanc4_eeprom_w);
+	DECLARE_WRITE16_MEMBER(fromanc2_subcpu_w);
+	DECLARE_READ16_MEMBER(fromanc2_subcpu_r);
+	DECLARE_READ8_MEMBER(fromanc2_maincpu_r_l);
+	DECLARE_READ8_MEMBER(fromanc2_maincpu_r_h);
+	DECLARE_WRITE8_MEMBER(fromanc2_maincpu_w_l);
+	DECLARE_WRITE8_MEMBER(fromanc2_maincpu_w_h);
+	DECLARE_WRITE8_MEMBER(fromanc2_subcpu_nmi_clr);
+	DECLARE_READ8_MEMBER(fromanc2_sndcpu_nmi_clr);
+	DECLARE_WRITE8_MEMBER(fromanc2_subcpu_rombank_w);
 };
 
 

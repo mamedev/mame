@@ -34,6 +34,9 @@ public:
 	device_t *m_subcpu;
 
 	UINT8       m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(kyugo_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(kyugo_sub_cpu_control_w);
+	DECLARE_WRITE8_MEMBER(kyugo_coin_counter_w);
 };
 
 

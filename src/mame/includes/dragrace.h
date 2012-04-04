@@ -41,6 +41,11 @@ public:
 
 	/* devices */
 	device_t *m_discrete;
+	DECLARE_WRITE8_MEMBER(dragrace_misc_w);
+	DECLARE_WRITE8_MEMBER(dragrace_misc_clear_w);
+	DECLARE_READ8_MEMBER(dragrace_input_r);
+	DECLARE_READ8_MEMBER(dragrace_steering_r);
+	DECLARE_READ8_MEMBER(dragrace_scanline_r);
 };
 
 

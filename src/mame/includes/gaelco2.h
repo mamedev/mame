@@ -20,6 +20,11 @@ public:
 
 	required_device<m68000_device> m_maincpu;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	DECLARE_READ16_MEMBER(p1_gun_x);
+	DECLARE_READ16_MEMBER(p1_gun_y);
+	DECLARE_READ16_MEMBER(p2_gun_x);
+	DECLARE_READ16_MEMBER(p2_gun_y);
+	DECLARE_READ16_MEMBER(dallas_kludge_r);
 };
 
 

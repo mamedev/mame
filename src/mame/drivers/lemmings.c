@@ -23,73 +23,69 @@
 #include "includes/lemmings.h"
 #include "video/decospr.h"
 
-static WRITE16_HANDLER( lemmings_control_w )
+WRITE16_MEMBER(lemmings_state::lemmings_control_w)
 {
-	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 
 	/* Offset==0 Pixel layer X scroll */
 	if (offset == 4)
 		return; /* Watchdog or IRQ ack */
-	COMBINE_DATA(&state->m_control_data[offset]);
+	COMBINE_DATA(&m_control_data[offset]);
 }
 
-static READ16_HANDLER( lemmings_trackball_r )
+READ16_MEMBER(lemmings_state::lemmings_trackball_r)
 {
 	switch (offset)
 	{
-	case 0: return input_port_read(space->machine(), "AN0");
-	case 1: return input_port_read(space->machine(), "AN1");
-	case 4: return input_port_read(space->machine(), "AN2");
-	case 5: return input_port_read(space->machine(), "AN3");
+	case 0: return input_port_read(machine(), "AN0");
+	case 1: return input_port_read(machine(), "AN1");
+	case 4: return input_port_read(machine(), "AN2");
+	case 5: return input_port_read(machine(), "AN3");
 	}
 	return 0;
 }
 
 /* Same as Robocop 2 protection chip */
-static READ16_HANDLER( lemmings_prot_r )
+READ16_MEMBER(lemmings_state::lemmings_prot_r)
 {
 	switch (offset << 1)
 	{
 		case 0x41a:
-			return input_port_read(space->machine(), "BUTTONS");
+			return input_port_read(machine(), "BUTTONS");
 
 		case 0x320:
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 
 		case 0x4e6:
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 	}
 
 	return 0;
 }
 
-static WRITE16_HANDLER( lemmings_palette_24bit_w )
+WRITE16_MEMBER(lemmings_state::lemmings_palette_24bit_w)
 {
-	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	int r, g, b;
 
-	COMBINE_DATA(&state->m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 	if (offset & 1)
 		offset--;
 
-	b = (state->m_paletteram[offset] >> 0) & 0xff;
-	g = (state->m_paletteram[offset + 1] >> 8) & 0xff;
-	r = (state->m_paletteram[offset + 1] >> 0) & 0xff;
+	b = (m_paletteram[offset] >> 0) & 0xff;
+	g = (m_paletteram[offset + 1] >> 8) & 0xff;
+	r = (m_paletteram[offset + 1] >> 0) & 0xff;
 
-	palette_set_color(space->machine(), offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset / 2, MAKE_RGB(r, g, b));
 }
 
-static WRITE16_HANDLER( lemmings_sound_w )
+WRITE16_MEMBER(lemmings_state::lemmings_sound_w)
 {
-	lemmings_state *state = space->machine().driver_data<lemmings_state>();
 	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->m_audiocpu, 1, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 1, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( lemmings_sound_ack_w )
+WRITE8_MEMBER(lemmings_state::lemmings_sound_ack_w)
 {
-	lemmings_state *state = space->machine().driver_data<lemmings_state>();
-	device_set_input_line(state->m_audiocpu, 1, CLEAR_LINE);
+	device_set_input_line(m_audiocpu, 1, CLEAR_LINE);
 }
 
 /******************************************************************************/
@@ -99,11 +95,11 @@ static ADDRESS_MAP_START( lemmings_map, AS_PROGRAM, 16, lemmings_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE_LEGACY(lemmings_palette_24bit_w) AM_BASE(m_paletteram)
-	AM_RANGE(0x170000, 0x17000f) AM_RAM_WRITE_LEGACY(lemmings_control_w) AM_BASE(m_control_data)
-	AM_RANGE(0x190000, 0x19000f) AM_READ_LEGACY(lemmings_trackball_r)
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_READ_LEGACY(lemmings_prot_r)
-	AM_RANGE(0x1a0064, 0x1a0065) AM_WRITE_LEGACY(lemmings_sound_w)
+	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(lemmings_palette_24bit_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x170000, 0x17000f) AM_RAM_WRITE(lemmings_control_w) AM_BASE(m_control_data)
+	AM_RANGE(0x190000, 0x19000f) AM_READ(lemmings_trackball_r)
+	AM_RANGE(0x1a0000, 0x1a07ff) AM_READ(lemmings_prot_r)
+	AM_RANGE(0x1a0064, 0x1a0065) AM_WRITE(lemmings_sound_w)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write) /* 1 written once a frame */
 	AM_RANGE(0x1e0000, 0x1e0001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write) /* 1 written once a frame */
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(lemmings_vram_w) AM_BASE(m_vram_data)
@@ -118,7 +114,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lemmings_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x1800, 0x1800) AM_READWRITE_LEGACY(soundlatch_r,lemmings_sound_ack_w)
+	AM_RANGE(0x1800, 0x1800) AM_READ_LEGACY(soundlatch_r) AM_WRITE(lemmings_sound_ack_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -78,111 +78,104 @@ static TIMER_DEVICE_CALLBACK( hyprduel_interrupt )
 	update_irq_state(timer.machine());
 }
 
-static READ16_HANDLER( hyprduel_irq_cause_r )
+READ16_MEMBER(hyprduel_state::hyprduel_irq_cause_r)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	return state->m_requested_int;
+	return m_requested_int;
 }
 
-static WRITE16_HANDLER( hyprduel_irq_cause_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_irq_cause_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		if (data == state->m_int_num)
-			state->m_requested_int &= ~(state->m_int_num & ~*state->m_irq_enable);
+		if (data == m_int_num)
+			m_requested_int &= ~(m_int_num & ~*m_irq_enable);
 		else
-			state->m_requested_int &= ~(data & *state->m_irq_enable);
+			m_requested_int &= ~(data & *m_irq_enable);
 
-		update_irq_state(space->machine());
+		update_irq_state(machine());
 	}
 }
 
 
-static WRITE16_HANDLER( hyprduel_subcpu_control_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_subcpu_control_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 
 	switch (data)
 	{
 		case 0x0d:
 		case 0x0f:
 		case 0x01:
-			if (!state->m_subcpu_resetline)
+			if (!m_subcpu_resetline)
 			{
-				device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
-				state->m_subcpu_resetline = 1;
+				device_set_input_line(m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+				m_subcpu_resetline = 1;
 			}
 			break;
 
 		case 0x00:
-			if (state->m_subcpu_resetline)
+			if (m_subcpu_resetline)
 			{
-				device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
-				state->m_subcpu_resetline = 0;
+				device_set_input_line(m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+				m_subcpu_resetline = 0;
 			}
-			device_spin_until_interrupt(&space->device());
+			device_spin_until_interrupt(&space.device());
 			break;
 
 		case 0x0c:
 		case 0x80:
-			device_set_input_line(state->m_subcpu, 2, HOLD_LINE);
+			device_set_input_line(m_subcpu, 2, HOLD_LINE);
 			break;
 	}
 }
 
 
-static READ16_HANDLER( hyprduel_cpusync_trigger1_r )
+READ16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_r)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	if (state->m_cpu_trigger == 1001)
+	if (m_cpu_trigger == 1001)
 	{
-		space->machine().scheduler().trigger(1001);
-		state->m_cpu_trigger = 0;
+		machine().scheduler().trigger(1001);
+		m_cpu_trigger = 0;
 	}
 
-	return state->m_sharedram1[0x000408 / 2 + offset];
+	return m_sharedram1[0x000408 / 2 + offset];
 }
 
-static WRITE16_HANDLER( hyprduel_cpusync_trigger1_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger1_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	COMBINE_DATA(&state->m_sharedram1[0x00040e / 2 + offset]);
+	COMBINE_DATA(&m_sharedram1[0x00040e / 2 + offset]);
 
-	if (((state->m_sharedram1[0x00040e / 2] << 16) + state->m_sharedram1[0x000410 / 2]) != 0x00)
+	if (((m_sharedram1[0x00040e / 2] << 16) + m_sharedram1[0x000410 / 2]) != 0x00)
 	{
-		if (!state->m_cpu_trigger && !state->m_subcpu_resetline)
+		if (!m_cpu_trigger && !m_subcpu_resetline)
 		{
-			device_spin_until_trigger(&space->device(), 1001);
-			state->m_cpu_trigger = 1001;
+			device_spin_until_trigger(&space.device(), 1001);
+			m_cpu_trigger = 1001;
 		}
 	}
 }
 
 
-static READ16_HANDLER( hyprduel_cpusync_trigger2_r )
+READ16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_r)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	if (state->m_cpu_trigger == 1002)
+	if (m_cpu_trigger == 1002)
 	{
-		space->machine().scheduler().trigger(1002);
-		state->m_cpu_trigger = 0;
+		machine().scheduler().trigger(1002);
+		m_cpu_trigger = 0;
 	}
 
-	return state->m_sharedram3[(0xfff34c - 0xfe4000) / 2 + offset];
+	return m_sharedram3[(0xfff34c - 0xfe4000) / 2 + offset];
 }
 
-static WRITE16_HANDLER( hyprduel_cpusync_trigger2_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_cpusync_trigger2_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	COMBINE_DATA(&state->m_sharedram1[0x000408 / 2 + offset]);
+	COMBINE_DATA(&m_sharedram1[0x000408 / 2 + offset]);
 
 	if (ACCESSING_BITS_8_15)
 	{
-		if (!state->m_cpu_trigger && !state->m_subcpu_resetline)
+		if (!m_cpu_trigger && !m_subcpu_resetline)
 		{
-			device_spin_until_trigger(&space->device(), 1002);
-			state->m_cpu_trigger = 1002;
+			device_spin_until_trigger(&space.device(), 1002);
+			m_cpu_trigger = 1002;
 		}
 	}
 }
@@ -206,13 +199,12 @@ static TIMER_CALLBACK( magerror_irq_callback )
     that the blitter can readily use (which is a form of compression)
 */
 
-static READ16_HANDLER( hyprduel_bankedrom_r )
+READ16_MEMBER(hyprduel_state::hyprduel_bankedrom_r)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	UINT8 *ROM = space->machine().region("gfx1")->base();
-	size_t  len = space->machine().region("gfx1")->bytes();
+	UINT8 *ROM = machine().region("gfx1")->base();
+	size_t  len = machine().region("gfx1")->bytes();
 
-	offset = offset * 2 + 0x10000 * (*state->m_rombank);
+	offset = offset * 2 + 0x10000 * (*m_rombank);
 
 	if (offset < len)
 		return ((ROM[offset + 0] << 8) + ROM[offset + 1]);
@@ -288,24 +280,23 @@ INLINE void blt_write( address_space *space, const int tmap, const offs_t offs, 
 }
 
 
-static WRITE16_HANDLER( hyprduel_blitter_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	COMBINE_DATA(&state->m_blitter_regs[offset]);
+	COMBINE_DATA(&m_blitter_regs[offset]);
 
 	if (offset == 0xc / 2)
 	{
-		UINT8 *src = space->machine().region("gfx1")->base();
-		size_t  src_len = space->machine().region("gfx1")->bytes();
+		UINT8 *src = machine().region("gfx1")->base();
+		size_t  src_len = machine().region("gfx1")->bytes();
 
-		UINT32 tmap = (state->m_blitter_regs[0x00 / 2] << 16) + state->m_blitter_regs[0x02 / 2];
-		UINT32 src_offs = (state->m_blitter_regs[0x04 / 2] << 16) + state->m_blitter_regs[0x06 / 2];
-		UINT32 dst_offs = (state->m_blitter_regs[0x08 / 2] << 16) + state->m_blitter_regs[0x0a / 2];
+		UINT32 tmap = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
+		UINT32 src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
+		UINT32 dst_offs = (m_blitter_regs[0x08 / 2] << 16) + m_blitter_regs[0x0a / 2];
 
 		int shift = (dst_offs & 0x80) ? 0 : 8;
 		UINT16 mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", cpu_get_pc(&space->device()), tmap, src_offs, dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", cpu_get_pc(&space.device()), tmap, src_offs, dst_offs);
 
 		dst_offs >>= 7 + 1;
 		switch (tmap)
@@ -315,7 +306,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", cpu_get_pc(&space->device()), tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n", cpu_get_pc(&space.device()), tmap);
 				return;
 		}
 
@@ -325,7 +316,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 			src_offs %= src_len;
 			b1 = blt_read(src, src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", cpu_get_pc(&space->device()), b1, src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n", cpu_get_pc(&space.device()), b1, src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -341,7 +332,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
                        another blit. */
 					if (b1 == 0)
 					{
-						space->machine().scheduler().timer_set(attotime::from_usec(500), FUNC(hyprduel_blit_done));
+						machine().scheduler().timer_set(attotime::from_usec(500), FUNC(hyprduel_blit_done));
 						return;
 					}
 
@@ -353,7 +344,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 						src_offs++;
 
 						dst_offs &= 0xffff;
-						blt_write(space, tmap, dst_offs, b2, mask);
+						blt_write(&space, tmap, dst_offs, b2, mask);
 						dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
 					}
 					break;
@@ -369,7 +360,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(space, tmap, dst_offs, b2 << shift, mask);
+						blt_write(&space, tmap, dst_offs, b2 << shift, mask);
 						dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
 						b2++;
 					}
@@ -386,7 +377,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(space, tmap, dst_offs, b2, mask);
+						blt_write(&space, tmap, dst_offs, b2, mask);
 						dst_offs = ((dst_offs + 1) & (0x100 - 1)) | (dst_offs & (~(0x100 - 1)));
 					}
 					break;
@@ -399,7 +390,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 					{
 						dst_offs += 0x100;
 						dst_offs &= ~(0x100 - 1);
-						dst_offs |= (0x100 - 1) & (state->m_blitter_regs[0x0a / 2] >> (7 + 1));
+						dst_offs |= (0x100 - 1) & (m_blitter_regs[0x0a / 2] >> (7 + 1));
 					}
 					else
 					{
@@ -409,7 +400,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 
 				default:
-					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n", cpu_get_pc(&space->device()), b1, src_offs - 1);
+					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n", cpu_get_pc(&space.device()), b1, src_offs - 1);
 					return;
 			}
 
@@ -427,24 +418,24 @@ static ADDRESS_MAP_START( hyprduel_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_0_w) AM_BASE(m_vram_0)		/* Layer 0 */
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_1_w) AM_BASE(m_vram_1)		/* Layer 1 */
 	AM_RANGE(0x440000, 0x45ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_2_w) AM_BASE(m_vram_2)		/* Layer 2 */
-	AM_RANGE(0x460000, 0x46ffff) AM_READ_LEGACY(hyprduel_bankedrom_r)		/* Banked ROM */
+	AM_RANGE(0x460000, 0x46ffff) AM_READ(hyprduel_bankedrom_r)		/* Banked ROM */
 	AM_RANGE(0x470000, 0x473fff) AM_RAM_WRITE_LEGACY(hyprduel_paletteram_w) AM_BASE(m_paletteram)	/* Palette */
 	AM_RANGE(0x474000, 0x474fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)			/* Sprites */
 	AM_RANGE(0x475000, 0x477fff) AM_RAM			/* only used memory test */
 	AM_RANGE(0x478000, 0x4787ff) AM_RAM AM_BASE_SIZE(m_tiletable, m_tiletable_size)	/* Tiles Set */
-	AM_RANGE(0x478840, 0x47884d) AM_WRITE_LEGACY(hyprduel_blitter_w) AM_BASE(m_blitter_regs)	/* Tiles Blitter */
+	AM_RANGE(0x478840, 0x47884d) AM_WRITE(hyprduel_blitter_w) AM_BASE(m_blitter_regs)	/* Tiles Blitter */
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE_LEGACY(hyprduel_window_w) AM_BASE(m_window)			/* Tilemap Window */
 	AM_RANGE(0x478870, 0x47887b) AM_RAM_WRITE_LEGACY(hyprduel_scrollreg_w) AM_BASE(m_scroll)		/* Scroll Regs */
 	AM_RANGE(0x47887c, 0x47887d) AM_WRITE_LEGACY(hyprduel_scrollreg_init_w)
 	AM_RANGE(0x478880, 0x478881) AM_WRITENOP
 	AM_RANGE(0x478890, 0x478891) AM_WRITENOP
 	AM_RANGE(0x4788a0, 0x4788a1) AM_WRITENOP
-	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE_LEGACY(hyprduel_irq_cause_r, hyprduel_irq_cause_w)	/* IRQ Cause,Acknowledge */
+	AM_RANGE(0x4788a2, 0x4788a3) AM_READWRITE(hyprduel_irq_cause_r, hyprduel_irq_cause_w)	/* IRQ Cause,Acknowledge */
 	AM_RANGE(0x4788a4, 0x4788a5) AM_RAM AM_BASE(m_irq_enable)		/* IRQ Enable */
 	AM_RANGE(0x4788aa, 0x4788ab) AM_RAM AM_BASE(m_rombank)		/* Rom Bank */
 	AM_RANGE(0x4788ac, 0x4788ad) AM_RAM AM_BASE(m_screenctrl)	/* Screen Control */
 	AM_RANGE(0x479700, 0x479713) AM_RAM AM_BASE(m_videoregs)	/* Video Registers */
-	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(hyprduel_subcpu_control_w)
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(hyprduel_subcpu_control_w)
 	AM_RANGE(0xc00000, 0xc07fff) AM_RAM AM_SHARE("share1") AM_BASE(m_sharedram1)
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE") AM_WRITENOP
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
@@ -470,23 +461,23 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( magerror_map, AS_PROGRAM, 16, hyprduel_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_WRITE_LEGACY(hyprduel_subcpu_control_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(hyprduel_subcpu_control_w)
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_0_w) AM_BASE(m_vram_0)		/* Layer 0 */
 	AM_RANGE(0x820000, 0x83ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_1_w) AM_BASE(m_vram_1)		/* Layer 1 */
 	AM_RANGE(0x840000, 0x85ffff) AM_RAM_WRITE_LEGACY(hyprduel_vram_2_w) AM_BASE(m_vram_2)		/* Layer 2 */
-	AM_RANGE(0x860000, 0x86ffff) AM_READ_LEGACY(hyprduel_bankedrom_r)		/* Banked ROM */
+	AM_RANGE(0x860000, 0x86ffff) AM_READ(hyprduel_bankedrom_r)		/* Banked ROM */
 	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE_LEGACY(hyprduel_paletteram_w) AM_BASE(m_paletteram)	/* Palette */
 	AM_RANGE(0x874000, 0x874fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		/* Sprites */
 	AM_RANGE(0x875000, 0x877fff) AM_RAM			/* only used memory test */
 	AM_RANGE(0x878000, 0x8787ff) AM_RAM AM_BASE_SIZE(m_tiletable, m_tiletable_size)	/* Tiles Set */
-	AM_RANGE(0x878840, 0x87884d) AM_WRITE_LEGACY(hyprduel_blitter_w) AM_BASE(m_blitter_regs)	/* Tiles Blitter */
+	AM_RANGE(0x878840, 0x87884d) AM_WRITE(hyprduel_blitter_w) AM_BASE(m_blitter_regs)	/* Tiles Blitter */
 	AM_RANGE(0x878860, 0x87886b) AM_WRITE_LEGACY(hyprduel_window_w) AM_BASE(m_window)			/* Tilemap Window */
 	AM_RANGE(0x878870, 0x87887b) AM_RAM_WRITE_LEGACY(hyprduel_scrollreg_w) AM_BASE(m_scroll)		/* Scroll Regs */
 	AM_RANGE(0x87887c, 0x87887d) AM_WRITE_LEGACY(hyprduel_scrollreg_init_w)
 	AM_RANGE(0x878880, 0x878881) AM_WRITENOP
 	AM_RANGE(0x878890, 0x878891) AM_WRITENOP
 	AM_RANGE(0x8788a0, 0x8788a1) AM_WRITENOP
-	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE_LEGACY(hyprduel_irq_cause_r, hyprduel_irq_cause_w)	/* IRQ Cause, Acknowledge */
+	AM_RANGE(0x8788a2, 0x8788a3) AM_READWRITE(hyprduel_irq_cause_r, hyprduel_irq_cause_w)	/* IRQ Cause, Acknowledge */
 	AM_RANGE(0x8788a4, 0x8788a5) AM_RAM AM_BASE(m_irq_enable)		/* IRQ Enable */
 	AM_RANGE(0x8788aa, 0x8788ab) AM_RAM AM_BASE(m_rombank)		/* Rom Bank */
 	AM_RANGE(0x8788ac, 0x8788ad) AM_RAM AM_BASE(m_screenctrl)	/* Screen Control */
@@ -818,10 +809,10 @@ static DRIVER_INIT( hyprduel )
 	state->m_int_num = 0x02;
 
 	/* cpu synchronization (severe timings) */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc0040e, 0xc00411, FUNC(hyprduel_cpusync_trigger1_w));
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00408, 0xc00409, FUNC(hyprduel_cpusync_trigger1_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00408, 0xc00409, FUNC(hyprduel_cpusync_trigger2_w));
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfff34c, 0xfff34d, FUNC(hyprduel_cpusync_trigger2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc0040e, 0xc00411, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_w),state));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0xc00408, 0xc00409, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger1_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00408, 0xc00409, write16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_w),state));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0xfff34c, 0xfff34d, read16_delegate(FUNC(hyprduel_state::hyprduel_cpusync_trigger2_r),state));
 }
 
 static DRIVER_INIT( magerror )

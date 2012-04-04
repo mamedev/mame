@@ -27,6 +27,10 @@ public:
 	UINT8 m_blank_tile[32];
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(battlera_sound_w);
+	DECLARE_WRITE8_MEMBER(control_data_w);
+	DECLARE_READ8_MEMBER(control_data_r);
+	DECLARE_WRITE8_MEMBER(battlera_adpcm_data_w);
 };
 
 

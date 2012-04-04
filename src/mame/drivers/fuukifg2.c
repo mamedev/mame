@@ -62,28 +62,26 @@ To Do:
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( fuuki16_vregs_w )
+WRITE16_MEMBER(fuuki16_state::fuuki16_vregs_w)
 {
-	fuuki16_state *state = space->machine().driver_data<fuuki16_state>();
-	UINT16 old_data = state->m_vregs[offset];
-	UINT16 new_data = COMBINE_DATA(&state->m_vregs[offset]);
+	UINT16 old_data = m_vregs[offset];
+	UINT16 new_data = COMBINE_DATA(&m_vregs[offset]);
 	if ((offset == 0x1c/2) && old_data != new_data)
 	{
-		const rectangle &visarea = space->machine().primary_screen->visible_area();
-		attotime period = space->machine().primary_screen->frame_period();
-		state->m_raster_interrupt_timer->adjust(space->machine().primary_screen->time_until_pos(new_data, visarea.max_x + 1), 0, period);
+		const rectangle &visarea = machine().primary_screen->visible_area();
+		attotime period = machine().primary_screen->frame_period();
+		m_raster_interrupt_timer->adjust(machine().primary_screen->time_until_pos(new_data, visarea.max_x + 1), 0, period);
 	}
 }
 
-static WRITE16_HANDLER( fuuki16_sound_command_w )
+WRITE16_MEMBER(fuuki16_state::fuuki16_sound_command_w)
 {
-	fuuki16_state *state = space->machine().driver_data<fuuki16_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,0,data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-//      device_spin_until_time(&space->device(), attotime::from_usec(50));   // Allow the other CPU to reply
-		space->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+//      device_spin_until_time(&space.device(), attotime::from_usec(50));   // Allow the other CPU to reply
+		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 	}
 }
 
@@ -99,8 +97,8 @@ static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x810000, 0x810001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("DSW")
-	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE_LEGACY(fuuki16_sound_command_w)											// To Sound CPU
-	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE_LEGACY(fuuki16_vregs_w) AM_BASE(m_vregs )						// Video Registers
+	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(fuuki16_sound_command_w)											// To Sound CPU
+	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(fuuki16_vregs_w) AM_BASE(m_vregs )						// Video Registers
 	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM AM_BASE(m_unknown)											//
 	AM_RANGE(0x8e0000, 0x8e0001) AM_RAM AM_BASE(m_priority)											//
 ADDRESS_MAP_END
@@ -114,12 +112,12 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static WRITE8_HANDLER( fuuki16_sound_rombank_w )
+WRITE8_MEMBER(fuuki16_state::fuuki16_sound_rombank_w)
 {
 	if (data <= 2)
-		memory_set_bank(space->machine(), "bank1", data);
+		memory_set_bank(machine(), "bank1", data);
 	else
-		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(&space->device()), data);
+		logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n", cpu_get_pc(&space.device()), data);
 }
 
 static WRITE8_DEVICE_HANDLER( fuuki16_oki_banking_w )
@@ -141,7 +139,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki16_sound_io_map, AS_IO, 8, fuuki16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(fuuki16_sound_rombank_w)	// ROM Bank
+	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki16_sound_rombank_w)	// ROM Bank
 	AM_RANGE(0x11, 0x11) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP	// From Main CPU / ? To Main CPU ?
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("oki", fuuki16_oki_banking_w)	// Oki Banking
 	AM_RANGE(0x30, 0x30) AM_WRITENOP	// ? In the NMI routine

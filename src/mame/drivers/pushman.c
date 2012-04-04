@@ -31,130 +31,124 @@
 #include "includes/pushman.h"
 #include "sound/2203intf.h"
 
-static WRITE16_HANDLER( pushman_flipscreen_w )
+WRITE16_MEMBER(pushman_state::pushman_flipscreen_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		flip_screen_set(space->machine(), data & 0x0200);
-		coin_counter_w(space->machine(), 0, data & 0x4000);
-		coin_counter_w(space->machine(), 1, data & 0x8000);
+		flip_screen_set(machine(), data & 0x0200);
+		coin_counter_w(machine(), 0, data & 0x4000);
+		coin_counter_w(machine(), 1, data & 0x8000);
 	}
 }
 
-static WRITE16_HANDLER( pushman_control_w )
+WRITE16_MEMBER(pushman_state::pushman_control_w)
 {
 	if (ACCESSING_BITS_8_15)
 		soundlatch_w(space, 0, (data >> 8) & 0xff);
 }
 
-static READ16_HANDLER( pushman_68705_r )
+READ16_MEMBER(pushman_state::pushman_68705_r)
 {
-	pushman_state *state = space->machine().driver_data<pushman_state>();
 
 	if (offset == 0)
-		return state->m_latch;
+		return m_latch;
 
-	if (offset == 3 && state->m_new_latch)
+	if (offset == 3 && m_new_latch)
 	{
-		state->m_new_latch = 0;
+		m_new_latch = 0;
 		return 0;
 	}
-	if (offset == 3 && !state->m_new_latch)
+	if (offset == 3 && !m_new_latch)
 		return 0xff;
 
-	return (state->m_shared_ram[2 * offset + 1] << 8) + state->m_shared_ram[2 * offset];
+	return (m_shared_ram[2 * offset + 1] << 8) + m_shared_ram[2 * offset];
 }
 
-static WRITE16_HANDLER( pushman_68705_w )
+WRITE16_MEMBER(pushman_state::pushman_68705_w)
 {
-	pushman_state *state = space->machine().driver_data<pushman_state>();
 
 	if (ACCESSING_BITS_8_15)
-		state->m_shared_ram[2 * offset] = data >> 8;
+		m_shared_ram[2 * offset] = data >> 8;
 	if (ACCESSING_BITS_0_7)
-		state->m_shared_ram[2 * offset + 1] = data & 0xff;
+		m_shared_ram[2 * offset + 1] = data & 0xff;
 
 	if (offset == 1)
 	{
-		device_set_input_line(state->m_mcu, M68705_IRQ_LINE, HOLD_LINE);
-		device_spin(&space->device());
-		state->m_new_latch = 0;
+		device_set_input_line(m_mcu, M68705_IRQ_LINE, HOLD_LINE);
+		device_spin(&space.device());
+		m_new_latch = 0;
 	}
 }
 
 /* ElSemi - Bouncing balls protection. */
-static READ16_HANDLER( bballs_68705_r )
+READ16_MEMBER(pushman_state::bballs_68705_r)
 {
-	pushman_state *state = space->machine().driver_data<pushman_state>();
 
 	if (offset == 0)
-		return state->m_latch;
-	if (offset == 3 && state->m_new_latch)
+		return m_latch;
+	if (offset == 3 && m_new_latch)
 	{
-		state->m_new_latch = 0;
+		m_new_latch = 0;
 		return 0;
 	}
-	if (offset == 3 && !state->m_new_latch)
+	if (offset == 3 && !m_new_latch)
 		return 0xff;
 
-	return (state->m_shared_ram[2 * offset + 1] << 8) + state->m_shared_ram[2 * offset];
+	return (m_shared_ram[2 * offset + 1] << 8) + m_shared_ram[2 * offset];
 }
 
-static WRITE16_HANDLER( bballs_68705_w )
+WRITE16_MEMBER(pushman_state::bballs_68705_w)
 {
-	pushman_state *state = space->machine().driver_data<pushman_state>();
 
 	if (ACCESSING_BITS_8_15)
-		state->m_shared_ram[2 * offset] = data >> 8;
+		m_shared_ram[2 * offset] = data >> 8;
 	if (ACCESSING_BITS_0_7)
-		state->m_shared_ram[2 * offset + 1] = data & 0xff;
+		m_shared_ram[2 * offset + 1] = data & 0xff;
 
 	if (offset == 0)
 	{
-		state->m_latch = 0;
-		if (state->m_shared_ram[0] <= 0xf)
+		m_latch = 0;
+		if (m_shared_ram[0] <= 0xf)
 		{
-			state->m_latch = state->m_shared_ram[0] << 2;
-			if (state->m_shared_ram[1])
-				state->m_latch |= 2;
-			state->m_new_latch = 1;
+			m_latch = m_shared_ram[0] << 2;
+			if (m_shared_ram[1])
+				m_latch |= 2;
+			m_new_latch = 1;
 		}
-		else if (state->m_shared_ram[0])
+		else if (m_shared_ram[0])
 		{
-			if (state->m_shared_ram[1])
-				state->m_latch |= 2;
-			state->m_new_latch = 1;
+			if (m_shared_ram[1])
+				m_latch |= 2;
+			m_new_latch = 1;
 		}
 	}
 }
 
 
-static READ8_HANDLER( pushman_68000_r )
+READ8_MEMBER(pushman_state::pushman_68000_r)
 {
-	pushman_state *state = space->machine().driver_data<pushman_state>();
-	return state->m_shared_ram[offset];
+	return m_shared_ram[offset];
 }
 
-static WRITE8_HANDLER( pushman_68000_w )
+WRITE8_MEMBER(pushman_state::pushman_68000_w)
 {
-	pushman_state *state = space->machine().driver_data<pushman_state>();
 
-	if (offset == 2 && (state->m_shared_ram[2] & 2) == 0 && data & 2)
+	if (offset == 2 && (m_shared_ram[2] & 2) == 0 && data & 2)
 	{
-		state->m_latch = (state->m_shared_ram[1] << 8) | state->m_shared_ram[0];
-		state->m_new_latch = 1;
+		m_latch = (m_shared_ram[1] << 8) | m_shared_ram[0];
+		m_new_latch = 1;
 	}
-	state->m_shared_ram[offset] = data;
+	m_shared_ram[offset] = data;
 }
 
 /******************************************************************************/
 
 static ADDRESS_MAP_START( pushman_map, AS_PROGRAM, 16, pushman_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x060000, 0x060007) AM_READWRITE_LEGACY(pushman_68705_r, pushman_68705_w)
+	AM_RANGE(0x060000, 0x060007) AM_READWRITE(pushman_68705_r, pushman_68705_w)
 	AM_RANGE(0xfe0800, 0xfe17ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(pushman_flipscreen_w)
-	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(pushman_control_w)
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("INPUTS") AM_WRITE(pushman_flipscreen_w)
+	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM") AM_WRITE(pushman_control_w)
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE_LEGACY(pushman_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITENOP /* ? */
@@ -164,7 +158,7 @@ static ADDRESS_MAP_START( pushman_map, AS_PROGRAM, 16, pushman_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pushman_state )
-	AM_RANGE(0x0000, 0x0007) AM_READWRITE_LEGACY(pushman_68000_r, pushman_68000_w)
+	AM_RANGE(0x0000, 0x0007) AM_READWRITE(pushman_68000_r, pushman_68000_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x0fff) AM_ROM
 ADDRESS_MAP_END
@@ -184,10 +178,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bballs_map, AS_PROGRAM, 16, pushman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
-	AM_RANGE(0x60000, 0x60007) AM_READWRITE_LEGACY(bballs_68705_r, bballs_68705_w)
+	AM_RANGE(0x60000, 0x60007) AM_READWRITE(bballs_68705_r, bballs_68705_w)
 	AM_RANGE(0xe0800, 0xe17ff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0xe4000, 0xe4001) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(pushman_flipscreen_w)
-	AM_RANGE(0xe4002, 0xe4003) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(pushman_control_w)
+	AM_RANGE(0xe4000, 0xe4001) AM_READ_PORT("INPUTS") AM_WRITE(pushman_flipscreen_w)
+	AM_RANGE(0xe4002, 0xe4003) AM_READ_PORT("SYSTEM") AM_WRITE(pushman_control_w)
 	AM_RANGE(0xe4004, 0xe4005) AM_READ_PORT("DSW")
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE_LEGACY(pushman_scroll_w)
 	AM_RANGE(0xe800e, 0xe800f) AM_WRITENOP /* ? */

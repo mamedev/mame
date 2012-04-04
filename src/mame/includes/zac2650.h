@@ -11,6 +11,7 @@ public:
 	int m_CollisionBackground;
 	int m_CollisionSprite;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(tinvader_sound_w);
 };
 
 

@@ -83,7 +83,7 @@ ADDRESS_MAP_END
                                 Zero Point
 ***************************************************************************/
 
-static WRITE16_HANDLER( zeropnt_sound_bank_w )
+WRITE16_MEMBER(unico_state::zeropnt_sound_bank_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -91,55 +91,55 @@ static WRITE16_HANDLER( zeropnt_sound_bank_w )
            contains garbage. Indeed, only banks 0&1 are used */
 
 		int bank = (data >> 8 ) & 1;
-		UINT8 *dst	= space->machine().region("oki")->base();
+		UINT8 *dst	= machine().region("oki")->base();
 		UINT8 *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 
-		coin_counter_w(space->machine(), 0,data & 0x1000);
-		set_led_status(space->machine(), 0,data & 0x0800);	// Start 1
-		set_led_status(space->machine(), 1,data & 0x0400);	// Start 2
+		coin_counter_w(machine(), 0,data & 0x1000);
+		set_led_status(machine(), 0,data & 0x0800);	// Start 1
+		set_led_status(machine(), 1,data & 0x0400);	// Start 2
 	}
 }
 
 /* Light Gun - need to wiggle the input slightly otherwise fire doesn't work */
-static READ16_HANDLER( unico_gunx_0_msb_r )
+READ16_MEMBER(unico_state::unico_gunx_0_msb_r)
 {
-	int x=input_port_read(space->machine(), "X0");
+	int x=input_port_read(machine(), "X0");
 
 	x=x*384/256; /* On screen pixel X */
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
 	else x=((x-0x160) * 0x20)/0x1f;
 
-	return ((x&0xff) ^ (space->machine().primary_screen->frame_number()&1))<<8;
+	return ((x&0xff) ^ (machine().primary_screen->frame_number()&1))<<8;
 }
 
-static READ16_HANDLER( unico_guny_0_msb_r )
+READ16_MEMBER(unico_state::unico_guny_0_msb_r)
 {
-	int y=input_port_read(space->machine(), "Y0");
+	int y=input_port_read(machine(), "Y0");
 
 	y=0x18+((y*0xe0)/0xff);
 
-	return ((y&0xff) ^ (space->machine().primary_screen->frame_number()&1))<<8;
+	return ((y&0xff) ^ (machine().primary_screen->frame_number()&1))<<8;
 }
 
-static READ16_HANDLER( unico_gunx_1_msb_r )
+READ16_MEMBER(unico_state::unico_gunx_1_msb_r)
 {
-	int x=input_port_read(space->machine(), "X1");
+	int x=input_port_read(machine(), "X1");
 
 	x=x*384/256; /* On screen pixel X */
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
 	else x=((x-0x160) * 0x20)/0x1f;
 
-	return ((x&0xff) ^ (space->machine().primary_screen->frame_number()&1))<<8;
+	return ((x&0xff) ^ (machine().primary_screen->frame_number()&1))<<8;
 }
 
-static READ16_HANDLER( unico_guny_1_msb_r )
+READ16_MEMBER(unico_state::unico_guny_1_msb_r)
 {
-	int y=input_port_read(space->machine(), "Y1");
+	int y=input_port_read(machine(), "Y1");
 
 	y=0x18+((y*0xe0)/0xff);
 
-	return ((y&0xff) ^ (space->machine().primary_screen->frame_number()&1))<<8;
+	return ((y&0xff) ^ (machine().primary_screen->frame_number()&1))<<8;
 }
 
 static ADDRESS_MAP_START( zeropnt_map, AS_PROGRAM, 16, unico_state )
@@ -150,14 +150,14 @@ static ADDRESS_MAP_START( zeropnt_map, AS_PROGRAM, 16, unico_state )
 	AM_RANGE(0x80001a, 0x80001b) AM_READ_PORT("DSW1")
 	AM_RANGE(0x80001c, 0x80001d) AM_READ_PORT("DSW2")
 	AM_RANGE(0x80010c, 0x800121) AM_WRITEONLY AM_BASE(m_scroll)	// Scroll
-	AM_RANGE(0x800170, 0x800171) AM_READ_LEGACY(unico_guny_0_msb_r			)	// Light Guns
-	AM_RANGE(0x800174, 0x800175) AM_READ_LEGACY(unico_gunx_0_msb_r			)	//
-	AM_RANGE(0x800178, 0x800179) AM_READ_LEGACY(unico_guny_1_msb_r			)	//
-	AM_RANGE(0x80017c, 0x80017d) AM_READ_LEGACY(unico_gunx_1_msb_r			)	//
+	AM_RANGE(0x800170, 0x800171) AM_READ(unico_guny_0_msb_r			)	// Light Guns
+	AM_RANGE(0x800174, 0x800175) AM_READ(unico_gunx_0_msb_r			)	//
+	AM_RANGE(0x800178, 0x800179) AM_READ(unico_guny_1_msb_r			)	//
+	AM_RANGE(0x80017c, 0x80017d) AM_READ(unico_gunx_1_msb_r			)	//
 	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff				)	// Sound
 	AM_RANGE(0x80018a, 0x80018b) AM_DEVWRITE8_LEGACY("ymsnd", ym3812_write_port_w, 0xff00			)	//
 	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w, 0xff00		)	//
-	AM_RANGE(0x80018e, 0x80018f) AM_WRITE_LEGACY(zeropnt_sound_bank_w				)	//
+	AM_RANGE(0x80018e, 0x80018f) AM_WRITE(zeropnt_sound_bank_w				)	//
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITEONLY	// ? IRQ Ack
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE_LEGACY(unico_vram_w) AM_BASE(m_vram)	// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM	// ? 0
@@ -170,29 +170,29 @@ ADDRESS_MAP_END
                                 Zero Point 2
 ***************************************************************************/
 
-static READ32_HANDLER( zeropnt2_gunx_0_msb_r )		{ return (unico_gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_guny_0_msb_r )		{ return (unico_guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_gunx_1_msb_r )		{ return (unico_gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_guny_1_msb_r )		{ return (unico_guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
+READ32_MEMBER(unico_state::zeropnt2_gunx_0_msb_r){ return (unico_gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
+READ32_MEMBER(unico_state::zeropnt2_guny_0_msb_r){ return (unico_guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
+READ32_MEMBER(unico_state::zeropnt2_gunx_1_msb_r){ return (unico_gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
+READ32_MEMBER(unico_state::zeropnt2_guny_1_msb_r){ return (unico_guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
 
-static WRITE32_HANDLER( zeropnt2_sound_bank_w )
+WRITE32_MEMBER(unico_state::zeropnt2_sound_bank_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
 		int bank = ((data >> 24) & 3) % 4;
-		UINT8 *dst	= space->machine().region("oki1")->base();
+		UINT8 *dst	= machine().region("oki1")->base();
 		UINT8 *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 	}
 }
 
-static WRITE32_HANDLER( zeropnt2_leds_w )
+WRITE32_MEMBER(unico_state::zeropnt2_leds_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
-		coin_counter_w(space->machine(), 0,data & 0x00010000);
-		set_led_status(space->machine(), 0,data & 0x00800000);	// Start 1
-		set_led_status(space->machine(), 1,data & 0x00400000);	// Start 2
+		coin_counter_w(machine(), 0,data & 0x00010000);
+		set_led_status(machine(), 0,data & 0x00800000);	// Start 1
+		set_led_status(machine(), 1,data & 0x00400000);	// Start 2
 	}
 }
 
@@ -221,13 +221,13 @@ static ADDRESS_MAP_START( zeropnt2_map, AS_PROGRAM, 32, unico_state )
 	AM_RANGE(0x800024, 0x800027) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff0000	)	// Sound
 	AM_RANGE(0x800028, 0x80002f) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r, ym2151_w, 0x00ff0000)	//
 	AM_RANGE(0x800030, 0x800033) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff0000	)	//
-	AM_RANGE(0x800034, 0x800037) AM_WRITE_LEGACY(zeropnt2_sound_bank_w				)	//
-	AM_RANGE(0x800038, 0x80003b) AM_WRITE_LEGACY(zeropnt2_leds_w					)	// ?
+	AM_RANGE(0x800034, 0x800037) AM_WRITE(zeropnt2_sound_bank_w				)	//
+	AM_RANGE(0x800038, 0x80003b) AM_WRITE(zeropnt2_leds_w					)	// ?
 	AM_RANGE(0x80010c, 0x800123) AM_WRITEONLY AM_BASE(m_scroll32		)	// Scroll
-	AM_RANGE(0x800140, 0x800143) AM_READ_LEGACY(zeropnt2_guny_0_msb_r			)	// Light Guns
-	AM_RANGE(0x800144, 0x800147) AM_READ_LEGACY(zeropnt2_gunx_0_msb_r			)	//
-	AM_RANGE(0x800148, 0x80014b) AM_READ_LEGACY(zeropnt2_guny_1_msb_r			)	//
-	AM_RANGE(0x80014c, 0x80014f) AM_READ_LEGACY(zeropnt2_gunx_1_msb_r			)	//
+	AM_RANGE(0x800140, 0x800143) AM_READ(zeropnt2_guny_0_msb_r			)	// Light Guns
+	AM_RANGE(0x800144, 0x800147) AM_READ(zeropnt2_gunx_0_msb_r			)	//
+	AM_RANGE(0x800148, 0x80014b) AM_READ(zeropnt2_guny_1_msb_r			)	//
+	AM_RANGE(0x80014c, 0x80014f) AM_READ(zeropnt2_gunx_1_msb_r			)	//
 	AM_RANGE(0x800150, 0x800153) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800154, 0x800157) AM_READ_PORT("DSW2")
 	AM_RANGE(0x80015c, 0x80015f) AM_READ_PORT("BUTTONS")

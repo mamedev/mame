@@ -33,17 +33,17 @@ static PALETTE_INIT( sspeedr )
 }
 
 
-static WRITE8_HANDLER( sspeedr_int_ack_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_int_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( sspeedr_lamp_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_lamp_w)
 {
 	output_set_value("lampGO", (data >> 0) & 1);
 	output_set_value("lampEP", (data >> 1) & 1);
-	coin_counter_w(space->machine(), 0, data & 8);
+	coin_counter_w(machine(), 0, data & 8);
 }
 
 
@@ -51,27 +51,25 @@ static WRITE8_HANDLER( sspeedr_lamp_w )
 static const UINT8 ls48_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
-static WRITE8_HANDLER( sspeedr_time_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_time_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	data = data & 15;
 	output_set_digit_value(0x18 + offset, ls48_map[data]);
-	state->m_led_TIME[offset] = data;
+	m_led_TIME[offset] = data;
 }
 
 
-static WRITE8_HANDLER( sspeedr_score_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_score_w)
 {
-	sspeedr_state *state = space->machine().driver_data<sspeedr_state>();
 	char buf[20];
 	sprintf(buf, "LED%02d", offset);
 	data = ~data & 15;
 	output_set_digit_value(offset, ls48_map[data]);
-	state->m_led_SCORE[offset] = data;
+	m_led_SCORE[offset] = data;
 }
 
 
-static WRITE8_HANDLER( sspeedr_sound_w )
+WRITE8_MEMBER(sspeedr_state::sspeedr_sound_w)
 {
 	/* not implemented */
 }
@@ -80,7 +78,7 @@ static WRITE8_HANDLER( sspeedr_sound_w )
 static ADDRESS_MAP_START( sspeedr_map, AS_PROGRAM, 8, sspeedr_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x21ff) AM_RAM
-	AM_RANGE(0x7f00, 0x7f17) AM_WRITE_LEGACY(sspeedr_score_w)
+	AM_RANGE(0x7f00, 0x7f17) AM_WRITE(sspeedr_score_w)
 ADDRESS_MAP_END
 
 
@@ -88,11 +86,11 @@ static ADDRESS_MAP_START( sspeedr_io_map, AS_IO, 8, sspeedr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(sspeedr_sound_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(sspeedr_lamp_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE(sspeedr_sound_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(sspeedr_lamp_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2")
-	AM_RANGE(0x04, 0x05) AM_WRITE_LEGACY(sspeedr_time_w)
+	AM_RANGE(0x04, 0x05) AM_WRITE(sspeedr_time_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(sspeedr_driver_horz_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(sspeedr_driver_pic_w)
@@ -106,7 +104,7 @@ static ADDRESS_MAP_START( sspeedr_io_map, AS_IO, 8, sspeedr_state )
 	AM_RANGE(0x1a, 0x1a) AM_WRITE_LEGACY(sspeedr_track_horz_2_w)
 	AM_RANGE(0x1b, 0x1b) AM_WRITE_LEGACY(sspeedr_track_ice_w)
 	AM_RANGE(0x1c, 0x1e) AM_WRITE_LEGACY(sspeedr_drones_vert_w)
-	AM_RANGE(0x1f, 0x1f) AM_WRITE_LEGACY(sspeedr_int_ack_w)
+	AM_RANGE(0x1f, 0x1f) AM_WRITE(sspeedr_int_ack_w)
 ADDRESS_MAP_END
 
 

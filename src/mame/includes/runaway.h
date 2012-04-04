@@ -9,6 +9,9 @@ public:
 	UINT8* m_sprite_ram;
 	tilemap_t *m_bg_tilemap;
 	int m_tile_bank;
+	DECLARE_READ8_MEMBER(runaway_input_r);
+	DECLARE_WRITE8_MEMBER(runaway_led_w);
+	DECLARE_WRITE8_MEMBER(runaway_irq_ack_w);
 };
 
 

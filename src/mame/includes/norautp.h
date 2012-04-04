@@ -14,6 +14,11 @@ public:
 
 	UINT16 *m_np_vram;
 	UINT16 m_np_addr;
+	DECLARE_READ8_MEMBER(test_r);
+	DECLARE_READ8_MEMBER(vram_data_r);
+	DECLARE_WRITE8_MEMBER(vram_data_w);
+	DECLARE_WRITE8_MEMBER(vram_addr_w);
+	DECLARE_READ8_MEMBER(test2_r);
 };
 
 

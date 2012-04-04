@@ -577,32 +577,31 @@ TODO:
 /***************************************************************************/
 
 
-static WRITE8_HANDLER( superpac_latch_w )
+WRITE8_MEMBER(mappy_state::superpac_latch_w)
 {
-	mappy_state *state = space->machine().driver_data<mappy_state>();
-	device_t *namcoio_1 = space->machine().device("namcoio_1");
-	device_t *namcoio_2 = space->machine().device("namcoio_2");
+	device_t *namcoio_1 = machine().device("namcoio_1");
+	device_t *namcoio_2 = machine().device("namcoio_2");
 	int bit = offset & 1;
 
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			state->m_sub_irq_mask = bit;
+			m_sub_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			state->m_main_irq_mask = bit;
+			m_main_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
 			break;
 
 		case 0x06:	/* SOUND ON */
-			mappy_sound_enable(space->machine().device("namco"), bit);
+			mappy_sound_enable(machine().device("namco"), bit);
 			break;
 
 		case 0x08:	/* 4 RESET */
@@ -611,7 +610,7 @@ static WRITE8_HANDLER( superpac_latch_w )
 			break;
 
 		case 0x0a:	/* SUB RESET */
-			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:	/* n.c. */
@@ -622,35 +621,34 @@ static WRITE8_HANDLER( superpac_latch_w )
 	}
 }
 
-static WRITE8_HANDLER( phozon_latch_w )
+WRITE8_MEMBER(mappy_state::phozon_latch_w)
 {
-	mappy_state *state = space->machine().driver_data<mappy_state>();
-	device_t *namcoio_1 = space->machine().device("namcoio_1");
-	device_t *namcoio_2 = space->machine().device("namcoio_2");
+	device_t *namcoio_1 = machine().device("namcoio_1");
+	device_t *namcoio_2 = machine().device("namcoio_2");
 	int bit = offset & 1;
 
 	switch (offset & 0x0e)
 	{
 		case 0x00:
-			state->m_sub_irq_mask = bit;
+			m_sub_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:
-			state->m_main_irq_mask = bit;
+			m_main_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x04:
-			state->m_sub2_irq_mask = bit;
+			m_sub2_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(space->machine(), "sub2", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "sub2", 0, CLEAR_LINE);
 			break;
 
 		case 0x06:
-			mappy_sound_enable(space->machine().device("namco"), bit);
+			mappy_sound_enable(machine().device("namco"), bit);
 			break;
 
 		case 0x08:
@@ -659,11 +657,11 @@ static WRITE8_HANDLER( phozon_latch_w )
 			break;
 
 		case 0x0a:
-			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:
-			cputag_set_input_line(space->machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0e:
@@ -671,33 +669,32 @@ static WRITE8_HANDLER( phozon_latch_w )
 	}
 }
 
-static WRITE8_HANDLER( mappy_latch_w )
+WRITE8_MEMBER(mappy_state::mappy_latch_w)
 {
-	mappy_state *state = space->machine().driver_data<mappy_state>();
-	device_t *namcoio_1 = space->machine().device("namcoio_1");
-	device_t *namcoio_2 = space->machine().device("namcoio_2");
+	device_t *namcoio_1 = machine().device("namcoio_1");
+	device_t *namcoio_2 = machine().device("namcoio_2");
 	int bit = offset & 1;
 
 	switch (offset & 0x0e)
 	{
 		case 0x00:	/* INT ON 2 */
-			state->m_sub_irq_mask = bit;
+			m_sub_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
-			state->m_main_irq_mask = bit;
+			m_main_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* FLIP */
-			flip_screen_set(space->machine(), bit);
+			flip_screen_set(machine(), bit);
 			break;
 
 		case 0x06:	/* SOUND ON */
-			mappy_sound_enable(space->machine().device("namco"), bit);
+			mappy_sound_enable(machine().device("namco"), bit);
 			break;
 
 		case 0x08:	/* 4 RESET */
@@ -706,7 +703,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 			break;
 
 		case 0x0a:	/* SUB RESET */
-			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:	/* n.c. */
@@ -720,32 +717,35 @@ static WRITE8_HANDLER( mappy_latch_w )
 
 static MACHINE_RESET( superpac )
 {
+	mappy_state *state = machine.driver_data<mappy_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 0x10; i += 2)
-		superpac_latch_w(space,i,0);
+		state->superpac_latch_w(*space,i,0);
 }
 
 static MACHINE_RESET( phozon )
 {
+	mappy_state *state = machine.driver_data<mappy_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 0x10; i += 2)
-		phozon_latch_w(space, i, 0);
+		state->phozon_latch_w(*space, i, 0);
 }
 
 static MACHINE_RESET( mappy )
 {
+	mappy_state *state = machine.driver_data<mappy_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 0x10; i += 2)
-		mappy_latch_w(space, i, 0);
+		state->mappy_latch_w(*space, i, 0);
 }
 
 /* different games need different interrupt generators & timers because they use different Namco I/O devices */
@@ -901,7 +901,7 @@ static ADDRESS_MAP_START( superpac_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the sound CPU */
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)		/* custom I/O chips interface */
-	AM_RANGE(0x5000, 0x500f) AM_WRITE_LEGACY(superpac_latch_w)				/* various control bits */
+	AM_RANGE(0x5000, 0x500f) AM_WRITE(superpac_latch_w)				/* various control bits */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -912,7 +912,7 @@ static ADDRESS_MAP_START( phozon_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the sound CPU */
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)		/* custom I/O chips interface */
-	AM_RANGE(0x5000, 0x500f) AM_WRITE_LEGACY(phozon_latch_w)				/* various control bits */
+	AM_RANGE(0x5000, 0x500f) AM_WRITE(phozon_latch_w)				/* various control bits */
 	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(watchdog_reset_w)				/* watchdog reset */
 	AM_RANGE(0x8000, 0xffff) AM_ROM									/* ROM */
 ADDRESS_MAP_END
@@ -924,7 +924,7 @@ static ADDRESS_MAP_START( mappy_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the sound CPU */
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)		/* custom I/O chips interface */
-	AM_RANGE(0x5000, 0x500f) AM_WRITE_LEGACY(mappy_latch_w)				/* various control bits */
+	AM_RANGE(0x5000, 0x500f) AM_WRITE(mappy_latch_w)				/* various control bits */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(watchdog_reset_w)				/* watchdog reset */
 	AM_RANGE(0x8000, 0xffff) AM_ROM									/* ROM code (only a000-ffff in Mappy) */
 ADDRESS_MAP_END
@@ -932,7 +932,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( superpac_cpu2_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU (also sound registers) */
-	AM_RANGE(0x2000, 0x200f) AM_WRITE_LEGACY(superpac_latch_w)                   /* various control bits */
+	AM_RANGE(0x2000, 0x200f) AM_WRITE(superpac_latch_w)                   /* various control bits */
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -943,7 +943,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mappy_cpu2_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU (also sound registers) */
-	AM_RANGE(0x2000, 0x200f) AM_WRITE_LEGACY(mappy_latch_w)						/* various control bits */
+	AM_RANGE(0x2000, 0x200f) AM_WRITE(mappy_latch_w)						/* various control bits */
 	AM_RANGE(0xe000, 0xffff) AM_ROM											/* ROM code */
 ADDRESS_MAP_END
 

@@ -32,6 +32,8 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_pc080sn;
 	device_t *m_pc090oj;
+	DECLARE_WRITE16_MEMBER(jumping_sound_w);
+	DECLARE_READ8_MEMBER(jumping_latch_r);
 };
 
 

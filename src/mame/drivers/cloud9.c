@@ -207,32 +207,31 @@ static MACHINE_RESET( cloud9 )
  *
  *************************************/
 
-static WRITE8_HANDLER( irq_ack_w )
+WRITE8_MEMBER(cloud9_state::irq_ack_w)
 {
-	cloud9_state *state = space->machine().driver_data<cloud9_state>();
-	if (state->m_irq_state)
+	if (m_irq_state)
 	{
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
-		state->m_irq_state = 0;
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_irq_state = 0;
 	}
 }
 
 
-static WRITE8_HANDLER( cloud9_led_w )
+WRITE8_MEMBER(cloud9_state::cloud9_led_w)
 {
-	set_led_status(space->machine(), offset, ~data & 0x80);
+	set_led_status(machine(), offset, ~data & 0x80);
 }
 
 
-static WRITE8_HANDLER( cloud9_coin_counter_w )
+WRITE8_MEMBER(cloud9_state::cloud9_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data & 0x80);
+	coin_counter_w(machine(), offset, data & 0x80);
 }
 
 
-static READ8_HANDLER( leta_r )
+READ8_MEMBER(cloud9_state::leta_r)
 {
-	return input_port_read(space->machine(), offset ? "TRACKX" : "TRACKY");
+	return input_port_read(machine(), offset ? "TRACKX" : "TRACKY");
 }
 
 
@@ -243,21 +242,19 @@ static READ8_HANDLER( leta_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( nvram_recall_w )
+WRITE8_MEMBER(cloud9_state::nvram_recall_w)
 {
-	cloud9_state *state = space->machine().driver_data<cloud9_state>();
-	state->m_nvram->recall(0);
-	state->m_nvram->recall(1);
-	state->m_nvram->recall(0);
+	m_nvram->recall(0);
+	m_nvram->recall(1);
+	m_nvram->recall(0);
 }
 
 
-static WRITE8_HANDLER( nvram_store_w )
+WRITE8_MEMBER(cloud9_state::nvram_store_w)
 {
-	cloud9_state *state = space->machine().driver_data<cloud9_state>();
-	state->m_nvram->store(0);
-	state->m_nvram->store(1);
-	state->m_nvram->store(0);
+	m_nvram->store(0);
+	m_nvram->store(1);
+	m_nvram->store(0);
 }
 
 
@@ -274,16 +271,16 @@ static ADDRESS_MAP_START( cloud9_map, AS_PROGRAM, 8, cloud9_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROMBANK("bank1") AM_WRITE_LEGACY(cloud9_videoram_w)
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x5400, 0x547f) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x5480, 0x54ff) AM_WRITE_LEGACY(irq_ack_w)
+	AM_RANGE(0x5480, 0x54ff) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x5500, 0x557f) AM_RAM_WRITE_LEGACY(cloud9_paletteram_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x5580, 0x5587) AM_MIRROR(0x0078) AM_WRITE_LEGACY(cloud9_video_control_w)
-	AM_RANGE(0x5600, 0x5601) AM_MIRROR(0x0078) AM_WRITE_LEGACY(cloud9_coin_counter_w)
-	AM_RANGE(0x5602, 0x5603) AM_MIRROR(0x0078) AM_WRITE_LEGACY(cloud9_led_w)
-	AM_RANGE(0x5680, 0x56ff) AM_WRITE_LEGACY(nvram_store_w)
-	AM_RANGE(0x5700, 0x577f) AM_WRITE_LEGACY(nvram_recall_w)
+	AM_RANGE(0x5600, 0x5601) AM_MIRROR(0x0078) AM_WRITE(cloud9_coin_counter_w)
+	AM_RANGE(0x5602, 0x5603) AM_MIRROR(0x0078) AM_WRITE(cloud9_led_w)
+	AM_RANGE(0x5680, 0x56ff) AM_WRITE(nvram_store_w)
+	AM_RANGE(0x5700, 0x577f) AM_WRITE(nvram_recall_w)
 	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x007e) AM_READ_PORT("IN0")
 	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x007e) AM_READ_PORT("IN1")
-	AM_RANGE(0x5900, 0x5903) AM_MIRROR(0x007c) AM_READ_LEGACY(leta_r)
+	AM_RANGE(0x5900, 0x5903) AM_MIRROR(0x007c) AM_READ(leta_r)
 	AM_RANGE(0x5a00, 0x5a0f) AM_MIRROR(0x00f0) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x5b00, 0x5b0f) AM_MIRROR(0x00f0) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x5c00, 0x5cff) AM_MIRROR(0x0300) AM_DEVREADWRITE("nvram", x2212_device, read, write)

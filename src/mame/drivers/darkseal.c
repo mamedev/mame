@@ -25,34 +25,33 @@
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( darkseal_control_w )
+WRITE16_MEMBER(darkseal_state::darkseal_control_w)
 {
-	darkseal_state *state = space->machine().driver_data<darkseal_state>();
 	switch (offset<<1) {
     case 6: /* DMA flag */
-		state->m_spriteram->copy();
+		m_spriteram->copy();
 		return;
     case 8: /* Sound CPU write */
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
     	return;
 	case 0xa: /* IRQ Ack (VBL) */
 		return;
 	}
 }
 
-static READ16_HANDLER( darkseal_control_r )
+READ16_MEMBER(darkseal_state::darkseal_control_r)
 {
 	switch (offset<<1)
 	{
 		case 0:
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 
 		case 2:
-			return input_port_read(space->machine(), "P1_P2");
+			return input_port_read(machine(), "P1_P2");
 
 		case 4:
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 	}
 
 	return ~0;
@@ -66,7 +65,7 @@ static ADDRESS_MAP_START( darkseal_map, AS_PROGRAM, 16, darkseal_state )
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE_LEGACY(darkseal_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x141000, 0x141fff) AM_RAM_WRITE_LEGACY(darkseal_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x180000, 0x18000f) AM_READWRITE_LEGACY(darkseal_control_r, darkseal_control_w)
+	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(darkseal_control_r, darkseal_control_w)
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
 	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)

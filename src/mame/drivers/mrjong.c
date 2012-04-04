@@ -55,7 +55,7 @@ ROMs 6A, 7A, 8A, 9A: 2764
  *
  *************************************/
 
-static READ8_HANDLER( io_0x03_r )
+READ8_MEMBER(mrjong_state::io_0x03_r)
 {
 	return 0x00;
 }
@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( mrjong_io_map, AS_IO, 8, mrjong_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P2") AM_WRITE_LEGACY(mrjong_flipscreen_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW") AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(io_0x03_r)		// Unknown
+	AM_RANGE(0x03, 0x03) AM_READ(io_0x03_r)		// Unknown
 ADDRESS_MAP_END
 
 /*************************************

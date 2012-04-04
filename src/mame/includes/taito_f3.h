@@ -193,6 +193,14 @@ public:
 	int (*m_dpix_n[8][16])(taito_f3_state *state, UINT32 s_pix);
 	int (**m_dpix_lp[5])(taito_f3_state *state, UINT32 s_pix);
 	int (**m_dpix_sp[9])(taito_f3_state *state, UINT32 s_pix);
+	DECLARE_READ32_MEMBER(f3_control_r);
+	DECLARE_WRITE32_MEMBER(f3_control_w);
+	DECLARE_WRITE32_MEMBER(f3_sound_reset_0_w);
+	DECLARE_WRITE32_MEMBER(f3_sound_reset_1_w);
+	DECLARE_WRITE32_MEMBER(f3_sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(f3_unk_w);
+	DECLARE_READ32_MEMBER(bubsympb_oki_r);
+	DECLARE_WRITE32_MEMBER(bubsympb_oki_w);
 };
 
 

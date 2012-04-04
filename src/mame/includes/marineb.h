@@ -22,6 +22,7 @@ public:
 	device_t *m_audiocpu;
 
 	UINT8     m_irq_mask;
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 

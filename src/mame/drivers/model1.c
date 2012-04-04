@@ -634,19 +634,19 @@ Notes:
 #include "machine/nvram.h"
 #include "includes/model1.h"
 
-static READ16_HANDLER( io_r )
+READ16_MEMBER(model1_state::io_r)
 {
 	static const char *const analognames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 	static const char *const inputnames[] = { "IN0", "IN1", "IN2" };
 
 	if(offset < 0x8)
-		return input_port_read_safe(space->machine(), analognames[offset], 0x00);
+		return input_port_read_safe(machine(), analognames[offset], 0x00);
 
 	if(offset < 0x10)
 	{
 		offset -= 0x8;
 		if(offset < 3)
-			return input_port_read(space->machine(), inputnames[offset]);
+			return input_port_read(machine(), inputnames[offset]);
 		return 0xff;
 	}
 
@@ -654,17 +654,17 @@ static READ16_HANDLER( io_r )
 	return 0xffff;
 }
 
-static READ16_HANDLER( fifoin_status_r )
+READ16_MEMBER(model1_state::fifoin_status_r)
 {
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( bank_w )
+WRITE16_MEMBER(model1_state::bank_w)
 {
 	if(ACCESSING_BITS_0_7) {
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
-			memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x1000000 + 0x100000*((data >> 4) & 0xf));
+			memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base() + 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			logerror("BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			break;
 		case 0x2: // 200000-2fffff data roms banking (unused, all known games have only one bank)
@@ -765,7 +765,7 @@ static MACHINE_RESET(model1_vr)
 	memset(state->m_to_68k, 0, sizeof(state->m_to_68k));
 }
 
-static READ16_HANDLER( network_ctl_r )
+READ16_MEMBER(model1_state::network_ctl_r)
 {
 	if(offset)
 		return 0x40;
@@ -773,100 +773,95 @@ static READ16_HANDLER( network_ctl_r )
 		return 0x00;
 }
 
-static WRITE16_HANDLER( network_ctl_w )
+WRITE16_MEMBER(model1_state::network_ctl_w)
 {
 }
 
-static WRITE16_HANDLER(md1_w)
+WRITE16_MEMBER(model1_state::md1_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	COMBINE_DATA(state->m_display_list1+offset);
+	COMBINE_DATA(m_display_list1+offset);
 	if(0 && offset)
 		return;
-	if(1 && state->m_dump)
-		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()));
+	if(1 && m_dump)
+		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space.device()));
 }
 
-static WRITE16_HANDLER(md0_w)
+WRITE16_MEMBER(model1_state::md0_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	COMBINE_DATA(state->m_display_list0+offset);
+	COMBINE_DATA(m_display_list0+offset);
 	if(0 && offset)
 		return;
-	if(1 && state->m_dump)
-		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()));
+	if(1 && m_dump)
+		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space.device()));
 }
 
-static WRITE16_HANDLER(p_w)
+WRITE16_MEMBER(model1_state::p_w)
 {
-	UINT16 old = space->machine().generic.paletteram.u16[offset];
+	UINT16 old = machine().generic.paletteram.u16[offset];
 	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
-	if(0 && space->machine().generic.paletteram.u16[offset] != old)
-		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space->device()));
+	if(0 && machine().generic.paletteram.u16[offset] != old)
+		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space.device()));
 }
 
-static WRITE16_HANDLER(mr_w)
+WRITE16_MEMBER(model1_state::mr_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	COMBINE_DATA(state->m_mr+offset);
+	COMBINE_DATA(m_mr+offset);
 	if(0 && offset == 0x1138/2)
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, cpu_get_pc(&space->device()));
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, cpu_get_pc(&space.device()));
 }
 
-static WRITE16_HANDLER(mr2_w)
+WRITE16_MEMBER(model1_state::mr2_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	COMBINE_DATA(state->m_mr2+offset);
+	COMBINE_DATA(m_mr2+offset);
 #if 0
 	if(0 && offset == 0x6e8/2) {
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, cpu_get_pc(&space->device()));
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, cpu_get_pc(&space.device()));
 	}
 	if(offset/2 == 0x3680/4)
-		logerror("MW f80[r25], %04x%04x (%x)\n", state->m_mr2[0x3680/2+1], state->m_mr2[0x3680/2], cpu_get_pc(&space->device()));
+		logerror("MW f80[r25], %04x%04x (%x)\n", m_mr2[0x3680/2+1], m_mr2[0x3680/2], cpu_get_pc(&space.device()));
 	if(offset/2 == 0x06ca/4)
-		logerror("MW fca[r19], %04x%04x (%x)\n", state->m_mr2[0x06ca/2+1], state->m_mr2[0x06ca/2], cpu_get_pc(&space->device()));
+		logerror("MW fca[r19], %04x%04x (%x)\n", m_mr2[0x06ca/2+1], m_mr2[0x06ca/2], cpu_get_pc(&space.device()));
 	if(offset/2 == 0x1eca/4)
-		logerror("MW fca[r22], %04x%04x (%x)\n", state->m_mr2[0x1eca/2+1], state->m_mr2[0x1eca/2], cpu_get_pc(&space->device()));
+		logerror("MW fca[r22], %04x%04x (%x)\n", m_mr2[0x1eca/2+1], m_mr2[0x1eca/2], cpu_get_pc(&space.device()));
 #endif
 
 	// wingwar scene position, pc=e1ce -> d735
 	if(offset/2 == 0x1f08/4)
-		logerror("MW  8[r10], %f (%x)\n", *(float *)(state->m_mr2+0x1f08/2), cpu_get_pc(&space->device()));
+		logerror("MW  8[r10], %f (%x)\n", *(float *)(m_mr2+0x1f08/2), cpu_get_pc(&space.device()));
 	if(offset/2 == 0x1f0c/4)
-		logerror("MW  c[r10], %f (%x)\n", *(float *)(state->m_mr2+0x1f0c/2), cpu_get_pc(&space->device()));
+		logerror("MW  c[r10], %f (%x)\n", *(float *)(m_mr2+0x1f0c/2), cpu_get_pc(&space.device()));
 	if(offset/2 == 0x1f10/4)
-		logerror("MW 10[r10], %f (%x)\n", *(float *)(state->m_mr2+0x1f10/2), cpu_get_pc(&space->device()));
+		logerror("MW 10[r10], %f (%x)\n", *(float *)(m_mr2+0x1f10/2), cpu_get_pc(&space.device()));
 }
 
-static READ16_HANDLER( snd_68k_ready_r )
+READ16_MEMBER(model1_state::snd_68k_ready_r)
 {
-	int sr = cpu_get_reg(space->machine().device("audiocpu"), M68K_SR);
+	int sr = cpu_get_reg(machine().device("audiocpu"), M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		device_spin_until_time(&space->device(), attotime::from_usec(40));
+		device_spin_until_time(&space.device(), attotime::from_usec(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
 	return 0xff;
 }
 
-static WRITE16_HANDLER( snd_latch_to_68k_w )
+WRITE16_MEMBER(model1_state::snd_latch_to_68k_w)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
-	state->m_to_68k[state->m_fifo_wptr] = data;
-	state->m_fifo_wptr++;
-	if (state->m_fifo_wptr >= ARRAY_LENGTH(state->m_to_68k)) state->m_fifo_wptr = 0;
+	m_to_68k[m_fifo_wptr] = data;
+	m_fifo_wptr++;
+	if (m_fifo_wptr >= ARRAY_LENGTH(m_to_68k)) m_fifo_wptr = 0;
 
-    if (state->m_dsbz80 != NULL)
+    if (m_dsbz80 != NULL)
     {
-        state->m_dsbz80->latch_w(*space, 0, data);
+        m_dsbz80->latch_w(*&space, 0, data);
     }
 
 	// signal the 68000 that there's data waiting
-	cputag_set_input_line(space->machine(), "audiocpu", 2, HOLD_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 2, HOLD_LINE);
 	// give the 68k time to reply
-	device_spin_until_time(&space->device(), attotime::from_usec(40));
+	device_spin_until_time(&space.device(), attotime::from_usec(40));
 }
 
 static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
@@ -874,11 +869,11 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(mr2_w) AM_BASE(m_mr2)
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE_LEGACY(mr_w)  AM_BASE(m_mr)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(mr2_w) AM_BASE(m_mr2)
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(mr_w)  AM_BASE(m_mr)
 
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE_LEGACY(md0_w) AM_BASE(m_display_list0)
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE_LEGACY(md1_w) AM_BASE(m_display_list1)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_BASE(m_display_list0)
+	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE(m_display_list1)
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE_LEGACY(model1_listctl_r, model1_listctl_w)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
@@ -888,25 +883,25 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
 	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
 
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE_LEGACY(p_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE(m_color_xlat)
 
-	AM_RANGE(0xc00000, 0xc0003f) AM_READ_LEGACY(io_r) AM_WRITENOP
+	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
 
-	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE_LEGACY(network_ctl_r, network_ctl_w)
+	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
 
 	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE_LEGACY(snd_latch_to_68k_w)
-	AM_RANGE(0xc40002, 0xc40003) AM_READ_LEGACY(snd_68k_ready_r)
+	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
+	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
 
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE_LEGACY(model1_tgp_copro_adr_r, model1_tgp_copro_adr_w)
 	AM_RANGE(0xd20000, 0xd20003) AM_WRITE_LEGACY(model1_tgp_copro_ram_w )
 	AM_RANGE(0xd80000, 0xd80003) AM_WRITE_LEGACY(model1_tgp_copro_w) AM_MIRROR(0x10)
-	AM_RANGE(0xdc0000, 0xdc0003) AM_READ_LEGACY(fifoin_status_r)
+	AM_RANGE(0xdc0000, 0xdc0003) AM_READ(fifoin_status_r)
 
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP        // Watchdog?  IRQ ack? Always 0x20, usually on irq
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE_LEGACY(bank_w)
+	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(bank_w)
 	AM_RANGE(0xe0000c, 0xe0000f) AM_WRITENOP
 
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
@@ -922,11 +917,11 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x100000, 0x1fffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x200000, 0x2fffff) AM_ROM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(mr2_w) AM_BASE(m_mr2)
-	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE_LEGACY(mr_w)  AM_BASE(m_mr)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(mr2_w) AM_BASE(m_mr2)
+	AM_RANGE(0x500000, 0x53ffff) AM_RAM_WRITE(mr_w)  AM_BASE(m_mr)
 
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE_LEGACY(md0_w) AM_BASE(m_display_list0)
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE_LEGACY(md1_w) AM_BASE(m_display_list1)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(md0_w) AM_BASE(m_display_list0)
+	AM_RANGE(0x610000, 0x61ffff) AM_RAM_WRITE(md1_w) AM_BASE(m_display_list1)
 	AM_RANGE(0x680000, 0x680003) AM_READWRITE_LEGACY(model1_listctl_r, model1_listctl_w)
 
 	AM_RANGE(0x700000, 0x70ffff) AM_DEVREADWRITE("tile", segas24_tile, tile_r, tile_w)
@@ -936,25 +931,25 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
 	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
 
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE_LEGACY(p_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE(m_color_xlat)
 
-	AM_RANGE(0xc00000, 0xc0003f) AM_READ_LEGACY(io_r) AM_WRITENOP
+	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
 
-	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE_LEGACY(network_ctl_r, network_ctl_w)
+	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
 
 	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0xc40000, 0xc40001) AM_WRITE_LEGACY(snd_latch_to_68k_w)
-	AM_RANGE(0xc40002, 0xc40003) AM_READ_LEGACY(snd_68k_ready_r)
+	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
+	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
 
 	AM_RANGE(0xd00000, 0xd00001) AM_READWRITE_LEGACY(model1_tgp_vr_adr_r, model1_tgp_vr_adr_w)
 	AM_RANGE(0xd20000, 0xd20003) AM_WRITE_LEGACY(model1_vr_tgp_ram_w )
 	AM_RANGE(0xd80000, 0xd80003) AM_WRITE_LEGACY(model1_vr_tgp_w) AM_MIRROR(0x10)
-	AM_RANGE(0xdc0000, 0xdc0003) AM_READ_LEGACY(fifoin_status_r)
+	AM_RANGE(0xdc0000, 0xdc0003) AM_READ(fifoin_status_r)
 
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITENOP        // Watchdog?  IRQ ack? Always 0x20, usually on irq
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE_LEGACY(bank_w)
+	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(bank_w)
 	AM_RANGE(0xe0000c, 0xe0000f) AM_WRITENOP
 
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
@@ -965,20 +960,19 @@ static ADDRESS_MAP_START( model1_vr_io, AS_IO, 16, model1_state )
 	AM_RANGE(0xd80000, 0xd80003) AM_READ_LEGACY(model1_vr_tgp_r)
 ADDRESS_MAP_END
 
-static READ16_HANDLER( m1_snd_68k_latch_r )
+READ16_MEMBER(model1_state::m1_snd_68k_latch_r)
 {
-	model1_state *state = space->machine().driver_data<model1_state>();
 	UINT16 retval;
 
-	retval = state->m_to_68k[state->m_fifo_rptr];
+	retval = m_to_68k[m_fifo_rptr];
 
-	state->m_fifo_rptr++;
-	if (state->m_fifo_rptr >= ARRAY_LENGTH(state->m_to_68k)) state->m_fifo_rptr = 0;
+	m_fifo_rptr++;
+	if (m_fifo_rptr >= ARRAY_LENGTH(m_to_68k)) m_fifo_rptr = 0;
 
 	return retval;
 }
 
-static READ16_HANDLER( m1_snd_v60_ready_r )
+READ16_MEMBER(model1_state::m1_snd_v60_ready_r)
 {
 	return 1;
 }
@@ -988,18 +982,18 @@ static WRITE16_DEVICE_HANDLER( m1_snd_mpcm_bnk_w )
 	multipcm_set_bank(device, 0x100000 * (data & 3), 0x100000 * (data & 3));
 }
 
-static WRITE16_HANDLER( m1_snd_68k_latch1_w )
+WRITE16_MEMBER(model1_state::m1_snd_68k_latch1_w)
 {
 }
 
-static WRITE16_HANDLER( m1_snd_68k_latch2_w )
+WRITE16_MEMBER(model1_state::m1_snd_68k_latch2_w)
 {
 }
 
 static ADDRESS_MAP_START( model1_snd, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
-	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE_LEGACY(m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
-	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE_LEGACY(m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
+	AM_RANGE(0xc20000, 0xc20001) AM_READWRITE(m1_snd_68k_latch_r, m1_snd_68k_latch1_w )
+	AM_RANGE(0xc20002, 0xc20003) AM_READWRITE(m1_snd_v60_ready_r, m1_snd_68k_latch2_w )
 	AM_RANGE(0xc40000, 0xc40007) AM_DEVREADWRITE8_LEGACY("sega1", multipcm_r, multipcm_w, 0x00ff )
 	AM_RANGE(0xc40012, 0xc40013) AM_WRITENOP
 	AM_RANGE(0xc50000, 0xc50001) AM_DEVWRITE_LEGACY("sega1", m1_snd_mpcm_bnk_w )

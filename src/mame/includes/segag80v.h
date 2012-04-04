@@ -24,6 +24,16 @@ public:
 	size_t m_vectorram_size;
 	int m_min_x;
 	int m_min_y;
+	DECLARE_WRITE8_MEMBER(mainram_w);
+	DECLARE_WRITE8_MEMBER(vectorram_w);
+	DECLARE_READ8_MEMBER(mangled_ports_r);
+	DECLARE_WRITE8_MEMBER(spinner_select_w);
+	DECLARE_READ8_MEMBER(spinner_input_r);
+	DECLARE_READ8_MEMBER(elim4_input_r);
+	DECLARE_WRITE8_MEMBER(multiply_w);
+	DECLARE_READ8_MEMBER(multiply_r);
+	DECLARE_WRITE8_MEMBER(coin_count_w);
+	DECLARE_WRITE8_MEMBER(unknown_w);
 };
 
 

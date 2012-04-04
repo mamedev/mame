@@ -320,23 +320,22 @@ TODO:
 
 
 
-static WRITE8_HANDLER( welltris_sh_bankswitch_w )
+WRITE8_MEMBER(welltris_state::welltris_sh_bankswitch_w)
 {
-	UINT8 *rom = space->machine().region("audiocpu")->base() + 0x10000;
+	UINT8 *rom = machine().region("audiocpu")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine(), "bank1",rom + (data & 0x03) * 0x8000);
+	memory_set_bankptr(machine(), "bank1",rom + (data & 0x03) * 0x8000);
 }
 
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(welltris_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		welltris_state *state = space->machine().driver_data<welltris_state>();
 
-		state->m_pending_command = 1;
+		m_pending_command = 1;
 		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -346,11 +345,10 @@ static CUSTOM_INPUT( pending_sound_r )
 	return state->m_pending_command ? 1 : 0;
 }
 
-static WRITE8_HANDLER( pending_command_clear_w )
+WRITE8_MEMBER(welltris_state::pending_command_clear_w)
 {
-	welltris_state *state = space->machine().driver_data<welltris_state>();
 
-	state->m_pending_command = 0;
+	m_pending_command = 0;
 }
 
 
@@ -370,7 +368,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0xfff004, 0xfff007) AM_WRITE_LEGACY(welltris_scrollreg_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("P4")					/* Right Side Ctrls */
 	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("SYSTEM")				/* Bit 5 Tested at start of irq 1 */
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("EXTRA")				/* P3+P4 Coin + Start Buttons */
 	AM_RANGE(0xfff00c, 0xfff00d) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITENOP					/* ?? */
@@ -386,10 +384,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, welltris_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(welltris_sh_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(welltris_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x10, 0x10) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0x18, 0x18) AM_WRITE_LEGACY(pending_command_clear_w)
+	AM_RANGE(0x18, 0x18) AM_WRITE(pending_command_clear_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( welltris )

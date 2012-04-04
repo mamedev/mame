@@ -124,27 +124,26 @@ static CUSTOM_INPUT( sound_latch_state_r )
 }
 
 
-static WRITE16_HANDLER( eeprom_control_w )
+WRITE16_MEMBER(dcheese_state::eeprom_control_w)
 {
 	/* toggles bit $0100 very frequently while waiting for things */
 	/* bits $0080-$0010 are probably lamps */
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
-		ticket_dispenser_w(space->machine().device("ticket"), 0, (data & 1) << 7);
+		input_port_write(machine(), "EEPROMOUT", data, 0xff);
+		ticket_dispenser_w(machine().device("ticket"), 0, (data & 1) << 7);
 	}
 }
 
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(dcheese_state::sound_command_w)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* write the latch and set the IRQ */
-		state->m_soundlatch_full = 1;
-		device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
+		m_soundlatch_full = 1;
+		device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
 		soundlatch_w(space, 0, data & 0xff);
 	}
 }
@@ -157,53 +156,50 @@ static WRITE16_HANDLER( sound_command_w )
  *
  *************************************/
 
-static READ8_HANDLER( sound_command_r )
+READ8_MEMBER(dcheese_state::sound_command_r)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 
 	/* read the latch and clear the IRQ */
-	state->m_soundlatch_full = 0;
-	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
+	m_soundlatch_full = 0;
+	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
 	return soundlatch_r(space, 0);
 }
 
 
-static READ8_HANDLER( sound_status_r )
+READ8_MEMBER(dcheese_state::sound_status_r)
 {
 	/* seems to be ready signal on BSMT or latching hardware */
-	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
+	bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
 	return bsmt->read_status() << 7;
 }
 
 
-static WRITE8_HANDLER( sound_control_w )
+WRITE8_MEMBER(dcheese_state::sound_control_w)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
-	UINT8 diff = data ^ state->m_sound_control;
-	state->m_sound_control = data;
+	UINT8 diff = data ^ m_sound_control;
+	m_sound_control = data;
 
 	/* bit 0x20 = LED */
 	/* bit 0x40 = BSMT2000 reset */
 	if ((diff & 0x40) && (data & 0x40))
-		state->m_bsmt->reset();
+		m_bsmt->reset();
 	if (data != 0x40 && data != 0x60)
-		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(&space->device()), data);
+		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(&space.device()), data);
 }
 
 
-static WRITE8_HANDLER( bsmt_data_w )
+WRITE8_MEMBER(dcheese_state::bsmt_data_w)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
-	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
+	bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
 
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if (offset % 2 == 0)
 	{
 		bsmt->write_reg(offset / 2);
-		state->m_sound_msb_latch = data;
+		m_sound_msb_latch = data;
 	}
 	else
-		bsmt->write_data((state->m_sound_msb_latch << 8) | data);
+		bsmt->write_data((m_sound_msb_latch << 8) | data);
 }
 
 
@@ -220,11 +216,11 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16, dcheese_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("200000") AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("220000") AM_WRITE_LEGACY(madmax_blitter_color_w)
-	AM_RANGE(0x240000, 0x240001) AM_READ_PORT("240000") AM_WRITE_LEGACY(eeprom_control_w)
+	AM_RANGE(0x240000, 0x240001) AM_READ_PORT("240000") AM_WRITE(eeprom_control_w)
 	AM_RANGE(0x260000, 0x26001f) AM_WRITE_LEGACY(madmax_blitter_xparam_w)
 	AM_RANGE(0x280000, 0x28001f) AM_WRITE_LEGACY(madmax_blitter_yparam_w)
 	AM_RANGE(0x2a0000, 0x2a003f) AM_READWRITE_LEGACY(madmax_blitter_vidparam_r, madmax_blitter_vidparam_w)
-	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(sound_command_w)
 	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(madmax_blitter_unknown_w)
 ADDRESS_MAP_END
 
@@ -238,9 +234,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, dcheese_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(sound_status_r, sound_control_w)
-	AM_RANGE(0x0800, 0x0fff) AM_READ_LEGACY(sound_command_r)
-	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0700) AM_WRITE_LEGACY(bsmt_data_w)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sound_status_r, sound_control_w)
+	AM_RANGE(0x0800, 0x0fff) AM_READ(sound_command_r)
+	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0700) AM_WRITE(bsmt_data_w)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0xffff) AM_ROM
 ADDRESS_MAP_END

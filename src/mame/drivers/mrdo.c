@@ -32,10 +32,10 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 
 /* this looks like some kind of protection. The game doesn't clear the screen */
 /* if a read from this address doesn't return the value it expects. */
-static READ8_HANDLER( mrdo_SECRE_r )
+READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
-	return RAM[cpu_get_reg(&space->device(), Z80_HL)];
+	UINT8 *RAM = machine().region("maincpu")->base();
+	return RAM[cpu_get_reg(&space.device(), Z80_HL)];
 }
 
 
@@ -48,7 +48,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mrdo_state )
 	AM_RANGE(0x9800, 0x9800) AM_WRITE_LEGACY(mrdo_flipscreen_w)	/* screen flip + playfield priority */
 	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0x9802, 0x9802) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
-	AM_RANGE(0x9803, 0x9803) AM_READ_LEGACY(mrdo_SECRE_r)
+	AM_RANGE(0x9803, 0x9803) AM_READ(mrdo_SECRE_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("DSW1")

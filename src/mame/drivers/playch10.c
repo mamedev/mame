@@ -307,48 +307,44 @@ Notes & Todo:
 /******************************************************************************/
 
 
-static WRITE8_HANDLER( up8w_w )
+WRITE8_MEMBER(playch10_state::up8w_w)
 {
-	playch10_state *state = space->machine().driver_data<playch10_state>();
-	state->m_up_8w = data & 1;
+	m_up_8w = data & 1;
 }
 
-static READ8_HANDLER( ram_8w_r )
+READ8_MEMBER(playch10_state::ram_8w_r)
 {
-	playch10_state *state = space->machine().driver_data<playch10_state>();
-	if ( offset >= 0x400 && state->m_up_8w )
-		return state->m_ram_8w[offset];
+	if ( offset >= 0x400 && m_up_8w )
+		return m_ram_8w[offset];
 
-	return state->m_ram_8w[offset & 0x3ff];
+	return m_ram_8w[offset & 0x3ff];
 }
 
-static WRITE8_HANDLER( ram_8w_w )
+WRITE8_MEMBER(playch10_state::ram_8w_w)
 {
-	playch10_state *state = space->machine().driver_data<playch10_state>();
-	if ( offset >= 0x400 && state->m_up_8w )
-		state->m_ram_8w[offset] = data;
+	if ( offset >= 0x400 && m_up_8w )
+		m_ram_8w[offset] = data;
 	else
-		state->m_ram_8w[offset & 0x3ff] = data;
+		m_ram_8w[offset & 0x3ff] = data;
 }
 
-static WRITE8_HANDLER( sprite_dma_w )
+WRITE8_MEMBER(playch10_state::sprite_dma_w)
 {
 	int source = ( data & 7 );
-	ppu2c0x_device *ppu = space->machine().device<ppu2c0x_device>("ppu");
-	ppu->spriteram_dma(space, source);
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
+	ppu->spriteram_dma(&space, source);
 }
 
 /* Only used in single monitor bios */
 
-static WRITE8_HANDLER( time_w )
+WRITE8_MEMBER(playch10_state::time_w)
 {
-	playch10_state *state = space->machine().driver_data<playch10_state>();
 	if(data == 0xf)
 		data = 0;
 
-	state->m_timedata[offset] = data;
+	m_timedata[offset] = data;
 
-	popmessage("Time: %d%d%d%d",state->m_timedata[3],state->m_timedata[2],state->m_timedata[1],state->m_timedata[0]);
+	popmessage("Time: %d%d%d%d",m_timedata[3],m_timedata[2],m_timedata[1],m_timedata[0]);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -372,7 +368,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	// 8V
-	AM_RANGE(0x8800, 0x8fff) AM_READWRITE_LEGACY(ram_8w_r, ram_8w_w) AM_BASE(m_ram_8w)	// 8W
+	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_BASE(m_ram_8w)	// 8W
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE_LEGACY(playch10_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE_LEGACY(pc10_prot_r, pc10_prot_w)
@@ -391,8 +387,8 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, playch10_state )
 	AM_RANGE(0x09, 0x09) AM_WRITE_LEGACY(pc10_DOGDI_w)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(pc10_PPURES_w)
 	AM_RANGE(0x0b, 0x0e) AM_WRITE_LEGACY(pc10_CARTSEL_w)
-	AM_RANGE(0x0f, 0x0f) AM_WRITE_LEGACY(up8w_w)
-	AM_RANGE(0x10, 0x13) AM_WRITE_LEGACY(time_w) AM_BASE(m_timedata)
+	AM_RANGE(0x0f, 0x0f) AM_WRITE(up8w_w)
+	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_BASE(m_timedata)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
@@ -400,7 +396,7 @@ static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
 	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)
-	AM_RANGE(0x4014, 0x4014) AM_WRITE_LEGACY(sprite_dma_w)
+	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nes", psg_4015_r, psg_4015_w)  /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE_LEGACY(pc10_in0_r, pc10_in0_w)
 	AM_RANGE(0x4017, 0x4017) AM_READ_LEGACY(pc10_in1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w) /* IN1 - input port 2 / PSG second control register */

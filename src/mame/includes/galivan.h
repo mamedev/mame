@@ -30,6 +30,15 @@ public:
 
 	UINT8       m_shift_scroll; //youmab
 	UINT32		m_shift_val;
+	DECLARE_WRITE8_MEMBER(galivan_sound_command_w);
+	DECLARE_READ8_MEMBER(soundlatch_clear_r);
+	DECLARE_READ8_MEMBER(IO_port_c0_r);
+	DECLARE_WRITE8_MEMBER(blit_trigger_w);
+	DECLARE_WRITE8_MEMBER(youmab_extra_bank_w);
+	DECLARE_READ8_MEMBER(youmab_8a_r);
+	DECLARE_WRITE8_MEMBER(youmab_81_w);
+	DECLARE_WRITE8_MEMBER(youmab_84_w);
+	DECLARE_WRITE8_MEMBER(youmab_86_w);
 };
 
 

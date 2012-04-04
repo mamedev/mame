@@ -104,31 +104,30 @@ static UINT8 iox_key_matrix_calc(running_machine &machine, UINT8 p_side)
 	return 0;
 }
 
-static READ8_HANDLER( key_matrix_r )
+READ8_MEMBER(speedatk_state::key_matrix_r)
 {
-	speedatk_state *state = space->machine().driver_data<speedatk_state>();
 
-	if(state->m_coin_impulse > 0)
+	if(m_coin_impulse > 0)
 	{
-		state->m_coin_impulse--;
+		m_coin_impulse--;
 		return 0x80;
 	}
 
-	if((input_port_read(space->machine(),"COINS") & 1) || (input_port_read(space->machine(),"COINS") & 2))
+	if((input_port_read(machine(),"COINS") & 1) || (input_port_read(machine(),"COINS") & 2))
 	{
-		state->m_coin_impulse = state->m_coin_settings;
-		state->m_coin_impulse--;
+		m_coin_impulse = m_coin_settings;
+		m_coin_impulse--;
 		return 0x80;
 	}
 
-	if(state->m_mux_data != 1 && state->m_mux_data != 2 && state->m_mux_data != 4)
+	if(m_mux_data != 1 && m_mux_data != 2 && m_mux_data != 4)
 		return 0xff; //unknown command
 
 	/* both side checks */
-	if(state->m_mux_data == 1)
+	if(m_mux_data == 1)
 	{
-		UINT8 p1_side = iox_key_matrix_calc(space->machine(),0);
-		UINT8 p2_side = iox_key_matrix_calc(space->machine(),2);
+		UINT8 p1_side = iox_key_matrix_calc(machine(),0);
+		UINT8 p2_side = iox_key_matrix_calc(machine(),2);
 
 		if(p1_side != 0)
 			return p1_side;
@@ -137,23 +136,21 @@ static READ8_HANDLER( key_matrix_r )
 	}
 
 	/* check individual input side */
-	return iox_key_matrix_calc(space->machine(),(state->m_mux_data == 2) ? 0 : 2);
+	return iox_key_matrix_calc(machine(),(m_mux_data == 2) ? 0 : 2);
 }
 
-static WRITE8_HANDLER( key_matrix_w )
+WRITE8_MEMBER(speedatk_state::key_matrix_w)
 {
-	speedatk_state *state = space->machine().driver_data<speedatk_state>();
 
-	state->m_mux_data = data;
+	m_mux_data = data;
 }
 
 /* Key matrix status,used for coin settings and I don't know what else... */
-static READ8_HANDLER( key_matrix_status_r )
+READ8_MEMBER(speedatk_state::key_matrix_status_r)
 {
-	speedatk_state *state = space->machine().driver_data<speedatk_state>();
 
 	/* bit 0: busy flag,active low */
-	return (state->m_km_status & 0xfe) | 1;
+	return (m_km_status & 0xfe) | 1;
 }
 
 /*
@@ -167,19 +164,18 @@ My guess is that the other commands configs the key matrix, it probably needs so
 8x coinage setting command
 a1
 */
-static WRITE8_HANDLER( key_matrix_status_w )
+WRITE8_MEMBER(speedatk_state::key_matrix_status_w)
 {
-	speedatk_state *state = space->machine().driver_data<speedatk_state>();
 
-	state->m_km_status = data;
-	if((state->m_km_status & 0xf0) == 0x80) //coinage setting command
-		state->m_coin_settings = state->m_km_status & 0xf;
+	m_km_status = data;
+	if((m_km_status & 0xf0) == 0x80) //coinage setting command
+		m_coin_settings = m_km_status & 0xf;
 }
 
 static ADDRESS_MAP_START( speedatk_mem, AS_PROGRAM, 8, speedatk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE_LEGACY(key_matrix_r,key_matrix_w)
-	AM_RANGE(0x8001, 0x8001) AM_READWRITE_LEGACY(key_matrix_status_r,key_matrix_status_w)
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(key_matrix_r,key_matrix_w)
+	AM_RANGE(0x8001, 0x8001) AM_READWRITE(key_matrix_status_r,key_matrix_status_w)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(speedatk_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE_LEGACY(speedatk_colorram_w) AM_BASE(m_colorram)

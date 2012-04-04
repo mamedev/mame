@@ -36,6 +36,9 @@ public:
 	UINT16 m_beam_state;
 	UINT16 m_old_beam_state;
 	UINT16 m_beam_states_per_frame;
+	DECLARE_READ8_MEMBER(vert_pos_r);
+	DECLARE_READ8_MEMBER(horiz_pos_r);
+	DECLARE_WRITE8_MEMBER(stactics_coin_lockout_w);
 };
 
 

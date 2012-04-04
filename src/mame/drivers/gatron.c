@@ -240,7 +240,7 @@
 *    Read/Write Handlers    *
 ****************************/
 
-static WRITE8_HANDLER( output_port_0_w )
+WRITE8_MEMBER(gatron_state::output_port_0_w)
 {
 /*  ---------------
     Pull Tabs lamps
@@ -342,7 +342,7 @@ static ADDRESS_MAP_START( gat_map, AS_PROGRAM, 8, gatron_state )
 	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE_LEGACY(gat_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)							/* PSG */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(output_port_0_w)										/* lamps */
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(output_port_0_w)										/* lamps */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gat_portmap, AS_IO, 8, gatron_state )

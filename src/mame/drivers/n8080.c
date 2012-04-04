@@ -17,22 +17,19 @@
 #define MASTER_CLOCK	XTAL_20_16MHz
 
 
-static WRITE8_HANDLER( n8080_shift_bits_w )
+WRITE8_MEMBER(n8080_state::n8080_shift_bits_w)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	state->m_shift_bits = data & 7;
+	m_shift_bits = data & 7;
 }
-static WRITE8_HANDLER( n8080_shift_data_w )
+WRITE8_MEMBER(n8080_state::n8080_shift_data_w)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	state->m_shift_data = (state->m_shift_data >> 8) | (data << 8);
+	m_shift_data = (m_shift_data >> 8) | (data << 8);
 }
 
 
-static READ8_HANDLER( n8080_shift_r )
+READ8_MEMBER(n8080_state::n8080_shift_r)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	return state->m_shift_data >> (8 - state->m_shift_bits);
+	return m_shift_data >> (8 - m_shift_bits);
 }
 
 static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, n8080_state )
@@ -53,11 +50,11 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, n8080_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(n8080_shift_r)
+	AM_RANGE(0x03, 0x03) AM_READ(n8080_shift_r)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN3")
 
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(n8080_shift_bits_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(n8080_shift_data_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(n8080_shift_bits_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(n8080_shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(n8080_sound_1_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(n8080_sound_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(n8080_video_control_w)

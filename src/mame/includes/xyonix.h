@@ -11,6 +11,9 @@ public:
 	int m_credits;
 	int m_coins;
 	int m_prev_coin;
+	DECLARE_WRITE8_MEMBER(xyonix_irqack_w);
+	DECLARE_READ8_MEMBER(xyonix_io_r);
+	DECLARE_WRITE8_MEMBER(xyonix_io_w);
 };
 
 

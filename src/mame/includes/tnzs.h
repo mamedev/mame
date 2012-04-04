@@ -52,6 +52,9 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_subcpu;
 	device_t *m_mcu;
+	DECLARE_WRITE8_MEMBER(tnzsb_sound_command_w);
+	DECLARE_WRITE8_MEMBER(jpopnics_palette_w);
+	DECLARE_WRITE8_MEMBER(jpopnics_subbankswitch_w);
 };
 
 

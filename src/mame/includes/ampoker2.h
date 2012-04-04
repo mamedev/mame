@@ -6,6 +6,14 @@ public:
 
 	UINT8 *m_videoram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(ampoker2_port30_w);
+	DECLARE_WRITE8_MEMBER(ampoker2_port31_w);
+	DECLARE_WRITE8_MEMBER(ampoker2_port32_w);
+	DECLARE_WRITE8_MEMBER(ampoker2_port33_w);
+	DECLARE_WRITE8_MEMBER(ampoker2_port34_w);
+	DECLARE_WRITE8_MEMBER(ampoker2_port35_w);
+	DECLARE_WRITE8_MEMBER(ampoker2_port36_w);
+	DECLARE_WRITE8_MEMBER(ampoker2_watchdog_reset_w);
 };
 
 

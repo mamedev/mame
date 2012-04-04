@@ -22,6 +22,17 @@ public:
 	int        m_spinner;
 	int        m_nmi_en;
 	int        m_ff_data;
+	DECLARE_WRITE8_MEMBER(flipscreen_w);
+	DECLARE_WRITE8_MEMBER(coin_w);
+	DECLARE_WRITE8_MEMBER(spinner_select_w);
+	DECLARE_READ8_MEMBER(spinner_r);
+	DECLARE_WRITE8_MEMBER(pbillrd_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(oigas_5_w);
+	DECLARE_READ8_MEMBER(oigas_3_r);
+	DECLARE_READ8_MEMBER(oigas_2_r);
+	DECLARE_READ8_MEMBER(freekick_ff_r);
+	DECLARE_WRITE8_MEMBER(freekick_ff_w);
 };
 
 

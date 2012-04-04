@@ -353,42 +353,39 @@ static INTERRUPT_GEN(psikyosh_interrupt)
 
 // VBL handler writes 0x00 on entry, 0xc0 on exit
 // bit 0 controls game speed on readback, mechanism is a little weird
-static WRITE32_HANDLER( psikyosh_irqctrl_w )
+WRITE32_MEMBER(psikyosh_state::psikyosh_irqctrl_w)
 {
-	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
 	if (!(data & 0x00c00000))
 	{
-		device_set_input_line(state->m_maincpu, 4, CLEAR_LINE);
+		device_set_input_line(m_maincpu, 4, CLEAR_LINE);
 	}
 }
 
-static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
+WRITE32_MEMBER(psikyosh_state::paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w)
 {
-	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
 	int r, g, b;
-	COMBINE_DATA(&state->m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 
-	b = ((state->m_paletteram[offset] & 0x0000ff00) >>8);
-	g = ((state->m_paletteram[offset] & 0x00ff0000) >>16);
-	r = ((state->m_paletteram[offset] & 0xff000000) >>24);
+	b = ((m_paletteram[offset] & 0x0000ff00) >>8);
+	g = ((m_paletteram[offset] & 0x00ff0000) >>16);
+	r = ((m_paletteram[offset] & 0xff000000) >>24);
 
-	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
 }
 
-static WRITE32_HANDLER( psikyosh_vidregs_w )
+WRITE32_MEMBER(psikyosh_state::psikyosh_vidregs_w)
 {
-	psikyosh_state *state = space->machine().driver_data<psikyosh_state>();
-	COMBINE_DATA(&state->m_vidregs[offset]);
+	COMBINE_DATA(&m_vidregs[offset]);
 
 	if (offset == 4) /* Configure bank for gfx test */
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
-			memory_set_bank(space->machine(), "bank2", state->m_vidregs[offset] & 0xfff);
+			memory_set_bank(machine(), "bank2", m_vidregs[offset] & 0xfff);
 	}
 }
 
 /* Mahjong Panel */
-static READ32_HANDLER( mjgtaste_input_r )
+READ32_MEMBER(psikyosh_state::mjgtaste_input_r)
 {
 /*
 Mahjong keyboard encoder -> JAMMA adapter (SK-G001). Created to allow the use of a Mahjong panel with the existing, recycled Dragon Blaze boards.
@@ -440,8 +437,8 @@ P1KEY11  29|30  P2KEY11
     GND  55|56  GND
 */
 
-	UINT32 controls = input_port_read(space->machine(), "CONTROLLER");
-	UINT32 value = input_port_read(space->machine(), "INPUTS");
+	UINT32 controls = input_port_read(machine(), "CONTROLLER");
+	UINT32 value = input_port_read(machine(), "INPUTS");
 
 	if(controls) {
 		// Clearly has ghosting, game will only recognise one key depressed at once, and keyboard can only represent keys with distinct rows and columns
@@ -486,7 +483,7 @@ P1KEY11  29|30  P2KEY11
 			KEY11 | KEY6, // Ron
 			KEY1 | KEY3   // Start
 		}; // generic Mahjong keyboard encoder, corresponds to ordering in input port
-		UINT32 keys = input_port_read(space->machine(), "MAHJONG");
+		UINT32 keys = input_port_read(machine(), "MAHJONG");
 		UINT32 which_key = 0x1;
 		int count = 0;
 
@@ -518,10 +515,10 @@ static ADDRESS_MAP_START( ps3v1_map, AS_PROGRAM, 32, psikyosh_state )
 // video chip
 	AM_RANGE(0x03000000, 0x03003fff) AM_RAM AM_SHARE("spriteram") // video banks0-7 (sprites and sprite list)
 	AM_RANGE(0x03004000, 0x0300ffff) AM_RAM AM_BASE(m_bgram) // video banks 7-0x1f (backgrounds and other effects)
-	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE_LEGACY(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(m_paletteram) // palette..
+	AM_RANGE(0x03040000, 0x03044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(m_paletteram) // palette..
 	AM_RANGE(0x03050000, 0x030501ff) AM_RAM AM_BASE(m_zoomram) // sprite zoom lookup table
-	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP AM_WRITE_LEGACY(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
-	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE_LEGACY(psikyosh_vidregs_w) AM_BASE(m_vidregs) //  video registers
+	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
+	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE(m_vidregs) //  video registers
 	AM_RANGE(0x03060000, 0x0307ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx) (Mirrored?)
@@ -546,10 +543,10 @@ static ADDRESS_MAP_START( ps5_map, AS_PROGRAM, 32, psikyosh_state )
 // video chip
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("spriteram") // video banks0-7 (sprites and sprite list)
 	AM_RANGE(0x04004000, 0x0400ffff) AM_RAM AM_BASE(m_bgram) // video banks 7-0x1f (backgrounds and other effects)
-	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE_LEGACY(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(m_paletteram)
+	AM_RANGE(0x04040000, 0x04044fff) AM_RAM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x04050000, 0x040501ff) AM_RAM AM_BASE(m_zoomram) // sprite zoom lookup table
-	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE_LEGACY(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
-	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE_LEGACY(psikyosh_vidregs_w) AM_BASE(m_vidregs) // video registers
+	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_READNOP AM_WRITE(psikyosh_irqctrl_w) // also writes to this address - might be vblank reads?
+	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_RAM_WRITE(psikyosh_vidregs_w) AM_BASE(m_vidregs) // video registers
 	AM_RANGE(0x04060000, 0x0407ffff) AM_ROMBANK("bank2") // data for rom tests (gfx), data is controlled by vidreg
 // rom mapping
 	AM_RANGE(0x05000000, 0x0507ffff) AM_ROMBANK("bank1") // data ROM
@@ -1264,7 +1261,8 @@ static DRIVER_INIT( mjgtaste )
 {
 	sh2drc_set_options(machine.device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x03000000, 0x03000003, FUNC(mjgtaste_input_r));
+	psikyosh_state *state = machine.driver_data<psikyosh_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x03000000, 0x03000003, read32_delegate(FUNC(psikyosh_state::mjgtaste_input_r),state));
 }
 
 

@@ -33,6 +33,12 @@ public:
 	device_t *m_filter1;
 	device_t *m_filter2;
 	device_t *m_filter3;
+	DECLARE_WRITE8_MEMBER(ddribble_bankswitch_w);
+	DECLARE_READ8_MEMBER(ddribble_sharedram_r);
+	DECLARE_WRITE8_MEMBER(ddribble_sharedram_w);
+	DECLARE_READ8_MEMBER(ddribble_snd_sharedram_r);
+	DECLARE_WRITE8_MEMBER(ddribble_snd_sharedram_w);
+	DECLARE_WRITE8_MEMBER(ddribble_coin_counter_w);
 };
 
 /*----------- defined in video/ddribble.c -----------*/

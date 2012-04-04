@@ -278,157 +278,154 @@ Notes:
                         GAME INPUTS
 **********************************************************/
 
-static WRITE16_HANDLER( growl_coin_word_w )	/* what about coins 3&4 ?? */
+WRITE16_MEMBER(taitof2_state::growl_coin_word_w)/* what about coins 3&4 ?? */
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(space->machine(), 0, ~data & 0x01);
-		coin_lockout_w(space->machine(), 1, ~data & 0x02);
-		coin_counter_w(space->machine(), 0,  data & 0x04);
-		coin_counter_w(space->machine(), 1,  data & 0x08);
+		coin_lockout_w(machine(), 0, ~data & 0x01);
+		coin_lockout_w(machine(), 1, ~data & 0x02);
+		coin_counter_w(machine(), 0,  data & 0x04);
+		coin_counter_w(machine(), 1,  data & 0x08);
 	}
 }
 
-static WRITE16_HANDLER( taitof2_4p_coin_word_w )
+WRITE16_MEMBER(taitof2_state::taitof2_4p_coin_word_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(space->machine(), 0, ~data & 0x01);
-		coin_lockout_w(space->machine(), 1, ~data & 0x02);
-		coin_lockout_w(space->machine(), 2, ~data & 0x04);
-		coin_lockout_w(space->machine(), 3, ~data & 0x08);
-		coin_counter_w(space->machine(), 0,  data & 0x10);
-		coin_counter_w(space->machine(), 1,  data & 0x20);
-		coin_counter_w(space->machine(), 2,  data & 0x40);
-		coin_counter_w(space->machine(), 3,  data & 0x80);
+		coin_lockout_w(machine(), 0, ~data & 0x01);
+		coin_lockout_w(machine(), 1, ~data & 0x02);
+		coin_lockout_w(machine(), 2, ~data & 0x04);
+		coin_lockout_w(machine(), 3, ~data & 0x08);
+		coin_counter_w(machine(), 0,  data & 0x10);
+		coin_counter_w(machine(), 1,  data & 0x20);
+		coin_counter_w(machine(), 2,  data & 0x40);
+		coin_counter_w(machine(), 3,  data & 0x80);
 	}
 }
 
-static WRITE16_HANDLER( ninjak_coin_word_w )
+WRITE16_MEMBER(taitof2_state::ninjak_coin_word_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_lockout_w(space->machine(), 0, ~data & 0x0100);
-		coin_lockout_w(space->machine(), 1, ~data & 0x0200);
-		coin_lockout_w(space->machine(), 2, ~data & 0x0400);
-		coin_lockout_w(space->machine(), 3, ~data & 0x0800);
-		coin_counter_w(space->machine(), 0,  data & 0x1000);
-		coin_counter_w(space->machine(), 1,  data & 0x2000);
-		coin_counter_w(space->machine(), 2,  data & 0x4000);
-		coin_counter_w(space->machine(), 3,  data & 0x8000);
+		coin_lockout_w(machine(), 0, ~data & 0x0100);
+		coin_lockout_w(machine(), 1, ~data & 0x0200);
+		coin_lockout_w(machine(), 2, ~data & 0x0400);
+		coin_lockout_w(machine(), 3, ~data & 0x0800);
+		coin_counter_w(machine(), 0,  data & 0x1000);
+		coin_counter_w(machine(), 1,  data & 0x2000);
+		coin_counter_w(machine(), 2,  data & 0x4000);
+		coin_counter_w(machine(), 3,  data & 0x8000);
 	}
 }
 
-static READ16_HANDLER( ninjak_input_r )
+READ16_MEMBER(taitof2_state::ninjak_input_r)
 {
 	switch (offset)
 	{
 		case 0x00:
-			return (input_port_read(space->machine(), "DSWA") << 8);
+			return (input_port_read(machine(), "DSWA") << 8);
 
 		case 0x01:
-			return (input_port_read(space->machine(), "DSWB") << 8);
+			return (input_port_read(machine(), "DSWB") << 8);
 
 		case 0x02:
-			return (input_port_read(space->machine(), "IN0") << 8);
+			return (input_port_read(machine(), "IN0") << 8);
 
 		case 0x03:
-			return (input_port_read(space->machine(), "IN1") << 8);
+			return (input_port_read(machine(), "IN1") << 8);
 
 		case 0x04:
-			return (input_port_read(space->machine(), "IN3") << 8);
+			return (input_port_read(machine(), "IN3") << 8);
 
 		case 0x05:
-			return (input_port_read(space->machine(), "IN4") << 8);
+			return (input_port_read(machine(), "IN4") << 8);
 
 		case 0x06:
-			return (input_port_read(space->machine(), "IN2") << 8);
+			return (input_port_read(machine(), "IN2") << 8);
 
 //      case 0x07:
 //          return (coin_word & mem_mask);
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", cpu_get_pc(&space->device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", cpu_get_pc(&space.device()), offset);
 
 	return 0xff;
 }
 
-static READ16_HANDLER( cameltry_paddle_r )
+READ16_MEMBER(taitof2_state::cameltry_paddle_r)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 	int curr, res = 0xff;
 
 	switch (offset)
 	{
 		case 0x00:
-			curr = input_port_read(space->machine(), "PADDLE1");
-			res = curr - state->m_last[0];
-			state->m_last[0] = curr;
+			curr = input_port_read(machine(), "PADDLE1");
+			res = curr - m_last[0];
+			m_last[0] = curr;
 			return res;
 
 		case 0x02:
-			curr = input_port_read(space->machine(), "PADDLE2");
-			res = curr - state->m_last[1];
-			state->m_last[1] = curr;
+			curr = input_port_read(machine(), "PADDLE2");
+			res = curr - m_last[1];
+			m_last[1] = curr;
 			return res;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", cpu_get_pc(&space->device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", cpu_get_pc(&space.device()), offset);
 
 	return 0;
 }
 
-static READ16_HANDLER( mjnquest_dsw_r )
+READ16_MEMBER(taitof2_state::mjnquest_dsw_r)
 {
 	switch (offset)
 	{
 		case 0x00:
 		{
-			return (input_port_read(space->machine(), "IN5") << 8) + input_port_read(space->machine(), "DSWA");	/* DSW A + coin */
+			return (input_port_read(machine(), "IN5") << 8) + input_port_read(machine(), "DSWA");	/* DSW A + coin */
 		}
 
 		case 0x01:
 		{
-			return (input_port_read(space->machine(), "IN6") << 8) + input_port_read(space->machine(), "DSWB");	/* DSW B + coin */
+			return (input_port_read(machine(), "IN6") << 8) + input_port_read(machine(), "DSWB");	/* DSW B + coin */
 		}
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", cpu_get_pc(&space->device()), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", cpu_get_pc(&space.device()), offset);
 
 	return 0xff;
 }
 
-static READ16_HANDLER( mjnquest_input_r )
+READ16_MEMBER(taitof2_state::mjnquest_input_r)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
-	switch (state->m_mjnquest_input)
+	switch (m_mjnquest_input)
 	{
 		case 0x01:
-			  return input_port_read(space->machine(), "IN0");
+			  return input_port_read(machine(), "IN0");
 
 		 case 0x02:
-			  return input_port_read(space->machine(), "IN1");
+			  return input_port_read(machine(), "IN1");
 
 		 case 0x04:
-			  return input_port_read(space->machine(), "IN2");
+			  return input_port_read(machine(), "IN2");
 
 		 case 0x08:
-			  return input_port_read(space->machine(), "IN3");
+			  return input_port_read(machine(), "IN3");
 
 		 case 0x10:
-			  return input_port_read(space->machine(), "IN4");
+			  return input_port_read(machine(), "IN4");
 
 	}
 
-	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", cpu_get_pc(&space->device()), state->m_mjnquest_input);
+	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", cpu_get_pc(&space.device()), m_mjnquest_input);
 
 	return 0xff;
 }
 
-static WRITE16_HANDLER( mjnquest_inputselect_w )
+WRITE16_MEMBER(taitof2_state::mjnquest_inputselect_w)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
-	state->m_mjnquest_input = (data >> 6);
+	m_mjnquest_input = (data >> 6);
 }
 
 /******************************************************************
@@ -592,9 +589,9 @@ static INTERRUPT_GEN( taitof2_interrupt )
                             SOUND
 ****************************************************************/
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(taitof2_state::sound_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank2", (data - 1) & 7);
+	memory_set_bank(machine(), "bank2", (data - 1) & 7);
 
 #ifdef MAME_DEBUG
 	if (((data - 1) & 7) > 2)
@@ -603,13 +600,12 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 }
 
 
-static READ8_HANDLER( driveout_sound_command_r)
+READ8_MEMBER(taitof2_state::driveout_sound_command_r)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
-	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
-//  logerror("sound IRQ OFF (sound command=%02x)\n", state->m_driveout_sound_latch);
-	return state->m_driveout_sound_latch;
+	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
+//  logerror("sound IRQ OFF (sound command=%02x)\n", m_driveout_sound_latch);
+	return m_driveout_sound_latch;
 }
 
 
@@ -619,38 +615,36 @@ static void reset_driveout_sound_region( running_machine &machine )
 	state->m_oki->set_bank_base(state->m_oki_bank * 0x40000);
 }
 
-static WRITE8_HANDLER( oki_bank_w )
+WRITE8_MEMBER(taitof2_state::oki_bank_w)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
-	if ((data & 4) && (state->m_oki_bank != (data & 3)) )
+	if ((data & 4) && (m_oki_bank != (data & 3)) )
 	{
-		state->m_oki_bank = (data & 3);
+		m_oki_bank = (data & 3);
 	}
 
-	reset_driveout_sound_region(space->machine());
+	reset_driveout_sound_region(machine());
 }
 
-static WRITE16_HANDLER( driveout_sound_command_w )
+WRITE16_MEMBER(taitof2_state::driveout_sound_command_w)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
 		if (offset == 0)
 		{
-			state->m_nibble = data & 1;
+			m_nibble = data & 1;
 		}
 		else
 		{
-			if (state->m_nibble == 0)
+			if (m_nibble == 0)
 			{
-				state->m_driveout_sound_latch = (data & 0x0f) | (state->m_driveout_sound_latch & 0xf0);
+				m_driveout_sound_latch = (data & 0x0f) | (m_driveout_sound_latch & 0xf0);
 			}
 			else
 			{
-				state->m_driveout_sound_latch = ((data << 4) & 0xf0) | (state->m_driveout_sound_latch & 0x0f);
-				device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
+				m_driveout_sound_latch = ((data << 4) & 0xf0) | (m_driveout_sound_latch & 0x0f);
+				device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
 			}
 		}
 	}
@@ -666,18 +660,16 @@ static WRITE16_HANDLER( driveout_sound_command_w )
 
 ***************************************************************************/
 
-static WRITE16_HANDLER( cchip2_word_w )
+WRITE16_MEMBER(taitof2_state::cchip2_word_w)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
-	logerror("cchip2_w pc: %06x offset %04x: %02x\n", cpu_get_pc(&space->device()), offset, data);
+	logerror("cchip2_w pc: %06x offset %04x: %02x\n", cpu_get_pc(&space.device()), offset, data);
 
-	COMBINE_DATA(&state->m_cchip2_ram[offset]);
+	COMBINE_DATA(&m_cchip2_ram[offset]);
 }
 
-static READ16_HANDLER( cchip2_word_r )
+READ16_MEMBER(taitof2_state::cchip2_word_r)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
 	/* C-Chip ID */
 	if (offset == 0x401)
@@ -685,7 +677,7 @@ static READ16_HANDLER( cchip2_word_r )
 
 	logerror("cchip2_r offset: %04x\n", offset);
 
-	return state->m_cchip2_ram[offset];
+	return m_cchip2_ram[offset];
 }
 
 
@@ -727,7 +719,7 @@ static ADDRESS_MAP_START( megab_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x100002, 0x100003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x120000, 0x12000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
-	AM_RANGE(0x180000, 0x180fff) AM_READWRITE_LEGACY(cchip2_word_r, cchip2_word_w) AM_BASE(m_cchip2_ram)
+	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(cchip2_word_r, cchip2_word_w) AM_BASE(m_cchip2_ram)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x400000, 0x40001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* ?? */
@@ -757,7 +749,7 @@ static ADDRESS_MAP_START( cameltry_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE8_LEGACY("tc0220ioc", tc0220ioc_r, tc0220ioc_w, 0x00ff)
-	AM_RANGE(0x300018, 0x30001f) AM_READ_LEGACY(cameltry_paddle_r)
+	AM_RANGE(0x300018, 0x30001f) AM_READ(cameltry_paddle_r)
 	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x320002, 0x320003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
 	AM_RANGE(0x800000, 0x813fff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_word_r, tc0100scn_word_w)	/* tilemaps */
@@ -798,7 +790,7 @@ static ADDRESS_MAP_START( quizhq_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_word_w)	/* palette */
-	AM_RANGE(0x500004, 0x500005) AM_WRITE_LEGACY(growl_coin_word_w)
+	AM_RANGE(0x500004, 0x500005) AM_WRITE(growl_coin_word_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSWB")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN0")
 	AM_RANGE(0x580000, 0x580001) AM_WRITE_LEGACY(watchdog_reset16_w)	/* ??? */
@@ -846,7 +838,7 @@ static ADDRESS_MAP_START( growl_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300004, 0x300005) AM_WRITE_LEGACY(growl_coin_word_w)
+	AM_RANGE(0x300004, 0x300005) AM_WRITE(growl_coin_word_w)
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN0")
@@ -870,9 +862,9 @@ static ADDRESS_MAP_START( mjnquest_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM   /* "sram" */
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200007) AM_DEVREADWRITE_LEGACY("tc0110pcr", tc0110pcr_word_r, tc0110pcr_word_w)	/* palette */
-	AM_RANGE(0x300000, 0x30000f) AM_READ_LEGACY(mjnquest_dsw_r)
-	AM_RANGE(0x310000, 0x310001) AM_READ_LEGACY(mjnquest_input_r)
-	AM_RANGE(0x320000, 0x320001) AM_WRITE_LEGACY(mjnquest_inputselect_w)
+	AM_RANGE(0x300000, 0x30000f) AM_READ(mjnquest_dsw_r)
+	AM_RANGE(0x310000, 0x310001) AM_READ(mjnquest_input_r)
+	AM_RANGE(0x320000, 0x320001) AM_WRITE(mjnquest_inputselect_w)
 	AM_RANGE(0x330000, 0x330001) AM_WRITENOP   /* watchdog ? */
 	AM_RANGE(0x350000, 0x350001) AM_WRITENOP   /* watchdog ? */
 	AM_RANGE(0x360000, 0x360001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
@@ -892,7 +884,7 @@ static ADDRESS_MAP_START( footchmp_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x430000, 0x43002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_word_r, tc0480scp_ctrl_word_w)
 	AM_RANGE(0x500000, 0x50001f) AM_DEVWRITE8_LEGACY("tc0360pri", tc0360pri_w, 0x00ff)	/* 500002 written like a watchdog?! */
 	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700006, 0x700007) AM_WRITE_LEGACY(taitof2_4p_coin_word_w)
+	AM_RANGE(0x700006, 0x700007) AM_WRITE(taitof2_4p_coin_word_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("IN2")
@@ -937,8 +929,8 @@ static ADDRESS_MAP_START( ninjak_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30000f) AM_READ_LEGACY(ninjak_input_r)
-	AM_RANGE(0x30000e, 0x30000f) AM_WRITE_LEGACY(ninjak_coin_word_w)
+	AM_RANGE(0x300000, 0x30000f) AM_READ(ninjak_input_r)
+	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(ninjak_coin_word_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE_LEGACY(watchdog_reset16_w)	/* ??? */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8_LEGACY("tc0140syt", tc0140syt_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8_LEGACY("tc0140syt", tc0140syt_comm_r, tc0140syt_comm_w, 0xff00)
@@ -953,7 +945,7 @@ static ADDRESS_MAP_START( solfigtr_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300004, 0x300005) AM_WRITE_LEGACY(growl_coin_word_w)	/* NOT VERIFIED */
+	AM_RANGE(0x300004, 0x300005) AM_WRITE(growl_coin_word_w)	/* NOT VERIFIED */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN0")
@@ -1058,7 +1050,7 @@ static ADDRESS_MAP_START( deadconx_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSWB")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("IN2")
-	AM_RANGE(0x700006, 0x700007) AM_WRITE_LEGACY(taitof2_4p_coin_word_w)
+	AM_RANGE(0x700006, 0x700007) AM_WRITE(taitof2_4p_coin_word_w)
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN0")
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
 	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(watchdog_reset16_w)   /* ??? */
@@ -1147,7 +1139,7 @@ ADDRESS_MAP_END
 /* same as driftout, except for sound address 0x200000 */
 static ADDRESS_MAP_START( driveout_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x200003) AM_READNOP AM_WRITE_LEGACY(driveout_sound_command_w)
+	AM_RANGE(0x200000, 0x200003) AM_READNOP AM_WRITE(driveout_sound_command_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("tc0430grw", tc0430grw_word_r, tc0430grw_word_w)	/* ROZ tilemap */
 	AM_RANGE(0x402000, 0x40200f) AM_DEVWRITE_LEGACY("tc0430grw", tc0430grw_ctrl_word_w)
@@ -1175,7 +1167,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taitof2_state )
 	AM_RANGE(0xea00, 0xea00) AM_READNOP
 	AM_RANGE(0xee00, 0xee00) AM_WRITENOP /* ? */
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ? */
-	AM_RANGE(0xf200, 0xf200) AM_WRITE_LEGACY(sound_bankswitch_w)	/* ?? */
+	AM_RANGE(0xf200, 0xf200) AM_WRITE(sound_bankswitch_w)	/* ?? */
 ADDRESS_MAP_END
 
 
@@ -1195,9 +1187,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( driveout_sound_map, AS_PROGRAM, 8, taitof2_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(oki_bank_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(driveout_sound_command_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(driveout_sound_command_r)
 ADDRESS_MAP_END
 
 /***********************************************************

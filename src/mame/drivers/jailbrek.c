@@ -92,13 +92,12 @@ Notes:
 #include "includes/jailbrek.h"
 
 
-static WRITE8_HANDLER( ctrl_w )
+WRITE8_MEMBER(jailbrek_state::ctrl_w)
 {
-	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
 
-	state->m_nmi_enable = data & 0x01;
-	state->m_irq_enable = data & 0x02;
-	flip_screen_set(space->machine(), data & 0x08);
+	m_nmi_enable = data & 0x01;
+	m_irq_enable = data & 0x02;
+	flip_screen_set(machine(), data & 0x08);
 }
 
 static INTERRUPT_GEN( jb_interrupt )
@@ -141,7 +140,7 @@ static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
 	AM_RANGE(0x2041, 0x2041) AM_WRITENOP /* ??? */
 	AM_RANGE(0x2042, 0x2042) AM_RAM AM_BASE(m_scroll_dir) /* bit 2 = scroll direction */
 	AM_RANGE(0x2043, 0x2043) AM_WRITENOP /* ??? */
-	AM_RANGE(0x2044, 0x2044) AM_WRITE_LEGACY(ctrl_w) /* irq, nmi enable, screen flip */
+	AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w) /* irq, nmi enable, screen flip */
 	AM_RANGE(0x3000, 0x307f) AM_RAM /* related to sprites? */
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2") AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
 	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("DSW3") AM_WRITENOP /* mirror of the previous? */

@@ -28,6 +28,10 @@ public:
 	cpu_device *m_audiocpu;
 
 	UINT8      m_irq_mask;
+	DECLARE_READ8_MEMBER(mikie_sh_timer_r);
+	DECLARE_WRITE8_MEMBER(mikie_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(mikie_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 

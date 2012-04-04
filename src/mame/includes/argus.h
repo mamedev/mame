@@ -35,6 +35,7 @@ public:
 	int m_mosaic;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(argus_bankselect_w);
 };
 
 

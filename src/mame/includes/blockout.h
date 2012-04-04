@@ -22,6 +22,9 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(blockout_sound_command_w);
+	DECLARE_WRITE16_MEMBER(blockout_irq6_ack_w);
+	DECLARE_WRITE16_MEMBER(blockout_irq5_ack_w);
 };
 
 

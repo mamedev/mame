@@ -28,12 +28,12 @@ static MACHINE_RESET( clshroad )
 }
 
 
-static READ8_HANDLER( clshroad_input_r )
+READ8_MEMBER(clshroad_state::clshroad_input_r)
 {
-	return	((~input_port_read(space->machine(), "P1") & (1 << offset)) ? 1 : 0) |
-			((~input_port_read(space->machine(), "P2") & (1 << offset)) ? 2 : 0) |
-			((~input_port_read(space->machine(), "DSW1") & (1 << offset)) ? 4 : 0) |
-			((~input_port_read(space->machine(), "DSW2") & (1 << offset)) ? 8 : 0) ;
+	return	((~input_port_read(machine(), "P1") & (1 << offset)) ? 1 : 0) |
+			((~input_port_read(machine(), "P2") & (1 << offset)) ? 2 : 0) |
+			((~input_port_read(machine(), "DSW1") & (1 << offset)) ? 4 : 0) |
+			((~input_port_read(machine(), "DSW2") & (1 << offset)) ? 8 : 0) ;
 }
 
 
@@ -45,7 +45,7 @@ static ADDRESS_MAP_START( clshroad_map, AS_PROGRAM, 8, clshroad_state )
 	AM_RANGE(0x9e00, 0x9fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xa001, 0xa001) AM_WRITENOP	// ? Interrupt related
 	AM_RANGE(0xa004, 0xa004) AM_WRITE_LEGACY(clshroad_flipscreen_w)
-	AM_RANGE(0xa100, 0xa107) AM_READ_LEGACY(clshroad_input_r)
+	AM_RANGE(0xa100, 0xa107) AM_READ(clshroad_input_r)
 	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE_LEGACY(clshroad_vram_1_w) AM_BASE(m_vram_1)	// Layer 1
 	AM_RANGE(0xb000, 0xb003) AM_WRITEONLY AM_BASE(m_vregs)	// Scroll
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(clshroad_vram_0_w) AM_BASE(m_vram_0)	// Layer 0

@@ -41,6 +41,19 @@ public:
 	cpu_device *m_audiocpu;
 	device_t *m_k007121_1;
 	device_t *m_k007121_2;
+	DECLARE_WRITE8_MEMBER(combatsc_vreg_w);
+	DECLARE_WRITE8_MEMBER(combatscb_sh_irqtrigger_w);
+	DECLARE_READ8_MEMBER(combatscb_io_r);
+	DECLARE_WRITE8_MEMBER(combatscb_priority_w);
+	DECLARE_WRITE8_MEMBER(combatsc_bankselect_w);
+	DECLARE_WRITE8_MEMBER(combatscb_io_w);
+	DECLARE_WRITE8_MEMBER(combatscb_bankselect_w);
+	DECLARE_WRITE8_MEMBER(combatsc_coin_counter_w);
+	DECLARE_READ8_MEMBER(trackball_r);
+	DECLARE_WRITE8_MEMBER(protection_w);
+	DECLARE_READ8_MEMBER(protection_r);
+	DECLARE_WRITE8_MEMBER(protection_clock_w);
+	DECLARE_WRITE8_MEMBER(combatsc_sh_irqtrigger_w);
 };
 
 

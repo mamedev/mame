@@ -260,25 +260,24 @@ static void cvs_slave_cpu_interrupt( device_t *cpu, int state )
  *
  *************************************/
 
-static READ8_HANDLER( cvs_input_r )
+READ8_MEMBER(cvs_state::cvs_input_r)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 	UINT8 ret = 0;
 
 	/* the upper 4 bits of the address is used to select the character banking attributes */
-	state->m_character_banking_mode = (offset >> 4) & 0x03;
-	state->m_character_ram_page_start = (offset << 2) & 0x300;
+	m_character_banking_mode = (offset >> 4) & 0x03;
+	m_character_ram_page_start = (offset << 2) & 0x300;
 
 	/* the lower 4 (or 3?) bits select the port to read */
 	switch (offset & 0x0f)	/* might be 0x07 */
 	{
-	case 0x00:  ret = input_port_read(space->machine(), "IN0"); break;
-	case 0x02:  ret = input_port_read(space->machine(), "IN1"); break;
-	case 0x03:  ret = input_port_read(space->machine(), "IN2"); break;
-	case 0x04:  ret = input_port_read(space->machine(), "IN3"); break;
-	case 0x06:  ret = input_port_read(space->machine(), "DSW3"); break;
-	case 0x07:  ret = input_port_read(space->machine(), "DSW2"); break;
-	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", cpu_get_pc(&space->device()), offset & 0x0f); break;
+	case 0x00:  ret = input_port_read(machine(), "IN0"); break;
+	case 0x02:  ret = input_port_read(machine(), "IN1"); break;
+	case 0x03:  ret = input_port_read(machine(), "IN2"); break;
+	case 0x04:  ret = input_port_read(machine(), "IN3"); break;
+	case 0x06:  ret = input_port_read(machine(), "DSW3"); break;
+	case 0x07:  ret = input_port_read(machine(), "DSW2"); break;
+	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", cpu_get_pc(&space.device()), offset & 0x0f); break;
 	}
 
 	return ret;
@@ -292,10 +291,9 @@ static READ8_HANDLER( cvs_input_r )
  *
  *************************************/
 #if 0
-static READ8_HANDLER( cvs_393hz_clock_r )
+READ8_MEMBER(cvs_state::cvs_393hz_clock_r)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
-	return state->m_cvs_393hz_clock ? 0x80 : 0;
+	return m_cvs_393hz_clock ? 0x80 : 0;
 }
 #endif
 
@@ -383,30 +381,27 @@ static WRITE8_DEVICE_HANDLER( cvs_unknown_w )
  *************************************/
 
 
-static WRITE8_HANDLER( cvs_speech_rom_address_lo_w )
+WRITE8_MEMBER(cvs_state::cvs_speech_rom_address_lo_w)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
 	/* assuming that d0-d2 are cleared here */
-	state->m_speech_rom_bit_address = (state->m_speech_rom_bit_address & 0xf800) | (data << 3);
-	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", cpu_get_pc(&space->device()), data, state->m_speech_rom_bit_address >> 3));
+	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0xf800) | (data << 3);
+	LOG(("%04x : CVS: Speech Lo %02x Address = %04x\n", cpu_get_pc(&space.device()), data, m_speech_rom_bit_address >> 3));
 }
 
-static WRITE8_HANDLER( cvs_speech_rom_address_hi_w )
+WRITE8_MEMBER(cvs_state::cvs_speech_rom_address_hi_w)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
-	state->m_speech_rom_bit_address = (state->m_speech_rom_bit_address & 0x07ff) | (data << 11);
-	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", cpu_get_pc(&space->device()), data, state->m_speech_rom_bit_address >> 3));
+	m_speech_rom_bit_address = (m_speech_rom_bit_address & 0x07ff) | (data << 11);
+	LOG(("%04x : CVS: Speech Hi %02x Address = %04x\n", cpu_get_pc(&space.device()), data, m_speech_rom_bit_address >> 3));
 }
 
 
-static READ8_HANDLER( cvs_speech_command_r )
+READ8_MEMBER(cvs_state::cvs_speech_command_r)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
 	/* FIXME: this was by observation on board ???
      *          -bit 7 is TMS status (active LO) */
-	return ((tms5110_ctl_r(state->m_tms, 0) ^ 1) << 7) | (soundlatch_r(space, 0) & 0x7f);
+	return ((tms5110_ctl_r(m_tms, 0) ^ 1) << 7) | (soundlatch_r(space, 0) & 0x7f);
 }
 
 
@@ -469,14 +464,13 @@ static const tms5110_interface tms5100_interface =
  *
  *************************************/
 
-static WRITE8_HANDLER( audio_command_w )
+WRITE8_MEMBER(cvs_state::audio_command_w)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
 	LOG(("data %02x\n", data));
 	/* cause interrupt on audio CPU if bit 7 set */
 	soundlatch_w(space, 0, data);
-	cvs_slave_cpu_interrupt(state->m_audiocpu, data & 0x80 ? 1 : 0);
+	cvs_slave_cpu_interrupt(m_audiocpu, data & 0x80 ? 1 : 0);
 }
 
 
@@ -503,9 +497,9 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( cvs_main_cpu_io_map, AS_IO, 8, cvs_state )
-	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(cvs_input_r, cvs_scroll_w)
+	AM_RANGE(0x00, 0xff) AM_READ(cvs_input_r) AM_WRITE_LEGACY(cvs_scroll_w)
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE_LEGACY(cvs_collision_clear, cvs_video_fx_w)
-	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READWRITE_LEGACY(cvs_collision_r, audio_command_w)
+	AM_RANGE(S2650_CTRL_PORT, S2650_CTRL_PORT) AM_READ_LEGACY(cvs_collision_r) AM_WRITE(audio_command_w)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 	AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_RAM AM_BASE(m_fo_state)
 ADDRESS_MAP_END
@@ -531,7 +525,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cvs_dac_cpu_io_map, AS_IO, 8, cvs_state )
 	/* doesn't look like it is used at all */
-    //AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_LEGACY(cvs_393hz_clock_r)
+    //AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
 ADDRESS_MAP_END
 
 
@@ -545,9 +539,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cvs_speech_cpu_map, AS_PROGRAM, 8, cvs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x1d00, 0x1d00) AM_WRITE_LEGACY(cvs_speech_rom_address_lo_w)
-	AM_RANGE(0x1d40, 0x1d40) AM_WRITE_LEGACY(cvs_speech_rom_address_hi_w)
-	AM_RANGE(0x1d80, 0x1d80) AM_READ_LEGACY(cvs_speech_command_r)
+	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(cvs_speech_rom_address_lo_w)
+	AM_RANGE(0x1d40, 0x1d40) AM_WRITE(cvs_speech_rom_address_hi_w)
+	AM_RANGE(0x1d80, 0x1d80) AM_READ(cvs_speech_command_r)
 	AM_RANGE(0x1ddc, 0x1dde) AM_DEVWRITE_LEGACY("tms", cvs_tms5110_ctl_w) AM_BASE(m_tms5110_ctl_data)
 	AM_RANGE(0x1ddf, 0x1ddf) AM_DEVWRITE_LEGACY("tms", cvs_tms5110_pdc_w)
 ADDRESS_MAP_END
@@ -555,7 +549,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cvs_speech_cpu_io_map, AS_IO, 8, cvs_state )
 /* romclk is much more probable, 393 Hz results in timing issues */
-//  AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_LEGACY(cvs_393hz_clock_r)
+//  AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(cvs_393hz_clock_r)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_DEVREAD_LEGACY("tms", tms_clock_r)
 ADDRESS_MAP_END
 

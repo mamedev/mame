@@ -681,23 +681,21 @@
 *    Read/Write  Handlers    *
 *****************************/
 
-static READ8_HANDLER( custom_09R81P_port_r )
+READ8_MEMBER(lucky74_state::custom_09R81P_port_r)
 {
-	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	if (offset != 0x00)
 	{
-		return state->m_adpcm_reg[offset];
+		return m_adpcm_reg[offset];
 	}
 	else
 	{
-		return state->m_adpcm_busy_line;
+		return m_adpcm_busy_line;
 	}
 }
 
-static WRITE8_HANDLER( custom_09R81P_port_w )
+WRITE8_MEMBER(lucky74_state::custom_09R81P_port_w)
 {
-	lucky74_state *state = space->machine().driver_data<lucky74_state>();
-	state->m_adpcm_reg[offset] = data;
+	m_adpcm_reg[offset] = data;
 }
 
 static WRITE8_DEVICE_HANDLER( ym2149_portb_w )
@@ -713,34 +711,32 @@ static WRITE8_DEVICE_HANDLER( ym2149_portb_w )
 	flip_screen_set(device->machine(), data & 0x01);
 }
 
-static READ8_HANDLER( usart_8251_r )
+READ8_MEMBER(lucky74_state::usart_8251_r)
 {
 	/* reads to USART 8251 port */
 	logerror("read from USART port.\n");
 	return 0xff;
 }
 
-static WRITE8_HANDLER( usart_8251_w )
+WRITE8_MEMBER(lucky74_state::usart_8251_w)
 {
-	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	/* writes to USART 8251 port */
-	state->m_usart_8251 = data;
-	logerror("write to USART port: %02x \n", state->m_usart_8251);
+	m_usart_8251 = data;
+	logerror("write to USART port: %02x \n", m_usart_8251);
 }
 
-static READ8_HANDLER( copro_sm7831_r )
+READ8_MEMBER(lucky74_state::copro_sm7831_r)
 {
 	/* read from SM7831 co-processor */
 	logerror("read from co-processor.\n");
 	return 0xff;
 }
 
-static WRITE8_HANDLER( copro_sm7831_w )
+WRITE8_MEMBER(lucky74_state::copro_sm7831_w)
 {
-	lucky74_state *state = space->machine().driver_data<lucky74_state>();
 	/* write to SM7831 co-processor */
-	state->m_copro_sm7831 = data;
-	logerror("write to co-processor: %2X\n", state->m_copro_sm7831);
+	m_copro_sm7831 = data;
+	logerror("write to co-processor: %2X\n", m_copro_sm7831);
 }
 
 
@@ -822,13 +818,13 @@ static ADDRESS_MAP_START( lucky74_map, AS_PROGRAM, 8, lucky74_state )
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)						/* YM2149 control */
 	AM_RANGE(0xf500, 0xf500) AM_DEVWRITE_LEGACY("sn3", sn76496_w)							/* SN76489 #3 */
 	AM_RANGE(0xf600, 0xf600) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)			/* YM2149 (Input Port 1) */
-	AM_RANGE(0xf700, 0xf701) AM_READWRITE_LEGACY(usart_8251_r, usart_8251_w)						/* USART 8251 port */
-	AM_RANGE(0xf800, 0xf803) AM_READWRITE_LEGACY(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
+	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)						/* USART 8251 port */
+	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lucky74_portmap, AS_IO, 8, lucky74_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x05) AM_READWRITE_LEGACY(custom_09R81P_port_r, custom_09R81P_port_w)	/* custom 09R81P (samples system) */
+	AM_RANGE(0x00, 0x05) AM_READWRITE(custom_09R81P_port_r, custom_09R81P_port_w)	/* custom 09R81P (samples system) */
 //  AM_RANGE(0xff, 0xff) AM_READWRITE_LEGACY(???)
 ADDRESS_MAP_END
 

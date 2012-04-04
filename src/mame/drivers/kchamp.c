@@ -74,17 +74,15 @@ IO ports and memory map changes. Dip switches differ too.
 * VS Version        *
 ********************/
 
-static WRITE8_HANDLER( control_w )
+WRITE8_MEMBER(kchamp_state::control_w)
 {
-	kchamp_state *state = space->machine().driver_data<kchamp_state>();
-	state->m_nmi_enable = data & 1;
+	m_nmi_enable = data & 1;
 }
 
-static WRITE8_HANDLER( sound_reset_w )
+WRITE8_MEMBER(kchamp_state::sound_reset_w)
 {
-	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	if (!(data & 1))
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, PULSE_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
@@ -94,18 +92,16 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 	state->m_sound_nmi_enable = ((data >> 1) & 1);
 }
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(kchamp_state::sound_command_w)
 {
-	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( sound_msm_w )
+WRITE8_MEMBER(kchamp_state::sound_msm_w)
 {
-	kchamp_state *state = space->machine().driver_data<kchamp_state>();
-	state->m_msm_data = data;
-	state->m_msm_play_lo_nibble = 1;
+	m_msm_data = data;
+	m_msm_play_lo_nibble = 1;
 }
 
 static ADDRESS_MAP_START( kchampvs_map, AS_PROGRAM, 8, kchamp_state )
@@ -121,9 +117,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kchampvs_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE_LEGACY(kchamp_flipscreen_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(control_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(sound_reset_w)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("P2") AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(control_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(sound_reset_w)
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("P2") AM_WRITE(sound_command_w)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
@@ -138,7 +134,7 @@ static ADDRESS_MAP_START( kchampvs_sound_io_map, AS_IO, 8, kchamp_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x01, 0x01) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE_LEGACY(sound_msm_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(sound_msm_w)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("msm", sound_control_w)
 ADDRESS_MAP_END
 
@@ -146,19 +142,17 @@ ADDRESS_MAP_END
 /********************
 * 1 Player Version  *
 ********************/
-static READ8_HANDLER( sound_reset_r )
+READ8_MEMBER(kchamp_state::sound_reset_r)
 {
-	kchamp_state *state = space->machine().driver_data<kchamp_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, PULSE_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 
-static WRITE8_HANDLER( kc_sound_control_w )
+WRITE8_MEMBER(kchamp_state::kc_sound_control_w)
 {
-	kchamp_state *state = space->machine().driver_data<kchamp_state>();
 
 	if (offset == 0)
-		state->m_sound_nmi_enable = ((data >> 7) & 1);
+		m_sound_nmi_enable = ((data >> 7) & 1);
 //  else
 //      DAC_set_volume(0, (data == 1) ? 255 : 0, 0);
 }
@@ -175,11 +169,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kchamp_io_map, AS_IO, 8, kchamp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW") AM_WRITE_LEGACY(kchamp_flipscreen_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(control_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(control_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("P1")
 	AM_RANGE(0x98, 0x98) AM_READ_PORT("P2")
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa8, 0xa8) AM_READWRITE_LEGACY(sound_reset_r, sound_command_w)
+	AM_RANGE(0xa8, 0xa8) AM_READWRITE(sound_reset_r, sound_command_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kchamp_sound_map, AS_PROGRAM, 8, kchamp_state )
@@ -192,7 +186,7 @@ static ADDRESS_MAP_START( kchamp_sound_io_map, AS_IO, 8, kchamp_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE_LEGACY(kc_sound_control_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
 	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(soundlatch_r)
 ADDRESS_MAP_END
 

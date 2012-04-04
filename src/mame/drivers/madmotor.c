@@ -24,14 +24,13 @@
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( madmotor_sound_w )
+WRITE16_MEMBER(madmotor_state::madmotor_sound_w)
 {
-	madmotor_state *state = space->machine().driver_data<madmotor_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -61,7 +60,7 @@ static ADDRESS_MAP_START( madmotor_map, AS_PROGRAM, 16, madmotor_state )
 	AM_RANGE(0x3f8002, 0x3f8003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3f8004, 0x3f8005) AM_READ_PORT("DSW")
 	AM_RANGE(0x3f8006, 0x3f8007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x3fc004, 0x3fc005) AM_WRITE_LEGACY(madmotor_sound_w)
+	AM_RANGE(0x3fc004, 0x3fc005) AM_WRITE(madmotor_sound_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

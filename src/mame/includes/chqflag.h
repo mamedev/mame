@@ -33,6 +33,12 @@ public:
 	device_t *m_k051960;
 	device_t *m_k051316_1;
 	device_t *m_k051316_2;
+	DECLARE_WRITE8_MEMBER(chqflag_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(chqflag_vreg_w);
+	DECLARE_WRITE8_MEMBER(select_analog_ctrl_w);
+	DECLARE_READ8_MEMBER(analog_read_r);
+	DECLARE_WRITE8_MEMBER(chqflag_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(k007232_bankswitch_w);
 };
 
 /*----------- defined in video/chqflag.c -----------*/

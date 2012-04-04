@@ -14,6 +14,10 @@ public:
 	UINT8 m_km_status;
 	UINT8 m_coin_settings;
 	UINT8 m_coin_impulse;
+	DECLARE_READ8_MEMBER(key_matrix_r);
+	DECLARE_WRITE8_MEMBER(key_matrix_w);
+	DECLARE_READ8_MEMBER(key_matrix_status_r);
+	DECLARE_WRITE8_MEMBER(key_matrix_status_w);
 };
 
 

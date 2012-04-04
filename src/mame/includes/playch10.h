@@ -45,6 +45,11 @@ public:
 	int m_gboard_command;
 	int m_pc10_bios;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(up8w_w);
+	DECLARE_READ8_MEMBER(ram_8w_r);
+	DECLARE_WRITE8_MEMBER(ram_8w_w);
+	DECLARE_WRITE8_MEMBER(sprite_dma_w);
+	DECLARE_WRITE8_MEMBER(time_w);
 };
 
 

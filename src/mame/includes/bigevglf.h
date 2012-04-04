@@ -47,6 +47,24 @@ public:
 	/* devices */
 	device_t *m_audiocpu;
 	device_t *m_mcu;
+	DECLARE_WRITE8_MEMBER(beg_banking_w);
+	DECLARE_WRITE8_MEMBER(beg_fromsound_w);
+	DECLARE_READ8_MEMBER(beg_fromsound_r);
+	DECLARE_READ8_MEMBER(beg_soundstate_r);
+	DECLARE_READ8_MEMBER(soundstate_r);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_READ8_MEMBER(sound_command_r);
+	DECLARE_WRITE8_MEMBER(nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(beg13_a_clr_w);
+	DECLARE_WRITE8_MEMBER(beg13_b_clr_w);
+	DECLARE_WRITE8_MEMBER(beg13_a_set_w);
+	DECLARE_WRITE8_MEMBER(beg13_b_set_w);
+	DECLARE_READ8_MEMBER(beg_status_r);
+	DECLARE_READ8_MEMBER(beg_trackball_x_r);
+	DECLARE_READ8_MEMBER(beg_trackball_y_r);
+	DECLARE_WRITE8_MEMBER(beg_port08_w);
+	DECLARE_READ8_MEMBER(sub_cpu_mcu_coin_port_r);
 };
 
 

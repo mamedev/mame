@@ -12,14 +12,13 @@
 #include "sound/2203intf.h"
 #include "includes/mosaic.h"
 
-static WRITE8_HANDLER( protection_w )
+WRITE8_MEMBER(mosaic_state::protection_w)
 {
-	mosaic_state *state = space->machine().driver_data<mosaic_state>();
 
 	if (!BIT(data, 7))
 	{
 		/* simply increment given value */
-		state->m_prot_val = (data + 1) << 8;
+		m_prot_val = (data + 1) << 8;
 	}
 	else
 	{
@@ -34,27 +33,25 @@ static WRITE8_HANDLER( protection_w )
 			0x411f, 0x473f
 		};
 
-		state->m_prot_val = jumptable[data & 0x7f];
+		m_prot_val = jumptable[data & 0x7f];
 	}
 }
 
-static READ8_HANDLER( protection_r )
+READ8_MEMBER(mosaic_state::protection_r)
 {
-	mosaic_state *state = space->machine().driver_data<mosaic_state>();
-	int res = (state->m_prot_val >> 8) & 0xff;
+	int res = (m_prot_val >> 8) & 0xff;
 
-	logerror("%06x: protection_r %02x\n", cpu_get_pc(&space->device()), res);
+	logerror("%06x: protection_r %02x\n", cpu_get_pc(&space.device()), res);
 
-	state->m_prot_val <<= 8;
+	m_prot_val <<= 8;
 
 	return res;
 }
 
-static WRITE8_HANDLER( gfire2_protection_w )
+WRITE8_MEMBER(mosaic_state::gfire2_protection_w)
 {
-	mosaic_state *state = space->machine().driver_data<mosaic_state>();
 
-	logerror("%06x: protection_w %02x\n", cpu_get_pc(&space->device()), data);
+	logerror("%06x: protection_w %02x\n", cpu_get_pc(&space.device()), data);
 
 	switch(data)
 	{
@@ -62,29 +59,28 @@ static WRITE8_HANDLER( gfire2_protection_w )
 			/* written repeatedly; no effect?? */
 			break;
 		case 0x02:
-			state->m_prot_val = 0x0a10;
+			m_prot_val = 0x0a10;
 			break;
 		case 0x04:
-			state->m_prot_val = 0x0a15;
+			m_prot_val = 0x0a15;
 			break;
 		case 0x06:
-			state->m_prot_val = 0x80e3;
+			m_prot_val = 0x80e3;
 			break;
 		case 0x08:
-			state->m_prot_val = 0x0965;
+			m_prot_val = 0x0965;
 			break;
 		case 0x0a:
-			state->m_prot_val = 0x04b4;
+			m_prot_val = 0x04b4;
 			break;
 	}
 }
 
-static READ8_HANDLER( gfire2_protection_r )
+READ8_MEMBER(mosaic_state::gfire2_protection_r)
 {
-	mosaic_state *state = space->machine().driver_data<mosaic_state>();
-	int res = state->m_prot_val & 0xff;
+	int res = m_prot_val & 0xff;
 
-	state->m_prot_val >>= 8;
+	m_prot_val >>= 8;
 
 	return res;
 }
@@ -112,7 +108,7 @@ static ADDRESS_MAP_START( mosaic_io_map, AS_IO, 8, mosaic_state )
 	AM_RANGE(0x00, 0x3f) AM_WRITENOP	/* Z180 internal registers */
 	AM_RANGE(0x30, 0x30) AM_READNOP	/* Z180 internal registers */
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x72, 0x72) AM_READWRITE_LEGACY(protection_r, protection_w)
+	AM_RANGE(0x72, 0x72) AM_READWRITE(protection_r, protection_w)
 	AM_RANGE(0x74, 0x74) AM_READ_PORT("P1")
 	AM_RANGE(0x76, 0x76) AM_READ_PORT("P2")
 ADDRESS_MAP_END
@@ -122,7 +118,7 @@ static ADDRESS_MAP_START( gfire2_io_map, AS_IO, 8, mosaic_state )
 	AM_RANGE(0x00, 0x3f) AM_WRITENOP	/* Z180 internal registers */
 	AM_RANGE(0x30, 0x30) AM_READNOP	/* Z180 internal registers */
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x72, 0x72) AM_READWRITE_LEGACY(gfire2_protection_r, gfire2_protection_w)
+	AM_RANGE(0x72, 0x72) AM_READWRITE(gfire2_protection_r, gfire2_protection_w)
 	AM_RANGE(0x74, 0x74) AM_READ_PORT("P1")
 	AM_RANGE(0x76, 0x76) AM_READ_PORT("P2")
 ADDRESS_MAP_END

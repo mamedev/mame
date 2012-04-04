@@ -27,6 +27,17 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_mcu;
+	DECLARE_WRITE8_MEMBER(thedeep_nmi_w);
+	DECLARE_WRITE8_MEMBER(thedeep_sound_w);
+	DECLARE_WRITE8_MEMBER(thedeep_protection_w);
+	DECLARE_READ8_MEMBER(thedeep_e004_r);
+	DECLARE_READ8_MEMBER(thedeep_protection_r);
+	DECLARE_WRITE8_MEMBER(thedeep_e100_w);
+	DECLARE_WRITE8_MEMBER(thedeep_p1_w);
+	DECLARE_READ8_MEMBER(thedeep_from_main_r);
+	DECLARE_WRITE8_MEMBER(thedeep_to_main_w);
+	DECLARE_WRITE8_MEMBER(thedeep_p3_w);
+	DECLARE_READ8_MEMBER(thedeep_p0_r);
 };
 
 

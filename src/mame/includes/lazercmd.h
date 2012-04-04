@@ -41,6 +41,14 @@ public:
 	/* device */
 	required_device<cpu_device> m_maincpu;
 	device_t *m_dac;
+	DECLARE_WRITE8_MEMBER(lazercmd_ctrl_port_w);
+	DECLARE_READ8_MEMBER(lazercmd_ctrl_port_r);
+	DECLARE_WRITE8_MEMBER(lazercmd_data_port_w);
+	DECLARE_READ8_MEMBER(lazercmd_data_port_r);
+	DECLARE_WRITE8_MEMBER(lazercmd_hardware_w);
+	DECLARE_WRITE8_MEMBER(medlanes_hardware_w);
+	DECLARE_WRITE8_MEMBER(bbonk_hardware_w);
+	DECLARE_READ8_MEMBER(lazercmd_hardware_r);
 };
 
 

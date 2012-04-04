@@ -152,15 +152,15 @@ Notes:
 #define MASTER_CLOCK	XTAL_24MHz
 
 
-static WRITE8_HANDLER( lsasquad_bankswitch_w )
+WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
 {
 	/* bits 0-2 select ROM bank */
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	memory_set_bank(machine(), "bank1", data & 0x07);
 
 	/* bit 3 is zeroed on startup, maybe reset sound CPU */
 
 	/* bit 4 flips screen */
-	flip_screen_set(space->machine(), data & 0x10);
+	flip_screen_set(machine(), data & 0x10);
 
 	/* other bits unknown */
 }
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
 	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xea00, 0xea00) AM_WRITE_LEGACY(lsasquad_bankswitch_w)
+	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
 	AM_RANGE(0xec00, 0xec00) AM_READWRITE_LEGACY(lsasquad_sound_result_r,lsasquad_sound_command_w)
 	AM_RANGE(0xec01, 0xec01) AM_READ_LEGACY(lsasquad_sound_status_r)
 	AM_RANGE(0xee00, 0xee00) AM_READWRITE_LEGACY(lsasquad_mcu_r,lsasquad_mcu_w)
@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
 	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xea00, 0xea00) AM_WRITE_LEGACY(lsasquad_bankswitch_w)
+	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
 	AM_RANGE(0xec00, 0xec00) AM_READWRITE_LEGACY(lsasquad_sound_result_r,lsasquad_sound_command_w)
 	AM_RANGE(0xec01, 0xec01) AM_READ_LEGACY(lsasquad_sound_status_r)
 ADDRESS_MAP_END
@@ -387,7 +387,7 @@ static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xe805, 0xe805) AM_READ_PORT("P2")
 	AM_RANGE(0xe806, 0xe806) AM_READ_PORT("START")
 	AM_RANGE(0xe807, 0xe807) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xea00, 0xea00) AM_WRITE_LEGACY(lsasquad_bankswitch_w)
+	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE_LEGACY(lsasquad_sound_command_w)
 	AM_RANGE(0xec01, 0xec01) AM_READ_LEGACY(lsasquad_sound_status_r)
 	AM_RANGE(0xee00, 0xee00) AM_READWRITE_LEGACY(lsasquad_mcu_r, lsasquad_mcu_w)

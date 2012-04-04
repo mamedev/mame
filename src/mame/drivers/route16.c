@@ -75,7 +75,7 @@
 #include "includes/route16.h"
 
 
-static READ8_HANDLER( routex_prot_read );
+
 
 
 
@@ -87,30 +87,27 @@ static READ8_HANDLER( routex_prot_read );
 
 
 
-static READ8_HANDLER( sharedram_r )
+READ8_MEMBER(route16_state::sharedram_r)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
-	return state->m_sharedram[offset];
+	return m_sharedram[offset];
 }
 
 
-static WRITE8_HANDLER( sharedram_w )
+WRITE8_MEMBER(route16_state::sharedram_w)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
-	state->m_sharedram[offset] = data;
+	m_sharedram[offset] = data;
 }
 
 
-static WRITE8_HANDLER( route16_sharedram_w )
+WRITE8_MEMBER(route16_state::route16_sharedram_w)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
-	state->m_sharedram[offset] = data;
+	m_sharedram[offset] = data;
 
 	// 4313-4319 are used in Route 16 as triggers to wake the other CPU
 	if (offset >= 0x0313 && offset <= 0x0319 && data == 0xff)
 	{
 		// Let the other CPU run
-		device_yield(&space->device());
+		device_yield(&space.device());
 	}
 }
 
@@ -154,24 +151,22 @@ static WRITE8_DEVICE_HANDLER( stratvox_sn76477_w )
 
 
 
-static WRITE8_HANDLER( ttmahjng_input_port_matrix_w )
+WRITE8_MEMBER(route16_state::ttmahjng_input_port_matrix_w)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
-	state->m_ttmahjng_port_select = data;
+	m_ttmahjng_port_select = data;
 }
 
 
-static READ8_HANDLER( ttmahjng_input_port_matrix_r )
+READ8_MEMBER(route16_state::ttmahjng_input_port_matrix_r)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
 	UINT8 ret = 0;
 
-	switch (state->m_ttmahjng_port_select)
+	switch (m_ttmahjng_port_select)
 	{
-	case 1:  ret = input_port_read(space->machine(), "KEY0"); break;
-	case 2:  ret = input_port_read(space->machine(), "KEY1"); break;
-	case 4:  ret = input_port_read(space->machine(), "KEY2"); break;
-	case 8:  ret = input_port_read(space->machine(), "KEY3"); break;
+	case 1:  ret = input_port_read(machine(), "KEY0"); break;
+	case 2:  ret = input_port_read(machine(), "KEY1"); break;
+	case 4:  ret = input_port_read(machine(), "KEY2"); break;
+	case 8:  ret = input_port_read(machine(), "KEY3"); break;
 	default: break;
 	}
 
@@ -189,26 +184,24 @@ static READ8_HANDLER( ttmahjng_input_port_matrix_r )
   this would then be checking that the sounds are mixed correctly.
 ***************************************************************************/
 
-static READ8_HANDLER ( speakres_in3_r )
+READ8_MEMBER(route16_state::speakres_in3_r)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
 	int bit2=4, bit1=2, bit0=1;
 
 	/* just using a counter, the constants are the number of reads
        before going low, each read is 40 cycles apart. the constants
        were chosen based on the startup tests and for vr0=vr2 */
-	state->m_speakres_vrx++;
-	if(state->m_speakres_vrx>0x300) bit0=0;		/* VR0 100k ohm - speech */
-	if(state->m_speakres_vrx>0x200) bit1=0;		/* VR1  50k ohm - main volume */
-	if(state->m_speakres_vrx>0x300) bit2=0;		/* VR2 100k ohm - explosion */
+	m_speakres_vrx++;
+	if(m_speakres_vrx>0x300) bit0=0;		/* VR0 100k ohm - speech */
+	if(m_speakres_vrx>0x200) bit1=0;		/* VR1  50k ohm - main volume */
+	if(m_speakres_vrx>0x300) bit2=0;		/* VR2 100k ohm - explosion */
 
 	return 0xf8|bit2|bit1|bit0;
 }
 
-static WRITE8_HANDLER ( speakres_out2_w )
+WRITE8_MEMBER(route16_state::speakres_out2_w)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
-	state->m_speakres_vrx=0;
+	m_speakres_vrx=0;
 }
 
 
@@ -222,7 +215,7 @@ static WRITE8_HANDLER ( speakres_out2_w )
 static ADDRESS_MAP_START( route16_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
   /*AM_RANGE(0x3000, 0x3001) AM_NOP   protection device */
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE_LEGACY(sharedram_r, route16_sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, route16_sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE_LEGACY(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE_LEGACY(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
@@ -232,18 +225,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( routex_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE_LEGACY(sharedram_r, route16_sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, route16_sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE_LEGACY(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE_LEGACY(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
-	AM_RANGE(0x6400, 0x6400) AM_READ_LEGACY(routex_prot_read)
+	AM_RANGE(0x6400, 0x6400) AM_READ(routex_prot_read)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(m_videoram1) AM_SIZE(m_videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( stratvox_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE_LEGACY(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE_LEGACY(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2")
@@ -253,21 +246,21 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speakres_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE_LEGACY(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1") AM_WRITE_LEGACY(route16_out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE_LEGACY(speakres_out2_w)
-	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(speakres_in3_r)
+	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(speakres_out2_w)
+	AM_RANGE(0x6000, 0x6000) AM_READ(speakres_in3_r)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(m_videoram1) AM_SIZE(m_videoram_size)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ttmahjng_cpu1_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE_LEGACY(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0") AM_WRITE_LEGACY(route16_out1_w)
-	AM_RANGE(0x5800, 0x5800) AM_READWRITE_LEGACY(ttmahjng_input_port_matrix_r, ttmahjng_input_port_matrix_w)
+	AM_RANGE(0x5800, 0x5800) AM_READWRITE(ttmahjng_input_port_matrix_r, ttmahjng_input_port_matrix_w)
 	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE_LEGACY("ay8910", ay8910_data_w)
 	AM_RANGE(0x6900, 0x6900) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(m_videoram1) AM_SIZE(m_videoram_size)
@@ -276,7 +269,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( route16_cpu2_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE_LEGACY(sharedram_r, route16_sharedram_w)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, route16_sharedram_w)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(m_videoram2)
 ADDRESS_MAP_END
 
@@ -284,7 +277,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( stratvox_cpu2_map, AS_PROGRAM, 8, route16_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE_LEGACY("dac", dac_w)
-	AM_RANGE(0x4000, 0x43ff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w)
+	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(m_videoram2)
 ADDRESS_MAP_END
 
@@ -946,11 +939,11 @@ ROM_END
  *
  *************************************/
 
-static READ8_HANDLER( routex_prot_read )
+READ8_MEMBER(route16_state::routex_prot_read)
 {
-	if (cpu_get_pc(&space->device()) == 0x2f) return 0xfb;
+	if (cpu_get_pc(&space.device()) == 0x2f) return 0xfb;
 
-	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space->device().tag(), cpu_get_pc(&space->device()));
+	logerror ("cpu '%s' (PC=%08X): unmapped prot read\n", space.device().tag(), cpu_get_pc(&space.device()));
 	return 0x00;
 
 }

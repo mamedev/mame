@@ -199,29 +199,29 @@
  *
  *************************************/
 
-static READ8_HANDLER( dual_pokey_r )
+READ8_MEMBER(mhavoc_state::dual_pokey_r)
 {
 	int pokey_num = (offset >> 3) & 0x01;
 	int control = (offset & 0x10) >> 1;
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		return pokey_r(space->machine().device("pokey1"), pokey_reg);
+		return pokey_r(machine().device("pokey1"), pokey_reg);
 	else
-		return pokey_r(space->machine().device("pokey2"), pokey_reg);
+		return pokey_r(machine().device("pokey2"), pokey_reg);
 }
 
 
-static WRITE8_HANDLER( dual_pokey_w )
+WRITE8_MEMBER(mhavoc_state::dual_pokey_w)
 {
 	int pokey_num = (offset >> 3) & 0x01;
 	int control = (offset & 0x10) >> 1;
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		pokey_w(space->machine().device("pokey1"), pokey_reg, data);
+		pokey_w(machine().device("pokey1"), pokey_reg, data);
 	else
-		pokey_w(space->machine().device("pokey2"), pokey_reg, data);
+		pokey_w(machine().device("pokey2"), pokey_reg, data);
 }
 
 
@@ -290,7 +290,7 @@ static ADDRESS_MAP_START( alphaone_map, AS_PROGRAM, 8, mhavoc_state )
 	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK("bank1") AM_BASE(m_zram0)
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
 	AM_RANGE(0x0a00, 0x0fff) AM_RAMBANK("bank1") AM_BASE(m_zram1)
-	AM_RANGE(0x1020, 0x103f) AM_READWRITE_LEGACY(dual_pokey_r, dual_pokey_w)
+	AM_RANGE(0x1020, 0x103f) AM_READWRITE(dual_pokey_r, dual_pokey_w)
 	AM_RANGE(0x1040, 0x1040) AM_READ_PORT("IN0") AM_WRITENOP	/* Alpha Input Port 0 */
 	AM_RANGE(0x1060, 0x1060) AM_READ_PORT("IN1")				/* Gamma Input Port */
 	AM_RANGE(0x1080, 0x1080) AM_READ_PORT("DIAL")				/* Roller Controller Input*/

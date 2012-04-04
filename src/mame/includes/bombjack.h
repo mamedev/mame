@@ -26,6 +26,9 @@ public:
 	UINT8		m_latch;
 
 	UINT8		m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(bombjack_soundlatch_w);
+	DECLARE_READ8_MEMBER(bombjack_soundlatch_r);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 

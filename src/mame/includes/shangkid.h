@@ -11,6 +11,11 @@ public:
 	UINT8 *m_videoreg;
 	int m_gfx_type;
 	tilemap_t *m_background;
+	DECLARE_WRITE8_MEMBER(shangkid_maincpu_bank_w);
+	DECLARE_WRITE8_MEMBER(shangkid_bbx_enable_w);
+	DECLARE_WRITE8_MEMBER(shangkid_cpu_reset_w);
+	DECLARE_WRITE8_MEMBER(shangkid_sound_enable_w);
+	DECLARE_READ8_MEMBER(shangkid_soundlatch_r);
 };
 
 

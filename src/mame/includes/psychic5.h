@@ -26,6 +26,11 @@ public:
 	int m_sy2;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_READ8_MEMBER(psychic5_bankselect_r);
+	DECLARE_WRITE8_MEMBER(psychic5_bankselect_w);
+	DECLARE_WRITE8_MEMBER(bombsa_bankselect_w);
+	DECLARE_WRITE8_MEMBER(psychic5_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(bombsa_flipscreen_w);
 };
 
 

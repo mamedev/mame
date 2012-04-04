@@ -39,6 +39,9 @@ public:
 	bitmap_ind16 m_helper1;
 	bitmap_ind16 m_helper2;
 	bitmap_ind16 m_helper3;
+	DECLARE_READ8_MEMBER(tank8_collision_r);
+	DECLARE_WRITE8_MEMBER(tank8_lockout_w);
+	DECLARE_WRITE8_MEMBER(tank8_int_reset_w);
 };
 
 

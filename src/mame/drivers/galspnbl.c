@@ -26,14 +26,13 @@ TODO:
 #include "includes/galspnbl.h"
 
 
-static WRITE16_HANDLER( soundcommand_w )
+WRITE16_MEMBER(galspnbl_state::soundcommand_w)
 {
-	galspnbl_state *state = space->machine().driver_data<galspnbl_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space,offset,data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -55,7 +54,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
 	AM_RANGE(0xa01000, 0xa017ff) AM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP	/* more palette ? */
 	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
-	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE_LEGACY(soundcommand_w)
+	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)
 	AM_RANGE(0xa80020, 0xa80021) AM_READ_PORT("SYSTEM") AM_WRITENOP		/* w - could be watchdog, but causes resets when picture is shown */
 	AM_RANGE(0xa80030, 0xa80031) AM_READ_PORT("DSW1") AM_WRITENOP		/* w - irq ack? */
 	AM_RANGE(0xa80040, 0xa80041) AM_READ_PORT("DSW2")

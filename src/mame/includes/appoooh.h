@@ -28,6 +28,7 @@ public:
 	device_t *m_adpcm;
 
 	UINT8 m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(appoooh_adpcm_w);
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */

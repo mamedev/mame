@@ -13,6 +13,9 @@ public:
 	tilemap_t *m_tilemap_1;
 	int m_tile_bank;
 	UINT16 *m_spriteram;
+	DECLARE_WRITE16_MEMBER(powerins_okibank_w);
+	DECLARE_WRITE16_MEMBER(powerins_soundlatch_w);
+	DECLARE_READ8_MEMBER(powerinb_fake_ym2203_r);
 };
 
 

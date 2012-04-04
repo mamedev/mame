@@ -62,10 +62,9 @@ Notes:
 
 
 
-static WRITE8_HANDLER( sprcros2_m_port7_w )
+WRITE8_MEMBER(sprcros2_state::sprcros2_m_port7_w)
 {
-	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
-	UINT8 *RAM = space->machine().region("master")->base();
+	UINT8 *RAM = machine().region("master")->base();
 
 	//76543210
 	//x------- unused
@@ -76,18 +75,17 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 	//------x- flip screen
 	//-------x nmi enable
 
-	if((state->m_port7^data)&0x40)
-		memory_set_bankptr(space->machine(), "bank1",&RAM[0x10000+((data&0x40)<<7)]);
+	if((m_port7^data)&0x40)
+		memory_set_bankptr(machine(), "bank1",&RAM[0x10000+((data&0x40)<<7)]);
 
-	space->machine().tilemap().set_flip_all(data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
+	machine().tilemap().set_flip_all(data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
-	state->m_port7 = data;
+	m_port7 = data;
 }
 
-static WRITE8_HANDLER( sprcros2_s_port3_w )
+WRITE8_MEMBER(sprcros2_state::sprcros2_s_port3_w)
 {
-	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
-	UINT8 *RAM = space->machine().region("slave")->base();
+	UINT8 *RAM = machine().region("slave")->base();
 
 	//76543210
 	//xxxx---- unused
@@ -95,10 +93,10 @@ static WRITE8_HANDLER( sprcros2_s_port3_w )
 	//-----xx- unused
 	//-------x nmi enable
 
-	if((state->m_s_port3^data)&0x08)
-		memory_set_bankptr(space->machine(), "bank2",&RAM[0x10000+((data&0x08)<<10)]);
+	if((m_s_port3^data)&0x08)
+		memory_set_bankptr(machine(), "bank2",&RAM[0x10000+((data&0x08)<<10)]);
 
-	state->m_s_port3 = data;
+	m_s_port3 = data;
 }
 
 static ADDRESS_MAP_START( sprcros2_master_map, AS_PROGRAM, 8, sprcros2_state )
@@ -119,7 +117,7 @@ static ADDRESS_MAP_START( sprcros2_master_io_map, AS_IO, 8, sprcros2_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("EXTRA") AM_DEVWRITE_LEGACY("sn3", sn76496_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW2")
-	AM_RANGE(0x07, 0x07) AM_WRITE_LEGACY(sprcros2_m_port7_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(sprcros2_m_port7_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sprcros2_slave_map, AS_PROGRAM, 8, sprcros2_state )
@@ -135,7 +133,7 @@ static ADDRESS_MAP_START( sprcros2_slave_io_map, AS_IO, 8, sprcros2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(sprcros2_bgscrollx_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(sprcros2_bgscrolly_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(sprcros2_s_port3_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(sprcros2_s_port3_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sprcros2 )

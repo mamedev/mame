@@ -72,13 +72,12 @@ static INTERRUPT_GEN( tutankhm_interrupt )
 }
 
 
-static WRITE8_HANDLER( irq_enable_w )
+WRITE8_MEMBER(tutankhm_state::irq_enable_w)
 {
-	tutankhm_state *state = space->machine().driver_data<tutankhm_state>();
 
-	state->m_irq_enable = data & 1;
-	if (!state->m_irq_enable)
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	m_irq_enable = data & 1;
+	if (!m_irq_enable)
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -88,9 +87,9 @@ static WRITE8_HANDLER( irq_enable_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( tutankhm_bankselect_w )
+WRITE8_MEMBER(tutankhm_state::tutankhm_bankselect_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	memory_set_bank(machine(), "bank1", data & 0x0f);
 }
 
 
@@ -100,15 +99,15 @@ static WRITE8_HANDLER( tutankhm_bankselect_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( sound_mute_w )
+WRITE8_MEMBER(tutankhm_state::sound_mute_w)
 {
-	space->machine().sound().system_mute(data & 1);
+	machine().sound().system_mute(data & 1);
 }
 
 
-static WRITE8_HANDLER( tutankhm_coin_counter_w )
+WRITE8_MEMBER(tutankhm_state::tutankhm_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset ^ 1, data);
+	coin_counter_w(machine(), offset ^ 1, data);
 }
 
 
@@ -128,13 +127,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x81a0, 0x81a0) AM_MIRROR(0x000f) AM_READ_PORT("IN1")	/* IN1: Player 1 I/O */
 	AM_RANGE(0x81c0, 0x81c0) AM_MIRROR(0x000f) AM_READ_PORT("IN2")	/* IN2: Player 2 I/O */
 	AM_RANGE(0x81e0, 0x81e0) AM_MIRROR(0x000f) AM_READ_PORT("DSW1")	/* DSW1 (inverted bits) */
-	AM_RANGE(0x8200, 0x8200) AM_MIRROR(0x00f8) AM_READNOP AM_WRITE_LEGACY(irq_enable_w)
-	AM_RANGE(0x8202, 0x8203) AM_MIRROR(0x00f8) AM_WRITE_LEGACY(tutankhm_coin_counter_w)
+	AM_RANGE(0x8200, 0x8200) AM_MIRROR(0x00f8) AM_READNOP AM_WRITE(irq_enable_w)
+	AM_RANGE(0x8202, 0x8203) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_coin_counter_w)
 	AM_RANGE(0x8204, 0x8204) AM_MIRROR(0x00f8) AM_WRITENOP // starfield?
-	AM_RANGE(0x8205, 0x8205) AM_MIRROR(0x00f8) AM_WRITE_LEGACY(sound_mute_w)
+	AM_RANGE(0x8205, 0x8205) AM_MIRROR(0x00f8) AM_WRITE(sound_mute_w)
 	AM_RANGE(0x8206, 0x8206) AM_MIRROR(0x00f8) AM_WRITE_LEGACY(tutankhm_flip_screen_x_w)
 	AM_RANGE(0x8207, 0x8207) AM_MIRROR(0x00f8) AM_WRITE_LEGACY(tutankhm_flip_screen_y_w)
-	AM_RANGE(0x8300, 0x8300) AM_MIRROR(0x00ff) AM_WRITE_LEGACY(tutankhm_bankselect_w)
+	AM_RANGE(0x8300, 0x8300) AM_MIRROR(0x00ff) AM_WRITE(tutankhm_bankselect_w)
 	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0x00ff) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)
 	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM

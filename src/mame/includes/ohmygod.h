@@ -25,6 +25,7 @@ public:
 	/* misc */
 	int m_adpcm_bank_shift;
 	int m_sndbank;
+	DECLARE_WRITE16_MEMBER(ohmygod_ctrl_w);
 };
 
 

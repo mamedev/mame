@@ -27,56 +27,52 @@ static INTERRUPT_GEN( gbusters_interrupt )
 		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
-static READ8_HANDLER( bankedram_r )
+READ8_MEMBER(gbusters_state::bankedram_r)
 {
-	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
-	if (state->m_palette_selected)
-		return space->machine().generic.paletteram.u8[offset];
+	if (m_palette_selected)
+		return machine().generic.paletteram.u8[offset];
 	else
-		return state->m_ram[offset];
+		return m_ram[offset];
 }
 
-static WRITE8_HANDLER( bankedram_w )
+WRITE8_MEMBER(gbusters_state::bankedram_w)
 {
-	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
-	if (state->m_palette_selected)
+	if (m_palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
 	else
-		state->m_ram[offset] = data;
+		m_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( gbusters_1f98_w )
+WRITE8_MEMBER(gbusters_state::gbusters_1f98_w)
 {
-	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
 	/* bit 0 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->m_k052109, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(m_k052109, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 7 used (during gfx rom tests), but unknown */
 
 	/* other bits unused/unknown */
 	if (data & 0xfe)
 	{
-		//logerror("%04x: (1f98) write %02x\n",cpu_get_pc(&space->device()), data);
+		//logerror("%04x: (1f98) write %02x\n",cpu_get_pc(&space.device()), data);
 		//popmessage("$1f98 = %02x", data);
 	}
 }
 
-static WRITE8_HANDLER( gbusters_coin_counter_w )
+WRITE8_MEMBER(gbusters_state::gbusters_coin_counter_w)
 {
-	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
 	/* bit 0 select palette RAM  or work RAM at 5800-5fff */
-	state->m_palette_selected = ~data & 0x01;
+	m_palette_selected = ~data & 0x01;
 
 	/* bits 1 & 2 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x02);
-	coin_counter_w(space->machine(), 1, data & 0x04);
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x04);
 
 	/* bits 3 selects tilemap priority */
-	state->m_priority = data & 0x08;
+	m_priority = data & 0x08;
 
 	/* bit 7 is used but unknown */
 
@@ -88,13 +84,13 @@ static WRITE8_HANDLER( gbusters_coin_counter_w )
 		sprintf(baf, "ccnt = %02x", data);
 		popmessage(baf);
 #endif
-		logerror("%04x: (ccount) write %02x\n", cpu_get_pc(&space->device()), data);
+		logerror("%04x: (ccount) write %02x\n", cpu_get_pc(&space.device()), data);
 	}
 }
 
-static WRITE8_HANDLER( gbusters_unknown_w )
+WRITE8_MEMBER(gbusters_state::gbusters_unknown_w)
 {
-	logerror("%04x: write %02x to 0x1f9c\n",cpu_get_pc(&space->device()), data);
+	logerror("%04x: write %02x to 0x1f9c\n",cpu_get_pc(&space.device()), data);
 
 {
 char baf[40];
@@ -103,10 +99,9 @@ char baf[40];
 }
 }
 
-static WRITE8_HANDLER( gbusters_sh_irqtrigger_w )
+WRITE8_MEMBER(gbusters_state::gbusters_sh_irqtrigger_w)
 {
-	gbusters_state *state = space->machine().driver_data<gbusters_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_DEVICE_HANDLER( gbusters_snd_bankswitch_w )
@@ -125,40 +120,38 @@ static WRITE8_DEVICE_HANDLER( gbusters_snd_bankswitch_w )
 }
 
 /* special handlers to combine 052109 & 051960 */
-static READ8_HANDLER( k052109_051960_r )
+READ8_MEMBER(gbusters_state::k052109_051960_r)
 {
-	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
-	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->m_k051960, offset - 0x3800);
+			return k051937_r(m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->m_k052109, offset);
+			return k052109_r(m_k052109, offset);
 		else
-			return k051960_r(state->m_k051960, offset - 0x3c00);
+			return k051960_r(m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->m_k052109, offset);
+		return k052109_r(m_k052109, offset);
 }
 
-static WRITE8_HANDLER( k052109_051960_w )
+WRITE8_MEMBER(gbusters_state::k052109_051960_w)
 {
-	gbusters_state *state = space->machine().driver_data<gbusters_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->m_k051960, offset - 0x3800, data);
+		k051937_w(m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->m_k052109, offset, data);
+		k052109_w(m_k052109, offset, data);
 	else
-		k051960_w(state->m_k051960, offset - 0x3c00, data);
+		k051960_w(m_k051960, offset - 0x3c00, data);
 }
 
 
 static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8, gbusters_state )
-	AM_RANGE(0x1f80, 0x1f80) AM_WRITE_LEGACY(gbusters_coin_counter_w)						/* coin counters */
+	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_coin_counter_w)						/* coin counters */
 	AM_RANGE(0x1f84, 0x1f84) AM_WRITE_LEGACY(soundlatch_w)									/* sound code # */
-	AM_RANGE(0x1f88, 0x1f88) AM_WRITE_LEGACY(gbusters_sh_irqtrigger_w)						/* cause interrupt on audio CPU */
+	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(gbusters_sh_irqtrigger_w)						/* cause interrupt on audio CPU */
 	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE_LEGACY(watchdog_reset_w)								/* watchdog reset */
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
@@ -166,11 +159,11 @@ static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8, gbusters_state )
 	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1f94, 0x1f94) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1f95, 0x1f95) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1f98, 0x1f98) AM_WRITE_LEGACY(gbusters_1f98_w)								/* enable gfx ROM read through VRAM */
-	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE_LEGACY(gbusters_unknown_w)							/* ??? */
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
+	AM_RANGE(0x1f98, 0x1f98) AM_WRITE(gbusters_1f98_w)								/* enable gfx ROM read through VRAM */
+	AM_RANGE(0x1f9c, 0x1f9c) AM_WRITE(gbusters_unknown_w)							/* ??? */
+	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)		/* tiles + sprites (RAM H21, G21 & H6) */
 	AM_RANGE(0x4000, 0x57ff) AM_RAM													/* RAM I12 */
-	AM_RANGE(0x5800, 0x5fff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE(m_ram)	/* palette + work RAM (RAM D16 & C16) */
+	AM_RANGE(0x5800, 0x5fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(m_ram)	/* palette + work RAM (RAM D16 & C16) */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")											/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM													/* ROM 878n02.rom */
 ADDRESS_MAP_END

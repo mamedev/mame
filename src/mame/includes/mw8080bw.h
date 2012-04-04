@@ -75,6 +75,20 @@ public:
 	device_t *m_sn2;
 	device_t *m_sn;
 	device_t *m_discrete;
+	DECLARE_READ8_MEMBER(mw8080bw_shift_result_rev_r);
+	DECLARE_READ8_MEMBER(mw8080bw_reversable_shift_result_r);
+	DECLARE_WRITE8_MEMBER(mw8080bw_reversable_shift_count_w);
+	DECLARE_WRITE8_MEMBER(seawolf_explosion_lamp_w);
+	DECLARE_WRITE8_MEMBER(seawolf_periscope_lamp_w);
+	DECLARE_WRITE8_MEMBER(gunfight_io_w);
+	DECLARE_WRITE8_MEMBER(tornbase_io_w);
+	DECLARE_WRITE8_MEMBER(maze_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(maze_io_w);
+	DECLARE_WRITE8_MEMBER(checkmat_io_w);
+	DECLARE_WRITE8_MEMBER(spcenctr_io_w);
+	DECLARE_READ8_MEMBER(bowler_shift_result_r);
+	DECLARE_WRITE8_MEMBER(bowler_lights_1_w);
+	DECLARE_WRITE8_MEMBER(bowler_lights_2_w);
 };
 
 

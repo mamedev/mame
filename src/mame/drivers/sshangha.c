@@ -60,52 +60,49 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( sshangha_protection16_w )
+WRITE16_MEMBER(sshangha_state::sshangha_protection16_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	COMBINE_DATA(&state->m_prot_data[offset]);
+	COMBINE_DATA(&m_prot_data[offset]);
 
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(&space->device()),offset<<1,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(&space.device()),offset<<1,data);
 }
 
 /* Protection/IO chip 146 */
-static READ16_HANDLER( sshangha_protection16_r )
+READ16_MEMBER(sshangha_state::sshangha_protection16_r)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	switch (offset)
 	{
 		case 0x050 >> 1:
-			return input_port_read(space->machine(), "INPUTS");
+			return input_port_read(machine(), "INPUTS");
 		case 0x76a >> 1:
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 		case 0x0ac >> 1:
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 
 		// Protection TODO
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(&space->device()),offset<<1);
-	return state->m_prot_data[offset];
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(&space.device()),offset<<1);
+	return m_prot_data[offset];
 }
 
-static READ16_HANDLER( sshanghb_protection16_r )
+READ16_MEMBER(sshangha_state::sshanghb_protection16_r)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	switch (offset)
 	{
 		case 0x050 >> 1:
-			return input_port_read(space->machine(), "INPUTS");
+			return input_port_read(machine(), "INPUTS");
 		case 0x76a >> 1:
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 		case 0x0ac >> 1:
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 	}
 
-	return state->m_prot_data[offset];
+	return m_prot_data[offset];
 }
 
 /* Probably returns 0xffff when sprite DMA is complete, the game waits on it */
-static READ16_HANDLER( deco_71_r )
+READ16_MEMBER(sshangha_state::deco_71_r)
 {
 	return 0xffff;
 }
@@ -174,10 +171,10 @@ static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
 
 	AM_RANGE(0x340000, 0x340fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x350000, 0x350001) AM_READ_LEGACY(deco_71_r)
+	AM_RANGE(0x350000, 0x350001) AM_READ(deco_71_r)
 	AM_RANGE(0x350000, 0x350007) AM_WRITENOP
 	AM_RANGE(0x360000, 0x360fff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0x370000, 0x370001) AM_READ_LEGACY(deco_71_r)
+	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
 	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
 
 	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_sprites_w) AM_BASE(m_sprite_paletteram)
@@ -187,12 +184,12 @@ static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE_LEGACY(sshangha_protection16_r,sshangha_protection16_w) AM_BASE(m_prot_data)
+	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_BASE(m_prot_data)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x084000, 0x0847ff) AM_READ_LEGACY(sshanghb_protection16_r)
+	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
 	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE(m_sound_shared_ram) /* the bootleg writes here */
 
 	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
@@ -222,16 +219,14 @@ ADDRESS_MAP_END
 
 /* 8 "sound latches" shared between main and sound cpus. */
 
-static READ8_HANDLER(sshangha_sound_shared_r)
+READ8_MEMBER(sshangha_state::sshangha_sound_shared_r)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	return state->m_sound_shared_ram[offset] & 0xff;
+	return m_sound_shared_ram[offset] & 0xff;
 }
 
-static WRITE8_HANDLER(sshangha_sound_shared_w)
+WRITE8_MEMBER(sshangha_state::sshangha_sound_shared_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	state->m_sound_shared_ram[offset] = data & 0xff;
+	m_sound_shared_ram[offset] = data & 0xff;
 }
 
 /* Note: there's rom data after 0x8000 but the game never seem to call a rom bank, left-over? */
@@ -239,7 +234,7 @@ static ADDRESS_MAP_START( sshangha_sound_map, AS_PROGRAM, 8, sshangha_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
 	AM_RANGE(0xc200, 0xc201) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf800, 0xf807) AM_READWRITE_LEGACY(sshangha_sound_shared_r,sshangha_sound_shared_w)
+	AM_RANGE(0xf800, 0xf807) AM_READWRITE(sshangha_sound_shared_r,sshangha_sound_shared_w)
 	AM_RANGE(0xf808, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

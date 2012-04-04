@@ -31,29 +31,29 @@ Sound: AY-3-8912
 #include "machine/nvram.h"
 
 
-static WRITE8_HANDLER( usgames_rombank_w )
+WRITE8_MEMBER(usgames_state::usgames_rombank_w)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 //  logerror ("BANK WRITE? -%02x-\n",data);
 //popmessage("%02x",data);
 
-	memory_set_bankptr(space->machine(),  "bank1",&RAM[ 0x10000 + 0x4000 * data] );
+	memory_set_bankptr(machine(),  "bank1",&RAM[ 0x10000 + 0x4000 * data] );
 }
 
-static WRITE8_HANDLER( lamps1_w )
+WRITE8_MEMBER(usgames_state::lamps1_w)
 {
 	/* button lamps */
-	set_led_status(space->machine(), 0,data & 0x01);
-	set_led_status(space->machine(), 1,data & 0x02);
-	set_led_status(space->machine(), 2,data & 0x04);
-	set_led_status(space->machine(), 3,data & 0x08);
-	set_led_status(space->machine(), 4,data & 0x10);
+	set_led_status(machine(), 0,data & 0x01);
+	set_led_status(machine(), 1,data & 0x02);
+	set_led_status(machine(), 2,data & 0x04);
+	set_led_status(machine(), 3,data & 0x08);
+	set_led_status(machine(), 4,data & 0x10);
 
 	/* bit 5 toggles all the time - extra lamp? */
 }
 
-static WRITE8_HANDLER( lamps2_w )
+WRITE8_MEMBER(usgames_state::lamps2_w)
 {
 	/* bit 5 toggles all the time - extra lamp? */
 }
@@ -64,12 +64,12 @@ static ADDRESS_MAP_START( usgames_map, AS_PROGRAM, 8, usgames_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
 	AM_RANGE(0x2010, 0x2010) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x2020, 0x2020) AM_WRITE_LEGACY(lamps1_w)
-	AM_RANGE(0x2030, 0x2030) AM_WRITE_LEGACY(lamps2_w)
+	AM_RANGE(0x2020, 0x2020) AM_WRITE(lamps1_w)
+	AM_RANGE(0x2030, 0x2030) AM_WRITE(lamps2_w)
 	AM_RANGE(0x2040, 0x2040) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2041, 0x2041) AM_READ_PORT("UNK1")
 	AM_RANGE(0x2041, 0x2041) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x2060, 0x2060) AM_WRITE_LEGACY(usgames_rombank_w)
+	AM_RANGE(0x2060, 0x2060) AM_WRITE(usgames_rombank_w)
 	AM_RANGE(0x2070, 0x2070) AM_READ_PORT("UNK2")
 	AM_RANGE(0x2400, 0x2401) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY(usgames_charram_w) AM_BASE(m_charram)
@@ -84,12 +84,12 @@ static ADDRESS_MAP_START( usg185_map, AS_PROGRAM, 8, usgames_state )
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("DSW")
 	AM_RANGE(0x2410, 0x2410) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x2420, 0x2420) AM_WRITE_LEGACY(lamps1_w)
-	AM_RANGE(0x2430, 0x2430) AM_WRITE_LEGACY(lamps2_w)
+	AM_RANGE(0x2420, 0x2420) AM_WRITE(lamps1_w)
+	AM_RANGE(0x2430, 0x2430) AM_WRITE(lamps2_w)
 	AM_RANGE(0x2440, 0x2440) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x2441, 0x2441) AM_READ_PORT("UNK1")
 	AM_RANGE(0x2441, 0x2441) AM_DEVWRITE("crtc", mc6845_device, register_w)
-	AM_RANGE(0x2460, 0x2460) AM_WRITE_LEGACY(usgames_rombank_w)
+	AM_RANGE(0x2460, 0x2460) AM_WRITE(usgames_rombank_w)
 	AM_RANGE(0x2470, 0x2470) AM_READ_PORT("UNK2")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE_LEGACY(usgames_charram_w) AM_BASE(m_charram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE_LEGACY(usgames_videoram_w) AM_BASE(m_videoram)

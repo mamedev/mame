@@ -34,6 +34,17 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_msm;
+	DECLARE_WRITE8_MEMBER(ojankohs_rombank_w);
+	DECLARE_WRITE8_MEMBER(ojankoy_rombank_w);
+	DECLARE_WRITE8_MEMBER(ojankohs_msm5205_w);
+	DECLARE_WRITE8_MEMBER(ojankoc_ctrl_w);
+	DECLARE_WRITE8_MEMBER(ojankohs_portselect_w);
+	DECLARE_READ8_MEMBER(ojankohs_keymatrix_r);
+	DECLARE_READ8_MEMBER(ojankoc_keymatrix_r);
+	DECLARE_READ8_MEMBER(ccasino_dipsw3_r);
+	DECLARE_READ8_MEMBER(ccasino_dipsw4_r);
+	DECLARE_WRITE8_MEMBER(ojankoy_coinctr_w);
+	DECLARE_WRITE8_MEMBER(ccasino_coinctr_w);
 };
 
 

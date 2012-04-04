@@ -30,102 +30,94 @@ static INTERRUPT_GEN( k88games_interrupt )
 		irq0_line_hold(device);
 }
 
-static READ8_HANDLER( bankedram_r )
+READ8_MEMBER(_88games_state::bankedram_r)
 {
-	_88games_state *state = space->machine().driver_data<_88games_state>();
 
-	if (state->m_videobank)
-		return state->m_ram[offset];
+	if (m_videobank)
+		return m_ram[offset];
 	else
 	{
-		if (state->m_zoomreadroms)
-			return k051316_rom_r(state->m_k051316, offset);
+		if (m_zoomreadroms)
+			return k051316_rom_r(m_k051316, offset);
 		else
-			return k051316_r(state->m_k051316, offset);
+			return k051316_r(m_k051316, offset);
 	}
 }
 
-static WRITE8_HANDLER( bankedram_w )
+WRITE8_MEMBER(_88games_state::bankedram_w)
 {
-	_88games_state *state = space->machine().driver_data<_88games_state>();
 
-	if (state->m_videobank)
-		state->m_ram[offset] = data;
+	if (m_videobank)
+		m_ram[offset] = data;
 	else
-		k051316_w(state->m_k051316, offset, data);
+		k051316_w(m_k051316, offset, data);
 }
 
-static WRITE8_HANDLER( k88games_5f84_w )
+WRITE8_MEMBER(_88games_state::k88games_5f84_w)
 {
-	_88games_state *state = space->machine().driver_data<_88games_state>();
 
 	/* bits 0/1 coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 2 enables ROM reading from the 051316 */
 	/* also 5fce == 2 read roms, == 3 read ram */
-	state->m_zoomreadroms = data & 0x04;
+	m_zoomreadroms = data & 0x04;
 
 	if (data & 0xf8)
 		popmessage("5f84 = %02x", data);
 }
 
-static WRITE8_HANDLER( k88games_sh_irqtrigger_w )
+WRITE8_MEMBER(_88games_state::k88games_sh_irqtrigger_w)
 {
-	_88games_state *state = space->machine().driver_data<_88games_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
 
-static WRITE8_HANDLER( speech_control_w )
+WRITE8_MEMBER(_88games_state::speech_control_w)
 {
-	_88games_state *state = space->machine().driver_data<_88games_state>();
 	device_t *upd;
 
-	state->m_speech_chip = (data & 4) ? 1 : 0;
-	upd = state->m_speech_chip ? state->m_upd_2 : state->m_upd_1;
+	m_speech_chip = (data & 4) ? 1 : 0;
+	upd = m_speech_chip ? m_upd_2 : m_upd_1;
 
 	upd7759_reset_w(upd, data & 2);
 	upd7759_start_w(upd, data & 1);
 }
 
-static WRITE8_HANDLER( speech_msg_w )
+WRITE8_MEMBER(_88games_state::speech_msg_w)
 {
-	_88games_state *state = space->machine().driver_data<_88games_state>();
-	device_t *upd = state->m_speech_chip ? state->m_upd_2 : state->m_upd_1;
+	device_t *upd = m_speech_chip ? m_upd_2 : m_upd_1;
 
 	upd7759_port_w(upd, 0, data);
 }
 
 /* special handlers to combine 052109 & 051960 */
-static READ8_HANDLER( k052109_051960_r )
+READ8_MEMBER(_88games_state::k052109_051960_r)
 {
-	_88games_state *state = space->machine().driver_data<_88games_state>();
 
-	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->m_k051960, offset - 0x3800);
+			return k051937_r(m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->m_k052109, offset);
+			return k052109_r(m_k052109, offset);
 		else
-			return k051960_r(state->m_k051960, offset - 0x3c00);
+			return k051960_r(m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->m_k052109, offset);
+		return k052109_r(m_k052109, offset);
 }
 
-static WRITE8_HANDLER( k052109_051960_w )
+WRITE8_MEMBER(_88games_state::k052109_051960_w)
 {
-	_88games_state *state = space->machine().driver_data<_88games_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->m_k051960, offset - 0x3800, data);
+		k051937_w(m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->m_k052109, offset, data);
+		k052109_w(m_k052109, offset, data);
 	else
-		k051960_w(state->m_k051960, offset - 0x3c00, data);
+		k051960_w(m_k051960, offset - 0x3c00, data);
 }
 
 /*************************************
@@ -139,28 +131,28 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _88games_state )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(m_paletteram_1000)	/* banked ROM + palette RAM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x3800, 0x3fff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE(m_ram)
-	AM_RANGE(0x5f84, 0x5f84) AM_WRITE_LEGACY(k88games_5f84_w)
+	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(m_ram)
+	AM_RANGE(0x5f84, 0x5f84) AM_WRITE(k88games_5f84_w)
 	AM_RANGE(0x5f88, 0x5f88) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x5f90, 0x5f90) AM_WRITE_LEGACY(k88games_sh_irqtrigger_w)
+	AM_RANGE(0x5f90, 0x5f90) AM_WRITE(k88games_sh_irqtrigger_w)
 	AM_RANGE(0x5f94, 0x5f94) AM_READ_PORT("IN0")
 	AM_RANGE(0x5f95, 0x5f95) AM_READ_PORT("IN1")
 	AM_RANGE(0x5f96, 0x5f96) AM_READ_PORT("IN2")
 	AM_RANGE(0x5f97, 0x5f97) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f9b, 0x5f9b) AM_READ_PORT("DSW2")
 	AM_RANGE(0x5fc0, 0x5fcf) AM_DEVWRITE_LEGACY("k051316", k051316_ctrl_w)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_LEGACY(k052109_051960_r, k052109_051960_w)
+	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, _88games_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(speech_msg_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(speech_msg_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(speech_control_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(speech_control_w)
 ADDRESS_MAP_END
 
 

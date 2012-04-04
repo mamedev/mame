@@ -30,6 +30,9 @@ public:
 
 	/* devices */
 	cpu_device *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(jack_sh_command_w);
+	DECLARE_WRITE8_MEMBER(joinem_misc_w);
+	DECLARE_READ8_MEMBER(striv_question_r);
 };
 
 

@@ -77,15 +77,15 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/funkybee.h"
 
 
-static READ8_HANDLER( funkybee_input_port_0_r )
+READ8_MEMBER(funkybee_state::funkybee_input_port_0_r)
 {
 	watchdog_reset_r(space, 0);
-	return input_port_read(space->machine(), "IN0");
+	return input_port_read(machine(), "IN0");
 }
 
-static WRITE8_HANDLER( funkybee_coin_counter_w )
+WRITE8_MEMBER(funkybee_state::funkybee_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data);
+	coin_counter_w(machine(), offset, data);
 }
 
 static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8, funkybee_state )
@@ -95,10 +95,10 @@ static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8, funkybee_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE_LEGACY(funkybee_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(funkybee_scroll_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(funkybee_flipscreen_w)
-	AM_RANGE(0xe802, 0xe803) AM_WRITE_LEGACY(funkybee_coin_counter_w)
+	AM_RANGE(0xe802, 0xe803) AM_WRITE(funkybee_coin_counter_w)
 	AM_RANGE(0xe805, 0xe805) AM_WRITE_LEGACY(funkybee_gfx_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READNOP	/* IRQ Ack */
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE_LEGACY(funkybee_input_port_0_r, watchdog_reset_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(funkybee_input_port_0_r, watchdog_reset_w)
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("IN2")
 ADDRESS_MAP_END

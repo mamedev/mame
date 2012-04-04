@@ -36,6 +36,17 @@ public:
 	UINT8 m_last_control;
 	int m_qb3_lastx;
 	int m_qb3_lasty;
+	DECLARE_READ8_MEMBER(inputs_r);
+	DECLARE_READ8_MEMBER(switches_r);
+	DECLARE_READ8_MEMBER(coin_input_r);
+	DECLARE_WRITE8_MEMBER(coin_reset_w);
+	DECLARE_WRITE8_MEMBER(mux_select_w);
+	DECLARE_READ8_MEMBER(speedfrk_wheel_r);
+	DECLARE_READ8_MEMBER(speedfrk_gear_r);
+	DECLARE_READ8_MEMBER(sundance_inputs_r);
+	DECLARE_READ8_MEMBER(boxingb_dial_r);
+	DECLARE_READ8_MEMBER(qb3_frame_r);
+	DECLARE_WRITE8_MEMBER(qb3_ram_bank_w);
 };
 
 

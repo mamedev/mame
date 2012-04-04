@@ -70,28 +70,26 @@ Mighty Guy board layout:
  *
  *************************************/
 
-static WRITE8_HANDLER( cop01_sound_command_w )
+WRITE8_MEMBER(cop01_state::cop01_sound_command_w)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE );
+	device_set_input_line(m_audiocpu, 0, ASSERT_LINE );
 }
 
-static READ8_HANDLER( cop01_sound_command_r )
+READ8_MEMBER(cop01_state::cop01_sound_command_r)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
 	int res = (soundlatch_r(space, offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
-	if ((state->m_audiocpu->total_cycles() / TIMER_RATE) & 1)
+	if ((m_audiocpu->total_cycles() / TIMER_RATE) & 1)
 	{
-		if (state->m_pulse == 0)
+		if (m_pulse == 0)
 			res |= 1;
 
-		state->m_pulse = 1;
+		m_pulse = 1;
 	}
 	else
-		state->m_pulse = 0;
+		m_pulse = 0;
 
 	return res;
 }
@@ -103,18 +101,16 @@ static CUSTOM_INPUT( mightguy_area_r )
 	return (input_port_read(field.machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
 }
 
-static WRITE8_HANDLER( cop01_irq_ack_w )
+WRITE8_MEMBER(cop01_state::cop01_irq_ack_w)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
 
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE );
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE );
 }
 
-static READ8_HANDLER( cop01_sound_irq_ack_w )
+READ8_MEMBER(cop01_state::cop01_sound_irq_ack_w)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
 
-	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE );
+	device_set_input_line(m_audiocpu, 0, CLEAR_LINE );
 	return 0;
 }
 
@@ -140,8 +136,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, cop01_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x40, 0x43) AM_WRITE_LEGACY(cop01_vreg_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE_LEGACY(cop01_sound_command_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE_LEGACY(cop01_irq_ack_w) /* ? */
+	AM_RANGE(0x44, 0x44) AM_WRITE(cop01_sound_command_w)
+	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8, cop01_state )
@@ -152,13 +148,13 @@ static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8, cop01_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x40, 0x43) AM_WRITE_LEGACY(cop01_vreg_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE_LEGACY(cop01_sound_command_w)
-	AM_RANGE(0x45, 0x45) AM_WRITE_LEGACY(cop01_irq_ack_w) /* ? */
+	AM_RANGE(0x44, 0x44) AM_WRITE(cop01_sound_command_w)
+	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cop01_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(cop01_sound_irq_ack_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ(cop01_sound_irq_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -167,15 +163,14 @@ static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, cop01_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(cop01_sound_command_r)
+	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
 ADDRESS_MAP_END
 
 
 /* this just gets some garbage out of the YM3526 */
-static READ8_HANDLER( kludge )
+READ8_MEMBER(cop01_state::kludge)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
-	return state->m_timer++;
+	return m_timer++;
 }
 
 static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8, cop01_state )
@@ -183,8 +178,8 @@ static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8, cop01_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP	/* 1412M2? */
 	AM_RANGE(0x03, 0x03) AM_WRITENOP	/* 1412M2? */
-	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(kludge)	/* 1412M2? */
-	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(cop01_sound_command_r)
+	AM_RANGE(0x03, 0x03) AM_READ(kludge)	/* 1412M2? */
+	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
 ADDRESS_MAP_END
 
 

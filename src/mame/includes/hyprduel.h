@@ -48,6 +48,15 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_subcpu;
+	DECLARE_READ16_MEMBER(hyprduel_irq_cause_r);
+	DECLARE_WRITE16_MEMBER(hyprduel_irq_cause_w);
+	DECLARE_WRITE16_MEMBER(hyprduel_subcpu_control_w);
+	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger1_r);
+	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger1_w);
+	DECLARE_READ16_MEMBER(hyprduel_cpusync_trigger2_r);
+	DECLARE_WRITE16_MEMBER(hyprduel_cpusync_trigger2_w);
+	DECLARE_READ16_MEMBER(hyprduel_bankedrom_r);
+	DECLARE_WRITE16_MEMBER(hyprduel_blitter_w);
 };
 
 

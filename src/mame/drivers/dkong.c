@@ -336,8 +336,8 @@ Donkey Kong Junior Notes
  *
  *************************************/
 
-static READ8_HANDLER( hb_dma_read_byte );
-static WRITE8_HANDLER( hb_dma_write_byte );
+
+
 static READ8_DEVICE_HANDLER( p8257_ctl_r );
 static WRITE8_DEVICE_HANDLER( p8257_ctl_w );
 
@@ -377,8 +377,8 @@ static I8257_INTERFACE( hb_dma )
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, hb_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, hb_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(dkong_state, hb_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(dkong_state, hb_dma_write_byte),
     { DEVCB_NULL, DEVCB_HANDLER(p8257_ctl_r), DEVCB_NULL, DEVCB_NULL },
     { DEVCB_HANDLER(p8257_ctl_w), DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
@@ -517,10 +517,9 @@ static MACHINE_RESET( drakton )
  *
  *************************************/
 
-static READ8_HANDLER( hb_dma_read_byte )
+READ8_MEMBER(dkong_state::hb_dma_read_byte)
 {
-    dkong_state *state = space->machine().driver_data<dkong_state>();
-    int   bucket = state->m_rev_map[(offset>>10) & 0x1ff];
+    int   bucket = m_rev_map[(offset>>10) & 0x1ff];
     int   addr;
 
     if (bucket < 0)
@@ -528,13 +527,12 @@ static READ8_HANDLER( hb_dma_read_byte )
 
     addr = ((bucket << 7) & 0x7c00) | (offset & 0x3ff);
 
-    return space->read_byte(addr);
+    return space.read_byte(addr);
 }
 
-static WRITE8_HANDLER( hb_dma_write_byte )
+WRITE8_MEMBER(dkong_state::hb_dma_write_byte)
 {
-    dkong_state *state = space->machine().driver_data<dkong_state>();
-    int   bucket = state->m_rev_map[(offset>>10) & 0x1ff];
+    int   bucket = m_rev_map[(offset>>10) & 0x1ff];
     int   addr;
 
     if (bucket < 0)
@@ -542,7 +540,7 @@ static WRITE8_HANDLER( hb_dma_write_byte )
 
     addr = ((bucket << 7) & 0x7c00) | (offset & 0x3ff);
 
-    space->write_byte(addr, data);
+    space.write_byte(addr, data);
 }
 
 static READ8_DEVICE_HANDLER( p8257_ctl_r )
@@ -564,9 +562,9 @@ static WRITE8_DEVICE_HANDLER( p8257_ctl_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( dkong3_coin_counter_w )
+WRITE8_MEMBER(dkong_state::dkong3_coin_counter_w)
 {
-    coin_counter_w(space->machine(), offset, data & 0x01);
+    coin_counter_w(machine(), offset, data & 0x01);
 }
 
 static WRITE8_DEVICE_HANDLER( p8257_drq_w )
@@ -575,68 +573,66 @@ static WRITE8_DEVICE_HANDLER( p8257_drq_w )
     i8257_drq1_w(device, data & 0x01);
 }
 
-static READ8_HANDLER( dkong_in2_r )
+READ8_MEMBER(dkong_state::dkong_in2_r)
 {
-	dkong_state *state = space->machine().driver_data<dkong_state>();
 	/* mcu status (sound feedback) is inverted bit4 from port B (8039) */
-	UINT8 mcustatus = latch8_bit4_q_r(state->m_dev_vp2, 0);
+	UINT8 mcustatus = latch8_bit4_q_r(m_dev_vp2, 0);
 	UINT8 r;
 
-	r = (input_port_read(space->machine(), "IN2") & 0xBF) | (mcustatus << 6);
-	coin_counter_w(space->machine(), offset, r >> 7);
+	r = (input_port_read(machine(), "IN2") & 0xBF) | (mcustatus << 6);
+	coin_counter_w(machine(), offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
 	return r;
 }
 
-static READ8_HANDLER( dkongjr_in2_r )
+READ8_MEMBER(dkong_state::dkongjr_in2_r)
 {
     /* dkongjr does not have the mcu line connected */
 
     UINT8 r;
 
-    r = (input_port_read(space->machine(), "IN2") & 0xBF) | 0x40;
-    coin_counter_w(space->machine(), offset, r >> 7);
+    r = (input_port_read(machine(), "IN2") & 0xBF) | 0x40;
+    coin_counter_w(machine(), offset, r >> 7);
     if (r & 0x10)
         r = (r & ~0x10) | 0x80; /* service ==> coin */
     return r;
 }
 
-static READ8_HANDLER( s2650_mirror_r )
+READ8_MEMBER(dkong_state::s2650_mirror_r)
 {
-    return space->read_byte(0x1000 + offset);
+    return space.read_byte(0x1000 + offset);
 }
 
 
-static WRITE8_HANDLER( s2650_mirror_w )
+WRITE8_MEMBER(dkong_state::s2650_mirror_w)
 {
-    space->write_byte(0x1000 + offset, data);
+    space.write_byte(0x1000 + offset, data);
 }
 
 
-static READ8_HANDLER( epos_decrypt_rom )
+READ8_MEMBER(dkong_state::epos_decrypt_rom)
 {
-    dkong_state *state = space->machine().driver_data<dkong_state>();
 
     if (offset & 0x01)
     {
-        state->m_decrypt_counter = state->m_decrypt_counter - 1;
-        if (state->m_decrypt_counter < 0)
-            state->m_decrypt_counter = 0x0F;
+        m_decrypt_counter = m_decrypt_counter - 1;
+        if (m_decrypt_counter < 0)
+            m_decrypt_counter = 0x0F;
     }
     else
     {
-        state->m_decrypt_counter = (state->m_decrypt_counter + 1) & 0x0F;
+        m_decrypt_counter = (m_decrypt_counter + 1) & 0x0F;
     }
 
-    switch(state->m_decrypt_counter)
+    switch(m_decrypt_counter)
     {
-        case 0x08:  memory_set_bank(space->machine(), "bank1", 0);      break;
-        case 0x09:  memory_set_bank(space->machine(), "bank1", 1);      break;
-        case 0x0A:  memory_set_bank(space->machine(), "bank1", 2);      break;
-        case 0x0B:  memory_set_bank(space->machine(), "bank1", 3);      break;
+        case 0x08:  memory_set_bank(machine(), "bank1", 0);      break;
+        case 0x09:  memory_set_bank(machine(), "bank1", 1);      break;
+        case 0x0A:  memory_set_bank(machine(), "bank1", 2);      break;
+        case 0x0B:  memory_set_bank(machine(), "bank1", 3);      break;
         default:
-            logerror("Invalid counter = %02X\n",state->m_decrypt_counter);
+            logerror("Invalid counter = %02X\n",m_decrypt_counter);
             break;
     }
 
@@ -644,119 +640,114 @@ static READ8_HANDLER( epos_decrypt_rom )
 }
 
 
-static WRITE8_HANDLER( s2650_data_w )
+WRITE8_MEMBER(dkong_state::s2650_data_w)
 {
-    dkong_state *state = space->machine().driver_data<dkong_state>();
 #if DEBUG_PROTECTION
-    logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(&space->device()), data);
+    logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(&space.device()), data);
 #endif
 
-    state->m_hunchloopback = data;
+    m_hunchloopback = data;
 }
 
-static WRITE8_HANDLER( s2650_fo_w )
+WRITE8_MEMBER(dkong_state::s2650_fo_w)
 {
-    dkong_state *state = space->machine().driver_data<dkong_state>();
 #if DEBUG_PROTECTION
-    logerror("write : pc = %04x, FO = %02x\n",cpu_get_pc(&space->device()), data);
+    logerror("write : pc = %04x, FO = %02x\n",cpu_get_pc(&space.device()), data);
 #endif
 
-    state->m_main_fo = data;
+    m_main_fo = data;
 
-    if (state->m_main_fo)
-    	state->m_hunchloopback = 0xfb;
+    if (m_main_fo)
+    	m_hunchloopback = 0xfb;
 }
 
-static READ8_HANDLER( s2650_port0_r )
+READ8_MEMBER(dkong_state::s2650_port0_r)
 {
-    dkong_state *state = space->machine().driver_data<dkong_state>();
 #if DEBUG_PROTECTION
-    logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(&space->device()), state->m_hunchloopback, state->m_main_fo);
+    logerror("port 0 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(&space.device()), m_hunchloopback, m_main_fo);
 #endif
 
-    switch (state->m_protect_type)
+    switch (m_protect_type)
     {
     	case DK2650_SHOOTGAL:
     	case DK2650_HUNCHBKD:
-        	if (state->m_main_fo)
-        		return state->m_hunchloopback;
+        	if (m_main_fo)
+        		return m_hunchloopback;
         	else
-        		return state->m_hunchloopback--;
+        		return m_hunchloopback--;
         case DK2650_SPCLFORC:
-	    	if (!state->m_main_fo)
-	    		return state->m_hunchloopback;
+	    	if (!m_main_fo)
+	    		return m_hunchloopback;
 	    	else
-	    		return state->m_hunchloopback--;
+	    		return m_hunchloopback--;
     }
-    fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(&space->device()));
+    fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(&space.device()));
 }
 
 
-static READ8_HANDLER( s2650_port1_r )
+READ8_MEMBER(dkong_state::s2650_port1_r)
 {
-    dkong_state *state = space->machine().driver_data<dkong_state>();
 
 #if DEBUG_PROTECTION
-    logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(&space->device()), state->m_hunchloopback, state->m_main_fo);
+    logerror("port 1 : pc = %04x, loopback = %02x fo=%d\n",cpu_get_pc(&space.device()), m_hunchloopback, m_main_fo);
 #endif
 
-    switch (state->m_protect_type)
+    switch (m_protect_type)
     {
         case DK2650_HUNCHBKD:
-        	return state->m_hunchloopback--;
+        	return m_hunchloopback--;
         case DK2650_EIGHTACT:
         case DK2650_HERBIEDK:
-        	if (state->m_hunchloopback & 0x80)
-        		return state->m_prot_cnt;
+        	if (m_hunchloopback & 0x80)
+        		return m_prot_cnt;
         	else
-        		return ++state->m_prot_cnt;
+        		return ++m_prot_cnt;
     }
-    fatalerror("Unhandled read from port 1 : pc = %4x\n",cpu_get_pc(&space->device()));
+    fatalerror("Unhandled read from port 1 : pc = %4x\n",cpu_get_pc(&space.device()));
 }
 
 
-static WRITE8_HANDLER( dkong3_2a03_reset_w )
+WRITE8_MEMBER(dkong_state::dkong3_2a03_reset_w)
 {
-     dkong_state *state = space->machine().driver_data<dkong_state>();
 
 	if (data & 1)
 	{
-		device_set_input_line(state->m_dev_n2a03a, INPUT_LINE_RESET, CLEAR_LINE);
-		device_set_input_line(state->m_dev_n2a03b, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(m_dev_n2a03a, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(m_dev_n2a03b, INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		device_set_input_line(state->m_dev_n2a03a, INPUT_LINE_RESET, ASSERT_LINE);
-		device_set_input_line(state->m_dev_n2a03b, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(m_dev_n2a03a, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(m_dev_n2a03b, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
-static READ8_HANDLER( strtheat_inputport_0_r )
+READ8_MEMBER(dkong_state::strtheat_inputport_0_r)
 {
-    if(input_port_read(space->machine(), "DSW0") & 0x40)
+    if(input_port_read(machine(), "DSW0") & 0x40)
     {
         /* Joystick inputs */
-        return input_port_read(space->machine(), "IN0");
+        return input_port_read(machine(), "IN0");
     }
     else
     {
         /* Steering Wheel inputs */
-        return (input_port_read(space->machine(), "IN0") & ~3) | (input_port_read(space->machine(), "IN4") & 3);
+        return (input_port_read(machine(), "IN0") & ~3) | (input_port_read(machine(), "IN4") & 3);
     }
 }
 
 
-static READ8_HANDLER( strtheat_inputport_1_r )
+READ8_MEMBER(dkong_state::strtheat_inputport_1_r)
 {
-    if(input_port_read(space->machine(), "DSW0") & 0x40)
+    if(input_port_read(machine(), "DSW0") & 0x40)
     {
         /* Joystick inputs */
-        return input_port_read(space->machine(), "IN1");
+        return input_port_read(machine(), "IN1");
     }
     else
     {
         /* Steering Wheel inputs */
-        return (input_port_read(space->machine(), "IN1") & ~3) | (input_port_read(space->machine(), "IN5") & 3);
+        return (input_port_read(machine(), "IN1") & ~3) | (input_port_read(machine(), "IN5") & 3);
     }
 }
 
@@ -765,11 +756,10 @@ static WRITE8_DEVICE_HANDLER( dkong_z80dma_rdy_w )
 	z80dma_rdy_w(device, data & 0x01);
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(dkong_state::nmi_mask_w)
 {
-	dkong_state *state = space->machine().driver_data<dkong_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 /*************************************
@@ -787,14 +777,14 @@ static ADDRESS_MAP_START( dkong_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls175.3d")    /* IN0, sound CPU intf */
     AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE_LEGACY(radarscp_grid_color_w)/* IN1 */
 
-    AM_RANGE(0x7d00, 0x7d00) AM_READ_LEGACY(dkong_in2_r)                               /* IN2 */
+    AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)                               /* IN2 */
     AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE_LEGACY("ls259.6h", latch8_bit0_w)     		/* Sound signals */
 
     AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(dkong_audio_irq_w)   /* DSW0 */
     AM_RANGE(0x7d81, 0x7d81) AM_WRITE_LEGACY(radarscp_grid_enable_w)
     AM_RANGE(0x7d82, 0x7d82) AM_WRITE_LEGACY(dkong_flipscreen_w)
     AM_RANGE(0x7d83, 0x7d83) AM_WRITE_LEGACY(dkong_spritebank_w)                       /* 2 PSL Signal */
-    AM_RANGE(0x7d84, 0x7d84) AM_WRITE_LEGACY(nmi_mask_w)
+    AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
     AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE_LEGACY("dma8257", p8257_drq_w)        		/* P8257 ==> /DRQ0 /DRQ1 */
     AM_RANGE(0x7d86, 0x7d87) AM_WRITE_LEGACY(dkong_palettebank_w)
 ADDRESS_MAP_END
@@ -812,13 +802,13 @@ static ADDRESS_MAP_START( dkongjr_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE_LEGACY(dkongjr_gfxbank_w)
     AM_RANGE(0x7c80, 0x7c87) AM_DEVWRITE_LEGACY("ls259.4h", latch8_bit0_w)     /* latch for sound and signals above */
 
-    AM_RANGE(0x7d00, 0x7d00) AM_READ_LEGACY(dkongjr_in2_r)                             /* IN2 */
+    AM_RANGE(0x7d00, 0x7d00) AM_READ(dkongjr_in2_r)                             /* IN2 */
     AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE_LEGACY("ls259.6h",latch8_bit0_w)      /* Sound addrs */
 
     AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(dkong_audio_irq_w)   /* DSW0 */
     AM_RANGE(0x7d82, 0x7d82) AM_WRITE_LEGACY(dkong_flipscreen_w)
     AM_RANGE(0x7d83, 0x7d83) AM_WRITE_LEGACY(dkong_spritebank_w)                       /* 2 PSL Signal */
-    AM_RANGE(0x7d84, 0x7d84) AM_WRITE_LEGACY(nmi_mask_w)
+    AM_RANGE(0x7d84, 0x7d84) AM_WRITE(nmi_mask_w)
     AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE_LEGACY("dma8257", p8257_drq_w)        /* P8257 ==> /DRQ0 /DRQ1 */
     AM_RANGE(0x7d86, 0x7d87) AM_WRITE_LEGACY(dkong_palettebank_w)
     AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE_LEGACY("ls259.5h", latch8_bit0_w)     /* latch for sound and signals above*/
@@ -837,12 +827,12 @@ static ADDRESS_MAP_START( dkong3_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_LATCH8_WRITE("latch1")
     AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")  AM_LATCH8_WRITE("latch2")
     AM_RANGE(0x7d00, 0x7d00) AM_READ_PORT("DSW0") AM_LATCH8_WRITE("latch3")
-    AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(dkong3_2a03_reset_w)
-    AM_RANGE(0x7e80, 0x7e80) AM_WRITE_LEGACY(dkong3_coin_counter_w)
+    AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW1") AM_WRITE(dkong3_2a03_reset_w)
+    AM_RANGE(0x7e80, 0x7e80) AM_WRITE(dkong3_coin_counter_w)
     AM_RANGE(0x7e81, 0x7e81) AM_WRITE_LEGACY(dkong3_gfxbank_w)
     AM_RANGE(0x7e82, 0x7e82) AM_WRITE_LEGACY(dkong_flipscreen_w)
     AM_RANGE(0x7e83, 0x7e83) AM_WRITE_LEGACY(dkong_spritebank_w)                 /* 2 PSL Signal */
-    AM_RANGE(0x7e84, 0x7e84) AM_WRITE_LEGACY(nmi_mask_w)
+    AM_RANGE(0x7e84, 0x7e84) AM_WRITE(nmi_mask_w)
     AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE_LEGACY("z80dma", dkong_z80dma_rdy_w)  /* ==> DMA Chip */
     AM_RANGE(0x7e86, 0x7e87) AM_WRITE_LEGACY(dkong_palettebank_w)
     AM_RANGE(0x8000, 0x9fff) AM_ROM                                       /* DK3 and bootleg DKjr only */
@@ -857,7 +847,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( epos_readport, AS_IO, 8, dkong_state )
     ADDRESS_MAP_GLOBAL_MASK(0xff)
-    AM_RANGE(0x00, 0xff) AM_READ_LEGACY(epos_decrypt_rom)  /* Switch protection logic */
+    AM_RANGE(0x00, 0xff) AM_READ(epos_decrypt_rom)  /* Switch protection logic */
 ADDRESS_MAP_END
 
 /* S2650 conversions */
@@ -867,7 +857,7 @@ static ADDRESS_MAP_START( s2650_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE(m_sprite_ram, m_sprite_ram_size)  /* 0x7000 */
     AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x007f) AM_READ_PORT("IN0") AM_DEVWRITE_LEGACY("ls175.3d", latch8_w)
     AM_RANGE(0x1480, 0x1480) AM_READ_PORT("IN1")
-    AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x007f) AM_READ_LEGACY(dkong_in2_r)                                 /* IN2 */
+    AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x007f) AM_READ(dkong_in2_r)                                 /* IN2 */
     AM_RANGE(0x1500, 0x1507) AM_DEVWRITE_LEGACY("ls259.6h", latch8_bit0_w)       /* Sound signals */
     AM_RANGE(0x1580, 0x1580) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(dkong_audio_irq_w)     /* DSW0 */
     AM_RANGE(0x1582, 0x1582) AM_WRITE_LEGACY(dkong_flipscreen_w)
@@ -881,19 +871,19 @@ static ADDRESS_MAP_START( s2650_map, AS_PROGRAM, 8, dkong_state )
     AM_RANGE(0x1f80, 0x1f8f) AM_DEVREADWRITE_LEGACY("dma8257", i8257_r, i8257_w)   /* P8257 control registers */
     /* 0x6800 not remapped */
     AM_RANGE(0x2000, 0x2fff) AM_ROM
-    AM_RANGE(0x3000, 0x3fff) AM_READWRITE_LEGACY(s2650_mirror_r, s2650_mirror_w)
+    AM_RANGE(0x3000, 0x3fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
     AM_RANGE(0x4000, 0x4fff) AM_ROM
-    AM_RANGE(0x5000, 0x5fff) AM_READWRITE_LEGACY(s2650_mirror_r, s2650_mirror_w)
+    AM_RANGE(0x5000, 0x5fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
     AM_RANGE(0x6000, 0x6fff) AM_ROM
-    AM_RANGE(0x7000, 0x7fff) AM_READWRITE_LEGACY(s2650_mirror_r, s2650_mirror_w)
+    AM_RANGE(0x7000, 0x7fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s2650_io_map, AS_IO, 8, dkong_state )
-    AM_RANGE(0x00, 0x00) AM_READ_LEGACY(s2650_port0_r)
-    AM_RANGE(0x01, 0x01) AM_READ_LEGACY(s2650_port1_r)
+    AM_RANGE(0x00, 0x00) AM_READ(s2650_port0_r)
+    AM_RANGE(0x01, 0x01) AM_READ(s2650_port1_r)
     AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-    AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_WRITE_LEGACY(s2650_fo_w)
-    AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE_LEGACY(s2650_data_w)
+    AM_RANGE(S2650_FO_PORT, S2650_FO_PORT) AM_WRITE(s2650_fo_w)
+    AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(s2650_data_w)
 ADDRESS_MAP_END
 
 
@@ -1626,10 +1616,10 @@ static READ8_DEVICE_HANDLER( braze_eeprom_r )
 	return eeprom->read_bit();
 }
 
-static WRITE8_HANDLER( braze_a15_w )
+WRITE8_MEMBER(dkong_state::braze_a15_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x01);
-	memory_set_bank(space->machine(), "bank2", data & 0x01);
+	memory_set_bank(machine(), "bank1", data & 0x01);
+	memory_set_bank(machine(), "bank2", data & 0x01);
 }
 
 static WRITE8_DEVICE_HANDLER( braze_eeprom_w )
@@ -3159,8 +3149,9 @@ static DRIVER_INIT( strtheat )
     drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
 
     /* custom handlers supporting Joystick or Steering Wheel */
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7c00, 0x7c00, FUNC(strtheat_inputport_0_r));
-    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7c80, 0x7c80, FUNC(strtheat_inputport_1_r));
+	dkong_state *state = machine.driver_data<dkong_state>();	
+    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7c00, 0x7c00, read8_delegate(FUNC(dkong_state::strtheat_inputport_0_r),state));
+    machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x7c80, 0x7c80, read8_delegate(FUNC(dkong_state::strtheat_inputport_1_r),state));
 }
 
 
@@ -3175,7 +3166,8 @@ static DRIVER_INIT( dkongx )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x5fff, "bank1" );
     machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xffff, "bank2" );
 
-	space->install_legacy_write_handler(0xe000, 0xe000, FUNC(braze_a15_w));
+	dkong_state *state = machine.driver_data<dkong_state>();
+	space->install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(dkong_state::braze_a15_w),state));
 
 	space->install_legacy_read_handler(*eeprom, 0xc800, 0xc800, FUNC(braze_eeprom_r));
 	space->install_legacy_write_handler(*eeprom, 0xc800, 0xc800, FUNC(braze_eeprom_w));

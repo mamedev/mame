@@ -52,6 +52,28 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_mcu;
 	required_device<buffered_spriteram8_device> m_spriteram;
+	DECLARE_WRITE8_MEMBER(dec8_mxc06_karn_buffer_spriteram_w);
+	DECLARE_READ8_MEMBER(i8751_h_r);
+	DECLARE_READ8_MEMBER(i8751_l_r);
+	DECLARE_WRITE8_MEMBER(i8751_reset_w);
+	DECLARE_READ8_MEMBER(gondo_player_1_r);
+	DECLARE_READ8_MEMBER(gondo_player_2_r);
+	DECLARE_WRITE8_MEMBER(dec8_i8751_w);
+	DECLARE_WRITE8_MEMBER(lastmisn_i8751_w);
+	DECLARE_WRITE8_MEMBER(shackled_i8751_w);
+	DECLARE_WRITE8_MEMBER(csilver_i8751_w);
+	DECLARE_WRITE8_MEMBER(srdarwin_i8751_w);
+	DECLARE_WRITE8_MEMBER(dec8_bank_w);
+	DECLARE_WRITE8_MEMBER(ghostb_bank_w);
+	DECLARE_WRITE8_MEMBER(csilver_control_w);
+	DECLARE_WRITE8_MEMBER(dec8_sound_w);
+	DECLARE_WRITE8_MEMBER(csilver_adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(csilver_sound_bank_w);
+	DECLARE_WRITE8_MEMBER(oscar_int_w);
+	DECLARE_WRITE8_MEMBER(shackled_int_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_READ8_MEMBER(dec8_mcu_from_main_r);
+	DECLARE_WRITE8_MEMBER(dec8_mcu_to_main_w);
 };
 
 /*----------- defined in video/dec8.c -----------*/

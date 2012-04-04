@@ -38,6 +38,29 @@ public:
 	device_t *m_ym;
 	device_t *m_sn;
 	UINT8 m_prot_data;
+	DECLARE_READ8_MEMBER(mrokumei_keyboard_r);
+	DECLARE_WRITE8_MEMBER(mrokumei_keyboard_select_w);
+	DECLARE_READ8_MEMBER(mrokumei_sound_io_r);
+	DECLARE_WRITE8_MEMBER(mrokumei_sound_bank_w);
+	DECLARE_WRITE8_MEMBER(mrokumei_sound_io_w);
+	DECLARE_WRITE8_MEMBER(mrokumei_sound_cmd_w);
+	DECLARE_READ8_MEMBER(reikaids_upd7807_porta_r);
+	DECLARE_WRITE8_MEMBER(reikaids_upd7807_porta_w);
+	DECLARE_WRITE8_MEMBER(reikaids_upd7807_portc_w);
+	DECLARE_READ8_MEMBER(reikaids_io_r);
+	DECLARE_READ8_MEMBER(reikaids_snd_command_r);
+	DECLARE_WRITE8_MEMBER(reikaids_snd_command_w);
+	DECLARE_WRITE8_MEMBER(pteacher_snd_command_w);
+	DECLARE_READ8_MEMBER(pteacher_snd_r);
+	DECLARE_READ8_MEMBER(pteacher_io_r);
+	DECLARE_READ8_MEMBER(pteacher_keyboard_r);
+	DECLARE_READ8_MEMBER(pteacher_upd7807_porta_r);
+	DECLARE_WRITE8_MEMBER(pteacher_snd_answer_w);
+	DECLARE_WRITE8_MEMBER(pteacher_upd7807_porta_w);
+	DECLARE_WRITE8_MEMBER(pteacher_upd7807_portc_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ8_MEMBER(mirderby_prot_r);
+	DECLARE_WRITE8_MEMBER(mirderby_prot_w);
 };
 
 

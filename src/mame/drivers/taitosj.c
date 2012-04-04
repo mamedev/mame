@@ -177,11 +177,10 @@ static WRITE8_DEVICE_HANDLER( taitosj_sndnmi_msk_w )
 	state->m_sndnmi_disable = data & 0x01;
 }
 
-static WRITE8_HANDLER( taitosj_soundcommand_w )
+WRITE8_MEMBER(taitosj_state::taitosj_soundcommand_w)
 {
-	taitosj_state *state = space->machine().driver_data<taitosj_state>();
 	soundlatch_w(space,offset,data);
-	if (!state->m_sndnmi_disable) cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+	if (!m_sndnmi_disable) cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -227,7 +226,7 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(m_colorbank)
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE_LEGACY(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(m_gfxpointer)
-	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE_LEGACY(taitosj_soundcommand_w)
+	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE_LEGACY(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
@@ -267,7 +266,7 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(m_colorbank)
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE_LEGACY(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE(m_gfxpointer)
-	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE_LEGACY(taitosj_soundcommand_w)
+	AM_RANGE(0xd50b, 0xd50b) AM_MIRROR(0x00f0) AM_WRITE(taitosj_soundcommand_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_MIRROR(0x00f0) AM_WRITEONLY /*watchdog_reset_w*/  /* Bio Attack sometimes resets after you die */
 	AM_RANGE(0xd50e, 0xd50e) AM_MIRROR(0x00f0) AM_WRITE_LEGACY(taitosj_bankswitch_w)
 	AM_RANGE(0xd50f, 0xd50f) AM_MIRROR(0x00f0) AM_WRITENOP
@@ -331,7 +330,7 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd40f, 0xd40f) AM_DEVREAD_LEGACY("ay1", ay8910_r)	/* DSW2 and DSW3 */
 	AM_RANGE(0xd508, 0xd508) AM_WRITE_LEGACY(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_BASE(m_gfxpointer)
-	AM_RANGE(0xd50b, 0xd50b) AM_WRITE_LEGACY(taitosj_soundcommand_w)
+	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(taitosj_soundcommand_w)
 	AM_RANGE(0xd50d, 0xd50d) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_WRITE_LEGACY(taitosj_bankswitch_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITEONLY AM_BASE(m_video_mode)

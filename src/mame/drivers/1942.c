@@ -69,9 +69,9 @@ correctly.
 #include "includes/1942.h"
 
 
-static WRITE8_HANDLER( c1942_bankswitch_w )
+WRITE8_MEMBER(_1942_state::c1942_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	memory_set_bank(machine(), "bank1", data & 0x03);
 }
 
 static TIMER_DEVICE_CALLBACK( c1942_scanline )
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( c1942_map, AS_PROGRAM, 8, _1942_state )
 	AM_RANGE(0xc802, 0xc803) AM_WRITE_LEGACY(c1942_scroll_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(c1942_c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE_LEGACY(c1942_palette_bank_w)
-	AM_RANGE(0xc806, 0xc806) AM_WRITE_LEGACY(c1942_bankswitch_w)
+	AM_RANGE(0xc806, 0xc806) AM_WRITE(c1942_bankswitch_w)
 	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(c1942_fgvideoram_w) AM_BASE(m_fg_videoram)
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(c1942_bgvideoram_w) AM_BASE(m_bg_videoram)

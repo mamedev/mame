@@ -13,6 +13,8 @@ public:
 	int m_video_enable;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(quizdna_rombank_w);
+	DECLARE_WRITE8_MEMBER(gekiretu_rombank_w);
 };
 
 

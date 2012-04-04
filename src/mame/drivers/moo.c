@@ -65,13 +65,12 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" 	/* unlock command */
 };
 
-static READ16_HANDLER( control2_r )
+READ16_MEMBER(moo_state::control2_r)
 {
-	moo_state *state = space->machine().driver_data<moo_state>();
-	return state->m_cur_control2;
+	return m_cur_control2;
 }
 
-static WRITE16_HANDLER( control2_w )
+WRITE16_MEMBER(moo_state::control2_w)
 {
 	/* bit 0  is data */
 	/* bit 1  is cs (active low) */
@@ -81,15 +80,14 @@ static WRITE16_HANDLER( control2_w )
 	/* bit 10 is watchdog */
 	/* bit 11 is enable irq 4 (unconfirmed) */
 
-	moo_state *state = space->machine().driver_data<moo_state>();
-	COMBINE_DATA(&state->m_cur_control2);
+	COMBINE_DATA(&m_cur_control2);
 
-	input_port_write(space->machine(), "EEPROMOUT", state->m_cur_control2, 0xff);
+	input_port_write(machine(), "EEPROMOUT", m_cur_control2, 0xff);
 
 	if (data & 0x100)
-		k053246_set_objcha_line(state->m_k053246, ASSERT_LINE);
+		k053246_set_objcha_line(m_k053246, ASSERT_LINE);
 	else
-		k053246_set_objcha_line(state->m_k053246, CLEAR_LINE);
+		k053246_set_objcha_line(m_k053246, CLEAR_LINE);
 }
 
 
@@ -155,7 +153,7 @@ static INTERRUPT_GEN( moobl_interrupt )
 	device_set_input_line(device, 5, HOLD_LINE);
 }
 
-static WRITE16_HANDLER( sound_cmd1_w )
+WRITE16_MEMBER(moo_state::sound_cmd1_w)
 {
 	if ((data & 0x00ff0000) == 0)
 	{
@@ -164,26 +162,25 @@ static WRITE16_HANDLER( sound_cmd1_w )
 	}
 }
 
-static WRITE16_HANDLER( sound_cmd2_w )
+WRITE16_MEMBER(moo_state::sound_cmd2_w)
 {
 	if ((data & 0x00ff0000) == 0)
 		soundlatch2_w(space, 0, data & 0xff);
 }
 
-static WRITE16_HANDLER( sound_irq_w )
+WRITE16_MEMBER(moo_state::sound_irq_w)
 {
-	moo_state *state = space->machine().driver_data<moo_state>();
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static READ16_HANDLER( sound_status_r )
+READ16_MEMBER(moo_state::sound_status_r)
 {
 	return soundlatch3_r(space, 0);
 }
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(moo_state::sound_bankswitch_w)
 {
-	memory_set_bankptr(space->machine(), "bank1", space->machine().region("soundcpu")->base() + 0x10000 + (data&0xf)*0x4000);
+	memory_set_bankptr(machine(), "bank1", machine().region("soundcpu")->base() + 0x10000 + (data&0xf)*0x4000);
 }
 
 
@@ -191,57 +188,54 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x10000 there. The CPU can access them all. */
-static READ16_HANDLER( K053247_scattered_word_r )
+READ16_MEMBER(moo_state::K053247_scattered_word_r)
 {
-	moo_state *state = space->machine().driver_data<moo_state>();
 
 	if (offset & 0x0078)
-		return state->m_spriteram[offset];
+		return m_spriteram[offset];
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return k053247_word_r(state->m_k053246, offset, mem_mask);
+		return k053247_word_r(m_k053246, offset, mem_mask);
 	}
 }
 
-static WRITE16_HANDLER( K053247_scattered_word_w )
+WRITE16_MEMBER(moo_state::K053247_scattered_word_w)
 {
-	moo_state *state = space->machine().driver_data<moo_state>();
 
 	if (offset & 0x0078)
-		COMBINE_DATA(state->m_spriteram + offset);
+		COMBINE_DATA(m_spriteram + offset);
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
 
-		k053247_word_w(state->m_k053246, offset, data, mem_mask);
+		k053247_word_w(m_k053246, offset, data, mem_mask);
 	}
 }
 
 #endif
 
 
-static WRITE16_HANDLER( moo_prot_w )
+WRITE16_MEMBER(moo_state::moo_prot_w)
 {
-	moo_state *state = space->machine().driver_data<moo_state>();
 	UINT32 src1, src2, dst, length, a, b, res;
 
-	COMBINE_DATA(&state->m_protram[offset]);
+	COMBINE_DATA(&m_protram[offset]);
 
 	if (offset == 0xc)	// trigger operation
 	{
-		src1 = (state->m_protram[1] & 0xff) << 16 | state->m_protram[0];
-		src2 = (state->m_protram[3] & 0xff) << 16 | state->m_protram[2];
-		dst = (state->m_protram[5] & 0xff) << 16 | state->m_protram[4];
-		length = state->m_protram[0xf];
+		src1 = (m_protram[1] & 0xff) << 16 | m_protram[0];
+		src2 = (m_protram[3] & 0xff) << 16 | m_protram[2];
+		dst = (m_protram[5] & 0xff) << 16 | m_protram[4];
+		length = m_protram[0xf];
 
 		while (length)
 		{
-			a = space->read_word(src1);
-			b = space->read_word(src2);
+			a = space.read_word(src1);
+			b = space.read_word(src2);
 			res = a + 2 * b;
 
-			space->write_word(dst, res);
+			space.write_word(dst, res);
 
 			src1 += 2;
 			src2 += 2;
@@ -267,19 +261,19 @@ static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)		/* K054338 alpha blending engine */
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
-	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE_LEGACY(moo_prot_w)
+	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
 	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)					/* CCU regs (ignored) */
-	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE_LEGACY(sound_irq_w)
-	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE_LEGACY(sound_cmd1_w)
-	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE_LEGACY(sound_cmd2_w)
-	AM_RANGE(0x0d6014, 0x0d6015) AM_READ_LEGACY(sound_status_r)
+	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
+	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
+	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
 	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM							/* sound regs fall through */
 	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)		/* VSCCS regs */
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("IN1")
-	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE_LEGACY(control2_r, control2_w)
+	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM	AM_BASE(m_workram)		/* Work RAM */
 	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE(m_spriteram)	/* Sprite RAM */
@@ -312,7 +306,7 @@ static ADDRESS_MAP_START( moobl_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("IN1")
-	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE_LEGACY(control2_r, control2_w)
+	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
 	AM_RANGE(0x180000, 0x18ffff) AM_RAM AM_BASE(m_workram)		 /* Work RAM */
 	AM_RANGE(0x190000, 0x19ffff) AM_RAM AM_BASE(m_spriteram)	 /* Sprite RAM */
@@ -332,20 +326,20 @@ static ADDRESS_MAP_START( bucky_map, AS_PROGRAM, 16, moo_state )
 	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)
 	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)		/* K054338 alpha blending engine */
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
-	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE_LEGACY(moo_prot_w)
+	AM_RANGE(0x0ce000, 0x0ce01f) AM_WRITE(moo_prot_w)
 	AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8_LEGACY("k053252",k053252_r,k053252_w,0x00ff)					/* CCU regs (ignored) */
 	AM_RANGE(0x0d2000, 0x0d20ff) AM_DEVREADWRITE_LEGACY("k054000", k054000_lsb_r, k054000_lsb_w)
-	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE_LEGACY(sound_irq_w)
-	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE_LEGACY(sound_cmd1_w)
-	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE_LEGACY(sound_cmd2_w)
-	AM_RANGE(0x0d6014, 0x0d6015) AM_READ_LEGACY(sound_status_r)
+	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
+	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
+	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
+	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
 	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM							/* sound regs fall through */
 	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)		/* VSCCS regs */
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1_P3")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2_P4")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("IN1")
-	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE_LEGACY(control2_r, control2_w)
+	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes */
 	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)	/* Graphic planes mirror */
 	AM_RANGE(0x184000, 0x187fff) AM_RAM							/* extra tile RAM? */
@@ -370,7 +364,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, moo_state )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(soundlatch3_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_LEGACY(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ_LEGACY(soundlatch2_r)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(sound_bankswitch_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( moo )

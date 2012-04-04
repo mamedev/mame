@@ -44,6 +44,15 @@ public:
 	required_device<m6502_device> m_maincpu;
 	required_device<x2212_device> m_nvram_4b;
 	required_device<x2212_device> m_nvram_4a;
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(led_w);
+	DECLARE_WRITE8_MEMBER(ccounter_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ8_MEMBER(leta_r);
+	DECLARE_WRITE8_MEMBER(nvram_recall_w);
+	DECLARE_WRITE8_MEMBER(nvram_store_w);
+	DECLARE_READ8_MEMBER(nvram_r);
+	DECLARE_WRITE8_MEMBER(nvram_w);
 };
 
 

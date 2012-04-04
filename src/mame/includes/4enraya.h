@@ -23,6 +23,9 @@ public:
 	int        m_videoram_size;
 
 	int 				m_snd_latch_bit;
+	DECLARE_WRITE8_MEMBER(sound_data_w);
+	DECLARE_READ8_MEMBER(fenraya_custom_map_r);
+	DECLARE_WRITE8_MEMBER(fenraya_custom_map_w);
 };
 
 

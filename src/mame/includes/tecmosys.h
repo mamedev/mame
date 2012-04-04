@@ -36,6 +36,12 @@ public:
 	UINT8 m_device_status;
 	const struct prot_data* m_device_data;
 	UINT8 m_device_value;
+	DECLARE_READ16_MEMBER(sound_r);
+	DECLARE_WRITE16_MEMBER(sound_w);
+	DECLARE_WRITE16_MEMBER(unk880000_w);
+	DECLARE_READ16_MEMBER(unk880000_r);
+	DECLARE_WRITE8_MEMBER(tecmosys_z80_bank_w);
+	DECLARE_WRITE8_MEMBER(tecmosys_oki_bank_w);
 };
 
 

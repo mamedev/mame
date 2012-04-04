@@ -26,6 +26,11 @@ public:
 
 	/* misc */
 	attotime m_timeout_time;
+	DECLARE_WRITE8_MEMBER(hitme_vidram_w);
+	DECLARE_READ8_MEMBER(hitme_port_0_r);
+	DECLARE_READ8_MEMBER(hitme_port_1_r);
+	DECLARE_READ8_MEMBER(hitme_port_2_r);
+	DECLARE_READ8_MEMBER(hitme_port_3_r);
 };
 
 

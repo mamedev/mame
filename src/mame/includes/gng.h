@@ -26,6 +26,9 @@ public:
 	UINT8      m_scrolly[2];
 
 	required_device<buffered_spriteram8_device> m_spriteram;
+	DECLARE_WRITE8_MEMBER(gng_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(gng_coin_counter_w);
+	DECLARE_READ8_MEMBER(diamond_hack_r);
 };
 
 

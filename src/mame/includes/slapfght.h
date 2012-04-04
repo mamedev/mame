@@ -56,6 +56,8 @@ public:
 	tilemap_t *m_fix_tilemap;
 	UINT8 m_irq_mask;
 	required_device<buffered_spriteram8_device> m_spriteram;
+	DECLARE_READ8_MEMBER(tigerh_status_r);
+	DECLARE_READ8_MEMBER(gtstarb1_port_0_read);
 };
 
 

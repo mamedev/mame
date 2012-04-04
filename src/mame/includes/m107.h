@@ -29,6 +29,15 @@ public:
 	UINT16 m_control[0x10];
 	UINT16 *m_spriteram;
 	UINT16 *m_buffered_spriteram;
+	DECLARE_WRITE16_MEMBER(m107_coincounter_w);
+	DECLARE_WRITE16_MEMBER(m107_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(m107_soundlatch_w);
+	DECLARE_READ16_MEMBER(m107_sound_status_r);
+	DECLARE_READ16_MEMBER(m107_soundlatch_r);
+	DECLARE_WRITE16_MEMBER(m107_sound_irq_ack_w);
+	DECLARE_WRITE16_MEMBER(m107_sound_status_w);
+	DECLARE_WRITE16_MEMBER(m107_sound_reset_w);
+	DECLARE_WRITE16_MEMBER(wpksoc_output_w);
 };
 
 

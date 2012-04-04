@@ -45,23 +45,22 @@ static DRIVER_INIT( poolshrk )
 }
 
 
-static WRITE8_HANDLER( poolshrk_da_latch_w )
+WRITE8_MEMBER(poolshrk_state::poolshrk_da_latch_w)
 {
-	poolshrk_state *state = space->machine().driver_data<poolshrk_state>();
-	state->m_da_latch = data & 15;
+	m_da_latch = data & 15;
 }
 
 
-static WRITE8_HANDLER( poolshrk_led_w )
+WRITE8_MEMBER(poolshrk_state::poolshrk_led_w)
 {
 	if (offset & 2)
-		set_led_status(space->machine(), 0, offset & 1);
+		set_led_status(machine(), 0, offset & 1);
 	if (offset & 4)
-		set_led_status(space->machine(), 1, offset & 1);
+		set_led_status(machine(), 1, offset & 1);
 }
 
 
-static WRITE8_HANDLER( poolshrk_watchdog_w )
+WRITE8_MEMBER(poolshrk_state::poolshrk_watchdog_w)
 {
 	if ((offset & 3) == 3)
 	{
@@ -70,17 +69,16 @@ static WRITE8_HANDLER( poolshrk_watchdog_w )
 }
 
 
-static READ8_HANDLER( poolshrk_input_r )
+READ8_MEMBER(poolshrk_state::poolshrk_input_r)
 {
-	poolshrk_state *state = space->machine().driver_data<poolshrk_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	UINT8 val = input_port_read(space->machine(), portnames[offset & 3]);
+	UINT8 val = input_port_read(machine(), portnames[offset & 3]);
 
-	int x = input_port_read(space->machine(), (offset & 1) ? "AN1" : "AN0");
-	int y = input_port_read(space->machine(), (offset & 1) ? "AN3" : "AN2");
+	int x = input_port_read(machine(), (offset & 1) ? "AN1" : "AN0");
+	int y = input_port_read(machine(), (offset & 1) ? "AN3" : "AN2");
 
-	if (x >= state->m_da_latch) val |= 8;
-	if (y >= state->m_da_latch) val |= 4;
+	if (x >= m_da_latch) val |= 8;
+	if (y >= m_da_latch) val |= 4;
 
 	if ((offset & 3) == 3)
 	{
@@ -91,9 +89,9 @@ static READ8_HANDLER( poolshrk_input_r )
 }
 
 
-static READ8_HANDLER( poolshrk_irq_reset_r )
+READ8_MEMBER(poolshrk_state::poolshrk_irq_reset_r)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -105,15 +103,15 @@ static ADDRESS_MAP_START( poolshrk_cpu_map, AS_PROGRAM, 8, poolshrk_state )
 	AM_RANGE(0x0400, 0x07ff) AM_MIRROR(0x2000) AM_WRITEONLY AM_BASE(m_playfield_ram)
 	AM_RANGE(0x0800, 0x080f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_BASE(m_hpos_ram)
 	AM_RANGE(0x0c00, 0x0c0f) AM_MIRROR(0x23f0) AM_WRITEONLY AM_BASE(m_vpos_ram)
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2000) AM_READWRITE_LEGACY(poolshrk_input_r, poolshrk_watchdog_w)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x2000) AM_READWRITE(poolshrk_input_r, poolshrk_watchdog_w)
 	AM_RANGE(0x1400, 0x17ff) AM_MIRROR(0x2000) AM_DEVWRITE_LEGACY("discrete", poolshrk_scratch_sound_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x2000) AM_DEVWRITE_LEGACY("discrete", poolshrk_score_sound_w)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x2000) AM_DEVWRITE_LEGACY("discrete", poolshrk_click_sound_w)
 	AM_RANGE(0x4000, 0x4000) AM_NOP /* diagnostic ROM location */
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE_LEGACY(poolshrk_da_latch_w)
+	AM_RANGE(0x6000, 0x63ff) AM_WRITE(poolshrk_da_latch_w)
 	AM_RANGE(0x6400, 0x67ff) AM_DEVWRITE_LEGACY("discrete", poolshrk_bump_sound_w)
-	AM_RANGE(0x6800, 0x6bff) AM_READ_LEGACY(poolshrk_irq_reset_r)
-	AM_RANGE(0x6c00, 0x6fff) AM_WRITE_LEGACY(poolshrk_led_w)
+	AM_RANGE(0x6800, 0x6bff) AM_READ(poolshrk_irq_reset_r)
+	AM_RANGE(0x6c00, 0x6fff) AM_WRITE(poolshrk_led_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 

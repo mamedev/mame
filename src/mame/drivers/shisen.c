@@ -13,31 +13,31 @@ driver by Nicola Salmoria
 #include "sound/2151intf.h"
 #include "includes/shisen.h"
 
-static READ8_HANDLER( sichuan2_dsw1_r )
+READ8_MEMBER(shisen_state::sichuan2_dsw1_r)
 {
-	int ret = input_port_read(space->machine(), "DSW1");
+	int ret = input_port_read(machine(), "DSW1");
 
 	/* Based on the coin mode fill in the upper bits */
-	if (input_port_read(space->machine(), "DSW2") & 0x04)
+	if (input_port_read(machine(), "DSW2") & 0x04)
 	{
 		/* Mode 1 */
-		ret	|= (input_port_read(space->machine(), "DSW1") << 4);
+		ret	|= (input_port_read(machine(), "DSW1") << 4);
 	}
 	else
 	{
 		/* Mode 2 */
-		ret	|= (input_port_read(space->machine(), "DSW1") & 0xf0);
+		ret	|= (input_port_read(machine(), "DSW1") & 0xf0);
 	}
 
 	return ret;
 }
 
-static WRITE8_HANDLER( sichuan2_coin_w )
+WRITE8_MEMBER(shisen_state::sichuan2_coin_w)
 {
 	if ((data & 0xf9) != 0x01) logerror("coin ctrl = %02x\n",data);
 
-	coin_counter_w(space->machine(), 0, data & 0x02);
-	coin_counter_w(space->machine(), 1, data & 0x04);
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x04);
 }
 
 
@@ -52,7 +52,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shisen_io_map, AS_IO, 8, shisen_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(sichuan2_dsw1_r, sichuan2_coin_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(sichuan2_dsw1_r, sichuan2_coin_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE_LEGACY("m72", m72_sound_command_byte_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1") AM_WRITE_LEGACY(sichuan2_bankswitch_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")

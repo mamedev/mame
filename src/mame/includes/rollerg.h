@@ -26,6 +26,11 @@ public:
 	device_t *m_k053260;
 	device_t *m_k053244;
 	device_t *m_k051316;
+	DECLARE_WRITE8_MEMBER(rollerg_0010_w);
+	DECLARE_READ8_MEMBER(rollerg_k051316_r);
+	DECLARE_WRITE8_MEMBER(soundirq_w);
+	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
+	DECLARE_READ8_MEMBER(pip_r);
 };
 
 /*----------- defined in video/rollerg.c -----------*/

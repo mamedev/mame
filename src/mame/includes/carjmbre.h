@@ -21,6 +21,7 @@ public:
 	UINT16  m_bgcolor;
 
 	UINT8	m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 };
 
 

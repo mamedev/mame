@@ -27,6 +27,11 @@ public:
 	UINT8    m_mcu_port_o;
 	UINT8    m_mcu_port_p;
 	UINT8    m_mcu_port_r[4];
+	DECLARE_READ8_MEMBER(mcu_port_r_r);
+	DECLARE_WRITE8_MEMBER(mcu_port_r_w);
+	DECLARE_READ8_MEMBER(mcu_portk_r);
+	DECLARE_WRITE8_MEMBER(mcu_port_o_w);
+	DECLARE_WRITE8_MEMBER(mcu_port_p_w);
 };
 
 

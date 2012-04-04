@@ -47,6 +47,26 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_subcpu;
 	device_t *m_mcu;
+	DECLARE_WRITE8_MEMBER(sub_cpu_halt_w);
+	DECLARE_READ8_MEMBER(from_snd_r);
+	DECLARE_WRITE8_MEMBER(to_main_w);
+	DECLARE_READ8_MEMBER(nycaptor_sharedram_r);
+	DECLARE_WRITE8_MEMBER(nycaptor_sharedram_w);
+	DECLARE_READ8_MEMBER(nycaptor_b_r);
+	DECLARE_READ8_MEMBER(nycaptor_by_r);
+	DECLARE_READ8_MEMBER(nycaptor_bx_r);
+	DECLARE_WRITE8_MEMBER(sound_cpu_reset_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_READ8_MEMBER(nycaptor_generic_control_r);
+	DECLARE_WRITE8_MEMBER(nycaptor_generic_control_w);
+	DECLARE_READ8_MEMBER(cyclshtg_mcu_status_r);
+	DECLARE_READ8_MEMBER(cyclshtg_mcu_r);
+	DECLARE_WRITE8_MEMBER(cyclshtg_mcu_w);
+	DECLARE_READ8_MEMBER(cyclshtg_mcu_status_r1);
+	DECLARE_WRITE8_MEMBER(cyclshtg_generic_control_w);
+	DECLARE_READ8_MEMBER(unk_r);
 };
 
 

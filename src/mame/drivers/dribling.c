@@ -150,30 +150,28 @@ static WRITE8_DEVICE_HANDLER( shr_w )
  *
  *************************************/
 
-static READ8_HANDLER( ioread )
+READ8_MEMBER(dribling_state::ioread)
 {
-	dribling_state *state = space->machine().driver_data<dribling_state>();
 
 	if (offset & 0x08)
-		return ppi8255_r(state->m_ppi_0, offset & 3);
+		return ppi8255_r(m_ppi_0, offset & 3);
 	else if (offset & 0x10)
-		return ppi8255_r(state->m_ppi_1, offset & 3);
+		return ppi8255_r(m_ppi_1, offset & 3);
 	return 0xff;
 }
 
 
-static WRITE8_HANDLER( iowrite )
+WRITE8_MEMBER(dribling_state::iowrite)
 {
-	dribling_state *state = space->machine().driver_data<dribling_state>();
 
 	if (offset & 0x08)
-		ppi8255_w(state->m_ppi_0, offset & 3, data);
+		ppi8255_w(m_ppi_0, offset & 3, data);
 	else if (offset & 0x10)
-		ppi8255_w(state->m_ppi_1, offset & 3, data);
+		ppi8255_w(m_ppi_1, offset & 3, data);
 	else if (offset & 0x40)
 	{
-		state->m_dr = state->m_ds;
-		state->m_ds = data;
+		m_dr = m_ds;
+		m_ds = data;
 	}
 }
 
@@ -223,7 +221,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, dribling_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0xff) AM_READWRITE_LEGACY(ioread, iowrite)
+	AM_RANGE(0x00, 0xff) AM_READWRITE(ioread, iowrite)
 ADDRESS_MAP_END
 
 

@@ -29,6 +29,8 @@ public:
 	int m_ball_x;
 	int m_ball_y;
 	tilemap_t* m_bg_tilemap;
+	DECLARE_READ8_MEMBER(videopin_misc_r);
+	DECLARE_WRITE8_MEMBER(videopin_led_w);
 };
 
 

@@ -35,6 +35,7 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_discrete;
+	DECLARE_WRITE8_MEMBER(orbit_misc_w);
 };
 
 

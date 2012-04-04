@@ -29,6 +29,9 @@ public:
 	UINT32 m_latch_374;
 
 	required_device<buffered_spriteram8_device> m_spriteram;
+	DECLARE_WRITE8_MEMBER(sidearms_bankswitch_w);
+	DECLARE_READ8_MEMBER(turtship_ports_r);
+	DECLARE_WRITE8_MEMBER(whizz_bankswitch_w);
 };
 
 /*----------- defined in video/sidearms.c -----------*/

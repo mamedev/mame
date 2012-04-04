@@ -22,6 +22,13 @@ public:
 	UINT8 m_main_irq_mask;
 	UINT8 m_sub_irq_mask;
 	UINT8 m_sub2_irq_mask;
+	DECLARE_READ8_MEMBER(gaplus_spriteram_r);
+	DECLARE_WRITE8_MEMBER(gaplus_spriteram_w);
+	DECLARE_WRITE8_MEMBER(gaplus_irq_1_ctrl_w);
+	DECLARE_WRITE8_MEMBER(gaplus_irq_2_ctrl_w);
+	DECLARE_WRITE8_MEMBER(gaplus_irq_3_ctrl_w);
+	DECLARE_WRITE8_MEMBER(gaplus_sreset_w);
+	DECLARE_WRITE8_MEMBER(gaplus_freset_w);
 };
 
 

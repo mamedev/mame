@@ -16,6 +16,9 @@ public:
 	tilemap_t  *m_bg_tilemap;
 
 	UINT8    m_irq_mask;
+	DECLARE_WRITE8_MEMBER(sbasketb_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(sbasketb_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 /*----------- defined in video/sbasketb.c -----------*/

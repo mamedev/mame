@@ -27,6 +27,16 @@ public:
 	device_t *m_k056832;
 	device_t *m_k053244;
 	device_t *m_k054000;
+	DECLARE_WRITE8_MEMBER(control2_w);
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(sound_irq_w);
+	DECLARE_READ8_MEMBER(sound_status_r);
+	DECLARE_WRITE8_MEMBER(le_bankswitch_w);
+	DECLARE_READ8_MEMBER(le_4800_r);
+	DECLARE_WRITE8_MEMBER(le_4800_w);
+	DECLARE_WRITE8_MEMBER(le_bgcolor_w);
+	DECLARE_READ8_MEMBER(guns_r);
+	DECLARE_READ8_MEMBER(gunsaux_r);
 };
 
 /*----------- defined in video/lethal.c -----------*/

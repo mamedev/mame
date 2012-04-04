@@ -42,6 +42,23 @@ public:
 	device_t *m_cpu2;
 	device_t *m_pandora;
 	device_t *m_beast;
+	DECLARE_WRITE8_MEMBER(beast_data_w);
+	DECLARE_READ8_MEMBER(beast_data_r);
+	DECLARE_READ8_MEMBER(beast_status_r);
+	DECLARE_WRITE8_MEMBER(trigger_nmi_on_cpu0);
+	DECLARE_WRITE8_MEMBER(cpu0_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(cpu1_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(coin_count_w);
+	DECLARE_WRITE8_MEMBER(trigger_nmi_on_sound_cpu2);
+	DECLARE_WRITE8_MEMBER(cpu2_bankswitch_w);
+	DECLARE_READ8_MEMBER(beast_p0_r);
+	DECLARE_WRITE8_MEMBER(beast_p0_w);
+	DECLARE_READ8_MEMBER(beast_p1_r);
+	DECLARE_WRITE8_MEMBER(beast_p1_w);
+	DECLARE_READ8_MEMBER(beast_p2_r);
+	DECLARE_WRITE8_MEMBER(beast_p2_w);
+	DECLARE_READ8_MEMBER(beast_p3_r);
+	DECLARE_WRITE8_MEMBER(beast_p3_w);
 };
 
 

@@ -67,13 +67,12 @@ static INTERRUPT_GEN( timeplt_interrupt )
 }
 
 
-static WRITE8_HANDLER( timeplt_nmi_enable_w )
+WRITE8_MEMBER(timeplt_state::timeplt_nmi_enable_w)
 {
-	timeplt_state *state = space->machine().driver_data<timeplt_state>();
 
-	state->m_nmi_enable = data & 1;
-	if (!state->m_nmi_enable)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_nmi_enable = data & 1;
+	if (!m_nmi_enable)
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -84,9 +83,9 @@ static WRITE8_HANDLER( timeplt_nmi_enable_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( timeplt_coin_counter_w )
+WRITE8_MEMBER(timeplt_state::timeplt_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset >> 1, data);
+	coin_counter_w(machine(), offset >> 1, data);
 }
 
 
@@ -97,7 +96,7 @@ static WRITE8_HANDLER( timeplt_coin_counter_w )
  *
  *************************************/
 
-static READ8_HANDLER( psurge_protection_r )
+READ8_MEMBER(timeplt_state::psurge_protection_r)
 {
 	return 0x80;
 }
@@ -123,10 +122,10 @@ static ADDRESS_MAP_START( timeplt_main_map, AS_PROGRAM, 8, timeplt_state )
 	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_nmi_enable_w)
+	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_nmi_enable_w)
 	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_flipscreen_w)
 	AM_RANGE(0xc304, 0xc304) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)
-	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_coin_counter_w)
+	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_coin_counter_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ_LEGACY(timeplt_scanline_r)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")
@@ -139,7 +138,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( psurge_main_map, AS_PROGRAM, 8, timeplt_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6004, 0x6004) AM_READ_LEGACY(psurge_protection_r)
+	AM_RANGE(0x6004, 0x6004) AM_READ(psurge_protection_r)
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE_LEGACY(timeplt_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE_LEGACY(timeplt_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xa800, 0xafff) AM_RAM
@@ -149,7 +148,7 @@ static ADDRESS_MAP_START( psurge_main_map, AS_PROGRAM, 8, timeplt_state )
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_flipscreen_w)
 	AM_RANGE(0xc304, 0xc304) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)
-	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_coin_counter_w)
+	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_coin_counter_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ_LEGACY(timeplt_scanline_r)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")
@@ -169,10 +168,10 @@ static ADDRESS_MAP_START( chkun_main_map, AS_PROGRAM, 8, timeplt_state )
 	AM_RANGE(0xb400, 0xb4ff) AM_MIRROR(0x0b00) AM_RAM AM_BASE(m_spriteram2)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_nmi_enable_w)
+	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_nmi_enable_w)
 	AM_RANGE(0xc302, 0xc302) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_flipscreen_w)
 	AM_RANGE(0xc304, 0xc304) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)
-	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE_LEGACY(timeplt_coin_counter_w)
+	AM_RANGE(0xc30a, 0xc30c) AM_MIRROR(0x0cf1) AM_WRITE(timeplt_coin_counter_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0cff) AM_READ_LEGACY(timeplt_scanline_r)
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x0cff) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc300, 0xc300) AM_MIRROR(0x0c9f) AM_READ_PORT("IN0")

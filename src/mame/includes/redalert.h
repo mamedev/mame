@@ -21,6 +21,10 @@ public:
 	UINT8 *m_video_control;
 	UINT8 *m_bitmap_colorram;
 	UINT8 m_control_xor;
+	DECLARE_READ8_MEMBER(redalert_interrupt_clear_r);
+	DECLARE_WRITE8_MEMBER(redalert_interrupt_clear_w);
+	DECLARE_READ8_MEMBER(panther_interrupt_clear_r);
+	DECLARE_READ8_MEMBER(panther_unk_r);
 };
 
 

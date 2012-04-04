@@ -27,65 +27,62 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( cbasebal_bankswitch_w )
+WRITE8_MEMBER(cbasebal_state::cbasebal_bankswitch_w)
 {
-	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
 	/* bits 0-4 select ROM bank */
-	//logerror("%04x: bankswitch %02x\n", cpu_get_pc(&space->device()), data);
-	memory_set_bank(space->machine(), "bank1", data & 0x1f);
+	//logerror("%04x: bankswitch %02x\n", cpu_get_pc(&space.device()), data);
+	memory_set_bank(machine(), "bank1", data & 0x1f);
 
 	/* bit 5 used but unknown */
 
 	/* bits 6-7 select RAM bank */
-	state->m_rambank = (data & 0xc0) >> 6;
+	m_rambank = (data & 0xc0) >> 6;
 }
 
 
-static READ8_HANDLER( bankedram_r )
+READ8_MEMBER(cbasebal_state::bankedram_r)
 {
-	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
-	switch (state->m_rambank)
+	switch (m_rambank)
 	{
 	case 2:
-		return cbasebal_textram_r(space, offset);	/* VRAM */
+		return cbasebal_textram_r(&space, offset);	/* VRAM */
 	case 1:
 		if (offset < 0x800)
-			return space->machine().generic.paletteram.u8[offset];
+			return machine().generic.paletteram.u8[offset];
 		else
 			return 0;
 		break;
 	default:
-		return cbasebal_scrollram_r(space, offset);	/* SCROLL */
+		return cbasebal_scrollram_r(&space, offset);	/* SCROLL */
 	}
 }
 
-static WRITE8_HANDLER( bankedram_w )
+WRITE8_MEMBER(cbasebal_state::bankedram_w)
 {
-	cbasebal_state *state = space->machine().driver_data<cbasebal_state>();
 
-	switch (state->m_rambank)
+	switch (m_rambank)
 	{
 	case 2:
-		cbasebal_textram_w(space, offset, data);
+		cbasebal_textram_w(&space, offset, data);
 		break;
 	case 1:
 		if (offset < 0x800)
 			paletteram_xxxxBBBBRRRRGGGG_le_w(space, offset, data);
 		break;
 	default:
-		cbasebal_scrollram_w(space, offset, data);
+		cbasebal_scrollram_w(&space, offset, data);
 		break;
 	}
 }
 
-static WRITE8_HANDLER( cbasebal_coinctrl_w )
+WRITE8_MEMBER(cbasebal_state::cbasebal_coinctrl_w)
 {
-	coin_lockout_w(space->machine(), 0, ~data & 0x04);
-	coin_lockout_w(space->machine(), 1, ~data & 0x08);
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_lockout_w(machine(), 0, ~data & 0x04);
+	coin_lockout_w(machine(), 1, ~data & 0x08);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 }
 
 
@@ -114,14 +111,14 @@ static const eeprom_interface cbasebal_eeprom_intf =
 static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8, cbasebal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE_LEGACY(bankedram_r, bankedram_w) AM_BASE_GENERIC(paletteram)	/* palette + vram + scrollram */
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_GENERIC(paletteram)	/* palette + vram + scrollram */
 	AM_RANGE(0xe000, 0xfdff) AM_RAM		/* work RAM */
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cbasebal_portmap, AS_IO, 8, cbasebal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(cbasebal_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(cbasebal_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE_PORT("IO_01")
 	AM_RANGE(0x02, 0x02) AM_WRITE_PORT("IO_02")
 	AM_RANGE(0x03, 0x03) AM_WRITE_PORT("IO_03")
@@ -133,7 +130,7 @@ static ADDRESS_MAP_START( cbasebal_portmap, AS_IO, 8, cbasebal_state )
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("P2")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(cbasebal_gfxctrl_w)
-	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(cbasebal_coinctrl_w)
+	AM_RANGE(0x14, 0x14) AM_WRITE(cbasebal_coinctrl_w)
 ADDRESS_MAP_END
 
 

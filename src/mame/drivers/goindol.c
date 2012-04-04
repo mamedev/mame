@@ -23,66 +23,60 @@ Notes:
 #include "includes/goindol.h"
 
 
-static WRITE8_HANDLER( goindol_bankswitch_w )
+WRITE8_MEMBER(goindol_state::goindol_bankswitch_w)
 {
-	goindol_state *state = space->machine().driver_data<goindol_state>();
 
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	memory_set_bank(machine(), "bank1", data & 0x03);
 
-	if (state->m_char_bank != ((data & 0x10) >> 4))
+	if (m_char_bank != ((data & 0x10) >> 4))
 	{
-		state->m_char_bank = (data & 0x10) >> 4;
-		space->machine().tilemap().mark_all_dirty();
+		m_char_bank = (data & 0x10) >> 4;
+		machine().tilemap().mark_all_dirty();
 	}
 
-	flip_screen_set(space->machine(), data & 0x20);
+	flip_screen_set(machine(), data & 0x20);
 }
 
 
 
-static READ8_HANDLER( prot_f422_r )
+READ8_MEMBER(goindol_state::prot_f422_r)
 {
-	goindol_state *state = space->machine().driver_data<goindol_state>();
 
 	/* bit 7 = vblank? */
-	state->m_prot_toggle ^= 0x80;
+	m_prot_toggle ^= 0x80;
 
-	return state->m_prot_toggle;
+	return m_prot_toggle;
 }
 
 
-static WRITE8_HANDLER( prot_fc44_w )
+WRITE8_MEMBER(goindol_state::prot_fc44_w)
 {
-	goindol_state *state = space->machine().driver_data<goindol_state>();
 
-	logerror("%04x: prot_fc44_w(%02x)\n", cpu_get_pc(&space->device()), data);
-	state->m_ram[0x0419] = 0x5b;
-	state->m_ram[0x041a] = 0x3f;
-	state->m_ram[0x041b] = 0x6d;
+	logerror("%04x: prot_fc44_w(%02x)\n", cpu_get_pc(&space.device()), data);
+	m_ram[0x0419] = 0x5b;
+	m_ram[0x041a] = 0x3f;
+	m_ram[0x041b] = 0x6d;
 }
 
-static WRITE8_HANDLER( prot_fd99_w )
+WRITE8_MEMBER(goindol_state::prot_fd99_w)
 {
-	goindol_state *state = space->machine().driver_data<goindol_state>();
 
-	logerror("%04x: prot_fd99_w(%02x)\n", cpu_get_pc(&space->device()), data);
-	state->m_ram[0x0421] = 0x3f;
+	logerror("%04x: prot_fd99_w(%02x)\n", cpu_get_pc(&space.device()), data);
+	m_ram[0x0421] = 0x3f;
 }
 
-static WRITE8_HANDLER( prot_fc66_w )
+WRITE8_MEMBER(goindol_state::prot_fc66_w)
 {
-	goindol_state *state = space->machine().driver_data<goindol_state>();
 
-	logerror("%04x: prot_fc66_w(%02x)\n", cpu_get_pc(&space->device()), data);
-	state->m_ram[0x0423] = 0x06;
+	logerror("%04x: prot_fc66_w(%02x)\n", cpu_get_pc(&space.device()), data);
+	m_ram[0x0423] = 0x06;
 }
 
-static WRITE8_HANDLER( prot_fcb0_w )
+WRITE8_MEMBER(goindol_state::prot_fcb0_w)
 {
-	goindol_state *state = space->machine().driver_data<goindol_state>();
 
-	logerror("%04x: prot_fcb0_w(%02x)\n", cpu_get_pc(&space->device()), data);
-	state->m_ram[0x0425] = 0x06;
+	logerror("%04x: prot_fcb0_w(%02x)\n", cpu_get_pc(&space.device()), data);
+	m_ram[0x0425] = 0x06;
 }
 
 
@@ -92,7 +86,7 @@ static ADDRESS_MAP_START( goindol_map, AS_PROGRAM, 8, goindol_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(m_ram)
 	AM_RANGE(0xc800, 0xc800) AM_READNOP AM_WRITE_LEGACY(soundlatch_w) // watchdog?
-	AM_RANGE(0xc810, 0xc810) AM_WRITE_LEGACY(goindol_bankswitch_w)
+	AM_RANGE(0xc810, 0xc810) AM_WRITE(goindol_bankswitch_w)
 	AM_RANGE(0xc820, 0xc820) AM_READ_PORT("DIAL")
 	AM_RANGE(0xc820, 0xd820) AM_WRITEONLY AM_BASE(m_fg_scrolly)
 	AM_RANGE(0xc830, 0xc830) AM_READ_PORT("P1")
@@ -105,12 +99,12 @@ static ADDRESS_MAP_START( goindol_map, AS_PROGRAM, 8, goindol_state )
 	AM_RANGE(0xe040, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(goindol_fg_videoram_w) AM_BASE_SIZE(m_fg_videoram, m_fg_videoram_size)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSW1")
-	AM_RANGE(0xf422, 0xf422) AM_READ_LEGACY(prot_f422_r)
+	AM_RANGE(0xf422, 0xf422) AM_READ(prot_f422_r)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfc44, 0xfc44) AM_WRITE_LEGACY(prot_fc44_w)
-	AM_RANGE(0xfc66, 0xfc66) AM_WRITE_LEGACY(prot_fc66_w)
-	AM_RANGE(0xfcb0, 0xfcb0) AM_WRITE_LEGACY(prot_fcb0_w)
-	AM_RANGE(0xfd99, 0xfd99) AM_WRITE_LEGACY(prot_fd99_w)
+	AM_RANGE(0xfc44, 0xfc44) AM_WRITE(prot_fc44_w)
+	AM_RANGE(0xfc66, 0xfc66) AM_WRITE(prot_fc66_w)
+	AM_RANGE(0xfcb0, 0xfcb0) AM_WRITE(prot_fcb0_w)
+	AM_RANGE(0xfd99, 0xfd99) AM_WRITE(prot_fd99_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, goindol_state )

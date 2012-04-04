@@ -18,6 +18,10 @@ public:
 	UINT16 *m_spriteram;
 	size_t m_spriteram_size;
 	bitmap_ind16 m_bitmap;
+	DECLARE_WRITE16_MEMBER(magmax_sound_w);
+	DECLARE_READ8_MEMBER(magmax_sound_irq_ack);
+	DECLARE_READ8_MEMBER(magmax_sound_r);
+	DECLARE_WRITE16_MEMBER(magmax_vreg_w);
 };
 
 

@@ -23,18 +23,17 @@
  *************************************/
 
 /* Roc'n'Rope has the IRQ vectors in RAM. The rom contains $FFFF at this address! */
-static WRITE8_HANDLER( rocnrope_interrupt_vector_w )
+WRITE8_MEMBER(rocnrope_state::rocnrope_interrupt_vector_w)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = machine().region("maincpu")->base();
 
 	RAM[0xfff2 + offset] = data;
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(rocnrope_state::irq_mask_w)
 {
-	rocnrope_state *state = space->machine().driver_data<rocnrope_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 }
 
 /*************************************
@@ -62,9 +61,9 @@ static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8, rocnrope_state )
 	AM_RANGE(0x8082, 0x8082) AM_WRITENOP	/* interrupt acknowledge??? */
 	AM_RANGE(0x8083, 0x8083) AM_WRITENOP	/* Coin counter 1 */
 	AM_RANGE(0x8084, 0x8084) AM_WRITENOP	/* Coin counter 2 */
-	AM_RANGE(0x8087, 0x8087) AM_WRITE_LEGACY(irq_mask_w)
+	AM_RANGE(0x8087, 0x8087) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x8100, 0x8100) AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x8182, 0x818d) AM_WRITE_LEGACY(rocnrope_interrupt_vector_w)
+	AM_RANGE(0x8182, 0x818d) AM_WRITE(rocnrope_interrupt_vector_w)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

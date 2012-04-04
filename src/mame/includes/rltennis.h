@@ -36,6 +36,9 @@ public:
 
 	emu_timer *m_timer;
 
+	DECLARE_READ16_MEMBER(rlt_io_r);
+	DECLARE_WRITE16_MEMBER(rlt_snd1_w);
+	DECLARE_WRITE16_MEMBER(rlt_snd2_w);
 };
 
 

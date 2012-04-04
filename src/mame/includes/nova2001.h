@@ -10,6 +10,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	UINT8 *m_spriteram;
+	DECLARE_WRITE8_MEMBER(ninjakun_cpu1_io_A002_w);
+	DECLARE_WRITE8_MEMBER(ninjakun_cpu2_io_A002_w);
 };
 
 

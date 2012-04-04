@@ -40,6 +40,16 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_msm;
+	DECLARE_WRITE8_MEMBER(firetrap_nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bankselect_w);
+	DECLARE_READ8_MEMBER(firetrap_8751_bootleg_r);
+	DECLARE_READ8_MEMBER(firetrap_8751_r);
+	DECLARE_WRITE8_MEMBER(firetrap_8751_w);
+	DECLARE_WRITE8_MEMBER(firetrap_sound_command_w);
+	DECLARE_WRITE8_MEMBER(firetrap_sound_2400_w);
+	DECLARE_WRITE8_MEMBER(firetrap_sound_bankselect_w);
+	DECLARE_WRITE8_MEMBER(firetrap_adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
 };
 
 

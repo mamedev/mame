@@ -56,6 +56,13 @@ public:
 	// memory
 	UINT8      m_videoram[0x400];
 	UINT8      m_colorram[0x400];
+	DECLARE_WRITE8_MEMBER(laserbat_videoram_w);
+	DECLARE_WRITE8_MEMBER(video_extra_w);
+	DECLARE_WRITE8_MEMBER(sprite_x_y_w);
+	DECLARE_WRITE8_MEMBER(laserbat_input_mux_w);
+	DECLARE_READ8_MEMBER(laserbat_input_r);
+	DECLARE_WRITE8_MEMBER(laserbat_cnteff_w);
+	DECLARE_WRITE8_MEMBER(laserbat_cntmov_w);
 };
 
 

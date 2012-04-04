@@ -13,70 +13,64 @@ driver by Nicola Salmoria
 #include "sound/ay8910.h"
 
 
-static READ8_HANDLER( sharedram_r )
+READ8_MEMBER(dogfgt_state::sharedram_r)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
-	return state->m_sharedram[offset];
+	return m_sharedram[offset];
 }
 
-static WRITE8_HANDLER( sharedram_w )
+WRITE8_MEMBER(dogfgt_state::sharedram_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
-	state->m_sharedram[offset] = data;
+	m_sharedram[offset] = data;
 }
 
 
-static WRITE8_HANDLER( subirqtrigger_w )
+WRITE8_MEMBER(dogfgt_state::subirqtrigger_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 	/* bit 0 used but unknown */
 	if (data & 0x04)
-		device_set_input_line(state->m_subcpu, 0, ASSERT_LINE);
+		device_set_input_line(m_subcpu, 0, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( sub_irqack_w )
+WRITE8_MEMBER(dogfgt_state::sub_irqack_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
-	device_set_input_line(state->m_subcpu, 0, CLEAR_LINE);
+	device_set_input_line(m_subcpu, 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( dogfgt_soundlatch_w )
+WRITE8_MEMBER(dogfgt_state::dogfgt_soundlatch_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
-	state->m_soundlatch = data;
+	m_soundlatch = data;
 }
 
-static WRITE8_HANDLER( dogfgt_soundcontrol_w )
+WRITE8_MEMBER(dogfgt_state::dogfgt_soundcontrol_w)
 {
-	dogfgt_state *state = space->machine().driver_data<dogfgt_state>();
 
 	/* bit 5 goes to 8910 #0 BDIR pin  */
-	if ((state->m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		ay8910_data_address_w(space->machine().device("ay1"), state->m_last_snd_ctrl >> 4, state->m_soundlatch);
+	if ((m_last_snd_ctrl & 0x20) == 0x20 && (data & 0x20) == 0x00)
+		ay8910_data_address_w(machine().device("ay1"), m_last_snd_ctrl >> 4, m_soundlatch);
 
 	/* bit 7 goes to 8910 #1 BDIR pin  */
-	if ((state->m_last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		ay8910_data_address_w(space->machine().device("ay2"), state->m_last_snd_ctrl >> 6, state->m_soundlatch);
+	if ((m_last_snd_ctrl & 0x80) == 0x80 && (data & 0x80) == 0x00)
+		ay8910_data_address_w(machine().device("ay2"), m_last_snd_ctrl >> 6, m_soundlatch);
 
-	state->m_last_snd_ctrl = data;
+	m_last_snd_ctrl = data;
 }
 
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, dogfgt_state )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0x0f80, 0x0fdf) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x1000, 0x17ff) AM_WRITE_LEGACY(dogfgt_bgvideoram_w) AM_BASE(m_bgvideoram)
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(dogfgt_1800_w)	/* text color, flip screen & coin counters */
 	AM_RANGE(0x1810, 0x1810) AM_READ_PORT("P2")
-	AM_RANGE(0x1810, 0x1810) AM_WRITE_LEGACY(subirqtrigger_w)
+	AM_RANGE(0x1810, 0x1810) AM_WRITE(subirqtrigger_w)
 	AM_RANGE(0x1820, 0x1820) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1820, 0x1823) AM_WRITE_LEGACY(dogfgt_scroll_w)
 	AM_RANGE(0x1824, 0x1824) AM_WRITE_LEGACY(dogfgt_plane_select_w)
 	AM_RANGE(0x1830, 0x1830) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1830, 0x1830) AM_WRITE_LEGACY(dogfgt_soundlatch_w)
-	AM_RANGE(0x1840, 0x1840) AM_WRITE_LEGACY(dogfgt_soundcontrol_w)
+	AM_RANGE(0x1830, 0x1830) AM_WRITE(dogfgt_soundlatch_w)
+	AM_RANGE(0x1840, 0x1840) AM_WRITE(dogfgt_soundcontrol_w)
 	AM_RANGE(0x1870, 0x187f) AM_WRITE_LEGACY(paletteram_BBGGGRRR_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE_LEGACY(dogfgt_bitmapram_r, dogfgt_bitmapram_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -84,8 +78,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, dogfgt_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE_LEGACY(sharedram_r, sharedram_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(sub_irqack_w)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(sharedram_r, sharedram_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(sub_irqack_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -69,6 +69,26 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<UINT32> m_spriteram;
+	DECLARE_WRITE32_MEMBER(skns_hit_w);
+	DECLARE_WRITE32_MEMBER(skns_hit2_w);
+	DECLARE_READ32_MEMBER(skns_hit_r);
+	DECLARE_WRITE32_MEMBER(skns_io_w);
+	DECLARE_WRITE32_MEMBER(skns_v3t_w);
+	DECLARE_READ32_MEMBER(gutsn_speedup_r);
+	DECLARE_READ32_MEMBER(cyvern_speedup_r);
+	DECLARE_READ32_MEMBER(puzzloopj_speedup_r);
+	DECLARE_READ32_MEMBER(puzzloopa_speedup_r);
+	DECLARE_READ32_MEMBER(puzzloopu_speedup_r);
+	DECLARE_READ32_MEMBER(puzzloope_speedup_r);
+	DECLARE_READ32_MEMBER(senknow_speedup_r);
+	DECLARE_READ32_MEMBER(teljan_speedup_r);
+	DECLARE_READ32_MEMBER(jjparads_speedup_r);
+	DECLARE_READ32_MEMBER(jjparad2_speedup_r);
+	DECLARE_READ32_MEMBER(ryouran_speedup_r);
+	DECLARE_READ32_MEMBER(galpans2_speedup_r);
+	DECLARE_READ32_MEMBER(panicstr_speedup_r);
+	DECLARE_READ32_MEMBER(sengekis_speedup_r);
+	DECLARE_READ32_MEMBER(sengekij_speedup_r);
 };
 
 

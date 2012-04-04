@@ -81,30 +81,28 @@ TODO:
 
 ******************************************************************************/
 
-static WRITE16_HANDLER( inufuku_soundcommand_w )
+WRITE16_MEMBER(inufuku_state::inufuku_soundcommand_w)
 {
-	inufuku_state *state = space->machine().driver_data<inufuku_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		/* hack... sound doesn't work otherwise */
 		if (data == 0x08)
 			return;
 
-		state->m_pending_command = 1;
+		m_pending_command = 1;
 		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-static WRITE8_HANDLER( pending_command_clear_w )
+WRITE8_MEMBER(inufuku_state::pending_command_clear_w)
 {
-	inufuku_state *state = space->machine().driver_data<inufuku_state>();
-	state->m_pending_command = 0;
+	m_pending_command = 0;
 }
 
-static WRITE8_HANDLER( inufuku_soundrombank_w )
+WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	memory_set_bank(machine(), "bank1", data & 0x03);
 }
 
 /******************************************************************************
@@ -140,7 +138,7 @@ static ADDRESS_MAP_START( inufuku_map, AS_PROGRAM, 16, inufuku_state )
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("P3")
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x280000, 0x280001) AM_WRITE_LEGACY(inufuku_soundcommand_w)	// sound command
+	AM_RANGE(0x280000, 0x280001) AM_WRITE(inufuku_soundcommand_w)	// sound command
 
 	AM_RANGE(0x300000, 0x301fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)						// palette ram
 	AM_RANGE(0x380000, 0x3801ff) AM_WRITEONLY AM_BASE(m_bg_rasterram)									// bg raster ram
@@ -172,8 +170,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( inufuku_sound_io_map, AS_IO, 8, inufuku_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(inufuku_soundrombank_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(soundlatch_r, pending_command_clear_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(soundlatch_r) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 

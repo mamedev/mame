@@ -43,9 +43,9 @@ void mystston_on_scanline_interrupt(running_machine &machine)
 }
 
 
-static WRITE8_HANDLER( irq_clear_w )
+WRITE8_MEMBER(mystston_state::irq_clear_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -70,25 +70,24 @@ static INPUT_CHANGED( coin_inserted )
  *
  *************************************/
 
-static WRITE8_HANDLER( mystston_ay8910_select_w )
+WRITE8_MEMBER(mystston_state::mystston_ay8910_select_w)
 {
-	mystston_state *state = space->machine().driver_data<mystston_state>();
 
 	/* bit 5 goes to 8910 #0 BDIR pin */
-	if (((*state->m_ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))
+	if (((*m_ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 	{
 		/* bit 4 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(space->machine().device("ay1"), *state->m_ay8910_select >> 4, *state->m_ay8910_data);
+		ay8910_data_address_w(machine().device("ay1"), *m_ay8910_select >> 4, *m_ay8910_data);
 	}
 
 	/* bit 7 goes to 8910 #1 BDIR pin */
-	if (((*state->m_ay8910_select & 0x80) == 0x80) && ((data & 0x80) == 0x00))
+	if (((*m_ay8910_select & 0x80) == 0x80) && ((data & 0x80) == 0x00))
 	{
 		/* bit 6 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(space->machine().device("ay2"), *state->m_ay8910_select >> 6, *state->m_ay8910_data);
+		ay8910_data_address_w(machine().device("ay2"), *m_ay8910_select >> 6, *m_ay8910_data);
 	}
 
-	*state->m_ay8910_select = data;
+	*m_ay8910_select = data;
 }
 
 
@@ -106,10 +105,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mystston_state )
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE(m_fg_videoram)
 	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_BASE(m_bg_videoram)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1f8f) AM_READ_PORT("IN0") AM_WRITE_LEGACY(mystston_video_control_w) AM_BASE(m_video_control)
-	AM_RANGE(0x2010, 0x2010) AM_MIRROR(0x1f8f) AM_READ_PORT("IN1") AM_WRITE_LEGACY(irq_clear_w)
+	AM_RANGE(0x2010, 0x2010) AM_MIRROR(0x1f8f) AM_READ_PORT("IN1") AM_WRITE(irq_clear_w)
 	AM_RANGE(0x2020, 0x2020) AM_MIRROR(0x1f8f) AM_READ_PORT("DSW0") AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x2030, 0x2030) AM_MIRROR(0x1f8f) AM_READ_PORT("DSW1") AM_WRITEONLY AM_BASE(m_ay8910_data)
-	AM_RANGE(0x2040, 0x2040) AM_MIRROR(0x1f8f) AM_READNOP AM_WRITE_LEGACY(mystston_ay8910_select_w) AM_BASE(m_ay8910_select)
+	AM_RANGE(0x2040, 0x2040) AM_MIRROR(0x1f8f) AM_READNOP AM_WRITE(mystston_ay8910_select_w) AM_BASE(m_ay8910_select)
 	AM_RANGE(0x2050, 0x2050) AM_MIRROR(0x1f8f) AM_NOP
 	AM_RANGE(0x2060, 0x207f) AM_MIRROR(0x1f80) AM_RAM AM_BASE(m_paletteram)
 	AM_RANGE(0x4000, 0xffff) AM_ROM

@@ -52,6 +52,14 @@ public:
 	device_t *m_tc0480scp;
 	device_t *m_tc0360pri;
 	device_t *m_tc0640fio;
+	DECLARE_READ16_MEMBER(color_ram_word_r);
+	DECLARE_WRITE16_MEMBER(color_ram_word_w);
+	DECLARE_READ16_MEMBER(slapshot_service_input_r);
+	DECLARE_READ16_MEMBER(opwolf3_adc_r);
+	DECLARE_WRITE16_MEMBER(opwolf3_adc_req_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(slapshot_msb_sound_w);
+	DECLARE_READ16_MEMBER(slapshot_msb_sound_r);
 };
 
 

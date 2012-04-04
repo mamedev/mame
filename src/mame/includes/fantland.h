@@ -29,6 +29,17 @@ public:
 	device_t *m_msm4;
 	UINT8 *m_spriteram;
 	UINT8 *m_spriteram2;
+	DECLARE_WRITE8_MEMBER(fantland_nmi_enable_w);
+	DECLARE_WRITE16_MEMBER(fantland_nmi_enable_16_w);
+	DECLARE_WRITE8_MEMBER(fantland_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(fantland_soundlatch_16_w);
+	DECLARE_READ16_MEMBER(spriteram_16_r);
+	DECLARE_READ16_MEMBER(spriteram2_16_r);
+	DECLARE_WRITE16_MEMBER(spriteram_16_w);
+	DECLARE_WRITE16_MEMBER(spriteram2_16_w);
+	DECLARE_WRITE8_MEMBER(borntofi_nmi_enable_w);
+	DECLARE_READ8_MEMBER(borntofi_inputs_r);
+	DECLARE_WRITE8_MEMBER(borntofi_msm5205_w);
 };
 
 

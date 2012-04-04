@@ -26,6 +26,16 @@ public:
 	/* misc */
 	int      m_bbprot_kludge;
 	UINT16   m_fof_700000_data;
+	DECLARE_READ16_MEMBER(fitfight_700000_r);
+	DECLARE_READ16_MEMBER(histryma_700000_r);
+	DECLARE_READ16_MEMBER(bbprot_700000_r);
+	DECLARE_WRITE16_MEMBER(fitfight_700000_w);
+	DECLARE_READ8_MEMBER(snd_porta_r);
+	DECLARE_READ8_MEMBER(snd_portb_r);
+	DECLARE_READ8_MEMBER(snd_portc_r);
+	DECLARE_WRITE8_MEMBER(snd_porta_w);
+	DECLARE_WRITE8_MEMBER(snd_portb_w);
+	DECLARE_WRITE8_MEMBER(snd_portc_w);
 };
 
 

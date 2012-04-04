@@ -262,9 +262,9 @@ static CUSTOM_INPUT( clock_r )
 }
 
 
-static WRITE8_HANDLER( bzone_coin_counter_w )
+WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset,data);
+	coin_counter_w(machine(), offset,data);
 }
 
 
@@ -302,7 +302,7 @@ static ADDRESS_MAP_START( bzone_map, AS_PROGRAM, 8, bzone_state )
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(bzone_coin_counter_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(bzone_coin_counter_w)
 	AM_RANGE(0x1200, 0x1200) AM_WRITE_LEGACY(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE_LEGACY(watchdog_reset_w)
 	AM_RANGE(0x1600, 0x1600) AM_WRITE_LEGACY(avgdvg_reset_w)
@@ -778,31 +778,30 @@ ROM_END
  *
  *************************************/
 
-static READ8_HANDLER( analog_data_r )
+READ8_MEMBER(bzone_state::analog_data_r)
 {
-	bzone_state *state = space->machine().driver_data<bzone_state>();
-	return state->m_analog_data;
+	return m_analog_data;
 }
 
 
-static WRITE8_HANDLER( analog_select_w )
+WRITE8_MEMBER(bzone_state::analog_select_w)
 {
-	bzone_state *state = space->machine().driver_data<bzone_state>();
 	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
 	if (offset <= 2)
-		state->m_analog_data = input_port_read(space->machine(), analog_port[offset]);
+		m_analog_data = input_port_read(machine(), analog_port[offset]);
 }
 
 
 static DRIVER_INIT( bradley )
 {
+	bzone_state *state = machine.driver_data<bzone_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->install_ram(0x400, 0x7ff);
 	space->install_read_port(0x1808, 0x1808, "1808");
 	space->install_read_port(0x1809, 0x1809, "1809");
-	space->install_legacy_read_handler(0x180a, 0x180a, FUNC(analog_data_r));
-	space->install_legacy_write_handler(0x1848, 0x1850, FUNC(analog_select_w));
+	space->install_read_handler(0x180a, 0x180a, read8_delegate(FUNC(bzone_state::analog_data_r),state));
+	space->install_write_handler(0x1848, 0x1850, write8_delegate(FUNC(bzone_state::analog_select_w),state));
 }
 
 

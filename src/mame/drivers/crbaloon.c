@@ -57,14 +57,13 @@ static void pc3092_update(running_machine &machine)
 }
 
 
-static WRITE8_HANDLER( pc3092_w )
+WRITE8_MEMBER(crbaloon_state::pc3092_w)
 {
-	crbaloon_state *state = space->machine().driver_data<crbaloon_state>();
-	state->m_pc3092_data[offset] = data & 0x0f;
+	m_pc3092_data[offset] = data & 0x0f;
 
-	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", cpu_get_pc(&space->device()), offset, state->m_pc3092_data[offset]);
+	if (LOG_PC3092) logerror("%04X:  write PC3092 #%d = 0x%02x\n", cpu_get_pc(&space.device()), offset, m_pc3092_data[offset]);
 
-	pc3092_update(space->machine());
+	pc3092_update(machine());
 }
 
 
@@ -115,12 +114,12 @@ static void pc3259_update(void)
 }
 
 
-static READ8_HANDLER( pc3259_r )
+READ8_MEMBER(crbaloon_state::pc3259_r)
 {
 	UINT8 ret = 0;
 	UINT8 reg = offset >> 2;
 
-	UINT16 collision_address = crbaloon_get_collision_address(space->machine());
+	UINT16 collision_address = crbaloon_get_collision_address(machine());
 	int collided = (collision_address != 0xffff);
 
 	switch (reg)
@@ -143,9 +142,9 @@ static READ8_HANDLER( pc3259_r )
 		break;
 	}
 
-	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", cpu_get_pc(&space->device()), reg, ret);
+	if (LOG_PC3259) logerror("%04X:  read PC3259 #%d = 0x%02x\n", cpu_get_pc(&space.device()), reg, ret);
 
-	return ret | (input_port_read(space->machine(), "DSW1") & 0xf0);
+	return ret | (input_port_read(machine(), "DSW1") & 0xf0);
 }
 
 
@@ -156,18 +155,17 @@ static READ8_HANDLER( pc3259_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( port_sound_w )
+WRITE8_MEMBER(crbaloon_state::port_sound_w)
 {
-	crbaloon_state *state = space->machine().driver_data<crbaloon_state>();
-	device_t *discrete = space->machine().device("discrete");
-	device_t *sn = space->machine().device("snsnd");
+	device_t *discrete = machine().device("discrete");
+	device_t *sn = machine().device("snsnd");
 
 	/* D0 - interrupt enable - also goes to PC3259 as /HTCTRL */
-	state->m_irq_mask = data & 0x01;
-	crbaloon_set_clear_collision_address(space->machine(), (data & 0x01) ? TRUE : FALSE);
+	m_irq_mask = data & 0x01;
+	crbaloon_set_clear_collision_address(machine(), (data & 0x01) ? TRUE : FALSE);
 
 	/* D1 - SOUND STOP */
-	space->machine().sound().system_enable((data & 0x02) ? TRUE : FALSE);
+	machine().sound().system_enable((data & 0x02) ? TRUE : FALSE);
 
 	/* D2 - unlabeled - music enable */
 	crbaloon_audio_set_music_enable(discrete, 0, (data & 0x04) ? TRUE : FALSE);
@@ -218,15 +216,15 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, crbaloon_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xf)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0c) AM_READ_PORT("DSW0")
 	AM_RANGE(0x01, 0x01) AM_MIRROR(0x0c) AM_READ_PORT("IN0")
-	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_MASK(0x0c) AM_READ_LEGACY(pc3259_r)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x0c) AM_MASK(0x0c) AM_READ(pc3259_r)
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x0c) AM_READ_PORT("IN1")
 
 	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* not connected */
 	AM_RANGE(0x01, 0x01) AM_WRITENOP /* watchdog */
 	AM_RANGE(0x02, 0x04) AM_WRITEONLY AM_BASE(m_spriteram)
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("discrete", crbaloon_audio_set_music_freq)
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(port_sound_w)
-	AM_RANGE(0x07, 0x0b) AM_WRITE_LEGACY(pc3092_w) AM_BASE(m_pc3092_data)
+	AM_RANGE(0x06, 0x06) AM_WRITE(port_sound_w)
+	AM_RANGE(0x07, 0x0b) AM_WRITE(pc3092_w) AM_BASE(m_pc3092_data)
 	AM_RANGE(0x0c, 0x0c) AM_WRITENOP /* MSK - to PC3259 */
 	AM_RANGE(0x0d, 0x0d) AM_WRITENOP /* schematics has it in a box marked "NOT USE" */
 	AM_RANGE(0x0e, 0x0f) AM_WRITENOP
@@ -342,11 +340,12 @@ GFXDECODE_END
 
 static MACHINE_RESET( crballoon )
 {
+	crbaloon_state *state = machine.driver_data<crbaloon_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_IO);
 	device_t *discrete = machine.device("discrete");
 
 	pc3092_reset();
-	port_sound_w(space, 0, 0);
+	state->port_sound_w(*space, 0, 0);
 	crbaloon_audio_set_music_freq(discrete, 0, 0);
 }
 

@@ -47,6 +47,14 @@ public:
 	UINT8 *m_tilemap_maskdata;
 	int m_copy_sprites;
 	UINT8 m_drawmode_table[16];
+	DECLARE_WRITE8_MEMBER(namcos1_sub_firq_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(firq_ack_w);
+	DECLARE_READ8_MEMBER(dsw_r);
+	DECLARE_WRITE8_MEMBER(namcos1_coin_w);
+	DECLARE_WRITE8_MEMBER(namcos1_dac_gain_w);
+	DECLARE_WRITE8_MEMBER(namcos1_dac0_w);
+	DECLARE_WRITE8_MEMBER(namcos1_dac1_w);
 };
 
 

@@ -139,6 +139,20 @@ public:
 	device_t *m_audiocpu;
 	msm5205_device *m_msm_1;	// fcrash
 	msm5205_device *m_msm_2;	// fcrash
+	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
+	DECLARE_READ16_MEMBER(forgottn_dial_0_r);
+	DECLARE_READ16_MEMBER(forgottn_dial_1_r);
+	DECLARE_WRITE16_MEMBER(forgottn_dial_0_reset_w);
+	DECLARE_WRITE16_MEMBER(forgottn_dial_1_reset_w);
+	DECLARE_WRITE8_MEMBER(cps1_snd_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(cps1_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(cps1_soundlatch2_w);
+	DECLARE_WRITE16_MEMBER(cpsq_coinctrl2_w);
+	DECLARE_READ16_MEMBER(qsound_rom_r);
+	DECLARE_READ16_MEMBER(qsound_sharedram2_r);
+	DECLARE_WRITE16_MEMBER(qsound_sharedram2_w);
+	DECLARE_WRITE8_MEMBER(qsound_banksw_w);
+	DECLARE_READ16_MEMBER(sf2mdt_r);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

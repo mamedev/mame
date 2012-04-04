@@ -24,6 +24,12 @@ public:
 	int m_palette_reverse_bot;
 
 	UINT8 m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(punchout_2a03_reset_w);
+	DECLARE_READ8_MEMBER(spunchout_rp5c01_r);
+	DECLARE_WRITE8_MEMBER(spunchout_rp5c01_w);
+	DECLARE_READ8_MEMBER(spunchout_exp_r);
+	DECLARE_WRITE8_MEMBER(spunchout_exp_w);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 };
 
 

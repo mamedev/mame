@@ -38,6 +38,10 @@ public:
 	/* misc */
 	int m_count;
 	int m_disable_irq;
+	DECLARE_READ8_MEMBER(aeroboto_201_r);
+	DECLARE_READ8_MEMBER(aeroboto_irq_ack_r);
+	DECLARE_READ8_MEMBER(aeroboto_2973_r);
+	DECLARE_WRITE8_MEMBER(aeroboto_1a2_w);
 };
 
 

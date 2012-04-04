@@ -20,6 +20,10 @@ public:
 
 	/* devices */
 	cpu_device *m_maincpu;
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE8_MEMBER(tutankhm_bankselect_w);
+	DECLARE_WRITE8_MEMBER(sound_mute_w);
+	DECLARE_WRITE8_MEMBER(tutankhm_coin_counter_w);
 };
 
 

@@ -65,32 +65,28 @@ TODO:
 
 
 /* Sound comm between CPU's */
-static READ8_HANDLER( sraider_sound_low_r )
+READ8_MEMBER(ladybug_state::sraider_sound_low_r)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	return state->m_sound_low;
+	return m_sound_low;
 }
 
-static READ8_HANDLER( sraider_sound_high_r )
+READ8_MEMBER(ladybug_state::sraider_sound_high_r)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	return state->m_sound_high;
+	return m_sound_high;
 }
 
-static WRITE8_HANDLER( sraider_sound_low_w )
+WRITE8_MEMBER(ladybug_state::sraider_sound_low_w)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	state->m_sound_low = data;
+	m_sound_low = data;
 }
 
-static WRITE8_HANDLER( sraider_sound_high_w )
+WRITE8_MEMBER(ladybug_state::sraider_sound_high_w)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	state->m_sound_high = data;
+	m_sound_high = data;
 }
 
 /* Protection? */
-static READ8_HANDLER( sraider_8005_r )
+READ8_MEMBER(ladybug_state::sraider_8005_r)
 {
 	/* This must return X011111X or cpu #1 will hang */
 	/* see code at rst $10 */
@@ -98,9 +94,8 @@ static READ8_HANDLER( sraider_8005_r )
 }
 
 /* Unknown IO */
-static WRITE8_HANDLER( sraider_misc_w )
+WRITE8_MEMBER(ladybug_state::sraider_misc_w)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 
 	switch(offset)
 	{
@@ -113,18 +108,18 @@ static WRITE8_HANDLER( sraider_misc_w )
 		case 0x05:
 		case 0x06:
 		case 0x07:
-			state->m_weird_value[offset & 7] = data & 1;
+			m_weird_value[offset & 7] = data & 1;
 			break;
 		/* These 6 bits are stored in the latch at N7 */
 		case 0x08:
-			state->m_sraider_0x30 = data&0x3f;
+			m_sraider_0x30 = data&0x3f;
 			break;
 		/* These 6 bits are stored in the latch at N8 */
 		case 0x10:
-			state->m_sraider_0x38 = data&0x3f;
+			m_sraider_0x38 = data&0x3f;
 			break;
 		default:
-			mame_printf_debug("(%04X) write to %02X\n", cpu_get_pc(&space->device()), offset);
+			mame_printf_debug("(%04X) write to %02X\n", cpu_get_pc(&space.device()), offset);
 			break;
 	}
 }
@@ -151,9 +146,9 @@ static ADDRESS_MAP_START( sraider_cpu1_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_WRITEONLY AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x8005, 0x8005) AM_READ_LEGACY(sraider_8005_r)  // protection check?
-	AM_RANGE(0x8006, 0x8006) AM_WRITE_LEGACY(sraider_sound_low_w)
-	AM_RANGE(0x8007, 0x8007) AM_WRITE_LEGACY(sraider_sound_high_w)
+	AM_RANGE(0x8005, 0x8005) AM_READ(sraider_8005_r)  // protection check?
+	AM_RANGE(0x8006, 0x8006) AM_WRITE(sraider_sound_low_w)
+	AM_RANGE(0x8007, 0x8007) AM_WRITE(sraider_sound_high_w)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
 	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
 	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
@@ -167,8 +162,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sraider_cpu2_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(sraider_sound_low_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(sraider_sound_high_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ(sraider_sound_low_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(sraider_sound_high_r)
 	AM_RANGE(0xc000, 0xc000) AM_READNOP //some kind of sync
 	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE(m_grid_data)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(sraider_io_w)
@@ -182,7 +177,7 @@ static ADDRESS_MAP_START( sraider_cpu2_io_map, AS_IO, 8, ladybug_state )
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
 	AM_RANGE(0x18, 0x18) AM_DEVWRITE_LEGACY("sn4", sn76496_w)
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("sn5", sn76496_w)
-	AM_RANGE(0x28, 0x3f) AM_WRITE_LEGACY(sraider_misc_w)  // lots unknown
+	AM_RANGE(0x28, 0x3f) AM_WRITE(sraider_misc_w)  // lots unknown
 ADDRESS_MAP_END
 
 

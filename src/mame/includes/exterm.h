@@ -19,6 +19,17 @@ public:
 	UINT16 m_last;
 	UINT16 *m_master_videoram;
 	UINT16 *m_slave_videoram;
+	DECLARE_WRITE16_MEMBER(exterm_host_data_w);
+	DECLARE_READ16_MEMBER(exterm_host_data_r);
+	DECLARE_READ16_MEMBER(exterm_input_port_0_r);
+	DECLARE_READ16_MEMBER(exterm_input_port_1_r);
+	DECLARE_WRITE16_MEMBER(exterm_output_port_0_w);
+	DECLARE_WRITE16_MEMBER(sound_latch_w);
+	DECLARE_WRITE8_MEMBER(sound_nmi_rate_w);
+	DECLARE_READ8_MEMBER(sound_master_latch_r);
+	DECLARE_READ8_MEMBER(sound_slave_latch_r);
+	DECLARE_READ8_MEMBER(sound_nmi_to_slave_r);
+	DECLARE_WRITE8_MEMBER(sound_control_w);
 };
 
 

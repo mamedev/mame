@@ -21,28 +21,26 @@
 
 // Sound section is copied from Mysterious Stones driver by Nicola, Mike, Brad
 
-static WRITE8_HANDLER( bogeyman_8910_latch_w )
+WRITE8_MEMBER(bogeyman_state::bogeyman_8910_latch_w)
 {
-	bogeyman_state *state = space->machine().driver_data<bogeyman_state>();
-	state->m_psg_latch = data;
+	m_psg_latch = data;
 }
 
-static WRITE8_HANDLER( bogeyman_8910_control_w )
+WRITE8_MEMBER(bogeyman_state::bogeyman_8910_control_w)
 {
-	bogeyman_state *state = space->machine().driver_data<bogeyman_state>();
 
 	// bit 0 is flipscreen
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(machine(), data & 0x01);
 
 	// bit 5 goes to 8910 #0 BDIR pin
-	if ((state->m_last_write & 0x20) == 0x20 && (data & 0x20) == 0x00)
-		ay8910_data_address_w(space->machine().device("ay1"), state->m_last_write >> 4, state->m_psg_latch);
+	if ((m_last_write & 0x20) == 0x20 && (data & 0x20) == 0x00)
+		ay8910_data_address_w(machine().device("ay1"), m_last_write >> 4, m_psg_latch);
 
 	// bit 7 goes to 8910 #1 BDIR pin
-	if ((state->m_last_write & 0x80) == 0x80 && (data & 0x80) == 0x00)
-		ay8910_data_address_w(space->machine().device("ay2"), state->m_last_write >> 6, state->m_psg_latch);
+	if ((m_last_write & 0x80) == 0x80 && (data & 0x80) == 0x00)
+		ay8910_data_address_w(machine().device("ay2"), m_last_write >> 6, m_psg_latch);
 
-	state->m_last_write = data;
+	m_last_write = data;
 }
 
 /* Memory Map */
@@ -55,8 +53,8 @@ static ADDRESS_MAP_START( bogeyman_map, AS_PROGRAM, 8, bogeyman_state )
 	AM_RANGE(0x2100, 0x21ff) AM_RAM_WRITE_LEGACY(bogeyman_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x3000, 0x300f) AM_RAM_WRITE_LEGACY(bogeyman_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1") AM_WRITE_LEGACY(bogeyman_8910_control_w)
-	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2") AM_WRITE_LEGACY(bogeyman_8910_latch_w)
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("P1") AM_WRITE(bogeyman_8910_control_w)
+	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("P2") AM_WRITE(bogeyman_8910_latch_w)
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW2") AM_WRITENOP // ??? sound
 	AM_RANGE(0x4000, 0xffff) AM_ROM

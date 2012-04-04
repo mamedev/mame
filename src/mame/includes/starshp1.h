@@ -60,6 +60,9 @@ public:
 	UINT16 *m_LSFR;
 	bitmap_ind16 m_helper;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(starshp1_collision_reset_w);
+	DECLARE_WRITE8_MEMBER(starshp1_analog_in_w);
+	DECLARE_WRITE8_MEMBER(starshp1_misc_w);
 };
 
 

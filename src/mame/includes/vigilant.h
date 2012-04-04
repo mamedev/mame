@@ -15,6 +15,9 @@ public:
 	bitmap_ind16 *m_bg_bitmap;
 	UINT8 *m_spriteram;
 	size_t m_spriteram_size;
+	DECLARE_WRITE8_MEMBER(vigilant_bank_select_w);
+	DECLARE_WRITE8_MEMBER(vigilant_out2_w);
+	DECLARE_WRITE8_MEMBER(kikcubic_coin_w);
 };
 
 

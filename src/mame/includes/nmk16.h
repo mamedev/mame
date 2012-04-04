@@ -42,6 +42,29 @@ public:
 	UINT8 m_start_helper;
 	UINT8 m_coin_count[2];
 	UINT8 m_coin_count_frac[2];
+	DECLARE_WRITE16_MEMBER(nmk16_mainram_strange_w);
+	DECLARE_WRITE16_MEMBER(ssmissin_sound_w);
+	DECLARE_WRITE8_MEMBER(ssmissin_soundbank_w);
+	DECLARE_WRITE16_MEMBER(tharrier_mcu_control_w);
+	DECLARE_READ16_MEMBER(tharrier_mcu_r);
+	DECLARE_WRITE16_MEMBER(macross2_sound_reset_w);
+	DECLARE_WRITE16_MEMBER(macross2_sound_command_w);
+	DECLARE_WRITE8_MEMBER(macross2_sound_bank_w);
+	DECLARE_WRITE8_MEMBER(tharrier_oki6295_bankswitch_0_w);
+	DECLARE_WRITE8_MEMBER(tharrier_oki6295_bankswitch_1_w);
+	DECLARE_WRITE16_MEMBER(afega_soundlatch_w);
+	DECLARE_READ16_MEMBER(mcu_shared_r);
+	DECLARE_WRITE16_MEMBER(hachamf_mainram_w);
+	DECLARE_WRITE16_MEMBER(tdragon_mainram_w);
+	DECLARE_WRITE8_MEMBER(okibank_w);
+	DECLARE_WRITE8_MEMBER(raphero_sound_rombank_w);
+	DECLARE_READ16_MEMBER(vandykeb_r);
+	DECLARE_READ16_MEMBER(afega_unknown_r);
+	DECLARE_WRITE16_MEMBER(afega_scroll0_w);
+	DECLARE_WRITE16_MEMBER(afega_scroll1_w);
+	DECLARE_WRITE16_MEMBER(twinactn_scroll0_w);
+	DECLARE_WRITE16_MEMBER(twinactn_scroll1_w);
+	DECLARE_WRITE16_MEMBER(twinactn_flipscreen_w);
 };
 
 

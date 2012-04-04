@@ -50,11 +50,10 @@ Notes:
  *
  *************************************/
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(carjmbre_state::nmi_mask_w)
 {
-	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 
@@ -62,7 +61,7 @@ static ADDRESS_MAP_START( carjmbre_map, AS_PROGRAM, 8, carjmbre_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 //  AM_RANGE(0x8800, 0x8800) AM_READNOP         // watchdog?
-	AM_RANGE(0x8803, 0x8803) AM_WRITE_LEGACY(nmi_mask_w)
+	AM_RANGE(0x8803, 0x8803) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x8805, 0x8805) AM_WRITE_LEGACY(carjmbre_bgcolor_w)	// guessed
 	AM_RANGE(0x8806, 0x8806) AM_WRITE_LEGACY(carjmbre_8806_w)		// video related?
 	AM_RANGE(0x8807, 0x8807) AM_WRITE_LEGACY(carjmbre_flipscreen_w)

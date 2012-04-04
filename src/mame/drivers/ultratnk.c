@@ -67,69 +67,65 @@ static MACHINE_RESET( ultratnk )
 }
 
 
-static READ8_HANDLER( ultratnk_wram_r )
+READ8_MEMBER(ultratnk_state::ultratnk_wram_r)
 {
-	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	return videoram[0x380 + offset];
 }
 
 
-static READ8_HANDLER( ultratnk_analog_r )
+READ8_MEMBER(ultratnk_state::ultratnk_analog_r)
 {
-	return (input_port_read(space->machine(), "ANALOG") << (~offset & 7)) & 0x80;
+	return (input_port_read(machine(), "ANALOG") << (~offset & 7)) & 0x80;
 }
-static READ8_HANDLER( ultratnk_coin_r )
+READ8_MEMBER(ultratnk_state::ultratnk_coin_r)
 {
-	return (input_port_read(space->machine(), "COIN") << (~offset & 7)) & 0x80;
+	return (input_port_read(machine(), "COIN") << (~offset & 7)) & 0x80;
 }
-static READ8_HANDLER( ultratnk_collision_r )
+READ8_MEMBER(ultratnk_state::ultratnk_collision_r)
 {
-	return (input_port_read(space->machine(), "COLLISION") << (~offset & 7)) & 0x80;
-}
-
-
-static READ8_HANDLER( ultratnk_options_r )
-{
-	return (input_port_read(space->machine(), "DIP") >> (2 * (offset & 3))) & 3;
+	return (input_port_read(machine(), "COLLISION") << (~offset & 7)) & 0x80;
 }
 
 
-static WRITE8_HANDLER( ultratnk_wram_w )
+READ8_MEMBER(ultratnk_state::ultratnk_options_r)
 {
-	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
-	UINT8 *videoram = state->m_videoram;
+	return (input_port_read(machine(), "DIP") >> (2 * (offset & 3))) & 3;
+}
+
+
+WRITE8_MEMBER(ultratnk_state::ultratnk_wram_w)
+{
+	UINT8 *videoram = m_videoram;
 	videoram[0x380 + offset] = data;
 }
 
 
-static WRITE8_HANDLER( ultratnk_collision_reset_w )
+WRITE8_MEMBER(ultratnk_state::ultratnk_collision_reset_w)
 {
-	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
-	state->m_collision[(offset >> 1) & 3] = 0;
+	m_collision[(offset >> 1) & 3] = 0;
 }
 
 
-static WRITE8_HANDLER( ultratnk_da_latch_w )
+WRITE8_MEMBER(ultratnk_state::ultratnk_da_latch_w)
 {
-	ultratnk_state *state = space->machine().driver_data<ultratnk_state>();
-	state->m_da_latch = data & 15;
+	m_da_latch = data & 15;
 }
 
 
-static WRITE8_HANDLER( ultratnk_led_1_w )
+WRITE8_MEMBER(ultratnk_state::ultratnk_led_1_w)
 {
-	set_led_status(space->machine(), 0, offset & 1); /* left player start */
+	set_led_status(machine(), 0, offset & 1); /* left player start */
 }
-static WRITE8_HANDLER( ultratnk_led_2_w )
+WRITE8_MEMBER(ultratnk_state::ultratnk_led_2_w)
 {
-	set_led_status(space->machine(), 1, offset & 1); /* right player start */
+	set_led_status(machine(), 1, offset & 1); /* right player start */
 }
 
 
-static WRITE8_HANDLER( ultratnk_lockout_w )
+WRITE8_MEMBER(ultratnk_state::ultratnk_lockout_w)
 {
-	coin_lockout_global_w(space->machine(), ~offset & 1);
+	coin_lockout_global_w(machine(), ~offset & 1);
 }
 
 
@@ -156,25 +152,25 @@ static ADDRESS_MAP_START( ultratnk_cpu_map, AS_PROGRAM, 8, ultratnk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x700) AM_RAM
-	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE_LEGACY(ultratnk_wram_r, ultratnk_wram_w)
+	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(ultratnk_wram_r, ultratnk_wram_w)
 	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(ultratnk_video_ram_w) AM_BASE(m_videoram)
 
 	AM_RANGE(0x1000, 0x17ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x1800, 0x1fff) AM_READ_PORT("IN1")
 
-	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x718) AM_READ_LEGACY(ultratnk_analog_r)
-	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_READ_LEGACY(ultratnk_coin_r)
-	AM_RANGE(0x2040, 0x2047) AM_MIRROR(0x718) AM_READ_LEGACY(ultratnk_collision_r)
-	AM_RANGE(0x2060, 0x2063) AM_MIRROR(0x71c) AM_READ_LEGACY(ultratnk_options_r)
+	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x718) AM_READ(ultratnk_analog_r)
+	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_READ(ultratnk_coin_r)
+	AM_RANGE(0x2040, 0x2047) AM_MIRROR(0x718) AM_READ(ultratnk_collision_r)
+	AM_RANGE(0x2060, 0x2063) AM_MIRROR(0x71c) AM_READ(ultratnk_options_r)
 
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x71f) AM_DEVWRITE_LEGACY("discrete", ultratnk_attract_w)
-	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_WRITE_LEGACY(ultratnk_collision_reset_w)
-	AM_RANGE(0x2040, 0x2041) AM_MIRROR(0x718) AM_WRITE_LEGACY(ultratnk_da_latch_w)
+	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_WRITE(ultratnk_collision_reset_w)
+	AM_RANGE(0x2040, 0x2041) AM_MIRROR(0x718) AM_WRITE(ultratnk_da_latch_w)
 	AM_RANGE(0x2042, 0x2043) AM_MIRROR(0x718) AM_DEVWRITE_LEGACY("discrete", ultratnk_explosion_w)
 	AM_RANGE(0x2044, 0x2045) AM_MIRROR(0x718) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x2066, 0x2067) AM_MIRROR(0x710) AM_WRITE_LEGACY(ultratnk_lockout_w)
-	AM_RANGE(0x2068, 0x2069) AM_MIRROR(0x710) AM_WRITE_LEGACY(ultratnk_led_1_w)
-	AM_RANGE(0x206a, 0x206b) AM_MIRROR(0x710) AM_WRITE_LEGACY(ultratnk_led_2_w)
+	AM_RANGE(0x2066, 0x2067) AM_MIRROR(0x710) AM_WRITE(ultratnk_lockout_w)
+	AM_RANGE(0x2068, 0x2069) AM_MIRROR(0x710) AM_WRITE(ultratnk_led_1_w)
+	AM_RANGE(0x206a, 0x206b) AM_MIRROR(0x710) AM_WRITE(ultratnk_led_2_w)
 	AM_RANGE(0x206c, 0x206d) AM_MIRROR(0x710) AM_DEVWRITE_LEGACY("discrete", ultratnk_fire_2_w)
 	AM_RANGE(0x206e, 0x206f) AM_MIRROR(0x710) AM_DEVWRITE_LEGACY("discrete", ultratnk_fire_1_w)
 

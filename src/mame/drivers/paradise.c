@@ -44,18 +44,18 @@ penky: we need to delay the irqs at startup or it won't boot. Either one of
 
 ***************************************************************************/
 
-static WRITE8_HANDLER( paradise_rombank_w )
+WRITE8_MEMBER(paradise_state::paradise_rombank_w)
 {
 	int bank = data;
-	int bank_n = space->machine().region("maincpu")->bytes() / 0x4000 - 1;
+	int bank_n = machine().region("maincpu")->bytes() / 0x4000 - 1;
 
 	if (bank >= bank_n)
 	{
-		logerror("PC %04X - invalid rom bank %x\n", cpu_get_pc(&space->device()), bank);
+		logerror("PC %04X - invalid rom bank %x\n", cpu_get_pc(&space.device()), bank);
 		bank %= bank_n;
 	}
 
-	memory_set_bank(space->machine(), "bank1", bank);
+	memory_set_bank(machine(), "bank1", bank);
 }
 
 static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
@@ -66,9 +66,9 @@ static WRITE8_DEVICE_HANDLER( paradise_okibank_w )
 	downcast<okim6295_device *>(device)->set_bank_base((data & 0x02) ? 0x40000 : 0);
 }
 
-static WRITE8_HANDLER( torus_coin_counter_w )
+WRITE8_MEMBER(paradise_state::torus_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data ^ 0xff);
+	coin_counter_w(machine(), 0, data ^ 0xff);
 }
 
 #define STANDARD_MAP	\
@@ -104,7 +104,7 @@ static ADDRESS_MAP_START( paradise_io_map, AS_IO, 8, paradise_state )
 	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(paradise_priority_w)	// Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(paradise_flipscreen_w)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE_LEGACY(paradise_palbank_w)	// Layers palette bank
-	AM_RANGE(0x2006, 0x2006) AM_WRITE_LEGACY(paradise_rombank_w)	// ROM bank
+	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w)	// ROM bank
 	AM_RANGE(0x2007, 0x2007) AM_DEVWRITE_LEGACY("oki2", paradise_okibank_w)	// OKI 1 samples bank
 	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_device, read, write)	// OKI 0
 	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1")
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( torus_io_map, AS_IO, 8, paradise_state )
 	AM_RANGE(0x1800, 0x1800) AM_WRITE_LEGACY(paradise_priority_w)	// Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(paradise_flipscreen_w)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE_LEGACY(paradise_palbank_w)	// Layers palette bank
-	AM_RANGE(0x2006, 0x2006) AM_WRITE_LEGACY(paradise_rombank_w)	// ROM bank
+	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w)	// ROM bank
 	AM_RANGE(0x2010, 0x2010) AM_DEVREADWRITE("oki1", okim6295_device, read, write)	// OKI 0
 	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2")
@@ -1231,7 +1231,7 @@ static DRIVER_INIT (torus)
 {
 	paradise_state *state = machine.driver_data<paradise_state>();
 	state->m_sprite_inc = 4;
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x2070, 0x2070, FUNC(torus_coin_counter_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x2070, 0x2070, write8_delegate(FUNC(paradise_state::torus_coin_counter_w),state));
 }
 
 

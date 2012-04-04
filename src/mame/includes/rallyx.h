@@ -38,6 +38,10 @@ public:
 	samples_device *m_samples;
 
 	UINT8    m_main_irq_mask;
+	DECLARE_WRITE8_MEMBER(rallyx_interrupt_vector_w);
+	DECLARE_WRITE8_MEMBER(rallyx_bang_w);
+	DECLARE_WRITE8_MEMBER(rallyx_latch_w);
+	DECLARE_WRITE8_MEMBER(locomotn_latch_w);
 };
 
 

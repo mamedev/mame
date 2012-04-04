@@ -28,6 +28,15 @@ public:
 	device_t *m_k007232;
 	device_t *m_k052109;
 	device_t *m_k051960;
+	DECLARE_WRITE8_MEMBER(dv_nmienable_w);
+	DECLARE_WRITE8_MEMBER(mainevt_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(mainevt_coin_w);
+	DECLARE_WRITE8_MEMBER(mainevt_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(mainevt_sh_irqcontrol_w);
+	DECLARE_WRITE8_MEMBER(devstor_sh_irqcontrol_w);
+	DECLARE_WRITE8_MEMBER(mainevt_sh_bankswitch_w);
+	DECLARE_READ8_MEMBER(k052109_051960_r);
+	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 };
 
 /*----------- defined in video/mainevt.c -----------*/

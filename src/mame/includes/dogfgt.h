@@ -32,6 +32,12 @@ public:
 
 	/* devices */
 	device_t *m_subcpu;
+	DECLARE_READ8_MEMBER(sharedram_r);
+	DECLARE_WRITE8_MEMBER(sharedram_w);
+	DECLARE_WRITE8_MEMBER(subirqtrigger_w);
+	DECLARE_WRITE8_MEMBER(sub_irqack_w);
+	DECLARE_WRITE8_MEMBER(dogfgt_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(dogfgt_soundcontrol_w);
 };
 
 

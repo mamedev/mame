@@ -34,6 +34,11 @@ public:
 	device_t *m_mcu;
 
 	UINT8          m_irq_mask;
+	DECLARE_WRITE8_MEMBER(champbas_watchdog_reset_w);
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE8_MEMBER(champbas_mcu_switch_w);
+	DECLARE_WRITE8_MEMBER(champbas_mcu_halt_w);
+	DECLARE_READ8_MEMBER(champbja_alt_protection_r);
 };
 
 

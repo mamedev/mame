@@ -44,18 +44,16 @@ The driver has been updated accordingly.
  *
  *************************************/
 
-static WRITE8_HANDLER( matmania_sh_command_w )
+WRITE8_MEMBER(matmania_state::matmania_sh_command_w)
 {
-	matmania_state *state = space->machine().driver_data<matmania_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( maniach_sh_command_w )
+WRITE8_MEMBER(matmania_state::maniach_sh_command_w)
 {
-	matmania_state *state = space->machine().driver_data<matmania_state>();
 	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -75,7 +73,7 @@ static ADDRESS_MAP_START( matmania_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE_SIZE(m_videoram3, m_videoram3_size)
 	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE(m_colorram3)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE(m_pageselect)
-	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE_LEGACY(matmania_sh_command_w)
+	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(matmania_sh_command_w)
 	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP /* ?? */
 	AM_RANGE(0x3050, 0x307f) AM_WRITE_LEGACY(matmania_paletteram_w) AM_BASE(m_paletteram)
@@ -92,7 +90,7 @@ static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE_SIZE(m_videoram3, m_videoram3_size)
 	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE(m_colorram3)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE(m_pageselect)
-	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE_LEGACY(maniach_sh_command_w)
+	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(maniach_sh_command_w)
 	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP	/* ?? */
 	AM_RANGE(0x3040, 0x3040) AM_READWRITE_LEGACY(maniach_mcu_r,maniach_mcu_w)

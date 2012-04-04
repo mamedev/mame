@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( mexico86_m68705_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( mexico86_sub_output_w )
+WRITE8_MEMBER(mexico86_state::mexico86_sub_output_w)
 {
 	/*--x- ---- coin lockout 2*/
 	/*---x ---- coin lockout 1*/
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( mexico86_sub_cpu_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN5")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN6")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("IN7")
-	AM_RANGE(0xc004, 0xc004) AM_WRITE_LEGACY(mexico86_sub_output_w)
+	AM_RANGE(0xc004, 0xc004) AM_WRITE(mexico86_sub_output_w)
 ADDRESS_MAP_END
 
 /*************************************

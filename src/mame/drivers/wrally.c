@@ -122,18 +122,16 @@ static ADDRESS_MAP_START( wrally_map, AS_PROGRAM, 16, wrally_state )
 	AM_RANGE(0xfec000, 0xfeffff) AM_RAM AM_BASE(m_shareram)										/* Work RAM (shared with DS5002FP) */
 ADDRESS_MAP_END
 
-static READ8_HANDLER( dallas_share_r )
+READ8_MEMBER(wrally_state::dallas_share_r)
 {
-	wrally_state *state = space->machine().driver_data<wrally_state>();
-	UINT8 *shareram = (UINT8 *)state->m_shareram;
+	UINT8 *shareram = (UINT8 *)m_shareram;
 
 	return shareram[BYTE_XOR_LE(offset) ^ 1];
 }
 
-static WRITE8_HANDLER( dallas_share_w )
+WRITE8_MEMBER(wrally_state::dallas_share_w)
 {
-	wrally_state *state = space->machine().driver_data<wrally_state>();
-	UINT8 *shareram = (UINT8 *)state->m_shareram;
+	UINT8 *shareram = (UINT8 *)m_shareram;
 
 	shareram[BYTE_XOR_LE(offset) ^ 1] = data;
 }
@@ -143,7 +141,7 @@ static ADDRESS_MAP_START( dallas_rom, AS_PROGRAM, 8, wrally_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dallas_ram, AS_IO, 8, wrally_state )
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(dallas_share_r, dallas_share_w)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dallas_share_r, dallas_share_w)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
 ADDRESS_MAP_END
 
 /* DS5002FP configuration */

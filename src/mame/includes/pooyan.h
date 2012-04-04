@@ -19,6 +19,7 @@ public:
 
 	/* devices */
 	cpu_device *m_maincpu;
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
 };
 
 

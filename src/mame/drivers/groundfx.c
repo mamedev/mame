@@ -78,18 +78,18 @@ Extract a standard version of this
 ("taito_8bpg_palette_word_w"?) to Taitoic.c ?
 ***********************************************************/
 
-static WRITE32_HANDLER( color_ram_w )
+WRITE32_MEMBER(groundfx_state::color_ram_w)
 {
 	int a,r,g,b;
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
 
 	{
-		a = space->machine().generic.paletteram.u32[offset];
+		a = machine().generic.paletteram.u32[offset];
 		r = (a &0xff0000) >> 16;
 		g = (a &0xff00) >> 8;
 		b = (a &0xff);
 
-		palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+		palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -136,20 +136,19 @@ static CUSTOM_INPUT( coin_word_r )
 	return state->m_coin_word;
 }
 
-static WRITE32_HANDLER( groundfx_input_w )
+WRITE32_MEMBER(groundfx_state::groundfx_input_w)
 {
-	groundfx_state *state = space->machine().driver_data<groundfx_state>();
 	switch (offset)
 	{
 		case 0x00:
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
-				watchdog_reset(space->machine());
+				watchdog_reset(machine());
 			}
 
 			if (ACCESSING_BITS_0_7)
 			{
-				input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+				input_port_write(machine(), "EEPROMOUT", data, 0xff);
 			}
 
 			break;
@@ -157,45 +156,44 @@ static WRITE32_HANDLER( groundfx_input_w )
 		case 0x01:
 			if (ACCESSING_BITS_24_31)
 			{
-				coin_lockout_w(space->machine(), 0,~data & 0x01000000);
-				coin_lockout_w(space->machine(), 1,~data & 0x02000000);
-				coin_counter_w(space->machine(), 0, data & 0x04000000);
-				coin_counter_w(space->machine(), 1, data & 0x08000000);
-				state->m_coin_word = (data >> 16) &0xffff;
+				coin_lockout_w(machine(), 0,~data & 0x01000000);
+				coin_lockout_w(machine(), 1,~data & 0x02000000);
+				coin_counter_w(machine(), 0, data & 0x04000000);
+				coin_counter_w(machine(), 1, data & 0x08000000);
+				m_coin_word = (data >> 16) &0xffff;
 			}
 			break;
 	}
 }
 
-static READ32_HANDLER( groundfx_adc_r )
+READ32_MEMBER(groundfx_state::groundfx_adc_r)
 {
-	return (input_port_read(space->machine(), "AN0") << 8) | input_port_read(space->machine(), "AN1");
+	return (input_port_read(machine(), "AN0") << 8) | input_port_read(machine(), "AN1");
 }
 
-static WRITE32_HANDLER( groundfx_adc_w )
+WRITE32_MEMBER(groundfx_state::groundfx_adc_w)
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
         1000 cycle delay is arbitrary */
-	space->machine().scheduler().timer_set(downcast<cpu_device *>(&space->device())->cycles_to_attotime(1000), FUNC(groundfx_interrupt5));
+	machine().scheduler().timer_set(downcast<cpu_device *>(&space.device())->cycles_to_attotime(1000), FUNC(groundfx_interrupt5));
 }
 
-static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
+WRITE32_MEMBER(groundfx_state::rotate_control_w)/* only a guess that it's rotation */
 {
-	groundfx_state *state = space->machine().driver_data<groundfx_state>();
 		if (ACCESSING_BITS_0_15)
 		{
-			state->m_rotate_ctrl[state->m_port_sel] = data;
+			m_rotate_ctrl[m_port_sel] = data;
 			return;
 		}
 
 		if (ACCESSING_BITS_16_31)
 		{
-			state->m_port_sel = (data &0x70000) >> 16;
+			m_port_sel = (data &0x70000) >> 16;
 		}
 }
 
 
-static WRITE32_HANDLER( motor_control_w )
+WRITE32_MEMBER(groundfx_state::motor_control_w)
 {
 /*
     Standard value poked is 0x00910200 (we ignore lsb and msb
@@ -219,20 +217,20 @@ static ADDRESS_MAP_START( groundfx_map, AS_PROGRAM, 32, groundfx_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM	AM_BASE(m_ram) /* main CPUA ram */
 	AM_RANGE(0x300000, 0x303fff) AM_RAM	AM_BASE_SIZE(m_spriteram, m_spriteram_size) /* sprite ram */
-	AM_RANGE(0x400000, 0x400003) AM_WRITE_LEGACY(motor_control_w)	/* gun vibration */
+	AM_RANGE(0x400000, 0x400003) AM_WRITE(motor_control_w)	/* gun vibration */
 	AM_RANGE(0x500000, 0x500003) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x500004, 0x500007) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x500000, 0x500007) AM_WRITE_LEGACY(groundfx_input_w)	/* eeprom etc. */
-	AM_RANGE(0x600000, 0x600003) AM_READWRITE_LEGACY(groundfx_adc_r,groundfx_adc_w)
+	AM_RANGE(0x500000, 0x500007) AM_WRITE(groundfx_input_w)	/* eeprom etc. */
+	AM_RANGE(0x600000, 0x600003) AM_READWRITE(groundfx_adc_r,groundfx_adc_w)
 	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("f3_shared")
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)	  /* tilemaps */
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)	// debugging
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)	/* piv tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE_LEGACY(color_ram_w) AM_BASE_GENERIC(paletteram) /* palette ram */
+	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram) /* palette ram */
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM						// ?? single bytes, blending ??
 	AM_RANGE(0xc00000, 0xc00007) AM_READNOP /* Network? */
-	AM_RANGE(0xd00000, 0xd00003) AM_WRITE_LEGACY(rotate_control_w)	/* perhaps port based rotate control? */
+	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)	/* perhaps port based rotate control? */
 	/* f00000 is seat control? */
 ADDRESS_MAP_END
 
@@ -438,20 +436,19 @@ ROM_START( groundfx )
 ROM_END
 
 
-static READ32_HANDLER( irq_speedup_r_groundfx )
+READ32_MEMBER(groundfx_state::irq_speedup_r_groundfx)
 {
-	groundfx_state *state = space->machine().driver_data<groundfx_state>();
-	cpu_device *cpu = downcast<cpu_device *>(&space->device());
+	cpu_device *cpu = downcast<cpu_device *>(&space.device());
 	int ptr;
 	offs_t sp = cpu->sp();
-	if ((sp&2)==0) ptr=state->m_ram[(sp&0x1ffff)/4];
-	else ptr=(((state->m_ram[(sp&0x1ffff)/4])&0x1ffff)<<16) |
-	(state->m_ram[((sp&0x1ffff)/4)+1]>>16);
+	if ((sp&2)==0) ptr=m_ram[(sp&0x1ffff)/4];
+	else ptr=(((m_ram[(sp&0x1ffff)/4])&0x1ffff)<<16) |
+	(m_ram[((sp&0x1ffff)/4)+1]>>16);
 
 	if (cpu->pc()==0x1ece && ptr==0x1b9a)
 		cpu->spin_until_interrupt();
 
-	return state->m_ram[0xb574/4];
+	return m_ram[0xb574/4];
 }
 
 
@@ -463,7 +460,8 @@ static DRIVER_INIT( groundfx )
 	int data;
 
 	/* Speedup handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x20b574, 0x20b577, FUNC(irq_speedup_r_groundfx));
+	groundfx_state *state = machine.driver_data<groundfx_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x20b574, 0x20b577, read32_delegate(FUNC(groundfx_state::irq_speedup_r_groundfx),state));
 
 	/* make piv tile GFX format suitable for gfxdecode */
 	offset = size/2;

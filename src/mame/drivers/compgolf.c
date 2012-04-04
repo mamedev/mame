@@ -34,22 +34,21 @@ static WRITE8_DEVICE_HANDLER( compgolf_scrolly_lo_w )
 	state->m_scrolly_lo = data;
 }
 
-static WRITE8_HANDLER( compgolf_ctrl_w )
+WRITE8_MEMBER(compgolf_state::compgolf_ctrl_w)
 {
-	compgolf_state *state = space->machine().driver_data<compgolf_state>();
 
 	/* bit 4 and 6 are always set */
 
 	int new_bank = (data & 4) >> 2;
 
-	if (state->m_bank != new_bank)
+	if (m_bank != new_bank)
 	{
-		state->m_bank = new_bank;
-		memory_set_bank(space->machine(), "bank1", state->m_bank);
+		m_bank = new_bank;
+		memory_set_bank(machine(), "bank1", m_bank);
 	}
 
-	state->m_scrollx_hi = (data & 1) << 8;
-	state->m_scrolly_hi = (data & 2) << 7;
+	m_scrollx_hi = (data & 1) << 8;
+	m_scrolly_hi = (data & 2) << 7;
 }
 
 
@@ -66,7 +65,7 @@ static ADDRESS_MAP_START( compgolf_map, AS_PROGRAM, 8, compgolf_state )
 	AM_RANGE(0x2000, 0x2060) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x2061, 0x2061) AM_WRITENOP
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("P1")
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2") AM_WRITE_LEGACY(compgolf_ctrl_w)
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("P2") AM_WRITE(compgolf_ctrl_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)

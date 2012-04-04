@@ -37,10 +37,9 @@ static CUSTOM_INPUT( wolfpack_dial_r )
 }
 
 
-static READ8_HANDLER( wolfpack_misc_r )
+READ8_MEMBER(wolfpack_state::wolfpack_misc_r)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	device_t *device = space->machine().device("speech");
+	device_t *device = machine().device("speech");
 	UINT8 val = 0;
 
 	/* BIT0 => SPEECH BUSY */
@@ -55,26 +54,26 @@ static READ8_HANDLER( wolfpack_misc_r )
 	if (!s14001a_bsy_r(device))
         val |= 0x01;
 
-	if (!state->m_collision)
+	if (!m_collision)
 		val |= 0x10;
 
-	if (space->machine().primary_screen->vpos() >= 240)
+	if (machine().primary_screen->vpos() >= 240)
 		val |= 0x80;
 
 	return val;
 }
 
 
-static WRITE8_HANDLER( wolfpack_high_explo_w ) { }
-static WRITE8_HANDLER( wolfpack_sonar_ping_w ) {}
-static WRITE8_HANDLER( wolfpack_sirlat_w ) {}
-static WRITE8_HANDLER( wolfpack_pt_sound_w ) {}
-static WRITE8_HANDLER( wolfpack_launch_torpedo_w ) {}
-static WRITE8_HANDLER( wolfpack_low_explo_w ) {}
-static WRITE8_HANDLER( wolfpack_screw_cont_w ) {}
-static WRITE8_HANDLER( wolfpack_lamp_flash_w ) {}
-static WRITE8_HANDLER( wolfpack_warning_light_w ) {}
-static WRITE8_HANDLER( wolfpack_audamp_w ) {}
+WRITE8_MEMBER(wolfpack_state::wolfpack_high_explo_w){ }
+WRITE8_MEMBER(wolfpack_state::wolfpack_sonar_ping_w){}
+WRITE8_MEMBER(wolfpack_state::wolfpack_sirlat_w){}
+WRITE8_MEMBER(wolfpack_state::wolfpack_pt_sound_w){}
+WRITE8_MEMBER(wolfpack_state::wolfpack_launch_torpedo_w){}
+WRITE8_MEMBER(wolfpack_state::wolfpack_low_explo_w){}
+WRITE8_MEMBER(wolfpack_state::wolfpack_screw_cont_w){}
+WRITE8_MEMBER(wolfpack_state::wolfpack_lamp_flash_w){}
+WRITE8_MEMBER(wolfpack_state::wolfpack_warning_light_w){}
+WRITE8_MEMBER(wolfpack_state::wolfpack_audamp_w){}
 
 static WRITE8_DEVICE_HANDLER( wolfpack_word_w )
 {
@@ -90,22 +89,21 @@ static WRITE8_DEVICE_HANDLER( wolfpack_start_speech_w )
 }
 
 
-static WRITE8_HANDLER( wolfpack_attract_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_attract_w)
 {
-	coin_lockout_global_w(space->machine(), !(data & 1));
+	coin_lockout_global_w(machine(), !(data & 1));
 }
 
 
-static WRITE8_HANDLER( wolfpack_credit_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_credit_w)
 {
-	set_led_status(space->machine(), 0, !(data & 1));
+	set_led_status(machine(), 0, !(data & 1));
 }
 
 
-static WRITE8_HANDLER( wolfpack_coldetres_w )
+WRITE8_MEMBER(wolfpack_state::wolfpack_coldetres_w)
 {
-	wolfpack_state *state = space->machine().driver_data<wolfpack_state>();
-	state->m_collision = 0;
+	m_collision = 0;
 }
 
 
@@ -113,28 +111,28 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wolfpack_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_BASE(m_alpha_num_ram)
-	AM_RANGE(0x2000, 0x2000) AM_READ_LEGACY(wolfpack_misc_r)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE_LEGACY(wolfpack_high_explo_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(wolfpack_sonar_ping_w)
-	AM_RANGE(0x2002, 0x2002) AM_WRITE_LEGACY(wolfpack_sirlat_w)
-	AM_RANGE(0x2003, 0x2003) AM_WRITE_LEGACY(wolfpack_pt_sound_w)
+	AM_RANGE(0x2000, 0x2000) AM_READ(wolfpack_misc_r)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(wolfpack_high_explo_w)
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(wolfpack_sonar_ping_w)
+	AM_RANGE(0x2002, 0x2002) AM_WRITE(wolfpack_sirlat_w)
+	AM_RANGE(0x2003, 0x2003) AM_WRITE(wolfpack_pt_sound_w)
 	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE_LEGACY("speech", wolfpack_start_speech_w)
-	AM_RANGE(0x2005, 0x2005) AM_WRITE_LEGACY(wolfpack_launch_torpedo_w)
-	AM_RANGE(0x2006, 0x2006) AM_WRITE_LEGACY(wolfpack_low_explo_w)
-	AM_RANGE(0x2007, 0x2007) AM_WRITE_LEGACY(wolfpack_screw_cont_w)
+	AM_RANGE(0x2005, 0x2005) AM_WRITE(wolfpack_launch_torpedo_w)
+	AM_RANGE(0x2006, 0x2006) AM_WRITE(wolfpack_low_explo_w)
+	AM_RANGE(0x2007, 0x2007) AM_WRITE(wolfpack_screw_cont_w)
 	AM_RANGE(0x2008, 0x2008) AM_WRITE_LEGACY(wolfpack_video_invert_w)
 	AM_RANGE(0x2009, 0x2009) AM_WRITE_LEGACY(wolfpack_ship_reflect_w)
-	AM_RANGE(0x200a, 0x200a) AM_WRITE_LEGACY(wolfpack_lamp_flash_w)
-	AM_RANGE(0x200c, 0x200c) AM_WRITE_LEGACY(wolfpack_credit_w)
-	AM_RANGE(0x200d, 0x200d) AM_WRITE_LEGACY(wolfpack_attract_w)
+	AM_RANGE(0x200a, 0x200a) AM_WRITE(wolfpack_lamp_flash_w)
+	AM_RANGE(0x200c, 0x200c) AM_WRITE(wolfpack_credit_w)
+	AM_RANGE(0x200d, 0x200d) AM_WRITE(wolfpack_attract_w)
 	AM_RANGE(0x200e, 0x200e) AM_WRITE_LEGACY(wolfpack_pt_pos_select_w)
-	AM_RANGE(0x200f, 0x200f) AM_WRITE_LEGACY(wolfpack_warning_light_w)
+	AM_RANGE(0x200f, 0x200f) AM_WRITE(wolfpack_warning_light_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW")
-	AM_RANGE(0x3000, 0x3000) AM_WRITE_LEGACY(wolfpack_audamp_w)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(wolfpack_audamp_w)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE_LEGACY(wolfpack_pt_horz_w)
 	AM_RANGE(0x3003, 0x3003) AM_WRITE_LEGACY(wolfpack_pt_pic_w)
 	AM_RANGE(0x3004, 0x3004) AM_DEVWRITE_LEGACY("speech", wolfpack_word_w)
-	AM_RANGE(0x3007, 0x3007) AM_WRITE_LEGACY(wolfpack_coldetres_w)
+	AM_RANGE(0x3007, 0x3007) AM_WRITE(wolfpack_coldetres_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(wolfpack_ship_h_w)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(wolfpack_torpedo_pic_w)
 	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(wolfpack_ship_size_w)

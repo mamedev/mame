@@ -79,18 +79,17 @@ static PALETTE_INIT( copsnrob )
  *
  *************************************/
 
-static READ8_HANDLER( copsnrob_misc_r )
+READ8_MEMBER(copsnrob_state::copsnrob_misc_r)
 {
-	return input_port_read(space->machine(), "IN0") & 0x80;
+	return input_port_read(machine(), "IN0") & 0x80;
 }
 
-static WRITE8_HANDLER( copsnrob_misc2_w )
+WRITE8_MEMBER(copsnrob_state::copsnrob_misc2_w)
 {
-	copsnrob_state *state = space->machine().driver_data<copsnrob_state>();
 
-	state->m_misc = data & 0x7f;
+	m_misc = data & 0x7f;
 	/* Multi Player Start */
-	set_led_status(space->machine(), 1, !((data >> 6) & 0x01));
+	set_led_status(machine(), 1, !((data >> 6) & 0x01));
 }
 
 
@@ -114,8 +113,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, copsnrob_state )
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 //  AM_RANGE(0x1000, 0x1003) AM_WRITENOP
 //  AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
-	AM_RANGE(0x1000, 0x1000) AM_READ_LEGACY(copsnrob_misc_r)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(copsnrob_misc2_w)
+	AM_RANGE(0x1000, 0x1000) AM_READ(copsnrob_misc_r)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(copsnrob_misc2_w)
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("CTRL1")
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("CTRL2")
 	AM_RANGE(0x100a, 0x100a) AM_READ_PORT("CTRL3")

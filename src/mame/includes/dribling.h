@@ -28,6 +28,8 @@ public:
 	device_t *m_maincpu;
 	device_t *m_ppi_0;
 	device_t *m_ppi_1;
+	DECLARE_READ8_MEMBER(ioread);
+	DECLARE_WRITE8_MEMBER(iowrite);
 };
 
 

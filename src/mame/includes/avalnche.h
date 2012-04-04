@@ -18,6 +18,11 @@ public:
 	size_t   m_videoram_size;
 
 	UINT8    m_avalance_video_inverted;
+	DECLARE_WRITE8_MEMBER(avalance_video_invert_w);
+	DECLARE_WRITE8_MEMBER(catch_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(avalance_credit_1_lamp_w);
+	DECLARE_WRITE8_MEMBER(avalance_credit_2_lamp_w);
+	DECLARE_WRITE8_MEMBER(avalance_start_lamp_w);
 };
 
 /*----------- defined in audio/avalnche.c -----------*/

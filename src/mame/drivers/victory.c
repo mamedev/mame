@@ -108,12 +108,12 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( lamp_control_w )
+WRITE8_MEMBER(victory_state::lamp_control_w)
 {
-	set_led_status(space->machine(), 0, data & 0x80);
-	set_led_status(space->machine(), 1, data & 0x40);
-	set_led_status(space->machine(), 2, data & 0x20);
-	set_led_status(space->machine(), 3, data & 0x10);
+	set_led_status(machine(), 0, data & 0x80);
+	set_led_status(machine(), 1, data & 0x40);
+	set_led_status(machine(), 2, data & 0x20);
+	set_led_status(machine(), 3, data & 0x10);
 }
 
 
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( main_io_map, AS_IO, 8, victory_state )
 	AM_RANGE(0x0a, 0x0a) AM_READ_PORT("COIN")
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("UNUSED")
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_WRITE_LEGACY(lamp_control_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_WRITE(lamp_control_w)
 	AM_RANGE(0x14, 0xff) AM_NOP
 ADDRESS_MAP_END
 

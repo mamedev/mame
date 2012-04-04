@@ -164,38 +164,36 @@ static TIMER_DEVICE_CALLBACK( nvram_write_timeout )
 }
 
 
-static WRITE16_HANDLER( nvram_thrash_w )
+WRITE16_MEMBER(coolpool_state::nvram_thrash_w)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 	/* keep track of the last few writes */
-	memmove(&state->m_nvram_write_seq[0], &state->m_nvram_write_seq[1], (NVRAM_UNLOCK_SEQ_LEN - 1) * sizeof(state->m_nvram_write_seq[0]));
-	state->m_nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN - 1] = offset & 0x3ff;
+	memmove(&m_nvram_write_seq[0], &m_nvram_write_seq[1], (NVRAM_UNLOCK_SEQ_LEN - 1) * sizeof(m_nvram_write_seq[0]));
+	m_nvram_write_seq[NVRAM_UNLOCK_SEQ_LEN - 1] = offset & 0x3ff;
 
 	/* if they match the unlock sequence, enable writes and set a timeout */
-	if (!memcmp(nvram_unlock_seq, state->m_nvram_write_seq, sizeof(nvram_unlock_seq)))
+	if (!memcmp(nvram_unlock_seq, m_nvram_write_seq, sizeof(nvram_unlock_seq)))
 	{
-		state->m_nvram_write_enable = 1;
-		timer_device *nvram_timer = space->machine().device<timer_device>("nvram_timer");
+		m_nvram_write_enable = 1;
+		timer_device *nvram_timer = machine().device<timer_device>("nvram_timer");
 		nvram_timer->adjust(attotime::from_msec(1000));
 	}
 }
 
 
-static WRITE16_HANDLER( nvram_data_w )
+WRITE16_MEMBER(coolpool_state::nvram_data_w)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 	/* only the low 8 bits matter */
 	if (ACCESSING_BITS_0_7)
 	{
-		if (state->m_nvram_write_enable)
+		if (m_nvram_write_enable)
 		{
-			state->m_nvram[offset] = data & 0xff;
+			m_nvram[offset] = data & 0xff;
 		}
 	}
 }
 
 
-static WRITE16_HANDLER( nvram_thrash_data_w )
+WRITE16_MEMBER(coolpool_state::nvram_thrash_data_w)
 {
 	nvram_data_w(space, offset, data, mem_mask);
 	nvram_thrash_w(space, offset, data, mem_mask);
@@ -218,73 +216,68 @@ static TIMER_DEVICE_CALLBACK( amerdart_audio_int_gen )
 }
 
 
-static WRITE16_HANDLER( amerdart_misc_w )
+WRITE16_MEMBER(coolpool_state::amerdart_misc_w)
 {
-	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(&space->device()),data);
+	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(&space.device()),data);
 
-	coin_counter_w(space->machine(), 0, ~data & 0x0001);
-	coin_counter_w(space->machine(), 1, ~data & 0x0002);
+	coin_counter_w(machine(), 0, ~data & 0x0001);
+	coin_counter_w(machine(), 1, ~data & 0x0002);
 
 	/* bits 10-15 are counted down over time */
 
-	cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static READ16_HANDLER( amerdart_dsp_bio_line_r )
+READ16_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
 	/* Skip idle checking */
-	if (state->m_old_cmd == state->m_cmd_pending)
-		state->m_same_cmd_count += 1;
+	if (m_old_cmd == m_cmd_pending)
+		m_same_cmd_count += 1;
 	else
-		state->m_same_cmd_count = 0;
+		m_same_cmd_count = 0;
 
-	if (state->m_same_cmd_count >= 5)
+	if (m_same_cmd_count >= 5)
 	{
-		state->m_same_cmd_count = 5;
-		device_spin(&space->device());
+		m_same_cmd_count = 5;
+		device_spin(&space.device());
 	}
-	state->m_old_cmd = state->m_cmd_pending;
+	m_old_cmd = m_cmd_pending;
 
-	return state->m_cmd_pending ? CLEAR_LINE : ASSERT_LINE;
+	return m_cmd_pending ? CLEAR_LINE : ASSERT_LINE;
 }
 
-static READ16_HANDLER( amerdart_iop_r )
+READ16_MEMBER(coolpool_state::amerdart_iop_r)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-//  logerror("%08x:IOP read %04x\n",cpu_get_pc(&space->device()),state->m_iop_answer);
-	cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
+//  logerror("%08x:IOP read %04x\n",cpu_get_pc(&space.device()),m_iop_answer);
+	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
 
-	return state->m_iop_answer;
+	return m_iop_answer;
 }
 
-static WRITE16_HANDLER( amerdart_iop_w )
+WRITE16_MEMBER(coolpool_state::amerdart_iop_w)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-//  logerror("%08x:IOP write %04x\n", cpu_get_pc(&space->device()), data);
-	COMBINE_DATA(&state->m_iop_cmd);
-	state->m_cmd_pending = 1;
+//  logerror("%08x:IOP write %04x\n", cpu_get_pc(&space.device()), data);
+	COMBINE_DATA(&m_iop_cmd);
+	m_cmd_pending = 1;
 }
 
-static READ16_HANDLER( amerdart_dsp_cmd_r )
+READ16_MEMBER(coolpool_state::amerdart_dsp_cmd_r)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-//  logerror("%08x:DSP cmd_r %04x\n", cpu_get_pc(&space->device()), state->m_iop_cmd);
-	state->m_cmd_pending = 0;
-	return state->m_iop_cmd;
+//  logerror("%08x:DSP cmd_r %04x\n", cpu_get_pc(&space.device()), m_iop_cmd);
+	m_cmd_pending = 0;
+	return m_iop_cmd;
 }
 
-static WRITE16_HANDLER( amerdart_dsp_answer_w )
+WRITE16_MEMBER(coolpool_state::amerdart_dsp_answer_w)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-//  logerror("%08x:DSP answer %04x\n", cpu_get_pc(&space->device()), data);
-	state->m_iop_answer = data;
-	cputag_set_input_line(space->machine(), "maincpu", 1, ASSERT_LINE);
+//  logerror("%08x:DSP answer %04x\n", cpu_get_pc(&space.device()), data);
+	m_iop_answer = data;
+	cputag_set_input_line(machine(), "maincpu", 1, ASSERT_LINE);
 }
 
 
@@ -372,7 +365,7 @@ static int amerdart_trackball_direction(address_space *space, int num, int data)
 }
 
 
-static READ16_HANDLER( amerdart_trackball_r )
+READ16_MEMBER(coolpool_state::amerdart_trackball_r)
 {
 /*
     Trackballs seem to be handled as though they're rotated 45 degrees anti-clockwise.
@@ -409,33 +402,32 @@ static READ16_HANDLER( amerdart_trackball_r )
 
 */
 
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
 
-	state->m_result = (state->m_lastresult | 0x00ff);
+	m_result = (m_lastresult | 0x00ff);
 
-	state->m_newx[1] = input_port_read(space->machine(), "XAXIS1");	/* Trackball 1  Left - Right */
-	state->m_newy[1] = input_port_read(space->machine(), "YAXIS1");	/* Trackball 1   Up  - Down  */
-	state->m_newx[2] = input_port_read(space->machine(), "XAXIS2");	/* Trackball 2  Left - Right */
-	state->m_newy[2] = input_port_read(space->machine(), "YAXIS2");	/* Trackball 2   Up  - Down  */
+	m_newx[1] = input_port_read(machine(), "XAXIS1");	/* Trackball 1  Left - Right */
+	m_newy[1] = input_port_read(machine(), "YAXIS1");	/* Trackball 1   Up  - Down  */
+	m_newx[2] = input_port_read(machine(), "XAXIS2");	/* Trackball 2  Left - Right */
+	m_newy[2] = input_port_read(machine(), "YAXIS2");	/* Trackball 2   Up  - Down  */
 
-	state->m_dx[1] = (INT8)(state->m_newx[1] - state->m_oldx[1]);
-	state->m_dy[1] = (INT8)(state->m_newy[1] - state->m_oldy[1]);
-	state->m_dx[2] = (INT8)(state->m_newx[2] - state->m_oldx[2]);
-	state->m_dy[2] = (INT8)(state->m_newy[2] - state->m_oldy[2]);
+	m_dx[1] = (INT8)(m_newx[1] - m_oldx[1]);
+	m_dy[1] = (INT8)(m_newy[1] - m_oldy[1]);
+	m_dx[2] = (INT8)(m_newx[2] - m_oldx[2]);
+	m_dy[2] = (INT8)(m_newy[2] - m_oldy[2]);
 
 	/* Determine Trackball 1 direction state */
-	state->m_result = (state->m_result & 0xf0ff) | (amerdart_trackball_direction(space, 1, ((state->m_result >>  8) & 0xf)) <<  8);
+	m_result = (m_result & 0xf0ff) | (amerdart_trackball_direction(&space, 1, ((m_result >>  8) & 0xf)) <<  8);
 
 	/* Determine Trackball 2 direction state */
-	state->m_result = (state->m_result & 0x0fff) | (amerdart_trackball_direction(space, 2, ((state->m_result >> 12) & 0xf)) << 12);
+	m_result = (m_result & 0x0fff) | (amerdart_trackball_direction(&space, 2, ((m_result >> 12) & 0xf)) << 12);
 
 
-//  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", cpu_get_pc(&space->device()), state->m_newx, state->m_newy, state->m_oldx, state->m_oldy, state->m_lastresult, state->m_result);
+//  logerror("%08X:read port 6 (X=%02X Y=%02X oldX=%02X oldY=%02X oldRes=%04X Res=%04X)\n", cpu_get_pc(&space.device()), m_newx, m_newy, m_oldx, m_oldy, m_lastresult, m_result);
 
-	state->m_lastresult = state->m_result;
+	m_lastresult = m_result;
 
-	return state->m_result;
+	return m_result;
 }
 
 
@@ -445,14 +437,14 @@ static READ16_HANDLER( amerdart_trackball_r )
  *
  *************************************/
 
-static WRITE16_HANDLER( coolpool_misc_w )
+WRITE16_MEMBER(coolpool_state::coolpool_misc_w)
 {
-	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(&space->device()),data);
+	logerror("%08x:IOP_system_w %04x\n",cpu_get_pc(&space.device()),data);
 
-	coin_counter_w(space->machine(), 0, ~data & 0x0001);
-	coin_counter_w(space->machine(), 1, ~data & 0x0002);
+	coin_counter_w(machine(), 0, ~data & 0x0001);
+	coin_counter_w(machine(), 1, ~data & 0x0002);
 
-	cputag_set_input_line(space->machine(), "dsp", INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "dsp", INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -477,21 +469,20 @@ static TIMER_CALLBACK( deferred_iop_w )
 }
 
 
-static WRITE16_HANDLER( coolpool_iop_w )
+WRITE16_MEMBER(coolpool_state::coolpool_iop_w)
 {
-	logerror("%08x:IOP write %04x\n", cpu_get_pc(&space->device()), data);
-	space->machine().scheduler().synchronize(FUNC(deferred_iop_w), data);
+	logerror("%08x:IOP write %04x\n", cpu_get_pc(&space.device()), data);
+	machine().scheduler().synchronize(FUNC(deferred_iop_w), data);
 }
 
 
-static READ16_HANDLER( coolpool_iop_r )
+READ16_MEMBER(coolpool_state::coolpool_iop_r)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-	logerror("%08x:IOP read %04x\n",cpu_get_pc(&space->device()),state->m_iop_answer);
-	cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
+	logerror("%08x:IOP read %04x\n",cpu_get_pc(&space.device()),m_iop_answer);
+	cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
 
-	return state->m_iop_answer;
+	return m_iop_answer;
 }
 
 
@@ -503,35 +494,32 @@ static READ16_HANDLER( coolpool_iop_r )
  *
  *************************************/
 
-static READ16_HANDLER( dsp_cmd_r )
+READ16_MEMBER(coolpool_state::dsp_cmd_r)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-	state->m_cmd_pending = 0;
-	logerror("%08x:IOP cmd_r %04x\n", cpu_get_pc(&space->device()), state->m_iop_cmd);
-	return state->m_iop_cmd;
+	m_cmd_pending = 0;
+	logerror("%08x:IOP cmd_r %04x\n", cpu_get_pc(&space.device()), m_iop_cmd);
+	return m_iop_cmd;
 }
 
 
-static WRITE16_HANDLER( dsp_answer_w )
+WRITE16_MEMBER(coolpool_state::dsp_answer_w)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-	logerror("%08x:IOP answer %04x\n", cpu_get_pc(&space->device()), data);
-	state->m_iop_answer = data;
-	cputag_set_input_line(space->machine(), "maincpu", 1, ASSERT_LINE);
+	logerror("%08x:IOP answer %04x\n", cpu_get_pc(&space.device()), data);
+	m_iop_answer = data;
+	cputag_set_input_line(machine(), "maincpu", 1, ASSERT_LINE);
 }
 
 
-static READ16_HANDLER( dsp_bio_line_r )
+READ16_MEMBER(coolpool_state::dsp_bio_line_r)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-	return state->m_cmd_pending ? CLEAR_LINE : ASSERT_LINE;
+	return m_cmd_pending ? CLEAR_LINE : ASSERT_LINE;
 }
 
 
-static READ16_HANDLER( dsp_hold_line_r )
+READ16_MEMBER(coolpool_state::dsp_hold_line_r)
 {
 	return CLEAR_LINE;	/* ??? */
 }
@@ -544,27 +532,25 @@ static READ16_HANDLER( dsp_hold_line_r )
  *
  *************************************/
 
-static READ16_HANDLER( dsp_rom_r )
+READ16_MEMBER(coolpool_state::dsp_rom_r)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
-	UINT8 *rom = space->machine().region("user2")->base();
+	UINT8 *rom = machine().region("user2")->base();
 
-	return rom[state->m_iop_romaddr & (space->machine().region("user2")->bytes() - 1)];
+	return rom[m_iop_romaddr & (machine().region("user2")->bytes() - 1)];
 }
 
 
-static WRITE16_HANDLER( dsp_romaddr_w )
+WRITE16_MEMBER(coolpool_state::dsp_romaddr_w)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
 	switch (offset)
 	{
 		case 0:
-			state->m_iop_romaddr = (state->m_iop_romaddr & 0xffff00) | (data >> 8);
+			m_iop_romaddr = (m_iop_romaddr & 0xffff00) | (data >> 8);
 			break;
 
 		case 1:
-			state->m_iop_romaddr = (state->m_iop_romaddr & 0x0000ff) | (data << 8);
+			m_iop_romaddr = (m_iop_romaddr & 0x0000ff) | (data << 8);
 			break;
 	}
 }
@@ -583,66 +569,65 @@ static WRITE16_DEVICE_HANDLER( dsp_dac_w )
  *
  *************************************/
 
-static READ16_HANDLER( coolpool_input_r )
+READ16_MEMBER(coolpool_state::coolpool_input_r)
 {
-	coolpool_state *state = space->machine().driver_data<coolpool_state>();
 
-	state->m_result = (input_port_read(space->machine(), "IN1") & 0x00ff) | (state->m_lastresult & 0xff00);
-	state->m_newx[1] = input_port_read(space->machine(), "XAXIS");
-	state->m_newy[1] = input_port_read(space->machine(), "YAXIS");
-	state->m_dx[1] = (INT8)(state->m_newx[1] - state->m_oldx[1]);
-	state->m_dy[1] = (INT8)(state->m_newy[1] - state->m_oldy[1]);
+	m_result = (input_port_read(machine(), "IN1") & 0x00ff) | (m_lastresult & 0xff00);
+	m_newx[1] = input_port_read(machine(), "XAXIS");
+	m_newy[1] = input_port_read(machine(), "YAXIS");
+	m_dx[1] = (INT8)(m_newx[1] - m_oldx[1]);
+	m_dy[1] = (INT8)(m_newy[1] - m_oldy[1]);
 
-	if (state->m_dx[1] < 0)
+	if (m_dx[1] < 0)
 	{
-		state->m_oldx[1]--;
-		switch (state->m_result & 0x300)
+		m_oldx[1]--;
+		switch (m_result & 0x300)
 		{
-			case 0x000:	state->m_result ^= 0x200;	break;
-			case 0x100:	state->m_result ^= 0x100;	break;
-			case 0x200:	state->m_result ^= 0x100;	break;
-			case 0x300:	state->m_result ^= 0x200;	break;
+			case 0x000:	m_result ^= 0x200;	break;
+			case 0x100:	m_result ^= 0x100;	break;
+			case 0x200:	m_result ^= 0x100;	break;
+			case 0x300:	m_result ^= 0x200;	break;
 		}
 	}
-	if (state->m_dx[1] > 0)
+	if (m_dx[1] > 0)
 	{
-		state->m_oldx[1]++;
-		switch (state->m_result & 0x300)
+		m_oldx[1]++;
+		switch (m_result & 0x300)
 		{
-			case 0x000:	state->m_result ^= 0x100;	break;
-			case 0x100:	state->m_result ^= 0x200;	break;
-			case 0x200:	state->m_result ^= 0x200;	break;
-			case 0x300:	state->m_result ^= 0x100;	break;
-		}
-	}
-
-	if (state->m_dy[1] < 0)
-	{
-		state->m_oldy[1]--;
-		switch (state->m_result & 0xc00)
-		{
-			case 0x000:	state->m_result ^= 0x800;	break;
-			case 0x400:	state->m_result ^= 0x400;	break;
-			case 0x800:	state->m_result ^= 0x400;	break;
-			case 0xc00:	state->m_result ^= 0x800;	break;
-		}
-	}
-	if (state->m_dy[1] > 0)
-	{
-		state->m_oldy[1]++;
-		switch (state->m_result & 0xc00)
-		{
-			case 0x000:	state->m_result ^= 0x400;	break;
-			case 0x400:	state->m_result ^= 0x800;	break;
-			case 0x800:	state->m_result ^= 0x800;	break;
-			case 0xc00:	state->m_result ^= 0x400;	break;
+			case 0x000:	m_result ^= 0x100;	break;
+			case 0x100:	m_result ^= 0x200;	break;
+			case 0x200:	m_result ^= 0x200;	break;
+			case 0x300:	m_result ^= 0x100;	break;
 		}
 	}
 
-//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", cpu_get_pc(&space->device()),
-//      state->m_newx[1], state->m_newy[1], state->m_oldx[1], state->m_oldy[1], state->m_result);
-	state->m_lastresult = state->m_result;
-	return state->m_result;
+	if (m_dy[1] < 0)
+	{
+		m_oldy[1]--;
+		switch (m_result & 0xc00)
+		{
+			case 0x000:	m_result ^= 0x800;	break;
+			case 0x400:	m_result ^= 0x400;	break;
+			case 0x800:	m_result ^= 0x400;	break;
+			case 0xc00:	m_result ^= 0x800;	break;
+		}
+	}
+	if (m_dy[1] > 0)
+	{
+		m_oldy[1]++;
+		switch (m_result & 0xc00)
+		{
+			case 0x000:	m_result ^= 0x400;	break;
+			case 0x400:	m_result ^= 0x800;	break;
+			case 0x800:	m_result ^= 0x800;	break;
+			case 0xc00:	m_result ^= 0x400;	break;
+		}
+	}
+
+//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", cpu_get_pc(&space.device()),
+//      m_newx[1], m_newy[1], m_oldx[1], m_oldy[1], m_result);
+	m_lastresult = m_result;
+	return m_result;
 }
 
 
@@ -655,9 +640,9 @@ static READ16_HANDLER( coolpool_input_r )
 
 static ADDRESS_MAP_START( amerdart_map, AS_PROGRAM, 16, coolpool_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(m_vram_base)
-	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE_LEGACY(amerdart_misc_w)
-	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE_LEGACY(amerdart_iop_r, amerdart_iop_w)
-	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE_LEGACY(nvram_thrash_data_w) AM_SHARE("nvram")
+	AM_RANGE(0x04000000, 0x0400000f) AM_WRITE(amerdart_misc_w)
+	AM_RANGE(0x05000000, 0x0500000f) AM_READWRITE(amerdart_iop_r, amerdart_iop_w)
+	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffb00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -666,10 +651,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( coolpool_map, AS_PROGRAM, 16, coolpool_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_vram_base)
 	AM_RANGE(0x01000000, 0x010000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)	// IMSG176P-40
-	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE_LEGACY(coolpool_iop_r, coolpool_iop_w)
-	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE_LEGACY(coolpool_misc_w)
+	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
+	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
 	AM_RANGE(0x03000000, 0x03ffffff) AM_ROM AM_REGION("gfx1", 0)
-	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE_LEGACY(nvram_thrash_data_w) AM_SHARE("nvram")
+	AM_RANGE(0x06000000, 0x06007fff) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -677,10 +662,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nballsht_map, AS_PROGRAM, 16, coolpool_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_vram_base)
-	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE_LEGACY(coolpool_iop_r, coolpool_iop_w)
-	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE_LEGACY(coolpool_misc_w)
+	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
+	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
 	AM_RANGE(0x04000000, 0x040000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)	// IMSG176P-40
-	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_RAM_WRITE_LEGACY(nvram_thrash_data_w) AM_SHARE("nvram")
+	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_RAM_WRITE(nvram_thrash_data_w) AM_SHARE("nvram")
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff000000, 0xff7fffff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
@@ -701,14 +686,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( amerdart_dsp_io_map, AS_IO, 16, coolpool_state )
-	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(dsp_romaddr_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(amerdart_dsp_answer_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(amerdart_dsp_answer_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac", dsp_dac_w)
-	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(dsp_rom_r)
+	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
-	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(amerdart_trackball_r)
-	AM_RANGE(0x07, 0x07) AM_READ_LEGACY(amerdart_dsp_cmd_r)
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ_LEGACY(amerdart_dsp_bio_line_r)
+	AM_RANGE(0x06, 0x06) AM_READ(amerdart_trackball_r)
+	AM_RANGE(0x07, 0x07) AM_READ(amerdart_dsp_cmd_r)
+	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(amerdart_dsp_bio_line_r)
 ADDRESS_MAP_END
 
 
@@ -719,14 +704,14 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( coolpool_dsp_io_map, AS_IO, 16, coolpool_state )
-	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(dsp_romaddr_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(dsp_cmd_r, dsp_answer_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE(dsp_romaddr_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(dsp_cmd_r, dsp_answer_w)
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac", dsp_dac_w)
-	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(dsp_rom_r)
+	AM_RANGE(0x04, 0x04) AM_READ(dsp_rom_r)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN0")
 	AM_RANGE(0x07, 0x07) AM_READ_PORT("IN1")
-	AM_RANGE(TMS32025_BIO, TMS32025_BIO) AM_READ_LEGACY(dsp_bio_line_r)
-	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ_LEGACY(dsp_hold_line_r)
+	AM_RANGE(TMS32025_BIO, TMS32025_BIO) AM_READ(dsp_bio_line_r)
+	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_hold_line_r)
 //  AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE_LEGACY(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 
@@ -1200,7 +1185,9 @@ static DRIVER_INIT( amerdart )
 
 static DRIVER_INIT( coolpool )
 {
-	machine.device("dsp")->memory().space(AS_IO)->install_legacy_read_handler(0x07, 0x07, FUNC(coolpool_input_r));
+	coolpool_state *state = machine.driver_data<coolpool_state>();
+
+	machine.device("dsp")->memory().space(AS_IO)->install_read_handler(0x07, 0x07, read16_delegate(FUNC(coolpool_state::coolpool_input_r),state));
 
 	register_state_save(machine);
 }

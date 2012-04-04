@@ -37,34 +37,34 @@ static MACHINE_START( m90 )
 
 /***************************************************************************/
 
-static WRITE16_HANDLER( m90_coincounter_w )
+WRITE16_MEMBER(m90_state::m90_coincounter_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x01);
-		coin_counter_w(space->machine(), 1, data & 0x02);
+		coin_counter_w(machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 1, data & 0x02);
 
 		if (data & 0xfc) logerror("Coin counter %02x\n",data);
 	}
 }
 
-static WRITE16_HANDLER( quizf1_bankswitch_w )
+WRITE16_MEMBER(m90_state::quizf1_bankswitch_w)
 {
 	if (ACCESSING_BITS_0_7)
-		memory_set_bank(space->machine(), "bank1", data & 0xf);
+		memory_set_bank(machine(), "bank1", data & 0xf);
 }
 
-static WRITE16_HANDLER( dynablsb_sound_command_w )
+WRITE16_MEMBER(m90_state::dynablsb_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(space, offset, data);
-		cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 #ifdef UNUSED_FUNCTION
-static WRITE16_HANDLER( unknown_w )
+WRITE16_MEMBER(m90_state::unknown_w)
 {
     printf("%04x    ",data);
 }
@@ -102,7 +102,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m90_main_cpu_io_map, AS_IO, 16, m90_state )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(m90_coincounter_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
@@ -110,15 +110,15 @@ static ADDRESS_MAP_START( m90_main_cpu_io_map, AS_IO, 16, m90_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dynablsb_main_cpu_io_map, AS_IO, 16, m90_state )
-	AM_RANGE(0x00, 0x01) AM_WRITE_LEGACY(dynablsb_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE(dynablsb_sound_command_w)
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x02, 0x03) AM_WRITE_LEGACY(m90_coincounter_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(m90_coincounter_w)
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x04, 0x05) AM_WRITE_LEGACY(unknown_w)      /* dynablsb: write continuously 0x6000 */
+//  AM_RANGE(0x04, 0x05) AM_WRITE(unknown_w)      /* dynablsb: write continuously 0x6000 */
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x06, 0x07) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(m90_video_control_w)
-//  AM_RANGE(0x90, 0x91) AM_WRITE_LEGACY(unknown_w)
+//  AM_RANGE(0x90, 0x91) AM_WRITE(unknown_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1185,8 +1185,9 @@ ROM_END
 
 static DRIVER_INIT( quizf1 )
 {
+	m90_state *state = machine.driver_data<m90_state>();
 	memory_configure_bank(machine, "bank1", 0, 16, machine.region("user1")->base(), 0x10000);
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x04, 0x05, FUNC(quizf1_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x04, 0x05, write16_delegate(FUNC(m90_state::quizf1_bankswitch_w),state));
 }
 
 

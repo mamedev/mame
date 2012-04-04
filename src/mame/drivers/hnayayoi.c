@@ -40,32 +40,30 @@ TODO:
 #include "includes/hnayayoi.h"
 
 
-static READ8_HANDLER( keyboard_0_r )
+READ8_MEMBER(hnayayoi_state::keyboard_0_r)
 {
-	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
 	int res = 0x3f;
 	int i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
 	for (i = 0; i < 5; i++)
 	{
-		if (~state->m_keyb & (1 << i))
-			res &= input_port_read(space->machine(), keynames[i]);
+		if (~m_keyb & (1 << i))
+			res &= input_port_read(machine(), keynames[i]);
 	}
 
 	return res;
 }
 
-static READ8_HANDLER( keyboard_1_r )
+READ8_MEMBER(hnayayoi_state::keyboard_1_r)
 {
 	/* Player 2 not supported */
 	return 0x3f;
 }
 
-static WRITE8_HANDLER( keyboard_w )
+WRITE8_MEMBER(hnayayoi_state::keyboard_w)
 {
-	hnayayoi_state *state = space->machine().driver_data<hnayayoi_state>();
-	state->m_keyb = data;
+	m_keyb = data;
 }
 
 
@@ -108,9 +106,9 @@ static ADDRESS_MAP_START( hnayayoi_io_map, AS_IO, 8, hnayayoi_state )
 	AM_RANGE(0x0c, 0x0c) AM_WRITE_LEGACY(dynax_blitter_rev1_clear_w)
 	AM_RANGE(0x23, 0x23) AM_DEVWRITE_LEGACY("msm", adpcm_vclk_w)
 	AM_RANGE(0x24, 0x24) AM_DEVWRITE_LEGACY("msm", adpcm_reset_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(keyboard_w)
-	AM_RANGE(0x41, 0x41) AM_READ_LEGACY(keyboard_0_r)
-	AM_RANGE(0x42, 0x42) AM_READ_LEGACY(keyboard_1_r)
+	AM_RANGE(0x40, 0x40) AM_WRITE(keyboard_w)
+	AM_RANGE(0x41, 0x41) AM_READ(keyboard_0_r)
+	AM_RANGE(0x42, 0x42) AM_READ(keyboard_1_r)
 	AM_RANGE(0x43, 0x43) AM_READ_PORT("COIN")
 	AM_RANGE(0x60, 0x61) AM_WRITE_LEGACY(hnayayoi_palbank_w)
 	AM_RANGE(0x62, 0x67) AM_WRITE_LEGACY(dynax_blitter_rev1_param_w)
@@ -130,9 +128,9 @@ static ADDRESS_MAP_START( hnfubuki_map, AS_PROGRAM, 8, hnayayoi_state )
 	AM_RANGE(0xff0c, 0xff0c) AM_WRITE_LEGACY(dynax_blitter_rev1_clear_w)
 	AM_RANGE(0xff23, 0xff23) AM_DEVWRITE_LEGACY("msm", adpcm_vclk_w)
 	AM_RANGE(0xff24, 0xff24) AM_DEVWRITE_LEGACY("msm", adpcm_reset_inv_w)
-	AM_RANGE(0xff40, 0xff40) AM_WRITE_LEGACY(keyboard_w)
-	AM_RANGE(0xff41, 0xff41) AM_READ_LEGACY(keyboard_0_r)
-	AM_RANGE(0xff42, 0xff42) AM_READ_LEGACY(keyboard_1_r)
+	AM_RANGE(0xff40, 0xff40) AM_WRITE(keyboard_w)
+	AM_RANGE(0xff41, 0xff41) AM_READ(keyboard_0_r)
+	AM_RANGE(0xff42, 0xff42) AM_READ(keyboard_1_r)
 	AM_RANGE(0xff43, 0xff43) AM_READ_PORT("COIN")
 	AM_RANGE(0xff60, 0xff61) AM_WRITE_LEGACY(hnayayoi_palbank_w)
 	AM_RANGE(0xff62, 0xff67) AM_WRITE_LEGACY(dynax_blitter_rev1_param_w)
@@ -151,9 +149,9 @@ static ADDRESS_MAP_START( untoucha_io_map, AS_IO, 8, hnayayoi_state )
 //  AM_RANGE(0x12, 0x12) AM_WRITENOP // CRT Controller
 	AM_RANGE(0x13, 0x13) AM_DEVWRITE_LEGACY("msm", adpcm_data_w)
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("COIN")
-	AM_RANGE(0x15, 0x15) AM_READ_LEGACY(keyboard_1_r)
-	AM_RANGE(0x16, 0x16) AM_READ_LEGACY(keyboard_0_r)	// bit 7 = blitter busy flag
-	AM_RANGE(0x17, 0x17) AM_WRITE_LEGACY(keyboard_w)
+	AM_RANGE(0x15, 0x15) AM_READ(keyboard_1_r)
+	AM_RANGE(0x16, 0x16) AM_READ(keyboard_0_r)	// bit 7 = blitter busy flag
+	AM_RANGE(0x17, 0x17) AM_WRITE(keyboard_w)
 	AM_RANGE(0x18, 0x19) AM_WRITE_LEGACY(hnayayoi_palbank_w)
 	AM_RANGE(0x1a, 0x1f) AM_WRITE_LEGACY(dynax_blitter_rev1_param_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE_LEGACY(dynax_blitter_rev1_clear_w)

@@ -21,30 +21,26 @@ Main CPU:
 #include "sound/dac.h"
 #include "includes/kingobox.h"
 
-static WRITE8_HANDLER( video_interrupt_w )
+WRITE8_MEMBER(kingofb_state::video_interrupt_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	device_set_input_line_and_vector(state->m_video_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_video_cpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( sprite_interrupt_w )
+WRITE8_MEMBER(kingofb_state::sprite_interrupt_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	device_set_input_line_and_vector(state->m_sprite_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_sprite_cpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( scroll_interrupt_w )
+WRITE8_MEMBER(kingofb_state::scroll_interrupt_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
 	sprite_interrupt_w(space, offset, data);
-	*state->m_scroll_y = data;
+	*m_scroll_y = data;
 }
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(kingofb_state::sound_command_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
 	soundlatch_w(space, 0, data);
-	device_set_input_line_and_vector(state->m_audio_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audio_cpu, 0, HOLD_LINE, 0xff);
 }
 
 
@@ -57,9 +53,9 @@ static ADDRESS_MAP_START( kingobox_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0xf800, 0xf800) AM_WRITE_LEGACY(kingofb_f800_w)	/* NMI enable, palette bank */
 	AM_RANGE(0xf801, 0xf801) AM_WRITENOP /* ???? */
 	AM_RANGE(0xf802, 0xf802) AM_WRITEONLY AM_BASE(m_scroll_y)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE_LEGACY(scroll_interrupt_w)
-	AM_RANGE(0xf804, 0xf804) AM_WRITE_LEGACY(video_interrupt_w)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE_LEGACY(sound_command_w) /* sound latch */
+	AM_RANGE(0xf803, 0xf803) AM_WRITE(scroll_interrupt_w)
+	AM_RANGE(0xf804, 0xf804) AM_WRITE(video_interrupt_w)
+	AM_RANGE(0xf807, 0xf807) AM_WRITE(sound_command_w) /* sound latch */
 	AM_RANGE(0xfc00, 0xfc00) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc01, 0xfc01) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc02, 0xfc02) AM_READ_PORT("P1")
@@ -106,9 +102,9 @@ static ADDRESS_MAP_START( ringking_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share2") /* shared with sprite cpu */
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("share1") /* shared with video cpu */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE_LEGACY(kingofb_f800_w)
-	AM_RANGE(0xd801, 0xd801) AM_WRITE_LEGACY(sprite_interrupt_w)
-	AM_RANGE(0xd802, 0xd802) AM_WRITE_LEGACY(video_interrupt_w)
-	AM_RANGE(0xd803, 0xd803) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xd801, 0xd801) AM_WRITE(sprite_interrupt_w)
+	AM_RANGE(0xd802, 0xd802) AM_WRITE(video_interrupt_w)
+	AM_RANGE(0xd803, 0xd803) AM_WRITE(sound_command_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW2")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P1")

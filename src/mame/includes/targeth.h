@@ -12,6 +12,8 @@ public:
 	tilemap_t *m_pant[2];
 
 	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(targeth_coin_counter_w);
 };
 
 

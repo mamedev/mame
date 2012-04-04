@@ -16,6 +16,8 @@ public:
 	UINT16 *m_vectorram;
 	int m_xcenter;
 	int m_ycenter;
+	DECLARE_READ16_MEMBER(nvram_r);
+	DECLARE_READ16_MEMBER(joystick_r);
 };
 
 /*----------- defined in audio/aztarac.c -----------*/

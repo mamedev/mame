@@ -18,6 +18,7 @@ public:
 	int m_flipscreen;
 	int m_alternate;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	DECLARE_READ16_MEMBER(sub_cpu_spin_r);
 };
 
 

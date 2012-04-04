@@ -54,6 +54,20 @@ public:
 	UINT8          m_s1945_mcu_control;
 	UINT8          m_s1945_mcu_bctrl;
 	const UINT8    *m_s1945_mcu_table;
+	DECLARE_READ32_MEMBER(sngkace_input_r);
+	DECLARE_READ32_MEMBER(gunbird_input_r);
+	DECLARE_WRITE32_MEMBER(psikyo_soundlatch_w);
+	DECLARE_WRITE32_MEMBER(s1945_soundlatch_w);
+	DECLARE_WRITE32_MEMBER(s1945_mcu_w);
+	DECLARE_READ32_MEMBER(s1945_mcu_r);
+	DECLARE_READ32_MEMBER(s1945_input_r);
+	DECLARE_WRITE32_MEMBER(paletteram32_xRRRRRGGGGGBBBBB_dword_w);
+	DECLARE_READ32_MEMBER(s1945bl_oki_r);
+	DECLARE_WRITE32_MEMBER(s1945bl_oki_w);
+	DECLARE_READ8_MEMBER(psikyo_soundlatch_r);
+	DECLARE_WRITE8_MEMBER(psikyo_clear_nmi_w);
+	DECLARE_WRITE8_MEMBER(sngkace_sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(gunbird_sound_bankswitch_w);
 };
 
 

@@ -28,6 +28,8 @@ public:
 
 	/* devices */
 	device_t *m_soundcpu;
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
 };
 
 

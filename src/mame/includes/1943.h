@@ -27,6 +27,8 @@ public:
 	int     m_obj_on;
 	int     m_bg1_on;
 	int     m_bg2_on;
+	DECLARE_READ8_MEMBER(c1943_protection_r);
+	DECLARE_READ8_MEMBER(_1943b_c007_r);
 };
 
 

@@ -363,7 +363,7 @@ Notes:
 
 
 
-#define START_TMS_SPINNING(n)			do { device_spin_until_trigger(&space->device(), 7351 + n); space->machine().driver_data<itech32_state>()->m_tms_spinning[n] = 1; } while (0)
+#define START_TMS_SPINNING(n)			do { device_spin_until_trigger(&space.device(), 7351 + n); m_tms_spinning[n] = 1; } while (0)
 #define STOP_TMS_SPINNING(machine, n)	do { (machine).scheduler().trigger(7351 + n); (machine).driver_data<itech32_state>()->m_tms_spinning[n] = 0; } while (0)
 
 
@@ -422,9 +422,9 @@ static INTERRUPT_GEN( generate_int1 )
 }
 
 
-static WRITE16_HANDLER( int1_ack_w )
+WRITE16_MEMBER(itech32_state::int1_ack_w)
 {
-	itech32_update_interrupts(space->machine(), 0, -1, -1);
+	itech32_update_interrupts(machine(), 0, -1, -1);
 }
 
 
@@ -473,116 +473,114 @@ static CUSTOM_INPUT( special_port_r )
 	return state->m_special_result;
 }
 
-static READ16_HANDLER( trackball_r )
+READ16_MEMBER(itech32_state::trackball_r)
 {
-	int lower = input_port_read(space->machine(), "TRACKX1");
-	int upper = input_port_read(space->machine(), "TRACKY1");
+	int lower = input_port_read(machine(), "TRACKX1");
+	int upper = input_port_read(machine(), "TRACKY1");
 
 	return (lower & 15) | ((upper & 15) << 4);
 }
 
 
-static READ32_HANDLER( trackball32_8bit_r )
+READ32_MEMBER(itech32_state::trackball32_8bit_r)
 {
-	int lower = input_port_read(space->machine(), "TRACKX1");
-	int upper = input_port_read(space->machine(), "TRACKY1");
+	int lower = input_port_read(machine(), "TRACKX1");
+	int upper = input_port_read(machine(), "TRACKY1");
 
 	return (lower & 255) | ((upper & 255) << 8);
 }
 
 
-static READ32_HANDLER( trackball32_4bit_p1_r )
+READ32_MEMBER(itech32_state::trackball32_4bit_p1_r)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	attotime curtime = space->machine().time();
+	attotime curtime = machine().time();
 
-	if ((curtime - state->m_p1_lasttime) > space->machine().primary_screen->scan_period())
+	if ((curtime - m_p1_lasttime) > machine().primary_screen->scan_period())
 	{
 		int upper, lower;
 		int dx, dy;
 
-		int curx = input_port_read(space->machine(), "TRACKX1");
-		int cury = input_port_read(space->machine(), "TRACKY1");
+		int curx = input_port_read(machine(), "TRACKX1");
+		int cury = input_port_read(machine(), "TRACKY1");
 
-		dx = curx - state->m_p1_effx;
+		dx = curx - m_p1_effx;
 		if (dx < -0x80) dx += 0x100;
 		else if (dx > 0x80) dx -= 0x100;
 		if (dx > 7) dx = 7;
 		else if (dx < -7) dx = -7;
-		state->m_p1_effx = (state->m_p1_effx + dx) & 0xff;
-		lower = state->m_p1_effx & 15;
+		m_p1_effx = (m_p1_effx + dx) & 0xff;
+		lower = m_p1_effx & 15;
 
-		dy = cury - state->m_p1_effy;
+		dy = cury - m_p1_effy;
 		if (dy < -0x80) dy += 0x100;
 		else if (dy > 0x80) dy -= 0x100;
 		if (dy > 7) dy = 7;
 		else if (dy < -7) dy = -7;
-		state->m_p1_effy = (state->m_p1_effy + dy) & 0xff;
-		upper = state->m_p1_effy & 15;
+		m_p1_effy = (m_p1_effy + dy) & 0xff;
+		upper = m_p1_effy & 15;
 
-		state->m_p1_lastresult = lower | (upper << 4);
+		m_p1_lastresult = lower | (upper << 4);
 	}
 
-	state->m_p1_lasttime = curtime;
-	return state->m_p1_lastresult | (state->m_p1_lastresult << 16);
+	m_p1_lasttime = curtime;
+	return m_p1_lastresult | (m_p1_lastresult << 16);
 }
 
 
-static READ32_HANDLER( trackball32_4bit_p2_r )
+READ32_MEMBER(itech32_state::trackball32_4bit_p2_r)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	attotime curtime = space->machine().time();
+	attotime curtime = machine().time();
 
-	if ((curtime - state->m_p2_lasttime) > space->machine().primary_screen->scan_period())
+	if ((curtime - m_p2_lasttime) > machine().primary_screen->scan_period())
 	{
 		int upper, lower;
 		int dx, dy;
 
-		int curx = input_port_read(space->machine(), "TRACKX2");
-		int cury = input_port_read(space->machine(), "TRACKY2");
+		int curx = input_port_read(machine(), "TRACKX2");
+		int cury = input_port_read(machine(), "TRACKY2");
 
-		dx = curx - state->m_p2_effx;
+		dx = curx - m_p2_effx;
 		if (dx < -0x80) dx += 0x100;
 		else if (dx > 0x80) dx -= 0x100;
 		if (dx > 7) dx = 7;
 		else if (dx < -7) dx = -7;
-		state->m_p2_effx = (state->m_p2_effx + dx) & 0xff;
-		lower = state->m_p2_effx & 15;
+		m_p2_effx = (m_p2_effx + dx) & 0xff;
+		lower = m_p2_effx & 15;
 
-		dy = cury - state->m_p2_effy;
+		dy = cury - m_p2_effy;
 		if (dy < -0x80) dy += 0x100;
 		else if (dy > 0x80) dy -= 0x100;
 		if (dy > 7) dy = 7;
 		else if (dy < -7) dy = -7;
-		state->m_p2_effy = (state->m_p2_effy + dy) & 0xff;
-		upper = state->m_p2_effy & 15;
+		m_p2_effy = (m_p2_effy + dy) & 0xff;
+		upper = m_p2_effy & 15;
 
-		state->m_p2_lastresult = lower | (upper << 4);
+		m_p2_lastresult = lower | (upper << 4);
 	}
 
-	state->m_p2_lasttime = curtime;
-	return state->m_p2_lastresult | (state->m_p2_lastresult << 16);
+	m_p2_lasttime = curtime;
+	return m_p2_lastresult | (m_p2_lastresult << 16);
 }
 
 
-static READ32_HANDLER( trackball32_4bit_combined_r )
+READ32_MEMBER(itech32_state::trackball32_4bit_combined_r)
 {
 	return trackball32_4bit_p1_r(space, offset, mem_mask) |
 			(trackball32_4bit_p2_r(space, offset, mem_mask) << 8);
 }
 
 
-static READ32_HANDLER( drivedge_steering_r )
+READ32_MEMBER(itech32_state::drivedge_steering_r)
 {
-	int val = input_port_read(space->machine(), "STEER") * 2 - 0x100;
+	int val = input_port_read(machine(), "STEER") * 2 - 0x100;
 	if (val < 0) val = 0x100 | (-val);
 	return val << 16;
 }
 
 
-static READ32_HANDLER( drivedge_gas_r )
+READ32_MEMBER(itech32_state::drivedge_gas_r)
 {
-	int val = input_port_read(space->machine(), "GAS");
+	int val = input_port_read(machine(), "GAS");
 	return val << 16;
 }
 
@@ -593,29 +591,27 @@ static READ32_HANDLER( drivedge_gas_r )
  *
  *************************************/
 
-static READ16_HANDLER( wcbowl_prot_result_r )
+READ16_MEMBER(itech32_state::wcbowl_prot_result_r)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	return state->m_main_ram[0x111d/2];
+	return m_main_ram[0x111d/2];
 }
 
 
-static READ32_HANDLER( itech020_prot_result_r )
+READ32_MEMBER(itech32_state::itech020_prot_result_r)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	UINT32 result = ((UINT32 *)state->m_main_ram)[state->m_itech020_prot_address >> 2];
-	result >>= (~state->m_itech020_prot_address & 3) * 8;
+	UINT32 result = ((UINT32 *)m_main_ram)[m_itech020_prot_address >> 2];
+	result >>= (~m_itech020_prot_address & 3) * 8;
 	return (result & 0xff) << 8;
 }
 
 
-static READ32_HANDLER( gt2kp_prot_result_r )
+READ32_MEMBER(itech32_state::gt2kp_prot_result_r)
 {
 	return 0x00010000;	/* 32 bit value at 680000 to 680003 will return the needed value of 0x01 */
 }
 
 
-static READ32_HANDLER( gtclass_prot_result_r )
+READ32_MEMBER(itech32_state::gtclass_prot_result_r)
 {
 	return 0x00008000;	/* 32 bit value at 680000 to 680003 will return the needed value of 0x80 */
 }
@@ -628,9 +624,9 @@ static READ32_HANDLER( gtclass_prot_result_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( sound_bank_w )
+WRITE8_MEMBER(itech32_state::sound_bank_w)
 {
-	memory_set_bankptr(space->machine(), "bank1", &space->machine().region("soundcpu")->base()[0x10000 + data * 0x4000]);
+	memory_set_bankptr(machine(), "bank1", &machine().region("soundcpu")->base()[0x10000 + data * 0x4000]);
 }
 
 
@@ -650,44 +646,41 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 }
 
 
-static WRITE16_HANDLER( sound_data_w )
+WRITE16_MEMBER(itech32_state::sound_data_w)
 {
 	if (ACCESSING_BITS_0_7)
-		space->machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data & 0xff);
+		machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data & 0xff);
 }
 
 
-static READ32_HANDLER( sound_data32_r )
+READ32_MEMBER(itech32_state::sound_data32_r)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	return state->m_sound_return << 16;
+	return m_sound_return << 16;
 }
 
 
-static WRITE32_HANDLER( sound_data32_w )
+WRITE32_MEMBER(itech32_state::sound_data32_w)
 {
 	if (ACCESSING_BITS_16_23)
-		space->machine().scheduler().synchronize(FUNC(delayed_sound_data_w), (data >> 16) & 0xff);
+		machine().scheduler().synchronize(FUNC(delayed_sound_data_w), (data >> 16) & 0xff);
 }
 
 
-static READ8_HANDLER( sound_data_r )
+READ8_MEMBER(itech32_state::sound_data_r)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	cputag_set_input_line(space->machine(), "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
-	state->m_sound_int_state = 0;
-	return state->m_sound_data;
+	cputag_set_input_line(machine(), "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
+	m_sound_int_state = 0;
+	return m_sound_data;
 }
 
 
-static WRITE8_HANDLER( sound_return_w )
+WRITE8_MEMBER(itech32_state::sound_return_w)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	state->m_sound_return = data;
+	m_sound_return = data;
 }
 
 
-static READ8_HANDLER( sound_data_buffer_r )
+READ8_MEMBER(itech32_state::sound_data_buffer_r)
 {
 	return 0;
 }
@@ -772,9 +765,9 @@ static const via6522_interface drivedge_via_interface =
  *
  *************************************/
 
-static WRITE8_HANDLER( firq_clear_w )
+WRITE8_MEMBER(itech32_state::firq_clear_w)
 {
-	cputag_set_input_line(space->machine(), "soundcpu", M6809_FIRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "soundcpu", M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -785,80 +778,73 @@ static WRITE8_HANDLER( firq_clear_w )
  *
  *************************************/
 
-static WRITE32_HANDLER( tms_reset_assert_w )
+WRITE32_MEMBER(itech32_state::tms_reset_assert_w)
 {
-	cputag_set_input_line(space->machine(), "dsp1", INPUT_LINE_RESET, ASSERT_LINE);
-	cputag_set_input_line(space->machine(), "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine(), "dsp1", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine(), "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
-static WRITE32_HANDLER( tms_reset_clear_w )
+WRITE32_MEMBER(itech32_state::tms_reset_clear_w)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
 	/* kludge to prevent crash on first boot */
-	if ((state->m_tms1_ram[0] & 0xff000000) == 0)
+	if ((m_tms1_ram[0] & 0xff000000) == 0)
 	{
-		cputag_set_input_line(space->machine(), "dsp1", INPUT_LINE_RESET, CLEAR_LINE);
-		STOP_TMS_SPINNING(space->machine(), 0);
+		cputag_set_input_line(machine(), "dsp1", INPUT_LINE_RESET, CLEAR_LINE);
+		STOP_TMS_SPINNING(machine(), 0);
 	}
-	if ((state->m_tms2_ram[0] & 0xff000000) == 0)
+	if ((m_tms2_ram[0] & 0xff000000) == 0)
 	{
-		cputag_set_input_line(space->machine(), "dsp2", INPUT_LINE_RESET, CLEAR_LINE);
-		STOP_TMS_SPINNING(space->machine(), 1);
+		cputag_set_input_line(machine(), "dsp2", INPUT_LINE_RESET, CLEAR_LINE);
+		STOP_TMS_SPINNING(machine(), 1);
 	}
 }
 
 
-static WRITE32_HANDLER( tms1_68k_ram_w )
+WRITE32_MEMBER(itech32_state::tms1_68k_ram_w)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	COMBINE_DATA(&state->m_tms1_ram[offset]);
-	if (offset == 0) COMBINE_DATA(state->m_tms1_boot);
-	if (offset == 0x382 && state->m_tms_spinning[0]) STOP_TMS_SPINNING(space->machine(), 0);
-	if (!state->m_tms_spinning[0])
-		space->machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+	COMBINE_DATA(&m_tms1_ram[offset]);
+	if (offset == 0) COMBINE_DATA(m_tms1_boot);
+	if (offset == 0x382 && m_tms_spinning[0]) STOP_TMS_SPINNING(machine(), 0);
+	if (!m_tms_spinning[0])
+		machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
-static WRITE32_HANDLER( tms2_68k_ram_w )
+WRITE32_MEMBER(itech32_state::tms2_68k_ram_w)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	COMBINE_DATA(&state->m_tms2_ram[offset]);
-	if (offset == 0x382 && state->m_tms_spinning[1]) STOP_TMS_SPINNING(space->machine(), 1);
-	if (!state->m_tms_spinning[1])
-		space->machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+	COMBINE_DATA(&m_tms2_ram[offset]);
+	if (offset == 0x382 && m_tms_spinning[1]) STOP_TMS_SPINNING(machine(), 1);
+	if (!m_tms_spinning[1])
+		machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
-static WRITE32_HANDLER( tms1_trigger_w )
+WRITE32_MEMBER(itech32_state::tms1_trigger_w)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	COMBINE_DATA(&state->m_tms1_ram[offset]);
-	space->machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+	COMBINE_DATA(&m_tms1_ram[offset]);
+	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
-static WRITE32_HANDLER( tms2_trigger_w )
+WRITE32_MEMBER(itech32_state::tms2_trigger_w)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	COMBINE_DATA(&state->m_tms2_ram[offset]);
-	space->machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
+	COMBINE_DATA(&m_tms2_ram[offset]);
+	machine().scheduler().boost_interleave(attotime::from_hz(CPU020_CLOCK/256), attotime::from_usec(20));
 }
 
 
-static READ32_HANDLER( drivedge_tms1_speedup_r )
+READ32_MEMBER(itech32_state::drivedge_tms1_speedup_r)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	if (state->m_tms1_ram[0x382] == 0 && cpu_get_pc(&space->device()) == 0xee) START_TMS_SPINNING(0);
-	return state->m_tms1_ram[0x382];
+	if (m_tms1_ram[0x382] == 0 && cpu_get_pc(&space.device()) == 0xee) START_TMS_SPINNING(0);
+	return m_tms1_ram[0x382];
 }
 
 
-static READ32_HANDLER( drivedge_tms2_speedup_r )
+READ32_MEMBER(itech32_state::drivedge_tms2_speedup_r)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	if (state->m_tms2_ram[0x382] == 0 && cpu_get_pc(&space->device()) == 0x809808) START_TMS_SPINNING(1);
-	return state->m_tms2_ram[0x382];
+	if (m_tms2_ram[0x382] == 0 && cpu_get_pc(&space.device()) == 0x809808) START_TMS_SPINNING(1);
+	return m_tms2_ram[0x382];
 }
 
 
@@ -869,7 +855,7 @@ static READ32_HANDLER( drivedge_tms2_speedup_r )
  *
  *************************************/
 
-static WRITE32_HANDLER( int1_ack32_w )
+WRITE32_MEMBER(itech32_state::int1_ack32_w)
 {
 	int1_ack_w(space, offset, data, mem_mask);
 }
@@ -922,9 +908,9 @@ static ADDRESS_MAP_START( timekill_map, AS_PROGRAM, 16, itech32_state )
 	AM_RANGE(0x060000, 0x060001) AM_WRITE_LEGACY(timekill_colora_w)
 	AM_RANGE(0x068000, 0x068001) AM_WRITE_LEGACY(timekill_colorbc_w)
 	AM_RANGE(0x070000, 0x070001) AM_WRITENOP	/* noisy */
-	AM_RANGE(0x078000, 0x078001) AM_WRITE_LEGACY(sound_data_w)
+	AM_RANGE(0x078000, 0x078001) AM_WRITE(sound_data_w)
 	AM_RANGE(0x080000, 0x08007f) AM_READWRITE_LEGACY(itech32_video_r, itech32_video_w) AM_BASE(m_video)
-	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE_LEGACY(int1_ack_w)
+	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(int1_ack_w)
 	AM_RANGE(0x0c0000, 0x0c7fff) AM_RAM_WRITE_LEGACY(timekill_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_main_rom)
 ADDRESS_MAP_END
@@ -933,7 +919,7 @@ ADDRESS_MAP_END
 /*------ BloodStorm and later games memory layout ------*/
 static ADDRESS_MAP_START( bloodstm_map, AS_PROGRAM, 16, itech32_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE(m_main_ram) AM_SHARE("nvram")
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1") AM_WRITE_LEGACY(int1_ack_w)
+	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("P1") AM_WRITE(int1_ack_w)
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P2")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("P3")
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P4") AM_WRITE_LEGACY(watchdog_reset16_w)
@@ -941,7 +927,7 @@ static ADDRESS_MAP_START( bloodstm_map, AS_PROGRAM, 16, itech32_state )
 	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(bloodstm_color1_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE_LEGACY(bloodstm_color2_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE_LEGACY(watchdog_reset16_w)
-	AM_RANGE(0x480000, 0x480001) AM_WRITE_LEGACY(sound_data_w)
+	AM_RANGE(0x480000, 0x480001) AM_WRITE(sound_data_w)
 	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE_LEGACY(bloodstm_video_r, bloodstm_video_w) AM_BASE(m_video)
 	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE_LEGACY(bloodstm_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE_LEGACY(bloodstm_plane_w)
@@ -954,59 +940,55 @@ ADDRESS_MAP_END
 
 #if LOG_DRIVEDGE_UNINIT_RAM
 
-static READ32_HANDLER( test1_r )
+READ32_MEMBER(itech32_state::test1_r)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	if (ACCESSING_BITS_24_31 && !state->m_written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0x100 + offset*4+0);
-	if (ACCESSING_BITS_16_23 && !state->m_written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0x100 + offset*4+1);
-	if (ACCESSING_BITS_8_15 && !state->m_written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0x100 + offset*4+2);
-	if (ACCESSING_BITS_0_7 && !state->m_written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0x100 + offset*4+3);
-	return ((UINT32 *)state->m_main_ram)[0x100/4 + offset];
+	if (ACCESSING_BITS_24_31 && !m_written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space.device()), 0x100 + offset*4+0);
+	if (ACCESSING_BITS_16_23 && !m_written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space.device()), 0x100 + offset*4+1);
+	if (ACCESSING_BITS_8_15 && !m_written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space.device()), 0x100 + offset*4+2);
+	if (ACCESSING_BITS_0_7 && !m_written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space.device()), 0x100 + offset*4+3);
+	return ((UINT32 *)m_main_ram)[0x100/4 + offset];
 }
 
-static WRITE32_HANDLER( test1_w )
+WRITE32_MEMBER(itech32_state::test1_w)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	if (ACCESSING_BITS_24_31) state->m_written[0x100 + offset*4+0] = 1;
-	if (ACCESSING_BITS_16_23) state->m_written[0x100 + offset*4+1] = 1;
-	if (ACCESSING_BITS_8_15) state->m_written[0x100 + offset*4+2] = 1;
-	if (ACCESSING_BITS_0_7) state->m_written[0x100 + offset*4+3] = 1;
-	COMBINE_DATA(&((UINT32 *)state->m_main_ram)[0x100/4 + offset]);
+	if (ACCESSING_BITS_24_31) m_written[0x100 + offset*4+0] = 1;
+	if (ACCESSING_BITS_16_23) m_written[0x100 + offset*4+1] = 1;
+	if (ACCESSING_BITS_8_15) m_written[0x100 + offset*4+2] = 1;
+	if (ACCESSING_BITS_0_7) m_written[0x100 + offset*4+3] = 1;
+	COMBINE_DATA(&((UINT32 *)m_main_ram)[0x100/4 + offset]);
 }
 
-static READ32_HANDLER( test2_r )
+READ32_MEMBER(itech32_state::test2_r)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	if (ACCESSING_BITS_24_31 && !state->m_written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0xc00 + offset*4+0);
-	if (ACCESSING_BITS_16_23 && !state->m_written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0xc00 + offset*4+1);
-	if (ACCESSING_BITS_8_15 && !state->m_written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0xc00 + offset*4+2);
-	if (ACCESSING_BITS_0_7 && !state->m_written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space->device()), 0xc00 + offset*4+3);
-	return ((UINT32 *)state->m_main_ram)[0xc00/4 + offset];
+	if (ACCESSING_BITS_24_31 && !m_written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space.device()), 0xc00 + offset*4+0);
+	if (ACCESSING_BITS_16_23 && !m_written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space.device()), 0xc00 + offset*4+1);
+	if (ACCESSING_BITS_8_15 && !m_written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space.device()), 0xc00 + offset*4+2);
+	if (ACCESSING_BITS_0_7 && !m_written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(&space.device()), 0xc00 + offset*4+3);
+	return ((UINT32 *)m_main_ram)[0xc00/4 + offset];
 }
 
-static WRITE32_HANDLER( test2_w )
+WRITE32_MEMBER(itech32_state::test2_w)
 {
-	itech32_state *state = space->machine().driver_data<itech32_state>();
-	if (ACCESSING_BITS_24_31) state->m_written[0xc00 + offset*4+0] = 1;
-	if (ACCESSING_BITS_16_23) state->m_written[0xc00 + offset*4+1] = 1;
-	if (ACCESSING_BITS_8_15) state->m_written[0xc00 + offset*4+2] = 1;
-	if (ACCESSING_BITS_0_7) state->m_written[0xc00 + offset*4+3] = 1;
-	COMBINE_DATA(&((UINT32 *)state->m_main_ram)[0xc00/4 + offset]);
+	if (ACCESSING_BITS_24_31) m_written[0xc00 + offset*4+0] = 1;
+	if (ACCESSING_BITS_16_23) m_written[0xc00 + offset*4+1] = 1;
+	if (ACCESSING_BITS_8_15) m_written[0xc00 + offset*4+2] = 1;
+	if (ACCESSING_BITS_0_7) m_written[0xc00 + offset*4+3] = 1;
+	COMBINE_DATA(&((UINT32 *)m_main_ram)[0xc00/4 + offset]);
 }
 #endif
 
 static ADDRESS_MAP_START( drivedge_map, AS_PROGRAM, 32, itech32_state )
 #if LOG_DRIVEDGE_UNINIT_RAM
-AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE_LEGACY(test1_r, test1_w)
-AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE_LEGACY(test2_r, test2_w)
+AM_RANGE(0x000100, 0x0003ff) AM_MIRROR(0x40000) AM_READWRITE(test1_r, test1_w)
+AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE(test2_r, test2_w)
 #endif
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x40000) AM_RAM AM_BASE(m_main_ram) AM_SHARE("nvram")
 	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("80000")
 	AM_RANGE(0x082000, 0x082003) AM_READ_PORT("82000")
-	AM_RANGE(0x084000, 0x084003) AM_READWRITE_LEGACY(sound_data32_r, sound_data32_w)
+	AM_RANGE(0x084000, 0x084003) AM_READWRITE(sound_data32_r, sound_data32_w)
 //  AM_RANGE(0x086000, 0x08623f) AM_RAM -- networking -- first 0x40 bytes = our data, next 0x40*8 bytes = their data, r/w on IRQ2
-	AM_RANGE(0x088000, 0x088003) AM_READ_LEGACY(drivedge_steering_r)
-	AM_RANGE(0x08a000, 0x08a003) AM_READ_LEGACY(drivedge_gas_r) AM_WRITENOP
+	AM_RANGE(0x088000, 0x088003) AM_READ(drivedge_steering_r)
+	AM_RANGE(0x08a000, 0x08a003) AM_READ(drivedge_gas_r) AM_WRITENOP
 	AM_RANGE(0x08c000, 0x08c003) AM_READ_PORT("8c000")
 	AM_RANGE(0x08e000, 0x08e003) AM_READ_PORT("8e000") AM_WRITENOP
 	AM_RANGE(0x100000, 0x10000f) AM_WRITE_LEGACY(drivedge_zbuf_control_w) AM_BASE(m_drivedge_zbuf_control)
@@ -1014,23 +996,23 @@ AM_RANGE(0x000c00, 0x007fff) AM_MIRROR(0x40000) AM_READWRITE_LEGACY(test2_r, tes
 	AM_RANGE(0x1a0000, 0x1bffff) AM_RAM_WRITE_LEGACY(drivedge_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x1c0000, 0x1c0003) AM_WRITENOP
 	AM_RANGE(0x1e0000, 0x1e0113) AM_READWRITE_LEGACY(itech020_video_r, itech020_video_w) AM_BASE(m_video)
-	AM_RANGE(0x1e4000, 0x1e4003) AM_WRITE_LEGACY(tms_reset_assert_w)
-	AM_RANGE(0x1ec000, 0x1ec003) AM_WRITE_LEGACY(tms_reset_clear_w)
+	AM_RANGE(0x1e4000, 0x1e4003) AM_WRITE(tms_reset_assert_w)
+	AM_RANGE(0x1ec000, 0x1ec003) AM_WRITE(tms_reset_clear_w)
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("200000")
-	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE_LEGACY(tms1_68k_ram_w) AM_SHARE("share1")
-	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE_LEGACY(tms2_68k_ram_w) AM_SHARE("share2")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM_WRITE(tms1_68k_ram_w) AM_SHARE("share1")
+	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(tms2_68k_ram_w) AM_SHARE("share2")
 	AM_RANGE(0x380000, 0x380003) AM_WRITENOP // AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0x600000, 0x607fff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_main_rom)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivedge_tms1_map, AS_PROGRAM, 32, itech32_state )
 	AM_RANGE(0x000000, 0x001fff) AM_RAM AM_BASE(m_tms1_boot)
-	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x400) AM_RAM_WRITE_LEGACY(tms1_trigger_w) AM_SHARE("share1") AM_BASE(m_tms1_ram)
+	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x400) AM_RAM_WRITE(tms1_trigger_w) AM_SHARE("share1") AM_BASE(m_tms1_ram)
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivedge_tms2_map, AS_PROGRAM, 32, itech32_state )
-	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x8400) AM_RAM_WRITE_LEGACY(tms2_trigger_w) AM_SHARE("share2") AM_BASE(m_tms2_ram)
+	AM_RANGE(0x008000, 0x0083ff) AM_MIRROR(0x8400) AM_RAM_WRITE(tms2_trigger_w) AM_SHARE("share2") AM_BASE(m_tms2_ram)
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1038,7 +1020,7 @@ ADDRESS_MAP_END
 /*------ 68EC020-based memory layout ------*/
 static ADDRESS_MAP_START( itech020_map, AS_PROGRAM, 32, itech32_state )
 	AM_RANGE(0x000000, 0x007fff) AM_RAM AM_BASE(m_main_ram)
-	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("P1") AM_WRITE_LEGACY(int1_ack32_w)
+	AM_RANGE(0x080000, 0x080003) AM_READ_PORT("P1") AM_WRITE(int1_ack32_w)
 	AM_RANGE(0x100000, 0x100003) AM_READ_PORT("P2")
 	AM_RANGE(0x180000, 0x180003) AM_READ_PORT("P3")
 	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("P4")
@@ -1046,13 +1028,13 @@ static ADDRESS_MAP_START( itech020_map, AS_PROGRAM, 32, itech32_state )
 	AM_RANGE(0x300000, 0x300003) AM_WRITE_LEGACY(itech020_color1_w)
 	AM_RANGE(0x380000, 0x380003) AM_WRITE_LEGACY(itech020_color2_w)
 	AM_RANGE(0x400000, 0x400003) AM_WRITE_LEGACY(watchdog_reset32_w)
-	AM_RANGE(0x480000, 0x480003) AM_WRITE_LEGACY(sound_data32_w)
+	AM_RANGE(0x480000, 0x480003) AM_WRITE(sound_data32_w)
 	AM_RANGE(0x500000, 0x5000ff) AM_READWRITE_LEGACY(itech020_video_r, itech020_video_w) AM_BASE(m_video)
 	AM_RANGE(0x578000, 0x57ffff) AM_READNOP				/* touched by protection */
 	AM_RANGE(0x580000, 0x59ffff) AM_RAM_WRITE_LEGACY(itech020_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x603fff) AM_RAM AM_SHARE("nvram")
 /* ? */	AM_RANGE(0x61ff00, 0x61ffff) AM_WRITENOP			/* Unknown Writes */
-	AM_RANGE(0x680000, 0x680003) AM_READ_LEGACY(itech020_prot_result_r) AM_WRITENOP
+	AM_RANGE(0x680000, 0x680003) AM_READ(itech020_prot_result_r) AM_WRITENOP
 /* ! */	AM_RANGE(0x680800, 0x68083f) AM_READONLY AM_WRITENOP /* Serial DUART Channel A/B & Top LED sign - To Do! */
 	AM_RANGE(0x700000, 0x700003) AM_WRITE_LEGACY(itech020_plane_w)
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_main_rom)
@@ -1068,10 +1050,10 @@ ADDRESS_MAP_END
 
 /*------ Rev 1 sound board memory layout ------*/
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, itech32_state )
-	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY(sound_return_w)
-	AM_RANGE(0x0400, 0x0400) AM_READ_LEGACY(sound_data_r)
+	AM_RANGE(0x0000, 0x0000) AM_WRITE(sound_return_w)
+	AM_RANGE(0x0400, 0x0400) AM_READ(sound_data_r)
 	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE_LEGACY("ensoniq", es5506_r, es5506_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE_LEGACY(sound_bank_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP	/* noisy */
 	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
@@ -1082,11 +1064,11 @@ ADDRESS_MAP_END
 
 /*------ Rev 2 sound board memory layout ------*/
 static ADDRESS_MAP_START( sound_020_map, AS_PROGRAM, 8, itech32_state )
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x400) AM_READ_LEGACY(sound_data_r)
+	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x400) AM_READ(sound_data_r)
 	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE_LEGACY("ensoniq", es5506_r, es5506_w)
-	AM_RANGE(0x0c00, 0x0c00) AM_WRITE_LEGACY(sound_bank_w)
-	AM_RANGE(0x1400, 0x1400) AM_WRITE_LEGACY(firq_clear_w)
-	AM_RANGE(0x1800, 0x1800) AM_READ_LEGACY(sound_data_buffer_r) AM_WRITENOP
+	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
+	AM_RANGE(0x1400, 0x1400) AM_WRITE(firq_clear_w)
+	AM_RANGE(0x1800, 0x1800) AM_READ(sound_data_buffer_r) AM_WRITENOP
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -4012,8 +3994,8 @@ static DRIVER_INIT( drivedge )
 	state->m_planes = 1;
 	state->m_is_drivedge = 1;
 
-	machine.device("dsp1")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8382, 0x8382, FUNC(drivedge_tms1_speedup_r));
-	machine.device("dsp2")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8382, 0x8382, FUNC(drivedge_tms2_speedup_r));
+	machine.device("dsp1")->memory().space(AS_PROGRAM)->install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms1_speedup_r),state));
+	machine.device("dsp2")->memory().space(AS_PROGRAM)->install_read_handler(0x8382, 0x8382, read32_delegate(FUNC(itech32_state::drivedge_tms2_speedup_r),state));
 }
 
 
@@ -4030,10 +4012,10 @@ static DRIVER_INIT( wcbowl )
 	state->m_vram_height = 1024;
 	state->m_planes = 1;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x680000, 0x680001, FUNC(trackball_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680000, 0x680001, read16_delegate(FUNC(itech32_state::trackball_r),state));
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x578000, 0x57ffff);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x680080, 0x680081, FUNC(wcbowl_prot_result_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680080, 0x680081, read16_delegate(FUNC(itech32_state::wcbowl_prot_result_r),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x680080, 0x680081);
 }
 
@@ -4082,8 +4064,8 @@ static void init_shuffle_bowl_common(running_machine &machine, int prot_addr)
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x300000, 0x300003, FUNC(itech020_color2_w));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x380000, 0x380003, FUNC(itech020_color1_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x180800, 0x180803, FUNC(trackball32_4bit_p1_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x181000, 0x181003, FUNC(trackball32_4bit_p2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),state));
 }
 
 
@@ -4134,7 +4116,8 @@ static DRIVER_INIT( gt3d )
         Hacked versions of this PCB have been found with GT97
         through GTClassic. This is _NOT_ a factory modification
     */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200003, FUNC(trackball32_8bit_r));
+	itech32_state *state = machine.driver_data<itech32_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_8bit_r),state));
 	init_gt_common(machine);
 }
 
@@ -4147,8 +4130,9 @@ static DRIVER_INIT( aama )
         board share the same sound CPU code and sample ROMs.
         This board has all versions of GT for it, GT3D through GTClassic
     */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x180800, 0x180803, FUNC(trackball32_4bit_p1_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x181000, 0x181003, FUNC(trackball32_4bit_p2_r));
+	itech32_state *state = machine.driver_data<itech32_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x180800, 0x180803, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x181000, 0x181003, read32_delegate(FUNC(itech32_state::trackball32_4bit_p2_r),state));
 	init_gt_common(machine);
 }
 
@@ -4172,7 +4156,8 @@ static DRIVER_INIT( s_ver )
         board: GT97 v1.21S, GT98, GT99, GT2K & GT Classic Versions 1.00S
         Trackball info is read through 200202 (actually 200203).
     */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200200, 0x200203, FUNC(trackball32_4bit_p1_r));
+	itech32_state *state = machine.driver_data<itech32_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200200, 0x200203, read32_delegate(FUNC(itech32_state::trackball32_4bit_p1_r),state));
 	init_gt_common(machine);
 }
 
@@ -4186,7 +4171,8 @@ static DRIVER_INIT( gt3dl )
         Player 1 trackball read through 200003
         Player 2 trackball read through 200002
     */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x200000, 0x200003, FUNC(trackball32_4bit_combined_r));
+	itech32_state *state = machine.driver_data<itech32_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x200000, 0x200003, read32_delegate(FUNC(itech32_state::trackball32_4bit_combined_r),state));
 	init_gt_common(machine);
 }
 
@@ -4194,7 +4180,8 @@ static DRIVER_INIT( gt3dl )
 static DRIVER_INIT( gt2kp )
 {
 	/* a little extra protection */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x680000, 0x680003, FUNC(gt2kp_prot_result_r));
+	itech32_state *state = machine.driver_data<itech32_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680000, 0x680003, read32_delegate(FUNC(itech32_state::gt2kp_prot_result_r),state));
 	DRIVER_INIT_CALL(aama);
 
 	/* The protection code is:
@@ -4215,7 +4202,8 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x01
 static DRIVER_INIT( gtclasscp )
 {
 	/* a little extra protection */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x680000, 0x680003, FUNC(gtclass_prot_result_r));
+	itech32_state *state = machine.driver_data<itech32_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x680000, 0x680003, read32_delegate(FUNC(itech32_state::gtclass_prot_result_r),state));
 	DRIVER_INIT_CALL(aama);
 
 	/* The protection code is:

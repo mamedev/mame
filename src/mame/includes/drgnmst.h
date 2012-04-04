@@ -37,6 +37,16 @@ public:
 	/* devices */
 	required_device<okim6295_device> m_oki_1;
 	required_device<okim6295_device> m_oki_2;
+	DECLARE_WRITE16_MEMBER(drgnmst_coin_w);
+	DECLARE_WRITE16_MEMBER(drgnmst_snd_command_w);
+	DECLARE_WRITE16_MEMBER(drgnmst_snd_flag_w);
+	DECLARE_READ8_MEMBER(pic16c5x_port0_r);
+	DECLARE_READ8_MEMBER(drgnmst_snd_command_r);
+	DECLARE_READ8_MEMBER(drgnmst_snd_flag_r);
+	DECLARE_WRITE8_MEMBER(drgnmst_pcm_banksel_w);
+	DECLARE_WRITE8_MEMBER(drgnmst_oki_w);
+	DECLARE_WRITE8_MEMBER(drgnmst_snd_control_w);
+	DECLARE_READ8_MEMBER(PIC16C5X_T0_clk_r);
 };
 
 

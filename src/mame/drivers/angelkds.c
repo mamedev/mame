@@ -129,18 +129,18 @@ Dumped by Chackn
 #include "sound/2203intf.h"
 #include "includes/angelkds.h"
 
-static READ8_HANDLER( angelkds_main_sound_r );
-static WRITE8_HANDLER( angelkds_main_sound_w );
-static READ8_HANDLER( angelkds_sub_sound_r );
-static WRITE8_HANDLER( angelkds_sub_sound_w );
+
+
+
+
 
 /*** CPU Banking
 
 */
 
-static WRITE8_HANDLER( angelkds_cpu_bank_write )
+WRITE8_MEMBER(angelkds_state::angelkds_cpu_bank_write)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
+	memory_set_bank(machine(), "bank1", data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
 }
 
 
@@ -154,24 +154,24 @@ these make the game a bit easier for testing purposes
 
 #if FAKEINPUTS
 
-static READ8_HANDLER( angelkds_input_r )
+READ8_MEMBER(angelkds_state::angelkds_input_r)
 {
 	int fake;
 	static const char *const portnames[] = { "I81", "I82" };
 	static const char *const fakenames[] = { "FAKE1", "FAKE2" };
 
-	fake = input_port_read(space->machine(), fakenames[offset]);
+	fake = input_port_read(machine(), fakenames[offset]);
 
-	return ((fake & 0x01) ? fake  : input_port_read(space->machine(), portnames[offset]));
+	return ((fake & 0x01) ? fake  : input_port_read(machine(), portnames[offset]));
 }
 
 #else
 
-static READ8_HANDLER( angelkds_input_r )
+READ8_MEMBER(angelkds_state::angelkds_input_r)
 {
 	static const char *const portnames[] = { "I81", "I82" };
 
-	return input_port_read(space->machine(), portnames[offset]);
+	return input_port_read(machine(), portnames[offset]);
 }
 
 #endif
@@ -213,15 +213,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, angelkds_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP // 00 on start-up, not again
-	AM_RANGE(0x42, 0x42) AM_WRITE_LEGACY(angelkds_cpu_bank_write)
+	AM_RANGE(0x42, 0x42) AM_WRITE(angelkds_cpu_bank_write)
 	AM_RANGE(0x43, 0x43) AM_WRITENOP // 9a on start-up, not again
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("I40")	/* "Coinage" Dip Switches */
 	AM_RANGE(0x41, 0x41) AM_READ_PORT("I41")	/* Other Dip Switches */
 	AM_RANGE(0x42, 0x42) AM_READ_PORT("I42")	/* Players inputs (not needed ?) */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("I80")	/* System inputs */
-	AM_RANGE(0x81, 0x82) AM_READ_LEGACY(angelkds_input_r)	/* Players inputs */
+	AM_RANGE(0x81, 0x82) AM_READ(angelkds_input_r)	/* Players inputs */
 	AM_RANGE(0x83, 0x83) AM_WRITENOP // 9b on start-up, not again
-	AM_RANGE(0xc0, 0xc3) AM_READWRITE_LEGACY(angelkds_main_sound_r, angelkds_main_sound_w) // 02 various points
+	AM_RANGE(0xc0, 0xc3) AM_READWRITE(angelkds_main_sound_r, angelkds_main_sound_w) // 02 various points
 ADDRESS_MAP_END
 
 /* sub cpu */
@@ -238,7 +238,7 @@ static ADDRESS_MAP_START( sub_portmap, AS_IO, 8, angelkds_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0x80, 0x83) AM_READWRITE_LEGACY(angelkds_sub_sound_r, angelkds_sub_sound_w) // spcpostn
+	AM_RANGE(0x80, 0x83) AM_READWRITE(angelkds_sub_sound_r, angelkds_sub_sound_w) // spcpostn
 ADDRESS_MAP_END
 
 
@@ -486,28 +486,24 @@ sound related ?
 
 */
 
-static WRITE8_HANDLER( angelkds_main_sound_w )
+WRITE8_MEMBER(angelkds_state::angelkds_main_sound_w)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	state->m_sound[offset] = data;
+	m_sound[offset] = data;
 }
 
-static READ8_HANDLER( angelkds_main_sound_r )
+READ8_MEMBER(angelkds_state::angelkds_main_sound_r)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	return state->m_sound2[offset];
+	return m_sound2[offset];
 }
 
-static WRITE8_HANDLER( angelkds_sub_sound_w )
+WRITE8_MEMBER(angelkds_state::angelkds_sub_sound_w)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	state->m_sound2[offset] = data;
+	m_sound2[offset] = data;
 }
 
-static READ8_HANDLER( angelkds_sub_sound_r )
+READ8_MEMBER(angelkds_state::angelkds_sub_sound_r)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	return state->m_sound[offset];
+	return m_sound[offset];
 }
 
 

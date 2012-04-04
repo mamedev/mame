@@ -22,6 +22,7 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(soundcommand_w);
 };
 
 

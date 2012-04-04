@@ -136,38 +136,37 @@ Dip locations verified with Service Mode.
 #define CRSHRACE_3P_HACK	0
 
 
-static READ16_HANDLER( extrarom1_r )
+READ16_MEMBER(crshrace_state::extrarom1_r)
 {
-	UINT8 *rom = space->machine().region("user1")->base();
+	UINT8 *rom = machine().region("user1")->base();
 
 	offset *= 2;
 
 	return rom[offset] | (rom[offset + 1] << 8);
 }
 
-static READ16_HANDLER( extrarom2_r )
+READ16_MEMBER(crshrace_state::extrarom2_r)
 {
-	UINT8 *rom = space->machine().region("user2")->base();
+	UINT8 *rom = machine().region("user2")->base();
 
 	offset *= 2;
 
 	return rom[offset] | (rom[offset + 1] << 8);
 }
 
-static WRITE8_HANDLER( crshrace_sh_bankswitch_w )
+WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	memory_set_bank(machine(), "bank1", data & 0x03);
 }
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(crshrace_state::sound_command_w)
 {
-	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_pending_command = 1;
+		m_pending_command = 1;
 		soundlatch_w(space, offset, data & 0xff);
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -177,19 +176,18 @@ static CUSTOM_INPUT( country_sndpending_r )
 	return state->m_pending_command;
 }
 
-static WRITE8_HANDLER( pending_command_clear_w )
+WRITE8_MEMBER(crshrace_state::pending_command_clear_w)
 {
-	crshrace_state *state = space->machine().driver_data<crshrace_state>();
-	state->m_pending_command = 0;
+	m_pending_command = 0;
 }
 
 
 
 static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x300000, 0x3fffff) AM_READ_LEGACY(extrarom1_r)
-	AM_RANGE(0x400000, 0x4fffff) AM_READ_LEGACY(extrarom2_r)
-	AM_RANGE(0x500000, 0x5fffff) AM_READ_LEGACY(extrarom2_r)	/* mirror */
+	AM_RANGE(0x300000, 0x3fffff) AM_READ(extrarom1_r)
+	AM_RANGE(0x400000, 0x4fffff) AM_READ(extrarom2_r)
+	AM_RANGE(0x500000, 0x5fffff) AM_READ(extrarom2_r)	/* mirror */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE_LEGACY(crshrace_videoram1_w) AM_BASE(m_videoram1)
 	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_SHARE("spriteram")
@@ -201,7 +199,7 @@ static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE_LEGACY(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
 	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
@@ -216,8 +214,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, crshrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(crshrace_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(soundlatch_r, pending_command_clear_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(crshrace_sh_bankswitch_w)
+	AM_RANGE(0x04, 0x04) AM_READ_LEGACY(soundlatch_r) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 

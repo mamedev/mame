@@ -174,13 +174,12 @@ static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 }
 
 
-static READ8_HANDLER( exerion_protection_r )
+READ8_MEMBER(exerion_state::exerion_protection_r)
 {
-	exerion_state *state = space->machine().driver_data<exerion_state>();
-	if (cpu_get_pc(&space->device()) == 0x4143)
-		return space->machine().region("maincpu")->base()[0x33c0 + (state->m_main_ram[0xd] << 2) + offset];
+	if (cpu_get_pc(&space.device()) == 0x4143)
+		return machine().region("maincpu")->base()[0x33c0 + (m_main_ram[0xd] << 2) + offset];
 	else
-		return state->m_main_ram[0x8 + offset];
+		return m_main_ram[0x8 + offset];
 }
 
 
@@ -193,7 +192,7 @@ static READ8_HANDLER( exerion_protection_r )
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, exerion_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6008, 0x600b) AM_READ_LEGACY(exerion_protection_r)
+	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE(m_main_ram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)

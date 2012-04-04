@@ -143,14 +143,13 @@ static void f1dream_protection_w(address_space *space)
 	}
 }
 
-static WRITE16_HANDLER( f1dream_control_w )
+WRITE16_MEMBER(tigeroad_state::f1dream_control_w)
 {
-	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
-	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(&space->device()), state->m_ram16[0x3fe0/2]);
-	f1dream_protection_w(space);
+	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(&space.device()), m_ram16[0x3fe0/2]);
+	f1dream_protection_w(&space);
 }
 
-static WRITE16_HANDLER( tigeroad_soundcmd_w )
+WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)
 {
 	if (ACCESSING_BITS_8_15)
 		soundlatch_w(space,offset,data >> 8);
@@ -173,7 +172,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0xfe0d00, 0xfe1807) AM_RAM		/* still part of OBJ RAM */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READ_PORT("P1_P2") AM_WRITE_LEGACY(tigeroad_videoctrl_w)	/* char bank, coin counters, + ? */
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM")
-/*  AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE_LEGACY(tigeroad_soundcmd_w) added by init_tigeroad() */
+/*  AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(tigeroad_soundcmd_w) added by init_tigeroad() */
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE_LEGACY(tigeroad_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE_LEGACY(tigeroad_scroll_w)
@@ -765,12 +764,14 @@ ROM_END
 
 static DRIVER_INIT( tigeroad )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe4002, 0xfe4003, FUNC(tigeroad_soundcmd_w));
+	tigeroad_state *state = machine.driver_data<tigeroad_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::tigeroad_soundcmd_w),state));
 }
 
 static DRIVER_INIT( f1dream )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe4002, 0xfe4003, FUNC(f1dream_control_w));
+	tigeroad_state *state = machine.driver_data<tigeroad_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::f1dream_control_w),state));
 }
 
 

@@ -374,7 +374,7 @@
 *   - Input Ports -   *
 **********************/
 
-static READ8_HANDLER( dsw_port_1_r )
+READ8_MEMBER(snookr10_state::dsw_port_1_r)
 {
 /*
    --------------------------------
@@ -390,7 +390,7 @@ static READ8_HANDLER( dsw_port_1_r )
     BIT 7 = Complement of DS1, bit 7
    ---------------------------------
 */
-return input_port_read(space->machine(), "SW1");
+return input_port_read(machine(), "SW1");
 }
 
 
@@ -414,57 +414,55 @@ return input_port_read(space->machine(), "SW1");
     STOP5  = bit4
 */
 
-static WRITE8_HANDLER( output_port_0_w )
+WRITE8_MEMBER(snookr10_state::output_port_0_w)
 {
-	snookr10_state *state = space->machine().driver_data<snookr10_state>();
 /*
    ----------------------------
     PORT 0x5000 ;OUTPUT PORT A
    ----------------------------
     BIT 0 = Coin counter.
-    BIT 1 = Lamps matrix, state->m_bit0.
+    BIT 1 = Lamps matrix, m_bit0.
     BIT 2 = Payout x10.
-    BIT 3 = Lamps matrix, state->m_bit1.
+    BIT 3 = Lamps matrix, m_bit1.
     BIT 4 = Key in.
-    BIT 5 = Lamps matrix, state->m_bit2.
+    BIT 5 = Lamps matrix, m_bit2.
     BIT 6 =
-    BIT 7 = Lamps matrix, state->m_bit3.
+    BIT 7 = Lamps matrix, m_bit3.
    ----------------------------
 */
-	state->m_outportl = data;
+	m_outportl = data;
 
-	state->m_bit0 = (data >> 1) & 1;
-	state->m_bit1 = (data >> 3) & 1;
-	state->m_bit2 = (data >> 5) & 1;
-	state->m_bit3 = (data >> 7) & 1;
-	state->m_bit4 = state->m_outporth & 1;
-	state->m_bit5 = (state->m_outporth >> 1) & 1;
+	m_bit0 = (data >> 1) & 1;
+	m_bit1 = (data >> 3) & 1;
+	m_bit2 = (data >> 5) & 1;
+	m_bit3 = (data >> 7) & 1;
+	m_bit4 = m_outporth & 1;
+	m_bit5 = (m_outporth >> 1) & 1;
 
-	output_set_lamp_value(0, state->m_bit5);	/* Lamp 0 - START  */
-	output_set_lamp_value(1, state->m_bit2);	/* Lamp 1 - CANCEL */
-	output_set_lamp_value(2, state->m_bit0);	/* Lamp 2 - STOP1  */
-	output_set_lamp_value(3, state->m_bit1);	/* Lamp 3 - STOP2  */
-	output_set_lamp_value(4, state->m_bit0);	/* Lamp 4 - STOP3  */
-	output_set_lamp_value(5, state->m_bit3);	/* Lamp 5 - STOP4  */
-	output_set_lamp_value(6, state->m_bit4);	/* Lamp 6 - STOP5  */
+	output_set_lamp_value(0, m_bit5);	/* Lamp 0 - START  */
+	output_set_lamp_value(1, m_bit2);	/* Lamp 1 - CANCEL */
+	output_set_lamp_value(2, m_bit0);	/* Lamp 2 - STOP1  */
+	output_set_lamp_value(3, m_bit1);	/* Lamp 3 - STOP2  */
+	output_set_lamp_value(4, m_bit0);	/* Lamp 4 - STOP3  */
+	output_set_lamp_value(5, m_bit3);	/* Lamp 5 - STOP4  */
+	output_set_lamp_value(6, m_bit4);	/* Lamp 6 - STOP5  */
 
-	coin_counter_w(space->machine(), 0, data & 0x01);	/* Coin in */
-	coin_counter_w(space->machine(), 1, data & 0x10);	/* Key in */
-	coin_counter_w(space->machine(), 2, data & 0x04);	/* Payout x10 */
+	coin_counter_w(machine(), 0, data & 0x01);	/* Coin in */
+	coin_counter_w(machine(), 1, data & 0x10);	/* Key in */
+	coin_counter_w(machine(), 2, data & 0x04);	/* Payout x10 */
 
-//  logerror("high: %04x - low: %X \n", state->m_outporth, state->m_outportl);
+//  logerror("high: %04x - low: %X \n", m_outporth, m_outportl);
 //  popmessage("written : %02X", data);
 }
 
-static WRITE8_HANDLER( output_port_1_w )
+WRITE8_MEMBER(snookr10_state::output_port_1_w)
 {
-	snookr10_state *state = space->machine().driver_data<snookr10_state>();
 /*
    ----------------------------
     PORT 0x5001 ;OUTPUT PORT B
    ----------------------------
-    BIT 0 = Lamps matrix, state->m_bit4
-    BIT 1 = Lamps matrix, state->m_bit5
+    BIT 0 = Lamps matrix, m_bit4
+    BIT 1 = Lamps matrix, m_bit5
     BIT 2 =
     BIT 3 =
     BIT 4 =
@@ -473,22 +471,22 @@ static WRITE8_HANDLER( output_port_1_w )
     BIT 7 =
    ----------------------------
 */
-	state->m_outporth = data << 8;
+	m_outporth = data << 8;
 
-	state->m_bit0 = (state->m_outportl >> 1) & 1;
-	state->m_bit1 = (state->m_outportl >> 3) & 1;
-	state->m_bit2 = (state->m_outportl >> 5) & 1;
-	state->m_bit3 = (state->m_outportl >> 7) & 1;
-	state->m_bit4 = data & 1;
-	state->m_bit5 = (data >> 1) & 1;
+	m_bit0 = (m_outportl >> 1) & 1;
+	m_bit1 = (m_outportl >> 3) & 1;
+	m_bit2 = (m_outportl >> 5) & 1;
+	m_bit3 = (m_outportl >> 7) & 1;
+	m_bit4 = data & 1;
+	m_bit5 = (data >> 1) & 1;
 
-	output_set_lamp_value(0, state->m_bit5);	/* Lamp 0 - START  */
-	output_set_lamp_value(1, state->m_bit2);	/* Lamp 1 - CANCEL */
-	output_set_lamp_value(2, state->m_bit0);	/* Lamp 2 - STOP1  */
-	output_set_lamp_value(3, state->m_bit1);	/* Lamp 3 - STOP2  */
-	output_set_lamp_value(4, state->m_bit0);	/* Lamp 4 - STOP3  */
-	output_set_lamp_value(5, state->m_bit3);	/* Lamp 5 - STOP4  */
-	output_set_lamp_value(6, state->m_bit4);	/* Lamp 6 - STOP5  */
+	output_set_lamp_value(0, m_bit5);	/* Lamp 0 - START  */
+	output_set_lamp_value(1, m_bit2);	/* Lamp 1 - CANCEL */
+	output_set_lamp_value(2, m_bit0);	/* Lamp 2 - STOP1  */
+	output_set_lamp_value(3, m_bit1);	/* Lamp 3 - STOP2  */
+	output_set_lamp_value(4, m_bit0);	/* Lamp 4 - STOP3  */
+	output_set_lamp_value(5, m_bit3);	/* Lamp 5 - STOP4  */
+	output_set_lamp_value(6, m_bit4);	/* Lamp 6 - STOP5  */
 }
 
 
@@ -503,9 +501,9 @@ static ADDRESS_MAP_START( snookr10_map, AS_PROGRAM, 8, snookr10_state )
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("IN2")		/* IN2 */
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("SW1")		/* DS1 */
-	AM_RANGE(0x3004, 0x3004) AM_READ_LEGACY(dsw_port_1_r)		/* complement of DS1, bit 7 */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(output_port_0_w)	/* OUT0 */
-	AM_RANGE(0x5001, 0x5001) AM_WRITE_LEGACY(output_port_1_w)	/* OUT1 */
+	AM_RANGE(0x3004, 0x3004) AM_READ(dsw_port_1_r)		/* complement of DS1, bit 7 */
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)	/* OUT0 */
+	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)	/* OUT1 */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE_LEGACY(snookr10_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE_LEGACY(snookr10_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -518,8 +516,8 @@ static ADDRESS_MAP_START( tenballs_map, AS_PROGRAM, 8, snookr10_state )
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("IN2")		/* IN2 */
 	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("SW1")		/* DS1 */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(output_port_0_w)	/* OUT0 */
-	AM_RANGE(0x5001, 0x5001) AM_WRITE_LEGACY(output_port_1_w)	/* OUT1 */
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(output_port_0_w)	/* OUT0 */
+	AM_RANGE(0x5001, 0x5001) AM_WRITE(output_port_1_w)	/* OUT1 */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE_LEGACY(snookr10_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE_LEGACY(snookr10_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM

@@ -43,6 +43,19 @@ public:
 	cpu_device *m_maincpu;
 	cpu_device *m_audiocpu;
 	device_t *m_vlm;
+	DECLARE_WRITE16_MEMBER(gx400_irq1_enable_word_w);
+	DECLARE_WRITE16_MEMBER(gx400_irq2_enable_word_w);
+	DECLARE_WRITE16_MEMBER(gx400_irq4_enable_word_w);
+	DECLARE_WRITE16_MEMBER(nemesis_irq_enable_word_w);
+	DECLARE_WRITE16_MEMBER(konamigt_irq_enable_word_w);
+	DECLARE_WRITE16_MEMBER(konamigt_irq2_enable_word_w);
+	DECLARE_READ16_MEMBER(gx400_sharedram_word_r);
+	DECLARE_WRITE16_MEMBER(gx400_sharedram_word_w);
+	DECLARE_READ16_MEMBER(konamigt_input_word_r);
+	DECLARE_WRITE16_MEMBER(selected_ip_word_w);
+	DECLARE_READ16_MEMBER(selected_ip_word_r);
+	DECLARE_WRITE16_MEMBER(nemesis_soundlatch_word_w);
+	DECLARE_READ8_MEMBER(wd_r);
 };
 
 

@@ -74,19 +74,17 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( irqack_w )
+WRITE8_MEMBER(_20pacgal_state::irqack_w)
 {
-	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 
-	if (!state->m_irq_mask)
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	if (!m_irq_mask)
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( timer_pulse_w )
+WRITE8_MEMBER(_20pacgal_state::timer_pulse_w)
 {
-	//_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 	//printf("timer pulse %02x\n", data);
 }
 
@@ -128,9 +126,9 @@ static const eeprom_interface _20pacgal_eeprom_intf =
  *
  *************************************/
 
-static WRITE8_HANDLER( _20pacgal_coin_counter_w )
+WRITE8_MEMBER(_20pacgal_state::_20pacgal_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(machine(), 0, data & 1);
 }
 
 
@@ -153,24 +151,22 @@ static void set_bankptr(running_machine &machine)
 		memory_set_bankptr(machine, "bank1", state->m_ram_48000);
 }
 
-static WRITE8_HANDLER( ram_bank_select_w )
+WRITE8_MEMBER(_20pacgal_state::ram_bank_select_w)
 {
-	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 
-	state->m_game_selected = data & 1;
-	set_bankptr(space->machine());
+	m_game_selected = data & 1;
+	set_bankptr(machine());
 }
 
-static WRITE8_HANDLER( ram_48000_w )
+WRITE8_MEMBER(_20pacgal_state::ram_48000_w)
 {
-	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
 
-	if (state->m_game_selected)
+	if (m_game_selected)
 	{
 		if (offset < 0x0800)
-			state->m_video_ram[offset & 0x07ff] = data;
+			m_video_ram[offset & 0x07ff] = data;
 
-		state->m_ram_48000[offset] = data;
+		m_ram_48000[offset] = data;
 	}
 }
 
@@ -180,22 +176,19 @@ static WRITE8_HANDLER( ram_48000_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( sprite_gfx_w )
+WRITE8_MEMBER(_20pacgal_state::sprite_gfx_w)
 {
-	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
-	state->m_sprite_gfx_ram[offset] = data;
+	m_sprite_gfx_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( sprite_ram_w )
+WRITE8_MEMBER(_20pacgal_state::sprite_ram_w)
 {
-	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
-	state->m_sprite_ram[offset] = data;
+	m_sprite_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( sprite_lookup_w )
+WRITE8_MEMBER(_20pacgal_state::sprite_lookup_w)
 {
-	_20pacgal_state *state = space->machine().driver_data<_20pacgal_state>();
-	state->m_sprite_color_lookup[offset] = data;
+	m_sprite_color_lookup[offset] = data;
 }
 
 static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
@@ -210,11 +203,11 @@ static ADDRESS_MAP_START( 20pacgal_map, AS_PROGRAM, 8, _20pacgal_state )
 	AM_RANGE(0x45f00, 0x45fff) AM_DEVWRITE_LEGACY("namco", namcos1_cus30_w)
 	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_BASE(m_char_gfx_ram)
 	AM_RANGE(0x47100, 0x47100) AM_RAM	/* leftover from original Galaga code */
-	AM_RANGE(0x48000, 0x49fff) AM_READ_BANK("bank1") AM_WRITE_LEGACY(ram_48000_w)	/* this should be a mirror of 08000-09ffff */
-	AM_RANGE(0x4c000, 0x4dfff) AM_WRITE_LEGACY(sprite_gfx_w)
-	AM_RANGE(0x4e000, 0x4e17f) AM_WRITE_LEGACY(sprite_ram_w)
+	AM_RANGE(0x48000, 0x49fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)	/* this should be a mirror of 08000-09ffff */
+	AM_RANGE(0x4c000, 0x4dfff) AM_WRITE(sprite_gfx_w)
+	AM_RANGE(0x4e000, 0x4e17f) AM_WRITE(sprite_ram_w)
 	AM_RANGE(0x4e180, 0x4feff) AM_WRITENOP
-	AM_RANGE(0x4ff00, 0x4ffff) AM_WRITE_LEGACY(sprite_lookup_w)
+	AM_RANGE(0x4ff00, 0x4ffff) AM_WRITE(sprite_lookup_w)
 ADDRESS_MAP_END
 
 
@@ -233,16 +226,16 @@ static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8, _20pacgal_state )
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x82, 0x82) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(timer_pulse_w)		/* ??? pulsed by the timer irq */
-	AM_RANGE(0x82, 0x82) AM_WRITE_LEGACY(irqack_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)		/* ??? pulsed by the timer irq */
+	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
 	AM_RANGE(0x84, 0x84) AM_NOP	/* ?? */
 	AM_RANGE(0x85, 0x86) AM_WRITEONLY AM_BASE(m_stars_seed)	/* stars: rng seed (lo/hi) */
 	AM_RANGE(0x87, 0x87) AM_READ_PORT("EEPROMIN") AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0x88, 0x88) AM_WRITE_LEGACY(ram_bank_select_w)
+	AM_RANGE(0x88, 0x88) AM_WRITE(ram_bank_select_w)
 	AM_RANGE(0x89, 0x89) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
 	AM_RANGE(0x8a, 0x8a) AM_WRITEONLY AM_BASE(m_stars_ctrl)	/* stars: bits 3-4 = active set; bit 5 = enable */
 	AM_RANGE(0x8b, 0x8b) AM_WRITEONLY AM_BASE(m_flip)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE_LEGACY(_20pacgal_coin_counter_w)
+	AM_RANGE(0x8f, 0x8f) AM_WRITE(_20pacgal_coin_counter_w)
 ADDRESS_MAP_END
 
 

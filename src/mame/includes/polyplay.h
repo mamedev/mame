@@ -23,6 +23,9 @@ public:
 	timer_device* m_timer;
 	int m_last;
 	UINT8 *m_characterram;
+	DECLARE_WRITE8_MEMBER(polyplay_sound_channel);
+	DECLARE_WRITE8_MEMBER(polyplay_start_timer2);
+	DECLARE_READ8_MEMBER(polyplay_random_read);
 };
 
 

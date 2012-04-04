@@ -23,6 +23,8 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_deco_tilegen1;
+	DECLARE_READ16_MEMBER(supbtime_controls_r);
+	DECLARE_WRITE16_MEMBER(sound_w);
 };
 
 

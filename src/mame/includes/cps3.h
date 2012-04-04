@@ -58,6 +58,36 @@ public:
 	unsigned short m_lastb2;
 	UINT32* m_mainram;
 	UINT8* m_user5region;
+	DECLARE_READ32_MEMBER(cps3_ssram_r);
+	DECLARE_WRITE32_MEMBER(cps3_ssram_w);
+	DECLARE_WRITE32_MEMBER(cps3_0xc0000000_ram_w);
+	DECLARE_WRITE32_MEMBER(cram_bank_w);
+	DECLARE_READ32_MEMBER(cram_data_r);
+	DECLARE_WRITE32_MEMBER(cram_data_w);
+	DECLARE_READ32_MEMBER(cps3_gfxflash_r);
+	DECLARE_WRITE32_MEMBER(cps3_gfxflash_w);
+	DECLARE_READ32_MEMBER(cps3_flash1_r);
+	DECLARE_READ32_MEMBER(cps3_flash2_r);
+	DECLARE_WRITE32_MEMBER(cps3_flash1_w);
+	DECLARE_WRITE32_MEMBER(cps3_flash2_w);
+	DECLARE_WRITE32_MEMBER(cram_gfxflash_bank_w);
+	DECLARE_READ32_MEMBER(cps3_vbl_r);
+	DECLARE_READ32_MEMBER(cps3_unk_io_r);
+	DECLARE_READ32_MEMBER(cps3_40C0000_r);
+	DECLARE_READ32_MEMBER(cps3_40C0004_r);
+	DECLARE_READ32_MEMBER(cps3_eeprom_r);
+	DECLARE_WRITE32_MEMBER(cps3_eeprom_w);
+	DECLARE_READ32_MEMBER(cps3_cdrom_r);
+	DECLARE_WRITE32_MEMBER(cps3_cdrom_w);
+	DECLARE_WRITE32_MEMBER(cps3_ss_bank_base_w);
+	DECLARE_WRITE32_MEMBER(cps3_ss_pal_base_w);
+	DECLARE_WRITE32_MEMBER(cps3_palettedma_w);
+	DECLARE_WRITE32_MEMBER(cps3_characterdma_w);
+	DECLARE_WRITE32_MEMBER(cps3_irq10_ack_w);
+	DECLARE_WRITE32_MEMBER(cps3_irq12_ack_w);
+	DECLARE_WRITE32_MEMBER(cps3_unk_vidregs_w);
+	DECLARE_READ32_MEMBER(cps3_colourram_r);
+	DECLARE_WRITE32_MEMBER(cps3_colourram_w);
 };
 
 

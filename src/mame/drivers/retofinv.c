@@ -36,71 +36,67 @@ Notes:
 
 
 
-static WRITE8_HANDLER( cpu1_reset_w )
+WRITE8_MEMBER(retofinv_state::cpu1_reset_w)
 {
-	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( cpu2_reset_w )
+WRITE8_MEMBER(retofinv_state::cpu2_reset_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( mcu_reset_w )
+WRITE8_MEMBER(retofinv_state::mcu_reset_w)
 {
 	/* the bootlegs don't have a MCU, so make sure it's there before trying to reset it */
-	if (space->machine().device("68705") != NULL)
-		cputag_set_input_line(space->machine(), "68705", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	if (machine().device("68705") != NULL)
+		cputag_set_input_line(machine(), "68705", INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( cpu2_m6000_w )
+WRITE8_MEMBER(retofinv_state::cpu2_m6000_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	state->m_cpu2_m6000 = data;
+	m_cpu2_m6000 = data;
 }
 
-static READ8_HANDLER( cpu0_mf800_r )
+READ8_MEMBER(retofinv_state::cpu0_mf800_r)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	return state->m_cpu2_m6000;
+	return m_cpu2_m6000;
 }
 
-static WRITE8_HANDLER( soundcommand_w )
+WRITE8_MEMBER(retofinv_state::soundcommand_w)
 {
       soundlatch_w(space, 0, data);
-      cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+      cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( irq0_ack_w )
+WRITE8_MEMBER(retofinv_state::irq0_ack_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	state->m_main_irq_mask = data & 1;
-	if (!state->m_main_irq_mask)
-		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	m_main_irq_mask = data & 1;
+	if (!m_main_irq_mask)
+		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( irq1_ack_w )
+WRITE8_MEMBER(retofinv_state::irq1_ack_w)
 {
-	retofinv_state *state = space->machine().driver_data<retofinv_state>();
-	state->m_sub_irq_mask = data & 1;
-	if (!state->m_sub_irq_mask)
-		cputag_set_input_line(space->machine(), "sub", 0, CLEAR_LINE);
+	m_sub_irq_mask = data & 1;
+	if (!m_sub_irq_mask)
+		cputag_set_input_line(machine(), "sub", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( coincounter_w )
+WRITE8_MEMBER(retofinv_state::coincounter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(machine(), 0, data & 1);
 }
 
-static WRITE8_HANDLER( coinlockout_w )
+WRITE8_MEMBER(retofinv_state::coinlockout_w)
 {
-	coin_lockout_w(space->machine(), 0,~data & 1);
+	coin_lockout_w(machine(), 0,~data & 1);
 }
 
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x7fff, 0x7fff) AM_WRITE_LEGACY(coincounter_w)
+	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(coincounter_w)
 	AM_RANGE(0x7b00, 0x7bff) AM_ROM	/* space for diagnostic ROM? The code looks */
 									/* for a string here, and jumps if it's present */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(retofinv_fg_videoram_w) AM_SHARE("share2") AM_BASE(m_fg_videoram)
@@ -115,17 +111,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xc005, 0xc005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc007, 0xc007) AM_READ_PORT("DSW3")
-	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(irq0_ack_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE_LEGACY(coinlockout_w)
-	AM_RANGE(0xc802, 0xc802) AM_WRITE_LEGACY(cpu2_reset_w)
-	AM_RANGE(0xc803, 0xc803) AM_WRITE_LEGACY(mcu_reset_w)
-//  AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(irq1_ack_w)   // presumably (meaning memory map is shared with cpu 1)
-	AM_RANGE(0xc805, 0xc805) AM_WRITE_LEGACY(cpu1_reset_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(irq0_ack_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(coinlockout_w)
+	AM_RANGE(0xc802, 0xc802) AM_WRITE(cpu2_reset_w)
+	AM_RANGE(0xc803, 0xc803) AM_WRITE(mcu_reset_w)
+//  AM_RANGE(0xc804, 0xc804) AM_WRITE(irq1_ack_w)   // presumably (meaning memory map is shared with cpu 1)
+	AM_RANGE(0xc805, 0xc805) AM_WRITE(cpu1_reset_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE_LEGACY(soundcommand_w)
+	AM_RANGE(0xd800, 0xd800) AM_WRITE(soundcommand_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(retofinv_mcu_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE_LEGACY(retofinv_mcu_w)
-	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(cpu0_mf800_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(cpu0_mf800_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
@@ -133,14 +129,14 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(retofinv_fg_videoram_w) AM_SHARE("share2")
 	AM_RANGE(0x8800, 0x9fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE_LEGACY(retofinv_bg_videoram_w) AM_SHARE("share3")
-	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(irq1_ack_w)
+	AM_RANGE(0xc804, 0xc804) AM_WRITE(irq1_ack_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(cpu2_m6000_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(cpu2_m6000_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM 		/* space for diagnostic ROM */

@@ -121,21 +121,19 @@
 #include "bingowng.lh"
 
 
-static WRITE8_HANDLER( protection_w )
+WRITE8_MEMBER(goldstar_state::protection_w)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
 	if (data == 0x2a)
-		state->m_dataoffset = 0;
+		m_dataoffset = 0;
 }
 
-static READ8_HANDLER( protection_r )
+READ8_MEMBER(goldstar_state::protection_r)
 {
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 	static const int data[4] = { 0x47, 0x4f, 0x4c, 0x44 };
 
-	state->m_dataoffset %= 4;
-	return data[state->m_dataoffset++];
+	m_dataoffset %= 4;
+	return data[m_dataoffset++];
 }
 
 static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
@@ -166,7 +164,7 @@ static ADDRESS_MAP_START( goldstar_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(goldstar_fa00_w)
 	AM_RANGE(0xfb00, 0xfb00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xfd00, 0xfdff) AM_RAM_WRITE_LEGACY(paletteram_BBGGGRRR_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE_LEGACY(protection_r,protection_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( goldstar_readport, AS_IO, 8, goldstar_state )
@@ -174,7 +172,7 @@ static ADDRESS_MAP_START( goldstar_readport, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( ncb3_port81_w )
+WRITE8_MEMBER(goldstar_state::ncb3_port81_w)
 {
 //  if (data!=0x00)
 //      popmessage("ncb3_port81_w %02x\n",data);
@@ -213,7 +211,7 @@ static ADDRESS_MAP_START( ncb3_readwriteport, AS_IO, 8, goldstar_state )
 //  AM_RANGE(0x06, 0x06) AM_READ_LEGACY(ncb3_unkread_r)    // unknown...
 //  AM_RANGE(0x08, 0x08) AM_READ_LEGACY(ncb3_unkread_r)    // unknown...
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW5")	/* confirmed for ncb3 */
-	AM_RANGE(0x81, 0x81) AM_WRITE_LEGACY(ncb3_port81_w) // ---> large writes.
+	AM_RANGE(0x81, 0x81) AM_WRITE(ncb3_port81_w) // ---> large writes.
 
 ADDRESS_MAP_END
 
@@ -248,7 +246,7 @@ ADDRESS_MAP_END
 
 
 
-static WRITE8_HANDLER( cm_outport1_w )
+WRITE8_MEMBER(goldstar_state::cm_outport1_w)
 {
 	/* lamps? */
 }
@@ -307,7 +305,7 @@ static ADDRESS_MAP_START( cm_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
-	AM_RANGE(0x12, 0x12) AM_WRITE_LEGACY(cm_outport1_w)	/* output port */
+	AM_RANGE(0x12, 0x12) AM_WRITE(cm_outport1_w)	/* output port */
 	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(cm_background_col_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE_LEGACY(cm_girl_scroll_w)
 ADDRESS_MAP_END
@@ -330,7 +328,7 @@ static ADDRESS_MAP_START( amcoe1_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
-	AM_RANGE(0x12, 0x12) AM_WRITE_LEGACY(cm_outport1_w)	/* output port */
+	AM_RANGE(0x12, 0x12) AM_WRITE(cm_outport1_w)	/* output port */
 	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(cm_background_col_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -343,12 +341,12 @@ static ADDRESS_MAP_START( amcoe2_portmap, AS_IO, 8, goldstar_state )
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE_LEGACY(cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
-	AM_RANGE(0x12, 0x12) AM_WRITE_LEGACY(cm_outport1_w)	/* output port */
+	AM_RANGE(0x12, 0x12) AM_WRITE(cm_outport1_w)	/* output port */
 	AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(cm_background_col_w)
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( lucky8_outport_w )
+WRITE8_MEMBER(goldstar_state::lucky8_outport_w)
 {
 	/* lamps */
 	output_set_lamp_value(0, (data >> 1) & 1);	/* D-UP Lamp */
@@ -378,29 +376,28 @@ static ADDRESS_MAP_START( lucky8_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	/* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE_LEGACY(lucky8_outport_w)
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( magodds_outb850_w )
+WRITE8_MEMBER(goldstar_state::magodds_outb850_w)
 {
 	// guess, could be wrong, this might just be lights
 
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
 	if (data&0x20)
-		state->m_tile_bank = 1;
+		m_tile_bank = 1;
 	else
-		state->m_tile_bank = 0;
+		m_tile_bank = 0;
 
 	//popmessage("magodds_outb850_w %02x\n", data);
 
-	state->m_fg_tilemap->mark_all_dirty();
+	m_fg_tilemap->mark_all_dirty();
 
 }
 
-static WRITE8_HANDLER( magodds_outb860_w )
+WRITE8_MEMBER(goldstar_state::magodds_outb860_w)
 {
 //  popmessage("magodds_outb860_w %02x\n", data);
 }
@@ -423,8 +420,8 @@ static ADDRESS_MAP_START(magodds_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	/* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE_LEGACY(magodds_outb850_w) //lamps
-	AM_RANGE(0xb860, 0xb860) AM_WRITE_LEGACY(magodds_outb860_w) //watchdog
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(magodds_outb850_w) //lamps
+	AM_RANGE(0xb860, 0xb860) AM_WRITE(magodds_outb860_w) //watchdog
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* sound */
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0xc000)
 ADDRESS_MAP_END
@@ -446,13 +443,13 @@ static ADDRESS_MAP_START( kkotnoli_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input Port */
 	AM_RANGE(0xb830, 0xb830) AM_WRITENOP		/* no ay8910 */
 	AM_RANGE(0xb840, 0xb840) AM_WRITENOP		/* no ay8910 */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE_LEGACY(lucky8_outport_w)
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* sound */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-//static WRITE8_HANDLER( ladylinr_outport_w )
+//WRITE8_MEMBER(goldstar_state::ladylinr_outport_w)
 //{
 /* LAMPS (b840)...
 
@@ -506,7 +503,7 @@ static ADDRESS_MAP_START( wcat3_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xb820, 0xb823) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* Input/Output Ports */
 	AM_RANGE(0xb830, 0xb830) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xb840, 0xb840) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)	/* no sound... only use both ports for DSWs */
-	AM_RANGE(0xb850, 0xb850) AM_WRITE_LEGACY(lucky8_outport_w)
+	AM_RANGE(0xb850, 0xb850) AM_WRITE(lucky8_outport_w)
 	AM_RANGE(0xb870, 0xb870) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* sound */
 //  AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE_LEGACY("ppi8255_3", ppi8255_r, ppi8255_w) /* Other PPI initialized? */
 	AM_RANGE(0xd000, 0xefff) AM_ROM
@@ -515,7 +512,7 @@ ADDRESS_MAP_END
 
 
 /*
-static READ8_HANDLER( unkch_unk_r )
+READ8_MEMBER(goldstar_state::unkch_unk_r)
 {
     return 0xff;
 }
@@ -548,28 +545,27 @@ static ADDRESS_MAP_START( unkch_map, AS_PROGRAM, 8, goldstar_state )
 	AM_RANGE(0xfe00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( unkcm_0x02_w )
+WRITE8_MEMBER(goldstar_state::unkcm_0x02_w)
 {
 	//popmessage("unkcm_0x02_w %02x", data);
 }
 
-static WRITE8_HANDLER( unkcm_0x03_w )
+WRITE8_MEMBER(goldstar_state::unkcm_0x03_w)
 {
 	//popmessage("unkcm_0x03_w %02x", data);
-	goldstar_state *state = space->machine().driver_data<goldstar_state>();
 
-	state->m_unkch_vidreg = data;
+	m_unkch_vidreg = data;
 
 	// -x-- ----   seems to toggle when a 'normal' tilemap should be displayed instead of the reels?
 }
 
 
-static WRITE8_HANDLER( unkcm_0x11_w )
+WRITE8_MEMBER(goldstar_state::unkcm_0x11_w)
 {
 	//popmessage("unkcm_0x11_w %02x", data);
 }
 
-static WRITE8_HANDLER( unkcm_0x12_w )
+WRITE8_MEMBER(goldstar_state::unkcm_0x12_w)
 {
 //  popmessage("unkcm_0x12_w %02x", data);
 }
@@ -578,10 +574,10 @@ static WRITE8_HANDLER( unkcm_0x12_w )
 static ADDRESS_MAP_START( unkch_portmap, AS_IO, 8, goldstar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(unkcm_0x02_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE_LEGACY(unkcm_0x03_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE_LEGACY(unkcm_0x11_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE_LEGACY(unkcm_0x12_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(unkcm_0x02_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(unkcm_0x03_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(unkcm_0x11_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(unkcm_0x12_w)
 
 //  AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w) /* Input Ports */
 //  AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w) /* DIP switches */
@@ -10269,11 +10265,11 @@ static DRIVER_INIT( nfb96sea )
 }
 
 
-static READ8_HANDLER( fixedvalb4_r )
+READ8_MEMBER(goldstar_state::fixedvalb4_r)
 {
 	return 0xb4;
 }
-static READ8_HANDLER( fixedvala8_r )
+READ8_MEMBER(goldstar_state::fixedvala8_r)
 {
 	return 0xa8;
 }
@@ -10294,13 +10290,13 @@ static DRIVER_INIT( schery97 )
 
 		ROM[i] = x;
 	}
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x1d, 0x1d, FUNC(fixedvala8_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x2a, 0x2a, FUNC(fixedvalb4_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x1d, 0x1d, read8_delegate(FUNC(goldstar_state::fixedvala8_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x2a, 0x2a, read8_delegate(FUNC(goldstar_state::fixedvalb4_r),state));
 	/* Oki 6295 at 0x20 */
 }
 
-static READ8_HANDLER( fixedval38_r )
+READ8_MEMBER(goldstar_state::fixedval38_r)
 {
 	return 0x38;
 }
@@ -10324,12 +10320,12 @@ static DRIVER_INIT( schery97a )
 	}
 
 
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x16, 0x16, FUNC(fixedval38_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x16, 0x16, read8_delegate(FUNC(goldstar_state::fixedval38_r),state));
 	/* Oki 6295 at 0x20 */
 }
 
-static READ8_HANDLER( fixedvalea_r )
+READ8_MEMBER(goldstar_state::fixedvalea_r)
 {
 	return 0xea;
 }
@@ -10351,12 +10347,12 @@ static DRIVER_INIT( skill98 )
 
 		ROM[i] = x;
 	}
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x1e, 0x1e, FUNC(fixedvalea_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x1e, 0x1e, read8_delegate(FUNC(goldstar_state::fixedvalea_r),state));
 	/* Oki 6295 at 0x20 */
 }
 
-static READ8_HANDLER( fixedval68_r )
+READ8_MEMBER(goldstar_state::fixedval68_r)
 {
 	return 0x68;
 }
@@ -10378,12 +10374,12 @@ static DRIVER_INIT( nfb96_c1 )
 		}
 		ROM[i] = x;
 	}
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x31, 0x31, FUNC(fixedval68_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x31, 0x31, read8_delegate(FUNC(goldstar_state::fixedval68_r),state));
 
 }
 
-static READ8_HANDLER( fixedval58_r )
+READ8_MEMBER(goldstar_state::fixedval58_r)
 {
 	return 0x58;
 }
@@ -10406,21 +10402,21 @@ static DRIVER_INIT( nfb96_c2 )
 
 		ROM[i] = x;
 	}
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x21, 0x21, FUNC(fixedval58_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x21, 0x21, read8_delegate(FUNC(goldstar_state::fixedval58_r),state));
 }
 
-static READ8_HANDLER( fixedval80_r )
+READ8_MEMBER(goldstar_state::fixedval80_r)
 {
 	return 0x80;
 }
 
-static READ8_HANDLER( fixedval96_r )
+READ8_MEMBER(goldstar_state::fixedval96_r)
 {
 	return 0x96;
 }
 
-static READ8_HANDLER( fixedvalaa_r )
+READ8_MEMBER(goldstar_state::fixedvalaa_r)
 {
 	return 0xaa;
 }
@@ -10442,16 +10438,17 @@ static DRIVER_INIT( nfb96_d )
 		}
 		ROM[i] = x;
 	}
+	goldstar_state *state = machine.driver_data<goldstar_state>();
 	// nfb96b needs both of these
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x23, 0x23, FUNC(fixedval80_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x5a, 0x5a, FUNC(fixedvalaa_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x23, 0x23, read8_delegate(FUNC(goldstar_state::fixedval80_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x5a, 0x5a, read8_delegate(FUNC(goldstar_state::fixedvalaa_r),state));
 
 	// csel96b
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x6e, 0x6e, FUNC(fixedval96_r));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x6e, 0x6e, read8_delegate(FUNC(goldstar_state::fixedval96_r),state));
 
 }
 
-static READ8_HANDLER( fixedvalbe_r )
+READ8_MEMBER(goldstar_state::fixedvalbe_r)
 {
 	return 0xbe;
 }
@@ -10474,17 +10471,17 @@ static DRIVER_INIT( nfb96_dk )
 		}
 		ROM[i] = x;
 	}
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x2e, 0x2e, FUNC(fixedvalbe_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x2e, 0x2e, read8_delegate(FUNC(goldstar_state::fixedvalbe_r),state));
 
 }
 
-static READ8_HANDLER( fixedval90_r )
+READ8_MEMBER(goldstar_state::fixedval90_r)
 {
 	return 0x90;
 }
 
-static READ8_HANDLER( fixedval84_r )
+READ8_MEMBER(goldstar_state::fixedval84_r)
 {
 	return 0x84;
 }
@@ -10507,11 +10504,12 @@ static DRIVER_INIT( rp35 )
 		ROM[i] = x;
 	}
 
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x5e, 0x5e, FUNC(fixedval84_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x36, 0x36, FUNC(fixedval90_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x5e, 0x5e, read8_delegate(FUNC(goldstar_state::fixedval84_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x36, 0x36, read8_delegate(FUNC(goldstar_state::fixedval90_r),state));
 }
 
-static READ8_HANDLER( fixedvalb2_r )
+READ8_MEMBER(goldstar_state::fixedvalb2_r)
 {
 	return 0xb2;
 }
@@ -10535,10 +10533,11 @@ static DRIVER_INIT( rp36 )
 		ROM[i] = x;
 	}
 
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x34, 0x34, FUNC(fixedvalb2_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x34, 0x34, read8_delegate(FUNC(goldstar_state::fixedvalb2_r),state));
 }
 
-static READ8_HANDLER( fixedval48_r )
+READ8_MEMBER(goldstar_state::fixedval48_r)
 {
 	return 0x48;
 }
@@ -10562,15 +10561,16 @@ static DRIVER_INIT( rp36c3 )
 		ROM[i] = x;
 	}
 
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x17, 0x17, FUNC(fixedval48_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x17, 0x17, read8_delegate(FUNC(goldstar_state::fixedval48_r),state));
 }
 
-static READ8_HANDLER( fixedval09_r )
+READ8_MEMBER(goldstar_state::fixedval09_r)
 {
 	return 0x09;
 }
 
-static READ8_HANDLER( fixedval74_r )
+READ8_MEMBER(goldstar_state::fixedval74_r)
 {
 	return 0x74;
 }
@@ -10594,17 +10594,18 @@ static DRIVER_INIT( po33 )
 
 		ROM[i] = x;
 	}
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x32, 0x32, FUNC(fixedval74_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x12, 0x12, FUNC(fixedval09_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x32, 0x32, read8_delegate(FUNC(goldstar_state::fixedval74_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x12, 0x12, read8_delegate(FUNC(goldstar_state::fixedval09_r),state));
 	/* oki6295 at 0x20 */
 }
 
-static READ8_HANDLER( fixedvale4_r )
+READ8_MEMBER(goldstar_state::fixedvale4_r)
 {
 	return 0xe4;
 }
 
-static READ8_HANDLER( fixedvalc7_r )
+READ8_MEMBER(goldstar_state::fixedvalc7_r)
 {
 	return 0xc7;
 }
@@ -10628,8 +10629,9 @@ static DRIVER_INIT( match133 )
 		ROM[i] = x;
 	}
 
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x16, 0x16, FUNC(fixedvalc7_r));
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x1a, 0x1a, FUNC(fixedvale4_r));
+	goldstar_state *state = machine.driver_data<goldstar_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x16, 0x16, read8_delegate(FUNC(goldstar_state::fixedvalc7_r),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x1a, 0x1a, read8_delegate(FUNC(goldstar_state::fixedvale4_r),state));
 }
 
 static DRIVER_INIT(cherrys)

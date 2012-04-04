@@ -27,6 +27,10 @@ public:
 	device_t *m_k052109;
 	device_t *m_k053244;
 	device_t *m_k053251;
+	DECLARE_READ8_MEMBER(bankedram_r);
+	DECLARE_WRITE8_MEMBER(bankedram_w);
+	DECLARE_WRITE8_MEMBER(surpratk_videobank_w);
+	DECLARE_WRITE8_MEMBER(surpratk_5fc0_w);
 };
 
 /*----------- defined in video/surpratk.c -----------*/

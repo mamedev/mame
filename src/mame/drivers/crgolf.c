@@ -42,9 +42,9 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( rom_bank_select_w )
+WRITE8_MEMBER(crgolf_state::rom_bank_select_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 15);
+	memory_set_bank(machine(), "bank1", data & 15);
 }
 
 
@@ -86,38 +86,36 @@ static MACHINE_RESET( crgolf )
  *
  *************************************/
 
-static READ8_HANDLER( switch_input_r )
+READ8_MEMBER(crgolf_state::switch_input_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
-	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	return input_port_read(space->machine(), portnames[state->m_port_select]);
+	return input_port_read(machine(), portnames[m_port_select]);
 }
 
 
-static READ8_HANDLER( analog_input_r )
+READ8_MEMBER(crgolf_state::analog_input_r)
 {
-	return ((input_port_read(space->machine(), "STICK0") >> 4) | (input_port_read(space->machine(), "STICK1") & 0xf0)) ^ 0x88;
+	return ((input_port_read(machine(), "STICK0") >> 4) | (input_port_read(machine(), "STICK1") & 0xf0)) ^ 0x88;
 }
 
 
-static WRITE8_HANDLER( switch_input_select_w )
+WRITE8_MEMBER(crgolf_state::switch_input_select_w)
 {
-	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	if (!(data & 0x40)) state->m_port_select = 6;
-	if (!(data & 0x20)) state->m_port_select = 5;
-	if (!(data & 0x10)) state->m_port_select = 4;
-	if (!(data & 0x08)) state->m_port_select = 3;
-	if (!(data & 0x04)) state->m_port_select = 2;
-	if (!(data & 0x02)) state->m_port_select = 1;
-	if (!(data & 0x01)) state->m_port_select = 0;
+	if (!(data & 0x40)) m_port_select = 6;
+	if (!(data & 0x20)) m_port_select = 5;
+	if (!(data & 0x10)) m_port_select = 4;
+	if (!(data & 0x08)) m_port_select = 3;
+	if (!(data & 0x04)) m_port_select = 2;
+	if (!(data & 0x02)) m_port_select = 1;
+	if (!(data & 0x01)) m_port_select = 0;
 }
 
 
-static WRITE8_HANDLER( unknown_w )
+WRITE8_MEMBER(crgolf_state::unknown_w)
 {
-	logerror("%04X:unknown_w = %02X\n", cpu_get_pc(&space->device()), data);
+	logerror("%04X:unknown_w = %02X\n", cpu_get_pc(&space.device()), data);
 }
 
 
@@ -137,18 +135,17 @@ static TIMER_CALLBACK( main_to_sound_callback )
 }
 
 
-static WRITE8_HANDLER( main_to_sound_w )
+WRITE8_MEMBER(crgolf_state::main_to_sound_w)
 {
-	space->machine().scheduler().synchronize(FUNC(main_to_sound_callback), data);
+	machine().scheduler().synchronize(FUNC(main_to_sound_callback), data);
 }
 
 
-static READ8_HANDLER( main_to_sound_r )
+READ8_MEMBER(crgolf_state::main_to_sound_r)
 {
-	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	return state->m_main_to_sound_data;
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	return m_main_to_sound_data;
 }
 
 
@@ -168,18 +165,17 @@ static TIMER_CALLBACK( sound_to_main_callback )
 }
 
 
-static WRITE8_HANDLER( sound_to_main_w )
+WRITE8_MEMBER(crgolf_state::sound_to_main_w)
 {
-	space->machine().scheduler().synchronize(FUNC(sound_to_main_callback), data);
+	machine().scheduler().synchronize(FUNC(sound_to_main_callback), data);
 }
 
 
-static READ8_HANDLER( sound_to_main_r )
+READ8_MEMBER(crgolf_state::sound_to_main_r)
 {
-	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
-	return state->m_sound_to_main_data;
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	return m_sound_to_main_data;
 }
 
 
@@ -261,8 +257,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0x8005, 0x8005) AM_WRITEONLY AM_BASE(m_screen_select)
 	AM_RANGE(0x8006, 0x8006) AM_WRITEONLY AM_BASE(m_screenb_enable)
 	AM_RANGE(0x8007, 0x8007) AM_WRITEONLY AM_BASE(m_screena_enable)
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE_LEGACY(sound_to_main_r, main_to_sound_w)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(rom_bank_select_w)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE(sound_to_main_r, main_to_sound_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0xa000, 0xffff) AM_READWRITE_LEGACY(crgolf_videoram_r, crgolf_videoram_w)
 ADDRESS_MAP_END
 
@@ -279,9 +275,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, crgolf_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITENOP
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE_LEGACY(switch_input_r, switch_input_select_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE_LEGACY(analog_input_r, unknown_w)
-	AM_RANGE(0xe003, 0xe003) AM_READWRITE_LEGACY(main_to_sound_r, sound_to_main_w)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(switch_input_r, switch_input_select_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(analog_input_r, unknown_w)
+	AM_RANGE(0xe003, 0xe003) AM_READWRITE(main_to_sound_r, sound_to_main_w)
 ADDRESS_MAP_END
 
 

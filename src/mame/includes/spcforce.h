@@ -12,6 +12,12 @@ public:
 	int m_sn76496_select;
 
 	UINT8 m_irq_mask;
+	DECLARE_WRITE8_MEMBER(spcforce_SN76496_latch_w);
+	DECLARE_READ8_MEMBER(spcforce_SN76496_select_r);
+	DECLARE_WRITE8_MEMBER(spcforce_SN76496_select_w);
+	DECLARE_READ8_MEMBER(spcforce_t0_r);
+	DECLARE_WRITE8_MEMBER(spcforce_soundtrigger_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 
