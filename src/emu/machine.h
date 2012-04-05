@@ -183,7 +183,6 @@ class tilemap_manager;
 class debug_view_manager;
 class osd_interface;
 
-typedef struct _memory_private memory_private;
 typedef struct _palette_private palette_private;
 typedef struct _romload_private romload_private;
 typedef struct _input_port_private input_port_private;
@@ -319,6 +318,7 @@ public:
 	resource_pool &respool() { return m_respool; }
 	device_scheduler &scheduler() { return m_scheduler; }
 	save_manager &save() { return m_save; }
+	memory_manager &memory() { assert(m_memory != NULL); return *m_memory; }
 	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
 	input_manager &input() const { assert(m_input != NULL); return *m_input; }
@@ -407,7 +407,6 @@ public:
 	UINT32					debug_flags;		// the current debug flags
 
 	// internal core information
-	memory_private *		memory_data;		// internal data from memory.c
 	palette_private *		palette_data;		// internal data from palette.c
 	romload_private *		romload_data;		// internal data from romload.c
 	input_port_private *	input_port_data;	// internal data from inptport.c
@@ -446,6 +445,7 @@ private:
 	device_scheduler		m_scheduler;			// scheduler object
 
 	// managers
+	memory_manager *		m_memory;				// internal data from memory.c
 	cheat_manager *			m_cheat;				// internal data from cheat.c
 	render_manager *		m_render;				// internal data from render.c
 	input_manager *			m_input;				// internal data from input.c

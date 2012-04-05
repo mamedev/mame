@@ -533,18 +533,18 @@ static READ16_DEVICE_HANDLER( csdeluxe_pia_r )
 	/* low bytes. */
 	pia6821_device *pia = downcast<pia6821_device *>(device);
 	if (ACCESSING_BITS_8_15)
-		return pia->read_alt(*memory_nonspecific_space(device->machine()), offset) << 8;
+		return pia->read_alt(*device->machine().memory().first_space(), offset) << 8;
 	else
-		return pia->read_alt(*memory_nonspecific_space(device->machine()), offset);
+		return pia->read_alt(*device->machine().memory().first_space(), offset);
 }
 
 static WRITE16_DEVICE_HANDLER( csdeluxe_pia_w )
 {
 	pia6821_device *pia = downcast<pia6821_device *>(device);
 	if (ACCESSING_BITS_8_15)
-		pia->write_alt(*memory_nonspecific_space(device->machine()), offset, data >> 8);
+		pia->write_alt(*device->machine().memory().first_space(), offset, data >> 8);
 	else
-		pia->write_alt(*memory_nonspecific_space(device->machine()), offset, data);
+		pia->write_alt(*device->machine().memory().first_space(), offset, data);
 }
 
 

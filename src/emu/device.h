@@ -302,6 +302,9 @@ protected:
 		virtual void findit() = 0;
 
 	protected:
+		// static helpers
+		void *find_memory(size_t &size);
+
 		// internal state
 		finder_base *m_next;
 		device_t &m_base;
@@ -401,7 +404,7 @@ protected:
 		}
 
 		// finder
-		virtual void findit() { astring subtag; m_target = reinterpret_cast<_PointerType *>(memory_get_shared(m_base.machine(), m_base.subtag(subtag, m_tag), m_bytes)); }
+		virtual void findit() { m_target = reinterpret_cast<_PointerType *>(find_memory(m_bytes)); }
 
 	protected:
 		// internal state

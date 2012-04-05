@@ -187,9 +187,11 @@ void nvram_device::determine_final_base()
 	// find our shared pointer with the target RAM
 	if (m_base == NULL)
 	{
-		m_base = memory_get_shared(machine(), tag(), m_length);
-		if (m_base == NULL)
+		memory_share *share = machine().memory().shared(*owner(), tag());
+		if (share == NULL)
 			throw emu_fatalerror("NVRAM device '%s' has no corresponding AM_SHARE region", tag());
+		m_base = share->ptr();
+		m_length = share->bytes();
 	}
 
 	// if we are region-backed for the default, find it now and make sure it's the right size

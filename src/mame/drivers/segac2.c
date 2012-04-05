@@ -111,7 +111,7 @@ static MACHINE_START( segac2 )
 static MACHINE_RESET( segac2 )
 {
 	segac2_state *state = machine.driver_data<segac2_state>();
-	megadrive_ram = reinterpret_cast<UINT16 *>(memory_get_shared(machine, "nvram"));
+	megadrive_ram = reinterpret_cast<UINT16 *>(machine.memory().shared("nvram")->ptr());
 
 	/* set up interrupts and such */
 	MACHINE_RESET_CALL(megadriv);

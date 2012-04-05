@@ -855,6 +855,19 @@ device_t::finder_base::~finder_base()
 }
 
 
+//-------------------------------------------------
+//  find_memory - find memory
+//-------------------------------------------------
+
+void *device_t::finder_base::find_memory(size_t &size)
+{
+	memory_share *share = m_base.machine().memory().shared(m_base, m_tag);
+	if (share == NULL)
+		return NULL;
+	size = share->bytes();
+	return share->ptr();
+}
+
 
 //**************************************************************************
 //  LIVE DEVICE INTERFACES

@@ -528,7 +528,7 @@ WRITE8_MEMBER(mpu4_state::bankswitch_w)
 
 READ8_MEMBER(mpu4_state::bankswitch_r)
 {
-	return memory_get_bank(machine(), "bank1");
+	return machine().memory().bank("bank1");
 }
 
 

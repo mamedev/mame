@@ -248,174 +248,6 @@ enum
 //**************************************************************************
 
 
-// ======================> memory_block
-
-// a memory block is a chunk of RAM associated with a range of memory in a device's address space
-class memory_block
-{
-	DISABLE_COPYING(memory_block);
-
-	friend class simple_list<memory_block>;
-	friend resource_pool_object<memory_block>::~resource_pool_object();
-
-public:
-	// construction/destruction
-	memory_block(address_space &space, offs_t bytestart, offs_t byteend, void *memory = NULL);
-	~memory_block();
-
-	// getters
-	running_machine &machine() const { return m_machine; }
-	memory_block *next() const { return m_next; }
-	offs_t bytestart() const { return m_bytestart; }
-	offs_t byteend() const { return m_byteend; }
-	UINT8 *data() const { return m_data; }
-
-	// is the given range contained by this memory block?
-	bool contains(address_space &space, offs_t bytestart, offs_t byteend) const
-	{
-		return (&space == &m_space && m_bytestart <= bytestart && m_byteend >= byteend);
-	}
-
-private:
-	// internal state
-	memory_block *			m_next;					// next memory block in the list
-	running_machine &		m_machine;				// need the machine to free our memory
-	address_space &			m_space;				// which address space are we associated with?
-	offs_t					m_bytestart, m_byteend;	// byte-normalized start/end for verifying a match
-	UINT8 *					m_data;					// pointer to the data for this block
-	UINT8 *					m_allocated;			// pointer to the actually allocated block
-};
-
-
-// ======================> memory_bank
-
-// a memory bank is a global pointer to memory that can be shared across devices and changed dynamically
-class memory_bank
-{
-	friend class simple_list<memory_bank>;
-	friend resource_pool_object<memory_bank>::~resource_pool_object();
-
-	// a bank reference is an entry in a list of address spaces that reference a given bank
-	class bank_reference
-	{
-		friend class simple_list<bank_reference>;
-		friend resource_pool_object<bank_reference>::~resource_pool_object();
-
-	public:
-		// construction/destruction
-		bank_reference(address_space &space, read_or_write readorwrite)
-			: m_next(NULL),
-			  m_space(space),
-			  m_readorwrite(readorwrite) { }
-
-		// getters
-		bank_reference *next() const { return m_next; }
-		address_space &space() const { return m_space; }
-
-		// does this reference match the space+read/write combination?
-		bool matches(address_space &space, read_or_write readorwrite) const
-		{
-			return (&space == &m_space && (readorwrite == ROW_READWRITE || readorwrite == m_readorwrite));
-		}
-
-	private:
-		// internal state
-		bank_reference *		m_next;				// link to the next reference
-		address_space &			m_space;			// address space that references us
-		read_or_write			m_readorwrite;		// used for read or write?
-	};
-
-	// a bank_entry contains a raw and decrypted pointer
-	struct bank_entry
-	{
-		UINT8 *			m_raw;
-		UINT8 *			m_decrypted;
-	};
-
-public:
-	// construction/destruction
-	memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag = NULL);
-	~memory_bank();
-
-	// getters
-	memory_bank *next() const { return m_next; }
-	running_machine &machine() const { return m_machine; }
-	int index() const { return m_index; }
-	int entry() const { return m_curentry; }
-	bool anonymous() const { return m_anonymous; }
-	offs_t bytestart() const { return m_bytestart; }
-	void *base() const { return *m_baseptr; }
-	void *base_decrypted() const { return *m_basedptr; }
-	const char *tag() const { return m_tag; }
-	const char *name() const { return m_name; }
-
-	// compare a range against our range
-	bool matches_exactly(offs_t bytestart, offs_t byteend) const { return (m_bytestart == bytestart && m_byteend == byteend); }
-	bool fully_covers(offs_t bytestart, offs_t byteend) const { return (m_bytestart <= bytestart && m_byteend >= byteend); }
-	bool is_covered_by(offs_t bytestart, offs_t byteend) const { return (m_bytestart >= bytestart && m_byteend <= byteend); }
-	bool straddles(offs_t bytestart, offs_t byteend) const { return (m_bytestart < byteend && m_byteend > bytestart); }
-
-	// track and verify address space references to this bank
-	bool references_space(address_space &space, read_or_write readorwrite) const;
-	void add_reference(address_space &space, read_or_write readorwrite);
-
-	// set the base explicitly
-	void set_base(void *base);
-	void set_base_decrypted(void *base);
-
-	// configure and set entries
-	void configure(int entrynum, void *base);
-	void configure_decrypted(int entrynum, void *base);
-	void set_entry(int entrynum);
-
-private:
-	// internal helpers
-	void invalidate_references();
-	void expand_entries(int entrynum);
-
-	// internal state
-	memory_bank *			m_next;					// next bank in sequence
-	running_machine &		m_machine;				// need the machine to free our memory
-	UINT8 **				m_baseptr;				// pointer to our base pointer in the global array
-	UINT8 **				m_basedptr;				// same for the decrypted base pointer
-	UINT8					m_index;				// array index for this handler
-	bool					m_anonymous;			// are we anonymous or explicit?
-	offs_t					m_bytestart;			// byte-adjusted start offset
-	offs_t					m_byteend;				// byte-adjusted end offset
-	int						m_curentry;				// current entry
-	bank_entry *			m_entry;				// array of entries (dynamically allocated)
-	int						m_entry_count;			// number of allocated entries
-	astring					m_name;					// friendly name for this bank
-	astring					m_tag;					// tag for this bank
-	simple_list<bank_reference> m_reflist;			// linked list of address spaces referencing this bank
-};
-
-
-// ======================> memory_share
-
-// a memory share contains information about shared memory region
-class memory_share
-{
-public:
-	// construction/destruction
-	memory_share(size_t size, void *ptr = NULL)
-		: m_ptr(ptr),
-		  m_size(size) { }
-
-	// getters
-	void *ptr() const { return m_ptr; }
-	size_t size() const { return m_size; }
-
-	// setters
-	void set_ptr(void *ptr) { m_ptr = ptr; }
-
-private:
-	// internal state
-	void *					m_ptr;					// pointer to the memory backing the region
-	size_t					m_size;					// size of the shared region
-};
-
-
 // ======================> handler_entry
 
 // a handler entry contains information about a memory handler
@@ -1057,8 +889,8 @@ class address_space_specific : public address_space
 
 public:
 	// construction/destruction
-	address_space_specific(device_memory_interface &memory, address_spacenum spacenum)
-		: address_space(memory, spacenum, _Large),
+	address_space_specific(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum)
+		: address_space(manager, memory, spacenum, _Large),
 		  m_read(*this, _Large),
 		  m_write(*this, _Large)
 	{
@@ -1667,27 +1499,6 @@ typedef address_space_specific<UINT64, ENDIANNESS_LITTLE, true> address_space_64
 typedef address_space_specific<UINT64, ENDIANNESS_BIG,    true> address_space_64be_large;
 
 
-// ======================> _memory_private
-
-// holds internal state for the memory system
-struct _memory_private
-{
-	bool					initialized;					// have we completed initialization?
-
-	UINT8 *					bank_ptr[STATIC_COUNT];			// array of bank pointers
-	UINT8 *					bankd_ptr[STATIC_COUNT];		// array of decrypted bank pointers
-
-	simple_list<address_space> spacelist;					// list of address spaces
-	simple_list<memory_block> blocklist;					// head of the list of memory blocks
-
-	simple_list<memory_bank> banklist;						// data gathered for each bank
-	tagmap_t<memory_bank *>	bankmap;						// map for fast bank lookups
-	UINT8					banknext;						// next bank to allocate
-
-	tagmap_t<memory_share *> sharemap;						// map for share lookups
-};
-
-
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -1702,9 +1513,6 @@ UINT8 address_table::s_watchpoint_table[1 << LEVEL1_BITS];
 //  FUNCTION PROTOTYPES
 //**************************************************************************
 
-// banking helpers
-static void bank_reattach(running_machine &machine);
-
 // debugging
 static void generate_memdump(running_machine &machine);
 
@@ -1718,11 +1526,13 @@ static void generate_memdump(running_machine &machine);
 //  memory_init - initialize the memory system
 //-------------------------------------------------
 
-void memory_init(running_machine &machine)
+memory_manager::memory_manager(running_machine &machine)
+	: m_machine(machine),
+	  m_initialized(false),
+	  m_banknext(STATIC_BANK1)
 {
-	// allocate our private data
-	memory_private *memdata = machine.memory_data = auto_alloc_clear(machine, memory_private);
-	memdata->banknext = STATIC_BANK1;
+	memset(m_bank_ptr, 0, sizeof(m_bank_ptr));
+	memset(m_bankd_ptr, 0, sizeof(m_bankd_ptr));
 
 	// loop over devices and spaces within each device
 	memory_interface_iterator iter(machine.root_device());
@@ -1732,39 +1542,33 @@ void memory_init(running_machine &machine)
 			// if there is a configuration for this space, we need an address space
 			const address_space_config *spaceconfig = memory->space_config(spacenum);
 			if (spaceconfig != NULL)
-				memdata->spacelist.append(address_space::allocate(machine, *spaceconfig, *memory, spacenum));
+				m_spacelist.append(address_space::allocate(*this, *spaceconfig, *memory, spacenum));
 		}
 
 	// construct and preprocess the address_map for each space
-	for (address_space *space = memdata->spacelist.first(); space != NULL; space = space->next())
+	for (address_space *space = m_spacelist.first(); space != NULL; space = space->next())
 		space->prepare_map();
 
 	// create the handlers from the resulting address maps
-	for (address_space *space = memdata->spacelist.first(); space != NULL; space = space->next())
+	for (address_space *space = m_spacelist.first(); space != NULL; space = space->next())
 		space->populate_from_map();
 
 	// allocate memory needed to back each address space
-	for (address_space *space = memdata->spacelist.first(); space != NULL; space = space->next())
+	for (address_space *space = m_spacelist.first(); space != NULL; space = space->next())
 		space->allocate_memory();
 
 	// find all the allocated pointers
-	for (address_space *space = memdata->spacelist.first(); space != NULL; space = space->next())
+	for (address_space *space = m_spacelist.first(); space != NULL; space = space->next())
 		space->locate_memory();
 
 	// register a callback to reset banks when reloading state
-	machine.save().register_postload(save_prepost_delegate(FUNC(bank_reattach), &machine));
+	machine.save().register_postload(save_prepost_delegate(FUNC(memory_manager::bank_reattach), this));
 
 	// dump the final memory configuration
 	generate_memdump(machine);
 
 	// we are now initialized
-	memdata->initialized = true;
-}
-
-address_space *memory_nonspecific_space(running_machine &machine)
-{
-	memory_private *memdata = machine.memory_data;
-	return memdata->spacelist.first();
+	m_initialized = true;
 }
 
 
@@ -1774,30 +1578,24 @@ address_space *memory_nonspecific_space(running_machine &machine)
 //**************************************************************************
 
 //-------------------------------------------------
-//  memory_configure_bank - configure the
-//  addresses for a bank
+//  configure_bank - configure the addresses for a 
+//  bank
 //-------------------------------------------------
 
-void memory_configure_bank(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
+void memory_manager::configure_bank(const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
-	memory_configure_bank(machine.root_device(), tag, startentry, numentries, base, stride);
+	configure_bank(machine().root_device(), tag, startentry, numentries, base, stride);
 }
 
-
-//-------------------------------------------------
-//  memory_configure_bank - configure the
-//  addresses for a bank
-//-------------------------------------------------
-
-void memory_configure_bank(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
+void memory_manager::configure_bank(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
 	// validation checks
 	astring fulltag;
-	memory_bank *bank = device.machine().memory_data->bankmap.find_hash_only(device.subtag(fulltag, tag));
+	memory_bank *bank = m_bankmap.find_hash_only(device.subtag(fulltag, tag));
 	if (bank == NULL)
-		fatalerror("memory_configure_bank called for unknown bank '%s'", fulltag.cstr());
+		fatalerror("configure_bank called for unknown bank '%s'", fulltag.cstr());
 	if (base == NULL)
-		fatalerror("memory_configure_bank called NULL base");
+		fatalerror("configure_bank called NULL base");
 
 	// fill in the requested bank entries (backwards to improve allocation)
 	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
@@ -1806,30 +1604,24 @@ void memory_configure_bank(device_t &device, const char *tag, int startentry, in
 
 
 //-------------------------------------------------
-//  memory_configure_bank_decrypted - configure
-//  the decrypted addresses for a bank
+//  configure_bank_decrypted - configure the 
+//  decrypted addresses for a bank
 //-------------------------------------------------
 
-void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride)
+void memory_manager::configure_bank_decrypted(const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
-	memory_configure_bank_decrypted(machine.root_device(), tag, startentry, numentries, base, stride);
+	memory_configure_bank_decrypted(machine().root_device(), tag, startentry, numentries, base, stride);
 }
 
-
-//-------------------------------------------------
-//  memory_configure_bank_decrypted - configure
-//  the decrypted addresses for a bank
-//-------------------------------------------------
-
-void memory_configure_bank_decrypted(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
+void memory_manager::configure_bank_decrypted(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride)
 {
 	// validation checks
 	astring fulltag;
-	memory_bank *bank = device.machine().memory_data->bankmap.find_hash_only(device.subtag(fulltag, tag));
+	memory_bank *bank = m_bankmap.find_hash_only(device.subtag(fulltag, tag));
 	if (bank == NULL)
-		fatalerror("memory_configure_bank_decrypted called for unknown bank '%s'", fulltag.cstr());
+		fatalerror("configure_bank_decrypted called for unknown bank '%s'", fulltag.cstr());
 	if (base == NULL)
-		fatalerror("memory_configure_bank_decrypted called NULL base");
+		fatalerror("configure_bank_decrypted called NULL base");
 
 	// fill in the requested bank entries (backwards to improve allocation)
 	for (int entrynum = startentry + numentries - 1; entrynum >= startentry; entrynum--)
@@ -1838,28 +1630,22 @@ void memory_configure_bank_decrypted(device_t &device, const char *tag, int star
 
 
 //-------------------------------------------------
-//  memory_set_bank - select one pre-configured
-//  entry to be the new bank base
+//  set_bank - select one pre-configured entry to 
+//  be the new bank base
 //-------------------------------------------------
 
-void memory_set_bank(running_machine &machine, const char *tag, int entrynum)
+void memory_manager::set_bank(const char *tag, int entrynum)
 {
-	memory_set_bank(machine.root_device(), tag, entrynum);
+	set_bank(machine().root_device(), tag, entrynum);
 }
 
-
-//-------------------------------------------------
-//  memory_set_bank - select one pre-configured
-//  entry to be the new bank base
-//-------------------------------------------------
-
-void memory_set_bank(device_t &device, const char *tag, int entrynum)
+void memory_manager::set_bank(device_t &device, const char *tag, int entrynum)
 {
 	// validation checks
 	astring fulltag;
-	memory_bank *bank = device.machine().memory_data->bankmap.find_hash_only(device.subtag(fulltag, tag));
+	memory_bank *bank = m_bankmap.find_hash_only(device.subtag(fulltag, tag));
 	if (bank == NULL)
-		fatalerror("memory_set_bank called for unknown bank '%s'", fulltag.cstr());
+		fatalerror("set_bank called for unknown bank '%s'", fulltag.cstr());
 
 	// set the base
 	bank->set_entry(entrynum);
@@ -1867,28 +1653,21 @@ void memory_set_bank(device_t &device, const char *tag, int entrynum)
 
 
 //-------------------------------------------------
-//  memory_get_bank - return the currently
-//  selected bank
+//  get_bank - return the currently selected bank
 //-------------------------------------------------
 
-int memory_get_bank(running_machine &machine, const char *tag)
+int memory_manager::bank(const char *tag)
 {
-	return memory_get_bank(machine.root_device(), tag);
+	return bank(machine().root_device(), tag);
 }
 
-
-//-------------------------------------------------
-//  memory_get_bank - return the currently
-//  selected bank
-//-------------------------------------------------
-
-int memory_get_bank(device_t &device, const char *tag)
+int memory_manager::bank(device_t &device, const char *tag)
 {
 	// validation checks
 	astring fulltag;
-	memory_bank *bank = device.machine().memory_data->bankmap.find_hash_only(device.subtag(fulltag, tag));
+	memory_bank *bank = m_bankmap.find_hash_only(device.subtag(fulltag, tag));
 	if (bank == NULL)
-		fatalerror("memory_get_bank called for unknown bank '%s'", fulltag.cstr());
+		fatalerror("bank() called for unknown bank '%s'", fulltag.cstr());
 
 	// return the current entry
 	return bank->entry();
@@ -1896,24 +1675,19 @@ int memory_get_bank(device_t &device, const char *tag)
 
 
 //-------------------------------------------------
-//  memory_set_bankptr - set the base of a bank
+//  set_bankptr - set the base of a bank
 //-------------------------------------------------
 
-void memory_set_bankptr(running_machine &machine, const char *tag, void *base)
+void memory_manager::set_bankptr(const char *tag, void *base)
 {
-	memory_set_bankptr(machine.root_device(), tag, base);
+	set_bankptr(machine().root_device(), tag, base);
 }
 
-
-//-------------------------------------------------
-//  memory_set_bankptr - set the base of a bank
-//-------------------------------------------------
-
-void memory_set_bankptr(device_t &device, const char *tag, void *base)
+void memory_manager::set_bankptr(device_t &device, const char *tag, void *base)
 {
 	// validation checks
 	astring fulltag;
-	memory_bank *bank = device.machine().memory_data->bankmap.find_hash_only(device.subtag(fulltag, tag));
+	memory_bank *bank = m_bankmap.find_hash_only(device.subtag(fulltag, tag));
 	if (bank == NULL)
 		throw emu_fatalerror("memory_set_bankptr called for unknown bank '%s'", fulltag.cstr());
 
@@ -1923,40 +1697,35 @@ void memory_set_bankptr(device_t &device, const char *tag, void *base)
 
 
 //-------------------------------------------------
-//  memory_get_shared - get a pointer to a shared
-//  memory region by tag
+//  shared - get a pointer to a shared memory 
+//  region by tag
 //-------------------------------------------------
 
-void *memory_get_shared(running_machine &machine, const char *tag)
+memory_share *memory_manager::shared(const char *tag)
 {
-	size_t size;
-	return memory_get_shared(machine, tag, size);
+	return shared(machine().root_device(), tag);
 }
 
-void *memory_get_shared(running_machine &machine, const char *tag, size_t &length)
+memory_share *memory_manager::shared(device_t &device, const char *tag)
 {
 	astring fulltag;
-	memory_share *share = machine.memory_data->sharemap.find(machine.root_device().subtag(fulltag, tag));
-	if (share == NULL)
-		return NULL;
-	length = share->size();
-	return share->ptr();
+	return m_sharelist.find(device.subtag(fulltag, tag).cstr());
 }
 
 
 //-------------------------------------------------
-//  memory_dump - dump the internal memory tables
-//  to the given file
+//  dump - dump the internal memory tables to the
+//  given file
 //-------------------------------------------------
 
-void memory_dump(running_machine &machine, FILE *file)
+void memory_manager::dump(FILE *file)
 {
 	// skip if we can't open the file
 	if (file == NULL)
 		return;
 
 	// loop over address spaces
-	for (address_space *space = machine.memory_data->spacelist.first(); space != NULL; space = space->next())
+	for (address_space *space = m_spacelist.first(); space != NULL; space = space->next())
 	{
 		fprintf(file, "\n\n"
 		              "====================================================\n"
@@ -1984,7 +1753,7 @@ static void generate_memdump(running_machine &machine)
 		FILE *file = fopen("memdump.log", "w");
 		if (file)
 		{
-			memory_dump(machine, file);
+			machine.memory().dump(file);
 			fclose(file);
 		}
 	}
@@ -1995,10 +1764,10 @@ static void generate_memdump(running_machine &machine)
 //  bank_reattach - reconnect banks after a load
 //-------------------------------------------------
 
-static void bank_reattach(running_machine &machine)
+void memory_manager::bank_reattach()
 {
 	// for each non-anonymous bank, explicitly reset its entry
-	for (memory_bank *bank = machine.memory_data->banklist.first(); bank != NULL; bank = bank->next())
+	for (memory_bank *bank = m_banklist.first(); bank != NULL; bank = bank->next())
 		if (!bank->anonymous() && bank->entry() != BANK_ENTRY_UNSPECIFIED)
 			bank->set_entry(bank->entry());
 }
@@ -2013,7 +1782,7 @@ static void bank_reattach(running_machine &machine)
 //  address_space - constructor
 //-------------------------------------------------
 
-address_space::address_space(device_memory_interface &memory, address_spacenum spacenum, bool large)
+address_space::address_space(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum, bool large)
 	: m_next(NULL),
 	  m_config(*memory.space_config(spacenum)),
 	  m_device(memory.device()),
@@ -2030,6 +1799,7 @@ address_space::address_space(device_memory_interface &memory, address_spacenum s
 	  m_name(memory.space_config(spacenum)->name()),
 	  m_addrchars((m_config.m_addrbus_width + 3) / 4),
 	  m_logaddrchars((m_config.m_logaddr_width + 3) / 4),
+	  m_manager(manager),
 	  m_machine(memory.device().machine())
 {
 	// notify the device
@@ -2052,7 +1822,7 @@ address_space::~address_space()
 //  allocate - static smart allocator of subtypes
 //-------------------------------------------------
 
-address_space &address_space::allocate(running_machine &machine, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum)
+address_space &address_space::allocate(memory_manager &manager, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum)
 {
 	// allocate one of the appropriate type
 	bool large = (config.addr2byte_end(0xffffffffUL >> (32 - config.m_addrbus_width)) >= (1 << 18));
@@ -2063,64 +1833,64 @@ address_space &address_space::allocate(running_machine &machine, const address_s
 			if (config.endianness() == ENDIANNESS_LITTLE)
 			{
 				if (large)
-					return *auto_alloc(machine, address_space_8le_large(memory, spacenum));
+					return *global_alloc(address_space_8le_large(manager, memory, spacenum));
 				else
-					return *auto_alloc(machine, address_space_8le_small(memory, spacenum));
+					return *global_alloc(address_space_8le_small(manager, memory, spacenum));
 			}
 			else
 			{
 				if (large)
-					return *auto_alloc(machine, address_space_8be_large(memory, spacenum));
+					return *global_alloc(address_space_8be_large(manager, memory, spacenum));
 				else
-					return *auto_alloc(machine, address_space_8be_small(memory, spacenum));
+					return *global_alloc(address_space_8be_small(manager, memory, spacenum));
 			}
 
 		case 16:
 			if (config.endianness() == ENDIANNESS_LITTLE)
 			{
 				if (large)
-					return *auto_alloc(machine, address_space_16le_large(memory, spacenum));
+					return *global_alloc(address_space_16le_large(manager, memory, spacenum));
 				else
-					return *auto_alloc(machine, address_space_16le_small(memory, spacenum));
+					return *global_alloc(address_space_16le_small(manager, memory, spacenum));
 			}
 			else
 			{
 				if (large)
-					return *auto_alloc(machine, address_space_16be_large(memory, spacenum));
+					return *global_alloc(address_space_16be_large(manager, memory, spacenum));
 				else
-					return *auto_alloc(machine, address_space_16be_small(memory, spacenum));
+					return *global_alloc(address_space_16be_small(manager, memory, spacenum));
 			}
 
 		case 32:
 			if (config.endianness() == ENDIANNESS_LITTLE)
 			{
 				if (large)
-					return *auto_alloc(machine, address_space_32le_large(memory, spacenum));
+					return *global_alloc(address_space_32le_large(manager, memory, spacenum));
 				else
-					return *auto_alloc(machine, address_space_32le_small(memory, spacenum));
+					return *global_alloc(address_space_32le_small(manager, memory, spacenum));
 			}
 			else
 			{
 				if (large)
-					return *auto_alloc(machine, address_space_32be_large(memory, spacenum));
+					return *global_alloc(address_space_32be_large(manager, memory, spacenum));
 				else
-					return *auto_alloc(machine, address_space_32be_small(memory, spacenum));
+					return *global_alloc(address_space_32be_small(manager, memory, spacenum));
 			}
 
 		case 64:
 			if (config.endianness() == ENDIANNESS_LITTLE)
 			{
 				if (large)
-					return *auto_alloc(machine, address_space_64le_large(memory, spacenum));
+					return *global_alloc(address_space_64le_large(manager, memory, spacenum));
 				else
-					return *auto_alloc(machine, address_space_64le_small(memory, spacenum));
+					return *global_alloc(address_space_64le_small(manager, memory, spacenum));
 			}
 			else
 			{
 				if (large)
-					return *auto_alloc(machine, address_space_64be_large(memory, spacenum));
+					return *global_alloc(address_space_64be_large(manager, memory, spacenum));
 				else
-					return *auto_alloc(machine, address_space_64be_small(memory, spacenum));
+					return *global_alloc(address_space_64be_small(manager, memory, spacenum));
 			}
 	}
 	throw emu_fatalerror("Invalid width %d specified for address_space::allocate", config.data_width());
@@ -2190,11 +1960,11 @@ void address_space::prepare_map()
 		{
 			// if we can't find it, add it to our map
 			astring fulltag;
-			if (machine().memory_data->sharemap.find(device().siblingtag(fulltag, entry->m_share)) == NULL)
+			if (manager().m_sharelist.find(device().siblingtag(fulltag, entry->m_share).cstr()) == NULL)
 			{
 				VPRINTF(("Creating share '%s' of length 0x%X\n", fulltag.cstr(), entry->m_byteend + 1 - entry->m_bytestart));
-				memory_share *share = auto_alloc(machine(), memory_share(entry->m_byteend + 1 - entry->m_bytestart));
-				machine().memory_data->sharemap.add(fulltag, share, false);
+				memory_share *share = auto_alloc(machine(), memory_share(m_map->m_databits, entry->m_byteend + 1 - entry->m_bytestart));
+				manager().m_sharelist.append(fulltag, *share);
 			}
 		}
 
@@ -2399,14 +2169,14 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 
 void address_space::allocate_memory()
 {
-	simple_list<memory_block> &blocklist = machine().memory_data->blocklist;
+	simple_list<memory_block> &blocklist = manager().m_blocklist;
 
 	// make a first pass over the memory map and track blocks with hardcoded pointers
 	// we do this to make sure they are found by space_find_backing_memory first
 	memory_block *prev_memblock_tail = blocklist.last();
 	for (address_map_entry *entry = m_map->m_entrylist.first(); entry != NULL; entry = entry->next())
 		if (entry->m_memory != NULL)
-			blocklist.append(*auto_alloc(machine(), memory_block(*this, entry->m_bytestart, entry->m_byteend, entry->m_memory)));
+			blocklist.append(*global_alloc(memory_block(*this, entry->m_bytestart, entry->m_byteend, entry->m_memory)));
 
 	// loop over all blocks just allocated and assign pointers from them
 	address_map_entry *unassigned = NULL;
@@ -2453,7 +2223,7 @@ void address_space::allocate_memory()
 		// we now have a block to allocate; do it
 		offs_t curbytestart = curblockstart * MEMORY_BLOCK_CHUNK;
 		offs_t curbyteend = curblockend * MEMORY_BLOCK_CHUNK + (MEMORY_BLOCK_CHUNK - 1);
-		memory_block &block = blocklist.append(*auto_alloc(machine(), memory_block(*this, curbytestart, curbyteend)));
+		memory_block &block = blocklist.append(*global_alloc(memory_block(*this, curbytestart, curbyteend)));
 
 		// assign memory that intersected the new block
 		unassigned = block_assign_intersecting(curbytestart, curbyteend, block.data());
@@ -2482,7 +2252,7 @@ void address_space::locate_memory()
 	}
 
 	// once this is done, find the starting bases for the banks
-	for (memory_bank *bank = machine().memory_data->banklist.first(); bank != NULL; bank = bank->next())
+	for (memory_bank *bank = manager().m_banklist.first(); bank != NULL; bank = bank->next())
 		if (bank->base() == NULL && bank->references_space(*this, ROW_READWRITE))
 		{
 			// set the initial bank pointer
@@ -2513,7 +2283,7 @@ void address_space::set_decrypted_region(offs_t addrstart, offs_t addrend, void 
 	bool found = false;
 
 	// loop over banks looking for a match
-	for (memory_bank *bank = machine().memory_data->banklist.first(); bank != NULL; bank = bank->next())
+	for (memory_bank *bank = manager().m_banklist.first(); bank != NULL; bank = bank->next())
 	{
 		// consider this bank if it is used for reading and matches the address space
 		if (bank->references_space(*this, ROW_READ))
@@ -2545,7 +2315,6 @@ void address_space::set_decrypted_region(offs_t addrstart, offs_t addrend, void 
 
 address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, offs_t byteend, UINT8 *base)
 {
-	memory_private *memdata = machine().memory_data;
 	address_map_entry *unassigned = NULL;
 
 	// loop over the adjusted map and assign memory to any blocks we can
@@ -2555,7 +2324,7 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		if (entry->m_memory == NULL && entry->m_share != NULL)
 		{
 			astring fulltag;
-			memory_share *share = memdata->sharemap.find(device().siblingtag(fulltag, entry->m_share));
+			memory_share *share = manager().m_sharelist.find(device().siblingtag(fulltag, entry->m_share).cstr());
 			if (share != NULL && share->ptr() != NULL)
 			{
 				entry->m_memory = share->ptr();
@@ -2578,7 +2347,7 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		if (entry->m_memory != NULL && entry->m_share != NULL)
 		{
 			astring fulltag;
-			memory_share *share = memdata->sharemap.find(device().siblingtag(fulltag, entry->m_share));
+			memory_share *share = manager().m_sharelist.find(device().siblingtag(fulltag, entry->m_share).cstr());
 			if (share != NULL && share->ptr() == NULL)
 			{
 				share->set_ptr(entry->m_memory);
@@ -2749,8 +2518,6 @@ void address_space::install_bank_generic(offs_t addrstart, offs_t addrend, offs_
 
 void *address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
 {
-	memory_private *memdata = machine().memory_data;
-
 	VPRINTF(("address_space::install_ram_generic(%s-%s mask=%s mirror=%s, %s, %p)\n",
 			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
 			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
@@ -2777,11 +2544,11 @@ void *address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_
 		}
 
 		// if we still don't have a pointer, and we're past the initialization phase, allocate a new block
-		if (bank.base() == NULL && memdata->initialized)
+		if (bank.base() == NULL && manager().m_initialized)
 		{
 			if (machine().phase() >= MACHINE_PHASE_RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!");
-			memory_block &block = memdata->blocklist.append(*auto_alloc(machine(), memory_block(*this, address_to_byte(addrstart), address_to_byte_end(addrend))));
+			memory_block &block = manager().m_blocklist.append(*global_alloc(memory_block(*this, address_to_byte(addrstart), address_to_byte_end(addrend))));
 			bank.set_base(block.data());
 		}
 	}
@@ -2806,11 +2573,11 @@ void *address_space::install_ram_generic(offs_t addrstart, offs_t addrend, offs_
 		}
 
 		// if we still don't have a pointer, and we're past the initialization phase, allocate a new block
-		if (bank.base() == NULL && memdata->initialized)
+		if (bank.base() == NULL && manager().m_initialized)
 		{
 			if (machine().phase() >= MACHINE_PHASE_RESET)
 				fatalerror("Attempted to call install_ram_generic() after initialization time without a baseptr!");
-			memory_block &block = memdata->blocklist.append(*auto_alloc(machine(), memory_block(*this, address_to_byte(addrstart), address_to_byte_end(addrend))));
+			memory_block &block = manager().m_blocklist.append(*global_alloc(memory_block(*this, address_to_byte(addrstart), address_to_byte_end(addrend))));
 			bank.set_base(block.data());
 		}
 	}
@@ -3199,7 +2966,7 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 	}
 
 	// if not found there, look in the allocated blocks
-	for (memory_block *block = machine().memory_data->blocklist.first(); block != NULL; block = block->next())
+	for (memory_block *block = manager().m_blocklist.first(); block != NULL; block = block->next())
 		if (block->contains(*this, bytestart, byteend))
 		{
 			VPRINTF(("found in allocated memory block %08X-%08X [%p]\n", block->bytestart(), block->byteend(), block->data() + (bytestart - block->bytestart())));
@@ -3227,7 +2994,7 @@ bool address_space::needs_backing_store(const address_map_entry *entry)
 	if (entry->m_share != NULL)
 	{
 		astring fulltag;
-		memory_share *share = machine().memory_data->sharemap.find(device().siblingtag(fulltag, entry->m_share));
+		memory_share *share = manager().m_sharelist.find(device().siblingtag(fulltag, entry->m_share).cstr());
 		if (share != NULL && share->ptr() == NULL)
 			return true;
 	}
@@ -3260,8 +3027,6 @@ bool address_space::needs_backing_store(const address_map_entry *entry)
 
 memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite)
 {
-	memory_private *memdata = machine().memory_data;
-
 	// adjust the addresses, handling mirrors and such
 	offs_t bytemirror = addrmirror;
 	offs_t bytestart = addrstart;
@@ -3272,11 +3037,11 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 	// if this bank is named, look it up
 	memory_bank *bank = NULL;
 	if (tag != NULL)
-		bank = memdata->bankmap.find_hash_only(tag);
+		bank = manager().m_bankmap.find_hash_only(tag);
 
 	// else try to find an exact match
 	else
-		for (bank = memdata->banklist.first(); bank != NULL; bank = bank->next())
+		for (bank = manager().m_banklist.first(); bank != NULL; bank = bank->next())
 			if (bank->anonymous() && bank->references_space(*this, ROW_READWRITE) && bank->matches_exactly(bytestart, byteend))
 				break;
 
@@ -3284,7 +3049,7 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 	if (bank == NULL)
 	{
 		// handle failure
-		int banknum = memdata->banknext++;
+		int banknum = manager().m_banknext++;
 		if (banknum > STATIC_BANKMAX)
 		{
 			if (tag != NULL)
@@ -3294,12 +3059,12 @@ memory_bank &address_space::bank_find_or_allocate(const char *tag, offs_t addrst
 		}
 
 		// allocate the bank
-		bank = auto_alloc(machine(), memory_bank(*this, banknum, bytestart, byteend, tag));
-		memdata->banklist.append(*bank);
+		bank = global_alloc(memory_bank(*this, banknum, bytestart, byteend, tag));
+		manager().m_banklist.append(*bank);
 
 		// for named banks, add to the map and register for save states
 		if (tag != NULL)
-			memdata->bankmap.add_unique_hash(tag, bank, false);
+			manager().m_bankmap.add_unique_hash(tag, bank, false);
 	}
 
 	// add a reference for this space
@@ -4145,7 +3910,7 @@ const char *address_table::handler_name(UINT8 entry) const
 
 	// banks have names
 	if (entry >= STATIC_BANK1 && entry <= STATIC_BANKMAX)
-		for (memory_bank *info = m_space.machine().memory_data->banklist.first(); info != NULL; info = info->next())
+		for (memory_bank *info = m_space.manager().first_bank(); info != NULL; info = info->next())
 			if (info->index() == entry)
 				return info->name();
 
@@ -4173,7 +3938,7 @@ address_table_read::address_table_read(address_space &space, bool large)
 	// allocate handlers for each entry, prepopulating the bankptrs for banks
 	for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
 	{
-		UINT8 **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? &space.machine().memory_data->bank_ptr[entrynum] : NULL;
+		UINT8 **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? space.manager().bank_pointer_addr(entrynum) : NULL;
 		m_handlers[entrynum] = auto_alloc(space.machine(), handler_entry_read(space.data_width(), space.endianness(), bankptr));
 	}
 
@@ -4249,7 +4014,7 @@ address_table_write::address_table_write(address_space &space, bool large)
 	// allocate handlers for each entry, prepopulating the bankptrs for banks
 	for (int entrynum = 0; entrynum < ARRAY_LENGTH(m_handlers); entrynum++)
 	{
-		UINT8 **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? &space.machine().memory_data->bank_ptr[entrynum] : NULL;
+		UINT8 **bankptr = (entrynum >= STATIC_BANK1 && entrynum <= STATIC_BANKMAX) ? space.manager().bank_pointer_addr(entrynum) : NULL;
 		m_handlers[entrynum] = auto_alloc(space.machine(), handler_entry_write(space.data_width(), space.endianness(), bankptr));
 	}
 
@@ -4379,8 +4144,8 @@ bool direct_read_data::set_direct_region(offs_t &byteaddress)
 	}
 
 	// if no decrypted opcodes, point to the same base
-	UINT8 *base = m_space.machine().memory_data->bank_ptr[m_entry];
-	UINT8 *based = m_space.machine().memory_data->bankd_ptr[m_entry];
+	UINT8 *base = *m_space.manager().bank_pointer_addr(m_entry, false);
+	UINT8 *based = *m_space.manager().bank_pointer_addr(m_entry, true);
 	if (based == NULL)
 		based = base;
 
@@ -4559,8 +4324,8 @@ memory_block::~memory_block()
 memory_bank::memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag)
 	: m_next(NULL),
 	  m_machine(space.machine()),
-	  m_baseptr(&space.machine().memory_data->bank_ptr[index]),
-	  m_basedptr(&space.machine().memory_data->bankd_ptr[index]),
+	  m_baseptr(space.manager().bank_pointer_addr(index, false)),
+	  m_basedptr(space.manager().bank_pointer_addr(index, true)),
 	  m_index(index),
 	  m_anonymous(tag == NULL),
 	  m_bytestart(bytestart),
@@ -4621,7 +4386,7 @@ void memory_bank::add_reference(address_space &space, read_or_write readorwrite)
 	// if we already have a reference, skip it
 	if (references_space(space, readorwrite))
 		return;
-	m_reflist.append(*auto_alloc(space.machine(), bank_reference(space, readorwrite)));
+	m_reflist.append(*global_alloc(bank_reference(space, readorwrite)));
 }
 
 
@@ -5888,3 +5653,21 @@ void handler_entry_write::write_stub_legacy(address_space &space, offs_t offset,
 {
 	m_legacy_info.handler.space64(m_legacy_info.object.space, offset, data, mask);
 }
+
+
+
+// configure the addresses for a bank
+void memory_configure_bank(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) { machine.memory().configure_bank(tag, startentry, numentries, base, stride); }
+void memory_configure_bank(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride) { device.machine().memory().configure_bank(device, tag, startentry, numentries, base, stride); }
+
+// configure the decrypted addresses for a bank
+void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) { machine.memory().configure_bank_decrypted(tag, startentry, numentries, base, stride); }
+void memory_configure_bank_decrypted(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride) { device.machine().memory().configure_bank_decrypted(device, tag, startentry, numentries, base, stride); }
+
+// select one pre-configured entry to be the new bank base
+void memory_set_bank(running_machine &machine, const char *tag, int entrynum) { machine.memory().set_bank(tag, entrynum); }
+void memory_set_bank(device_t &device, const char *tag, int entrynum) { device.machine().memory().set_bank(device, tag, entrynum); }
+
+// set the absolute address of a bank base
+void memory_set_bankptr(running_machine &machine, const char *tag, void *base) { machine.memory().set_bankptr(tag, base); }
+void memory_set_bankptr(device_t &device, const char *tag, void *base) { device.machine().memory().set_bankptr(device, tag, base); }

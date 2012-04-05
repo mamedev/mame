@@ -286,7 +286,7 @@ static void pc16650d_tx_callback(running_machine &machine, int channel, int coun
 {
 	meritm_state *state = machine.driver_data<meritm_state>();
 	for(int i = 0; i < count; i++)
-		state->m_microtouch->rx(*memory_nonspecific_space(machine), 0, data[i]);
+		state->m_microtouch->rx(*machine.memory().first_space(), 0, data[i]);
 }
 
 WRITE8_MEMBER(meritm_state::microtouch_tx)

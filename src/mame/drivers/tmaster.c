@@ -205,7 +205,7 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 	tmaster_state *state = device->machine().driver_data<tmaster_state>();
 	if ( channel == 0 )
 	{
-		state->m_microtouch->rx(*memory_nonspecific_space(device->machine()), 0, data);
+		state->m_microtouch->rx(*device->machine().memory().first_space(), 0, data);
 	}
 };
 
@@ -658,7 +658,7 @@ static void galgames_update_rombank(running_machine &machine, UINT32 cart)
 
 	state->m_gfx_offs = 0x200000 * cart;
 
-	if (memory_get_bank(machine, GALGAMES_BANK_000000_R) == GALGAMES_RAM)
+	if (machine.memory().bank(GALGAMES_BANK_000000_R) == GALGAMES_RAM)
 		memory_set_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0 + state->m_galgames_cart);	// rom
 
 	memory_set_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0 + state->m_galgames_cart);	// rom

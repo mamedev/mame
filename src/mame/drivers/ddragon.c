@@ -268,7 +268,7 @@ static WRITE8_HANDLER( darktowr_mcu_bank_w )
 static WRITE8_HANDLER( darktowr_bankswitch_w )
 {
 	ddragon_state *state = space->machine().driver_data<ddragon_state>();
-	int oldbank = memory_get_bank(space->machine(), "bank1");
+	int oldbank = space->machine().memory().bank("bank1");
 	int newbank = (data & 0xe0) >> 5;
 
 	state->m_scrollx_hi = (data & 0x01);

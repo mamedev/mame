@@ -410,7 +410,7 @@ static const mc6845_interface mc6845_intf =
 
 static WRITE8_DEVICE_HANDLER( pia_comp_w )
 {
-	downcast<pia6821_device *>(device)->write(*memory_nonspecific_space(device->machine()), offset, ~data);
+	downcast<pia6821_device *>(device)->write(*device->machine().memory().first_space(), offset, ~data);
 }
 
 

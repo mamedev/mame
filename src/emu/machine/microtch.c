@@ -343,5 +343,5 @@ void microtouch_serial_device::tra_complete()
 void microtouch_serial_device::rcv_complete()
 {
 	receive_register_extract();
-	microtouch_device::rx(*memory_nonspecific_space(machine()), 0, get_received_char());
+	microtouch_device::rx(*machine().memory().first_space(), 0, get_received_char());
 }

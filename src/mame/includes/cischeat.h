@@ -50,13 +50,6 @@ public:
 };
 
 
-/*----------- defined in drivers/cischeat.c -----------*/
-
-READ16_HANDLER( scudhamm_motor_pos_r );
-READ16_HANDLER( scudhamm_motor_status_r );
-READ16_HANDLER( scudhamm_analog_r );
-
-
 /*----------- defined in video/cischeat.c -----------*/
 
 WRITE16_HANDLER( cischeat_scrollram_0_w );

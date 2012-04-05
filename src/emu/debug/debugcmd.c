@@ -2596,7 +2596,7 @@ static void execute_memdump(running_machine &machine, int ref, int params, const
 	file = fopen(filename, "w");
 	if (file)
 	{
-		memory_dump(machine, file);
+		machine.memory().dump(file);
 		fclose(file);
 	}
 }

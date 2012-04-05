@@ -143,7 +143,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  colortable(NULL),
 	  shadow_table(NULL),
 	  debug_flags(0),
-	  memory_data(NULL),
 	  palette_data(NULL),
 	  romload_data(NULL),
 	  input_port_data(NULL),
@@ -159,6 +158,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_regionlist(m_respool),
 	  m_save(*this),
 	  m_scheduler(*this),
+	  m_memory(NULL),
 	  m_cheat(NULL),
 	  m_render(NULL),
 	  m_input(NULL),
@@ -283,7 +283,7 @@ void running_machine::start()
 	// first load ROMs, then populate memory, and finally initialize CPUs
 	// these operations must proceed in this order
 	rom_init(*this);
-	memory_init(*this);
+	m_memory = auto_alloc(*this, memory_manager(*this));
 	watchdog_init(*this);
 
 	// allocate the gfx elements prior to device initialization

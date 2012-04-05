@@ -472,7 +472,7 @@ WRITE8_HANDLER( qix_68705_portC_w )
 static TIMER_CALLBACK( pia_w_callback )
 {
 	pia6821_device *device = (pia6821_device *)ptr;
-	device->write(*memory_nonspecific_space(device->machine()), param >> 8, param & 0xff);
+	device->write(*device->machine().memory().first_space(), param >> 8, param & 0xff);
 }
 
 
