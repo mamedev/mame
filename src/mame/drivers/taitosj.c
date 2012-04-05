@@ -331,7 +331,7 @@ static ADDRESS_MAP_START( kikstart_main_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0xd508, 0xd508) AM_WRITE_LEGACY(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_WRITEONLY AM_BASE(m_gfxpointer)
 	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(taitosj_soundcommand_w)
-	AM_RANGE(0xd50d, 0xd50d) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xd50d, 0xd50d) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd50e, 0xd50e) AM_WRITE_LEGACY(taitosj_bankswitch_w)
 	AM_RANGE(0xd600, 0xd600) AM_WRITEONLY AM_BASE(m_video_mode)
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(m_kikstart_scrollram)// scroll ram + ???
@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( taitosj_audio_map, AS_PROGRAM, 8, taitosj_state )
 	AM_RANGE(0x4803, 0x4803) AM_DEVREAD_LEGACY("ay3", ay8910_r)
 	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE_LEGACY("ay4", ay8910_address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_DEVREAD_LEGACY("ay4", ay8910_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostic ROM */
 ADDRESS_MAP_END
 

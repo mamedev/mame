@@ -267,7 +267,7 @@ static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x8010, 0x801d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0x8020, 0x8020) AM_DEVWRITE_LEGACY("msm", sound_control_0_w)
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /*???*/ /* this is NOT mixer_enable */

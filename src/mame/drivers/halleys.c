@@ -1684,7 +1684,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0x4803, 0x4803) AM_DEVREAD_LEGACY("ay3", ay8910_r)
 	AM_RANGE(0x4804, 0x4805) AM_DEVWRITE_LEGACY("ay4", ay8910_address_data_w)
 	AM_RANGE(0x4805, 0x4805) AM_DEVREAD_LEGACY("ay4", ay8910_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe000, 0xefff) AM_ROM // space for diagnostic ROM
 ADDRESS_MAP_END
 

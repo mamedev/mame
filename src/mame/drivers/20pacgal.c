@@ -225,7 +225,7 @@ static ADDRESS_MAP_START( 20pacgal_io_map, AS_IO, 8, _20pacgal_state )
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x82, 0x82) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x80, 0x80) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(timer_pulse_w)		/* ??? pulsed by the timer irq */
 	AM_RANGE(0x82, 0x82) AM_WRITE(irqack_w)
 	AM_RANGE(0x84, 0x84) AM_NOP	/* ?? */

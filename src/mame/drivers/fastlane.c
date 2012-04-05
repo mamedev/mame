@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( fastlane_map, AS_PROGRAM, 8, fastlane_state )
 	AM_RANGE(0x0803, 0x0803) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0901, 0x0901) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0b00, 0x0b00) AM_WRITE_LEGACY(watchdog_reset_w)											/* watchdog reset */
+	AM_RANGE(0x0b00, 0x0b00) AM_WRITE(watchdog_reset_w)											/* watchdog reset */
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(fastlane_bankswitch_w)									/* bankswitch control */
 	AM_RANGE(0x0d00, 0x0d0d) AM_DEVREADWRITE_LEGACY("konami1", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 1) */
 	AM_RANGE(0x0e00, 0x0e0d) AM_DEVREADWRITE_LEGACY("konami2", fastlane_k007232_r, fastlane_k007232_w)	/* 007232 registers (chip 2) */

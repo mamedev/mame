@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(nmi_enable_w)	/* nmi enable */
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(sound_reset_w)/* sound reset ? */
-	AM_RANGE(0xb800, 0xb800) AM_WRITE_LEGACY(soundlatch_w) /* sound write */
+	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_w) /* sound write */
 	AM_RANGE(0xb800, 0xb800) AM_READNOP		/* NMI ack? */
 	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(timelimt_scroll_x_lsb_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE_LEGACY(timelimt_scroll_x_msb_w)
@@ -65,7 +65,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, timelimt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x00, 0x00) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, timelimt_state )
@@ -75,7 +75,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, timelimt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(soundlatch_clear_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_address_data_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_address_data_w)
 ADDRESS_MAP_END
@@ -210,7 +210,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

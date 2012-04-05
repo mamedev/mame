@@ -142,7 +142,7 @@ static void sound_w(running_machine &machine, UINT8 data)
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
-	soundlatch_w(space, 0, data & 0xff);
+	state->soundlatch_w(*space, 0, data & 0xff);
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -634,7 +634,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas1x_state )
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ym1", ym3438_r, ym3438_w)
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ym2", ym3438_r, ym3438_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE_LEGACY(soundbank_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_READWRITE_LEGACY(soundlatch_r, mcu_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_READ(soundlatch_r) AM_WRITE_LEGACY(mcu_data_w)
 ADDRESS_MAP_END
 
 

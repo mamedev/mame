@@ -101,7 +101,8 @@ static TIMER_CALLBACK( nmi_callback )
 
 WRITE8_HANDLER( bublbobl_sound_command_w )
 {
-	soundlatch_w(space, offset, data);
+	bublbobl_state *state = space->machine().driver_data<bublbobl_state>();
+	state->soundlatch_w(*space, offset, data);
 	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 

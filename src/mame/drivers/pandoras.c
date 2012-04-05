@@ -135,9 +135,9 @@ static ADDRESS_MAP_START( pandoras_master_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x1800, 0x1807) AM_WRITE(pandoras_int_control_w)								/* INT control */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITE_LEGACY(pandoras_scrolly_w)									/* bg scroll */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITE(pandoras_z80_irqtrigger_w)							/* cause INT on the Z80 */
-	AM_RANGE(0x1e00, 0x1e00) AM_WRITE_LEGACY(soundlatch_w)											/* sound command to the Z80 */
+	AM_RANGE(0x1e00, 0x1e00) AM_WRITE(soundlatch_w)											/* sound command to the Z80 */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pandoras_cpub_irqtrigger_w)							/* cause FIRQ on CPU B */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE_LEGACY(watchdog_reset_w)										/* watchdog reset */
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(watchdog_reset_w)										/* watchdog reset */
 	AM_RANGE(0x4000, 0x5fff) AM_ROM															/* space for diagnostic ROM */
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("share4")										/* Shared RAM with CPU B */
 	AM_RANGE(0x8000, 0xffff) AM_ROM															/* ROM */
@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( pandoras_slave_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x1a03, 0x1a03) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW2")
 //  AM_RANGE(0x1e00, 0x1e00) AM_READNOP                                                     /* ??? seems to be important */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(watchdog_reset_w)										/* watchdog reset */
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)										/* watchdog reset */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(pandoras_cpua_irqtrigger_w)							/* cause FIRQ on CPU A */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share4")										/* Shared RAM with the CPU A */
 	AM_RANGE(0xe000, 0xffff) AM_ROM															/* ROM */
@@ -164,12 +164,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pandoras_sound_map, AS_PROGRAM, 8, pandoras_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM															/* ROM */
 	AM_RANGE(0x2000, 0x23ff) AM_RAM															/* RAM */
-	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(soundlatch_r)											/* soundlatch_r */
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)											/* soundlatch_r */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)							/* AY-8910 */
 	AM_RANGE(0x6001, 0x6001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)									/* AY-8910 */
 	AM_RANGE(0x6002, 0x6002) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)							/* AY-8910 */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(pandoras_i8039_irqtrigger_w)							/* cause INT on the 8039 */
-	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(soundlatch2_w)										/* sound command to the 8039 */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch2_w)										/* sound command to the 8039 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_i8039_map, AS_PROGRAM, 8, pandoras_state )
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( pandoras_i8039_map, AS_PROGRAM, 8, pandoras_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_i8039_io_map, AS_IO, 8, pandoras_state )
-	AM_RANGE(0x00, 0xff) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END

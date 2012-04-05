@@ -577,7 +577,7 @@ static ADDRESS_MAP_START( gaia_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(gaia_coin_lsb_w)												// Coin counter only
 	AM_RANGE(0xd00012, 0xd00013) AM_READ_PORT("IN1")													// Inputs
 	AM_RANGE(0xd00014, 0xd00015) AM_READ_PORT("DSW")													// Dips
-	AM_RANGE(0xd00014, 0xd00015) AM_WRITE_LEGACY(watchdog_reset16_w)											// Watchdog?
+	AM_RANGE(0xd00014, 0xd00015) AM_WRITE(watchdog_reset16_w)											// Watchdog?
 ADDRESS_MAP_END
 
 
@@ -749,7 +749,7 @@ static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16, cave_state )
 /**/AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 /**/AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_BASE(m_spriteram_2)							// Sprites?
 	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)												// IRQ Cause
-	AM_RANGE(0x300068, 0x300069) AM_WRITE_LEGACY(watchdog_reset16_w)											// Watchdog
+	AM_RANGE(0x300068, 0x300069) AM_WRITE(watchdog_reset16_w)											// Watchdog
 	AM_RANGE(0x30006e, 0x30006f) AM_READWRITE(soundlatch_ack_r, sound_cmd_w)							// From Sound CPU
 	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
 	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE_LEGACY(cave_vram_1_8x8_w) AM_BASE(m_vram[1])		// Layer 1
@@ -773,7 +773,7 @@ static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM																	// ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM																	// ROM
 	AM_RANGE(0x408000, 0x408fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
-	AM_RANGE(0x600000, 0x600001) AM_READ_LEGACY(watchdog_reset16_r)											// Watchdog?
+	AM_RANGE(0x600000, 0x600001) AM_READ(watchdog_reset16_r)											// Watchdog?
 	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE_LEGACY(cave_vram_2_w) AM_BASE(m_vram[2])			// Layer 2
 	AM_RANGE(0x888000, 0x88ffff) AM_RAM																	//
 	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE_LEGACY(cave_vram_1_w) AM_BASE(m_vram[1])			// Layer 1
@@ -781,7 +781,7 @@ static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
 	AM_RANGE(0x988000, 0x98ffff) AM_RAM																	//
 	AM_RANGE(0xa80000, 0xa80007) AM_READ(cave_irq_cause_r)												// IRQ Cause
-	AM_RANGE(0xa80068, 0xa80069) AM_WRITE_LEGACY(watchdog_reset16_w)											// Watchdog?
+	AM_RANGE(0xa80068, 0xa80069) AM_WRITE(watchdog_reset16_w)											// Watchdog?
 	AM_RANGE(0xa8006c, 0xa8006d) AM_READ(soundflags_ack_r) AM_WRITENOP									// Communication
 	AM_RANGE(0xa8006e, 0xa8006f) AM_READWRITE(soundlatch_ack_r, sound_cmd_w)							// From Sound CPU
 	AM_RANGE(0xa80000, 0xa8007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
@@ -952,7 +952,7 @@ static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0")													// Inputs + EEPROM + Hopper
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")													// Inputs
 	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)												// IRQ Cause
-	AM_RANGE(0x700068, 0x700069) AM_WRITE_LEGACY(watchdog_reset16_w)											// Watchdog
+	AM_RANGE(0x700068, 0x700069) AM_WRITE(watchdog_reset16_w)											// Watchdog
 	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// M6295
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)												// Leds + Hopper
@@ -987,7 +987,7 @@ static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_BASE(m_spriteram_2)							// Sprite bank 2
 	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE_LEGACY(cave_vram_0_w) AM_BASE(m_vram[0])			// Layer 0
 	AM_RANGE(0x400000, 0x400007) AM_READ(cave_irq_cause_r)												// IRQ Cause
-	AM_RANGE(0x400068, 0x400069) AM_WRITE_LEGACY(watchdog_reset16_w)											// Watchdog
+	AM_RANGE(0x400068, 0x400069) AM_WRITE(watchdog_reset16_w)											// Watchdog
 	AM_RANGE(0x400000, 0x40007f) AM_WRITEONLY AM_BASE(m_videoregs)						// Video Regs
 	AM_RANGE(0x500000, 0x500005) AM_WRITEONLY AM_BASE(m_vctrl[0])						// Layer 0 Control
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette

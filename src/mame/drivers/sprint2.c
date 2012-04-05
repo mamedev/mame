@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
 	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(sprint2_lamp1_w)
 	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE(sprint2_lamp2_w)
 	AM_RANGE(0x0c60, 0x0c6f) AM_WRITENOP /* SPARE */
-	AM_RANGE(0x0c80, 0x0cff) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x0c80, 0x0cff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0d00, 0x0d7f) AM_WRITE_LEGACY(sprint2_collision_reset1_w)
 	AM_RANGE(0x0d80, 0x0dff) AM_WRITE_LEGACY(sprint2_collision_reset2_w)
 	AM_RANGE(0x0e00, 0x0e7f) AM_WRITE(sprint2_steering_reset1_w)

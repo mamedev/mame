@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( skyraid_map, AS_PROGRAM, 8, skyraid_state )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(skyraid_scroll_w)
 	AM_RANGE(0x4400, 0x4400) AM_DEVWRITE_LEGACY("discrete", skyraid_sound_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(skyraid_range_w)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE(skyraid_offset_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM

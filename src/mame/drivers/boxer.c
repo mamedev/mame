@@ -307,7 +307,7 @@ static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8, boxer_state )
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(boxer_irq_reset_w)
 	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(boxer_bell_w)
 	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_BASE(m_sprite_ram)
-	AM_RANGE(0x1f00, 0x1fff) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 

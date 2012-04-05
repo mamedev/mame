@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, deadang_state )
 	AM_RANGE(0x03800, 0x03fff) AM_RAM_WRITE_LEGACY(deadang_foreground_w) AM_BASE(m_video_data)
 	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x08000, 0x08001) AM_WRITE_LEGACY(deadang_bank_w)
-	AM_RANGE(0x0c000, 0x0c001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 

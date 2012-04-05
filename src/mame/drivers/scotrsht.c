@@ -80,14 +80,14 @@ static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )
 	AM_RANGE(0x3301, 0x3301) AM_READ_PORT("P1")
 	AM_RANGE(0x3302, 0x3302) AM_READ_PORT("P2")
 	AM_RANGE(0x3303, 0x3303) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3300, 0x3300) AM_WRITE_LEGACY(watchdog_reset_w) /* watchdog */
+	AM_RANGE(0x3300, 0x3300) AM_WRITE(watchdog_reset_w) /* watchdog */
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scotrsht_sound_map, AS_PROGRAM, 8, scotrsht_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scotrsht_sound_port, AS_IO, 8, scotrsht_state )

@@ -94,7 +94,7 @@ static ADDRESS_MAP_START( pcktgal_sound_map, AS_PROGRAM, 8, pcktgal_state )
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(pcktgal_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pcktgal_sound_bank_w)
-	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 	AM_RANGE(0x3400, 0x3400) AM_DEVREAD_LEGACY("msm", pcktgal_adpcm_reset_r)	/* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
 	AM_RANGE(0x8000, 0xffff) AM_ROM

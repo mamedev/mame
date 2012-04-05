@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xd100, 0xd100) AM_WRITE_LEGACY(buggychl_ctrl_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xd300, 0xd300) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xd300, 0xd300) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd303, 0xd303) AM_WRITE_LEGACY(buggychl_sprite_lookup_bank_w)
 	AM_RANGE(0xd400, 0xd400) AM_DEVREADWRITE_LEGACY("bmcu", buggychl_mcu_r, buggychl_mcu_w)
 	AM_RANGE(0xd401, 0xd401) AM_DEVREAD_LEGACY("bmcu", buggychl_mcu_status_r)
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0x4820, 0x4820) AM_RAM	/* VOL/BAL   for the 7630 on the MSM5232 output */
 	AM_RANGE(0x4830, 0x4830) AM_RAM	/* TRBL/BASS for the 7630 on the MSM5232 output  */
-	AM_RANGE(0x5000, 0x5000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
 //  AM_RANGE(0x5001, 0x5001) AM_READNOP /* is command pending? */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_WRITE(nmi_disable_w)

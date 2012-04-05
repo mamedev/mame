@@ -529,7 +529,8 @@ static WRITE32_HANDLER( cage_to_main_w )
 	cage_t *state = &cage;
 	if (LOG_COMM)
 		logerror("%06X:Data from CAGE = %04X\n", cpu_get_pc(&space->device()), data);
-	soundlatch_word_w(space, 0, data, mem_mask);
+	driver_device *drvstate = space->machine().driver_data<driver_device>();
+	drvstate->soundlatch_word_w(*space, 0, data, mem_mask);
 	state->cage_to_cpu_ready = 1;
 	update_control_lines(space->machine());
 }
@@ -550,11 +551,12 @@ static READ32_HANDLER( cage_io_status_r )
 UINT16 cage_main_r(address_space *space)
 {
 	cage_t *state = &cage;
+	driver_device *drvstate = space->machine().driver_data<driver_device>();	
 	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", space->machine().describe_context(), soundlatch_word_r(space, 0, 0));
+		logerror("%s:main read data = %04X\n", space->machine().describe_context(), drvstate->soundlatch_word_r(*space, 0, 0));
 	state->cage_to_cpu_ready = 0;
 	update_control_lines(space->machine());
-	return soundlatch_word_r(space, 0, 0xffff);
+	return drvstate->soundlatch_word_r(*space, 0, 0xffff);
 }
 
 

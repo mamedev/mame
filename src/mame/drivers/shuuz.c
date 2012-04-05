@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, shuuz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x101000, 0x101fff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
-	AM_RANGE(0x102000, 0x102001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x102000, 0x102001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x103000, 0x103003) AM_READ_LEGACY(leta_r)
 	AM_RANGE(0x105000, 0x105001) AM_READWRITE_LEGACY(special_port0_r, latch_w)
 	AM_RANGE(0x105002, 0x105003) AM_READ_PORT("BUTTONS")

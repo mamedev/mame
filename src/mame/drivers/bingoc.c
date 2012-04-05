@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( sound_io, AS_IO, 8, bingoc_state )
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("upd", bingoc_play_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
 #if !SOUND_TEST
-	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(soundlatch_r) //soundlatch
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r) //soundlatch
 #else
 	AM_RANGE(0xc0, 0xc0) AM_READ(sound_test_r)
 #endif

@@ -124,8 +124,9 @@ WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 
 READ8_DEVICE_HANDLER( hotshock_soundlatch_r )
 {
+	driver_device *drvstate = device->machine().driver_data<driver_device>();
 	cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);
-	return soundlatch_r(device->machine().device("audiocpu")->memory().space(AS_PROGRAM),0);
+	return drvstate->soundlatch_r(*device->machine().device("audiocpu")->memory().space(AS_PROGRAM),0);
 }
 
 static void filter_w(device_t *device, int data)

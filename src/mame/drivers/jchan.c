@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE_LEGACY(jchan_ctrl_r, jchan_ctrl_w) AM_BASE(m_ctrl)
 
-	AM_RANGE(0xf80000, 0xf80001) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
+	AM_RANGE(0xf80000, 0xf80001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 ADDRESS_MAP_END
 
 
@@ -536,7 +536,7 @@ static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
 
 	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff) // sound
 
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 ADDRESS_MAP_END
 
 

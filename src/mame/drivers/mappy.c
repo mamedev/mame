@@ -902,7 +902,7 @@ static ADDRESS_MAP_START( superpac_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x5000, 0x500f) AM_WRITE(superpac_latch_w)				/* various control bits */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -913,7 +913,7 @@ static ADDRESS_MAP_START( phozon_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x5000, 0x500f) AM_WRITE(phozon_latch_w)				/* various control bits */
-	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(watchdog_reset_w)				/* watchdog reset */
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(watchdog_reset_w)				/* watchdog reset */
 	AM_RANGE(0x8000, 0xffff) AM_ROM									/* ROM */
 ADDRESS_MAP_END
 
@@ -925,7 +925,7 @@ static ADDRESS_MAP_START( mappy_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE_LEGACY("namcoio_1", namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE_LEGACY("namcoio_2", namcoio_r, namcoio_w)		/* custom I/O chips interface */
 	AM_RANGE(0x5000, 0x500f) AM_WRITE(mappy_latch_w)				/* various control bits */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(watchdog_reset_w)				/* watchdog reset */
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)				/* watchdog reset */
 	AM_RANGE(0x8000, 0xffff) AM_ROM									/* ROM code (only a000-ffff in Mappy) */
 ADDRESS_MAP_END
 

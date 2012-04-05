@@ -211,7 +211,7 @@ static READ16_HANDLER( sandscrp_soundlatch_word_r )
 {
 	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	state->m_latch2_full = 0;
-	return soundlatch2_r(space,0);
+	return state->soundlatch2_r(*space,0);
 }
 
 static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
@@ -220,7 +220,7 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		state->m_latch1_full = 1;
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_w(*space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 		device_spin_until_time(&space->device(), attotime::from_usec(100));	// Allow the other cpu to reply
 	}
@@ -244,7 +244,7 @@ static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
-	AM_RANGE(0xec0000, 0xec0001) AM_READ_LEGACY(watchdog_reset16_r)	//
+	AM_RANGE(0xec0000, 0xec0001) AM_READ(watchdog_reset16_r)	//
 	AM_RANGE(0x800000, 0x800001) AM_READ_LEGACY(sandscrp_irq_cause_r)	// IRQ Cause
 	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE_LEGACY(sandscrp_soundlatch_word_r, sandscrp_soundlatch_word_w)	// From/To Sound CPU
 	AM_RANGE(0xe40000, 0xe40001) AM_READWRITE_LEGACY(sandscrp_latchstatus_word_r, sandscrp_latchstatus_word_w)	//
@@ -280,14 +280,14 @@ static READ8_HANDLER( sandscrp_soundlatch_r )
 {
 	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	state->m_latch1_full = 0;
-	return soundlatch_r(space,0);
+	return state->soundlatch_r(*space,0);
 }
 
 static WRITE8_HANDLER( sandscrp_soundlatch_w )
 {
 	sandscrp_state *state = space->machine().driver_data<sandscrp_state>();
 	state->m_latch2_full = 1;
-	soundlatch2_w(space,0,data);
+	state->soundlatch2_w(*space,0,data);
 }
 
 static ADDRESS_MAP_START( sandscrp_soundmem, AS_PROGRAM, 8, sandscrp_state )

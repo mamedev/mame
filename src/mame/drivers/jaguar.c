@@ -1231,7 +1231,7 @@ static ADDRESS_MAP_START( r3000_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x06000000, 0x06000003) AM_READWRITE_LEGACY(misc_control_r, misc_control_w)
 	AM_RANGE(0x10000000, 0x1007ffff) AM_RAM
 	AM_RANGE(0x12000000, 0x120fffff) AM_RAM		// tested in self-test only?
-	AM_RANGE(0x14000004, 0x14000007) AM_WRITE_LEGACY(watchdog_reset32_w)
+	AM_RANGE(0x14000004, 0x14000007) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x16000000, 0x16000003) AM_WRITE_LEGACY(eeprom_enable_w)
 	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE_LEGACY(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
@@ -1243,7 +1243,7 @@ static ADDRESS_MAP_START( m68020_map, AS_PROGRAM, 32, cojag_state )
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
 	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM
 	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE_LEGACY(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
-	AM_RANGE(0xa30000, 0xa30003) AM_WRITE_LEGACY(watchdog_reset32_w)
+	AM_RANGE(0xa30000, 0xa30003) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0xa40000, 0xa40003) AM_WRITE_LEGACY(eeprom_enable_w)
 	AM_RANGE(0xb70000, 0xb70003) AM_READWRITE_LEGACY(misc_control_r, misc_control_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_ROMBANK("bank2")

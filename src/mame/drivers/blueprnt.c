@@ -96,7 +96,7 @@ static ADDRESS_MAP_START( blueprnt_map, AS_PROGRAM, 8, blueprnt_state )
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ(blueprnt_sh_dipsw_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(blueprnt_sound_command_w)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE_LEGACY(watchdog_reset_r, blueprnt_flipscreen_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ(watchdog_reset_r) AM_WRITE_LEGACY(blueprnt_flipscreen_w)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE_LEGACY(blueprnt_colorram_w) AM_BASE(m_colorram)
 ADDRESS_MAP_END
 
@@ -254,7 +254,7 @@ static const ay8910_interface ay8910_interface_1 =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
 	DEVCB_HANDLER(dipsw_w),
 	DEVCB_NULL
 };

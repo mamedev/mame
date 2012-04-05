@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wwfwfest_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
 ADDRESS_MAP_END
 

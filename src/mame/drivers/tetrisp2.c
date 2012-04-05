@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( tetrisp2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")										// Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(tetrisp2_ip_1_word_r)									// Inputs & protection
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")											// Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ_LEGACY(watchdog_reset16_r)									// Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)									// Watchdog
 ADDRESS_MAP_END
 
 
@@ -382,7 +382,7 @@ static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xbe0006, 0xbe0007) AM_READ_PORT("PRINT"			)	// ""
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW"				)	// ""
 
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ_LEGACY(watchdog_reset16_r		)	// Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r		)	// Watchdog
 ADDRESS_MAP_END
 
 
@@ -416,7 +416,7 @@ static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")										// Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")											// Inputs
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")											// Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ_LEGACY(watchdog_reset16_r)									// Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)									// Watchdog
 ADDRESS_MAP_END
 
 
@@ -450,7 +450,7 @@ static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")										// Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")											// Inputs
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")											// Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ_LEGACY(watchdog_reset16_r)									// Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)									// Watchdog
 ADDRESS_MAP_END
 
 
@@ -485,7 +485,7 @@ static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")											// Inputs
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")											// Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ_LEGACY(watchdog_reset16_r)									// Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)									// Watchdog
 ADDRESS_MAP_END
 
 
@@ -517,7 +517,7 @@ static ADDRESS_MAP_START( rocknms_sub_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
 //  AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READWRITE(rocknms_main2sub_r, rocknms_sub2main_w)			// MAIN <-> SUB Communication
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ_LEGACY(watchdog_reset16_r	)									// Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r	)									// Watchdog
 ADDRESS_MAP_END
 
 

@@ -108,9 +108,10 @@ void decoprot_reset(running_machine &machine)
 
 WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 {
+	driver_device *state = space->machine().driver_data<driver_device>();
 	if (offset == (0x150 / 2))
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_w(*space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 		return;
 	}
@@ -227,9 +228,10 @@ READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 
 WRITE16_HANDLER( deco16_60_prot_w ) /* Edward Randy */
 {
+	driver_device *state = space->machine().driver_data<driver_device>();
 	if (offset == (0x64 / 2))
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_w(*space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 	}
 
@@ -417,9 +419,10 @@ static int mutantf_port_0e_hack=0, mutantf_port_6a_hack=0,mutantf_port_e8_hack=0
 
 WRITE16_HANDLER( deco16_66_prot_w ) /* Mutant Fighter */
 {
+	driver_device *state = space->machine().driver_data<driver_device>();
 	if (offset == (0x64 / 2))
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_w(*space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 		return;
 	}
@@ -604,9 +607,10 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 
 WRITE16_HANDLER( deco16_104_cninja_prot_w )
 {
+	driver_device *state = space->machine().driver_data<driver_device>();
 	if (offset == (0xa8 / 2))
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_w(*space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 		return;
 	}
@@ -665,11 +669,12 @@ READ16_HANDLER( deco16_104_cninja_prot_r )
 
 WRITE16_HANDLER( deco16_146_funkyjet_prot_w )
 {
+	driver_device *state = space->machine().driver_data<driver_device>();
 	COMBINE_DATA(&deco16_prot_ram[offset]);
 
 	if (offset == (0x10a >> 1))
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_w(*space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 		return;
 	}
@@ -786,10 +791,10 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
 		COMBINE_DATA(&decoprot_buffer_ram[offset]);
 	else
 		COMBINE_DATA(&deco16_prot_ram[offset]);
-
+	driver_device *state = space->machine().driver_data<driver_device>();
 	if (offset == (0xa8 / 2))
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_w(*space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 		return;
 	}
@@ -1213,13 +1218,14 @@ READ16_HANDLER( deco16_104_rohga_prot_r )
 
 static WRITE16_HANDLER( deco16_146_core_prot_w )
 {
+	driver_device *state = space->machine().driver_data<driver_device>();
 	const int writeport=offset;
 	const int sndport=0x260;
 	const int xorport=0x340;
 	const int maskport=0x6c0;
 	if (writeport == sndport)
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_w(*space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 		return;
 	}
@@ -1746,9 +1752,10 @@ READ16_HANDLER( dietgo_104_prot_r )
 
 WRITE16_HANDLER( dietgo_104_prot_w )
 {
+	driver_device *state = space->machine().driver_data<driver_device>();
 	if (offset == (0x380 / 2))
 	{
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_w(*space, 0, data & 0xff);
 		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
 		return;
 	}

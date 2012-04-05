@@ -150,9 +150,9 @@ WRITE8_MEMBER(gbusters_state::k052109_051960_w)
 
 static ADDRESS_MAP_START( gbusters_map, AS_PROGRAM, 8, gbusters_state )
 	AM_RANGE(0x1f80, 0x1f80) AM_WRITE(gbusters_coin_counter_w)						/* coin counters */
-	AM_RANGE(0x1f84, 0x1f84) AM_WRITE_LEGACY(soundlatch_w)									/* sound code # */
+	AM_RANGE(0x1f84, 0x1f84) AM_WRITE(soundlatch_w)									/* sound code # */
 	AM_RANGE(0x1f88, 0x1f88) AM_WRITE(gbusters_sh_irqtrigger_w)						/* cause interrupt on audio CPU */
-	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE_LEGACY(watchdog_reset_w)								/* watchdog reset */
+	AM_RANGE(0x1f8c, 0x1f8c) AM_WRITE(watchdog_reset_w)								/* watchdog reset */
 	AM_RANGE(0x1f90, 0x1f90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P1")
 	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P2")
@@ -171,7 +171,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gbusters_sound_map, AS_PROGRAM, 8, gbusters_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM													/* ROM 878h01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM													/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)									/* soundlatch_r */
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)									/* soundlatch_r */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)		/* 007232 registers */
 	AM_RANGE(0xc001, 0xc001) AM_DEVREAD_LEGACY("ymsnd", ym2151_status_port_r)					/* YM 2151 */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)				/* YM 2151 */

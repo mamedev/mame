@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig1_state )
 	AM_RANGE(0x038000, 0x03ffff) AM_ROM	/* pitfight slapstic goes here */
 	AM_RANGE(0x040000, 0x077fff) AM_ROM
 	AM_RANGE(0x078000, 0x07ffff) AM_ROM	/* hydra slapstic goes here */
-	AM_RANGE(0xf80000, 0xf80001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0xf80000, 0xf80001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xf88000, 0xf8ffff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0xf90000, 0xf90001) AM_WRITE_LEGACY(atarigen_sound_upper_w)
 	AM_RANGE(0xf98000, 0xf98001) AM_WRITE_LEGACY(atarigen_sound_reset_w)

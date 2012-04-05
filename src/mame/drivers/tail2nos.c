@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tail2nos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x07, 0x07) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP	/* the write is a clear pending command */
+	AM_RANGE(0x07, 0x07) AM_READ(soundlatch_r) AM_WRITENOP	/* the write is a clear pending command */
 	AM_RANGE(0x08, 0x0b) AM_DEVWRITE_LEGACY("ymsnd", ym2608_w)
 #if 0
 	AM_RANGE(0x18, 0x1b) AM_DEVREAD_LEGACY("ymsnd", ym2608_r)

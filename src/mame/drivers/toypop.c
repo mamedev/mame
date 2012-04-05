@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8, toypop_state )
 	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE_LEGACY("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x6820, 0x682f) AM_DEVREADWRITE_LEGACY("56xx_2", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(toypop_main_interrupt_enable_w)		/* enable interrupt */
-	AM_RANGE(0x7800, 0x7800) AM_READ_LEGACY(watchdog_reset_r) AM_WRITE(toypop_main_interrupt_disable_w) /* disable interrupt */
+	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r) AM_WRITE(toypop_main_interrupt_disable_w) /* disable interrupt */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(toypop_m68000_clear_w)				/* reset 68000 */
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(toypop_m68000_assert_w)				/* reset 68000 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(toypop_sound_clear_w)					/* sound CPU reset */
@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, toypop_state )
 	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(toypop_sound_interrupt_disable_w)	/* ??? toypop doesn't write here */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(toypop_sound_interrupt_enable_acknowledge_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

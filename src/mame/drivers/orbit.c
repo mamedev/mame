@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( orbit_map, AS_PROGRAM, 8, orbit_state )
 	AM_RANGE(0x3a00, 0x3a00) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("discrete", orbit_note_amp_w)
 	AM_RANGE(0x3c00, 0x3c0f) AM_MIRROR(0x00f0) AM_WRITE(orbit_misc_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("discrete", orbit_noise_rst_w)
-	AM_RANGE(0x3f00, 0x3f00) AM_MIRROR(0x00ff) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x3f00, 0x3f00) AM_MIRROR(0x00ff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 

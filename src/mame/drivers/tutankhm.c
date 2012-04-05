@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_BASE(m_paletteram)
 	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_BASE(m_scroll)
-	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2")	/* DSW2 (inverted bits) */
 	AM_RANGE(0x8180, 0x8180) AM_MIRROR(0x000f) AM_READ_PORT("IN0")	/* IN0 I/O: Coin slots, service, 1P/2P buttons */
 	AM_RANGE(0x81a0, 0x81a0) AM_MIRROR(0x000f) AM_READ_PORT("IN1")	/* IN1: Player 1 I/O */
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x8207, 0x8207) AM_MIRROR(0x00f8) AM_WRITE_LEGACY(tutankhm_flip_screen_y_w)
 	AM_RANGE(0x8300, 0x8300) AM_MIRROR(0x00ff) AM_WRITE(tutankhm_bankselect_w)
 	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0x00ff) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)
-	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xffff) AM_ROM

@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	AM_RANGE(0xcc, 0xcc) AM_WRITENOP		/* same as 0xca */
 	AM_RANGE(0xcd, 0xcd) AM_WRITENOP		/* same as 0xcb */
 	AM_RANGE(0xce, 0xce) AM_WRITENOP		/* only written at startup */
-	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
@@ -220,13 +220,13 @@ static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("P1")
 	AM_RANGE(0xf818, 0xf818) AM_READ_PORT("P2")
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
-	AM_RANGE(0xf828, 0xf828) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xf828, 0xf828) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE_LEGACY(tecfri_scroll_bg_w)
 	AM_RANGE(0xf838, 0xf838) AM_WRITENOP				/* only written at startup */
 	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xf83a, 0xf83a) AM_WRITE(sauro_coin1_w)
 	AM_RANGE(0xf83b, 0xf83b) AM_WRITE(sauro_coin2_w)
-	AM_RANGE(0xf83c, 0xf83c) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xf83c, 0xf83c) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP				/* only written at startup */
 ADDRESS_MAP_END
 

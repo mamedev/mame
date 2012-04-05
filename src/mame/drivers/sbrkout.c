@@ -369,7 +369,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbrkout_state )
 	AM_RANGE(0x0c50, 0x0c51) AM_MIRROR(0x000e) AM_WRITE(pot_mask1_w)
 	AM_RANGE(0x0c60, 0x0c61) AM_MIRROR(0x000e) AM_WRITE(pot_mask2_w)
 	AM_RANGE(0x0c70, 0x0c71) AM_MIRROR(0x000e) AM_WRITE(coincount_w)
-	AM_RANGE(0x0c80, 0x0c80) AM_MIRROR(0x007f) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x0c80, 0x0c80) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_MIRROR(0x007f) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x03ff) AM_READ(sync2_r)
 	AM_RANGE(0x2800, 0x3fff) AM_ROM

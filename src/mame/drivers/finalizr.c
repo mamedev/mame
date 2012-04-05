@@ -104,12 +104,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x0811, 0x0811) AM_READ_PORT("P1")
 	AM_RANGE(0x0812, 0x0812) AM_READ_PORT("P2")
 	AM_RANGE(0x0813, 0x0813) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0818, 0x0818) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x0818, 0x0818) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
 	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0x081b, 0x081b) AM_WRITENOP		/* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
-	AM_RANGE(0x081d, 0x081d) AM_WRITE_LEGACY(soundlatch_w)			/* custom sound chip */
+	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_w)			/* custom sound chip */
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE(m_colorram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE(m_colorram2)
@@ -126,7 +126,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, finalizr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, finalizr_state )
-	AM_RANGE(0x00, 0xff)                   AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x00, 0xff)                   AM_READ(soundlatch_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(i8039_T0_w)

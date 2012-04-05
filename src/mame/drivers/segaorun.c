@@ -369,7 +369,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
-	soundlatch_w(space, 0, param);
+	state->soundlatch_w(*space, 0, param);
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -385,7 +385,7 @@ static READ8_HANDLER( sound_data_r )
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(space, offset);
+	return state->soundlatch_r(*space, offset);
 }
 
 
@@ -673,7 +673,7 @@ static READ16_HANDLER( outrun_custom_io_r )
 		}
 
 		case 0x60/2:
-			return watchdog_reset_r(space,0);
+			return state->watchdog_reset_r(*space,0);
 	}
 
 	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", cpu_get_pc(&space->device()), offset * 2);
@@ -709,7 +709,7 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 			return;
 
 		case 0x60/2:
-			watchdog_reset_w(space,0,0);
+			state->watchdog_reset_w(*space,0,0);
 			return;
 
 		case 0x70/2:
@@ -771,7 +771,7 @@ static WRITE16_HANDLER( shangon_custom_io_w )
 			return;
 
 		case 0x3000/2:
-			watchdog_reset_w(space, 0, 0);
+			state->watchdog_reset_w(*space, 0, 0);
 			return;
 
 		case 0x3020/2:

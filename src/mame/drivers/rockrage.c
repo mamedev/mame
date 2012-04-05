@@ -106,7 +106,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(rockrage_sh_irqtrigger_w)					/* cause interrupt on audio CPU */
-	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE_LEGACY(watchdog_reset_w)							/* watchdog reset */
+	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)							/* watchdog reset */
 	AM_RANGE(0x2f00, 0x2f00) AM_WRITE_LEGACY(rockrage_vreg_w)							/* ??? */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(rockrage_bankswitch_w)					/* bankswitch control */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM												/* RAM */
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( rockrage_sound_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w) 				/* VLM5030 */
 	AM_RANGE(0x3000, 0x3000) AM_DEVREAD_LEGACY("vlm", rockrage_VLM5030_busy_r)			/* VLM5030 */
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("vlm", rockrage_speech_w)				/* VLM5030 */
-	AM_RANGE(0x5000, 0x5000) AM_READ_LEGACY(soundlatch_r)								/* soundlatch_r */
+	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)								/* soundlatch_r */
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)			/* YM 2151 */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM												/* RAM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM												/* ROM */

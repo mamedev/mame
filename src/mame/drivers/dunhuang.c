@@ -489,7 +489,7 @@ static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
 
 	AM_RANGE( 0x0008, 0x0008 ) AM_WRITE(dunhuang_vert_clear_w )
 
-	AM_RANGE( 0x000c, 0x000c ) AM_READ_LEGACY(watchdog_reset_r )
+	AM_RANGE( 0x000c, 0x000c ) AM_READ(watchdog_reset_r )
 
 	AM_RANGE( 0x000f, 0x000f ) AM_WRITE(dunhuang_block_addr_lo_w )
 	AM_RANGE( 0x0010, 0x0010 ) AM_WRITE(dunhuang_block_addr_hi_w )

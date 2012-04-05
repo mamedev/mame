@@ -411,7 +411,7 @@ static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE_LEGACY(psychic5_paged_ram_r, psychic5_paged_ram_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_RAM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xf000, 0xf000) AM_RAM_WRITE(soundlatch_w)
 	AM_RANGE(0xf001, 0xf001) AM_READNOP AM_WRITE(psychic5_coin_counter_w)
 	AM_RANGE(0xf002, 0xf002) AM_READWRITE(psychic5_bankselect_r, psychic5_bankselect_w)
 	AM_RANGE(0xf003, 0xf003) AM_READWRITE_LEGACY(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
@@ -425,7 +425,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( psychic5_sound_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psychic5_soundport_map, AS_IO, 8, psychic5_state )
@@ -441,7 +441,7 @@ static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 
 	/* ports look like the other games */
-	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(soundlatch_w) // confirmed
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch_w) // confirmed
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(bombsa_flipscreen_w)
 	AM_RANGE(0xd002, 0xd002) AM_READWRITE(psychic5_bankselect_r, bombsa_bankselect_w)
 	AM_RANGE(0xd003, 0xd003) AM_READWRITE_LEGACY(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
@@ -457,7 +457,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bombsa_sound_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY								// Is this a confirm of some sort?
 ADDRESS_MAP_END
 

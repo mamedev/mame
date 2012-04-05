@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sonson_state )
 	AM_RANGE(0x3005, 0x3005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3006, 0x3006) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3008, 0x3008) AM_WRITENOP	// might be Y scroll, but the game always sets it to 0
-	AM_RANGE(0x3010, 0x3010) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x3010, 0x3010) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3018, 0x3018) AM_WRITE_LEGACY(sonson_flipscreen_w)
 	AM_RANGE(0x3019, 0x3019) AM_WRITE(sonson_sh_irqtrigger_w)
 	AM_RANGE(0x301e, 0x301e) AM_WRITE(sonson_coin2_counter_w)
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sonson_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( pass_map, AS_PROGRAM, 16, pass_state )
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE_LEGACY(pass_bg_videoram_w) AM_BASE(m_bg_videoram) // Background
 	AM_RANGE(0x210000, 0x213fff) AM_RAM_WRITE_LEGACY(pass_fg_videoram_w) AM_BASE(m_fg_videoram) // Foreground
 	AM_RANGE(0x220000, 0x2203ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x230000, 0x230001) AM_WRITE_LEGACY(soundlatch_word_w)
+	AM_RANGE(0x230000, 0x230001) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x230100, 0x230101) AM_READ_PORT("DSW")
 	AM_RANGE(0x230200, 0x230201) AM_READ_PORT("INPUTS")
 ADDRESS_MAP_END
@@ -127,10 +127,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pass_sound_io_map, AS_IO, 8, pass_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(soundlatch_clear_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_clear_w)
 ADDRESS_MAP_END
 
 /* todo : work out function of unknown but used dsw */

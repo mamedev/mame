@@ -350,8 +350,8 @@ static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x00, 0x01) AM_WRITENOP	/* the 2A03 #1 is not present */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(soundlatch_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(soundlatch2_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE(soundlatch_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)	/* VLM5030 */
 //  AM_RANGE(0x05, 0x05) AM_WRITENOP  /* unused */
 //  AM_RANGE(0x06, 0x06) AM_WRITENOP
@@ -370,8 +370,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0x4017, 0x4017) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)
+	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
 	AM_RANGE(0x4000, 0x4017) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r,nes_psg_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END

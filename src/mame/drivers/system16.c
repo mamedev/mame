@@ -422,7 +422,7 @@ static ADDRESS_MAP_START(tturfbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(tturfbl_soundbank_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(tturfbl_soundbank_w)
-	AM_RANGE(0xe800, 0xe800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(tturfbl_msm5205_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -438,14 +438,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe800, 0xe800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, segas1x_bootleg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -453,7 +453,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_7759_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe800, 0xe800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -473,7 +473,7 @@ static ADDRESS_MAP_START( sound_7759_io_map, AS_IO, 8, segas1x_bootleg_state )
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("7759", upd7759_bank_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("7759", upd7759_port_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -532,7 +532,7 @@ ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START( fpointbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1056,7 +1056,7 @@ static ADDRESS_MAP_START( sound_18_io_map, AS_IO, 8, segas1x_bootleg_state )
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("3438.0", ym3438_r, ym3438_w)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("3438.1", ym3438_r, ym3438_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(sys18_soundbank_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -1230,7 +1230,7 @@ static ADDRESS_MAP_START(shdancbl_sound_map, AS_PROGRAM, 8, segas1x_bootleg_stat
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READ(shdancbl_soundbank_r)
 	AM_RANGE(0xc000, 0xc00f) AM_WRITENOP
-	AM_RANGE(0xc400, 0xc400) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc400, 0xc400) AM_READ(soundlatch_r)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(shdancbl_msm5205_data_w)
 	AM_RANGE(0xcc00, 0xcc03) AM_DEVREADWRITE_LEGACY("3438.0", ym3438_r, ym3438_w)
 	AM_RANGE(0xd000, 0xd003) AM_DEVREADWRITE_LEGACY("3438.1", ym3438_r, ym3438_w)

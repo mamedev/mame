@@ -758,7 +758,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, armedf_state )
 	AM_RANGE(0x2, 0x2) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
 	AM_RANGE(0x3, 0x3) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
 	AM_RANGE(0x4, 0x4) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x6, 0x6) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x6, 0x6) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 

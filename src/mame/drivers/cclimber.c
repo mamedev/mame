@@ -399,7 +399,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( swimmer_audio_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 	AM_RANGE(0x4000, 0x4001) AM_RAM				/* ??? */
 ADDRESS_MAP_END
 

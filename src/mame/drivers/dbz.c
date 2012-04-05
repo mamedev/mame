@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( dbz_sound_map, AS_PROGRAM, 8, dbz_state )
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd000, 0xd002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe001) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe001) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_sound_io_map, AS_IO, 8, dbz_state )

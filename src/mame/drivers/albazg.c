@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, albazg_state )
 	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xc0, 0xc0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/

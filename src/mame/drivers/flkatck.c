@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( flkatck_sound_map, AS_PROGRAM, 8, flkatck_state )
 //  AM_RANGE(0x9001, 0x9001) AM_RAM                                             /* ??? */
 	AM_RANGE(0x9004, 0x9004) AM_READNOP											/* ??? */
 	AM_RANGE(0x9006, 0x9006) AM_WRITENOP										/* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)								/* soundlatch_r */
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)								/* soundlatch_r */
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w)	/* 007232 registers */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)			/* YM2151 */
 ADDRESS_MAP_END

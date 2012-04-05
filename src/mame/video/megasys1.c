@@ -447,7 +447,7 @@ WRITE16_HANDLER( megasys1_vregs_A_w )
 							}
 							break;
 
-		case 0x308/2   :	soundlatch_word_w(space,0,new_data,0xffff);
+		case 0x308/2   :	state->soundlatch_word_w(*space,0,new_data,0xffff);
 							cputag_set_input_line(space->machine(), "soundcpu", 4, HOLD_LINE);
 							break;
 
@@ -465,7 +465,7 @@ READ16_HANDLER( megasys1_vregs_C_r )
 	megasys1_state *state = space->machine().driver_data<megasys1_state>();
 	switch (offset)
 	{
-		case 0x8000/2:	return soundlatch2_word_r(space,0,0xffff);
+		case 0x8000/2:	return state->soundlatch2_word_r(*space,0,0xffff);
 		default:		return state->m_vregs[offset];
 	}
 }
@@ -501,7 +501,7 @@ WRITE16_HANDLER( megasys1_vregs_C_w )
 							break;
 
 		case 0x8000/2   :	/* Cybattler reads sound latch on irq 2 */
-							soundlatch_word_w(space, 0, new_data, 0xffff);
+							state->soundlatch_word_w(*space, 0, new_data, 0xffff);
 							cputag_set_input_line(space->machine(), "soundcpu", 2, HOLD_LINE);
 							break;
 

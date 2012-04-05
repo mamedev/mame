@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xfc46, 0xfc46) AM_WRITEONLY AM_BASE(m_scroll2xlo)
 	AM_RANGE(0xfc47, 0xfc47) AM_WRITEONLY AM_BASE(m_scroll2xhi)
 	AM_RANGE(0xfcc0, 0xfcc0) AM_WRITE(wc90_sound_command_w)
-	AM_RANGE(0xfcd0, 0xfcd0) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xfcd0, 0xfcd0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(wc90_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90_bankswitch1_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wc90_state )
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE_LEGACY("ymsnd", ym2608_r, ym2608_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_READNOP /* ??? adpcm ??? */
-	AM_RANGE(0xfc10, 0xfc10) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xfc10, 0xfc10) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 

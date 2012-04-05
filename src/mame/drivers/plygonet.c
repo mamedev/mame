@@ -519,7 +519,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x600004, 0x600007) AM_WRITE(sound_w)
 	AM_RANGE(0x600008, 0x60000b) AM_READ(sound_r)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
-	AM_RANGE(0x680000, 0x680003) AM_WRITE_LEGACY(watchdog_reset32_w)
+	AM_RANGE(0x680000, 0x680003) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x700000, 0x73ffff) AM_READ(psac_rom_r)
 	AM_RANGE(0x780000, 0x79ffff) AM_READ(ttl_rom_r)
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM
@@ -570,9 +570,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, polygonet_state )
 	AM_RANGE(0xe230, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("konami2", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(soundlatch3_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0xfff1, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END

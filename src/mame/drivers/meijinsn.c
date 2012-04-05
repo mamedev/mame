@@ -190,7 +190,7 @@ static ADDRESS_MAP_START( meijinsn_sound_io_map, AS_IO, 8, meijinsn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(soundlatch_clear_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -326,7 +326,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r)
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r)
 };
 
 static MACHINE_START( meijinsn )

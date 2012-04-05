@@ -170,7 +170,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, lastduel_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)
-	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(lastduel_state::mg_bankswitch_w)
@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( madgear_sound_map, AS_PROGRAM, 8, lastduel_state )
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)
 	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)
 	AM_RANGE(0xf004, 0xf004) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xf006, 0xf006) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf006, 0xf006) AM_READ(soundlatch_r)
 	AM_RANGE(0xf00a, 0xf00a) AM_WRITE(mg_bankswitch_w)
 ADDRESS_MAP_END
 

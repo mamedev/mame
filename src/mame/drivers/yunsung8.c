@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, yunsung8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE_LEGACY(yunsung8_videobank_w)	// video RAM bank
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(yunsung8_bankswitch_w)	// ROM Bank + Layers Enable
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_WRITE_LEGACY(soundlatch_w)	// To Sound CPU
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_WRITE(soundlatch_w)	// To Sound CPU
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(yunsung8_flipscreen_w)	// Flip Screen
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, yunsung8_state )
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r)	// From Main CPU
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)	// From Main CPU
 ADDRESS_MAP_END
 
 

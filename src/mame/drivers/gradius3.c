@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( gradius3_map, AS_PROGRAM, 16, gradius3_state )
 	AM_RANGE(0x0d0000, 0x0d0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0d0002, 0x0d0003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0d8000, 0x0d8001) AM_WRITE(cpuB_irqtrigger_w)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITE(sound_command_w)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("share1")
@@ -191,7 +191,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gradius3_s_map, AS_PROGRAM, 8, gradius3_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE_LEGACY("k007232", sound_bank_w)				/* 007232 bankswitch */
-	AM_RANGE(0xf010, 0xf010) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_r)
 	AM_RANGE(0xf020, 0xf02d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xf030, 0xf031) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM

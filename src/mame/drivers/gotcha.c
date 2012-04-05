@@ -97,7 +97,7 @@ static WRITE16_DEVICE_HANDLER( gotcha_oki_bank_w )
 
 static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(soundlatch_word_w)
+	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
 	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE_LEGACY("oki", gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gotcha_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("oki", okim6295_device, write)	// TWO addresses!
-	AM_RANGE(0xc006, 0xc006) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
 

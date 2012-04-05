@@ -389,9 +389,9 @@ static ADDRESS_MAP_START( combatsc_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(combatsc_coin_counter_w)	/* coin counters */
 	AM_RANGE(0x040c, 0x040c) AM_WRITE(combatsc_vreg_w)
 	AM_RANGE(0x0410, 0x0410) AM_WRITE(combatsc_bankselect_w)
-	AM_RANGE(0x0414, 0x0414) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x0414, 0x0414) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x0418, 0x0418) AM_WRITE(combatsc_sh_irqtrigger_w)
-	AM_RANGE(0x041c, 0x041c) AM_WRITE_LEGACY(watchdog_reset_w)			/* watchdog reset? */
+	AM_RANGE(0x041c, 0x041c) AM_WRITE(watchdog_reset_w)			/* watchdog reset? */
 
 	AM_RANGE(0x0600, 0x06ff) AM_RAM AM_BASE(m_paletteram)		/* palette */
 	AM_RANGE(0x0800, 0x1fff) AM_RAM								/* RAM */
@@ -419,7 +419,7 @@ static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0xb000, 0xb000) AM_DEVREAD_LEGACY("upd", combatsc_busy_r)					/* upd7759 busy? */
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("upd", combatsc_voice_reset_w)			/* upd7759 reset? */
 
-	AM_RANGE(0xd000, 0xd000) AM_READ_LEGACY(soundlatch_r)								/* soundlatch_r? */
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)								/* soundlatch_r? */
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ymsnd", combatsc_ym2203_r, ym2203_w)	/* YM 2203 intercepted */
 ADDRESS_MAP_END
 
@@ -440,7 +440,7 @@ static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)	/* YM 2203 */
 	AM_RANGE(0x9008, 0x9009) AM_DEVREAD_LEGACY("ymsnd", ym2203_r)					/* ??? */
 	AM_RANGE(0x9800, 0x9800) AM_DEVWRITE_LEGACY("msm5205",combatscb_dac_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)						/* soundlatch_r? */
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)						/* soundlatch_r? */
 ADDRESS_MAP_END
 
 /*************************************

@@ -384,7 +384,7 @@ static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1d0016, 0x1d0017) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x1d0016, 0x1d0017) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x1d0020, 0x1d0027) AM_READ(shadfrce_input_ports_r)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
@@ -401,7 +401,7 @@ static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END

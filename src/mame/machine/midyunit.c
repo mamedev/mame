@@ -627,7 +627,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 				break;
 
 			case SOUND_YAWDIM:
-				soundlatch_w(space, 0, data);
+				state->soundlatch_w(*space, 0, data);
 				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 				break;
 		}

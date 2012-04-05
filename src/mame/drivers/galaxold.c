@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( galaxold_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7004, 0x7004) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0x7006, 0x7006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7800, 0x7fff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 	AM_RANGE(0xfffc, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -458,7 +458,7 @@ static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 ADDRESS_MAP_END
 
@@ -490,7 +490,7 @@ static ADDRESS_MAP_START( rockclim_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(galaxold_nmi_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 ADDRESS_MAP_END
 
@@ -518,7 +518,7 @@ static ADDRESS_MAP_START( ckongg_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xc804, 0xc804) AM_WRITENOP // link cut
 	AM_RANGE(0xc806, 0xc806) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_READ_LEGACY(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_READ(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 ADDRESS_MAP_END
 
 /* Memory map based on mooncrst_map according to Z80 code - seems to be good but needs further checking */
@@ -545,7 +545,7 @@ static ADDRESS_MAP_START( ckongmc_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb004, 0xb004) AM_WRITENOP                                                            /* AM_WRITE_LEGACY(galaxold_stars_enable_w) */
 	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)                                     /* GUESS */
 	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)                                     /* GUESS */
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)     /* GUESS */
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)     /* GUESS */
 ADDRESS_MAP_END
 
 
@@ -573,7 +573,7 @@ static ADDRESS_MAP_START( scramblb_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7004, 0x7004) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0x7006, 0x7006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7800, 0x7800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 	AM_RANGE(0x8102, 0x8102) AM_READ_LEGACY(scramblb_protection_1_r)
 	AM_RANGE(0x8202, 0x8202) AM_READ_LEGACY(scramblb_protection_2_r)
@@ -601,7 +601,7 @@ static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6804, 0x6804) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7007) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7000, 0x7007) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x7006, 0x7006) AM_WRITENOP
 	AM_RANGE(0x7007, 0x7007) AM_WRITENOP
 	AM_RANGE(0x7800, 0x7807) AM_READ(scramb2_port2_r) // reads from 8 addresses, 1 bit per address
@@ -633,7 +633,7 @@ static ADDRESS_MAP_START( _4in1_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7004, 0x7004) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0x7006, 0x7006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7800, 0x78ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x78ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x7800, 0x78ff) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(_4in1_bank_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM		/* fixed menu code */
@@ -657,7 +657,7 @@ static ADDRESS_MAP_START( bagmanmc_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(galaxold_nmi_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 ADDRESS_MAP_END
 
 
@@ -683,7 +683,7 @@ static ADDRESS_MAP_START( dkongjrm_map, AS_PROGRAM, 8, galaxold_state )
   //AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 ADDRESS_MAP_END
 
 
@@ -696,7 +696,7 @@ static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x8860, 0x887f) AM_RAM AM_BASE(m_bulletsram) AM_SIZE(m_bulletsram_size)
 	AM_RANGE(0x8880, 0x8bff) AM_WRITENOP
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(galaxold_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x9800, 0x9800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x9800, 0x9800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa7ff, 0xa7ff) AM_READ_PORT("IN0") /* mirror */
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1") AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_background_enable_w)
@@ -708,7 +708,7 @@ static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 ADDRESS_MAP_END
 
 
@@ -728,7 +728,7 @@ static ADDRESS_MAP_START( bongo, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb004, 0xb004) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r) AM_WRITENOP
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bongo_io, AS_IO, 8, galaxold_state )
@@ -798,7 +798,7 @@ static ADDRESS_MAP_START( harem_cpu2_io, AS_IO, 8, galaxold_state )
 	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("ay3", ay8910_address_w)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("ay3", ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
@@ -820,7 +820,7 @@ static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x1604, 0x1604) AM_MIRROR(0x6000) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0x1606, 0x1606) AM_MIRROR(0x6000) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x1607, 0x1607) AM_MIRROR(0x6000) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_READ_LEGACY(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
+	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_READ(watchdog_reset_r) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE_LEGACY(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM

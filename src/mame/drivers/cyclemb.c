@@ -280,7 +280,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclemb_sound_io, AS_IO, 8, cyclemb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x40, 0x40) AM_READ_LEGACY(soundlatch_r) AM_WRITE_LEGACY(soundlatch2_w)
+	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( cyclemb )

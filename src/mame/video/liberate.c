@@ -127,7 +127,7 @@ WRITE8_HANDLER( deco16_io_w )
 			device_set_input_line(state->m_maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			soundlatch_w(space, 0, data);
+			state->soundlatch_w(*space, 0, data);
 			device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
@@ -156,7 +156,7 @@ WRITE8_HANDLER( prosoccr_io_w )
 			device_set_input_line(state->m_maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			soundlatch_w(space, 0, data);
+			state->soundlatch_w(*space, 0, data);
 			device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
@@ -176,7 +176,7 @@ WRITE8_HANDLER( prosport_io_w )
 			state->m_back_tilemap->mark_all_dirty();
 			break;
 		case 2: /* Sound */
-			soundlatch_w(space, 0, data);
+			state->soundlatch_w(*space, 0, data);
 			device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 		case 4: /* Irq ack */

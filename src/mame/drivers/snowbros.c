@@ -198,7 +198,7 @@ WRITE16_MEMBER(snowbros_state::semicom_soundcmd_w)
 static ADDRESS_MAP_START( snowbros_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,snowbros_68000_sound_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
@@ -219,7 +219,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, snowbros_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
+	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
 
@@ -280,7 +280,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wintbob_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,snowbros_68000_sound_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW1")
@@ -320,7 +320,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( honeydol_sound_io_map, AS_IO, 8, snowbros_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)								// not connected?
-	AM_RANGE(0x04, 0x04) AM_READWRITE_LEGACY(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
+	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
 /* Twin Adventure */
@@ -337,7 +337,7 @@ WRITE16_MEMBER(snowbros_state::twinadv_68000_sound_w)
 static ADDRESS_MAP_START( twinadv_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(snowbros_68000_sound_r,twinadv_68000_sound_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)
 
@@ -362,7 +362,7 @@ static WRITE8_DEVICE_HANDLER( twinadv_oki_bank_w )
 
 static ADDRESS_MAP_START( twinadv_sound_io_map, AS_IO, 8, snowbros_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READWRITE_LEGACY(soundlatch_r, soundlatch_w) // back to 68k?
+	AM_RANGE(0x02, 0x02) AM_READWRITE(soundlatch_r, soundlatch_w) // back to 68k?
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("oki", twinadv_oki_bank_w) // oki bank?
 	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -396,7 +396,7 @@ static ADDRESS_MAP_START( hyperpac_sound_map, AS_PROGRAM, 8, snowbros_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xf008, 0xf008) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 /* Same volume used for all samples at the Moment, could be right, we have no
@@ -512,7 +512,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 static ADDRESS_MAP_START( snowbros3_map, AS_PROGRAM, 16, snowbros_state )
 	AM_RANGE( 0x000000, 0x03ffff) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff) AM_RAM
-	AM_RANGE( 0x200000, 0x200001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE( 0x200000, 0x200001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE( 0x300000, 0x300001) AM_READ(sb3_sound_r) // ?
 	AM_RANGE( 0x300000, 0x300001) AM_DEVWRITE_LEGACY("oki", sb3_sound_w)  // ?
 	AM_RANGE( 0x400000, 0x400001) AM_WRITE(snowbros_flipscreen_w)

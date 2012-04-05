@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, ddribble_state )
 	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW3")
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(ddribble_coin_counter_w)								/* coin counters */
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE_LEGACY(watchdog_reset_w)										/* watchdog reset */
+	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(watchdog_reset_w)										/* watchdog reset */
 	AM_RANGE(0x8000, 0xffff) AM_ROM															/* ROM */
 ADDRESS_MAP_END
 

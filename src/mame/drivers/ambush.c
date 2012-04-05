@@ -66,7 +66,7 @@ WRITE8_MEMBER(ambush_state::flip_screen_w)
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ambush_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc080, 0xc09f) AM_BASE(m_scrollram)
 	AM_RANGE(0xc100, 0xc1ff) AM_BASE(m_colorram)

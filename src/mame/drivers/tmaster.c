@@ -753,7 +753,7 @@ static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
 	AM_RANGE( 0x600000, 0x600001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
 	AM_RANGE( 0x800020, 0x80003f ) AM_NOP	// ?
-	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE_LEGACY(watchdog_reset16_w )
+	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE(watchdog_reset16_w )
 
 	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE(galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15

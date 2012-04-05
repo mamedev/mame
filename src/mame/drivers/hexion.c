@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xf480, 0xf480) AM_WRITE_LEGACY(hexion_bankswitch_w)
 	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
 	AM_RANGE(0xf500, 0xf500) AM_WRITE_LEGACY(hexion_gfxrom_select_w)
-	AM_RANGE(0xf540, 0xf540) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xf540, 0xf540) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 

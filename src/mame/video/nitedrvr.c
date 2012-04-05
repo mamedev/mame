@@ -22,7 +22,7 @@ WRITE8_HANDLER( nitedrvr_hvc_w )
 	state->m_hvc[offset & 0x3f] = data;
 
 	if ((offset & 0x30) == 0x30)
-		watchdog_reset_w(space, 0, 0);
+		state->watchdog_reset_w(*space, 0, 0);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

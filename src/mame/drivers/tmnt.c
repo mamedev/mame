@@ -563,7 +563,7 @@ static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrick_nv_r, cuebrick_nv_w) AM_SHARE("nvram")
@@ -584,7 +584,7 @@ static ADDRESS_MAP_START( mia_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
 #if 0
@@ -606,7 +606,7 @@ static ADDRESS_MAP_START( tmnt_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P3")
 	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(tmnt_sound_command_w)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0014, 0x0a0015) AM_READ_PORT("P4")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
@@ -630,7 +630,7 @@ static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0040, 0x0a0043) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x0a0040, 0x0a0041) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x0a0060, 0x0a007f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
-	AM_RANGE(0x0a0080, 0x0a0081) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x0a0080, 0x0a0081) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, punkshot_k052109_word_noA12_w)
 	AM_RANGE(0x110000, 0x110007) AM_DEVREADWRITE_LEGACY("k051960", k051937_word_r, k051937_word_w)
 	AM_RANGE(0x110400, 0x1107ff) AM_DEVREADWRITE_LEGACY("k051960", k051960_word_r, k051960_word_w)
@@ -651,7 +651,7 @@ static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x0a0018, 0x0a0019) AM_WRITE_LEGACY(lgtnfght_0a0018_w)
 	AM_RANGE(0x0a0020, 0x0a0023) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x0a0020, 0x0a0021) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
-	AM_RANGE(0x0a0028, 0x0a0029) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x0a0028, 0x0a0029) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x0c0000, 0x0c001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x0e0000, 0x0e001f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
@@ -680,7 +680,7 @@ static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x700200, 0x700201) AM_WRITE(blswhstl_eeprom_w)
 	AM_RANGE(0x700300, 0x700301) AM_WRITE_LEGACY(blswhstl_700300_w)
-	AM_RANGE(0x700400, 0x700401) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x700400, 0x700401) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x780600, 0x780603) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x780600, 0x780601) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)
 	AM_RANGE(0x780604, 0x780605) AM_WRITE(ssriders_soundkludge_w)
@@ -726,7 +726,7 @@ static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x120006, 0x120007) AM_READ_PORT("DSW1/DSW2")
 	AM_RANGE(0x121000, 0x121001) AM_READ_LEGACY(glfgreat_ball_r)	/* returns the color of the center pixel of the roz layer */
 	AM_RANGE(0x122000, 0x122001) AM_WRITE_LEGACY(glfgreat_122000_w)
-	AM_RANGE(0x124000, 0x124001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x124000, 0x124001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x125000, 0x125003) AM_DEVREADWRITE8_LEGACY("k053260", punkshot_sound_r, glfgreat_sound_w, 0xff00)	/* K053260 */
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
 	AM_RANGE(0x300000, 0x3fffff) AM_READ_LEGACY(glfgreat_rom_r)
@@ -751,7 +751,7 @@ static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x122000, 0x122001) AM_WRITE(prmrsocr_eeprom_w)	/* EEPROM + video control */
 	AM_RANGE(0x123000, 0x123001) AM_WRITE(prmrsocr_sound_irq_w)
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
-	AM_RANGE(0x280000, 0x280001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x280000, 0x280001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x300000, 0x33ffff) AM_READ_LEGACY(prmrsocr_rom_r)
 ADDRESS_MAP_END
 
@@ -1009,7 +1009,7 @@ static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x1c0102, 0x1c0103) AM_READ(ssriders_eeprom_r)
 	AM_RANGE(0x1c0200, 0x1c0201) AM_WRITE_LEGACY(ssriders_eeprom_w)	/* EEPROM and gfx control */
 	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE_LEGACY(ssriders_1c0300_w)
-	AM_RANGE(0x1c0400, 0x1c0401) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)
+	AM_RANGE(0x1c0400, 0x1c0401) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)
 	AM_RANGE(0x1c0500, 0x1c057f) AM_RAM	/* TMNT2 only (1J) unknown, mostly MCU blit offsets */
 //  AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r) /* protection device */
 	AM_RANGE(0x1c0800, 0x1c081f) AM_WRITE(tmnt2_1c0800_w) AM_BASE(m_tmnt2_1c0800)	/* protection device */
@@ -1035,7 +1035,7 @@ static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x1c0102, 0x1c0103) AM_READ(ssriders_eeprom_r)
 	AM_RANGE(0x1c0200, 0x1c0201) AM_WRITE_LEGACY(ssriders_eeprom_w)	/* EEPROM and gfx control */
 	AM_RANGE(0x1c0300, 0x1c0301) AM_WRITE_LEGACY(ssriders_1c0300_w)
-	AM_RANGE(0x1c0400, 0x1c0401) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)
+	AM_RANGE(0x1c0400, 0x1c0401) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)
 	AM_RANGE(0x1c0500, 0x1c057f) AM_RAM	/* TMNT2 only (1J) unknown */
 	AM_RANGE(0x1c0800, 0x1c0801) AM_READ(ssriders_protection_r)
 	AM_RANGE(0x1c0800, 0x1c0803) AM_WRITE(ssriders_protection_w)
@@ -1096,7 +1096,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mia_audio_map, AS_PROGRAM, 8, tmnt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 ADDRESS_MAP_END
@@ -1106,7 +1106,7 @@ static ADDRESS_MAP_START( tmnt_audio_map, AS_PROGRAM, 8, tmnt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(tmnt_sres_r, tmnt_sres_w)	/* title music & UPD7759C reset */
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE_LEGACY("upd", upd7759_port_w)
@@ -1174,9 +1174,9 @@ static ADDRESS_MAP_START( prmrsocr_audio_map, AS_PROGRAM, 8, tmnt_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xe100, 0xe12f) AM_READWRITE(k054539_ctrl_r, k054539_ctrl_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(soundlatch3_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(prmrsocr_audio_bankswitch_w)
 ADDRESS_MAP_END
 

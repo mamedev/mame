@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, cloak_state )
 	AM_RANGE(0x3803, 0x3803) AM_WRITE_LEGACY(cloak_flipscreen_w)
 	AM_RANGE(0x3805, 0x3805) AM_WRITENOP	// ???
 	AM_RANGE(0x3806, 0x3807) AM_WRITE(cloak_led_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(cloak_irq_reset_0_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_WRITE(cloak_nvram_enable_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM

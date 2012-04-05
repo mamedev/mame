@@ -285,8 +285,9 @@ WRITE8_MEMBER(segag80r_state::coin_count_w)
 
 static WRITE8_DEVICE_HANDLER( sindbadm_soundport_w )
 {
+	segag80r_state *state = device->machine().driver_data<segag80r_state>();
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	soundlatch_w(space, 0, data);
+	state->soundlatch_w(*space, 0, data);
 	cputag_set_input_line(device->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	device->machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50));
 }
@@ -382,7 +383,7 @@ static ADDRESS_MAP_START( sindbadm_sound_map, AS_PROGRAM, 8, segag80r_state )
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x1800) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("sn1", sindbadm_SN76496_w)
 	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("sn2", sindbadm_SN76496_w)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 

@@ -60,8 +60,8 @@ static ADDRESS_MAP_START( momoko_map, AS_PROGRAM, 8, momoko_state )
 	AM_RANGE(0xd064, 0xd0ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0xd400, 0xd400) AM_READ_PORT("IN0") AM_WRITENOP /* interrupt ack? */
 	AM_RANGE(0xd402, 0xd402) AM_READ_PORT("IN1") AM_WRITE_LEGACY(momoko_flipscreen_w)
-	AM_RANGE(0xd404, 0xd404) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0xd406, 0xd406) AM_READ_PORT("DSW0") AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xd404, 0xd404) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xd406, 0xd406) AM_READ_PORT("DSW0") AM_WRITE(soundlatch_w)
 	AM_RANGE(0xd407, 0xd407) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE_LEGACY(momoko_fg_scrolly_w)
@@ -217,7 +217,7 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+		DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
 		DEVCB_NULL,
 		DEVCB_NULL,
 		DEVCB_NULL

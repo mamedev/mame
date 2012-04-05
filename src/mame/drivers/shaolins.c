@@ -29,7 +29,7 @@ static TIMER_DEVICE_CALLBACK( shaolins_interrupt )
 static ADDRESS_MAP_START( shaolins_map, AS_PROGRAM, 8, shaolins_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITE_LEGACY(shaolins_nmi_w)	/* bit 0 = flip screen, bit 1 = nmi enable, bit 2 = ? */
 														/* bit 3, bit 4 = coin counters */
-	AM_RANGE(0x0100, 0x0100) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x0100, 0x0100) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0300, 0x0300) AM_DEVWRITE_LEGACY("sn1", sn76496_w)	/* trigger chip to read from latch. The program always */
 	AM_RANGE(0x0400, 0x0400) AM_DEVWRITE_LEGACY("sn2", sn76496_w)	/* writes the same number as the latch, so we don't */
 															/* bother emulating them. */

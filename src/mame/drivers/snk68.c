@@ -159,7 +159,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, snk68_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r) AM_WRITE(sound_status_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r) AM_WRITE(sound_status_w)
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( D7759_write_port_0_w )

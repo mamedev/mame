@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pacland_state )
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w)		/* PSG device, shared RAM */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(pacland_irq_1_ctrl_w)
-	AM_RANGE(0x7800, 0x7fff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(pacland_subreset_w)
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(pacland_flipscreen_w)
@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, pacland_state )
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
 	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w)		/* PSG device, shared RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE_LEGACY(watchdog_reset_w)		/* watchdog? */
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE(watchdog_reset_w)		/* watchdog? */
 	AM_RANGE(0x4000, 0x7fff) AM_WRITE(pacland_irq_2_ctrl_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM

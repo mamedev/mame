@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, sbowling_state )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1") AM_WRITENOP

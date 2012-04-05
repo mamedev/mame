@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, jackal_state )
 	AM_RANGE(0x0013, 0x0013) AM_READ_PORT("IN0")
 	AM_RANGE(0x0014, 0x0015) AM_READ(topgunbl_rotary_r)
 	AM_RANGE(0x0018, 0x0018) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0019, 0x0019) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x0019, 0x0019) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x001c, 0x001c) AM_WRITE(jackal_rambank_w)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(jackal_zram_r, jackal_zram_w)				// MAIN   Z RAM,SUB    Z RAM
 	AM_RANGE(0x0060, 0x1fff) AM_RAM AM_SHARE("share1")							// M COMMON RAM,S COMMON RAM

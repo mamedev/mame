@@ -41,9 +41,9 @@ static ADDRESS_MAP_START( hcastle_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0x0200, 0x0207) AM_WRITE_LEGACY(hcastle_pf2_control_w)
 	AM_RANGE(0x0220, 0x023f) AM_RAM /* rowscroll? */
 	AM_RANGE(0x0400, 0x0400) AM_WRITE(hcastle_bankswitch_w)
-	AM_RANGE(0x0404, 0x0404) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x0404, 0x0404) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x0408, 0x0408) AM_WRITE(hcastle_soundirq_w)
-	AM_RANGE(0x040c, 0x040c) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x040c, 0x040c) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("SYSTEM") AM_WRITE(hcastle_coin_w)
 	AM_RANGE(0x0411, 0x0411) AM_READ_PORT("P1")
 	AM_RANGE(0x0412, 0x0412) AM_READ_PORT("P2")
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hcastle_state )
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami1", k007232_r, k007232_w)
 	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_LEGACY("konami1", sound_bank_w) /* 7232 bankswitch */
-	AM_RANGE(0xd000, 0xd000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 /*****************************************************************************/

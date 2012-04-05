@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dblewing_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_status_port_r,ym2151_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(irq_latch_r) //timing? sound latch?
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END

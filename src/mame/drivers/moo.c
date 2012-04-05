@@ -361,9 +361,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, moo_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE_LEGACY(soundlatch3_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 

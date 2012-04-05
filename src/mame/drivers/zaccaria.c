@@ -273,7 +273,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x6e00, 0x6e00) AM_READWRITE(zaccaria_dsw_r, sound_command_w)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
 	AM_RANGE(0x7800, 0x7803) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7c00, 0x7c00) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( sound_map_2, AS_PROGRAM, 8, zaccaria_state )
 	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia6821_device, read, write) AM_MIRROR(0x8F6C)
 	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE_LEGACY("dac2", mc1408_data_w) AM_MIRROR(0x83FF) /* MC1408 */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w) AM_MIRROR(0xC3FF)
-	AM_RANGE(0x1800, 0x1800) AM_READ_LEGACY(soundlatch_r) AM_MIRROR(0xC3FF)
+	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r) AM_MIRROR(0xC3FF)
 	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 low
 	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_MIRROR(0x8000) // rom 7 with A12 low
 	AM_RANGE(0x6000, 0x6fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 high
@@ -532,7 +532,7 @@ static const ay8910_interface ay8910_config =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch2_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_r),
 	DEVCB_HANDLER(ay8910_port0a_w),
 	DEVCB_NULL
 };

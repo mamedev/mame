@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, firefox_state )
 	AM_RANGE(0x4107, 0x4107) AM_MIRROR(0x00f8) AM_READ(adc_r)					/* ADC */
 	AM_RANGE(0x4200, 0x4200) AM_MIRROR(0x0047) AM_WRITE(main_irq_clear_w)		/* RSTIRQ */
 	AM_RANGE(0x4208, 0x4208) AM_MIRROR(0x0047) AM_WRITE(main_firq_clear_w)		/* RSTFIRQ */
-	AM_RANGE(0x4210, 0x4210) AM_MIRROR(0x0047) AM_WRITE_LEGACY(watchdog_reset_w)		/* WDCLK */
+	AM_RANGE(0x4210, 0x4210) AM_MIRROR(0x0047) AM_WRITE(watchdog_reset_w)		/* WDCLK */
 	AM_RANGE(0x4218, 0x4218) AM_MIRROR(0x0047) AM_WRITE(firefox_disc_read_w)	/* DSKREAD */
 	AM_RANGE(0x4220, 0x4223) AM_MIRROR(0x0044) AM_WRITE(adc_select_w)			/* ADCSTART */
 	AM_RANGE(0x4230, 0x4230) AM_MIRROR(0x0047) AM_WRITE(self_reset_w)			/* AMUCK */

@@ -139,7 +139,7 @@ static void f1dream_protection_w(address_space *space)
 	else if ((prevpc == 0x27f8) || (prevpc == 0x511a) || (prevpc == 0x5142) || (prevpc == 0x516a))
 	{
 		/* The main CPU stuffs the byte for the soundlatch into 0xfffffd.*/
-		soundlatch_w(space,2,state->m_ram16[0x3ffc/2]);
+		state->soundlatch_w(*space,2,state->m_ram16[0x3ffc/2]);
 	}
 }
 
@@ -187,12 +187,12 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tigeroad_state )
 	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tigeroad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_WRITE_LEGACY(soundlatch2_w)
+	AM_RANGE(0x7f, 0x7f) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sample_map, AS_PROGRAM, 8, tigeroad_state )
@@ -201,7 +201,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sample_port_map, AS_IO, 8, tigeroad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r)
 	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm", msm5205_w)
 ADDRESS_MAP_END
 

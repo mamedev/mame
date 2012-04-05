@@ -104,7 +104,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
 	AM_RANGE(0xffff, 0xffff) AM_WRITENOP	/* watchdog? */
 ADDRESS_MAP_END
 

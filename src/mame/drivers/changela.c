@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( changela_map, AS_PROGRAM, 8, changela_state )
 	AM_RANGE(0xd030, 0xd030) AM_READWRITE(changela_30_r, mcu_w)
 	AM_RANGE(0xd031, 0xd031) AM_READ(changela_31_r)
 
-	AM_RANGE(0xe000, 0xe000) AM_WRITE_LEGACY(watchdog_reset_w)	/* Watchdog */
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(watchdog_reset_w)	/* Watchdog */
 
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM	/* RAM2 (Processor RAM) */
 ADDRESS_MAP_END

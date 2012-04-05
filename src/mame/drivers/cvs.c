@@ -516,7 +516,7 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, AS_PROGRAM, 8, cvs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x107f) AM_RAM
-	AM_RANGE(0x1800, 0x1800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
 	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE_LEGACY("dac1", dac_w)
 	AM_RANGE(0x1880, 0x1883) AM_DEVWRITE_LEGACY("dac2", cvs_4_bit_dac_data_w) AM_BASE(m_cvs_4_bit_dac_data)
 	AM_RANGE(0x1884, 0x1887) AM_DEVWRITE_LEGACY("dac3", cvs_unknown_w)	AM_BASE(m_dac3_state)	/* ???? not connected to anything */

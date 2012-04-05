@@ -57,7 +57,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vulgus_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc802, 0xc803) AM_RAM AM_BASE(m_scroll_low)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(vulgus_c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE_LEGACY(vulgus_palette_bank_w)
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vulgus_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_WRITEONLY
-	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END

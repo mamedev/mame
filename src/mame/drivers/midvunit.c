@@ -200,7 +200,7 @@ static WRITE32_HANDLER( midvunit_control_w )
 
 	/* bit 3 is the watchdog */
 	if ((olddata ^ state->m_control_data) & 0x0008)
-		watchdog_reset_w(space, 0, 0);
+		state->watchdog_reset_w(*space, 0, 0);
 
 	/* bit 1 is the DCS sound reset */
 	dcs_reset_w(space->machine(), (~state->m_control_data >> 1) & 1);
@@ -222,7 +222,7 @@ static WRITE32_HANDLER( crusnwld_control_w )
 
 	/* bit 9 is the watchdog */
 	if ((olddata ^ state->m_control_data) & 0x0200)
-		watchdog_reset_w(space, 0, 0);
+		state->watchdog_reset_w(*space, 0, 0);
 
 	/* bit 8 is the LED */
 
@@ -434,7 +434,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
 			/* bit 0x10 resets watchdog */
 			if ((olddata ^ state->m_midvplus_misc[offset]) & 0x0010)
 			{
-				watchdog_reset_w(space, 0, 0);
+				state->watchdog_reset_w(*space, 0, 0);
 				logit = 0;
 			}
 			break;

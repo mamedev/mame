@@ -521,7 +521,7 @@ static ADDRESS_MAP_START( looping_io_map, AS_IO, 8, looping_state )
 	/* 404 = C0 */
 	/* 405 = C1 */
 	AM_RANGE(0x406, 0x406) AM_WRITE(main_irq_ack_w)
-	AM_RANGE(0x407, 0x407) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x407, 0x407) AM_WRITE(watchdog_reset_w)
 
 	AM_RANGE(0x10000, 0x10000) AM_NOP		/* external IDLE signal -- we can ignore it */
 ADDRESS_MAP_END
@@ -605,7 +605,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

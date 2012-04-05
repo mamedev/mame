@@ -407,7 +407,7 @@ static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07a304, 0x07a305) AM_WRITE_LEGACY(gaiden_bgscrolly_w)
 	AM_RANGE(0x07a308, 0x07a309) AM_WRITE_LEGACY(gaiden_bgoffsety_w)
 	AM_RANGE(0x07a30c, 0x07a30d) AM_WRITE_LEGACY(gaiden_bgscrollx_w)
-	AM_RANGE(0x07a800, 0x07a801) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x07a800, 0x07a801) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x07a802, 0x07a803) AM_WRITE(gaiden_sound_command_w)
 	AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
 	AM_RANGE(0x07a808, 0x07a809) AM_WRITE_LEGACY(gaiden_flip_w)
@@ -440,7 +440,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drgnbowl_sound_map, AS_PROGRAM, 8, gaiden_state )
@@ -452,7 +452,7 @@ static ADDRESS_MAP_START( drgnbowl_sound_port_map, AS_IO, 8, gaiden_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
@@ -906,7 +906,7 @@ static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 //  AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-//  AM_RANGE(0xfc20, 0xfc20) AM_READ_LEGACY(soundlatch_r)
+//  AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
@@ -927,7 +927,7 @@ static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x07f002, 0x07f003) AM_WRITE_LEGACY(gaiden_bgscrollx_w)
 	AM_RANGE(0x07f004, 0x07f005) AM_WRITE_LEGACY(gaiden_fgscrolly_w)
 	AM_RANGE(0x07f006, 0x07f007) AM_WRITE_LEGACY(gaiden_fgscrollx_w)
-	AM_RANGE(0x07a800, 0x07a801) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x07a800, 0x07a801) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x07e000, 0x07e001) AM_WRITE(gaiden_sound_command_w)
 //  AM_RANGE(0x07a806, 0x07a807) AM_WRITENOP
 //  AM_RANGE(0x07a808, 0x07a809) AM_WRITE_LEGACY(gaiden_flip_w)

@@ -194,7 +194,7 @@ static const ppi8255_interface single_ppi_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),
 	DEVCB_HANDLER(video_control_w),
 	DEVCB_HANDLER(tilemap_sound_w)
 };
@@ -433,7 +433,7 @@ static READ8_HANDLER( sound_data_r )
 
 	/* assert ACK */
 	ppi8255_set_port_c(state->m_ppi8255, 0x00);
-	return soundlatch_r(space, offset);
+	return state->soundlatch_r(*space, offset);
 }
 
 
@@ -953,7 +953,7 @@ static READ8_HANDLER( mcu_io_r )
 	{
 		case 0:
 			if (offset >= 0x0000 && offset < 0x3fff)
-				return watchdog_reset_r(space, 0);		/* unsure about this one */
+				return state->watchdog_reset_r(*space, 0);		/* unsure about this one */
 			else if (offset >= 0x4000 && offset < 0x8000)
 				return maincpu_byte_r(space->machine(), 0xc70001 ^ (offset & 0x3fff));
 			else if (offset >= 0x8000 && offset < 0xc000)
@@ -1013,7 +1013,7 @@ static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16, segas1x_state )
 	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
 	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE_LEGACY(misc_io_r, misc_io_w)
-	AM_RANGE(0xc60000, 0xc6ffff) AM_READ_LEGACY(watchdog_reset16_r)
+	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(watchdog_reset16_r)
 	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_BASE_LEGACY(&workram) AM_SHARE("nvram")
 ADDRESS_MAP_END
 

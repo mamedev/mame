@@ -247,8 +247,8 @@ static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
 	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_1", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ_LEGACY(soundlatch2_r)
+	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(z80ctrl_w)
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END

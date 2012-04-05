@@ -177,7 +177,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)	//
-	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r)	// From Main CPU
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)	// From Main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

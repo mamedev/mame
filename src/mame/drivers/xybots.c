@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xybots_state )
 	AM_RANGE(0xffe200, 0xffe2ff) AM_MIRROR(0x7f8000) AM_READ_LEGACY(special_port1_r)
 	AM_RANGE(0xffe800, 0xffe8ff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0xffe900, 0xffe9ff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(atarigen_sound_w)
-	AM_RANGE(0xffea00, 0xffeaff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0xffea00, 0xffeaff) AM_MIRROR(0x7f8000) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xffeb00, 0xffebff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
 	AM_RANGE(0xffee00, 0xffeeff) AM_MIRROR(0x7f8000) AM_WRITE_LEGACY(atarigen_sound_reset_w)
 ADDRESS_MAP_END

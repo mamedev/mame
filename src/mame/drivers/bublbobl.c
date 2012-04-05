@@ -293,7 +293,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfa00, 0xfa00) AM_READWRITE_LEGACY(bublbobl_sound_status_r, bublbobl_sound_command_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITE_LEGACY(bublbobl_soundcpu_reset_w)
-	AM_RANGE(0xfa80, 0xfa80) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xfb40, 0xfb40) AM_WRITE_LEGACY(bublbobl_bankswitch_w)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM AM_BASE(m_mcu_sharedram)
 ADDRESS_MAP_END
@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym3526_r, ym3526_w)
-	AM_RANGE(0xb000, 0xb000) AM_READWRITE_LEGACY(soundlatch_r, bublbobl_sound_status_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r) AM_WRITE_LEGACY(bublbobl_sound_status_w)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE_LEGACY(bublbobl_sh_nmi_enable_w) AM_READNOP
 	AM_RANGE(0xb002, 0xb002) AM_WRITE_LEGACY(bublbobl_sh_nmi_disable_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM	// space for diagnostic ROM?
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE(m_objectram, m_objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
-	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfa04, 0xfa04) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfa05, 0xfa05) AM_READ_PORT("IN0")
@@ -392,7 +392,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tokio_sound_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READWRITE_LEGACY(soundlatch_r, bublbobl_sound_status_w)
+	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_r) AM_WRITE_LEGACY(bublbobl_sound_status_w)
 	AM_RANGE(0x9800, 0x9800) AM_READNOP	// ???
 	AM_RANGE(0xa000, 0xa000) AM_WRITE_LEGACY(bublbobl_sh_nmi_disable_w)
 	AM_RANGE(0xa800, 0xa800) AM_WRITE_LEGACY(bublbobl_sh_nmi_enable_w)

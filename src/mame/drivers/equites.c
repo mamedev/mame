@@ -712,7 +712,7 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x100000, 0x100001) AM_READ(equites_spriteram_kludge_r)
 	AM_RANGE(0x100000, 0x1001ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_WRITE_LEGACY(soundlatch_word_w) // LSB: sound latch
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN1") AM_WRITE(soundlatch_word_w) // LSB: sound latch
 	AM_RANGE(0x184000, 0x184001) AM_WRITE_LEGACY(equites_flip0_w)
 	AM_RANGE(0x188000, 0x188001) AM_WRITE(mcu_halt_clear_w) // 8404 control port1
 	AM_RANGE(0x18c000, 0x18c001) AM_WRITENOP // 8404 control port2
@@ -723,7 +723,7 @@ static ADDRESS_MAP_START( equites_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x380000, 0x380001) AM_WRITE_LEGACY(equites_bgcolor_w) // bg color register[CC--]
 	// 580000 unknown (protection?) (gekisou only, installed by DRIVER_INIT)
 	// 5a0000 unknown (protection?) (gekisou only, installed by DRIVER_INIT)
-	AM_RANGE(0x780000, 0x780001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x780000, 0x780001) AM_WRITE(watchdog_reset16_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
@@ -739,7 +739,7 @@ static ADDRESS_MAP_START( splndrbt_map, AS_PROGRAM, 16, equites_state )
 	AM_RANGE(0x0e8000, 0x0e8001) AM_WRITENOP // 8404 control port4
 	AM_RANGE(0x0ec000, 0x0ec001) AM_WRITE_LEGACY(splndrbt_selchar1_w) // select active char map
 	AM_RANGE(0x100000, 0x100001) AM_WRITE_LEGACY(splndrbt_bg_scrollx_w)
-	AM_RANGE(0x140000, 0x140001) AM_WRITE_LEGACY(soundlatch_word_w) // LSB: sound command
+	AM_RANGE(0x140000, 0x140001) AM_WRITE(soundlatch_word_w) // LSB: sound command
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE_LEGACY(splndrbt_bg_scrolly_w)
 	AM_RANGE(0x180000, 0x1807ff) AM_READWRITE(mcu_r, mcu_w)	// 8-bit
 	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_READWRITE_LEGACY(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
@@ -751,7 +751,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc080, 0xc08d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0xc0a0, 0xc0a1) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.

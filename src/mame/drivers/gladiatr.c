@@ -291,14 +291,16 @@ static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 
 static WRITE8_HANDLER( glad_cpu_sound_command_w )
 {
-	soundlatch_w(space,0,data);
+	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
+	state->soundlatch_w(*space,0,data);
 	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static READ8_HANDLER( glad_cpu_sound_command_r )
 {
+	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(space,0);
+	return state->soundlatch_r(*space,0);
 }
 
 static WRITE8_HANDLER( gladiatr_flipscreen_w )

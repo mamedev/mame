@@ -21,7 +21,7 @@ WRITE16_HANDLER( aztarac_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		soundlatch_w(space, offset, data);
+		state->soundlatch_w(*space, offset, data);
 		state->m_sound_status ^= 0x21;
 		if (state->m_sound_status & 0x20)
 			cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
@@ -33,7 +33,7 @@ READ8_HANDLER( aztarac_snd_command_r )
 	aztarac_state *state = space->machine().driver_data<aztarac_state>();
     state->m_sound_status |= 0x01;
     state->m_sound_status &= ~0x20;
-    return soundlatch_r(space,offset);
+    return state->soundlatch_r(*space,offset);
 }
 
 READ8_HANDLER( aztarac_snd_status_r )

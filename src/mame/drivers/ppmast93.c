@@ -196,13 +196,13 @@ static ADDRESS_MAP_START( ppmast93_cpu1_io, AS_IO, 8, ppmast93_state )
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW1")
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ppmast93_port4_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ppmast93_cpu2_map, AS_PROGRAM, 8, ppmast93_state )
 	AM_RANGE(0x0000, 0xfbff) AM_ROM AM_REGION("sub", 0x10000)
-	AM_RANGE(0xfc00, 0xfc00) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r)
 	AM_RANGE(0xfd00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

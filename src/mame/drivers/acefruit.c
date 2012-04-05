@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
 	AM_RANGE(0xa002, 0xa003) AM_WRITE(acefruit_coin_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(acefruit_solenoid_w)
 	AM_RANGE(0xa005, 0xa006) AM_WRITE(acefruit_sound_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

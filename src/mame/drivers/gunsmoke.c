@@ -106,9 +106,9 @@ static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8, gunsmoke_state )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc4c9, 0xc4cb) AM_READ(gunsmoke_protection_r)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(gunsmoke_c804_w)	// ROM bank switch, screen flip
-	AM_RANGE(0xc806, 0xc806) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(gunsmoke_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE_LEGACY(gunsmoke_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE(m_scrollx)
@@ -121,7 +121,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gunsmoke_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
 	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 ADDRESS_MAP_END

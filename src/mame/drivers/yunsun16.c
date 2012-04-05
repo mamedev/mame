@@ -176,7 +176,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, yunsun16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w )
-	AM_RANGE(0x18, 0x18) AM_READ_LEGACY(soundlatch_r )						// From Main CPU
+	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r )						// From Main CPU
 	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)		// M6295
 ADDRESS_MAP_END
 

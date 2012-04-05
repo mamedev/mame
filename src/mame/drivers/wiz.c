@@ -245,7 +245,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0xf008, 0xf00f) AM_WRITENOP			/* initialized by Stinger/Scion */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
 	AM_RANGE(0xf018, 0xf018) AM_READ_PORT("IN1")
-	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf800, 0xf80f) AM_WRITE(sound_command_w)	/* sound registers */
 	AM_RANGE(0xf818, 0xf818) AM_WRITE_LEGACY(wiz_bgcolor_w)
 ADDRESS_MAP_END
@@ -261,20 +261,20 @@ WRITE8_MEMBER(wiz_state::wiz_sound_nmi_mask_w)
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Stinger/Scion */
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Stinger/Scion */
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("8910.3", ay8910_address_data_w)
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_data_w)		/* Wiz only */
-	AM_RANGE(0x7000, 0x7000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Wiz */
+	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Wiz */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Stinger/Scion */
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Stinger/Scion */
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("8910.1", ay8910_address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("8910.2", ay8910_address_data_w)		/* Wiz only */
-	AM_RANGE(0x7000, 0x7000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Wiz */
+	AM_RANGE(0x7000, 0x7000) AM_READ(soundlatch_r) AM_WRITE(wiz_sound_nmi_mask_w)	/* Wiz */
 ADDRESS_MAP_END
 
 

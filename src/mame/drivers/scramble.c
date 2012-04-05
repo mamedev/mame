@@ -51,8 +51,8 @@ static ADDRESS_MAP_START( scramble_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6804, 0x6804) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_READ_LEGACY(watchdog_reset_r)
-	AM_RANGE(0x7800, 0x7800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x8110, 0x8113) AM_DEVREAD_LEGACY("ppi8255_0", ppi8255_r)  /* mirror for Frog */
 	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( turpins_map, AS_PROGRAM, 8, scramble_state )
 //  AM_RANGE(0x8100, 0x8103) AM_WRITE_LEGACY(ppi8255_0_w)
 //  AM_RANGE(0x8200, 0x8203) AM_WRITE_LEGACY(ppi8255_1_w)
 
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 //  AM_RANGE(0x8100, 0x8103) AM_READ_LEGACY(ppi8255_0_r)
 //  AM_RANGE(0x8200, 0x8203) AM_READ_LEGACY(ppi8255_1_r)
 
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( ckongs_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0xa802, 0xa802) AM_WRITE_LEGACY(galaxold_coin_counter_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( mars_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6808, 0x6808) AM_WRITE_LEGACY(galaxold_coin_counter_0_w)
 	AM_RANGE(0x6809, 0x6809) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x680b, 0x680b) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x7000, 0x7000) AM_READNOP
 	AM_RANGE(0x8100, 0x810f) AM_DEVREADWRITE_LEGACY("ppi8255_0", mars_ppi8255_r, mars_ppi8255_w)
 	AM_RANGE(0x8200, 0x820f) AM_DEVREADWRITE_LEGACY("ppi8255_1", mars_ppi8255_r, mars_ppi8255_w)
@@ -155,7 +155,7 @@ static ADDRESS_MAP_START( newsin7_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6808, 0x6808) AM_WRITE_LEGACY(galaxold_coin_counter_0_w)
 	AM_RANGE(0x6809, 0x6809) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x680b, 0x680b) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8200, 0x820f) AM_DEVREADWRITE_LEGACY("ppi8255_1", mars_ppi8255_r, mars_ppi8255_w)
 	AM_RANGE(0xa000, 0xafff) AM_ROM
 	AM_RANGE(0xc100, 0xc10f) AM_DEVREADWRITE_LEGACY("ppi8255_0", mars_ppi8255_r, mars_ppi8255_w)
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( mrkougar_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6808, 0x6808) AM_WRITE_LEGACY(galaxold_coin_counter_0_w)
 	AM_RANGE(0x6809, 0x6809) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x680b, 0x680b) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8100, 0x810f) AM_DEVREADWRITE_LEGACY("ppi8255_0", mars_ppi8255_r, mars_ppi8255_w)
 	AM_RANGE(0x8200, 0x820f) AM_DEVREADWRITE_LEGACY("ppi8255_1", mars_ppi8255_r, mars_ppi8255_w)
 ADDRESS_MAP_END
@@ -197,8 +197,8 @@ static ADDRESS_MAP_START( hotshock_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6005, 0x6005) AM_WRITE_LEGACY(galaxold_coin_counter_0_w)
 	AM_RANGE(0x6006, 0x6006) AM_WRITE_LEGACY(galaxold_gfxbank_w)
 	AM_RANGE(0x6801, 0x6801) AM_WRITE_LEGACY(galaxold_nmi_enable_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(watchdog_reset_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0") AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0") AM_WRITE(soundlatch_w)
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
 	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
@@ -216,8 +216,8 @@ static ADDRESS_MAP_START( hunchbks_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x1500, 0x1503) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x1606, 0x1606) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x1607, 0x1607) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x1680, 0x1680) AM_READ_LEGACY(watchdog_reset_r)
-	AM_RANGE(0x1780, 0x1780) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x1680, 0x1680) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x1780, 0x1780) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE_LEGACY(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
@@ -242,7 +242,7 @@ static ADDRESS_MAP_START( mimonscr_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6800, 0x6802) AM_WRITE_LEGACY(galaxold_gfxbank_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8100, 0x8103) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x8200, 0x8203) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -264,9 +264,9 @@ static ADDRESS_MAP_START( ad2083_map, AS_PROGRAM, 8, scramble_state )
 	AM_RANGE(0x6805, 0x6805) AM_WRITE_LEGACY(galaxold_coin_counter_1_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE_LEGACY(scrambold_background_red_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE_LEGACY(scrambold_background_green_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE_LEGACY(hotshock_sh_irqtrigger_w)
-	AM_RANGE(0x7000, 0x7000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
 	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
@@ -1152,7 +1152,7 @@ static const ay8910_interface scramble_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
 	DEVCB_HANDLER(scramble_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL

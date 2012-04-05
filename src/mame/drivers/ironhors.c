@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0020, 0x003f) AM_RAM AM_BASE(m_scroll)
 	AM_RANGE(0x0040, 0x005f) AM_RAM
 	AM_RANGE(0x0060, 0x00df) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x0900, 0x0900) AM_READ_PORT("DSW3") AM_WRITE(ironhors_sh_irqtrigger_w)
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(ironhors_palettebank_w)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(ironhors_flipscreen_w)
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, ironhors_state )
@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( farwest_master_map, AS_PROGRAM, 8, ironhors_state )
 	AM_RANGE(0x31db, 0x31fa) AM_RAM AM_BASE(m_scroll)
 	AM_RANGE(0x0040, 0x005f) AM_RAM
 	AM_RANGE(0x0060, 0x00ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x0900, 0x0900) /*AM_READ_PORT("DSW3") */AM_WRITE(ironhors_sh_irqtrigger_w)
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW2") //AM_WRITE_LEGACY(ironhors_palettebank_w)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(ironhors_flipscreen_w)
@@ -442,7 +442,7 @@ static READ8_DEVICE_HANDLER( farwest_soundlatch_r )
 {
 	ironhors_state *state = device->machine().driver_data<ironhors_state>();
 
-	return soundlatch_r(state->m_soundcpu->memory().space(AS_PROGRAM), 0);
+	return state->soundlatch_r(*state->m_soundcpu->memory().space(AS_PROGRAM), 0);
 }
 
 static const ym2203_interface farwest_ym2203_config =

@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( mw18w_portmap, AS_IO, 8, mw18w_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(mw18w_lamps_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(mw18w_led_display_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4")
-	AM_RANGE(0x06, 0x06) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(mw18w_irq0_clear_w)
 ADDRESS_MAP_END
 

@@ -511,7 +511,7 @@ static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x7000, 0x7fff) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0x8000, 0x8fff) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP /* ack ? */
+	AM_RANGE(0x8000, 0x8fff) AM_READ(soundlatch_r) AM_WRITENOP /* ack ? */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

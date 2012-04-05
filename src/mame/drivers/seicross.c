@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("TEST")		/* test */
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, seicross_state )

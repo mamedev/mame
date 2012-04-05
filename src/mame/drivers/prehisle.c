@@ -54,7 +54,7 @@ static WRITE8_DEVICE_HANDLER( D7759_upd_reset_w )
 static ADDRESS_MAP_START( prehisle_sound_map, AS_PROGRAM, 8, prehisle_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP	// ???
 ADDRESS_MAP_END
 

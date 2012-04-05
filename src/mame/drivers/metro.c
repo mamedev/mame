@@ -352,9 +352,9 @@ static int metro_io_callback( device_t *device, int ioline, int state )
 	switch (ioline)
 	{
 		case UPD7810_RXD:	/* read the RxD line */
-			data = soundlatch_r(space, 0);
+			data = driver_state->soundlatch_r(*space, 0);
 			state = data & 1;
-			soundlatch_w(space, 0, data >> 1);
+			driver_state->soundlatch_w(*space, 0, data >> 1);
 			break;
 		default:
 			logerror("upd7810 ioline %d not handled\n", ioline);
@@ -1342,7 +1342,7 @@ static ADDRESS_MAP_START( gakusai_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278832, 0x278833) AM_READWRITE(metro_irq_cause_r, metro_irq_cause_w)			// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r)								// Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")								//
-	AM_RANGE(0x278836, 0x278837) AM_WRITE_LEGACY(watchdog_reset16_w)							// Watchdog
+	AM_RANGE(0x278836, 0x278837) AM_WRITE(watchdog_reset16_w)							// Watchdog
 	AM_RANGE(0x278840, 0x27884d) AM_WRITE(metro_blitter_w) AM_BASE(m_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x278860, 0x27886b) AM_WRITE_LEGACY(metro_window_w) AM_BASE(m_window)		// Tilemap Window
 	AM_RANGE(0x278850, 0x27885b) AM_WRITEONLY AM_BASE(m_scroll)				// Scroll Regs
@@ -1378,7 +1378,7 @@ static ADDRESS_MAP_START( gakusai2_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x678820, 0x67882f) AM_WRITEONLY AM_BASE(m_irq_vectors)			// IRQ Vectors
 	AM_RANGE(0x678830, 0x678831) AM_WRITEONLY AM_BASE(m_irq_enable)			// IRQ Enable
 	AM_RANGE(0x678832, 0x678833) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)			// IRQ Cause / IRQ Acknowledge
-	AM_RANGE(0x678836, 0x678837) AM_WRITE_LEGACY(watchdog_reset16_w)							// Watchdog
+	AM_RANGE(0x678836, 0x678837) AM_WRITE(watchdog_reset16_w)							// Watchdog
 	AM_RANGE(0x678840, 0x67884d) AM_WRITE(metro_blitter_w) AM_BASE(m_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x678860, 0x67886b) AM_WRITE_LEGACY(metro_window_w) AM_BASE(m_window)		// Tilemap Window
 	AM_RANGE(0x678880, 0x678881) AM_READ(gakusai_input_r)								// Inputs
@@ -1448,7 +1448,7 @@ static ADDRESS_MAP_START( dokyusp_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x278820, 0x27882f) AM_WRITEONLY AM_BASE(m_irq_vectors)			// IRQ Vectors
 	AM_RANGE(0x278830, 0x278831) AM_WRITEONLY AM_BASE(m_irq_enable)			// IRQ Enable
 	AM_RANGE(0x278832, 0x278833) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)			// IRQ Cause / IRQ Acknowledge
-	AM_RANGE(0x278836, 0x278837) AM_WRITE_LEGACY(watchdog_reset16_w)							// Watchdog
+	AM_RANGE(0x278836, 0x278837) AM_WRITE(watchdog_reset16_w)							// Watchdog
 	AM_RANGE(0x278840, 0x27884d) AM_WRITE(metro_blitter_w) AM_BASE(m_blitter_regs)	// Tiles Blitter
 	AM_RANGE(0x278860, 0x27886b) AM_WRITE_LEGACY(metro_window_w) AM_BASE(m_window)		// Tilemap Window
 	AM_RANGE(0x278850, 0x27885b) AM_WRITEONLY AM_BASE(m_scroll)				// Scroll Regs
@@ -1720,7 +1720,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blzntrnd_sound_io_map, AS_IO, 8, metro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(blzntrnd_sh_bankswitch_w)
-	AM_RANGE(0x40, 0x40) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP
+	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r) AM_WRITENOP
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r,ym2610_w)
 ADDRESS_MAP_END
 
@@ -1784,7 +1784,7 @@ static ADDRESS_MAP_START( mouja_map, AS_PROGRAM, 16, metro_state )
 	AM_RANGE(0x478830, 0x478831) AM_WRITEONLY AM_BASE(m_irq_enable)			// IRQ Enable
 	AM_RANGE(0x478832, 0x478833) AM_READWRITE(metro_irq_cause_r,metro_irq_cause_w)			// IRQ Cause / IRQ Acknowledge
 	AM_RANGE(0x478834, 0x478835) AM_WRITE(mouja_irq_timer_ctrl_w)						// IRQ set timer count
-	AM_RANGE(0x478836, 0x478837) AM_WRITE_LEGACY(watchdog_reset16_w)							// Watchdog
+	AM_RANGE(0x478836, 0x478837) AM_WRITE(watchdog_reset16_w)							// Watchdog
 	AM_RANGE(0x478850, 0x47885b) AM_WRITEONLY AM_BASE(m_scroll)				// Scroll Regs
 	AM_RANGE(0x478860, 0x47886b) AM_WRITE_LEGACY(metro_window_w) AM_BASE(m_window)		// Tilemap Window
 	AM_RANGE(0x478880, 0x478881) AM_READ_PORT("IN0")								// Inputs

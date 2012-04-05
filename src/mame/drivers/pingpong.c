@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* coin counters + irq enables */
 	AM_RANGE(0xa200, 0xa200) AM_WRITENOP		/* SN76496 data latch */
 	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* trigger read */
-	AM_RANGE(0xa600, 0xa600) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("IN3")
 	AM_RANGE(0xa200, 0xa200) AM_WRITENOP		/* SN76496 data latch */
 	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* trigger read */
-	AM_RANGE(0xa600, 0xa600) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 

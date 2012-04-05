@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, canyon_state )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0x0400, 0x0401) AM_DEVWRITE_LEGACY("discrete", canyon_motor_w)
 	AM_RANGE(0x0500, 0x0500) AM_DEVWRITE_LEGACY("discrete", canyon_explode_w)
-	AM_RANGE(0x0501, 0x0501) AM_WRITE_LEGACY(watchdog_reset_w) /* watchdog, disabled in service mode */
+	AM_RANGE(0x0501, 0x0501) AM_WRITE(watchdog_reset_w) /* watchdog, disabled in service mode */
 	AM_RANGE(0x0600, 0x0603) AM_DEVWRITE_LEGACY("discrete", canyon_whistle_w)
 	AM_RANGE(0x0680, 0x0683) AM_WRITE(canyon_led_w)
 	AM_RANGE(0x0700, 0x0703) AM_DEVWRITE_LEGACY("discrete", canyon_attract_w)

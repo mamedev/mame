@@ -386,7 +386,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfc1fff) AM_READWRITE_LEGACY(sound_busy_r, atarigen_sound_reset_w)
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0xfe0000, 0xfe1fff) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0xfe0000, 0xfe1fff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
 	AM_RANGE(0xfe4000, 0xfe5fff) AM_READ_PORT("FE4000")
 	AM_RANGE(0xfe6000, 0xfe6001) AM_READ_PORT("FE6000")
@@ -653,7 +653,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 
 
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
-	//AM_RANGE(0xfe0000, 0xfe1fff) AM_WRITE_LEGACY(watchdog_reset16_w)
+	//AM_RANGE(0xfe0000, 0xfe1fff) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xfe2000, 0xfe3fff) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
 
 	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE_LEGACY(badlands_pf_bank_w)

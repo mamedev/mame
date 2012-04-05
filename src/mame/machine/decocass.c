@@ -61,7 +61,7 @@ WRITE8_HANDLER( decocass_sound_command_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	LOG(2,("CPU %s sound command -> $%02x\n", space->device().tag(), data));
-	soundlatch_w(space, 0, data);
+	state->soundlatch_w(*space, 0, data);
 	state->m_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
 	state->m_sound_ack &= ~0x40;
@@ -70,7 +70,8 @@ WRITE8_HANDLER( decocass_sound_command_w )
 
 READ8_HANDLER( decocass_sound_data_r )
 {
-	UINT8 data = soundlatch2_r(space, 0);
+	decocass_state *state = space->machine().driver_data<decocass_state>();
+	UINT8 data = state->soundlatch2_r(*space, 0);
 	LOG(2,("CPU %s sound data    <- $%02x\n", space->device().tag(), data));
 	return data;
 }
@@ -87,14 +88,14 @@ WRITE8_HANDLER( decocass_sound_data_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	LOG(2,("CPU %s sound data    -> $%02x\n", space->device().tag(), data));
-	soundlatch2_w(space, 0, data);
+	state->soundlatch2_w(*space, 0, data);
 	state->m_sound_ack |= 0x40;
 }
 
 READ8_HANDLER( decocass_sound_command_r )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	UINT8 data = soundlatch_r(space, 0);
+	UINT8 data = state->soundlatch_r(*space, 0);
 	LOG(4,("CPU %s sound command <- $%02x\n", space->device().tag(), data));
 	device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, CLEAR_LINE);
 	state->m_sound_ack &= ~0x80;

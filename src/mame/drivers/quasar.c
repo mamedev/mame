@@ -99,17 +99,20 @@ static WRITE8_HANDLER( quasar_sh_command_w )
 	// lower nibble = command to I8035
 	// not necessarily like this, but it seems to work better than direct mapping
 	// (although schematics has it as direct - but then the schematics are wrong elsewhere to!)
-	soundlatch_w(space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
+	quasar_state *state = space->machine().driver_data<quasar_state>();
+	state->soundlatch_w(*space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
 }
 
 static READ8_HANDLER( quasar_sh_command_r )
 {
-	return soundlatch_r(space, 0) + (input_port_read(space->machine(), "DSW2") & 0x30);
+	quasar_state *state = space->machine().driver_data<quasar_state>();
+	return state->soundlatch_r(*space, 0) + (input_port_read(space->machine(), "DSW2") & 0x30);
 }
 
 static READ8_HANDLER( audio_t1_r )
 {
-	return (soundlatch_r(space, 0) == 0);
+	quasar_state *state = space->machine().driver_data<quasar_state>();
+	return (state->soundlatch_r(*space, 0) == 0);
 }
 
 // memory map taken from the manual

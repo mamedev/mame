@@ -35,7 +35,7 @@ static ADDRESS_MAP_START( exedexes_map, AS_PROGRAM, 8, exedexes_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW0")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE_LEGACY(exedexes_c804_w)								/* coin counters + text layer enable */
 	AM_RANGE(0xc806, 0xc806) AM_WRITENOP											/* Watchdog ?? */
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE_LEGACY(exedexes_videoram_w) AM_BASE(m_videoram)	/* Video RAM */
@@ -53,7 +53,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, exedexes_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
 	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE_LEGACY("sn2", sn76496_w)

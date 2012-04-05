@@ -310,9 +310,9 @@ ADDRESS_MAP_END
 
 ADDRESS_MAP_START( pgm_z80_io, AS_IO, 8, pgm_state )
 	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE_LEGACY("ics", ics2115_device::read, ics2115_device::write)
-	AM_RANGE(0x8100, 0x81ff) AM_READ_LEGACY(soundlatch3_r) AM_WRITE(z80_l3_w)
-	AM_RANGE(0x8200, 0x82ff) AM_READWRITE_LEGACY(soundlatch_r, soundlatch_w)
-	AM_RANGE(0x8400, 0x84ff) AM_READWRITE_LEGACY(soundlatch2_r, soundlatch2_w)
+	AM_RANGE(0x8100, 0x81ff) AM_READ(soundlatch3_r) AM_WRITE(z80_l3_w)
+	AM_RANGE(0x8200, 0x82ff) AM_READWRITE(soundlatch_r, soundlatch_w)
+	AM_RANGE(0x8400, 0x84ff) AM_READWRITE(soundlatch2_r, soundlatch2_w)
 ADDRESS_MAP_END
 
 /*** 68000 (main CPU) + variants for protection devices **********************/
@@ -326,12 +326,12 @@ ADDRESS_MAP_START( pgm_base_mem, AS_PROGRAM, 16, pgm_state )
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(m_videoregs) /* Video Regs inc. Zoom Table */
 
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_LEGACY(soundlatch_word_r) AM_WRITE(m68k_l1_w)
-	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE_LEGACY(soundlatch2_word_r, soundlatch2_word_w)
+	AM_RANGE(0xc00002, 0xc00003) AM_READ(soundlatch_word_r) AM_WRITE(m68k_l1_w)
+	AM_RANGE(0xc00004, 0xc00005) AM_READWRITE(soundlatch2_word_r, soundlatch2_word_w)
 	AM_RANGE(0xc00006, 0xc00007) AM_DEVREADWRITE8("rtc", v3021_device, read, write, 0x00ff)
 	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(z80_reset_w)
 	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITE(z80_ctrl_w)
-	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE_LEGACY(soundlatch3_word_r, soundlatch3_word_w)
+	AM_RANGE(0xc0000c, 0xc0000d) AM_READWRITE(soundlatch3_word_r, soundlatch3_word_w)
 
 	AM_RANGE(0xc08000, 0xc08001) AM_READ_PORT("P1P2")
 	AM_RANGE(0xc08002, 0xc08003) AM_READ_PORT("P3P4")

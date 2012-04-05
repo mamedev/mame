@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, gstriker_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(gs_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(gs_sh_pending_command_clear_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 

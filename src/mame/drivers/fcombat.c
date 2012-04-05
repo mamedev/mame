@@ -126,14 +126,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, fcombat_state )
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(ec00_w)
 	AM_RANGE(0xed00, 0xed00) AM_WRITE(ed00_w)
 	AM_RANGE(0xee00, 0xee00) AM_WRITE(ee00_w)	// related to protection ? - doesn't seem to have any effect
-	AM_RANGE(0xef00, 0xef00) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xef00, 0xef00) AM_WRITE(soundlatch_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, fcombat_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREAD_LEGACY("ay2", ay8910_r)

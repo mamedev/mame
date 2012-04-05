@@ -186,7 +186,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, suprridr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x00, 0x00) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 

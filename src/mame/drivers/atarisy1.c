@@ -477,7 +477,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy1_state )
 	AM_RANGE(0x820000, 0x820001) AM_WRITE_LEGACY(atarisy1_yscroll_w) AM_BASE(m_yscroll)
 	AM_RANGE(0x840000, 0x840001) AM_WRITE_LEGACY(atarisy1_priority_w)
 	AM_RANGE(0x860000, 0x860001) AM_WRITE_LEGACY(atarisy1_bankselect_w) AM_BASE(m_bankselect)
-	AM_RANGE(0x880000, 0x880001) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x880000, 0x880001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
 	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0x900000, 0x9fffff) AM_RAM

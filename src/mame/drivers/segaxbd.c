@@ -379,7 +379,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
-	soundlatch_w(space, 0, param);
+	state->soundlatch_w(*space, 0, param);
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -403,7 +403,7 @@ static READ8_HANDLER( sound_data_r )
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(space, offset);
+	return state->soundlatch_r(*space, offset);
 }
 
 
@@ -563,7 +563,7 @@ static WRITE16_HANDLER( iochip_0_w )
                 D1: (CONT) - affects sprite hardware
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(space,0,0);
+			if (((oldval ^ data) & 0x40) && !(data & 0x40)) state->watchdog_reset_w(*space,0,0);
 			segaic16_set_display_enable(space->machine(), data & 0x20);
 			device_set_input_line(state->m_soundcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;

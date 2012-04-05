@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( crimfght_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x3f85, 0x3f85) AM_READ_PORT("P3")
 	AM_RANGE(0x3f86, 0x3f86) AM_READ_PORT("P4")
 	AM_RANGE(0x3f87, 0x3f87) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f88, 0x3f88) AM_READ_LEGACY(watchdog_reset_r) AM_WRITE(crimfght_coin_w)	/* watchdog reset */
+	AM_RANGE(0x3f88, 0x3f88) AM_READ(watchdog_reset_r) AM_WRITE(crimfght_coin_w)	/* watchdog reset */
 	AM_RANGE(0x3f8c, 0x3f8c) AM_WRITE(crimfght_sh_irqtrigger_w)	/* cause interrupt on audio CPU? */
 	AM_RANGE(0x2000, 0x5fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)	/* video RAM + sprite RAM */
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")						/* banked ROM */
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( crimfght_sound_map, AS_PROGRAM, 8, crimfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM 821l01.h4 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)			/* YM2151 */
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r)								/* soundlatch_r */
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)								/* soundlatch_r */
 	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)	/* 007232 registers */
 ADDRESS_MAP_END
 

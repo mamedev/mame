@@ -761,7 +761,7 @@ static ADDRESS_MAP_START( animalc_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE_LEGACY(watchdog_reset_w )	// 1
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(watchdog_reset_w )	// 1
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -993,7 +993,7 @@ static ADDRESS_MAP_START( haekaka_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE_LEGACY(watchdog_reset_w )	// 1
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(watchdog_reset_w )	// 1
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1231,7 +1231,7 @@ static ADDRESS_MAP_START( itazuram_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE_LEGACY(watchdog_reset_w )	// 1
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(watchdog_reset_w )	// 1
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -1445,7 +1445,7 @@ static ADDRESS_MAP_START( tdoboon_io, AS_IO, 8, sigmab98_state )
 	AM_RANGE( 0x91, 0x91 ) AM_DEVWRITE("oki", okim9810_device, write_TMP_register )
 	AM_RANGE( 0x92, 0x92 ) AM_DEVREAD("oki", okim9810_device, read )
 	AM_RANGE( 0xb0, 0xb0 ) AM_WRITE(sammymdl_hopper_w )
-	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE_LEGACY(watchdog_reset_w )	// 1
+	AM_RANGE( 0xc0, 0xc0 ) AM_WRITE(watchdog_reset_w )	// 1
 ADDRESS_MAP_END
 
 

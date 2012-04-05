@@ -382,7 +382,7 @@ static ADDRESS_MAP_START( berlwall, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x680004, 0x680005) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x680006, 0x680007) AM_READ_PORT("UNK")
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(kaneko16_coin_lockout_w)	// Coin Lockout
-	AM_RANGE(0x780000, 0x780001) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x780000, 0x780001) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x800000, 0x80001f) AM_DEVREADWRITE_LEGACY("ay1", kaneko16_YM2149_r, kaneko16_YM2149_w)	// Sound
 	AM_RANGE(0x800200, 0x80021f) AM_DEVREADWRITE_LEGACY("ay2", kaneko16_YM2149_r, kaneko16_YM2149_w)
 	AM_RANGE(0x8003fe, 0x8003ff) AM_NOP // for OKI when accessed as .l
@@ -432,7 +432,7 @@ static ADDRESS_MAP_START( bakubrkr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x700000, 0x700fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x800000, 0x80001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs)	// Layers 0 Regs
 	AM_RANGE(0x900000, 0x90001f) AM_RAM_WRITE_LEGACY(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs	)	// Sprites Regs
-	AM_RANGE(0xa80000, 0xa80001) AM_READ_LEGACY(watchdog_reset16_r)	// Watchdog
+	AM_RANGE(0xa80000, 0xa80001) AM_READ(watchdog_reset16_r)	// Watchdog
 	AM_RANGE(0xb00000, 0xb0001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_1_regs_w) AM_BASE(m_layers_1_regs)	// Layers 1 Regs
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(kaneko16_eeprom_w)	// EEPROM
 	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("P1")
@@ -529,7 +529,7 @@ static ADDRESS_MAP_START( bloodwar, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x900000, 0x900039) AM_READWRITE_LEGACY(bloodwar_calc_r, bloodwar_calc_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
@@ -591,7 +591,7 @@ static ADDRESS_MAP_START( bonkadv, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x900000, 0x900015) AM_READWRITE_LEGACY(galpanib_calc_r,galpanib_calc_w)
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
 	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
@@ -678,7 +678,7 @@ static ADDRESS_MAP_START( gtmr_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 
 	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)													// Random Number ?
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)						// Watchdog
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)						// Watchdog
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
@@ -752,7 +752,7 @@ static ADDRESS_MAP_START( gtmr2_map, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x880000, 0x880001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 
 	AM_RANGE(0x900014, 0x900015) AM_READ(kaneko16_rnd_r)	// Random Number ?
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
+	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
 //  AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
@@ -791,7 +791,7 @@ static ADDRESS_MAP_START( mgcrystl, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x800000, 0x80001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs)	// Layers 0 Regs
 	AM_RANGE(0x900000, 0x90001f) AM_RAM_WRITE_LEGACY(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs)	// Sprites Regs
 	AM_RANGE(0xb00000, 0xb0001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_1_regs_w) AM_BASE(m_layers_1_regs)	// Layers 1 Regs
-	AM_RANGE(0xa00000, 0xa00001) AM_READ_LEGACY(watchdog_reset16_r)	// Watchdog
+	AM_RANGE(0xa00000, 0xa00001) AM_READ(watchdog_reset16_r)	// Watchdog
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("DSW_P1")
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P2")
 	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("SYSTEM")
@@ -857,7 +857,7 @@ static ADDRESS_MAP_START( shogwarr, AS_PROGRAM, 16, kaneko16_state )
 	AM_RANGE(0x800000, 0x80000f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs)	// Layers 0 Regs
 	AM_RANGE(0x900000, 0x90001f) AM_RAM_WRITE_LEGACY(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs)	// Sprites Regs
 	AM_RANGE(0xa00000, 0xa0007f) AM_READWRITE_LEGACY(bloodwar_calc_r, bloodwar_calc_w)
-	AM_RANGE(0xa80000, 0xa80001) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
+	AM_RANGE(0xa80000, 0xa80001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// Watchdog
 	AM_RANGE(0xb80000, 0xb80001) AM_READ_PORT("P1")
 	AM_RANGE(0xb80002, 0xb80003) AM_READ_PORT("P2")
 	AM_RANGE(0xb80004, 0xb80005) AM_READ_PORT("SYSTEM")
@@ -887,7 +887,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blazeon_soundport, AS_IO, 8, kaneko16_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x06, 0x06) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 

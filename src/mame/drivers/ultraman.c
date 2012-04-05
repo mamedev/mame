@@ -43,7 +43,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x1c0018, 0x1c0019) AM_WRITE_LEGACY(ultraman_gfxctrl_w)	/* counters + gfx ctrl */
 	AM_RANGE(0x1c0020, 0x1c0021) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x1c0028, 0x1c0029) AM_WRITE(sound_irq_trigger_w)
-	AM_RANGE(0x1c0030, 0x1c0031) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x1c0030, 0x1c0031) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8_LEGACY("k051316_1", k051316_r, k051316_w, 0x00ff)	/* K051316 #0 RAM */
 	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8_LEGACY("k051316_2", k051316_r, k051316_w, 0x00ff)	/* K051316 #1 RAM */
 	AM_RANGE(0x206000, 0x206fff) AM_DEVREADWRITE8_LEGACY("k051316_3", k051316_r, k051316_w, 0x00ff)	/* K051316 #2 RAM */
@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ultraman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r)	/* Sound latch read */
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)	/* Sound latch read */
 //  AM_RANGE(0xd000, 0xd000) AM_WRITENOP      /* ??? */
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("oki", okim6295_device, read, write)		/* M6295 */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	/* YM2151 */

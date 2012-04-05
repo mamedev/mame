@@ -67,7 +67,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, galspnbl_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP	/* irq ack ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 

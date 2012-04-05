@@ -937,7 +937,7 @@ static ADDRESS_MAP_START( galpani3_map, AS_PROGRAM, 16, galpani3_state )
 	AM_RANGE(0xf00014, 0xf00015) AM_READ_PORT("COIN")
 	AM_RANGE(0xf00016, 0xf00017) AM_NOP // ? read, but overwritten
 	AM_RANGE(0xf00020, 0xf00023) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff)	// sound
-	AM_RANGE(0xf00040, 0xf00041) AM_READWRITE_LEGACY(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
+	AM_RANGE(0xf00040, 0xf00041) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 	AM_RANGE(0xf00050, 0xf00051) AM_NOP // ? written once (3rd opcode, $30.b)
 ADDRESS_MAP_END
 

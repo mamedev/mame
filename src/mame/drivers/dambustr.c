@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
 
 	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xf800, 0xffff) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 

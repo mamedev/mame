@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( argus_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc200, 0xc200) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE_LEGACY(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
 	AM_RANGE(0xc300, 0xc301) AM_RAM AM_BASE(m_bg0_scrollx)
@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( valtric_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc200, 0xc200) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE_LEGACY(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE_LEGACY(valtric_unknown_w)
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( butasan_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc100, 0xc100) AM_WRITE_LEGACY(butasan_unknown_w)
-	AM_RANGE(0xc200, 0xc200) AM_WRITE_LEGACY(soundlatch_w)
+	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE_LEGACY(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
 	AM_RANGE(0xc203, 0xc203) AM_WRITE_LEGACY(butasan_pageselect_w)
@@ -268,13 +268,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map_a, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map_b, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 #if 0

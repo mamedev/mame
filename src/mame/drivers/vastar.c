@@ -110,7 +110,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0xb000, 0xbfff) AM_READWRITE_LEGACY(vastar_bg1videoram_r, vastar_bg1videoram_w)	/* mirror address */
 	AM_RANGE(0xc000, 0xc000) AM_WRITEONLY AM_BASE(m_sprite_priority)	/* sprite/BG priority */
 	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE_LEGACY(vastar_fgvideoram_w) AM_BASE(m_fgvideoram)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE_LEGACY(watchdog_reset_r, watchdog_reset_w)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
 	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE(vastar_sharedram_r, vastar_sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0xf100, 0xf7ff) AM_RAM
 

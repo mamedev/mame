@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 /* memory map provided thru schematics */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x2000, 0x3fff) AM_READ(soundlatch_r)
 	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)

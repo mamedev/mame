@@ -55,7 +55,7 @@ static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW2")
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_LEGACY(watchdog_reset16_r)
+	AM_RANGE(0xc00000, 0xc00001) AM_READ(watchdog_reset16_r)
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE_LEGACY(ohmygod_spritebank_w)
 ADDRESS_MAP_END
 

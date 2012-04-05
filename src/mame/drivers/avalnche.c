@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, avalnche_state )
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1")
 	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x2003, 0x2003) AM_MIRROR(0x0ffc) AM_READNOP
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_1_lamp_w)
 	AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_DEVWRITE_LEGACY("discrete", avalnche_attract_enable_w)
 	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE(avalance_video_invert_w)
@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( catch_map, AS_PROGRAM, 8, avalnche_state )
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffc) AM_READ_PORT("IN1")
 	AM_RANGE(0x2002, 0x2002) AM_MIRROR(0x0ffc) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x2003, 0x2003) AM_MIRROR(0x0ffc) AM_READNOP
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0ff8) AM_WRITE(avalance_credit_1_lamp_w)
 //  AM_RANGE(0x4001, 0x4001) AM_MIRROR(0x0ff8) AM_DEVWRITE_LEGACY("discrete", avalnche_attract_enable_w) /* It is attract_enable just like avalnche, but not hooked up yet. */
 	AM_RANGE(0x4002, 0x4002) AM_MIRROR(0x0ff8) AM_WRITE(avalance_video_invert_w)

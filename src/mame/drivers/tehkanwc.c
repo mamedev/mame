@@ -232,10 +232,10 @@ static ADDRESS_MAP_START( main_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0xf810, 0xf811) AM_READWRITE(tehkanwc_track_1_r, tehkanwc_track_1_reset_w)	/* track 1 x/y */
 	AM_RANGE(0xf812, 0xf812) AM_WRITE_LEGACY(gridiron_led1_w)
 	AM_RANGE(0xf813, 0xf813) AM_READ_PORT("P2BUT")
-	AM_RANGE(0xf820, 0xf820) AM_READ_LEGACY(soundlatch2_r) AM_WRITE(sound_command_w)	/* answer from the sound CPU */
+	AM_RANGE(0xf820, 0xf820) AM_READ(soundlatch2_r) AM_WRITE(sound_command_w)	/* answer from the sound CPU */
 	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITENOP			/* ?? writes 0x00 or 0xff */
-	AM_RANGE(0xf860, 0xf860) AM_READWRITE_LEGACY(watchdog_reset_r, tehkanwc_flipscreen_x_w)
+	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r) AM_WRITE_LEGACY(tehkanwc_flipscreen_x_w)
 	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE_LEGACY(tehkanwc_flipscreen_y_w)
 ADDRESS_MAP_END
 
@@ -251,7 +251,7 @@ static ADDRESS_MAP_START( sub_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("share7") /* sprites */
 	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE_LEGACY(tehkanwc_scroll_x_w)
 	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE_LEGACY(tehkanwc_scroll_y_w)
-	AM_RANGE(0xf860, 0xf860) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, tehkanwc_state )
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x8001, 0x8001) AM_DEVWRITE_LEGACY("msm", msm_reset_w)/* MSM51xx reset */
 	AM_RANGE(0x8002, 0x8002) AM_WRITENOP	/* ?? written in the IRQ handler */
 	AM_RANGE(0x8003, 0x8003) AM_WRITENOP	/* ?? written in the NMI handler */
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(sound_answer_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r) AM_WRITE(sound_answer_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, AS_IO, 8, tehkanwc_state )

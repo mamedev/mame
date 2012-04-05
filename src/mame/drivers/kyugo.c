@@ -1374,7 +1374,8 @@ ROM_END
 static DRIVER_INIT( gyrodine )
 {
 	/* add watchdog */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xe000, FUNC(watchdog_reset_w));
+	kyugo_state *state = machine.driver_data<kyugo_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(kyugo_state::watchdog_reset_w),state));
 }
 
 

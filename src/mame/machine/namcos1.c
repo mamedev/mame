@@ -599,7 +599,7 @@ WRITE8_HANDLER( namcos1_watchdog_w )
 	if (state->m_wdog == 7 || !state->m_reset)
 	{
 		state->m_wdog = 0;
-		watchdog_reset_w(space,0,0);
+		state->watchdog_reset_w(*space,0,0);
 	}
 }
 

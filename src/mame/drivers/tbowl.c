@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( 6206A_map, AS_PROGRAM, 8, tbowl_state )
 	AM_RANGE(0xe004, 0xe005) AM_WRITE(tbowl_adpcm_vol_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITENOP
 	AM_RANGE(0xe007, 0xe007) AM_WRITENOP	/* NMI acknowledge */
-	AM_RANGE(0xe010, 0xe010) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe010, 0xe010) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 /*** Input Ports

@@ -130,10 +130,11 @@ WRITE8_HANDLER( skydiver_lamp_d_w )
 
 WRITE8_HANDLER( skydiver_2000_201F_w )
 {
+	skydiver_state *state = space->machine().driver_data<skydiver_state>();
 	device_t *discrete = space->machine().device("discrete");
 	int bit = offset & 0x01;
 
-	watchdog_reset_w(space,0,0);
+	state->watchdog_reset_w(*space,0,0);
 
 	switch (offset & 0x0e)
 	{

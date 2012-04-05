@@ -197,9 +197,9 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
 
 	AM_RANGE(0xb00000, 0xb0000f) AM_RAM AM_BASE(m_vidregs)
 
-	AM_RANGE(0xb00018, 0xb00019) AM_WRITE_LEGACY(watchdog_reset16_w) // NOST Only
+	AM_RANGE(0xb00018, 0xb00019) AM_WRITE(watchdog_reset16_w) // NOST Only
 	AM_RANGE(0xb0001e, 0xb0001f) AM_READ(mcat_wd_r) // MCAT Only
-	AM_RANGE(0xc00000, 0xc00001) AM_READ_LEGACY(soundlatch2_word_r) AM_WRITE(mcat_soundlatch_w)
+	AM_RANGE(0xc00000, 0xc00001) AM_READ(soundlatch2_word_r) AM_WRITE(mcat_soundlatch_w)
 ADDRESS_MAP_END
 
 /*** Sound ***/
@@ -220,7 +220,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcatadv_sound_io_map, AS_IO, 8, mcatadv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READWRITE_LEGACY(soundlatch_r, soundlatch2_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 
 
@@ -235,7 +235,7 @@ static ADDRESS_MAP_START( nost_sound_io_map, AS_IO, 8, mcatadv_state )
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2610_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREAD_LEGACY("ymsnd", ym2610_r)
 	AM_RANGE(0x40, 0x40) AM_WRITE(mcatadv_sound_bw_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE_LEGACY(soundlatch_r, soundlatch2_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 
 /*** Inputs ***/

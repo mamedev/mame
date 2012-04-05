@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8, aliens_state )
 	AM_RANGE(0x5f82, 0x5f82) AM_READ_PORT("P2")
 	AM_RANGE(0x5f83, 0x5f83) AM_READ_PORT("DSW2")
 	AM_RANGE(0x5f84, 0x5f84) AM_READ_PORT("DSW1")
-	AM_RANGE(0x5f88, 0x5f88) AM_READ_LEGACY(watchdog_reset_r) AM_WRITE(aliens_coin_counter_w)		/* coin counters */
+	AM_RANGE(0x5f88, 0x5f88) AM_READ(watchdog_reset_r) AM_WRITE(aliens_coin_counter_w)		/* coin counters */
 	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(aliens_sh_irqtrigger_w)							/* cause interrupt on audio CPU */
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM														/* ROM e24_j02.bin */
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( aliens_sound_map, AS_PROGRAM, 8, aliens_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM g04_b03.bin */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ_LEGACY(soundlatch_r)				/* soundlatch_r */
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)				/* soundlatch_r */
 	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 ADDRESS_MAP_END
 

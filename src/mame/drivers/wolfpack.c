@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wolfpack_state )
 	AM_RANGE(0x4004, 0x4004) AM_WRITE_LEGACY(wolfpack_ship_pic_w)
 	AM_RANGE(0x4005, 0x4005) AM_WRITE_LEGACY(wolfpack_torpedo_h_w)
 	AM_RANGE(0x4006, 0x4006) AM_WRITE_LEGACY(wolfpack_torpedo_v_w)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x5000, 0x5fff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9000) AM_READNOP /* debugger ROM location? */
 	AM_RANGE(0xf000, 0xffff) AM_ROM

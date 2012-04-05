@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiping_state )
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(subcpu_reset_w)
 	AM_RANGE(0xa800, 0xa807) AM_READ(ports_r)
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM
-	AM_RANGE(0xb800, 0xb800) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xb800, 0xb800) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wiping_state )

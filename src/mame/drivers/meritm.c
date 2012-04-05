@@ -621,7 +621,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( meritm_io_map, AS_IO, 8, meritm_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(meritm_psd_a15_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("v9938_0", v9938_device, read, write)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("v9938_1", v9938_device, read, write)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)

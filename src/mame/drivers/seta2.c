@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( grdians_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
-	AM_RANGE(0x70000c, 0x70000d) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x70000c, 0x70000d) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(grdians_lockout_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( gundamex_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN0")				// P1
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN1")				// P2
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE_LEGACY(grdians_lockout_w)
 	AM_RANGE(0xb00000, 0xb03fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( mj4simai_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ_LEGACY(mj4simai_p1_r)				// P1
 	AM_RANGE(0x600002, 0x600003) AM_READ_LEGACY(mj4simai_p2_r)				// P2
 	AM_RANGE(0x600004, 0x600005) AM_WRITE_LEGACY(mj4simai_keyboard_w)		// select keyboard row to read
-	AM_RANGE(0x600006, 0x600007) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x600100, 0x600101) AM_READ_PORT("SYSTEM")				//
 	AM_RANGE(0x600200, 0x600201) AM_WRITENOP						// Leds? Coins?
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( myangel_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("SYSTEM")				// Coins
-	AM_RANGE(0x700006, 0x700007) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x700006, 0x700007) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x700200, 0x700201) AM_WRITENOP						// Leds? Coins?
 	AM_RANGE(0x700300, 0x700301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x700302, 0x700303) AM_READ_PORT("DSW2")				// DSW 2
@@ -306,7 +306,7 @@ static ADDRESS_MAP_START( myangel2_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
-	AM_RANGE(0x600006, 0x600007) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x600200, 0x600201) AM_WRITENOP						// Leds? Coins?
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( pzlbowl_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("P1")						// P1
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")						// P2
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE_LEGACY(pzlbowl_coins_r,pzlbowl_coin_counter_w)	// Coins + Protection?
-	AM_RANGE(0x500006, 0x500007) AM_READ_LEGACY(watchdog_reset16_r)			// Watchdog
+	AM_RANGE(0x500006, 0x500007) AM_READ(watchdog_reset16_r)			// Watchdog
 	AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(pzlbowl_protection_r)			// Protection
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0x840000, 0x84ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
@@ -380,7 +380,7 @@ static ADDRESS_MAP_START( penbros_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x600004, 0x600005) AM_WRITE_LEGACY(pzlbowl_coin_counter_w)	// Coins Counter
-	AM_RANGE(0x600006, 0x600007) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r)		// Watchdog
 	//AM_RANGE(0x700000, 0x700001) AM_READ_LEGACY(pzlbowl_protection_r)      // Protection
 	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)		// Sprites
 	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
@@ -435,7 +435,7 @@ static ADDRESS_MAP_START( reelquak_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("TICKET")				// Tickets
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("SYSTEM")				// Coins
-	AM_RANGE(0x400006, 0x400007) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x400006, 0x400007) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x400200, 0x400201) AM_WRITE_LEGACY(reelquak_coin_w)			// Coin Counters / IRQ Ack
 	AM_RANGE(0x400300, 0x400301) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0x400302, 0x400303) AM_READ_PORT("DSW2")				// DSW 2
@@ -496,7 +496,7 @@ static ADDRESS_MAP_START( samshoot_map, AS_PROGRAM, 16, seta2_state )
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ_PORT("TRIGGER")			// Trigger
 	AM_RANGE( 0x700002, 0x700003 ) AM_READ_PORT("PUMP")				// Pump
 	AM_RANGE( 0x700004, 0x700005 ) AM_READ_PORT("COIN")	AM_WRITE_LEGACY(samshoot_coin_w )	// Coins
-	AM_RANGE( 0x700006, 0x700007 ) AM_READ_LEGACY(watchdog_reset16_r )	// Watchdog?
+	AM_RANGE( 0x700006, 0x700007 ) AM_READ(watchdog_reset16_r )	// Watchdog?
 
 	AM_RANGE( 0x800000, 0x83ffff ) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
 	AM_RANGE( 0x840000, 0x84ffff ) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
@@ -627,7 +627,7 @@ static ADDRESS_MAP_START( funcube_map, AS_PROGRAM, 32, seta2_state )
 	AM_RANGE( 0x00200000, 0x0020ffff ) AM_RAM
 
 	AM_RANGE( 0x00500000, 0x00500003 ) AM_READ_LEGACY(funcube_debug_r )
-	AM_RANGE( 0x00500004, 0x00500007 ) AM_READ_LEGACY(watchdog_reset32_r ) AM_WRITENOP
+	AM_RANGE( 0x00500004, 0x00500007 ) AM_READ(watchdog_reset32_r ) AM_WRITENOP
 
 	AM_RANGE( 0x00600000, 0x00600003 ) AM_DEVREADWRITE_LEGACY("oki", oki_read, oki_write)
 

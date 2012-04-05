@@ -62,7 +62,7 @@ WRITE8_HANDLER( skyfox_vregs_w )
 	switch (offset)
 	{
 		case 0:	state->m_bg_ctrl = data;	break;
-		case 1:	soundlatch_w(space, 0, data);	break;
+		case 1:	state->soundlatch_w(*space, 0, data);	break;
 		case 2:	break;
 		case 3:	break;
 		case 4:	break;

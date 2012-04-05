@@ -333,7 +333,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_vsgongf_map, AS_PROGRAM, 8, tsamurai_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM /* work RAM */
-	AM_RANGE(0x8000, 0x8000) AM_READ_LEGACY(soundlatch_r) AM_WRITE(vsgongf_sound_nmi_enable_w) /* NMI enable */
+	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r) AM_WRITE(vsgongf_sound_nmi_enable_w) /* NMI enable */
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("dac", dac_w)
 ADDRESS_MAP_END
 

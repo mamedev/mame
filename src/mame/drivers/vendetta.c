@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)
 	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE_LEGACY("k053260", vendetta_sound_r, k053260_w)
 	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD_LEGACY("k053246", k053246_r)
-	AM_RANGE(0x5fea, 0x5fea) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bank2")

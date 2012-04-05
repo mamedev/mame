@@ -178,7 +178,7 @@ static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_SIZE(m_bwp3_rombase, m_bwp3_romsize)
 ADDRESS_MAP_END

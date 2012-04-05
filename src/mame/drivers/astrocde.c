@@ -710,7 +710,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tenpin_sub_io_map, AS_IO, 8, astrocde_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x97, 0x97) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x97, 0x97) AM_READ(soundlatch_r)
 	AM_RANGE(0x98, 0x98) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0x98, 0x98) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x9a, 0x9a) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)

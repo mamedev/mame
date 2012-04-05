@@ -664,7 +664,8 @@ static INTERRUPT_GEN( qsound_interrupt )
 
 static WRITE32_HANDLER( zn_qsound_w )
 {
-	soundlatch_w(space, 0, data);
+	zn_state *state = space->machine().driver_data<zn_state>();
+	state->soundlatch_w(*space, 0, data);
 	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -709,7 +710,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qsound_portmap, AS_IO, 8, zn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
@@ -1638,10 +1639,11 @@ static WRITE32_HANDLER( coh1002e_bank_w )
 
 static WRITE32_HANDLER( coh1002e_latch_w )
 {
+	zn_state *state = space->machine().driver_data<zn_state>();
 	if (offset)
 		cputag_set_input_line(space->machine(), "audiocpu", 2, HOLD_LINE);	// irq 2 on the 68k
 	else
-		soundlatch_w(space, 0, data);
+		state->soundlatch_w(*space, 0, data);
 }
 
 static DRIVER_INIT( coh1002e )
@@ -1663,7 +1665,7 @@ static ADDRESS_MAP_START( psarc_snd_map, AS_PROGRAM, 16, zn_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0fffff) AM_RAM
 	AM_RANGE(0x100000, 0x10001f) AM_DEVREADWRITE8_LEGACY("ymf", ymf271_r, ymf271_w, 0x00ff )
-	AM_RANGE(0x180008, 0x180009) AM_READ8_LEGACY(soundlatch_r, 0x00ff )
+	AM_RANGE(0x180008, 0x180009) AM_READ8(soundlatch_r, 0x00ff )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITENOP
 	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
 ADDRESS_MAP_END
@@ -2520,7 +2522,7 @@ static READ32_HANDLER( cbaj_z80_r )
 
 	ready = state->m_cbaj_to_r3k;
 	state->m_cbaj_to_r3k &= ~2;
-	return soundlatch2_r(space,0) | ready<<24;
+	return state->soundlatch2_r(*space,0) | ready<<24;
 }
 
 static WRITE32_HANDLER( cbaj_z80_w )
@@ -2560,7 +2562,7 @@ static WRITE8_HANDLER( cbaj_z80_latch_w )
 	zn_state *state = space->machine().driver_data<zn_state>();
 
 	state->m_cbaj_to_r3k |= 2;
-	soundlatch2_w(space, 0, data);
+	state->soundlatch2_w(*space, 0, data);
 }
 
 static READ8_HANDLER( cbaj_z80_ready_r )

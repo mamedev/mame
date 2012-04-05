@@ -178,7 +178,7 @@ static ADDRESS_MAP_START( megasys1A_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("P1")
 	AM_RANGE(0x080004, 0x080005) AM_READ_PORT("P2")
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("DSW")
-	AM_RANGE(0x080008, 0x080009) AM_READ_LEGACY(soundlatch2_word_r)	/* from sound cpu */
+	AM_RANGE(0x080008, 0x080009) AM_READ(soundlatch2_word_r)	/* from sound cpu */
 	AM_RANGE(0x084000, 0x0843ff) AM_RAM_WRITE_LEGACY(megasys1_vregs_A_w) AM_BASE(m_vregs)
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x08e000, 0x08ffff) AM_RAM AM_BASE(m_objectram)
@@ -395,8 +395,8 @@ static READ8_DEVICE_HANDLER( oki_status_r )
 
 static ADDRESS_MAP_START( megasys1A_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_READ_LEGACY(soundlatch_word_r)
-	AM_RANGE(0x060000, 0x060001) AM_WRITE_LEGACY(soundlatch2_word_w)	// to main cpu
+	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r)
+	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	// to main cpu
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r,ym2151_w, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8_LEGACY("oki1", oki_status_r, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
@@ -413,8 +413,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megasys1B_sound_map, AS_PROGRAM, 16, megasys1_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040001) AM_READWRITE_LEGACY(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
-	AM_RANGE(0x060000, 0x060001) AM_READWRITE_LEGACY(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
+	AM_RANGE(0x040000, 0x040001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
+	AM_RANGE(0x060000, 0x060001) AM_READWRITE(soundlatch_word_r,soundlatch2_word_w)	/* from/to main cpu */
 	AM_RANGE(0x080000, 0x080003) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2151_r,ym2151_w, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_DEVREAD8_LEGACY("oki1", oki_status_r, 0x00ff)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
@@ -433,7 +433,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_sound_map, AS_PROGRAM, 8, megasys1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP /* ?? */
 ADDRESS_MAP_END
 

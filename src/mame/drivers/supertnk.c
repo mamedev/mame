@@ -329,7 +329,7 @@ static ADDRESS_MAP_START( supertnk_io_map, AS_IO, 8, supertnk_state )
 	AM_RANGE(0x0402, 0x0402) AM_WRITE(supertnk_bankswitch_0_w)
 	AM_RANGE(0x0404, 0x0404) AM_WRITE(supertnk_bankswitch_1_w)
 	AM_RANGE(0x0406, 0x0406) AM_WRITE(supertnk_interrupt_ack_w)
-	AM_RANGE(0x0407, 0x0407) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x0407, 0x0407) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
 

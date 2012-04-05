@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3526_r, ym3526_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP // message for main cpu
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r) AM_WRITENOP // message for main cpu
 	AM_RANGE(0xb001, 0xb001) AM_READNOP AM_WRITE_LEGACY(bublbobl_sh_nmi_enable_w)	// bit 0: message pending for main cpu, bit 1: message pending for sound cpu
 	AM_RANGE(0xb002, 0xb002) AM_WRITE_LEGACY(bublbobl_sh_nmi_disable_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM			// space for diagnostic ROM?

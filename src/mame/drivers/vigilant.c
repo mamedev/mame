@@ -110,7 +110,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, vigilant_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x80, 0x81) AM_READ_LEGACY(soundlatch_r) AM_DEVWRITE_LEGACY("m72", vigilant_sample_addr_w)	/* STL / STH */
+	AM_RANGE(0x80, 0x81) AM_READ(soundlatch_r) AM_DEVWRITE_LEGACY("m72", vigilant_sample_addr_w)	/* STL / STH */
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)			/* COUNT UP */
 	AM_RANGE(0x83, 0x83) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)	/* IRQ clear */
 	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)	/* S ROM C */
@@ -120,7 +120,7 @@ static ADDRESS_MAP_START( buccanrs_sound_io_map, AS_IO, 8, vigilant_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0x80, 0x80) AM_READ_LEGACY(soundlatch_r)				/* SDRE */
+	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)				/* SDRE */
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("m72", vigilant_sample_addr_w)	/* STL / STH */
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)				/* COUNT UP */
 	AM_RANGE(0x83, 0x83) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)		/* IRQ clear */

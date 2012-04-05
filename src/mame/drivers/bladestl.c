@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bladestl_state )
 	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")				/* DISPW #2 */
 	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")				/* DIPSW #1 */
 	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(bladestl_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
-	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE_LEGACY(watchdog_reset_w)			/* watchdog reset */
+	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
 	AM_RANGE(0x2f00, 0x2f03) AM_READ(trackball_r)				/* Trackballs */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(bladestl_bankswitch_w)	/* bankswitch control */
 	AM_RANGE(0x2f80, 0x2f9f) AM_DEVREADWRITE_LEGACY("k051733", k051733_r, k051733_w)	/* Protection: 051733 */
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bladestl_state )
 	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE_LEGACY("upd", bladestl_speech_ctrl_w)	/* UPD7759 */
 	AM_RANGE(0x4000, 0x4000) AM_DEVREAD_LEGACY("upd", bladestl_speech_busy_r)	/* UPD7759 */
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP								/* ??? */
-	AM_RANGE(0x6000, 0x6000) AM_READ_LEGACY(soundlatch_r)						/* soundlatch_r */
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)						/* soundlatch_r */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
 	AM_RANGE(0x5080, 0x5080) AM_DEVWRITE_LEGACY("dac", audio_dac_w)
-	AM_RANGE(0x50c0, 0x50c0) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

@@ -508,7 +508,7 @@ static ADDRESS_MAP_START( mcrmono_portmap, AS_IO, 8, mcr3_state )
 	AM_RANGE(0x03, 0x03) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP3")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x78) AM_READ_PORT("MONO.IP4")
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x78) AM_WRITE_LEGACY(mcrmono_control_port_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x78) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x78) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf0, 0xf3) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -537,7 +537,7 @@ static ADDRESS_MAP_START( spyhunt_portmap, AS_IO, 8, mcr3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	SSIO_INPUT_PORTS
 	AM_RANGE(0x84, 0x86) AM_WRITE_LEGACY(spyhunt_scroll_value_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END

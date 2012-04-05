@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16, toki_state )
 				/* gets written the same value as 75000a (bg2 scrollx) */
 	AM_RANGE(0x071804, 0x071807) AM_WRITENOP	/* sprite related, always 01be0100 */
 	AM_RANGE(0x07180e, 0x071e45) AM_WRITEONLY AM_SHARE("spriteram")
-	AM_RANGE(0x072000, 0x072001) AM_READ_LEGACY(watchdog_reset16_r)   /* probably */
+	AM_RANGE(0x072000, 0x072001) AM_READ(watchdog_reset16_r)   /* probably */
 	AM_RANGE(0x075000, 0x075001) AM_WRITE(tokib_soundcommand16_w)
 	AM_RANGE(0x075004, 0x07500b) AM_WRITEONLY AM_BASE(m_scrollram16)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)
 	AM_RANGE(0xec00, 0xec01) AM_MIRROR(0x0008) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 /*****************************************************************************/

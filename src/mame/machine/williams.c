@@ -702,17 +702,19 @@ WRITE8_HANDLER( bubbles_cmos_w )
 
 WRITE8_HANDLER( williams_watchdog_reset_w )
 {
+	williams_state *state = space->machine().driver_data<williams_state>();
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
-		watchdog_reset_w(space,0,0);
+		state->watchdog_reset_w(*space,0,0);
 }
 
 
 WRITE8_HANDLER( williams2_watchdog_reset_w )
 {
+	williams_state *state = space->machine().driver_data<williams_state>();
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
-		watchdog_reset_w(space,0,0);
+		state->watchdog_reset_w(*space,0,0);
 }
 
 

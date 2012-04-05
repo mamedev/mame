@@ -290,7 +290,7 @@ static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
 	segas1x_state *state = device->machine().driver_data<segas1x_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
-	soundlatch_w(space, offset, data);
+	state->soundlatch_w(*space, offset, data);
 }
 
 
@@ -417,7 +417,7 @@ static READ8_HANDLER( sound_data_r )
 
 	/* assert ACK */
 	ppi8255_set_port_c(state->m_ppi8255_1, 0x00);
-	return soundlatch_r(space, offset);
+	return state->soundlatch_r(*space, offset);
 }
 
 

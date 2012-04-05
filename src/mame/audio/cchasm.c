@@ -44,14 +44,14 @@ READ8_HANDLER( cchasm_soundlatch2_r )
 	cchasm_state *state = space->machine().driver_data<cchasm_state>();
 	state->m_sound_flags &= ~0x80;
 	z80ctc_trg2_w(state->m_ctc, 0);
-	return soundlatch2_r(space, offset);
+	return state->soundlatch2_r(*space, offset);
 }
 
 WRITE8_HANDLER( cchasm_soundlatch4_w )
 {
 	cchasm_state *state = space->machine().driver_data<cchasm_state>();
 	state->m_sound_flags |= 0x40;
-	soundlatch4_w(space, offset, data);
+	state->soundlatch4_w(*space, offset, data);
 	cputag_set_input_line(space->machine(), "maincpu", 1, HOLD_LINE);
 }
 
@@ -66,11 +66,11 @@ WRITE16_HANDLER( cchasm_io_w )
 		switch (offset & 0xf)
 		{
 		case 0:
-			soundlatch_w (space, offset, data);
+			state->soundlatch_w(*space, offset, data);
 			break;
 		case 1:
 			state->m_sound_flags |= 0x80;
-			soundlatch2_w (space, offset, data);
+			state->soundlatch2_w(*space, offset, data);
 			z80ctc_trg2_w(state->m_ctc, 1);
 			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			break;
@@ -87,10 +87,10 @@ READ16_HANDLER( cchasm_io_r )
 	switch (offset & 0xf)
 	{
 	case 0x0:
-		return soundlatch3_r (space, offset) << 8;
+		return state->soundlatch3_r(*space, offset) << 8;
 	case 0x1:
 		state->m_sound_flags &= ~0x40;
-		return soundlatch4_r (space,offset) << 8;
+		return state->soundlatch4_r(*space,offset) << 8;
 	case 0x2:
 		return (state->m_sound_flags| (input_port_read(space->machine(), "IN3") & 0x07) | 0x08) << 8;
 	case 0x5:

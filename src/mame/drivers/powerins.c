@@ -114,7 +114,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( powerins_sound_map, AS_PROGRAM, 8, powerins_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 //  AM_RANGE(0xe000, 0xe000) AM_WRITENOP // ? written only once ?
 //  AM_RANGE(0xe001, 0xe001) AM_WRITENOP // ?
 ADDRESS_MAP_END

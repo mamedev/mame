@@ -561,7 +561,7 @@ static ADDRESS_MAP_START( arkanoid_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0xd001, 0xd001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE_LEGACY(arkanoid_d008_w)	/* gfx bank, flip screen etc. */
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")		/* 2 bits from the 68705 */
-	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READWRITE_LEGACY(arkanoid_Z80_mcu_r, arkanoid_Z80_mcu_w)  /* input from the 68705 */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(arkanoid_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
@@ -576,7 +576,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0xd001, 0xd001) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE_LEGACY(arkanoid_d008_w)	/* gfx bank, flip screen etc. */
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("MUX") AM_WRITENOP
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(arkanoid_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
@@ -591,7 +591,7 @@ static ADDRESS_MAP_START( hexa_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0xd001, 0xd001) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE_LEGACY(hexa_d008_w)
-	AM_RANGE(0xd010, 0xd010) AM_WRITE_LEGACY(watchdog_reset_w)	/* or IRQ acknowledge, or both */
+	AM_RANGE(0xd010, 0xd010) AM_WRITE(watchdog_reset_w)	/* or IRQ acknowledge, or both */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(arkanoid_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 ADDRESS_MAP_END
 
@@ -602,7 +602,7 @@ static ADDRESS_MAP_START( brixian_map, AS_PROGRAM, 8, arkanoid_state )
 	AM_RANGE(0xd001, 0xd001) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE_LEGACY(arkanoid_d008_w)	/* gfx bank, flip screen etc. */
 	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("BUTTONS") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("MUX") AM_WRITENOP
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE_LEGACY(arkanoid_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)

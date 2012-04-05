@@ -1490,6 +1490,7 @@ static WRITE16_HANDLER( sharedram_68000_w )
 
 static WRITE16_HANDLER( sub_ctrl_w )
 {
+	seta_state *state = space->machine().driver_data<seta_state>();
 	switch(offset)
 	{
 		case 0/2:	// bit 0: reset sub cpu?
@@ -1507,11 +1508,11 @@ static WRITE16_HANDLER( sub_ctrl_w )
 			break;
 
 		case 4/2:	// not sure
-			if (ACCESSING_BITS_0_7)	soundlatch_w(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7)	state->soundlatch_w(*space, 0, data & 0xff);
 			break;
 
 		case 6/2:	// not sure
-			if (ACCESSING_BITS_0_7)	soundlatch2_w(space, 0, data & 0xff);
+			if (ACCESSING_BITS_0_7)	state->soundlatch2_w(*space, 0, data & 0xff);
 			break;
 	}
 
@@ -1655,9 +1656,10 @@ static READ16_HANDLER ( calibr50_ip_r )
 
 static WRITE16_HANDLER( calibr50_soundlatch_w )
 {
+	seta_state *state = space->machine().driver_data<seta_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_word_w(space, 0, data, mem_mask);
+		state->soundlatch_word_w(*space, 0, data, mem_mask);
 		cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, PULSE_LINE);
 		device_spin_until_time(&space->device(), attotime::from_usec(50));	// Allow the other cpu to reply
 	}
@@ -1670,7 +1672,7 @@ static ADDRESS_MAP_START( calibr50_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x200000, 0x200fff) AM_RAM								// NVRAM
 	AM_RANGE(0x300000, 0x300001) AM_READNOP							// ? (value's read but not used)
 	AM_RANGE(0x300000, 0x300001) AM_WRITENOP						// ? (random value)
-	AM_RANGE(0x400000, 0x400001) AM_READ_LEGACY(watchdog_reset16_r)		// Watchdog
+	AM_RANGE(0x400000, 0x400001) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP						// ?
 	AM_RANGE(0x600000, 0x600003) AM_READ_LEGACY(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
@@ -1682,7 +1684,7 @@ static ADDRESS_MAP_START( calibr50_map, AS_PROGRAM, 16, seta_state )
 /**/AM_RANGE(0xd00000, 0xd005ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r16, spriteylow_w16)		// Sprites Y
 	AM_RANGE(0xd00600, 0xd00607) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritectrl_r16, spritectrl_w16)
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)		// Sprites Code + X + Attr
-	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE_LEGACY(soundlatch2_word_r,calibr50_soundlatch_w)	// From Sub CPU
+	AM_RANGE(0xb00000, 0xb00001) AM_READ(soundlatch2_word_r) AM_WRITE_LEGACY(calibr50_soundlatch_w)	// From Sub CPU
 /**/AM_RANGE(0xc00000, 0xc00001) AM_RAM								// ? $4000
 ADDRESS_MAP_END
 
@@ -1763,7 +1765,7 @@ static ADDRESS_MAP_START( usclssic_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xb40010, 0xb40011) AM_READ_PORT("COINS")					// Coins
 	AM_RANGE(0xb40010, 0xb40011) AM_WRITE_LEGACY(calibr50_soundlatch_w)		// To Sub CPU
 	AM_RANGE(0xb40018, 0xb4001f) AM_READ_LEGACY(usclssic_dsw_r)				// 2 DSWs
-	AM_RANGE(0xb40018, 0xb40019) AM_WRITE_LEGACY(watchdog_reset16_w)			// Watchdog
+	AM_RANGE(0xb40018, 0xb40019) AM_WRITE(watchdog_reset16_w)			// Watchdog
 	AM_RANGE(0xb80000, 0xb80001) AM_READNOP								// Watchdog (value is discarded)?
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecode_r16, spritecode_w16)			// Sprites Code + X + Attr
 	AM_RANGE(0xd00000, 0xd03fff) AM_RAM_WRITE_LEGACY(seta_vram_0_w) AM_BASE(m_vram_0)	// VRAM
@@ -2313,7 +2315,7 @@ static ADDRESS_MAP_START( extdwnhl_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x400008, 0x40000b) AM_READ_LEGACY(seta_dsw_r)				// DSW
-	AM_RANGE(0x40000c, 0x40000d) AM_READWRITE_LEGACY(watchdog_reset16_r,watchdog_reset16_w)	// Watchdog (extdwnhl (R) & sokonuke (W) MUST RETURN $FFFF)
+	AM_RANGE(0x40000c, 0x40000d) AM_READWRITE(watchdog_reset16_r,watchdog_reset16_w)	// Watchdog (extdwnhl (R) & sokonuke (W) MUST RETURN $FFFF)
 	AM_RANGE(0x500000, 0x500003) AM_RAM_WRITE_LEGACY(seta_vregs_w) AM_BASE(m_vregs)	// Coin Lockout + Video Registers
 	AM_RANGE(0x500004, 0x500007) AM_NOP								// IRQ Ack  (extdwnhl (R) & sokonuke (W))
 	AM_RANGE(0x600400, 0x600fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
@@ -2344,7 +2346,7 @@ static ADDRESS_MAP_START( kamenrid_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x500004, 0x500007) AM_READ_LEGACY(seta_dsw_r)				// DSW
 	AM_RANGE(0x500008, 0x500009) AM_READ_PORT("COINS")				// Coins
-	AM_RANGE(0x50000c, 0x50000d) AM_READWRITE_LEGACY(watchdog_reset16_r,watchdog_reset16_w)	// xx Watchdog? (sokonuke)
+	AM_RANGE(0x50000c, 0x50000d) AM_READWRITE(watchdog_reset16_r,watchdog_reset16_w)	// xx Watchdog? (sokonuke)
 	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE_LEGACY(seta_vregs_w) AM_BASE(m_vregs)	// ? Coin Lockout + Video Registers
 	AM_RANGE(0x600006, 0x600007) AM_WRITENOP						// ?
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// Palette RAM (tested)
@@ -2377,7 +2379,7 @@ static ADDRESS_MAP_START( madshark_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("COINS")				// Coins
 	AM_RANGE(0x500008, 0x50000b) AM_READ_LEGACY(seta_dsw_r)				// DSW
-	AM_RANGE(0x50000c, 0x50000d) AM_WRITE_LEGACY(watchdog_reset16_w)		// Watchdog
+	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(watchdog_reset16_w)		// Watchdog
 	AM_RANGE(0x600000, 0x600005) AM_RAM_WRITE_LEGACY(seta_vregs_w) AM_BASE(m_vregs)	// ? Coin Lockout + Video Registers
 	AM_RANGE(0x600006, 0x600007) AM_WRITENOP						// ?
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE(m_paletteram, m_paletteram_size)	// Palette
@@ -2752,10 +2754,11 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( utoukond_soundlatch_w )
 {
+	seta_state *state = space->machine().driver_data<seta_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_w(*space, 0, data & 0xff);
 	}
 }
 
@@ -2893,7 +2896,7 @@ static ADDRESS_MAP_START( inttoote_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("P1")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("P2") AM_WRITENOP
 
-	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(watchdog_reset16_w)	// Watchdog
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(watchdog_reset16_w)	// Watchdog
 
 	AM_RANGE(0x300010, 0x300011) AM_WRITENOP	// lev1 ack
 	AM_RANGE(0x300020, 0x300021) AM_WRITENOP	// lev2 ack
@@ -2958,7 +2961,7 @@ static ADDRESS_MAP_START( jockeyc_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("P1")
 	AM_RANGE(0x200010, 0x200011) AM_READ_PORT("P2") AM_WRITENOP
 
-	AM_RANGE(0x300000, 0x300001) AM_WRITE_LEGACY(watchdog_reset16_w)	// Watchdog
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(watchdog_reset16_w)	// Watchdog
 
 	AM_RANGE(0x300002, 0x300003) AM_WRITENOP
 
@@ -3020,8 +3023,8 @@ static READ8_HANDLER( ff_r )	{return 0xff;}
 static ADDRESS_MAP_START( tndrcade_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM 							// RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_LEGACY(ff_r)						// ? (bits 0/1/2/3: 1 -> do test 0-ff/100-1e0/5001-57ff/banked rom)
-	//AM_RANGE(0x0800, 0x0800) AM_READ_LEGACY(soundlatch_r)              //
-	//AM_RANGE(0x0801, 0x0801) AM_READ_LEGACY(soundlatch2_r)             //
+	//AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)              //
+	//AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)             //
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")					// P2
@@ -3041,8 +3044,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( twineagl_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM							// RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ_LEGACY(soundlatch_r)			//
-	AM_RANGE(0x0801, 0x0801) AM_READ_LEGACY(soundlatch2_r)			//
+	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)			//
+	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)			//
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("P1")				// P1
 	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P2")				// P2
@@ -3083,8 +3086,8 @@ static READ8_HANDLER( downtown_ip_r )
 
 static ADDRESS_MAP_START( downtown_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM							// RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ_LEGACY(soundlatch_r)			//
-	AM_RANGE(0x0801, 0x0801) AM_READ_LEGACY(soundlatch2_r)			//
+	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)			//
+	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)			//
 	AM_RANGE(0x1000, 0x1007) AM_READ_LEGACY(downtown_ip_r)			// Input Ports
 	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE(m_sharedram)		// Shared RAM
@@ -3106,13 +3109,14 @@ static MACHINE_RESET(calibr50)
 
 static WRITE8_HANDLER( calibr50_soundlatch2_w )
 {
-	soundlatch2_w(space,0,data);
+	seta_state *state = space->machine().driver_data<seta_state>();
+	state->soundlatch2_w(*space,0,data);
 	device_spin_until_time(&space->device(), attotime::from_usec(50));	// Allow the other cpu to reply
 }
 
 static ADDRESS_MAP_START( calibr50_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE_LEGACY("x1snd", seta_sound_r,seta_sound_w)	// Sound
-	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(soundlatch_r)				// From Main CPU
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)				// From Main CPU
 	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(sub_bankswitch_w)			// Bankswitching
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM								// ROM
@@ -3126,8 +3130,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( metafox_sub_map, AS_PROGRAM, 8, seta_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM							// RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ_LEGACY(soundlatch_r)			//
-	AM_RANGE(0x0801, 0x0801) AM_READ_LEGACY(soundlatch2_r)			//
+	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_r)			//
+	AM_RANGE(0x0801, 0x0801) AM_READ(soundlatch2_r)			//
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("COINS")			// Coins
 	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(sub_bankswitch_lockout_w)	// ROM Bank + Coin Lockout
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P1")				// P1
@@ -3154,7 +3158,7 @@ static ADDRESS_MAP_START( utoukond_sound_io_map, AS_IO, 8, seta_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym3438_r, ym3438_w)
 	AM_RANGE(0x80, 0x80) AM_WRITENOP //?
-	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -8564,7 +8568,7 @@ static ADDRESS_MAP_START( thunderlbl_sound_map, AS_PROGRAM, 8, seta_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xdfff) AM_ROM//ROMBANK("bank1")
-	AM_RANGE(0xe800, 0xe800) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -8574,7 +8578,7 @@ static ADDRESS_MAP_START( thunderlbl_sound_portmap, AS_IO, 8, seta_state )
 	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	//AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE_LEGACY("upd", upd7759_control_w)
 	//AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_DEVREADWRITE_LEGACY("upd", upd7759_status_r, upd7759_port_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 

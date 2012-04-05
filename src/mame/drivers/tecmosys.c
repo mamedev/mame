@@ -351,8 +351,8 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, tecmosys_state )
 	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(tecmosys_z80_bank_w)
-	AM_RANGE(0x40, 0x40) AM_READ_LEGACY(soundlatch_r)
-	AM_RANGE(0x50, 0x50) AM_WRITE_LEGACY(soundlatch2_w)
+	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
+	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
 	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE_LEGACY("ymz", ymz280b_r, ymz280b_w)
 ADDRESS_MAP_END
 

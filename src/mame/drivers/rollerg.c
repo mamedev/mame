@@ -79,7 +79,7 @@ READ8_MEMBER(rollerg_state::pip_r)
 
 static ADDRESS_MAP_START( rollerg_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0x0010, 0x0010) AM_WRITE(rollerg_0010_w)
-	AM_RANGE(0x0020, 0x0020) AM_READWRITE_LEGACY(watchdog_reset_r,watchdog_reset_w)
+	AM_RANGE(0x0020, 0x0020) AM_READWRITE(watchdog_reset_r,watchdog_reset_w)
 	AM_RANGE(0x0030, 0x0031) AM_DEVREADWRITE_LEGACY("k053260", rollerg_sound_r, k053260_w)	/* K053260 */
 	AM_RANGE(0x0040, 0x0040) AM_WRITE(soundirq_w)
 	AM_RANGE(0x0050, 0x0050) AM_READ_PORT("P1")

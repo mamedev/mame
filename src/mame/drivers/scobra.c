@@ -86,7 +86,7 @@ static const ay8910_interface hustler_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
 	DEVCB_HANDLER(frogger_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa804, 0xa804) AM_WRITE_LEGACY(galaxold_stars_enable_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
@@ -141,7 +141,7 @@ static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x8880, 0x88ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(galaxold_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_READWRITE_LEGACY(galaxold_videoram_r, galaxold_videoram_w)	/* mirror */
-	AM_RANGE(0x9800, 0x9800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x9800, 0x9800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xa000, 0xa00f) AM_DEVREADWRITE_LEGACY("ppi8255_0", scobra_type2_ppi8255_r, scobra_type2_ppi8255_w)
 	AM_RANGE(0xa800, 0xa80f) AM_DEVREADWRITE_LEGACY("ppi8255_1", scobra_type2_ppi8255_r, scobra_type2_ppi8255_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(galaxold_stars_enable_w)
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa804, 0xa804) AM_WRITE_LEGACY(galaxold_nmi_enable_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa80e, 0xa80e) AM_WRITENOP	/* coin counters */
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xd000, 0xd01f) AM_DEVREADWRITE_LEGACY("ppi8255_0", hustler_ppi8255_r, hustler_ppi8255_w)
 	AM_RANGE(0xe000, 0xe01f) AM_DEVREADWRITE_LEGACY("ppi8255_1", hustler_ppi8255_r, hustler_ppi8255_w)
 ADDRESS_MAP_END
@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa802, 0xa802) AM_WRITENOP	/* coin counters */
 	AM_RANGE(0xa806, 0xa806) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xc100, 0xc103) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa800, 0xa802) AM_WRITE_LEGACY(galaxold_gfxbank_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE_LEGACY(galaxold_flip_screen_x_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE_LEGACY(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -644,7 +644,7 @@ static const ay8910_interface scobra_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
 	DEVCB_HANDLER(scramble_portB_r),
 	DEVCB_NULL,
 	DEVCB_NULL

@@ -350,7 +350,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
-	AM_RANGE(0x09, 0x09) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x09, 0x09) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(avgdvg_reset_w)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("AVGDVG")				/* vg_halt */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")				/* DIP SW C4 */
@@ -378,7 +378,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_LEGACY(soundlatch_r)	/* likely ay8910 input port, not direct */
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)	/* likely ay8910 input port, not direct */
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END

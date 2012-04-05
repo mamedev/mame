@@ -639,7 +639,7 @@ static const ppi8255_interface konami_ppi8255_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),		/* Port A write */
 	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
 	DEVCB_HANDLER(konami_portc_1_w)							/* Port C write */
 };
@@ -743,7 +743,7 @@ static const ppi8255_interface scramble_ppi8255_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_HANDLER(scramble_protection_r),					/* Port C read */
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),		/* Port A write */
 	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
 	DEVCB_HANDLER(scramble_protection_w)					/* Port C write */
 };
@@ -764,8 +764,9 @@ static WRITE8_HANDLER( explorer_sound_control_w )
 
 static READ8_DEVICE_HANDLER( explorer_sound_latch_r )
 {
-	cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);
-	return soundlatch_r(device->machine().device("audiocpu")->memory().space(AS_PROGRAM), 0);
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
+	cputag_set_input_line(device->machine(), "audiocpu", 0, CLEAR_LINE);	
+	return state->soundlatch_r(*device->machine().device("audiocpu")->memory().space(AS_PROGRAM), 0);
 }
 
 
@@ -808,7 +809,7 @@ static WRITE8_DEVICE_HANDLER( sfx_sample_control_w )
 
 static const ppi8255_interface sfx_ppi8255_2_intf =
 {
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch2_r),/* Port A read */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_r),		/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_NULL,												/* Port C read */
 	DEVCB_NULL,												/* Port A write */
@@ -1068,7 +1069,7 @@ static const ppi8255_interface scorpion_ppi8255_1_intf =
 	DEVCB_NULL,												/* Port A read */
 	DEVCB_NULL,												/* Port B read */
 	DEVCB_HANDLER(scorpion_protection_r),					/* Port C read */
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),	/* Port A write */
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_w),		/* Port A write */
 	DEVCB_HANDLER(konami_sound_control_w),					/* Port B write */
 	DEVCB_HANDLER(scorpion_protection_w)					/* Port C write */
 };
@@ -1205,7 +1206,7 @@ static WRITE8_HANDLER( kingball_sound2_w )
 {
 	galaxian_state *state = space->machine().driver_data<galaxian_state>();
 	state->m_kingball_sound = (state->m_kingball_sound & ~0x02) | (data << 1);
-	soundlatch_w(space, 0, state->m_kingball_sound | 0xf0);
+	state->soundlatch_w(*space, 0, state->m_kingball_sound | 0xf0);
 }
 
 
@@ -1285,7 +1286,8 @@ static READ8_HANDLER( jumpbug_protection_r )
 
 static WRITE8_HANDLER( checkman_sound_command_w )
 {
-	soundlatch_w(space, 0, data);
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+	state->soundlatch_w(*space, 0, data);
 	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -1451,7 +1453,7 @@ static ADDRESS_MAP_START( galaxian_map_base, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x7006, 0x7006) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_flip_screen_y_w)
 	//AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
-	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galaxian_map, AS_PROGRAM, 8, galaxian_state )
@@ -1485,7 +1487,7 @@ static ADDRESS_MAP_START( mooncrst_map_base, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xb006, 0xb006) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_flip_screen_y_w)
 //  AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_DEVWRITE_LEGACY(GAL_AUDIO, galaxian_pitch_w)
-	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8, galaxian_state )
@@ -1508,7 +1510,7 @@ static ADDRESS_MAP_START( fantastc_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07ff) AM_READ_PORT("IN2")
 	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(irq_enable_w)
-	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xfffe, 0xfffe) AM_NOP //?
 ADDRESS_MAP_END
 
@@ -1532,7 +1534,7 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xf004, 0xf004) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_stars_enable_w)
 	AM_RANGE(0xf006, 0xf006) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_flip_screen_x_w)
 	AM_RANGE(0xf007, 0xf007) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_flip_screen_y_w)
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07ff) AM_WRITE_LEGACY(galaxian_pitch_w)
 ADDRESS_MAP_END
 #endif
@@ -1552,7 +1554,7 @@ static ADDRESS_MAP_START( theend_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x6805, 0x6805) AM_MIRROR(0x07f8) //POUT2
 	AM_RANGE(0x6806, 0x6806) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE_LEGACY(theend_ppi8255_r, theend_ppi8255_w)
 ADDRESS_MAP_END
 
@@ -1573,7 +1575,7 @@ static ADDRESS_MAP_START( scobra_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xa805, 0xa805) AM_MIRROR(0x47f8) /* POUT2 */
 	AM_RANGE(0xa806, 0xa806) AM_MIRROR(0x47f8) AM_WRITE_LEGACY(galaxian_flip_screen_x_w)
 	AM_RANGE(0xa807, 0xa807) AM_MIRROR(0x47f8) AM_WRITE_LEGACY(galaxian_flip_screen_y_w)
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x47ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x47ff) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 
@@ -1590,7 +1592,7 @@ static ADDRESS_MAP_START( anteateruk_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x1006, 0x1006) AM_MIRROR(0x01f8) AM_WRITE_LEGACY(galaxian_flip_screen_x_w)
 	AM_RANGE(0x1007, 0x1007) AM_MIRROR(0x01f8) AM_WRITE_LEGACY(galaxian_flip_screen_y_w)
 	AM_RANGE(0x1200, 0x12ff) AM_MIRROR(0x0100) AM_RAM_WRITE_LEGACY(galaxian_objram_w) AM_SHARE("spriteram")
-	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0x03ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x3efc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc100, 0xc103) AM_MIRROR(0x3efc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
@@ -1613,7 +1615,7 @@ static ADDRESS_MAP_START( anteaterg_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x2607, 0x2607) AM_MIRROR(0x01f8) AM_WRITE_LEGACY(galaxian_flip_screen_y_w)
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
 	AM_RANGE(0x7c00, 0x7fff) AM_RAM_WRITE_LEGACY(galaxian_videoram_w) AM_BASE(m_videoram)	/* mirror! */
-	AM_RANGE(0xf400, 0xf400) AM_MIRROR(0x01ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xf400, 0xf400) AM_MIRROR(0x01ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x01fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
@@ -1623,7 +1625,7 @@ static ADDRESS_MAP_START( frogger_map, AS_PROGRAM, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xa800, 0xabff) AM_MIRROR(0x0400) AM_RAM_WRITE_LEGACY(galaxian_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0xb000, 0xb0ff) AM_MIRROR(0x0700) AM_RAM_WRITE_LEGACY(galaxian_objram_w) AM_SHARE("spriteram")
 	AM_RANGE(0xb808, 0xb808) AM_MIRROR(0x07e3) AM_WRITE_LEGACY(irq_enable_w)
@@ -1650,7 +1652,7 @@ static ADDRESS_MAP_START( turtles_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xa028, 0xa028) AM_MIRROR(0x47c7) AM_WRITE_LEGACY(scramble_background_blue_w)
 	AM_RANGE(0xa030, 0xa030) AM_MIRROR(0x47c7) AM_WRITE_LEGACY(coin_count_0_w)
 	AM_RANGE(0xa038, 0xa038) AM_MIRROR(0x47c7) AM_WRITE_LEGACY(coin_count_1_w)
-	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x47ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x47ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xb000, 0xb03f) AM_MIRROR(0x47cf) AM_READWRITE_LEGACY(turtles_ppi8255_0_r, turtles_ppi8255_0_w)
 	AM_RANGE(0xb800, 0xb83f) AM_MIRROR(0x47cf) AM_READWRITE_LEGACY(turtles_ppi8255_1_r, turtles_ppi8255_1_w)
 ADDRESS_MAP_END
@@ -1739,7 +1741,7 @@ static ADDRESS_MAP_START( frogf_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xa806, 0xa806) AM_MIRROR(0x07f1) AM_WRITE_LEGACY(galaxian_flip_screen_y_w)
 	AM_RANGE(0xa808, 0xa808) AM_MIRROR(0x07f1) AM_WRITE_LEGACY(coin_count_1_w)
 	AM_RANGE(0xa80e, 0xa80e) AM_MIRROR(0x07f1) AM_WRITE_LEGACY(coin_count_0_w)
-	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_MIRROR(0x07ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE_LEGACY(frogf_ppi8255_r, frogf_ppi8255_w)
 ADDRESS_MAP_END
 
@@ -1761,7 +1763,7 @@ static ADDRESS_MAP_START( mshuttle_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0xa800, 0xa800) AM_WRITE_LEGACY(cclimber_sample_rate_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN2")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE_LEGACY(cclimber_sample_volume_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mshuttle_portmap, AS_IO, 8, galaxian_state )
@@ -1843,7 +1845,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( checkman_sound_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x03, 0x03) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_r)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END
@@ -1870,7 +1872,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kingball_sound_portmap, AS_IO, 8, galaxian_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ_LEGACY(soundlatch_r) AM_DEVWRITE_LEGACY("dac", kingball_dac_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_READ(soundlatch_r) AM_DEVWRITE_LEGACY("dac", kingball_dac_w)
 ADDRESS_MAP_END
 
 
@@ -1975,7 +1977,7 @@ static const ay8910_interface frogger_ay8910_interface =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
 	DEVCB_HANDLER(frogger_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1985,7 +1987,7 @@ static const ay8910_interface konami_ay8910_interface_1 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
 	DEVCB_HANDLER(konami_sound_timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -2027,7 +2029,7 @@ static const ay8910_interface sfx_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch2_w),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_w),
 	DEVCB_HANDLER(sfx_sample_control_w)
 };
 
@@ -2045,7 +2047,7 @@ static const ay8910_interface checkmaj_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -3372,13 +3374,14 @@ static DRIVER_INIT( scramble )
 
 static DRIVER_INIT( explorer )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
 
 	/* watchdog works for writes as well? (or is it just disabled?) */
-	space->install_legacy_write_handler(0x7000, 0x7000, 0, 0x7ff, FUNC(watchdog_reset_w));
+	space->install_write_handler(0x7000, 0x7000, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::watchdog_reset_w),state));
 
 	/* I/O appears to be direct, not via PPIs */
 	space->unmap_readwrite(0x8000, 0xffff);
@@ -3386,7 +3389,7 @@ static DRIVER_INIT( explorer )
 	space->install_read_port(0x8001, 0x8001, 0, 0xffc, "IN1");
 	space->install_read_port(0x8002, 0x8002, 0, 0xffc, "IN2");
 	space->install_read_port(0x8003, 0x8003, 0, 0xffc, "IN3");
-	space->install_legacy_write_handler(0x8000, 0x8000, 0, 0xfff, FUNC(soundlatch_w));
+	space->install_write_handler(0x8000, 0x8000, 0, 0xfff, write8_delegate(FUNC(galaxian_state::soundlatch_w),state));
 	space->install_legacy_write_handler(0x9000, 0x9000, 0, 0xfff, FUNC(explorer_sound_control_w));
 }
 
@@ -3406,6 +3409,7 @@ static DRIVER_INIT( sfx )
 
 static DRIVER_INIT( atlantis )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
@@ -3413,7 +3417,7 @@ static DRIVER_INIT( atlantis )
 
 	/* watchdog is at $7800? (or is it just disabled?) */
 	space->unmap_read(0x7000, 0x7000, 0, 0x7ff);
-	space->install_legacy_read_handler(0x7800, 0x7800, 0, 0x7ff, FUNC(watchdog_reset_r));
+	space->install_read_handler(0x7800, 0x7800, 0, 0x7ff, read8_delegate(FUNC(galaxian_state::watchdog_reset_r),state));
 }
 
 
@@ -3449,12 +3453,13 @@ static DRIVER_INIT( frogger )
 
 static DRIVER_INIT( froggrmc )
 {
+	galaxian_state *state = machine.driver_data<galaxian_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
 
-	space->install_legacy_write_handler(0xa800, 0xa800, 0, 0x7ff, FUNC(soundlatch_w));
+	space->install_write_handler(0xa800, 0xa800, 0, 0x7ff, write8_delegate(FUNC(galaxian_state::soundlatch_w),state));
 	space->install_legacy_write_handler(0xb001, 0xb001, 0, 0x7f8, FUNC(froggrmc_sound_control_w));
 
 	/* actually needs 2k of RAM */

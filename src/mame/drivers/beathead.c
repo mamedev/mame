@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, beathead_state)
 	AM_RANGE(0x41000400, 0x41000403) AM_WRITEONLY AM_BASE(m_palette_select)
 	AM_RANGE(0x41000500, 0x41000503) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0x41000600, 0x41000603) AM_WRITE(finescroll_w)
-	AM_RANGE(0x41000700, 0x41000703) AM_WRITE_LEGACY(watchdog_reset32_w)
+	AM_RANGE(0x41000700, 0x41000703) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x42000000, 0x4201ffff) AM_RAM_WRITE(palette_w) AM_BASE(m_paletteram)
 	AM_RANGE(0x43000000, 0x43000007) AM_READWRITE(hsync_ram_r, hsync_ram_w)
 	AM_RANGE(0x8df80000, 0x8df80003) AM_READNOP	/* noisy x4 during scanline int */

@@ -856,7 +856,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tnzsb_io_map, AS_IO, 8, tnzs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x02, 0x02) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8742_io_map, AS_IO, 8, tnzs_state )

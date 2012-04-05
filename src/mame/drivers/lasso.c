@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( lasso_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE(m_chip_data)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x7000)
 ADDRESS_MAP_END
 
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( chameleo_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0xb000, 0xb000) AM_WRITEONLY AM_BASE(m_chip_data)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x7000)
 ADDRESS_MAP_END
 
@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( wwjgtin_audio_map, AS_PROGRAM, 8, lasso_state )
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
 	AM_RANGE(0xb003, 0xb003) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
-	AM_RANGE(0xb005, 0xb005) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -203,7 +203,7 @@ static ADDRESS_MAP_START( pinbo_audio_io_map, AS_IO, 8, lasso_state )
 	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0x08, 0x08) AM_READ_LEGACY(soundlatch_r) AM_WRITENOP /* ??? */
+	AM_RANGE(0x08, 0x08) AM_READ(soundlatch_r) AM_WRITENOP /* ??? */
 	AM_RANGE(0x14, 0x14) AM_WRITENOP	/* ??? */
 ADDRESS_MAP_END
 

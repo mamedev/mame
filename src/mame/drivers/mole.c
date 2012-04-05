@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( mole_map, AS_PROGRAM, 8, mole_state )
 	AM_RANGE(0x8c40, 0x8c40) AM_WRITENOP // ???
 	AM_RANGE(0x8c80, 0x8c80) AM_WRITENOP // ???
 	AM_RANGE(0x8c81, 0x8c81) AM_WRITENOP // ???
-	AM_RANGE(0x8d00, 0x8d00) AM_READ_PORT("DSW") AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x8d00, 0x8d00) AM_READ_PORT("DSW") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8d40, 0x8d40) AM_READ_PORT("IN0")
 	AM_RANGE(0x8d80, 0x8d80) AM_READ_PORT("IN1")
 	AM_RANGE(0x8dc0, 0x8dc0) AM_READ_PORT("IN2") AM_WRITE(mole_flipscreen_w)

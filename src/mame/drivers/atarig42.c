@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarig42_state )
 	AM_RANGE(0xe00050, 0xe00051) AM_WRITE_LEGACY(io_latch_w)
 	AM_RANGE(0xe00060, 0xe00061) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0xe03000, 0xe03001) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
-	AM_RANGE(0xe03800, 0xe03801) AM_WRITE_LEGACY(watchdog_reset16_w)
+	AM_RANGE(0xe03800, 0xe03801) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0xe80000, 0xe80fff) AM_RAM
 	AM_RANGE(0xf40000, 0xf40001) AM_READ_LEGACY(asic65_io_r)
 	AM_RANGE(0xf60000, 0xf60001) AM_READ_LEGACY(asic65_r)

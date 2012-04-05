@@ -510,7 +510,7 @@ static ADDRESS_MAP_START( tx1_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE_LEGACY(tx1_scolst_w)
 	AM_RANGE(0x0d000, 0x0d003) AM_WRITE_LEGACY(tx1_slincs_w)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE_LEGACY(tx1_slock_w)
-	AM_RANGE(0x0f000, 0x0f001) AM_READWRITE_LEGACY(watchdog_reset16_r, resume_math_w)
+	AM_RANGE(0x0f000, 0x0f001) AM_READ(watchdog_reset16_r) AM_WRITE_LEGACY(resume_math_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE_LEGACY(z80_shared_r, z80_shared_w)
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -561,7 +561,7 @@ static ADDRESS_MAP_START( buggyboy_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE_LEGACY(buggyboy_scolst_w)
 	AM_RANGE(0x0d000, 0x0d003) AM_WRITE_LEGACY(tx1_slincs_w)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE_LEGACY(buggyboy_sky_w)
-	AM_RANGE(0x0f000, 0x0f003) AM_READWRITE_LEGACY(watchdog_reset16_r, resume_math_w)
+	AM_RANGE(0x0f000, 0x0f003) AM_READ(watchdog_reset16_r) AM_WRITE_LEGACY(resume_math_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE_LEGACY(z80_shared_r, z80_shared_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
@@ -576,7 +576,7 @@ static ADDRESS_MAP_START( buggybjr_main, AS_PROGRAM, 16, tx1_state )
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE_LEGACY(buggyboy_scolst_w)
 	AM_RANGE(0x0d000, 0x0d003) AM_WRITE_LEGACY(tx1_slincs_w)
 	AM_RANGE(0x0e000, 0x0e001) AM_WRITE_LEGACY(buggyboy_sky_w)
-	AM_RANGE(0x0f000, 0x0f003) AM_READWRITE_LEGACY(watchdog_reset16_r, resume_math_w)
+	AM_RANGE(0x0f000, 0x0f003) AM_READ(watchdog_reset16_r) AM_WRITE_LEGACY(resume_math_w)
 	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE_LEGACY(z80_shared_r, z80_shared_w)
 	AM_RANGE(0x20000, 0x2ffff) AM_ROM
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM

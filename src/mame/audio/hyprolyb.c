@@ -45,8 +45,8 @@ static DEVICE_RESET( hyprolyb_adpcm )
 WRITE8_DEVICE_HANDLER( hyprolyb_adpcm_w )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
-
-	soundlatch2_w(state->m_space, offset, data);
+	driver_device *drvstate = device->machine().driver_data<driver_device>();
+	drvstate->soundlatch2_w(*state->m_space, offset, data);
 	state->m_adpcm_ready = 0x80;
 }
 
@@ -84,9 +84,9 @@ static READ8_DEVICE_HANDLER( hyprolyb_adpcm_ready_r )
 static READ8_DEVICE_HANDLER( hyprolyb_adpcm_data_r )
 {
 	hyprolyb_adpcm_state *state = get_safe_token(device);
-
+	driver_device *drvstate = device->machine().driver_data<driver_device>();
 	state->m_adpcm_ready = 0x00;
-	return soundlatch2_r(state->m_space, offset);
+	return drvstate->soundlatch2_r(*state->m_space, offset);
 }
 
 static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8, driver_device )

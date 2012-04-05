@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x1fc4, 0x1fc4) AM_READ_LEGACY(simpsons_sound_interrupt_r)
 	AM_RANGE(0x1fc6, 0x1fc7) AM_DEVREADWRITE_LEGACY("k053260", simpsons_sound_r, k053260_w)
 	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD_LEGACY("k053246", k053246_r)
-	AM_RANGE(0x1fca, 0x1fca) AM_READ_LEGACY(watchdog_reset_r)
+	AM_RANGE(0x1fca, 0x1fca) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank4")
 	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM

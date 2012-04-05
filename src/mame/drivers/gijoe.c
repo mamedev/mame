@@ -197,8 +197,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gijoe_state )
 	AM_RANGE(0x0000, 0xebff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE_LEGACY(soundlatch2_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gijoe )

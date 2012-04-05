@@ -584,8 +584,8 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, cps_state )
 	AM_RANGE(0xf002, 0xf002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(cps1_snd_bankswitch_w)
 	AM_RANGE(0xf006, 0xf006) AM_DEVWRITE_LEGACY("oki", cps1_oki_pin7_w) /* controls pin 7 of OKI chip */
-	AM_RANGE(0xf008, 0xf008) AM_READ_LEGACY(soundlatch_r)	/* Sound command */
-	AM_RANGE(0xf00a, 0xf00a) AM_READ_LEGACY(soundlatch2_r) /* Sound timer fade */
+	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)	/* Sound command */
+	AM_RANGE(0xf00a, 0xf00a) AM_READ(soundlatch2_r) /* Sound timer fade */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( qsound_main_map, AS_PROGRAM, 16, cps_state )

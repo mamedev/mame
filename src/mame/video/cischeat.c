@@ -305,7 +305,7 @@ READ16_HANDLER( bigrun_vregs_r )
 		case 0x0004/2 : return input_port_read(space->machine(), "IN3");	// Motor Limit Switches
 		case 0x0006/2 : return input_port_read(space->machine(), "IN4");	// DSW 1 & 2
 
-		case 0x0008/2 :	return soundlatch2_word_r(space,0,0xffff);	// From sound cpu
+		case 0x0008/2 :	return state->soundlatch2_word_r(*space,0,0xffff);	// From sound cpu
 
 		case 0x0010/2 :
 			switch (state->m_ip_select & 0x3)
@@ -355,7 +355,7 @@ WRITE16_HANDLER( bigrun_vregs_w )
 			break;
 
 		case 0x000a/2   :	// to sound cpu
-			soundlatch_word_w(space,0,new_data,0xffff);
+			state->soundlatch_word_w(*space,0,new_data,0xffff);
 			break;
 
 		case 0x000c/2   :	break;	// ??
@@ -413,7 +413,7 @@ READ16_HANDLER( cischeat_vregs_r )
 			}
 
 		case 0x2200/2 : return input_port_read(space->machine(), "IN5");	// DSW 3 (4 bits)
-		case 0x2300/2 : return soundlatch2_r(space,0);	// From sound cpu
+		case 0x2300/2 : return state->soundlatch2_r(*space,0);	// From sound cpu
 
 		default:	SHOW_READ_ERROR("vreg %04X read!",offset*2);
 					return state->m_vregs[offset];
@@ -468,7 +468,7 @@ WRITE16_HANDLER( cischeat_vregs_w )
 		case 0x2208/2   : break;	// watchdog reset
 
 		case 0x2300/2   :	/* Sound CPU: reads latch during int 4, and stores command */
-							soundlatch_word_w(space, 0, new_data, 0xffff);
+							state->soundlatch_word_w(*space, 0, new_data, 0xffff);
 							cputag_set_input_line(space->machine(), "soundcpu", 4, HOLD_LINE);
 							break;
 
@@ -501,7 +501,7 @@ READ16_HANDLER( f1gpstar_vregs_r )
 
 		case 0x0006/2 :	return input_port_read(space->machine(), "IN3");	// ? Read at boot only
 
-		case 0x0008/2 :	return soundlatch2_r(space,0);		// From sound cpu
+		case 0x0008/2 :	return state->soundlatch2_r(*space,0);		// From sound cpu
 
 		case 0x000c/2 :	return input_port_read(space->machine(), "IN4");	// DSW 3
 
@@ -545,7 +545,7 @@ READ16_HANDLER( wildplt_vregs_r )
 
 		case 0x0004/2 :	return input_port_read(space->machine(), "IN1"); // Buttons
 
-		case 0x0008/2 :	return soundlatch2_r(space,0); // From sound cpu
+		case 0x0008/2 :	return state->soundlatch2_r(*space,0); // From sound cpu
 
 		case 0x0010/2 :	// X, Y
 			return input_port_read(space->machine(), "IN2") | (input_port_read(space->machine(), "IN3")<<8);
@@ -587,7 +587,7 @@ CPU #0 PC 00235C : Warning, vreg 0006 <- 0000
 		case 0x0014/2   :	break;
 
 		/* Usually written in sequence, but not always */
-		case 0x0008/2   :	soundlatch_word_w(space, 0, new_data, 0xffff);	break;
+		case 0x0008/2   :	state->soundlatch_word_w(*space, 0, new_data, 0xffff);	break;
 		case 0x0018/2   :	cputag_set_input_line(space->machine(), "soundcpu", 4, HOLD_LINE);	break;
 
 		case 0x0010/2   :	break;
@@ -670,7 +670,7 @@ WRITE16_HANDLER( scudhamm_vregs_w )
 		case 0x100/2+1 : CISCHEAT_VREG_SCROLL(2,y);		break;
 		case 0x100/2+2 : cischeat_set_vreg_flag(state,2,new_data);break;
 
-		case 0x208/2   : watchdog_reset_w(space,0,0);	break;
+		case 0x208/2   : state->watchdog_reset_w(*space,0,0);	break;
 
 		default: SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
 	}

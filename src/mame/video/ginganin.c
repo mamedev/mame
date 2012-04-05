@@ -179,7 +179,7 @@ WRITE16_HANDLER( ginganin_vregs16_w )
 		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
-		soundlatch_w(space, 0, data);
+		state->soundlatch_w(*space, 0, data);
 		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 	default:

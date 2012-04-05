@@ -161,7 +161,7 @@ static ADDRESS_MAP_START( atarifb_map, AS_PROGRAM, 8, atarifb_state )
 	AM_RANGE(0x3000, 0x3000) AM_NOP /* Interrupt Acknowledge */
 	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(atarifb_in0_r)
 	AM_RANGE(0x4002, 0x4002) AM_READ_LEGACY(atarifb_in2_r)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( atarifb4_map, AS_PROGRAM, 8, atarifb_state )
 	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(atarifb4_in0_r)
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x4002, 0x4002) AM_READ_LEGACY(atarifb4_in2_r)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( abaseb_map, AS_PROGRAM, 8, atarifb_state )
 	AM_RANGE(0x3000, 0x3000) AM_NOP /* Interrupt Acknowledge */
 	AM_RANGE(0x4000, 0x4000) AM_READ_LEGACY(atarifb_in0_r)
 	AM_RANGE(0x4002, 0x4002) AM_READ_LEGACY(atarifb_in2_r)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -219,7 +219,7 @@ static ADDRESS_MAP_START( soccer_map, AS_PROGRAM, 8, atarifb_state )
 	AM_RANGE(0x1001, 0x1001) AM_WRITE_LEGACY(soccer_out1_w) /* OUT 1 */
 	AM_RANGE(0x1002, 0x1002) AM_WRITE_LEGACY(soccer_out2_w) /* OUT 2 */
 	AM_RANGE(0x1004, 0x1004) AM_WRITENOP /* Interrupt Acknowledge */
-	AM_RANGE(0x1005, 0x1005) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x1005, 0x1005) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1800, 0x1800) AM_READ_LEGACY(atarifb4_in0_r)
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("EXTRA")
 	AM_RANGE(0x1802, 0x1802) AM_READ_LEGACY(atarifb4_in2_r)

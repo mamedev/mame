@@ -673,7 +673,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITENOP // this gets written the same values as 0x2000
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("adpcm", adpcm_play_w)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE_LEGACY("ymsnd", ym3526_r,ym3526_w)

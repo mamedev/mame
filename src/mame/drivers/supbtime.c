@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supbtime_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_NOP /* This board only has 1 oki chip */
-	AM_RANGE(0x140000, 0x140001) AM_READ_LEGACY(soundlatch_r)
+	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE_LEGACY(h6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
