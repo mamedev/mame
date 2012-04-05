@@ -303,7 +303,7 @@ protected:
 
 	protected:
 		// static helpers
-		void *find_memory(size_t &size);
+		void *find_memory(UINT8 width, size_t &bytes, bool required);
 
 		// internal state
 		finder_base *m_next;
@@ -367,11 +367,12 @@ protected:
 	{
 	public:
 		// construction/destruction
-		shared_ptr_finder(device_t &base, const char *tag)
+		shared_ptr_finder(device_t &base, const char *tag, UINT8 width = 0)
 			: finder_base(base, tag),
 			  m_target(0),
 			  m_bytes(0),
-			  m_allocated(false) { }
+			  m_allocated(false),
+			  m_width((width != 0) ? width : sizeof(_PointerType) * 8) { }
 		
 		virtual ~shared_ptr_finder() { if (m_allocated) global_free(m_target); }
 
@@ -404,13 +405,14 @@ protected:
 		}
 
 		// finder
-		virtual void findit() { m_target = reinterpret_cast<_PointerType *>(find_memory(m_bytes)); }
+		virtual void findit() { m_target = reinterpret_cast<_PointerType *>(find_memory(m_width, m_bytes, _Required)); }
 
 	protected:
 		// internal state
 		_PointerType *m_target;
 		size_t m_bytes;
 		bool m_allocated;
+		UINT8 m_width;
 	};
 	
 	// optional device finder
@@ -418,7 +420,7 @@ protected:
 	class optional_shared_ptr : public shared_ptr_finder<_PointerType, false>
 	{
 	public:
-		optional_shared_ptr(device_t &base, const char *tag) : shared_ptr_finder<_PointerType, false>(base, tag) { }
+		optional_shared_ptr(device_t &base, const char *tag, UINT8 width = 0) : shared_ptr_finder<_PointerType, false>(base, tag, width) { }
 	};
 
 	// required devices are similar but throw an error if they are not found
@@ -426,7 +428,7 @@ protected:
 	class required_shared_ptr : public shared_ptr_finder<_PointerType, true>
 	{
 	public:
-		required_shared_ptr(device_t &base, const char *tag) : shared_ptr_finder<_PointerType, true>(base, tag) { }
+		required_shared_ptr(device_t &base, const char *tag, UINT8 width = 0) : shared_ptr_finder<_PointerType, true>(base, tag, width) { }
 	};
 
 	// internal helpers

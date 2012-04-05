@@ -859,12 +859,18 @@ device_t::finder_base::~finder_base()
 //  find_memory - find memory
 //-------------------------------------------------
 
-void *device_t::finder_base::find_memory(size_t &size)
+void *device_t::finder_base::find_memory(UINT8 width, size_t &bytes, bool required)
 {
 	memory_share *share = m_base.machine().memory().shared(m_base, m_tag);
 	if (share == NULL)
 		return NULL;
-	size = share->bytes();
+	if (share->width() != width)
+	{
+		if (required)
+			mame_printf_warning("Shared ptr '%s' found but is width %d, not %d as requested\n", m_tag, share->width(), width);
+		return NULL;
+	}
+	bytes = share->bytes();
 	return share->ptr();
 }
 
