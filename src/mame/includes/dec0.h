@@ -27,6 +27,10 @@ public:
 	DECLARE_WRITE16_MEMBER(midres_sound_w);
 	DECLARE_WRITE16_MEMBER(unmapped_w);
 	DECLARE_WRITE8_MEMBER(automat_adpcm_w);
+	DECLARE_READ16_MEMBER(slyspy_controls_r);
+	DECLARE_READ16_MEMBER(slyspy_protection_r);
+	DECLARE_WRITE16_MEMBER(slyspy_state_w);
+	DECLARE_READ16_MEMBER(slyspy_state_r);
 };
 
 

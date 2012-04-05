@@ -35,6 +35,8 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
+	DECLARE_READ32_MEMBER(randgen_r);
+	DECLARE_WRITE32_MEMBER(srand_w);
 };
 
 

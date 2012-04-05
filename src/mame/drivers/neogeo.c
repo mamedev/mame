@@ -444,22 +444,21 @@ WRITE16_MEMBER(neogeo_state::io_control_w)
  *
  *************************************/
 
-READ16_HANDLER( neogeo_unmapped_r )
+READ16_MEMBER(neogeo_state::neogeo_unmapped_r)
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
 	UINT16 ret;
 
 	/* unmapped memory returns the last word on the data bus, which is almost always the opcode
        of the next instruction due to prefetch */
 
 	/* prevent recursion */
-	if (state->m_recurse)
+	if (m_recurse)
 		ret = 0xffff;
 	else
 	{
-		state->m_recurse = 1;
-		ret = space->read_word(cpu_get_pc(&space->device()));
-		state->m_recurse = 0;
+		m_recurse = 1;
+		ret = space.read_word(cpu_get_pc(&space.device()));
+		m_recurse = 0;
 	}
 
 	return ret;
@@ -1092,21 +1091,21 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, neogeo_state )
 	AM_RANGE(0x2ffff0, 0x2fffff) AM_WRITE(main_cpu_bank_select_w)
 	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN0")
 	AM_RANGE(0x300080, 0x300081) AM_MIRROR(0x01ff7e) AM_READ_PORT("IN4")
-	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READ_LEGACY(neogeo_unmapped_r) AM_WRITE(watchdog_w)
+	AM_RANGE(0x300000, 0x300001) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE(watchdog_w)
 	AM_RANGE(0x320000, 0x320001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN3") AM_WRITE(audio_command_w)
 	AM_RANGE(0x340000, 0x340001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN1")
-	AM_RANGE(0x360000, 0x37ffff) AM_READ_LEGACY(neogeo_unmapped_r)
+	AM_RANGE(0x360000, 0x37ffff) AM_READ(neogeo_unmapped_r)
 	AM_RANGE(0x380000, 0x380001) AM_MIRROR(0x01fffe) AM_READ_PORT("IN2")
 	AM_RANGE(0x380000, 0x38007f) AM_MIRROR(0x01ff80) AM_WRITE(io_control_w)
-	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ_LEGACY(neogeo_unmapped_r) AM_WRITE(system_control_w)
+	AM_RANGE(0x3a0000, 0x3a001f) AM_MIRROR(0x01ffe0) AM_READ(neogeo_unmapped_r) AM_WRITE(system_control_w)
 	AM_RANGE(0x3c0000, 0x3c0007) AM_MIRROR(0x01fff8) AM_READ_LEGACY(neogeo_video_register_r)
 	AM_RANGE(0x3c0000, 0x3c000f) AM_MIRROR(0x01fff0) AM_WRITE_LEGACY(neogeo_video_register_w)
-	AM_RANGE(0x3e0000, 0x3fffff) AM_READ_LEGACY(neogeo_unmapped_r)
+	AM_RANGE(0x3e0000, 0x3fffff) AM_READ(neogeo_unmapped_r)
 	AM_RANGE(0x400000, 0x401fff) AM_MIRROR(0x3fe000) AM_READWRITE_LEGACY(neogeo_paletteram_r, neogeo_paletteram_w)
 	AM_RANGE(0x800000, 0x800fff) AM_READWRITE(memcard_r, memcard_w)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_MIRROR(0x0e0000) AM_ROMBANK(NEOGEO_BANK_BIOS)
 	AM_RANGE(0xd00000, 0xd0ffff) AM_MIRROR(0x0f0000) AM_RAM_WRITE(save_ram_w) AM_BASE_LEGACY(&save_ram)
-	AM_RANGE(0xe00000, 0xffffff) AM_READ_LEGACY(neogeo_unmapped_r)
+	AM_RANGE(0xe00000, 0xffffff) AM_READ(neogeo_unmapped_r)
 ADDRESS_MAP_END
 
 

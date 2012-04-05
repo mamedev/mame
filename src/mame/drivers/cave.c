@@ -492,10 +492,9 @@ READ16_MEMBER(cave_state::donpachi_videoregs_r)
 }
 
 #if 0
-WRITE16_HANDLER( donpachi_videoregs_w )
+WRITE16_MEMBER(cave_state::donpachi_videoregs_w)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
-	COMBINE_DATA(&state->m_videoregs[offset]);
+	COMBINE_DATA(&m_videoregs[offset]);
 
 	switch (offset)
 	{

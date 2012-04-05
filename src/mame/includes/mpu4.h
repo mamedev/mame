@@ -245,6 +245,7 @@ public:
 	DECLARE_READ8_MEMBER(mpu4_ym2413_r);
 	DECLARE_READ8_MEMBER(crystal_sound_r);
 	DECLARE_WRITE8_MEMBER(crystal_sound_w);
+	DECLARE_WRITE8_MEMBER(ic3ss_w);
 };
 
 /* mpu4.c, used by mpu4vid.c */
@@ -259,8 +260,6 @@ MACHINE_CONFIG_EXTERN( mpu4_common );
 MACHINE_CONFIG_EXTERN( mpu4_common2 );
 
 MACHINE_CONFIG_EXTERN( mod2     );
-
-WRITE8_HANDLER( ic3ss_w );
 
 extern MACHINE_START( mod2     );
 extern const ay8910_interface ay8910_config;

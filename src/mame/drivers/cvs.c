@@ -112,120 +112,110 @@ Todo & FIXME:
  *
  *************************************/
 
-READ8_HANDLER( cvs_video_or_color_ram_r )
+READ8_MEMBER(cvs_state::cvs_video_or_color_ram_r)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
-	if (*state->m_fo_state)
-		return state->m_video_ram[offset];
+	if (*m_fo_state)
+		return m_video_ram[offset];
 	else
-		return state->m_color_ram[offset];
+		return m_color_ram[offset];
 }
 
-WRITE8_HANDLER( cvs_video_or_color_ram_w )
+WRITE8_MEMBER(cvs_state::cvs_video_or_color_ram_w)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
-	if (*state->m_fo_state)
-		state->m_video_ram[offset] = data;
+	if (*m_fo_state)
+		m_video_ram[offset] = data;
 	else
-		state->m_color_ram[offset] = data;
-}
-
-
-READ8_HANDLER( cvs_bullet_ram_or_palette_r )
-{
-	cvs_state *state = space->machine().driver_data<cvs_state>();
-
-	if (*state->m_fo_state)
-		return state->m_palette_ram[offset & 0x0f];
-	else
-		return state->m_bullet_ram[offset];
-}
-
-WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
-{
-	cvs_state *state = space->machine().driver_data<cvs_state>();
-
-	if (*state->m_fo_state)
-		state->m_palette_ram[offset & 0x0f] = data;
-	else
-		state->m_bullet_ram[offset] = data;
+		m_color_ram[offset] = data;
 }
 
 
-READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
+READ8_MEMBER(cvs_state::cvs_bullet_ram_or_palette_r)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
-	if (*state->m_fo_state)
-		return state->m_character_ram[(0 * 0x800) | 0x400 | state->m_character_ram_page_start | offset];
+	if (*m_fo_state)
+		return m_palette_ram[offset & 0x0f];
 	else
-		return s2636_work_ram_r(state->m_s2636_0, offset);
+		return m_bullet_ram[offset];
 }
 
-WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
+WRITE8_MEMBER(cvs_state::cvs_bullet_ram_or_palette_w)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
-	if (*state->m_fo_state)
+	if (*m_fo_state)
+		m_palette_ram[offset & 0x0f] = data;
+	else
+		m_bullet_ram[offset] = data;
+}
+
+
+READ8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_r)
+{
+
+	if (*m_fo_state)
+		return m_character_ram[(0 * 0x800) | 0x400 | m_character_ram_page_start | offset];
+	else
+		return s2636_work_ram_r(m_s2636_0, offset);
+}
+
+WRITE8_MEMBER(cvs_state::cvs_s2636_0_or_character_ram_w)
+{
+
+	if (*m_fo_state)
 	{
-		offset |= (0 * 0x800) | 0x400 | state->m_character_ram_page_start;
-		state->m_character_ram[offset] = data;
-		gfx_element_mark_dirty(space->machine().gfx[1], (offset / 8) % 256);
+		offset |= (0 * 0x800) | 0x400 | m_character_ram_page_start;
+		m_character_ram[offset] = data;
+		gfx_element_mark_dirty(machine().gfx[1], (offset / 8) % 256);
 	}
 	else
-		s2636_work_ram_w(state->m_s2636_0, offset, data);
+		s2636_work_ram_w(m_s2636_0, offset, data);
 }
 
 
-READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
+READ8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_r)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
-	if (*state->m_fo_state)
-		return state->m_character_ram[(1 * 0x800) | 0x400 | state->m_character_ram_page_start | offset];
+	if (*m_fo_state)
+		return m_character_ram[(1 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return s2636_work_ram_r(state->m_s2636_1, offset);
+		return s2636_work_ram_r(m_s2636_1, offset);
 }
 
-WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
+WRITE8_MEMBER(cvs_state::cvs_s2636_1_or_character_ram_w)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
-	if (*state->m_fo_state)
+	if (*m_fo_state)
 	{
-		offset |= (1 * 0x800) | 0x400 | state->m_character_ram_page_start;
-		state->m_character_ram[offset] = data;
-		gfx_element_mark_dirty(space->machine().gfx[1], (offset / 8) % 256);
+		offset |= (1 * 0x800) | 0x400 | m_character_ram_page_start;
+		m_character_ram[offset] = data;
+		gfx_element_mark_dirty(machine().gfx[1], (offset / 8) % 256);
 	}
 	else
-		s2636_work_ram_w(state->m_s2636_1, offset, data);
+		s2636_work_ram_w(m_s2636_1, offset, data);
 }
 
 
-READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
+READ8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_r)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
-	if (*state->m_fo_state)
-		return state->m_character_ram[(2 * 0x800) | 0x400 | state->m_character_ram_page_start | offset];
+	if (*m_fo_state)
+		return m_character_ram[(2 * 0x800) | 0x400 | m_character_ram_page_start | offset];
 	else
-		return s2636_work_ram_r(state->m_s2636_2, offset);
+		return s2636_work_ram_r(m_s2636_2, offset);
 }
 
-WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
+WRITE8_MEMBER(cvs_state::cvs_s2636_2_or_character_ram_w)
 {
-	cvs_state *state = space->machine().driver_data<cvs_state>();
 
-	if (*state->m_fo_state)
+	if (*m_fo_state)
 	{
-		offset |= (2 * 0x800) | 0x400 | state->m_character_ram_page_start;
-		state->m_character_ram[offset] = data;
-		gfx_element_mark_dirty(space->machine().gfx[1], (offset / 8) % 256);
+		offset |= (2 * 0x800) | 0x400 | m_character_ram_page_start;
+		m_character_ram[offset] = data;
+		gfx_element_mark_dirty(machine().gfx[1], (offset / 8) % 256);
 	}
 	else
-		s2636_work_ram_w(state->m_s2636_2, offset, data);
+		s2636_work_ram_w(m_s2636_2, offset, data);
 }
 
 
@@ -484,11 +474,11 @@ WRITE8_MEMBER(cvs_state::audio_command_w)
 static ADDRESS_MAP_START( cvs_main_cpu_map, AS_PROGRAM, 8, cvs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_bullet_ram_or_palette_r, cvs_bullet_ram_or_palette_w) AM_BASE(m_bullet_ram)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_video_or_color_ram_r, cvs_video_or_color_ram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_bullet_ram_or_palette_r, cvs_bullet_ram_or_palette_w) AM_BASE(m_bullet_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(cvs_video_or_color_ram_r, cvs_video_or_color_ram_w) AM_BASE(m_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x4000, 0x53ff) AM_ROM

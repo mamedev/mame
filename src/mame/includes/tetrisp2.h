@@ -57,11 +57,10 @@ public:
 	DECLARE_WRITE16_MEMBER(tetrisp2_coincounter_w);
 	DECLARE_WRITE16_MEMBER(nndmseal_coincounter_w);
 	DECLARE_WRITE16_MEMBER(nndmseal_b20000_w);
+	DECLARE_WRITE16_MEMBER(tetrisp2_systemregs_w);
+	DECLARE_READ16_MEMBER(tetrisp2_nvram_r);
+	DECLARE_WRITE16_MEMBER(tetrisp2_nvram_w);
 };
-
-WRITE16_HANDLER( tetrisp2_systemregs_w );
-READ16_HANDLER( tetrisp2_nvram_r );
-WRITE16_HANDLER( tetrisp2_nvram_w );
 
 /*----------- defined in video/tetrisp2.c -----------*/
 

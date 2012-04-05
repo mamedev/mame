@@ -2004,7 +2004,7 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4_state )
 	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
 	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0xffa040, 0xffa04f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff)  // 6840PTM on sampled sound board
-	AM_RANGE(0xffa040, 0xffa04f) AM_WRITE8_LEGACY(ic3ss_w,0x00ff)  // 6840PTM on sampled sound board
+	AM_RANGE(0xffa040, 0xffa04f) AM_WRITE8(ic3ss_w,0x00ff)  // 6840PTM on sampled sound board
 	AM_RANGE(0xffa060, 0xffa067) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write,0x00ff)    // PIA6821 on sampled sound board
 	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE_LEGACY(characteriser16_r, characteriser16_w)
 //  AM_RANGE(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
@@ -2061,7 +2061,7 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4_state )
 	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write, 0xff00)
 	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff00)  // 6840PTM on sampled sound board
-	AM_RANGE(0xe03000, 0xe0300f) AM_WRITE8_LEGACY(ic3ss_w,0xff00)  // 6840PTM on sampled sound board
+	AM_RANGE(0xe03000, 0xe0300f) AM_WRITE8(ic3ss_w,0xff00)  // 6840PTM on sampled sound board
 	AM_RANGE(0xe04000, 0xe0400f) AM_READWRITE_LEGACY(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE_LEGACY(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
 

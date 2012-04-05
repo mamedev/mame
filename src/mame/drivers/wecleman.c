@@ -492,9 +492,6 @@ WRITE16_MEMBER(wecleman_state::blitter_w)
                     WEC Le Mans 24 Main CPU Handlers
 ***************************************************************************/
 
-static WRITE16_HANDLER( wecleman_soundlatch_w );
-
-
 static ADDRESS_MAP_START( wecleman_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM	// ROM (03c000-03ffff used as RAM sometimes!)
 	AM_RANGE(0x040494, 0x040495) AM_WRITE_LEGACY(wecleman_videostatus_w) AM_BASE(m_videostatus)	// cloud blending control (HACK)
@@ -507,7 +504,7 @@ static ADDRESS_MAP_START( wecleman_map, AS_PROGRAM, 16, wecleman_state )
 	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE_LEGACY(wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x124000, 0x127fff) AM_RAM AM_SHARE("share1")	// Shared with main CPU
 	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE(m_spriteram)	// Sprites
-	AM_RANGE(0x140000, 0x140001) AM_WRITE_LEGACY(wecleman_soundlatch_w)	// To sound CPU
+	AM_RANGE(0x140000, 0x140001) AM_WRITE(wecleman_soundlatch_w)	// To sound CPU
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(selected_ip_w)	// Selects accelerator / wheel / ..
 	AM_RANGE(0x140004, 0x140005) AM_WRITE(irqctrl_w)	// Main CPU controls the other CPUs
 	AM_RANGE(0x140006, 0x140007) AM_WRITENOP	// Watchdog reset
@@ -582,13 +579,12 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* 140001.b */
-WRITE16_HANDLER( wecleman_soundlatch_w )
+WRITE16_MEMBER(wecleman_state::wecleman_soundlatch_w)
 {
-	wecleman_state *state = space->machine().driver_data<wecleman_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->soundlatch_w(*space, 0, data & 0xFF);
-		cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+		soundlatch_w(*&space, 0, data & 0xFF);
+		cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 	}
 }
 

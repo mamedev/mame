@@ -115,20 +115,19 @@ static MACHINE_RESET( sshangha )
 
 /******************************************************************************/
 
-INLINE void set_color_888(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
+INLINE void sshangha_set_color_888(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
 {
 	palette_set_color_rgb(machine, color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
 }
 
 
-WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites2_w )
+WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	COMBINE_DATA(&state->m_sprite_paletteram2[offset]);
-	set_color_888(space->machine(), (offset/2)+0x100, 0, 8, 16, state->m_sprite_paletteram2[(offset) | 1] | (state->m_sprite_paletteram2[(offset) & ~1] << 16) );
+	COMBINE_DATA(&m_sprite_paletteram2[offset]);
+	sshangha_set_color_888(machine(), (offset/2)+0x100, 0, 8, 16, m_sprite_paletteram2[(offset) | 1] | (m_sprite_paletteram2[(offset) & ~1] << 16) );
 }
 
-WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites_w )
+WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_sprites_w)
 {
 	// hack??? we have to call this otherwise the sprite colours for some selected tiles are wrong (most noticeable on the 2nd level of quest mode)
 	// however if we simply mirror the memory both ways the how to play screen ends up with bad colours
@@ -137,23 +136,20 @@ WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites_w )
 	// maybe related to sprite DMA on the original, or the apparent lack of a 2nd sprite controller on the bootleg.
 	paletteram16_xbgr_word_be_sprites2_w(space,offset,data,mem_mask);
 
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	COMBINE_DATA(&state->m_sprite_paletteram[offset]);
-	set_color_888(space->machine(), (offset/2)+0x000, 0, 8, 16, state->m_sprite_paletteram[(offset) | 1] | (state->m_sprite_paletteram[(offset) & ~1] << 16) );
+	COMBINE_DATA(&m_sprite_paletteram[offset]);
+	sshangha_set_color_888(machine(), (offset/2)+0x000, 0, 8, 16, m_sprite_paletteram[(offset) | 1] | (m_sprite_paletteram[(offset) & ~1] << 16) );
 }
 
-WRITE16_HANDLER( paletteram16_xbgr_word_be_tilelow_w )
+WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	COMBINE_DATA(&state->m_tile_paletteram1[offset]);
-	set_color_888(space->machine(), (offset/2)+0x200, 0, 8, 16, state->m_tile_paletteram1[(offset) | 1] | (state->m_tile_paletteram1[(offset) & ~1] << 16) );
+	COMBINE_DATA(&m_tile_paletteram1[offset]);
+	sshangha_set_color_888(machine(), (offset/2)+0x200, 0, 8, 16, m_tile_paletteram1[(offset) | 1] | (m_tile_paletteram1[(offset) & ~1] << 16) );
 }
 
-WRITE16_HANDLER( paletteram16_xbgr_word_be_tilehigh_w )
+WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	COMBINE_DATA(&state->m_tile_paletteram2[offset]);
-	set_color_888(space->machine(), (offset/2)+0x300, 0, 8, 16, state->m_tile_paletteram2[(offset) | 1] | (state->m_tile_paletteram2[(offset) & ~1] << 16) );
+	COMBINE_DATA(&m_tile_paletteram2[offset]);
+	sshangha_set_color_888(machine(), (offset/2)+0x300, 0, 8, 16, m_tile_paletteram2[(offset) | 1] | (m_tile_paletteram2[(offset) & ~1] << 16) );
 }
 
 static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
@@ -177,10 +173,10 @@ static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
 	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
 
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_sprites_w) AM_BASE(m_sprite_paletteram)
-	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE(m_tile_paletteram2)
-	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_sprites2_w) AM_BASE(m_sprite_paletteram2)
-	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_tilelow_w) AM_BASE(m_tile_paletteram1)
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_BASE(m_sprite_paletteram)
+	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE(m_tile_paletteram2)
+	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_BASE(m_sprite_paletteram2)
+	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE(m_tile_paletteram1)
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
@@ -204,10 +200,10 @@ static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16, sshangha_state )
 
 	AM_RANGE(0x340000, 0x340fff) AM_RAM // original spriteram
 
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_sprites_w) AM_BASE(m_sprite_paletteram)
-	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE(m_tile_paletteram2)
-	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_sprites2_w) AM_BASE(m_sprite_paletteram2)
-	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_tilelow_w) AM_BASE(m_tile_paletteram1)
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_BASE(m_sprite_paletteram)
+	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE(m_tile_paletteram2)
+	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_BASE(m_sprite_paletteram2)
+	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE(m_tile_paletteram1)
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
 
 	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM AM_SHARE("spriteram") // bootleg spriteram

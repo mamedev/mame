@@ -284,83 +284,74 @@ static CUSTOM_INPUT( xain_vblank_r )
 
 ***************************************************************************/
 
-READ8_HANDLER( xain_68705_port_a_r )
+READ8_MEMBER(xain_state::xain_68705_port_a_r)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	return (state->m_port_a_out & state->m_ddr_a) | (state->m_port_a_in & ~state->m_ddr_a);
+	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_HANDLER( xain_68705_port_a_w )
+WRITE8_MEMBER(xain_state::xain_68705_port_a_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_port_a_out = data;
+	m_port_a_out = data;
 }
 
-WRITE8_HANDLER( xain_68705_ddr_a_w )
+WRITE8_MEMBER(xain_state::xain_68705_ddr_a_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_ddr_a = data;
+	m_ddr_a = data;
 }
 
-READ8_HANDLER( xain_68705_port_b_r )
+READ8_MEMBER(xain_state::xain_68705_port_b_r)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	return (state->m_port_b_out & state->m_ddr_b) | (state->m_port_b_in & ~state->m_ddr_b);
+	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_HANDLER( xain_68705_port_b_w )
+WRITE8_MEMBER(xain_state::xain_68705_port_b_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	if ((state->m_ddr_b & 0x02) && (~data & 0x02))
+	if ((m_ddr_b & 0x02) && (~data & 0x02))
 	{
-		state->m_port_a_in = state->m_from_main;
+		m_port_a_in = m_from_main;
 	}
 	/* Rising edge of PB1 */
-	else if ((state->m_ddr_b & 0x02) && (~state->m_port_b_out & 0x02) && (data & 0x02))
+	else if ((m_ddr_b & 0x02) && (~m_port_b_out & 0x02) && (data & 0x02))
 	{
-		state->m_mcu_accept = 1;
-		cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
+		m_mcu_accept = 1;
+		cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
 	}
 
 	/* Rising edge of PB2 */
-	if ((state->m_ddr_b & 0x04) && (~state->m_port_b_out & 0x04) && (data & 0x04))
+	if ((m_ddr_b & 0x04) && (~m_port_b_out & 0x04) && (data & 0x04))
 	{
-		state->m_mcu_ready = 0;
-		state->m_from_mcu = state->m_port_a_out;
+		m_mcu_ready = 0;
+		m_from_mcu = m_port_a_out;
 	}
 
-	state->m_port_b_out = data;
+	m_port_b_out = data;
 }
 
-WRITE8_HANDLER( xain_68705_ddr_b_w )
+WRITE8_MEMBER(xain_state::xain_68705_ddr_b_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_ddr_b = data;
+	m_ddr_b = data;
 }
 
-READ8_HANDLER( xain_68705_port_c_r )
+READ8_MEMBER(xain_state::xain_68705_port_c_r)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_port_c_in = 0;
+	m_port_c_in = 0;
 
-	if (!state->m_mcu_accept)
-		state->m_port_c_in |= 0x01;
-	if (state->m_mcu_ready)
-		state->m_port_c_in |= 0x02;
+	if (!m_mcu_accept)
+		m_port_c_in |= 0x01;
+	if (m_mcu_ready)
+		m_port_c_in |= 0x02;
 
-	return (state->m_port_c_out & state->m_ddr_c) | (state->m_port_c_in & ~state->m_ddr_c);
+	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
-WRITE8_HANDLER( xain_68705_port_c_w )
+WRITE8_MEMBER(xain_state::xain_68705_port_c_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_port_c_out = data;
+	m_port_c_out = data;
 }
 
-WRITE8_HANDLER( xain_68705_ddr_c_w )
+WRITE8_MEMBER(xain_state::xain_68705_ddr_c_w)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_ddr_c = data;
+	m_ddr_c = data;
 }
 
 static CUSTOM_INPUT( mcu_status_r )
@@ -383,14 +374,13 @@ static CUSTOM_INPUT( mcu_status_r )
 	return res;
 }
 
-READ8_HANDLER( mcu_comm_reset_r )
+READ8_MEMBER(xain_state::mcu_comm_reset_r)
 {
-	xain_state *state = space->machine().driver_data<xain_state>();
-	state->m_mcu_ready = 1;
-	state->m_mcu_accept = 1;
+	m_mcu_ready = 1;
+	m_mcu_accept = 1;
 
-	if (space->machine().device("mcu") != NULL)
-		cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
+	if (machine().device("mcu") != NULL)
+		cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
 
 	return 0xff;
 }
@@ -411,7 +401,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x3a04, 0x3a04) AM_READ(xain_68705_r)
 	AM_RANGE(0x3a04, 0x3a05) AM_WRITE_LEGACY(xain_scrollxP0_w)
 	AM_RANGE(0x3a05, 0x3a05) AM_READ_PORT("VBLANK")
-	AM_RANGE(0x3a06, 0x3a06) AM_READ_LEGACY(mcu_comm_reset_r)
+	AM_RANGE(0x3a06, 0x3a06) AM_READ(mcu_comm_reset_r)
 	AM_RANGE(0x3a06, 0x3a07) AM_WRITE_LEGACY(xain_scrollyP0_w)
 	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(xain_sound_command_w)
 	AM_RANGE(0x3a09, 0x3a0c) AM_WRITE(xain_main_irq_w)
@@ -435,12 +425,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, xain_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(xain_68705_port_a_r, xain_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(xain_68705_port_b_r, xain_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(xain_68705_port_c_r, xain_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(xain_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(xain_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(xain_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(xain_68705_port_a_r, xain_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(xain_68705_port_b_r, xain_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(xain_68705_port_c_r, xain_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(xain_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(xain_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(xain_68705_ddr_c_w)
 //  AM_RANGE(0x0008, 0x0008) AM_READWRITE_LEGACY(m68705_tdr_r, m68705_tdr_w)
 //  AM_RANGE(0x0009, 0x0009) AM_READWRITE_LEGACY(m68705_tcr_r, m68705_tcr_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM

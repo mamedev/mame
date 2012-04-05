@@ -2032,12 +2032,11 @@ static READ32_HANDLER ( viprp1o_speedup_r )
 
 #ifdef UNUSED_FUNCTION
 // causes input problems?
-READ32_HANDLER ( ejanhs_speedup_r )
+READ32_MEMBER(seibuspi_state::ejanhs_speedup_r)
 {
-	seibuspi_state *state = space->machine().driver_data<seibuspi_state>();
-// mame_printf_debug("%08x\n",cpu_get_pc(&space->device()));
- if (cpu_get_pc(&space->device())==0x03032c7) device_spin_until_interrupt(&space->device()); // idle
- return state->m_spimainram[(0x002d224-0x800)/4];
+// mame_printf_debug("%08x\n",cpu_get_pc(&space.device()));
+ if (cpu_get_pc(&space.device())==0x03032c7) device_spin_until_interrupt(&space.device()); // idle
+ return m_spimainram[(0x002d224-0x800)/4];
 }
 #endif
 

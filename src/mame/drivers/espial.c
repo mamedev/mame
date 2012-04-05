@@ -72,10 +72,9 @@ WRITE8_MEMBER(espial_state::espial_master_interrupt_mask_w)
 }
 
 
-WRITE8_HANDLER( espial_sound_nmi_mask_w )
+WRITE8_MEMBER(espial_state::espial_sound_nmi_mask_w)
 {
-	espial_state *state = space->machine().driver_data<espial_state>();
-	state->m_sound_nmi_enabled = data & 1;
+	m_sound_nmi_enabled = data & 1;
 }
 
 static TIMER_DEVICE_CALLBACK( espial_scanline )
@@ -156,7 +155,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( espial_sound_map, AS_PROGRAM, 8, espial_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(espial_sound_nmi_mask_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(espial_sound_nmi_mask_w)
 	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 

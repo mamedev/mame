@@ -119,11 +119,11 @@ static READ8_HANDLER( audio_t1_r )
 
 static ADDRESS_MAP_START( quasar, AS_PROGRAM, 8, quasar_state )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_bullet_ram_or_palette_r, quasar_bullet_w) AM_BASE(m_bullet_ram)
-	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
-	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w)
-	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_video_or_color_ram_r, quasar_video_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_READ(cvs_bullet_ram_or_palette_r) AM_WRITE_LEGACY(quasar_bullet_w) AM_BASE(m_bullet_ram)
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_0_or_character_ram_r, cvs_s2636_0_or_character_ram_w)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_1_or_character_ram_r, cvs_s2636_1_or_character_ram_w)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_READWRITE(cvs_s2636_2_or_character_ram_r, cvs_s2636_2_or_character_ram_w)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE_LEGACY(quasar_video_w) AM_BASE(m_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x4000, 0x53ff) AM_ROM

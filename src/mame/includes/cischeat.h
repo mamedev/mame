@@ -44,6 +44,9 @@ public:
 	DECLARE_WRITE16_MEMBER(bigrun_soundbank_w);
 	DECLARE_READ16_MEMBER(f1gpstr2_io_r);
 	DECLARE_WRITE16_MEMBER(f1gpstr2_io_w);
+	DECLARE_READ16_MEMBER(scudhamm_motor_status_r);
+	DECLARE_READ16_MEMBER(scudhamm_motor_pos_r);
+	DECLARE_READ16_MEMBER(scudhamm_analog_r);
 };
 
 

@@ -46,6 +46,15 @@ public:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(renegade_coin_counter_w);
 	void mcu_process_command();
+	DECLARE_READ8_MEMBER(renegade_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(renegade_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(renegade_68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(renegade_68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(renegade_68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(renegade_68705_ddr_b_w);
+	DECLARE_READ8_MEMBER(renegade_68705_port_c_r);
+	DECLARE_WRITE8_MEMBER(renegade_68705_port_c_w);
+	DECLARE_WRITE8_MEMBER(renegade_68705_ddr_c_w);
 };
 
 

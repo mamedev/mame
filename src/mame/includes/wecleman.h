@@ -47,6 +47,7 @@ public:
 	DECLARE_WRITE8_MEMBER(multiply_w);
 	DECLARE_WRITE16_MEMBER(hotchase_soundlatch_w);
 	DECLARE_WRITE8_MEMBER(hotchase_sound_control_w);
+	DECLARE_WRITE16_MEMBER(wecleman_soundlatch_w);
 };
 
 

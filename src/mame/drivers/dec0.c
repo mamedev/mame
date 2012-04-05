@@ -332,25 +332,25 @@ ADDRESS_MAP_END
 
 
 
-READ16_HANDLER( slyspy_controls_r )
+READ16_MEMBER(dec0_state::slyspy_controls_r)
 {
 	switch (offset<<1)
 	{
 		case 0: /* Dip Switches */
-			return input_port_read(space->machine(), "DSW");
+			return input_port_read(machine(), "DSW");
 
 		case 2: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(space->machine(), "INPUTS");
+			return input_port_read(machine(), "INPUTS");
 
 		case 4: /* Credits */
-			return input_port_read(space->machine(), "SYSTEM");
+			return input_port_read(machine(), "SYSTEM");
 	}
 
 	logerror("Unknown control read at 30c000 %d\n", offset);
 	return ~0;
 }
 
-READ16_HANDLER( slyspy_protection_r )
+READ16_MEMBER(dec0_state::slyspy_protection_r)
 {
 	/* These values are for Boulderdash, I have no idea what they do in Slyspy */
 	switch (offset<<1) {
@@ -360,7 +360,7 @@ READ16_HANDLER( slyspy_protection_r )
 		case 6:		return 0x2;
 	}
 
-	logerror("%04x, Unknown protection read at 30c000 %d\n", cpu_get_pc(&space->device()), offset);
+	logerror("%04x, Unknown protection read at 30c000 %d\n", cpu_get_pc(&space.device()), offset);
 	return 0;
 }
 
@@ -406,19 +406,17 @@ WRITE16_MEMBER(dec0_state::unmapped_w)
 
 void slyspy_set_protection_map(running_machine& machine, int type);
 
-WRITE16_HANDLER( slyspy_state_w )
+WRITE16_MEMBER(dec0_state::slyspy_state_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->m_slyspy_state=0;
-	slyspy_set_protection_map(space->machine(), state->m_slyspy_state);
+	m_slyspy_state=0;
+	slyspy_set_protection_map(machine(), m_slyspy_state);
 }
 
-READ16_HANDLER( slyspy_state_r )
+READ16_MEMBER(dec0_state::slyspy_state_r)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->m_slyspy_state++;
-	state->m_slyspy_state=state->m_slyspy_state%4;
-	slyspy_set_protection_map(space->machine(), state->m_slyspy_state);
+	m_slyspy_state++;
+	m_slyspy_state=m_slyspy_state%4;
+	slyspy_set_protection_map(machine(), m_slyspy_state);
 
 	return 0; /* Value doesn't mater */
 }
@@ -433,8 +431,8 @@ void slyspy_set_protection_map(running_machine& machine, int type)
 
 	space->install_write_handler( 0x240000, 0x24ffff, write16_delegate(FUNC(dec0_state::unmapped_w),state));
 
-	space->install_legacy_write_handler( 0x24a000, 0x24a001, FUNC(slyspy_state_w));
-	space->install_legacy_read_handler( 0x244000, 0x244001, FUNC(slyspy_state_r));
+	space->install_write_handler( 0x24a000, 0x24a001, write16_delegate(FUNC(dec0_state::slyspy_state_w),state));
+	space->install_read_handler( 0x244000, 0x244001, read16_delegate(FUNC(dec0_state::slyspy_state_r),state));
 
 	switch (type)
 	{
@@ -511,8 +509,8 @@ static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE(m_spriteram)	/* Sprites */
 	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
-	AM_RANGE(0x314008, 0x31400f) AM_READ_LEGACY(slyspy_controls_r)
-	AM_RANGE(0x31c000, 0x31c00f) AM_READ_LEGACY(slyspy_protection_r) AM_WRITENOP
+	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
+	AM_RANGE(0x31c000, 0x31c00f) AM_READ(slyspy_protection_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
@@ -599,7 +597,7 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_state )
 //  AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
 //  AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 
-	AM_RANGE(0x314008, 0x31400f) AM_READ_LEGACY(slyspy_controls_r)
+	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
 //  AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
 
 	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_0_w)

@@ -43,6 +43,7 @@ public:
 	UINT32 m_bg_fore_layer_position;
 	UINT8 m_alpha_table[8192];
 	UINT8 m_sprite_bpp;
+	DECLARE_READ32_MEMBER(ejanhs_speedup_r);
 };
 
 

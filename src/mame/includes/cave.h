@@ -139,6 +139,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sailormn_rombank_w);
 	DECLARE_WRITE8_MEMBER(sailormn_okibank0_w);
 	DECLARE_WRITE8_MEMBER(sailormn_okibank1_w);
+	DECLARE_WRITE16_MEMBER(donpachi_videoregs_w);
 };
 
 /*----------- defined in video/cave.c -----------*/

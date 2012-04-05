@@ -50,12 +50,11 @@ Notes:
 
 ***************************************************************************/
 
-WRITE16_HANDLER( tetrisp2_systemregs_w )
+WRITE16_MEMBER(tetrisp2_state::tetrisp2_systemregs_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_systemregs[offset] = data;
+		m_systemregs[offset] = data;
 	}
 }
 
@@ -216,17 +215,15 @@ READ16_MEMBER(tetrisp2_state::tetrisp2_ip_1_word_r)
 
 
 /* The game only ever writes even bytes and reads odd bytes */
-READ16_HANDLER( tetrisp2_nvram_r )
+READ16_MEMBER(tetrisp2_state::tetrisp2_nvram_r)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	return	( (state->m_nvram[offset] >> 8) & 0x00ff ) |
-			( (state->m_nvram[offset] << 8) & 0xff00 ) ;
+	return	( (m_nvram[offset] >> 8) & 0x00ff ) |
+			( (m_nvram[offset] << 8) & 0xff00 ) ;
 }
 
-WRITE16_HANDLER( tetrisp2_nvram_w )
+WRITE16_MEMBER(tetrisp2_state::tetrisp2_nvram_w)
 {
-	tetrisp2_state *state = space->machine().driver_data<tetrisp2_state>();
-	COMBINE_DATA(&state->m_nvram[offset]);
+	COMBINE_DATA(&m_nvram[offset]);
 }
 
 READ16_MEMBER(tetrisp2_state::rockn_nvram_r)
@@ -297,15 +294,15 @@ static ADDRESS_MAP_START( tetrisp2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE_LEGACY(tetrisp2_vram_rot_w) AM_BASE(m_vram_rot)	// Rotation
 	AM_RANGE(0x650000, 0x651fff) AM_RAM_WRITE_LEGACY(tetrisp2_vram_rot_w)								// Rotation (mirror)
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
-	AM_RANGE(0x900000, 0x903fff) AM_READ_LEGACY(tetrisp2_nvram_r) AM_WRITE_LEGACY(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
-	AM_RANGE(0x904000, 0x907fff) AM_READ_LEGACY(tetrisp2_nvram_r) AM_WRITE_LEGACY(tetrisp2_nvram_w)				// NVRAM (mirror)
+	AM_RANGE(0x900000, 0x903fff) AM_READ(tetrisp2_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x904000, 0x907fff) AM_READ(tetrisp2_nvram_r) AM_WRITE(tetrisp2_nvram_w)				// NVRAM (mirror)
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(tetrisp2_coincounter_w)								// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// ???
 	AM_RANGE(0xb40000, 0xb4000b) AM_WRITEONLY AM_BASE(m_scroll_fg)						// Foreground Scrolling
 	AM_RANGE(0xb40010, 0xb4001b) AM_WRITEONLY AM_BASE(m_scroll_bg)						// Background Scrolling
 	AM_RANGE(0xb4003e, 0xb4003f) AM_WRITENOP													// scr_size
 	AM_RANGE(0xb60000, 0xb6002f) AM_WRITEONLY AM_BASE(m_rotregs)						// Rotation Registers
-	AM_RANGE(0xba0000, 0xba001f) AM_WRITE_LEGACY(tetrisp2_systemregs_w)								// system param
+	AM_RANGE(0xba0000, 0xba001f) AM_WRITE(tetrisp2_systemregs_w)								// system param
 	AM_RANGE(0xba001a, 0xba001b) AM_WRITENOP													// Lev 4 irq ack
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP													// Lev 2 irq ack
 	AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP														// INT-level1 dummy read
@@ -359,7 +356,7 @@ static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16, tetrisp2_state )
 
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )	// Sound
 
-	AM_RANGE(0x900000, 0x903fff) AM_READWRITE_LEGACY(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
 
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(nndmseal_coincounter_w)	// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITE(nndmseal_b20000_w)		// ???
@@ -398,7 +395,7 @@ static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x408000, 0x409fff) AM_RAM															// ???
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE_LEGACY(tetrisp2_vram_rot_w) AM_BASE(m_vram_rot)	// Rotation
-	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE_LEGACY(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
 	AM_RANGE(0xa40000, 0xa40003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READWRITE(rockn_adpcmbank_r, rockn_adpcmbank_w)				// Sound Bank
@@ -432,7 +429,7 @@ static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE_LEGACY(tetrisp2_vram_fg_w) AM_BASE(m_vram_fg)	// Foreground
 	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE_LEGACY(tetrisp2_vram_bg_w) AM_BASE(m_vram_bg)	// Background
 	AM_RANGE(0x808000, 0x809fff) AM_RAM															// ???
-	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE_LEGACY(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
 	AM_RANGE(0xa40000, 0xa40003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READWRITE(rockn_adpcmbank_r, rockn2_adpcmbank_w)			// Sound Bank
@@ -466,7 +463,7 @@ static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE_LEGACY(tetrisp2_vram_fg_w) AM_BASE(m_vram_fg)	// Foreground
 	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE_LEGACY(tetrisp2_vram_bg_w) AM_BASE(m_vram_bg)	// Background
 //  AM_RANGE(0x808000, 0x809fff) AM_RAM                                                         // ???
-	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE_LEGACY(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READ(rockn_nvram_r) AM_WRITE(tetrisp2_nvram_w) AM_BASE(m_nvram) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
 	AM_RANGE(0xa40000, 0xa40003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READWRITE(rockn_adpcmbank_r, rockn_adpcmbank_w)				// Sound Bank

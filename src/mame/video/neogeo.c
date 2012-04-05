@@ -795,11 +795,12 @@ static void set_video_control( running_machine &machine, UINT16 data )
 
 READ16_HANDLER( neogeo_video_register_r )
 {
+	neogeo_state *state = space->machine().driver_data<neogeo_state>();
 	UINT16 ret;
 
 	/* accessing the LSB only is not mapped */
 	if (mem_mask == 0x00ff)
-		ret = neogeo_unmapped_r(space, 0, 0xffff) & 0x00ff;
+		ret = state->neogeo_unmapped_r(*space, 0, 0xffff) & 0x00ff;
 	else
 	{
 		switch (offset)

@@ -128,6 +128,11 @@ public:
 	DECLARE_READ8_MEMBER(hng64_comm_memory_r);
 	DECLARE_WRITE8_MEMBER(hng64_comm_memory_w);
 	DECLARE_WRITE8_MEMBER(hng64_comm_io_mmu);
+	DECLARE_WRITE32_MEMBER(trap_write);
+	DECLARE_WRITE32_MEMBER(hng64_3d_1_w);
+	DECLARE_WRITE32_MEMBER(activate_3d_buffer);
+	DECLARE_READ8_MEMBER(hng64_comm_shared_r);
+	DECLARE_WRITE8_MEMBER(hng64_comm_shared_w);
 };
 
 

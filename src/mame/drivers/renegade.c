@@ -289,80 +289,71 @@ static DRIVER_INIT( kuniokunb )
 
 ***************************************************************************/
 
-READ8_HANDLER( renegade_68705_port_a_r )
+READ8_MEMBER(renegade_state::renegade_68705_port_a_r)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	return (state->m_port_a_out & state->m_ddr_a) | (state->m_port_a_in & ~state->m_ddr_a);
+	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_HANDLER( renegade_68705_port_a_w )
+WRITE8_MEMBER(renegade_state::renegade_68705_port_a_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_port_a_out = data;
+	m_port_a_out = data;
 }
 
-WRITE8_HANDLER( renegade_68705_ddr_a_w )
+WRITE8_MEMBER(renegade_state::renegade_68705_ddr_a_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_ddr_a = data;
+	m_ddr_a = data;
 }
 
-READ8_HANDLER( renegade_68705_port_b_r )
+READ8_MEMBER(renegade_state::renegade_68705_port_b_r)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	return (state->m_port_b_out & state->m_ddr_b) | (state->m_port_b_in & ~state->m_ddr_b);
+	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_HANDLER( renegade_68705_port_b_w )
+WRITE8_MEMBER(renegade_state::renegade_68705_port_b_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	if ((state->m_ddr_b & 0x02) && (~data & 0x02) && (state->m_port_b_out & 0x02))
+	if ((m_ddr_b & 0x02) && (~data & 0x02) && (m_port_b_out & 0x02))
 	{
-		state->m_port_a_in = state->m_from_main;
+		m_port_a_in = m_from_main;
 
-		if (state->m_main_sent)
-			cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
+		if (m_main_sent)
+			cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
 
-		state->m_main_sent = 0;
+		m_main_sent = 0;
 	}
-	if ((state->m_ddr_b & 0x04) && (data & 0x04) && (~state->m_port_b_out & 0x04))
+	if ((m_ddr_b & 0x04) && (data & 0x04) && (~m_port_b_out & 0x04))
 	{
-		state->m_from_mcu = state->m_port_a_out;
-		state->m_mcu_sent = 1;
+		m_from_mcu = m_port_a_out;
+		m_mcu_sent = 1;
 	}
 
-	state->m_port_b_out = data;
+	m_port_b_out = data;
 }
 
-WRITE8_HANDLER( renegade_68705_ddr_b_w )
+WRITE8_MEMBER(renegade_state::renegade_68705_ddr_b_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_ddr_b = data;
+	m_ddr_b = data;
 }
 
 
-READ8_HANDLER( renegade_68705_port_c_r )
+READ8_MEMBER(renegade_state::renegade_68705_port_c_r)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_port_c_in = 0;
-	if (state->m_main_sent)
-		state->m_port_c_in |= 0x01;
-	if (!state->m_mcu_sent)
-		state->m_port_c_in |= 0x02;
+	m_port_c_in = 0;
+	if (m_main_sent)
+		m_port_c_in |= 0x01;
+	if (!m_mcu_sent)
+		m_port_c_in |= 0x02;
 
-	return (state->m_port_c_out & state->m_ddr_c) | (state->m_port_c_in & ~state->m_ddr_c);
+	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
-WRITE8_HANDLER( renegade_68705_port_c_w )
+WRITE8_MEMBER(renegade_state::renegade_68705_port_c_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_port_c_out = data;
+	m_port_c_out = data;
 }
 
-WRITE8_HANDLER( renegade_68705_ddr_c_w )
+WRITE8_MEMBER(renegade_state::renegade_68705_ddr_c_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_ddr_c = data;
+	m_ddr_c = data;
 }
 
 
@@ -683,12 +674,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_mcu_map, AS_PROGRAM, 8, renegade_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(renegade_68705_port_a_r, renegade_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(renegade_68705_port_b_r, renegade_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(renegade_68705_port_c_r, renegade_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(renegade_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(renegade_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(renegade_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(renegade_68705_port_a_r, renegade_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(renegade_68705_port_b_r, renegade_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(renegade_68705_port_c_r, renegade_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(renegade_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(renegade_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(renegade_68705_ddr_c_w)
 //  AM_RANGE(0x0008, 0x0008) AM_READWRITE_LEGACY(m68705_tdr_r, m68705_tdr_w)
 //  AM_RANGE(0x0009, 0x0009) AM_READWRITE_LEGACY(m68705_tcr_r, m68705_tcr_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM

@@ -401,14 +401,13 @@ WRITE16_MEMBER(cischeat_state::scudhamm_paletteram16_w)
     ---- ---- ---- --1-     Up Limit
     ---- ---- ---- ---0     Down Limit  */
 
-READ16_HANDLER( scudhamm_motor_status_r )
+READ16_MEMBER(cischeat_state::scudhamm_motor_status_r)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-	return state->m_scudhamm_motor_command;	// Motor Status
+	return m_scudhamm_motor_command;	// Motor Status
 }
 
 
-READ16_HANDLER( scudhamm_motor_pos_r )
+READ16_MEMBER(cischeat_state::scudhamm_motor_pos_r)
 {
 	return 0x00 << 8;
 }
@@ -428,18 +427,17 @@ WRITE16_MEMBER(cischeat_state::scudhamm_motor_command_w)
 }
 
 
-READ16_HANDLER( scudhamm_analog_r )
+READ16_MEMBER(cischeat_state::scudhamm_analog_r)
 {
-	cischeat_state *state = space->machine().driver_data<cischeat_state>();
-	int i=input_port_read(space->machine(), "IN1"),j;
+	int i=input_port_read(machine(), "IN1"),j;
 
-	if ((i^state->m_prev)&0x4000) {
-		if (i<state->m_prev) state->m_prev-=0x8000;
-		else state->m_prev+=0x8000;
+	if ((i^m_prev)&0x4000) {
+		if (i<m_prev) m_prev-=0x8000;
+		else m_prev+=0x8000;
 	}
 
-	j=i-state->m_prev;
-	state->m_prev=i;
+	j=i-m_prev;
+	m_prev=i;
 
 	/* effect of hammer collision 'accelerometer':
     $00 - $09 - no hit
@@ -504,9 +502,9 @@ static ADDRESS_MAP_START( scudhamm_map, AS_PROGRAM, 16, cischeat_state )
 	AM_RANGE(0x100014, 0x100015) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)				// Sound
 	AM_RANGE(0x100018, 0x100019) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)				//
 	AM_RANGE(0x10001c, 0x10001d) AM_WRITE(scudhamm_enable_w)											// ?
-	AM_RANGE(0x100040, 0x100041) AM_READ_LEGACY(scudhamm_analog_r) AM_WRITENOP							// A / D
-	AM_RANGE(0x100044, 0x100045) AM_READ_LEGACY(scudhamm_motor_pos_r)									// Motor Position
-	AM_RANGE(0x100050, 0x100051) AM_READ_LEGACY(scudhamm_motor_status_r) AM_WRITE(scudhamm_motor_command_w)		// Motor Limit Switches
+	AM_RANGE(0x100040, 0x100041) AM_READ(scudhamm_analog_r) AM_WRITENOP							// A / D
+	AM_RANGE(0x100044, 0x100045) AM_READ(scudhamm_motor_pos_r)									// Motor Position
+	AM_RANGE(0x100050, 0x100051) AM_READ(scudhamm_motor_status_r) AM_WRITE(scudhamm_motor_command_w)		// Motor Limit Switches
 	AM_RANGE(0x10005c, 0x10005d) AM_READ_PORT("IN2")													// 2 x DSW
 ADDRESS_MAP_END
 

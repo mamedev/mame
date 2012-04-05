@@ -1614,28 +1614,27 @@ static WRITE8_DEVICE_HANDLER( ic3ss_o3_callback )
 /* This is a bit of a cheat - since we don't clock into the OKI chip directly, we need to
 calculate the oscillation frequency in advance. We're running the timer for interrupt
 purposes, but the frequency calculation is done by plucking the values out as they are written.*/
-WRITE8_HANDLER( ic3ss_w )
+WRITE8_MEMBER(mpu4_state::ic3ss_w)
 {
-	device_t *ic3ss = space->machine().device("ptm_ic3ss");
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	device_t *ic3ss = machine().device("ptm_ic3ss");
 	downcast<ptm6840_device *>(ic3ss)->write(offset,data);
-	device_t *msm6376 = space->machine().device("msm6376");
+	device_t *msm6376 = machine().device("msm6376");
 
 	if (offset == 3)
 	{
-		state->m_t1 = data;
+		m_t1 = data;
 	}
 	if (offset == 6)
 	{
-		state->m_t3h = data;
+		m_t3h = data;
 	}
 	if (offset == 7)
 	{
-		state->m_t3l = data;
+		m_t3l = data;
 	}
 
-	float num = (1720000/((state->m_t3l + 1)*(state->m_t3h + 1)));
-	float denom1 = ((state->m_t3h *(state->m_t3l + 1)+ 1)/(2*(state->m_t1 + 1)));
+	float num = (1720000/((m_t3l + 1)*(m_t3h + 1)));
+	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
 
 	int denom2 = denom1 +0.5;//need to round up, this gives same precision as chip
 	int freq=num*denom2;
@@ -2598,12 +2597,13 @@ void mpu4_install_mod4yam_space(address_space *space)
 
 void mpu4_install_mod4oki_space(address_space *space)
 {
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	pia6821_device *pia_ic4ss = space->machine().device<pia6821_device>("pia_ic4ss");
 	ptm6840_device *ptm_ic3ss = space->machine().device<ptm6840_device>("ptm_ic3ss");
 
 	space->install_readwrite_handler(0x0880, 0x0883, 0, 0, read8_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8_delegate(FUNC(pia6821_device::write), pia_ic4ss));
 	space->install_read_handler(0x08c0, 0x08c7, 0, 0, read8_delegate(FUNC(ptm6840_device::read), ptm_ic3ss));
-	space->install_legacy_write_handler(0x08c0, 0x08c7, 0, 0, FUNC(ic3ss_w));
+	space->install_write_handler(0x08c0, 0x08c7, 0, 0, write8_delegate(FUNC(mpu4_state::ic3ss_w),state));
 }
 
 void mpu4_install_mod4bwb_space(address_space *space)

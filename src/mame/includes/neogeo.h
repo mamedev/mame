@@ -123,6 +123,7 @@ public:
 	DECLARE_READ8_MEMBER(audio_cpu_bank_select_8000_bfff_r);
 	DECLARE_WRITE16_MEMBER(system_control_w);
 	DECLARE_WRITE16_MEMBER(watchdog_w);
+	DECLARE_READ16_MEMBER(neogeo_unmapped_r);
 };
 
 
@@ -133,7 +134,6 @@ void neogeo_set_display_counter_msb(address_space *space, UINT16 data);
 void neogeo_set_display_counter_lsb(address_space *space, UINT16 data);
 void neogeo_acknowledge_interrupt(running_machine &machine, UINT16 data);
 void neogeo_set_main_cpu_bank_address(address_space *space, UINT32 bank_address);
-READ16_HANDLER( neogeo_unmapped_r );
 DEVICE_IMAGE_LOAD( neo_cartridge );
 
 

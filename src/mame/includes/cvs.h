@@ -69,6 +69,16 @@ public:
 	DECLARE_WRITE8_MEMBER(cvs_speech_rom_address_hi_w);
 	DECLARE_READ8_MEMBER(cvs_speech_command_r);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
+	DECLARE_READ8_MEMBER(cvs_video_or_color_ram_r);
+	DECLARE_WRITE8_MEMBER(cvs_video_or_color_ram_w);
+	DECLARE_READ8_MEMBER(cvs_bullet_ram_or_palette_r);
+	DECLARE_WRITE8_MEMBER(cvs_bullet_ram_or_palette_w);
+	DECLARE_READ8_MEMBER(cvs_s2636_0_or_character_ram_r);
+	DECLARE_WRITE8_MEMBER(cvs_s2636_0_or_character_ram_w);
+	DECLARE_READ8_MEMBER(cvs_s2636_1_or_character_ram_r);
+	DECLARE_WRITE8_MEMBER(cvs_s2636_1_or_character_ram_w);
+	DECLARE_READ8_MEMBER(cvs_s2636_2_or_character_ram_r);
+	DECLARE_WRITE8_MEMBER(cvs_s2636_2_or_character_ram_w);
 };
 
 
@@ -76,19 +86,6 @@ public:
 
 MACHINE_START( cvs );
 MACHINE_RESET( cvs );
-
-READ8_HANDLER( cvs_video_or_color_ram_r );
-WRITE8_HANDLER( cvs_video_or_color_ram_w );
-
-READ8_HANDLER( cvs_bullet_ram_or_palette_r );
-WRITE8_HANDLER( cvs_bullet_ram_or_palette_w );
-
-READ8_HANDLER( cvs_s2636_0_or_character_ram_r );
-WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w );
-READ8_HANDLER( cvs_s2636_1_or_character_ram_r );
-WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w );
-READ8_HANDLER( cvs_s2636_2_or_character_ram_r );
-WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w );
 
 /*----------- defined in video/cvs.c -----------*/
 

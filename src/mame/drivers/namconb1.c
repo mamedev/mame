@@ -823,14 +823,12 @@ static READ32_HANDLER( gunbulet_gun_r )
 	return result<<24;
 } /* gunbulet_gun_r */
 
-static
-READ32_HANDLER( randgen_r )
+READ32_MEMBER(namconb1_state::randgen_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 } /* randgen_r */
 
-static
-WRITE32_HANDLER( srand_w )
+WRITE32_MEMBER(namconb1_state::srand_w)
 {
 	/**
      * Used to seed the hardware random number generator.
@@ -857,7 +855,7 @@ static ADDRESS_MAP_START( namconb1_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10001f) AM_READ_LEGACY(gunbulet_gun_r)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
-	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE_LEGACY(randgen_r,srand_w)
+	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE_LEGACY(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE_LEGACY(namconb_cpureg_r, namconb1_cpureg_w)
@@ -874,7 +872,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( namconb2_am, AS_PROGRAM, 32, namconb1_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x1c0000, 0x1cffff) AM_RAM
-	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE_LEGACY(randgen_r,srand_w)
+	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
 	AM_RANGE(0x200000, 0x207fff) AM_READWRITE_LEGACY(namconb_share_r, namconb_share_w)
 	AM_RANGE(0x208000, 0x2fffff) AM_RAM
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("data", 0)

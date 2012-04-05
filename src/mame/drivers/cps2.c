@@ -813,7 +813,7 @@ static READ16_HANDLER( joy_or_paddle_r )
 static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM																			/* 68000 ROM */
 	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_BASE_SIZE(m_output, m_output_size)						/* CPS2 object output */
-	AM_RANGE(0x618000, 0x619fff) AM_READWRITE_LEGACY(qsound_sharedram1_r, qsound_sharedram1_w)     					/* Q RAM */
+	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)     					/* Q RAM */
 	AM_RANGE(0x662000, 0x662001) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662008, 0x662009) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662020, 0x662021) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
@@ -844,7 +844,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM																			/* 68000 ROM */
 	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_BASE_SIZE(m_output, m_output_size)						/* CPS2 object output */
-	AM_RANGE(0x618000, 0x619fff) AM_READWRITE_LEGACY(qsound_sharedram1_r, qsound_sharedram1_w)     					/* Q RAM */
+	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)     					/* Q RAM */
 	AM_RANGE(0x662000, 0x662001) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662008, 0x662009) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662020, 0x662021) AM_RAM																			/* Network adapter related, accessed in SSF2TB */

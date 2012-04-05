@@ -244,10 +244,10 @@ Stephh's log (2006.09.20) :
 
 
 
-READ16_HANDLER( cps1_dsw_r )
+READ16_MEMBER(cps_state::cps1_dsw_r)
 {
 	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
-	int in = input_port_read(space->machine(), dswname[offset]);
+	int in = input_port_read(machine(), dswname[offset]);
 	return (in << 8) | 0xff;
 }
 
@@ -301,14 +301,14 @@ WRITE16_MEMBER(cps_state::cps1_soundlatch2_w)
 		soundlatch2_w(space, 0, data & 0xff);
 }
 
-WRITE16_HANDLER( cps1_coinctrl_w )
+WRITE16_MEMBER(cps_state::cps1_coinctrl_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0100);
-		coin_counter_w(space->machine(), 1, data & 0x0200);
-		coin_lockout_w(space->machine(), 0, ~data & 0x0400);
-		coin_lockout_w(space->machine(), 1, ~data & 0x0800);
+		coin_counter_w(machine(), 0, data & 0x0100);
+		coin_counter_w(machine(), 1, data & 0x0200);
+		coin_lockout_w(machine(), 0, ~data & 0x0400);
+		coin_lockout_w(machine(), 1, ~data & 0x0800);
 
 		// bit 15 = CPS-A custom reset?
 	}
@@ -359,18 +359,16 @@ READ16_MEMBER(cps_state::qsound_rom_r)
 	}
 }
 
-READ16_HANDLER( qsound_sharedram1_r )
+READ16_MEMBER(cps_state::qsound_sharedram1_r)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	return state->m_qsound_sharedram1[offset] | 0xff00;
+	return m_qsound_sharedram1[offset] | 0xff00;
 }
 
-WRITE16_HANDLER( qsound_sharedram1_w )
+WRITE16_MEMBER(cps_state::qsound_sharedram1_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_qsound_sharedram1[offset] = data;
+		m_qsound_sharedram1[offset] = data;
 }
 
 READ16_MEMBER(cps_state::qsound_sharedram2_r)
@@ -539,9 +537,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")			/* Player input ports */
 	/* forgottn, willow, cawing, nemo, varth read from 800010. Probably debug input leftover from development */
-	AM_RANGE(0x800018, 0x80001f) AM_READ_LEGACY(cps1_dsw_r)			/* System input ports / Dip Switches */
+	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)			/* System input ports / Dip Switches */
 	AM_RANGE(0x800020, 0x800021) AM_READNOP						/* ? Used by Rockman ? not mapped according to PAL */
-	AM_RANGE(0x800030, 0x800037) AM_WRITE_LEGACY(cps1_coinctrl_w)
+	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
 	/* Forgotten Worlds has dial controls on B-board mapped at 800040-80005f. See DRIVER_INIT */
 	AM_RANGE(0x800100, 0x80013f) AM_WRITE_LEGACY(cps1_cps_a_w) AM_BASE(m_cps_a_regs)	/* CPS-A custom */
 	/* CPS-B custom is mapped by the PAL IOB2 on the B-board. SF2 revision "E" World and USA 910228 has it a a different
@@ -591,13 +589,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( qsound_main_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")			/* Player input ports */
-	AM_RANGE(0x800018, 0x80001f) AM_READ_LEGACY(cps1_dsw_r)			/* System input ports / Dip Switches */
-	AM_RANGE(0x800030, 0x800037) AM_WRITE_LEGACY(cps1_coinctrl_w)
+	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)			/* System input ports / Dip Switches */
+	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
 	AM_RANGE(0x800100, 0x80013f) AM_WRITE_LEGACY(cps1_cps_a_w) AM_BASE(m_cps_a_regs)	/* CPS-A custom */
 	AM_RANGE(0x800140, 0x80017f) AM_READWRITE_LEGACY(cps1_cps_b_r, cps1_cps_b_w) AM_BASE(m_cps_b_regs)	/* CPS-B custom (mapped by LWIO/IOB1 PAL on B-board) */
 	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE_LEGACY(cps1_gfxram_w) AM_BASE_SIZE(m_gfxram, m_gfxram_size)	/* SF2CE executes code from here */
 	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(qsound_rom_r)			/* Slammasters protection */
-	AM_RANGE(0xf18000, 0xf19fff) AM_READWRITE_LEGACY(qsound_sharedram1_r, qsound_sharedram1_w)  /* Q RAM */
+	AM_RANGE(0xf18000, 0xf19fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)  /* Q RAM */
 	AM_RANGE(0xf1c000, 0xf1c001) AM_READ_PORT("IN2")			/* Player 3 controls (later games) */
 	AM_RANGE(0xf1c002, 0xf1c003) AM_READ_PORT("IN3")			/* Player 4 controls ("Muscle Bombers") */
 	AM_RANGE(0xf1c004, 0xf1c005) AM_WRITE(cpsq_coinctrl2_w)		/* Coin control2 (later games) */

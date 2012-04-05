@@ -460,7 +460,7 @@ or Fatal Fury for example).
 
 
 #ifdef UNUSED_FUNCTION
-WRITE32_HANDLER( trap_write )
+WRITE32_MEMBER(hng64_state::trap_write)
 {
     logerror("Remapped write... %08x %08x\n",offset,data);
 }
@@ -808,7 +808,7 @@ READ32_MEMBER(hng64_state::hng64_3d_1_r)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_HANDLER( hng64_3d_1_w )
+WRITE32_MEMBER(hng64_state::hng64_3d_1_w)
 {
 	fatalerror("WRITE32_HANDLER( hng64_3d_1_w )");
 }
@@ -887,7 +887,7 @@ WRITE32_MEMBER(hng64_state::dl_control_w)
 }
 
 #ifdef UNUSED_FUNCTION
-WRITE32_HANDLER( activate_3d_buffer )
+WRITE32_MEMBER(hng64_state::activate_3d_buffer)
 {
     COMBINE_DATA (&active_3d_buffer[offset]);
     mame_printf_debug("COMBINED %d\n", active_3d_buffer[offset]);
@@ -1210,7 +1210,7 @@ WRITE8_MEMBER(hng64_state::hng64_comm_io_mmu)
 }
 
 #ifdef UNUSED_FUNCTION
-READ8_HANDLER( hng64_comm_shared_r )
+READ8_MEMBER(hng64_state::hng64_comm_shared_r)
 {
     // I'm thinking 0x54 comes from an interrupt on the MIPS CPU?  Or maybe the Toshiba one?
     // Nothing from CPU0 seems to ping the COM CPU as often as it reads 0x54.
@@ -1226,7 +1226,7 @@ READ8_HANDLER( hng64_comm_shared_r )
     if (offset==0x04) (hng64_com_shared_b & 0x000000ff) ? return 0xff : return 0x00;
 }
 
-WRITE8_HANDLER( hng64_comm_shared_w )
+WRITE8_MEMBER(hng64_state::hng64_comm_shared_w)
 {
     if (offset==0x00) hng64_com_shared_a = (hng64_com_shared_a & 0x00ffffff) | (data << 24);
     if (offset==0x01) hng64_com_shared_a = (hng64_com_shared_a & 0xff00ffff) | (data << 16);
@@ -1258,7 +1258,7 @@ static ADDRESS_MAP_START( hng_comm_io_map, AS_IO, 8, hng64_state )
 //  AM_RANGE(0x3c,0x3f) AM_NOP              /* Reserved */
 
 	/* General IO */
-	AM_RANGE(0x50,0x54) AM_NOP // AM_WRITE_LEGACY(hng64_comm_shared_r, hng64_comm_shared_w)
+	AM_RANGE(0x50,0x54) AM_NOP // AM_WRITE(hng64_comm_shared_r, hng64_comm_shared_w)
 //  AM_RANGE(0x72,0x72) AM_WRITE            /* dunno yet */
 ADDRESS_MAP_END
 

@@ -85,7 +85,7 @@ static WRITE8_HANDLER(galaxia_video_w)
 	galaxia_state *state = space->machine().driver_data<galaxia_state>();
 //  space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
 	state->m_bg_tilemap->mark_tile_dirty(offset);
-	cvs_video_or_color_ram_w(space, offset, data);
+	state->cvs_video_or_color_ram_w(*space, offset, data);
 }
 
 static WRITE8_HANDLER(galaxia_scroll_w)
@@ -130,7 +130,7 @@ static ADDRESS_MAP_START( galaxia_mem_map, AS_PROGRAM, 8, galaxia_state )
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_1", s2636_work_ram_r, s2636_work_ram_w)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_2", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_video_or_color_ram_r, galaxia_video_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE_LEGACY(galaxia_video_w) AM_BASE(m_video_ram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 	AM_RANGE(0x7214, 0x7214) AM_READ_PORT("IN0")
@@ -140,7 +140,7 @@ static ADDRESS_MAP_START( astrowar_mem_map, AS_PROGRAM, 8, galaxia_state )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
 	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_DEVREADWRITE_LEGACY("s2636_0", s2636_work_ram_r, s2636_work_ram_w)
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE_LEGACY(cvs_video_or_color_ram_r, galaxia_video_w)  AM_BASE(m_video_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READ(cvs_video_or_color_ram_r) AM_WRITE_LEGACY(galaxia_video_w)  AM_BASE(m_video_ram)
 	AM_RANGE(0x1c00, 0x1cff) AM_MIRROR(0x6000) AM_RAM AM_BASE(m_bullet_ram)
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 ADDRESS_MAP_END

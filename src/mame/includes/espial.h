@@ -32,6 +32,7 @@ public:
 	device_t *m_audiocpu;
 	DECLARE_WRITE8_MEMBER(espial_master_interrupt_mask_w);
 	DECLARE_WRITE8_MEMBER(espial_master_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(espial_sound_nmi_mask_w);
 };
 
 /*----------- defined in video/espial.c -----------*/
