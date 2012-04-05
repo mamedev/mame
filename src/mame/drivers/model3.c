@@ -4656,7 +4656,7 @@ ROM_START( spikeout )	/* Step 2.1 */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
-ROM_START( spikeofe )	/* Step 2.1, Sega game ID# is 833-13746, ROM board ID# 834-13747 SPK F/E */
+ROM_START( spikeofe )	/* Step 2.1, Sega game ID# is 833-13746, ROM board ID# 834-13747 SPK F/E, Security board ID# 837-13726-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21653.17", 0x000006, 0x200000, CRC(f4bd9c3c) SHA1(de509c25226939d7a9c1b402ab6923844c12314e) )
@@ -4733,7 +4733,7 @@ ROM_START( spikeofe )	/* Step 2.1, Sega game ID# is 833-13746, ROM board ID# 834
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
-ROM_START( eca )	/* Step 2.1 */
+ROM_START( eca )	/* Step 2.1, Sega game ID# is 833-13427, ROM board ID# 834-13428, MAIN board ID# 837-13022-1, Security board ID# 837-13947-COM */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-22895.17", 0x000006, 0x200000, CRC(07df16a0) SHA1(a9ad2b229854a5f4f761565141db738adde28720) )
