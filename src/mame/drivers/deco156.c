@@ -102,8 +102,8 @@ static WRITE32_DEVICE_HANDLER( hvysmsh_oki_0_bank_w )
 
 WRITE32_MEMBER(deco156_state::wcvol95_nonbuffered_palette_w)
 {
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
-	palette_set_color_rgb(machine(),offset,pal5bit(machine().generic.paletteram.u32[offset] >> 0),pal5bit(machine().generic.paletteram.u32[offset] >> 5),pal5bit(machine().generic.paletteram.u32[offset] >> 10));
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	palette_set_color_rgb(machine(),offset,pal5bit(m_generic_paletteram_32[offset] >> 0),pal5bit(m_generic_paletteram_32[offset] >> 5),pal5bit(m_generic_paletteram_32[offset] >> 10));
 }
 
 /* This is the same as deco32_nonbuffered_palette_w in video/deco32.c */
@@ -111,11 +111,11 @@ WRITE32_MEMBER(deco156_state::deco156_nonbuffered_palette_w)
 {
 	int r,g,b;
 
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	b = (machine().generic.paletteram.u32[offset] >>16) & 0xff;
-	g = (machine().generic.paletteram.u32[offset] >> 8) & 0xff;
-	r = (machine().generic.paletteram.u32[offset] >> 0) & 0xff;
+	b = (m_generic_paletteram_32[offset] >>16) & 0xff;
+	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
+	r = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
 	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( hvysmsh_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x194000, 0x195fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_dword_r, deco16ic_pf2_data_dword_w)
 	AM_RANGE(0x1a0000, 0x1a0fff) AM_READWRITE(wcvol95_pf1_rowscroll_r, wcvol95_pf1_rowscroll_w)
 	AM_RANGE(0x1a4000, 0x1a4fff) AM_READWRITE(wcvol95_pf2_rowscroll_r, wcvol95_pf2_rowscroll_w)
-	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(deco156_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1c0000, 0x1c0fff) AM_RAM_WRITE(deco156_nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1d0010, 0x1d002f) AM_READNOP // Check for DMA complete?
 	AM_RANGE(0x1e0000, 0x1e1fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 ADDRESS_MAP_END
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( wcvol95_map, AS_PROGRAM, 32, deco156_state )
 	AM_RANGE(0x150000, 0x150003) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x160000, 0x161fff) AM_READWRITE(wcvol95_spriteram_r, wcvol95_spriteram_w)
 	AM_RANGE(0x170000, 0x170003) AM_NOP // Irq ack?
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(wcvol95_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(wcvol95_nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x000000ff)
 ADDRESS_MAP_END
 

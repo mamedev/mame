@@ -257,7 +257,7 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_rgb32 &bitmap
 
 			if (srcptr2[x]&0x3fff)
 			{
-				penvalue2 = machine.generic.paletteram.u16[srcptr2[x]&0x3fff];
+				penvalue2 = state->m_generic_paletteram_16[srcptr2[x]&0x3fff];
 				colour2 = paldata[srcptr2[x]&0x3fff];
 			}
 			else

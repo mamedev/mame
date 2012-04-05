@@ -193,27 +193,27 @@ static DRIVER_INIT( av2mj2rg )
 static ADDRESS_MAP_START( pstadium_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE_LEGACY(nbmj8991_clut_r,nbmj8991_clut_w)
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// finalbny
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplew1_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf200, 0xf20f) AM_READWRITE_LEGACY(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// mjgottub
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplew2_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf400, 0xf40f) AM_READWRITE_LEGACY(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjlstory_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf700, 0xf70f) AM_READWRITE_LEGACY(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -221,27 +221,27 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( galkoku_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE_LEGACY(nbmj8991_clut_r,nbmj8991_clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type1_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// hyouban
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galkaika_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE_LEGACY(nbmj8991_clut_r,nbmj8991_clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type2_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type2_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// tokimbsj
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokyogal_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type2_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type2_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf400, 0xf40f) AM_READWRITE_LEGACY(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( av2mj1bb_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf500, 0xf50f) AM_READWRITE_LEGACY(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -249,7 +249,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( av2mj2rg_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE_LEGACY(nbmj8991_clut_r,nbmj8991_clut_w)
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE_LEGACY(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

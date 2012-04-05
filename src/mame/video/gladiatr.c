@@ -104,16 +104,17 @@ WRITE8_HANDLER( gladiatr_paletteram_w )
 {
 	int r,g,b;
 
-	space->machine().generic.paletteram.u8[offset] = data;
+	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
+	state->m_generic_paletteram_8[offset] = data;
 	offset &= 0x3ff;
 
-	r = (space->machine().generic.paletteram.u8[offset] >> 0) & 0x0f;
-	g = (space->machine().generic.paletteram.u8[offset] >> 4) & 0x0f;
-	b = (space->machine().generic.paletteram.u8[offset + 0x400] >> 0) & 0x0f;
+	r = (state->m_generic_paletteram_8[offset] >> 0) & 0x0f;
+	g = (state->m_generic_paletteram_8[offset] >> 4) & 0x0f;
+	b = (state->m_generic_paletteram_8[offset + 0x400] >> 0) & 0x0f;
 
-	r = (r << 1) + ((space->machine().generic.paletteram.u8[offset + 0x400] >> 4) & 0x01);
-	g = (g << 1) + ((space->machine().generic.paletteram.u8[offset + 0x400] >> 5) & 0x01);
-	b = (b << 1) + ((space->machine().generic.paletteram.u8[offset + 0x400] >> 6) & 0x01);
+	r = (r << 1) + ((state->m_generic_paletteram_8[offset + 0x400] >> 4) & 0x01);
+	g = (g << 1) + ((state->m_generic_paletteram_8[offset + 0x400] >> 5) & 0x01);
+	b = (b << 1) + ((state->m_generic_paletteram_8[offset + 0x400] >> 6) & 0x01);
 
 	palette_set_color_rgb(space->machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }

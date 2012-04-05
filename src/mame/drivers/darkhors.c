@@ -334,7 +334,7 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x870000, 0x873fff) AM_RAM_WRITE(darkhors_tmapram2_w) AM_BASE(m_tmapram2)
 	AM_RANGE(0x874000, 0x87dfff) AM_RAM
 	AM_RANGE(0x87e000, 0x87ffff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_SHARE("paletteram")
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
 	AM_RANGE(0x8c0120, 0x8c012f) AM_WRITEONLY AM_BASE(m_tmapscroll)
 	AM_RANGE(0x8c0130, 0x8c013f) AM_WRITEONLY AM_BASE(m_tmapscroll2)
@@ -365,7 +365,7 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 
 	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE(m_spriteram)
 
-	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w) AM_SHARE("paletteram")
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
 
 	AM_RANGE(0x8C0000, 0x8C01ff) AM_RAM

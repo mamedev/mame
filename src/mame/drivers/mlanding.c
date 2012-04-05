@@ -481,7 +481,7 @@ static ADDRESS_MAP_START( mlanding_mem, AS_PROGRAM, 16, mlanding_state )
 	AM_RANGE(0x2d0000, 0x2d0001) AM_READNOP
 	AM_RANGE(0x2d0002, 0x2d0003) AM_DEVREAD8_LEGACY("tc0140syt", tc0140syt_comm_r, 0x00ff)
 
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(ml_mecha_ram_r,ml_mecha_ram_w)
 
 	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")

@@ -1048,12 +1048,12 @@ READ16_MEMBER(namcos21_state::data2_r)
 
 READ16_MEMBER(namcos21_state::paletteram16_r)
 {
-	return machine().generic.paletteram.u16[offset];
+	return m_generic_paletteram_16[offset];
 }
 
 WRITE16_MEMBER(namcos21_state::paletteram16_w)
 {
-	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 }
 
 /******************************************************************************/
@@ -1077,7 +1077,7 @@ READ16_MEMBER(namcos21_state::NAMCO_C139_SCI_register_r){ return 0; }
 	AM_RANGE(0x480000, 0x4807ff) AM_READWRITE(namcos21_depthcue_r,namcos21_depthcue_w) /* Air Combat */ \
 	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE_LEGACY(namco_obj16_r,namco_obj16_w) \
 	AM_RANGE(0x720000, 0x720007) AM_READWRITE_LEGACY(namco_spritepos16_r,namco_spritepos16_w) \
-	AM_RANGE(0x740000, 0x75ffff) AM_READWRITE(paletteram16_r,paletteram16_w) AM_BASE_GENERIC(paletteram) \
+	AM_RANGE(0x740000, 0x75ffff) AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram") \
 	AM_RANGE(0x760000, 0x760001) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w) \
 	AM_RANGE(0x800000, 0x8fffff) AM_READ(datarom_r) \
 	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(shareram1_r,shareram1_w) AM_BASE(m_mpSharedRAM1) \
@@ -1355,7 +1355,7 @@ static ADDRESS_MAP_START( am_gpu_winrun, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x180000, 0x19ffff) AM_RAM /* work RAM */
 	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE_LEGACY(namcos2_68k_gpu_C148_r,namcos2_68k_gpu_C148_w)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_winrun_gpucomram )
-	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(paletteram16_r,paletteram16_w) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x400000, 0x41ffff) AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x6fffff) AM_READ(gpu_data_r)
 	AM_RANGE(0xc00000, 0xcfffff) AM_READWRITE_LEGACY(winrun_gpu_videoram_r,winrun_gpu_videoram_w)
 	AM_RANGE(0xd00000, 0xd0000f) AM_READWRITE_LEGACY(winrun_gpu_register_r,winrun_gpu_register_w)
@@ -1417,7 +1417,7 @@ ADDRESS_MAP_END
 #define DRIVEYES_68K_COMMON \
 	AM_RANGE(0x700000, 0x71ffff) AM_READWRITE_LEGACY(namco_obj16_r,namco_obj16_w) \
 	AM_RANGE(0x720000, 0x720007) AM_READWRITE_LEGACY(namco_spritepos16_r,namco_spritepos16_w) \
-	AM_RANGE(0x740000, 0x75ffff) AM_READWRITE(paletteram16_r,paletteram16_w) AM_BASE_GENERIC(paletteram) \
+	AM_RANGE(0x740000, 0x75ffff) AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram") \
 	AM_RANGE(0x760000, 0x760001) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w) \
 	AM_RANGE(0x800000, 0x8fffff) AM_READ(datarom_r) \
 	AM_RANGE(0x900000, 0x90ffff) AM_READWRITE(shareram1_r,shareram1_w) AM_BASE(m_mpSharedRAM1) \

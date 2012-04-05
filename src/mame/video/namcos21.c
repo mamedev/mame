@@ -137,6 +137,7 @@ VIDEO_START( namcos21 )
 static void
 update_palette( running_machine &machine )
 {
+	namcos21_state *state = machine.driver_data<namcos21_state>();
 	int i;
 	INT16 data1,data2;
 	int r,g,b;
@@ -160,8 +161,8 @@ update_palette( running_machine &machine )
     */
 	for( i=0; i<NAMCOS21_NUM_COLORS; i++ )
 	{
-		data1 = machine.generic.paletteram.u16[0x00000/2+i];
-		data2 = machine.generic.paletteram.u16[0x10000/2+i];
+		data1 = state->m_generic_paletteram_16[0x00000/2+i];
+		data2 = state->m_generic_paletteram_16[0x10000/2+i];
 
 		r = data1>>8;
 		g = data1&0xff;

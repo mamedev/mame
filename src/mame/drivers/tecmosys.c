@@ -300,10 +300,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE_LEGACY(fg_tilemap_w) AM_BASE(m_fgtilemap_ram) // fix ram
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE(m_spriteram) // obj ram
 	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram) // AM_WRITEONLY // obj pal
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // AM_WRITEONLY // obj pal
 
 	//AM_RANGE(0x980000, 0x9807ff) AM_WRITEONLY // bg pal
-	//AM_RANGE(0x980800, 0x980fff) AM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram) // fix pal
+	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // fix pal
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
 	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE_LEGACY(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(m_tilemap_paletteram16)
 

@@ -12,7 +12,6 @@ public:
 
 	/* memory pointers */
 	UINT8 *    m_ram;
-//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	int        m_layer_colorbase[3];

@@ -183,7 +183,7 @@ static ADDRESS_MAP_START( mcatadv_map, AS_PROGRAM, 16, mcatadv_state )
 	AM_RANGE(0x400000, 0x401fff) AM_RAM_WRITE_LEGACY(mcatadv_videoram1_w) AM_BASE(m_videoram1) // Tilemap 0
 	AM_RANGE(0x500000, 0x501fff) AM_RAM_WRITE_LEGACY(mcatadv_videoram2_w) AM_BASE(m_videoram2) // Tilemap 1
 
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x602000, 0x602fff) AM_RAM // Bigger than needs to be?
 
 	AM_RANGE(0x700000, 0x707fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size) // Sprites, two halves for double buffering

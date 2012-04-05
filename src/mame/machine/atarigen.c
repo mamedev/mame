@@ -1395,10 +1395,11 @@ void atarigen_halt_until_hblank_0(screen_device &screen)
 
 WRITE16_HANDLER( atarigen_666_paletteram_w )
 {
+	atarigen_state *state = space->machine().driver_data<atarigen_state>();
 	int newword, r, g, b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	newword = space->machine().generic.paletteram.u16[offset];
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	newword = state->m_generic_paletteram_16[offset];
 
 	r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 	g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
@@ -1415,12 +1416,13 @@ WRITE16_HANDLER( atarigen_666_paletteram_w )
 
 WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	atarigen_state *state = space->machine().driver_data<atarigen_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
 	if (ACCESSING_BITS_8_15)
 	{
 		int palentry = offset / 2;
-		int newword = (space->machine().generic.paletteram.u16[palentry * 2] & 0xff00) | (space->machine().generic.paletteram.u16[palentry * 2 + 1] >> 8);
+		int newword = (state->m_generic_paletteram_16[palentry * 2] & 0xff00) | (state->m_generic_paletteram_16[palentry * 2 + 1] >> 8);
 
 		int r, g, b;
 
@@ -1439,13 +1441,14 @@ WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 
 WRITE32_HANDLER( atarigen_666_paletteram32_w )
 {
+	atarigen_state *state = space->machine().driver_data<atarigen_state>();
 	int newword, r, g, b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		newword = space->machine().generic.paletteram.u32[offset] >> 16;
+		newword = state->m_generic_paletteram_32[offset] >> 16;
 
 		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
@@ -1456,7 +1459,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 
 	if (ACCESSING_BITS_0_15)
 	{
-		newword = space->machine().generic.paletteram.u32[offset] & 0xffff;
+		newword = state->m_generic_paletteram_32[offset] & 0xffff;
 
 		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);

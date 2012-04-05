@@ -88,11 +88,12 @@ WRITE8_HANDLER( balsente_paletteram_w )
 {
 	int r, g, b;
 
-	space->machine().generic.paletteram.u8[offset] = data & 0x0f;
+	balsente_state *state = space->machine().driver_data<balsente_state>();
+	state->m_generic_paletteram_8[offset] = data & 0x0f;
 
-	r = space->machine().generic.paletteram.u8[(offset & ~3) + 0];
-	g = space->machine().generic.paletteram.u8[(offset & ~3) + 1];
-	b = space->machine().generic.paletteram.u8[(offset & ~3) + 2];
+	r = state->m_generic_paletteram_8[(offset & ~3) + 0];
+	g = state->m_generic_paletteram_8[(offset & ~3) + 1];
+	b = state->m_generic_paletteram_8[(offset & ~3) + 2];
 
 	palette_set_color_rgb(space->machine(), offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
 }

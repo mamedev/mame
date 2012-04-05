@@ -53,10 +53,11 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 WRITE16_HANDLER( unico_palette_w )
 {
+	unico_state *state = space->machine().driver_data<unico_state>();
 	UINT16 data1, data2;
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	data1 = space->machine().generic.paletteram.u16[offset & ~1];
-	data2 = space->machine().generic.paletteram.u16[offset |  1];
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	data1 = state->m_generic_paletteram_16[offset & ~1];
+	data2 = state->m_generic_paletteram_16[offset |  1];
 	palette_set_color_rgb( space->machine(),offset/2,
 		 (data1 >> 8) & 0xFC,
 		 (data1 >> 0) & 0xFC,
@@ -65,7 +66,8 @@ WRITE16_HANDLER( unico_palette_w )
 
 WRITE32_HANDLER( unico_palette32_w )
 {
-	UINT32 rgb0 = COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	unico_state *state = space->machine().driver_data<unico_state>();
+	UINT32 rgb0 = COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
 	palette_set_color_rgb( space->machine(),offset,
 		 (rgb0 >> 24) & 0xFC,
 		 (rgb0 >> 16) & 0xFC,

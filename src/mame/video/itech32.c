@@ -311,13 +311,14 @@ WRITE32_HANDLER( itech020_plane_w )
 
 WRITE16_HANDLER( timekill_paletteram_w )
 {
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	int r, g, b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
-	r = space->machine().generic.paletteram.u16[offset & ~1] & 0xff;
-	g = space->machine().generic.paletteram.u16[offset & ~1] >> 8;
-	b = space->machine().generic.paletteram.u16[offset |  1] >> 8;
+	r = state->m_generic_paletteram_16[offset & ~1] & 0xff;
+	g = state->m_generic_paletteram_16[offset & ~1] >> 8;
+	b = state->m_generic_paletteram_16[offset |  1] >> 8;
 
 	palette_set_color(space->machine(), offset / 2, MAKE_RGB(r, g, b));
 }
@@ -325,16 +326,17 @@ WRITE16_HANDLER( timekill_paletteram_w )
 
 WRITE16_HANDLER( bloodstm_paletteram_w )
 {
+	itech32_state *state = space->machine().driver_data<itech32_state>();
 	int r, g, b;
 
 	/* in test mode, the LSB is used; in game mode, the MSB is used */
 	if (!ACCESSING_BITS_0_7 && (offset & 1))
 		data >>= 8, mem_mask >>= 8;
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
-	r = space->machine().generic.paletteram.u16[offset & ~1] & 0xff;
-	g = space->machine().generic.paletteram.u16[offset & ~1] >> 8;
-	b = space->machine().generic.paletteram.u16[offset |  1] & 0xff;
+	r = state->m_generic_paletteram_16[offset & ~1] & 0xff;
+	g = state->m_generic_paletteram_16[offset & ~1] >> 8;
+	b = state->m_generic_paletteram_16[offset |  1] & 0xff;
 
 	palette_set_color(space->machine(), offset / 2, MAKE_RGB(r, g, b));
 }
@@ -344,11 +346,12 @@ WRITE32_HANDLER( drivedge_paletteram_w )
 {
 	int r, g, b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	itech32_state *state = space->machine().driver_data<itech32_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
 
-	r = space->machine().generic.paletteram.u32[offset] & 0xff;
-	g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
-	b = (space->machine().generic.paletteram.u32[offset] >> 16) & 0xff;
+	r = state->m_generic_paletteram_32[offset] & 0xff;
+	g = (state->m_generic_paletteram_32[offset] >> 8) & 0xff;
+	b = (state->m_generic_paletteram_32[offset] >> 16) & 0xff;
 
 	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 }
@@ -358,11 +361,12 @@ WRITE32_HANDLER( itech020_paletteram_w )
 {
 	int r, g, b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	itech32_state *state = space->machine().driver_data<itech32_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
 
-	r = (space->machine().generic.paletteram.u32[offset] >> 16) & 0xff;
-	g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
-	b = space->machine().generic.paletteram.u32[offset] & 0xff;
+	r = (state->m_generic_paletteram_32[offset] >> 16) & 0xff;
+	g = (state->m_generic_paletteram_32[offset] >> 8) & 0xff;
+	b = state->m_generic_paletteram_32[offset] & 0xff;
 
 	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
 }

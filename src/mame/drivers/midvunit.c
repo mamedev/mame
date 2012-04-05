@@ -500,7 +500,7 @@ static ADDRESS_MAP_START( midvunit_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x997000, 0x997000) AM_NOP	// communications
 	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE_LEGACY(midvunit_sound_w)
 	AM_RANGE(0x9c0000, 0x9c1fff) AM_READWRITE_LEGACY(midvunit_cmos_r, midvunit_cmos_w) AM_SHARE("nvram")
-	AM_RANGE(0x9e0000, 0x9e7fff) AM_RAM_WRITE_LEGACY(midvunit_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x9e0000, 0x9e7fff) AM_RAM_WRITE_LEGACY(midvunit_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE_LEGACY(midvunit_textureram_r, midvunit_textureram_w) AM_BASE(m_textureram)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -525,7 +525,7 @@ static ADDRESS_MAP_START( midvplus_map, AS_PROGRAM, 32, midvunit_state )
 	AM_RANGE(0x994000, 0x994000) AM_WRITE_LEGACY(midvunit_control_w)
 	AM_RANGE(0x995020, 0x995020) AM_WRITE_LEGACY(midvunit_cmos_protect_w)
 	AM_RANGE(0x9a0000, 0x9a0007) AM_DEVREADWRITE_LEGACY("ide", midway_ide_asic_r, midway_ide_asic_w)
-	AM_RANGE(0x9c0000, 0x9c7fff) AM_RAM_WRITE_LEGACY(midvunit_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x9c0000, 0x9c7fff) AM_RAM_WRITE_LEGACY(midvunit_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9d0000, 0x9d000f) AM_READWRITE_LEGACY(midvplus_misc_r, midvplus_misc_w) AM_BASE(m_midvplus_misc)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE_LEGACY(midvunit_textureram_r, midvunit_textureram_w) AM_BASE(m_textureram)
 	AM_RANGE(0xc00000, 0xcfffff) AM_RAM

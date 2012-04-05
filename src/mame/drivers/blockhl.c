@@ -42,7 +42,7 @@ READ8_MEMBER(blockhl_state::bankedram_r)
 {
 
 	if (m_palette_selected)
-		return machine().generic.paletteram.u8[offset];
+		return m_generic_paletteram_8[offset];
 	else
 		return m_ram[offset];
 }

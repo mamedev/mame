@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( btime_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(btime_w)	/* override the following entries to */
 												/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(m_rambase)
-	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE_LEGACY(btime_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE_LEGACY(btime_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(m_colorram)
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE_LEGACY(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
@@ -389,7 +389,7 @@ static ADDRESS_MAP_START( tisland_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(tisland_w)	/* override the following entries to */
 													/* support ROM decryption */
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(m_rambase)
-	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE_LEGACY(btime_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE_LEGACY(btime_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(m_colorram)
 	AM_RANGE(0x1800, 0x1bff) AM_READWRITE_LEGACY(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
@@ -471,7 +471,7 @@ static ADDRESS_MAP_START( bnj_map, AS_PROGRAM, 8, btime_state )
 	AM_RANGE(0x5000, 0x51ff) AM_WRITE_LEGACY(bnj_background_w) AM_BASE_SIZE(m_bnj_backgroundram, m_bnj_backgroundram_size)
 	AM_RANGE(0x5400, 0x5400) AM_WRITE_LEGACY(bnj_scroll1_w)
 	AM_RANGE(0x5800, 0x5800) AM_WRITE_LEGACY(bnj_scroll2_w)
-	AM_RANGE(0x5c00, 0x5c0f) AM_WRITE_LEGACY(btime_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x5c00, 0x5c0f) AM_WRITE_LEGACY(btime_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

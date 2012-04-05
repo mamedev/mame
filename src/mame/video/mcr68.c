@@ -153,8 +153,9 @@ WRITE16_HANDLER( mcr68_paletteram_w )
 {
 	int newword;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	newword = space->machine().generic.paletteram.u16[offset];
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	newword = state->m_generic_paletteram_16[offset];
 	palette_set_color_rgb(space->machine(), offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
 }
 
@@ -163,8 +164,9 @@ WRITE16_HANDLER( zwackery_paletteram_w )
 {
 	int newword;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	newword = space->machine().generic.paletteram.u16[offset];
+	mcr68_state *state = space->machine().driver_data<mcr68_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	newword = state->m_generic_paletteram_16[offset];
 	palette_set_color_rgb(space->machine(), offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
 }
 

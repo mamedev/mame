@@ -39,7 +39,8 @@ WRITE16_HANDLER( galpanic_bgvideoram_w )
 
 WRITE16_HANDLER( galpanic_paletteram_w )
 {
-	data = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	galpanic_state *state = space->machine().driver_data<galpanic_state>();
+	data = COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 	/* bit 0 seems to be a transparency flag for the front bitmap */
 	palette_set_color_rgb(space->machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }

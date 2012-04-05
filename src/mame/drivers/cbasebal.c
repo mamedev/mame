@@ -50,7 +50,7 @@ READ8_MEMBER(cbasebal_state::bankedram_r)
 		return cbasebal_textram_r(&space, offset);	/* VRAM */
 	case 1:
 		if (offset < 0x800)
-			return machine().generic.paletteram.u8[offset];
+			return m_generic_paletteram_8[offset];
 		else
 			return 0;
 		break;
@@ -111,7 +111,7 @@ static const eeprom_interface cbasebal_eeprom_intf =
 static ADDRESS_MAP_START( cbasebal_map, AS_PROGRAM, 8, cbasebal_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_GENERIC(paletteram)	/* palette + vram + scrollram */
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("paletteram")	/* palette + vram + scrollram */
 	AM_RANGE(0xe000, 0xfdff) AM_RAM		/* work RAM */
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END

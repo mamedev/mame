@@ -369,7 +369,7 @@ static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x102800, 0x103fff) AM_RAM
 	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE_LEGACY(shadfrce_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_BASE(m_spvideoram) AM_SIZE(m_spvideoram_size) /* sprites */
-	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE_LEGACY(shadfrce_bg0scrollx_w) /* SCROLL X */
 	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE_LEGACY(shadfrce_bg0scrolly_w) /* SCROLL Y */
 	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE_LEGACY(shadfrce_bg1scrollx_w) /* SCROLL X */

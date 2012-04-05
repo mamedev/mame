@@ -94,9 +94,9 @@ WRITE32_MEMBER(superchs_state::cpua_ctrl_w)
 WRITE32_MEMBER(superchs_state::superchs_palette_w)
 {
 	int a,r,g,b;
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	a = machine().generic.paletteram.u32[offset];
+	a = m_generic_paletteram_32[offset];
 	r = (a &0xff0000) >> 16;
 	g = (a &0xff00) >> 8;
 	b = (a &0xff);
@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( superchs_map, AS_PROGRAM, 32, superchs_state )
 	AM_RANGE(0x1b0000, 0x1b002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(m_shared_ram)
 	AM_RANGE(0x240000, 0x240003) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(superchs_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(superchs_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2c0000, 0x2c07ff) AM_RAM AM_SHARE("f3_shared")
 	AM_RANGE(0x300000, 0x300007) AM_READWRITE(superchs_input_r, superchs_input_w)	/* eerom etc. */
 	AM_RANGE(0x340000, 0x340003) AM_READWRITE(superchs_stick_r, superchs_stick_w)	/* stick int request */

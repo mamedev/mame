@@ -572,7 +572,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, superqix_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE_LEGACY(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(pbillian_from_mcu_r)
@@ -585,7 +585,7 @@ static ADDRESS_MAP_START( pbillian_port_map, AS_IO, 8, superqix_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotsmash_port_map, AS_IO, 8, superqix_state )
-	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE_LEGACY(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0000, 0x01ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x0408, 0x0408) AM_READ(hotsmash_from_mcu_r)
@@ -598,7 +598,7 @@ static ADDRESS_MAP_START( hotsmash_port_map, AS_IO, 8, superqix_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE_LEGACY(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x0405, 0x0405) AM_DEVREAD_LEGACY("ay2", ay8910_r)
@@ -611,7 +611,7 @@ static ADDRESS_MAP_START( sqix_port_map, AS_IO, 8, superqix_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bootleg_port_map, AS_IO, 8, superqix_state )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE_LEGACY(paletteram_BBGGRRII_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0000, 0x00ff) AM_RAM_WRITE(paletteram_BBGGRRII_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0401, 0x0401) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x0402, 0x0403) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
 	AM_RANGE(0x0405, 0x0405) AM_DEVREAD_LEGACY("ay2", ay8910_r)

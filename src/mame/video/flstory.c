@@ -66,10 +66,8 @@ VIDEO_START( flstory )
 	state->m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
 	state->m_bg_tilemap->set_scroll_cols(32);
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram2.u8, 0x200);
+	state->m_generic_paletteram_8.allocate(0x200);
+	state->m_generic_paletteram2_8.allocate(0x200);
 }
 
 VIDEO_START( rumba )
@@ -81,10 +79,8 @@ VIDEO_START( rumba )
 	state->m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
 	state->m_bg_tilemap->set_scroll_cols(32);
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram2.u8, 0x200);
+	state->m_generic_paletteram_8.allocate(0x200);
+	state->m_generic_paletteram2_8.allocate(0x200);
 }
 
 VIDEO_START( victnine )
@@ -93,10 +89,8 @@ VIDEO_START( victnine )
 	state->m_bg_tilemap = tilemap_create(machine, victnine_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_cols(32);
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram2.u8, 0x200);
+	state->m_generic_paletteram_8.allocate(0x200);
+	state->m_generic_paletteram2_8.allocate(0x200);
 }
 
 WRITE8_HANDLER( flstory_videoram_w )
@@ -110,18 +104,18 @@ WRITE8_HANDLER( flstory_palette_w )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_split2_w(space, (offset & 0xff) + (state->m_palette_bank << 8),data);
+		state->paletteram_xxxxBBBBGGGGRRRR_split2_w(*space, (offset & 0xff) + (state->m_palette_bank << 8),data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_split1_w(space, (offset & 0xff) + (state->m_palette_bank << 8),data);
+		state->paletteram_xxxxBBBBGGGGRRRR_split1_w(*space, (offset & 0xff) + (state->m_palette_bank << 8),data);
 }
 
 READ8_HANDLER( flstory_palette_r )
 {
 	flstory_state *state = space->machine().driver_data<flstory_state>();
 	if (offset & 0x100)
-		return space->machine().generic.paletteram2.u8[ (offset & 0xff) + (state->m_palette_bank << 8) ];
+		return state->m_generic_paletteram2_8[ (offset & 0xff) + (state->m_palette_bank << 8) ];
 	else
-		return space->machine().generic.paletteram.u8  [ (offset & 0xff) + (state->m_palette_bank << 8) ];
+		return state->m_generic_paletteram_8  [ (offset & 0xff) + (state->m_palette_bank << 8) ];
 }
 
 WRITE8_HANDLER( flstory_gfxctrl_w )

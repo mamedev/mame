@@ -797,9 +797,9 @@ WRITE16_MEMBER(model1_state::md0_w)
 
 WRITE16_MEMBER(model1_state::p_w)
 {
-	UINT16 old = machine().generic.paletteram.u16[offset];
+	UINT16 old = m_generic_paletteram_16[offset];
 	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
-	if(0 && machine().generic.paletteram.u16[offset] != old)
+	if(0 && m_generic_paletteram_16[offset] != old)
 		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(&space.device()));
 }
 
@@ -883,7 +883,7 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
 	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
 
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("paletteram")
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE(m_color_xlat)
 
 	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP
@@ -931,7 +931,7 @@ static ADDRESS_MAP_START( model1_vr_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0x770000, 0x770001) AM_WRITENOP		// Video synchronization switch
 	AM_RANGE(0x780000, 0x7fffff) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
 
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(p_w) AM_SHARE("paletteram")
 	AM_RANGE(0x910000, 0x91bfff) AM_RAM  AM_BASE(m_color_xlat)
 
 	AM_RANGE(0xc00000, 0xc0003f) AM_READ(io_r) AM_WRITENOP

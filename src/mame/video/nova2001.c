@@ -51,18 +51,19 @@ WRITE8_HANDLER( ninjakun_paletteram_w )
 {
 	int i;
 
-	paletteram_BBGGRRII_w(space,offset,data);
+	nova2001_state *state = space->machine().driver_data<nova2001_state>();
+	state->paletteram_BBGGRRII_w(*space,offset,data);
 
 	// expand the sprite palette to full length
 	if (offset < 16)
 	{
-		paletteram_BBGGRRII_w(space, 0x200 + offset * 16 + 1, data);
+		state->paletteram_BBGGRRII_w(*space, 0x200 + offset * 16 + 1, data);
 
 		if (offset != 1)
 		{
 			for (i = 0; i < 16; i++)
 			{
-				paletteram_BBGGRRII_w(space, 0x200 + offset + i * 16, data);
+				state->paletteram_BBGGRRII_w(*space, 0x200 + offset + i * 16, data);
 			}
 		}
 	}

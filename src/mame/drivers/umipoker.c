@@ -305,7 +305,7 @@ static ADDRESS_MAP_START( umipoker_map, AS_PROGRAM, 16, umipoker_state )
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(umipoker_vram_0_w) AM_BASE(m_vram_0)
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(umipoker_vram_1_w) AM_BASE(m_vram_1)
 	AM_RANGE(0x804000, 0x805fff) AM_RAM_WRITE(umipoker_vram_2_w) AM_BASE(m_vram_2)

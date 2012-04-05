@@ -243,28 +243,28 @@ WRITE8_MEMBER(cshooter_state::bank_w)
 
 WRITE8_MEMBER(cshooter_state::pal_w)
 {
-	machine().generic.paletteram.u8[offset]=data;
+	m_generic_paletteram_8[offset]=data;
 	offset&=0xff;
-	palette_set_color_rgb(machine(), offset, pal4bit(machine().generic.paletteram.u8[offset] >> 4), pal4bit(machine().generic.paletteram.u8[offset]), pal4bit(machine().generic.paletteram.u8[offset+0x100]));
+	palette_set_color_rgb(machine(), offset, pal4bit(m_generic_paletteram_8[offset] >> 4), pal4bit(m_generic_paletteram_8[offset]), pal4bit(m_generic_paletteram_8[offset+0x100]));
 }
 
 WRITE8_MEMBER(cshooter_state::pal2_w)
 {
-	machine().generic.paletteram.u8[offset]=data;
+	m_generic_paletteram_8[offset]=data;
 	offset&=0x1ff;
-	palette_set_color_rgb(machine(), offset, pal4bit(machine().generic.paletteram.u8[offset] >> 4), pal4bit(machine().generic.paletteram.u8[offset]), pal4bit(machine().generic.paletteram.u8[offset+0x200]));
+	palette_set_color_rgb(machine(), offset, pal4bit(m_generic_paletteram_8[offset] >> 4), pal4bit(m_generic_paletteram_8[offset]), pal4bit(m_generic_paletteram_8[offset+0x200]));
 }
 
 READ8_MEMBER(cshooter_state::pal_r)
 {
-	return machine().generic.paletteram.u8[offset];
+	return m_generic_paletteram_8[offset];
 }
 
 static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITEONLY
 	AM_RANGE(0xb000, 0xb0ff) AM_READONLY			// sound related ?
-	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_SHARE("paletteram")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN0")
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("IN1")
 	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("IN2")
@@ -305,7 +305,7 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE(m_txram)
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_SHARE("paletteram")
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
 	AM_RANGE(0xdc00, 0xdc1f) AM_RAM //video registers
 	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)

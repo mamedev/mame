@@ -3181,6 +3181,7 @@ void K054338_fill_backcolor(running_machine &machine, bitmap_rgb32 &bitmap, int 
 	UINT32 *dst_ptr, *pal_ptr;
 	int bgcolor;
 	const rectangle &visarea = machine.primary_screen->visible_area();
+	driver_device *state = machine.driver_data();
 
 	clipx = visarea.min_x & ~3;
 	clipy = visarea.min_y;
@@ -3192,7 +3193,7 @@ void K054338_fill_backcolor(running_machine &machine, bitmap_rgb32 &bitmap, int 
 	dst_ptr += clipx;
 
 	BGC_SET = 0;
-	pal_ptr = machine.generic.paletteram.u32;
+	pal_ptr = state->m_generic_paletteram_32;
 
 	if (!mode)
 	{

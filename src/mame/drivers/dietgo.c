@@ -24,7 +24,7 @@ static ADDRESS_MAP_START( dietgo_map, AS_PROGRAM, 16, dietgo_state )
 	AM_RANGE(0x220000, 0x2207ff) AM_WRITEONLY AM_BASE(m_pf1_rowscroll)
 	AM_RANGE(0x222000, 0x2227ff) AM_WRITEONLY AM_BASE(m_pf2_rowscroll)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x300000, 0x300bff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x300000, 0x300bff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x340000, 0x3407ff) AM_READWRITE_LEGACY(dietgo_104_prot_r, dietgo_104_prot_w)
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM // mainram
 ADDRESS_MAP_END

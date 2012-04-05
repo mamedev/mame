@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( ninjakun_cpu1_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE_LEGACY(nova2001_fg_videoram_w) AM_BASE(m_fg_videoram) AM_SHARE("share1")
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE_LEGACY(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_BASE(m_bg_videoram) AM_SHARE("share2")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(m_spriteram) AM_SHARE("share3")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE_LEGACY(ninjakun_paletteram_w) AM_BASE_GENERIC(paletteram) AM_SHARE("share4")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE_LEGACY(ninjakun_paletteram_w) AM_SHARE("paletteram") AM_SHARE("share4")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share5")
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share6")
 ADDRESS_MAP_END
@@ -260,7 +260,7 @@ static ADDRESS_MAP_START( raiders5_cpu1_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0xc001, 0xc001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0xc003, 0xc003) AM_DEVREAD_LEGACY("ay2", ay8910_r)
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE_LEGACY(ninjakun_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE_LEGACY(ninjakun_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 

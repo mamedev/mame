@@ -491,7 +491,7 @@ static ADDRESS_MAP_START( gegege_mem_map, AS_PROGRAM, 8, sigmab98_state )
 
 	AM_RANGE( 0xa000, 0xafff ) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 
-	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0xc000, 0xc1ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_be_w) AM_SHARE("paletteram")
 
 	AM_RANGE( 0xc800, 0xc87f ) AM_RAM
 
@@ -737,7 +737,7 @@ static ADDRESS_MAP_START( animalc_map, AS_PROGRAM, 8, sigmab98_state )
 	AM_RANGE( 0xa000, 0xafff ) AM_RAM
 	AM_RANGE( 0xb000, 0xbfff ) AM_RAMBANK("sprbank")
 
-	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_be_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0xd000, 0xd1ff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_be_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0xd800, 0xd87f ) AM_RAM	// table?
 
 	AM_RANGE( 0xe011, 0xe011 ) AM_WRITENOP	// IRQ Enable? Screen disable?
@@ -905,7 +905,7 @@ READ8_MEMBER(sigmab98_state::haekaka_b000_r)
 
 		case 0x67:	// PALETTERAM + TABLE? + REGS
 			if (offset < 0x200)
-				return machine().generic.paletteram.u8[offset];
+				return m_generic_paletteram_8[offset];
 			else if (offset == (0xc013-0xb000))
 				return haekaka_vblank_r(space, offset);
 			break;
@@ -931,7 +931,7 @@ WRITE8_MEMBER(sigmab98_state::haekaka_b000_w)
 			if (offset < 0x200)
 			{
 				paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//              machine().generic.paletteram.u8[offset] = data;
+//              m_generic_paletteram_8[offset] = data;
 				return;
 			}
 			else if ((offset >= 0x800) && (offset < 0x880))
@@ -1139,7 +1139,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_rambank_w)
 			switch (data)
 			{
 				case 0x52:	memory_set_bankptr(machine(), "palbank", m_nvram);									break;
-				case 0x64:	memory_set_bankptr(machine(), "palbank", machine().generic.paletteram.u8);	break;
+				case 0x64:	memory_set_bankptr(machine(), "palbank", m_generic_paletteram_8);	break;
 				default:
 					logerror("%s: unknown ram bank = %02x, reg2 = %02x\n", machine().describe_context(), data, m_reg2);
 					return;
@@ -1172,7 +1172,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_nvram_palette_w)
 	if (m_rambank == 0x64)
 	{
 		paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//      machine().generic.paletteram.u8[offset] = data;
+//      m_generic_paletteram_8[offset] = data;
 	}
 	else if (m_rambank == 0x52)
 	{
@@ -1190,7 +1190,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
 	{
 		if (offset < 0x200)
 			paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//          machine().generic.paletteram.u8[offset] = data;
+//          m_generic_paletteram_8[offset] = data;
 	}
 	else
 	{
@@ -1199,7 +1199,7 @@ WRITE8_MEMBER(sigmab98_state::itazuram_palette_w)
 }
 READ8_MEMBER(sigmab98_state::itazuram_palette_r)
 {
-	return machine().generic.paletteram.u8[offset];
+	return m_generic_paletteram_8[offset];
 }
 
 static ADDRESS_MAP_START( itazuram_map, AS_PROGRAM, 8, sigmab98_state )
@@ -1381,7 +1381,7 @@ READ8_MEMBER(sigmab98_state::tdoboon_c000_r)
 
 		case 0x66:	// PALETTERAM + TABLE?
 			if (offset < 0x200)
-				return machine().generic.paletteram.u8[offset];
+				return m_generic_paletteram_8[offset];
 			break;
 
 		case 0x67:	// REGS
@@ -1410,7 +1410,7 @@ WRITE8_MEMBER(sigmab98_state::tdoboon_c000_w)
 			if (offset < 0x200)
 			{
 				paletteram_xRRRRRGGGGGBBBBB_be_w(space, offset, data);
-//              machine().generic.paletteram.u8[offset] = data;
+//              m_generic_paletteram_8[offset] = data;
 				return;
 			}
 			else if ((offset >= 0x800) && (offset < 0x880))
@@ -2155,9 +2155,9 @@ static DRIVER_INIT( itazuram )
 	state->m_rombank = 0x0f;
 
 	// RAM banks
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x3000);
-	memset(machine.generic.paletteram.u8, 0, 0x3000);
-	memory_set_bankptr(machine, "palbank", machine.generic.paletteram.u8);
+	state->m_generic_paletteram_8.allocate(0x3000);
+	memset(state->m_generic_paletteram_8, 0, 0x3000);
+	memory_set_bankptr(machine, "palbank", state->m_generic_paletteram_8);
 	state->m_rambank = 0x64;
 
 	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000 * 5);
@@ -2269,8 +2269,8 @@ static DRIVER_INIT( haekaka )
 {
 	sigmab98_state *state = machine.driver_data<sigmab98_state>();
 	// RAM banks
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	memset(machine.generic.paletteram.u8, 0, 0x200);
+	state->m_generic_paletteram_8.allocate(0x200);
+	memset(state->m_generic_paletteram_8, 0, 0x200);
 
 	state->m_spriteram = auto_alloc_array(machine, UINT8, 0x1000);
 	memset(state->m_spriteram, 0, 0x1000);

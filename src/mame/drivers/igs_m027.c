@@ -142,10 +142,10 @@ static TILE_GET_INFO( get_bg_tilemap_tile_info )
 /* Palette Layer */
 WRITE32_MEMBER(igs_m027_state::igs_palette32_w)
 {
-	machine().generic.paletteram.u16=(UINT16 *)m_igs_palette32;
+	m_generic_paletteram_16.set_target((UINT16 *)m_igs_palette32, 0x800);
 	COMBINE_DATA(&m_igs_palette32[offset]);
-	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2,machine().generic.paletteram.u16[offset*2],0);
-	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2+1,machine().generic.paletteram.u16[offset*2+1],0);
+	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2,m_generic_paletteram_16[offset*2],0);
+	//paletteram16_xGGGGGRRRRRBBBBB_word_w(offset*2+1,m_generic_paletteram_16[offset*2+1],0);
 	//if(data!=0)
 	//fprintf(stdout,"PALETTE RAM OFFSET %x ,data %x!\n",offset ,m_igs_palette32[offset]);
 }

@@ -8261,7 +8261,7 @@ void k054338_fill_backcolor( device_t *device, bitmap_rgb32 &bitmap, int mode ) 
 	dst_ptr += clipx;
 
 	BGC_SET = 0;
-	pal_ptr = device->machine().generic.paletteram.u32;
+	pal_ptr = device->machine().driver_data()->m_generic_paletteram_32;
 
 	if (!mode || k054338->k055555 == NULL)
 	{

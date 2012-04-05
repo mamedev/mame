@@ -50,8 +50,8 @@ static ADDRESS_MAP_START( gng_map, AS_PROGRAM, 8, gng_state )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P2")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3004, 0x3004) AM_READ_PORT("DSW2")
-	AM_RANGE(0x3800, 0x38ff) AM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0x3900, 0x39ff) AM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3800, 0x38ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0x3900, 0x39ff) AM_WRITE(paletteram_RRRRGGGGBBBBxxxx_split1_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3a00, 0x3a00) AM_WRITE_LEGACY(soundlatch_w)
 	AM_RANGE(0x3b08, 0x3b09) AM_WRITE_LEGACY(gng_bgscrollx_w)
 	AM_RANGE(0x3b0a, 0x3b0b) AM_WRITE_LEGACY(gng_bgscrolly_w)
@@ -328,10 +328,10 @@ static MACHINE_RESET( gng )
                  For now let's fill everything with white colors until we have better info about it */
 		for(i=0;i<0x100;i+=4)
 		{
-			machine.generic.paletteram.u8[i] = machine.generic.paletteram2.u8[i] = 0x00;
-			machine.generic.paletteram.u8[i+1] = machine.generic.paletteram2.u8[i+1] = 0x55;
-			machine.generic.paletteram.u8[i+2] = machine.generic.paletteram2.u8[i+2] = 0xaa;
-			machine.generic.paletteram.u8[i+3] = machine.generic.paletteram2.u8[i+3] = 0xff;
+			state->m_generic_paletteram_8[i] = state->m_generic_paletteram2_8[i] = 0x00;
+			state->m_generic_paletteram_8[i+1] = state->m_generic_paletteram2_8[i+1] = 0x55;
+			state->m_generic_paletteram_8[i+2] = state->m_generic_paletteram2_8[i+2] = 0xaa;
+			state->m_generic_paletteram_8[i+3] = state->m_generic_paletteram2_8[i+3] = 0xff;
 			palette_set_color_rgb(machine,i+0,0x00,0x00,0x00);
 			palette_set_color_rgb(machine,i+1,0x55,0x55,0x55);
 			palette_set_color_rgb(machine,i+2,0xaa,0xaa,0xaa);

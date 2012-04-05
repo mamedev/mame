@@ -377,8 +377,8 @@ void device_t::start()
 	m_region = machine().region(tag());
 
 	// find all the registered devices
-	for (auto_finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
-		autodev->findit(*this);
+	for (finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
+		autodev->findit();
 
 	// let the interfaces do their pre-work
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
@@ -825,55 +825,33 @@ void device_t::remove_subdevice(device_t &device)
 //  list of stuff to find after we go live
 //-------------------------------------------------
 
-void device_t::register_auto_finder(auto_finder_base &autodev)
+device_t::finder_base *device_t::register_auto_finder(finder_base &autodev)
 {
 	// add to this list
-	autodev.m_next = m_auto_finder_list;
+	finder_base *old = m_auto_finder_list;
 	m_auto_finder_list = &autodev;
+	return old;
 }
 
 
 //-------------------------------------------------
-//  auto_finder_base - constructor
+//  finder_base - constructor
 //-------------------------------------------------
 
-device_t::auto_finder_base::auto_finder_base(device_t &base, const char *tag)
-	: m_next(NULL),
+device_t::finder_base::finder_base(device_t &base, const char *tag)
+	: m_next(base.register_auto_finder(*this)),
+	  m_base(base),
 	  m_tag(tag)
 {
-	// register ourselves with our device class
-	base.register_auto_finder(*this);
 }
 
 
 //-------------------------------------------------
-//  ~auto_finder_base - destructor
+//  ~finder_base - destructor
 //-------------------------------------------------
 
-device_t::auto_finder_base::~auto_finder_base()
+device_t::finder_base::~finder_base()
 {
-}
-
-
-//-------------------------------------------------
-//  find_device - find a device; done here instead
-//  of inline in the template due to include
-//  dependency ordering
-//-------------------------------------------------
-
-device_t *device_t::auto_finder_base::find_device(device_t &base, const char *tag)
-{
-	return base.subdevice(tag);
-}
-
-
-//-------------------------------------------------
-//  find_shared_ptr - find a shared pointer
-//-------------------------------------------------
-
-void *device_t::auto_finder_base::find_shared_ptr(device_t &base, const char *tag, size_t &bytes)
-{
-	return memory_get_shared(base.machine(), tag, bytes);
 }
 
 

@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x1003, 0x1003) AM_WRITE(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x1004, 0x1004) AM_WRITE(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM //vram attr?
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE(m_videoram)
@@ -230,7 +230,7 @@ static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x1003, 0x1003) AM_WRITE(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE(m_videoram)
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM

@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE_LEGACY("k056832", k056832_long_w)
 

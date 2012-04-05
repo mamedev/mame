@@ -511,7 +511,7 @@ READ16_MEMBER(bingor_state::test_r)
 static ADDRESS_MAP_START( bingor_map, AS_PROGRAM, 16, bingor_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0x90000, 0x9ffff) AM_ROM AM_REGION("gfx", 0)
-	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE_LEGACY(paletteram16_RRRRGGGGBBBBIIII_word_w) AM_BASE_GENERIC(paletteram) //wrong
+	AM_RANGE(0xa0300, 0xa031f) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBIIII_word_w) AM_SHARE("paletteram") //wrong
 	AM_RANGE(0xa0000, 0xaffff) AM_RAM AM_BASE(m_blit_ram)
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END

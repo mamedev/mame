@@ -315,10 +315,11 @@ VIDEO_START( blswhstl )
 
 WRITE16_HANDLER( tmnt_paletteram_word_w )
 {
-	COMBINE_DATA(space->machine().generic.paletteram.u16 + offset);
+	tmnt_state *state = space->machine().driver_data<tmnt_state>();
+	COMBINE_DATA(state->m_generic_paletteram_16 + offset);
 	offset &= ~1;
 
-	data = (space->machine().generic.paletteram.u16[offset] << 8) | space->machine().generic.paletteram.u16[offset + 1];
+	data = (state->m_generic_paletteram_16[offset] << 8) | state->m_generic_paletteram_16[offset + 1];
 	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 

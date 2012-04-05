@@ -77,8 +77,8 @@ static ADDRESS_MAP_START( janshi_vdp_map8, AS_0, 8, pinkiri8_state )
 
 	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_BASE(m_janshi_vram2) // y pos + unknown
 
-	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xff2000, 0xff27ff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xff2000, 0xff27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_SHARE("paletteram2")
 
 	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_BASE(m_janshi_crtc_regs)
 ADDRESS_MAP_END

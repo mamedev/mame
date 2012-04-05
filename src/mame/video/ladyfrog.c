@@ -51,9 +51,9 @@ WRITE8_HANDLER( ladyfrog_palette_w )
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_split2_w(space, (offset & 0xff) + (state->m_palette_bank << 8), data);
+		state->paletteram_xxxxBBBBGGGGRRRR_split2_w(*space, (offset & 0xff) + (state->m_palette_bank << 8), data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_split1_w(space, (offset & 0xff) + (state->m_palette_bank << 8), data);
+		state->paletteram_xxxxBBBBGGGGRRRR_split1_w(*space, (offset & 0xff) + (state->m_palette_bank << 8), data);
 }
 
 READ8_HANDLER( ladyfrog_palette_r )
@@ -61,9 +61,9 @@ READ8_HANDLER( ladyfrog_palette_r )
 	ladyfrog_state *state = space->machine().driver_data<ladyfrog_state>();
 
 	if (offset & 0x100)
-		return space->machine().generic.paletteram2.u8[(offset & 0xff) + (state->m_palette_bank << 8)];
+		return state->m_generic_paletteram2_8[(offset & 0xff) + (state->m_palette_bank << 8)];
 	else
-		return space->machine().generic.paletteram.u8[(offset & 0xff) + (state->m_palette_bank << 8)];
+		return state->m_generic_paletteram_8[(offset & 0xff) + (state->m_palette_bank << 8)];
 }
 
 WRITE8_HANDLER( ladyfrog_gfxctrl_w )
@@ -145,13 +145,11 @@ static VIDEO_START( ladyfrog_common )
 	state->m_spriteram = auto_alloc_array(machine, UINT8, 160);
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	state->m_generic_paletteram_8.allocate(0x200);
+	state->m_generic_paletteram2_8.allocate(0x200);
 	state->m_bg_tilemap->set_scroll_cols(32);
 	state->m_bg_tilemap->set_scrolldy(15, 15);
 
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram2.u8, 0x200);
 	state->save_pointer(NAME(state->m_spriteram), 160);
 }
 

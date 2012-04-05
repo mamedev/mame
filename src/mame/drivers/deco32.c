@@ -730,7 +730,7 @@ static ADDRESS_MAP_START( captaven_map, AS_PROGRAM, 32, deco32_state )
 
 	AM_RANGE(0x128000, 0x128fff) AM_READ(captaven_prot_r)
 	AM_RANGE(0x1280c8, 0x1280cb) AM_WRITE(deco32_sound_w)
-	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE_LEGACY(deco32_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
+	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE_LEGACY(deco32_nonbuffered_palette_w) AM_SHARE("paletteram") /* Palette RAM */
 	AM_RANGE(0x148000, 0x14800f) AM_READWRITE(deco32_irq_controller_r, deco32_irq_controller_w)
 	AM_RANGE(0x160000, 0x167fff) AM_RAM /* Extra work RAM */
 	AM_RANGE(0x168000, 0x168003) AM_READ(captaven_soundcpu_r)
@@ -762,7 +762,7 @@ static ADDRESS_MAP_START( fghthist_map, AS_PROGRAM, 32, deco32_state )
 
 	AM_RANGE(0x140000, 0x140003) AM_WRITENOP /* VBL irq ack */
 
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE_LEGACY(deco32_palette_dma_w)
 	//
 	AM_RANGE(0x178000, 0x179fff) AM_READWRITE(deco32_spriteram_r, deco32_spriteram_w)
@@ -793,7 +793,7 @@ static ADDRESS_MAP_START( fghthsta_memmap, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x140000, 0x140003) AM_WRITENOP /* VBL irq ack */
 	AM_RANGE(0x150000, 0x150003) AM_WRITE(fghthist_eeprom_w) /* Volume port/Eprom */
 
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE_LEGACY(deco32_palette_dma_w)
 	AM_RANGE(0x16c010, 0x16c013) AM_READNOP
 
@@ -824,7 +824,7 @@ static ADDRESS_MAP_START( dragngun_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x120000, 0x120fff) AM_READ(dragngun_prot_r)
 	AM_RANGE(0x1204c0, 0x1204c3) AM_WRITE(deco32_sound_w)
 	AM_RANGE(0x128000, 0x12800f) AM_READWRITE(deco32_irq_controller_r, deco32_irq_controller_w)
-	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x138000, 0x138003) AM_NOP /* Palette dma complete in bit 0x8? ack?  return 0 else tight loop */
 	AM_RANGE(0x138008, 0x13800b) AM_WRITE_LEGACY(deco32_palette_dma_w)
 
@@ -872,7 +872,7 @@ static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x1204c0, 0x1204c3) AM_WRITE(deco32_sound_w)
 	AM_RANGE(0x128000, 0x12800f) AM_READWRITE(deco32_irq_controller_r, deco32_irq_controller_w)
 
-	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x130000, 0x131fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x138000, 0x138003) AM_READONLY AM_WRITENOP //palette dma complete in bit 0x8? ack?  return 0 else tight loop
 	AM_RANGE(0x138008, 0x13800b) AM_WRITE_LEGACY(deco32_palette_dma_w)
 
@@ -927,7 +927,7 @@ static ADDRESS_MAP_START( tattass_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x164004, 0x164007) AM_WRITENOP /* Palette control Obj1 ($6 constant) */
 	AM_RANGE(0x164008, 0x16400b) AM_WRITENOP /* Palette control Obj2 ($5 constant) */
 	AM_RANGE(0x16400c, 0x16400f) AM_WRITENOP
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
 	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE_LEGACY(deco32_palette_dma_w)
 
@@ -968,7 +968,7 @@ static ADDRESS_MAP_START( nslasher_map, AS_PROGRAM, 32, deco32_state )
 	AM_RANGE(0x164004, 0x164007) AM_WRITENOP /* Palette control Obj1 ($4 constant) */
 	AM_RANGE(0x164008, 0x16400b) AM_WRITENOP /* Palette control Obj2 ($6 constant) */
 	AM_RANGE(0x16400c, 0x16400f) AM_WRITENOP
-	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x168000, 0x169fff) AM_RAM_WRITE_LEGACY(deco32_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x16c000, 0x16c003) AM_WRITENOP
 	AM_RANGE(0x16c008, 0x16c00b) AM_WRITE_LEGACY(deco32_palette_dma_w)
 

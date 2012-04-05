@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dominob_state )
 	AM_RANGE(0xe840, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf07f) AM_RAM AM_BASE(m_bgram)
 	AM_RANGE(0xf080, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

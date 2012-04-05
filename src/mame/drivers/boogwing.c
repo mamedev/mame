@@ -122,7 +122,7 @@ static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x280000, 0x28000f) AM_NOP // ?
 	AM_RANGE(0x282000, 0x282001) AM_NOP // Palette setup?
 	AM_RANGE(0x282008, 0x282009) AM_DEVWRITE_LEGACY("deco_common", decocomn_palette_dma_w)
-	AM_RANGE(0x284000, 0x285fff) AM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x284000, 0x285fff) AM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x3c0000, 0x3c004f) AM_RAM // ?
 ADDRESS_MAP_END

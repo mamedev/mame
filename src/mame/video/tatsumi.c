@@ -57,7 +57,8 @@ WRITE16_HANDLER( roundup5_palette_w )
 //  static int hack=0;
 	int word;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
 //  if (offset==0xbfe)
 //      hack++;
@@ -79,7 +80,7 @@ bit 0:  3.9kOhm resistor
 //  logerror("PAL: %04x %02x\n",offset,data);
 
 	offset&=~1;
-	word = ((space->machine().generic.paletteram.u16[offset] & 0xff)<<8) | (space->machine().generic.paletteram.u16[offset+1] & 0xff);
+	word = ((state->m_generic_paletteram_16[offset] & 0xff)<<8) | (state->m_generic_paletteram_16[offset+1] & 0xff);
 	palette_set_color_rgb(space->machine(),offset/2,pal5bit(word >> 10),pal5bit(word >> 5),pal5bit(word >> 0));
 }
 
@@ -88,7 +89,8 @@ WRITE16_HANDLER( apache3_palette_w )
 {
 //  static int hack=0;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	tatsumi_state *state = space->machine().driver_data<tatsumi_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
 //  if (offset==0xbfe)
 //      hack++;
@@ -109,7 +111,7 @@ bit 0:  3.9kOhm resistor
 
 //  logerror("PAL: %04x %02x\n",offset,data);
 
-	data = space->machine().generic.paletteram.u16[offset];
+	data = state->m_generic_paletteram_16[offset];
 	palette_set_color_rgb(space->machine(),offset,pal5bit(data >> 10),pal5bit(data >> 5),pal5bit(data >> 0));
 }
 

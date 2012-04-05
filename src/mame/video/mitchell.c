@@ -45,10 +45,9 @@ VIDEO_START( pang )
 	state->m_objram = auto_alloc_array_clear(machine, UINT8, state->m_videoram_size);
 
 	/* Palette RAM */
-	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 2 * machine.total_colors());
+	state->m_generic_paletteram_8.allocate(2 * machine.total_colors());
 
 	state->save_pointer(NAME(state->m_objram), state->m_videoram_size);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 2 * machine.total_colors());
 }
 
 
@@ -267,9 +266,9 @@ WRITE8_HANDLER( pang_paletteram_w )
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
 	if (state->m_paletteram_bank)
-		paletteram_xxxxRRRRGGGGBBBB_le_w(space, offset + 0x800, data);
+		state->paletteram_xxxxRRRRGGGGBBBB_le_w(*space, offset + 0x800, data);
 	else
-		paletteram_xxxxRRRRGGGGBBBB_le_w(space, offset, data);
+		state->paletteram_xxxxRRRRGGGGBBBB_le_w(*space, offset, data);
 }
 
 READ8_HANDLER( pang_paletteram_r )
@@ -277,19 +276,21 @@ READ8_HANDLER( pang_paletteram_r )
 	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
 	if (state->m_paletteram_bank)
-		return space->machine().generic.paletteram.u8[offset + 0x800];
+		return state->m_generic_paletteram_8[offset + 0x800];
 
-	return space->machine().generic.paletteram.u8[offset];
+	return state->m_generic_paletteram_8[offset];
 }
 
 WRITE8_HANDLER( mgakuen_paletteram_w )
 {
-	paletteram_xxxxRRRRGGGGBBBB_le_w(space, offset, data);
+	mitchell_state *state = space->machine().driver_data<mitchell_state>();
+	state->paletteram_xxxxRRRRGGGGBBBB_le_w(*space, offset, data);
 }
 
 READ8_HANDLER( mgakuen_paletteram_r )
 {
-	return space->machine().generic.paletteram.u8[offset];
+	mitchell_state *state = space->machine().driver_data<mitchell_state>();
+	return state->m_generic_paletteram_8[offset];
 }
 
 

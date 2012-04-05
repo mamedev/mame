@@ -37,7 +37,7 @@ static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(soundlatch2_w)
 	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_BASE(m_scroll)
 	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
-	AM_RANGE(0x3800, 0x3cff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3800, 0x3cff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

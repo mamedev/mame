@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "includes/midtunit.h"
+#include "includes/midxunit.h"
 
 
 /* compile-time options */
@@ -296,8 +297,9 @@ WRITE16_HANDLER( midtunit_paletteram_w )
 {
 	//int newword;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	//newword = space->machine().generic.paletteram.u16[offset];
+	midtunit_state *state = space->machine().driver_data<midtunit_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	//newword = state->m_generic_paletteram_16[offset];
 	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
@@ -311,7 +313,8 @@ WRITE16_HANDLER( midxunit_paletteram_w )
 
 READ16_HANDLER( midxunit_paletteram_r )
 {
-	return space->machine().generic.paletteram.u16[offset / 2];
+	midxunit_state *state = space->machine().driver_data<midxunit_state>();
+	return state->m_generic_paletteram_16[offset / 2];
 }
 
 

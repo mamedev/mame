@@ -32,9 +32,9 @@ READ8_MEMBER(parodius_state::bankedram_r)
 	if (m_videobank & 0x01)
 	{
 		if (m_videobank & 0x04)
-			return machine().generic.paletteram.u8[offset + 0x0800];
+			return m_generic_paletteram_8[offset + 0x0800];
 		else
-			return machine().generic.paletteram.u8[offset];
+			return m_generic_paletteram_8[offset];
 	}
 	else
 		return m_ram[offset];
@@ -254,7 +254,7 @@ static MACHINE_START( parodius )
 	memory_configure_bank(machine, "bank1", 14, 2, &ROM[0x08000], 0x4000);
 	memory_set_bank(machine, "bank1", 0);
 
-	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x1000);
+	state->m_generic_paletteram_8.allocate(0x1000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -267,7 +267,6 @@ static MACHINE_START( parodius )
 	state->save_item(NAME(state->m_sprite_colorbase));
 	state->save_item(NAME(state->m_layer_colorbase));
 	state->save_item(NAME(state->m_layerpri));
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x1000);
 }
 
 static MACHINE_RESET( parodius )

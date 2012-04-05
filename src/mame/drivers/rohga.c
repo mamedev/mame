@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( rohga_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE(m_pf4_rowscroll)
 
 	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3e0000, 0x3e1fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3e0000, 0x3e1fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3f0000, 0x3f3fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( wizdfire_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x370000, 0x370001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
 
-	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE_LEGACY("deco_common", decocomn_palette_dma_w)
 
 	AM_RANGE(0xfe4000, 0xfe47ff) AM_READWRITE_LEGACY(deco16_104_prot_r,deco16_104_prot_w) AM_BASE_LEGACY(&deco16_prot_ram) /* Protection device */
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( nitrobal_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x370000, 0x370001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write) /* Triggers DMA for spriteram */
 
-	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE_LEGACY("deco_common", decocomn_palette_dma_w)
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE(m_pf4_rowscroll)
 
 	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3e0000, 0x3e1fff) AM_MIRROR(0x2000) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3e0000, 0x3e1fff) AM_MIRROR(0x2000) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xff7fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 

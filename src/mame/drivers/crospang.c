@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( crospang_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITENOP
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE_LEGACY(crospang_fg_videoram_w) AM_BASE(m_fg_videoram)
 	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE_LEGACY(crospang_bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( bestri_map, AS_PROGRAM, 16, crospang_state )
 
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE_LEGACY(crospang_fg_videoram_w) AM_BASE(m_fg_videoram)
 	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE_LEGACY(crospang_bg_videoram_w) AM_BASE(m_bg_videoram)
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
 	AM_RANGE(0x270004, 0x270005) AM_WRITENOP

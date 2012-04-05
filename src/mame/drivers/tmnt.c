@@ -558,7 +558,7 @@ static ADDRESS_MAP_START( cuebrick_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x060000, 0x063fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(tmnt_paletteram_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(tmnt_paletteram_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE_LEGACY(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
@@ -579,7 +579,7 @@ static ADDRESS_MAP_START( mia_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x060000, 0x063fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(tmnt_paletteram_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(tmnt_paletteram_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE_LEGACY(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
@@ -600,7 +600,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tmnt_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(tmnt_paletteram_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(tmnt_paletteram_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS") AM_WRITE_LEGACY(tmnt_0a0000_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
@@ -621,7 +621,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( punkshot_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /* main RAM */
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("DSW1/DSW2")
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("COINS/DSW3")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P3/P4")
@@ -640,7 +640,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lgtnfght_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x090000, 0x093fff) AM_RAM	/*main RAM */
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("COINS")
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
@@ -671,7 +671,7 @@ static ADDRESS_MAP_START( blswhstl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x180000, 0x183fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_word_r, k052109_word_w)
 	AM_RANGE(0x204000, 0x207fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x300000, 0x303fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x500000, 0x50003f) AM_DEVREADWRITE_LEGACY("k054000", k054000_lsb_r, k054000_lsb_w)
 	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(k053244_word_noA1_r, k053244_word_noA1_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("P1")
@@ -713,7 +713,7 @@ static ADDRESS_MAP_START( glfgreat_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)	/* 053936? */
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)				/* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE_LEGACY("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
@@ -737,7 +737,7 @@ static ADDRESS_MAP_START( prmrsocr_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
 	AM_RANGE(0x104000, 0x107fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
-	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x108000, 0x108fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x10c000, 0x10cfff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)
 	AM_RANGE(0x110000, 0x11001f) AM_WRITE(k053244_word_noA1_w)				/* duplicate! */
 	AM_RANGE(0x114000, 0x11401f) AM_DEVREADWRITE_LEGACY("k053245", k053244_lsb_r, k053244_lsb_w)	/* duplicate! */
@@ -999,7 +999,7 @@ logerror("copy command %04x sprite %08x data %08x: %04x%04x %04x%04x  modifiers 
 static ADDRESS_MAP_START( tmnt2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM AM_BASE(m_tmnt2_rom)
 	AM_RANGE(0x104000, 0x107fff) AM_RAM AM_BASE(m_sunset_104000)	/* main RAM */
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(k053245_scattered_word_w) AM_BASE(m_spriteram)	// k053245_scattered_word_r
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P2")
@@ -1025,7 +1025,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ssriders_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P2")
@@ -1051,7 +1051,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sunsetbl_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x0bffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x14c000, 0x14cfff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x14c000, 0x14cfff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x14e700, 0x14e71f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x180000, 0x183fff) AM_READWRITE(k053245_scattered_word_r, k053245_scattered_word_w) AM_BASE(m_spriteram)
 	AM_RANGE(0x184000, 0x18ffff) AM_RAM
@@ -1077,7 +1077,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( thndrx2_main_map, AS_PROGRAM, 16, tmnt_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* main RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x300000, 0x30001f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)
 	AM_RANGE(0x400000, 0x400003) AM_DEVREAD8_LEGACY("k053260", punkshot_sound_r, 0x00ff)	/* K053260 */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8_LEGACY("k053260", k053260_w, 0x00ff)

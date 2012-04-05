@@ -113,7 +113,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, toobin_state )
 	AM_RANGE(0xc00000, 0xc07fff) AM_RAM_WRITE_LEGACY(atarigen_playfield_large_w) AM_BASE(m_playfield)
 	AM_RANGE(0xc08000, 0xc097ff) AM_MIRROR(0x046000) AM_RAM_WRITE_LEGACY(atarigen_alpha_w) AM_BASE(m_alpha)
 	AM_RANGE(0xc09800, 0xc09fff) AM_MIRROR(0x046000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
-	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE_LEGACY(toobin_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc10000, 0xc107ff) AM_MIRROR(0x047800) AM_RAM_WRITE_LEGACY(toobin_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff6000, 0xff6001) AM_READNOP		/* who knows? read at controls time */
 	AM_RANGE(0xff8000, 0xff8001) AM_MIRROR(0x4500fe) AM_WRITE_LEGACY(watchdog_reset16_w)
 	AM_RANGE(0xff8100, 0xff8101) AM_MIRROR(0x4500fe) AM_WRITE_LEGACY(atarigen_sound_w)

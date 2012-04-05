@@ -509,7 +509,7 @@ READ32_MEMBER(hng64_state::hng64_com_share_r)
 
 WRITE32_MEMBER(hng64_state::hng64_pal_w)
 {
-	UINT32 *paletteram = machine().generic.paletteram.u32;
+	UINT32 *paletteram = m_generic_paletteram_32;
 	int r, g, b/*, a*/;
 
 	COMBINE_DATA(&paletteram[offset]);
@@ -1050,7 +1050,7 @@ static ADDRESS_MAP_START( hng_map, AS_PROGRAM, 32, hng64_state )
 	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_BASE(m_spriteregs)
 	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE_LEGACY(hng64_videoram_w) AM_BASE(m_videoram)	// Tilemap
 	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(m_videoregs)
-	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(m_tcram)	// Transition Control
 	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE(m_dl)	// 3d Display List
 //  AM_RANGE(0x20300200, 0x20300213) AM_RAM_WRITE_LEGACY(xxxx) AM_BASE(m_xxxxxxxx)  // 3d Display List Upload?

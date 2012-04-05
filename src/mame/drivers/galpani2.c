@@ -304,7 +304,7 @@ static ADDRESS_MAP_START( galpani2_mem1, AS_PROGRAM, 16, galpani2_state )
 	AM_RANGE(0x314000, 0x314001) AM_WRITENOP										// ? flip backgrounds ?
 	AM_RANGE(0x318000, 0x318001) AM_DEVREADWRITE_LEGACY("eeprom", galpani2_eeprom_r, galpani2_eeprom_w)	// EEPROM
 	AM_RANGE(0x380000, 0x387fff) AM_RAM												// Palette?
-	AM_RANGE(0x388000, 0x38ffff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram	)	// Palette
+	AM_RANGE(0x388000, 0x38ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram"	)	// Palette
 	AM_RANGE(0x390000, 0x3901ff) AM_WRITENOP										// ? at startup of service mode
 
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM_WRITE_LEGACY(galpani2_bg8_0_w) AM_BASE(m_bg8[0])	// Background 0

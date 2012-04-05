@@ -129,8 +129,8 @@ ROM15.BIN       MX29F1610, SOP44 Surface Mounted Mask ROM /
 
 WRITE32_MEMBER(silkroad_state::paletteram32_xRRRRRGGGGGBBBBB_dword_w)
 {
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
-	palette_set_color_rgb(machine(),offset,pal5bit(machine().generic.paletteram.u32[offset] >> (10+16)),pal5bit(machine().generic.paletteram.u32[offset] >> (5+16)),pal5bit(machine().generic.paletteram.u32[offset] >> (0+16)));
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	palette_set_color_rgb(machine(),offset,pal5bit(m_generic_paletteram_32[offset] >> (10+16)),pal5bit(m_generic_paletteram_32[offset] >> (5+16)),pal5bit(m_generic_paletteram_32[offset] >> (0+16)));
 }
 
 static WRITE32_DEVICE_HANDLER(silk_6295_bank_w)
@@ -155,7 +155,7 @@ WRITE32_MEMBER(silkroad_state::silk_coin_counter_w)
 static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 32, silkroad_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x40c000, 0x40cfff) AM_RAM AM_BASE(m_sprram) // sprites
-	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram) // palette
+	AM_RANGE(0x600000, 0x603fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_SHARE("paletteram") // palette
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE_LEGACY(silkroad_fgram_w) AM_BASE(m_vidram)  // lower Layer
 	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE_LEGACY(silkroad_fgram2_w) AM_BASE(m_vidram2)  // mid layer
 	AM_RANGE(0x808000, 0x80bfff) AM_RAM_WRITE_LEGACY(silkroad_fgram3_w) AM_BASE(m_vidram3) // higher layer

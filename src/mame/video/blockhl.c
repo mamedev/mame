@@ -45,14 +45,12 @@ VIDEO_START( blockhl )
 {
 	blockhl_state *state = machine.driver_data<blockhl_state>();
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x800);
+	state->m_generic_paletteram_8.allocate(0x800);
 
 	state->m_layer_colorbase[0] = 0;
 	state->m_layer_colorbase[1] = 16;
 	state->m_layer_colorbase[2] = 32;
 	state->m_sprite_colorbase = 48;
-
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x800);
 }
 
 SCREEN_UPDATE_IND16( blockhl )

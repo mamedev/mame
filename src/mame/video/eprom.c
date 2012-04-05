@@ -23,7 +23,7 @@ static void update_palette(running_machine &machine)
 	for (color = 0; color < 0x800; ++color)
 	{
 		int i, r, g, b;
-		UINT16 const data = machine.generic.paletteram.u16[color];
+		UINT16 const data = state->m_generic_paletteram_16[color];
 
 		/* FIXME this is only a very crude approximation of the palette output.
          * The circuit involves a dozen transistors and probably has an output

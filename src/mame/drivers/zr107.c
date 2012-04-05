@@ -233,8 +233,8 @@ static SCREEN_UPDATE_RGB32( jetwave )
 
 WRITE32_MEMBER(zr107_state::paletteram32_w)
 {
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
-	data = machine().generic.paletteram.u32[offset];
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	data = m_generic_paletteram_32[offset];
 	palette_set_color_rgb(machine(), (offset * 2) + 0, pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16));
 	palette_set_color_rgb(machine(), (offset * 2) + 1, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
@@ -412,7 +412,7 @@ static ADDRESS_MAP_START( zr107_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x74000000, 0x74003fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)
 	AM_RANGE(0x74020000, 0x7402003f) AM_DEVREADWRITE_LEGACY("k056832", k056832_long_r, k056832_long_w)
 	AM_RANGE(0x74060000, 0x7406003f) AM_READWRITE(ccu_r, ccu_w)
-	AM_RANGE(0x74080000, 0x74081fff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x74080000, 0x74081fff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0x740a0000, 0x740a3fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_long_r)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)		/* 21N 21K 23N 23K */
 	AM_RANGE(0x78010000, 0x7801ffff) AM_WRITE_LEGACY(cgboard_dsp_shared_w_ppc)
@@ -430,15 +430,15 @@ ADDRESS_MAP_END
 
 WRITE32_MEMBER(zr107_state::jetwave_palette_w)
 {
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
-	data = machine().generic.paletteram.u32[offset];
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	data = m_generic_paletteram_32[offset];
 	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static ADDRESS_MAP_START( jetwave_map, AS_PROGRAM, 32, zr107_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_MIRROR(0x80000000) AM_RAM		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_reg_r, k001604_reg_w)
-	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(jetwave_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_MIRROR(0x80000000) AM_RAM_WRITE(jetwave_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x74020000, 0x7403ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_tile_r, k001604_tile_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_MIRROR(0x80000000) AM_DEVREADWRITE_LEGACY("k001604", k001604_char_r, k001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_MIRROR(0x80000000) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)		/* 21N 21K 23N 23K */

@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( pktgaldx_map, AS_PROGRAM, 16, pktgaldx_state )
 	AM_RANGE(0x112000, 0x1127ff) AM_RAM AM_BASE(m_pf2_rowscroll)
 
 	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x130000, 0x130fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x140000, 0x14000f) AM_DEVWRITE8("oki1", okim6295_device, write, 0x00ff)
 	AM_RANGE(0x140006, 0x140007) AM_DEVREAD8("oki1", okim6295_device, read, 0x00ff)
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( pktgaldb_map, AS_PROGRAM, 16, pktgaldx_state )
 
 	AM_RANGE(0x300000, 0x30000f) AM_RAM // ??
 
-	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE_LEGACY(paletteram16_xbgr_word_be_w) AM_BASE_GENERIC(paletteram) // extra colours?
+	AM_RANGE(0x330000, 0x330bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_w) AM_SHARE("paletteram") // extra colours?
 ADDRESS_MAP_END
 
 

@@ -75,9 +75,9 @@ WRITE32_MEMBER(vegaeo_state::vega_palette_w)
 {
 	UINT16 paldata;
 
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	paldata = machine().generic.paletteram.u32[offset] & 0x7fff;
+	paldata = m_generic_paletteram_32[offset] & 0x7fff;
 	palette_set_color_rgb(machine(), offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 32, vegaeo_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
 	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x000000ff)
-	AM_RANGE(0xfc200000, 0xfc2003ff) AM_RAM_WRITE(vega_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xfc200000, 0xfc2003ff) AM_RAM_WRITE(vega_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
 	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITENOP // soundlatch
 	AM_RANGE(0xfca00000, 0xfca00003) AM_WRITE(vega_misc_w)

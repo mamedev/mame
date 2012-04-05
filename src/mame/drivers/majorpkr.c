@@ -529,9 +529,7 @@ static VIDEO_START(majorpkr)
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, tilemap_scan_rows, 16, 8, 36, 28);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-	state->machine().generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 4 * 0x800);
-
-	state->m_videoram = auto_alloc_array(machine, UINT8, 4 * 0x800); /* 2 banks in use, but the game clears 4 after boot ... */
+	state->m_generic_paletteram_8.allocate(4 * 0x800);
 }
 
 
@@ -581,15 +579,15 @@ WRITE8_MEMBER(majorpkr_state::palette_bank_w)
 
 READ8_MEMBER(majorpkr_state::paletteram_r)
 {
-	return machine().generic.paletteram.u8[m_palette_bank * 0x800 + offset];
+	return m_generic_paletteram_8[m_palette_bank * 0x800 + offset];
 }
 
 WRITE8_MEMBER(majorpkr_state::paletteram_w)
 {
-	machine().generic.paletteram.u8[m_palette_bank * 0x800 + offset] = data;
+	m_generic_paletteram_8[m_palette_bank * 0x800 + offset] = data;
 
 	offset >>= 1;
-	int color = machine().generic.paletteram.u8[m_palette_bank * 0x800 + offset * 2] + machine().generic.paletteram.u8[m_palette_bank * 0x800 + offset * 2 + 1] * 256;
+	int color = m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2] + m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2 + 1] * 256;
 	palette_set_color(machine(), offset + m_palette_bank * 256 * 4, MAKE_RGB(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
 }
 

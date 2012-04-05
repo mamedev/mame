@@ -265,7 +265,7 @@ WRITE16_HANDLER( batrider_textdata_dma_w )
 
 	memcpy(dest, state->m_txvideoram16, state->m_tx_vram_size);
 	dest += (state->m_tx_vram_size/2);
-	memcpy(dest, space->machine().generic.paletteram.u16, state->m_paletteram_size);
+	memcpy(dest, state->m_generic_paletteram_16, state->m_paletteram_size);
 	dest += (state->m_paletteram_size/2);
 	memcpy(dest, state->m_txvideoram16_offs, state->m_tx_offs_vram_size);
 	dest += (state->m_tx_offs_vram_size/2);

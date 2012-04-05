@@ -118,17 +118,17 @@ static SCREEN_UPDATE_IND16( feversoc )
 WRITE32_MEMBER(feversoc_state::fs_paletteram_w)
 {
 	int r,g,b;
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	r = ((machine().generic.paletteram.u32[offset] & 0x001f0000)>>16) << 3;
-	g = ((machine().generic.paletteram.u32[offset] & 0x03e00000)>>16) >> 2;
-	b = ((machine().generic.paletteram.u32[offset] & 0x7c000000)>>16) >> 7;
+	r = ((m_generic_paletteram_32[offset] & 0x001f0000)>>16) << 3;
+	g = ((m_generic_paletteram_32[offset] & 0x03e00000)>>16) >> 2;
+	b = ((m_generic_paletteram_32[offset] & 0x7c000000)>>16) >> 7;
 
 	palette_set_color(machine(),offset*2+0,MAKE_RGB(r,g,b));
 
-	r = (machine().generic.paletteram.u32[offset] & 0x001f) << 3;
-	g = (machine().generic.paletteram.u32[offset] & 0x03e0) >> 2;
-	b = (machine().generic.paletteram.u32[offset] & 0x7c00) >> 7;
+	r = (m_generic_paletteram_32[offset] & 0x001f) << 3;
+	g = (m_generic_paletteram_32[offset] & 0x03e0) >> 2;
+	b = (m_generic_paletteram_32[offset] & 0x7c00) >> 7;
 
 	palette_set_color(machine(),offset*2+1,MAKE_RGB(r,g,b));
 }
@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
 	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
 //  AM_RANGE(0x06010000, 0x06017fff) AM_RAM //contains RISE11 keys and other related stuff.
-	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static const gfx_layout spi_spritelayout =

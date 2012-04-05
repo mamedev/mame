@@ -150,7 +150,7 @@ static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16, k3_state )
 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// Main Ram
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	// palette
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")	// palette
 	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_BASE(m_spriteram_1)
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_BASE(m_spriteram_2)
 	AM_RANGE(0x2c0000, 0x2c0fff) AM_RAM_WRITE(k3_bgram_w) AM_BASE(m_bgram)

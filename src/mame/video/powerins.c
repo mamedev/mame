@@ -81,7 +81,8 @@ WRITE16_HANDLER( powerins_paletteram16_w )
 	/*  RRRR GGGG BBBB RGBx */
 	/*  4321 4321 4321 000x */
 
-	UINT16 newword = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	powerins_state *state = space->machine().driver_data<powerins_state>();
+	UINT16 newword = COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
 	int r = ((newword >> 11) & 0x1E ) | ((newword >> 3) & 0x01);
 	int g = ((newword >>  7) & 0x1E ) | ((newword >> 2) & 0x01);

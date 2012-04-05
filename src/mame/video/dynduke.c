@@ -7,10 +7,11 @@
 
 WRITE16_HANDLER( dynduke_paletteram_w )
 {
+	dynduke_state *state = space->machine().driver_data<dynduke_state>();
 	int color;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	color=space->machine().generic.paletteram.u16[offset];
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	color=state->m_generic_paletteram_16[offset];
 	palette_set_color_rgb(space->machine(),offset,pal4bit(color >> 0),pal4bit(color >> 4),pal4bit(color >> 8));
 }
 

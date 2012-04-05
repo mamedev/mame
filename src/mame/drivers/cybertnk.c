@@ -667,7 +667,7 @@ static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_BASE(m_bg_vram)
 	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_BASE(m_fg_vram)
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_BASE(m_io_ram)
 ADDRESS_MAP_END
 

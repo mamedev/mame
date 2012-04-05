@@ -1250,7 +1250,7 @@ WRITE8_HANDLER( leland_gated_paletteram_w )
 {
 	leland_state *state = space->machine().driver_data<leland_state>();
 	if (state->m_wcol_enable)
-		paletteram_BBGGGRRR_w(space, offset, data);
+		state->paletteram_BBGGGRRR_w(*space, offset, data);
 }
 
 
@@ -1258,7 +1258,7 @@ READ8_HANDLER( leland_gated_paletteram_r )
 {
 	leland_state *state = space->machine().driver_data<leland_state>();
 	if (state->m_wcol_enable)
-		return space->machine().generic.paletteram.u8[offset];
+		return state->m_generic_paletteram_8[offset];
 	return 0xff;
 }
 
@@ -1267,7 +1267,7 @@ WRITE8_HANDLER( ataxx_paletteram_and_misc_w )
 {
 	leland_state *state = space->machine().driver_data<leland_state>();
 	if (state->m_wcol_enable)
-		paletteram_xxxxRRRRGGGGBBBB_le_w(space, offset, data);
+		state->paletteram_xxxxRRRRGGGGBBBB_le_w(*space, offset, data);
 	else if (offset == 0x7f8 || offset == 0x7f9)
 		leland_master_video_addr_w(space, offset - 0x7f8, data);
 	else if (offset == 0x7fc)
@@ -1299,7 +1299,7 @@ READ8_HANDLER( ataxx_paletteram_and_misc_r )
 {
 	leland_state *state = space->machine().driver_data<leland_state>();
 	if (state->m_wcol_enable)
-		return space->machine().generic.paletteram.u8[offset];
+		return state->m_generic_paletteram_8[offset];
 	else if (offset == 0x7fc || offset == 0x7fd)
 	{
 		int result = state->m_xrom_base[0x00000 | state->m_xrom1_addr | ((offset & 1) << 16)];

@@ -53,7 +53,7 @@ static ADDRESS_MAP_START( goal92_map, AS_PROGRAM, 16, goal92_state )
 	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE_LEGACY(goal92_foreground_w) AM_BASE(m_fg_data)
 	AM_RANGE(0x101800, 0x101fff) AM_RAM // it has tiles for clouds, but they aren't used
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE_LEGACY(goal92_text_w) AM_BASE(m_tx_data)
-	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x104000, 0x13ffff) AM_RAM
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x140800, 0x140801) AM_WRITENOP

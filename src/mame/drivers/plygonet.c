@@ -293,11 +293,11 @@ WRITE32_MEMBER(polygonet_state::plygonet_palette_w)
 {
 	int r,g,b;
 
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	r = (machine().generic.paletteram.u32[offset] >>16) & 0xff;
-	g = (machine().generic.paletteram.u32[offset] >> 8) & 0xff;
-	b = (machine().generic.paletteram.u32[offset] >> 0) & 0xff;
+	r = (m_generic_paletteram_32[offset] >>16) & 0xff;
+	g = (m_generic_paletteram_32[offset] >> 8) & 0xff;
+	b = (m_generic_paletteram_32[offset] >> 0) & 0xff;
 
 	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
@@ -504,7 +504,7 @@ WRITE16_MEMBER(polygonet_state::dsp56k_ram_bank04_write)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, polygonet_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE16_LEGACY("k053936", k053936_ctrl_r, k053936_ctrl_w, 0xffffffff)
 	AM_RANGE(0x440000, 0x440fff) AM_READWRITE_LEGACY(polygonet_roz_ram_r, polygonet_roz_ram_w)
 	AM_RANGE(0x480000, 0x4bffff) AM_DEVREAD_LEGACY("eeprom", polygonet_eeprom_r)

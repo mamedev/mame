@@ -407,8 +407,8 @@ static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 	if (lines & 0x20)
 	{
 		device->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x03ff, "bank3");
-		device->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0000, 0x03ff, FUNC(paletteram_xBBBBBGGGGGRRRRR_be_w));
-		memory_set_bankptr(device->machine(), "bank3", device->machine().generic.paletteram.v);
+		device->memory().space(AS_PROGRAM)->install_write_handler(0x0000, 0x03ff, write8_delegate(FUNC(crimfght_state::paletteram_xBBBBBGGGGGRRRRR_be_w), state));
+		memory_set_bankptr(device->machine(), "bank3", state->m_generic_paletteram_8);
 	}
 	else
 		device->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x03ff, "bank1");								/* RAM */

@@ -71,6 +71,9 @@ public:
 	DECLARE_READ8_MEMBER(sparkman_c0a3_r);
 	DECLARE_WRITE8_MEMBER(sparkman_en_trash_w);
 	DECLARE_WRITE8_MEMBER(brickzn_pcm_w);
+
+	DECLARE_READ8_MEMBER(banked_paletteram_r);
+	DECLARE_WRITE8_MEMBER( brickzn_banked_paletteram_w );
 };
 
 
@@ -87,10 +90,7 @@ SAMPLES_START( suna8_sh_start );
 WRITE8_HANDLER( suna8_spriteram_w );			// for debug
 WRITE8_HANDLER( suna8_banked_spriteram_w );	// for debug
 
-READ8_HANDLER( suna8_banked_paletteram_r );
 READ8_HANDLER( suna8_banked_spriteram_r );
-
-WRITE8_HANDLER( brickzn_banked_paletteram_w );
 
 VIDEO_START( suna8_textdim0 );
 VIDEO_START( suna8_textdim8 );

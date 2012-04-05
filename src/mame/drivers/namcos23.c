@@ -1469,14 +1469,15 @@ static UINT8 nthbyte( const UINT32 *pSource, int offs )
 
 INLINE void UpdatePalette( running_machine &machine, int entry )
 {
+	namcos23_state *state = machine.driver_data<namcos23_state>();
 	int j;
 
 	for( j=0; j<2; j++ )
 	{
 		int which = (entry*2)+(j*2);
-		int r = nthbyte(machine.generic.paletteram.u32, which+0x00001);
-		int g = nthbyte(machine.generic.paletteram.u32, which+0x10001);
-		int b = nthbyte(machine.generic.paletteram.u32, which+0x20001);
+		int r = nthbyte(state->m_generic_paletteram_32, which+0x00001);
+		int g = nthbyte(state->m_generic_paletteram_32, which+0x10001);
+		int b = nthbyte(state->m_generic_paletteram_32, which+0x20001);
 		palette_set_color( machine, which/2, MAKE_RGB(r,g,b) );
 	}
 }
@@ -1485,7 +1486,7 @@ INLINE void UpdatePalette( running_machine &machine, int entry )
 
 WRITE32_MEMBER(namcos23_state::namcos23_paletteram_w)
 {
-	COMBINE_DATA( &machine().generic.paletteram.u32[offset] );
+	COMBINE_DATA( &m_generic_paletteram_32[offset] );
 
 	UpdatePalette(machine(), (offset % (0x10000/4))*2);
 }
@@ -2459,7 +2460,7 @@ static ADDRESS_MAP_START( gorgon_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x06080000, 0x06081fff) AM_RAM
 
 	AM_RANGE(0x06108000, 0x061087ff) AM_RAM		// GAMMA (C404-3S)
-	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06110000, 0x0613ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x06400000, 0x06403fff) AM_RAM_WRITE(s23_txtchar_w ) AM_BASE(m_charram)	// text layer characters
 	AM_RANGE(0x06404000, 0x0641dfff) AM_RAM
 	AM_RANGE(0x0641e000, 0x0641ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_BASE(m_textram)
@@ -2493,7 +2494,7 @@ static ADDRESS_MAP_START( ss23_map, AS_PROGRAM, 32, namcos23_state )
 	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE(namcos23_textram_w ) AM_BASE(m_textram)
 	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16(s23_c361_r, s23_c361_w, 0xffffffff ) // C361
 	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM // Blending control & GAMMA (C404)
-	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE(namcos23_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x1000000) // data ROMs
 	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x1000000)
 	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16(s23_c412_r, s23_c412_w, 0xffffffff )

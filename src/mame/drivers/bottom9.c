@@ -84,7 +84,7 @@ READ8_MEMBER(bottom9_state::bottom9_bankedram2_r)
 	if (m_k052109_selected)
 		return k052109_051960_r(space, offset + 0x2000);
 	else
-		return machine().generic.paletteram.u8[offset];
+		return m_generic_paletteram_8[offset];
 }
 
 WRITE8_MEMBER(bottom9_state::bottom9_bankedram2_w)
@@ -177,7 +177,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bottom9_state )
 	AM_RANGE(0x1fd3, 0x1fd3) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1fe0, 0x1fe0) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1ff0, 0x1fff) AM_DEVWRITE_LEGACY("k051316", k051316_ctrl_w)
-	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x2000, 0x27ff) AM_READWRITE(bottom9_bankedram2_r, bottom9_bankedram2_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")

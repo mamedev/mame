@@ -84,13 +84,11 @@ VIDEO_START( nycaptor )
 	state->m_bg_tilemap->set_transmask(2, 0xfffc, 0x0003);//split 2
 	state->m_bg_tilemap->set_transmask(3, 0xfff0, 0x000f);//split 3
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	state->m_generic_paletteram_8.allocate(0x200);
+	state->m_generic_paletteram2_8.allocate(0x200);
 	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->save_pointer(NAME(state->m_spriteram), 160);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram2.u8, 0x200);
 }
 
 WRITE8_HANDLER( nycaptor_videoram_w )
@@ -114,9 +112,9 @@ WRITE8_HANDLER( nycaptor_palette_w )
 		return;
 
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_split2_w(space, (offset & 0xff) + (state->m_palette_bank << 8), data);
+		state->paletteram_xxxxBBBBGGGGRRRR_split2_w(*space, (offset & 0xff) + (state->m_palette_bank << 8), data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_split1_w(space, (offset & 0xff) + (state->m_palette_bank << 8), data);
+		state->paletteram_xxxxBBBBGGGGRRRR_split1_w(*space, (offset & 0xff) + (state->m_palette_bank << 8), data);
 }
 
 READ8_HANDLER( nycaptor_palette_r )
@@ -124,9 +122,9 @@ READ8_HANDLER( nycaptor_palette_r )
 	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
 
 	if (offset & 0x100)
-		return space->machine().generic.paletteram2.u8[(offset & 0xff) + (state->m_palette_bank << 8)];
+		return state->m_generic_paletteram2_8[(offset & 0xff) + (state->m_palette_bank << 8)];
 	else
-		return space->machine().generic.paletteram.u8 [(offset & 0xff) + (state->m_palette_bank << 8)];
+		return state->m_generic_paletteram_8 [(offset & 0xff) + (state->m_palette_bank << 8)];
 }
 
 WRITE8_HANDLER( nycaptor_gfxctrl_w )

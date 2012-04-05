@@ -60,8 +60,6 @@ address_map_entry::address_map_entry(address_map &map, offs_t start, offs_t end)
 	  m_sizeptr(NULL),
 	  m_baseptroffs_plus1(0),
 	  m_sizeptroffs_plus1(0),
-	  m_genbaseptroffs_plus1(0),
-	  m_gensizeptroffs_plus1(0),
 	  m_region(NULL),
 	  m_rgnoffs(0),
 	  m_rspace8(NULL),

@@ -200,11 +200,11 @@ WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 
 WRITE32_MEMBER(namcofl_state::namcofl_paletteram_w)
 {
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
 	if ((offset == 0x1808/4) && ACCESSING_BITS_16_31)
 	{
-		UINT16 v = machine().generic.paletteram.u32[offset] >> 16;
+		UINT16 v = m_generic_paletteram_32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
 		m_raster_interrupt_timer->adjust(machine().primary_screen->time_until_pos(triggerscanline));
@@ -233,7 +233,7 @@ static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
 	AM_RANGE(0x30284000, 0x3028bfff) AM_READWRITE(namcofl_share_r, namcofl_share_w)
 	AM_RANGE(0x30300000, 0x30303fff) AM_RAM /* COMRAM */
 	AM_RANGE(0x30380000, 0x303800ff) AM_READ(fl_network_r )	/* network registers */
-	AM_RANGE(0x30400000, 0x3040ffff) AM_RAM_WRITE(namcofl_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x30400000, 0x3040ffff) AM_RAM_WRITE(namcofl_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_le_r, namco_tilemapvideoram32_le_w )
 	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE_LEGACY(namco_tilemapcontrol32_le_r, namco_tilemapcontrol32_le_w )
 	AM_RANGE(0x30c00000, 0x30c1ffff) AM_READWRITE_LEGACY(namco_rozvideoram32_le_r,namco_rozvideoram32_le_w)

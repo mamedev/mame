@@ -184,7 +184,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_logerror_list(m_respool)
 {
 	memset(gfx, 0, sizeof(gfx));
-	memset(&generic, 0, sizeof(generic));
 	memset(&m_base_time, 0, sizeof(m_base_time));
 
 	// set the machine on all devices
@@ -1050,9 +1049,12 @@ driver_device::driver_device(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, "Driver Device", tag, NULL, 0),
 	  m_system(NULL),
 	  m_palette_init(NULL),
-	  m_generic_paletteram(*this, "paletteram"),
-	  m_generic_paletteram16(*this, "paletteram"),
-	  m_generic_paletteram2(*this, "paletteram2")
+	  m_generic_paletteram_8(*this, "paletteram"),
+	  m_generic_paletteram2_8(*this, "paletteram2"),
+	  m_generic_paletteram_16(*this, "paletteram"),
+	  m_generic_paletteram2_16(*this, "paletteram2"),
+	  m_generic_paletteram_32(*this, "paletteram"),
+	  m_generic_paletteram2_32(*this, "paletteram2")
 {
 	memset(m_callbacks, 0, sizeof(m_callbacks));
 }

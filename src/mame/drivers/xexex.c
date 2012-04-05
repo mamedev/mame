@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)
 	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)		// Passthrough to tile roms
 	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("k053250", k053250_t, rom_r)
-	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE_LEGACY(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_SHARE("paletteram")
 
 #if XE_DEBUG
 	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD_LEGACY("k056832", k056832_word_r)

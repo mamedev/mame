@@ -170,7 +170,8 @@ static void journey_set_color(running_machine &machine, int index, int data)
 
 WRITE8_HANDLER( mcr_91490_paletteram_w )
 {
-	space->machine().generic.paletteram.u8[offset] = data;
+	mcr_state *state = space->machine().driver_data<mcr_state>();
+	state->m_generic_paletteram_8[offset] = data;
 	offset &= 0x7f;
 	mcr_set_color(space->machine(), (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 }

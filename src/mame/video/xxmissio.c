@@ -48,7 +48,8 @@ READ8_HANDLER( xxmissio_bgram_r )
 
 WRITE8_HANDLER( xxmissio_paletteram_w )
 {
-	paletteram_BBGGRRII_w(space,offset,data);
+	xxmissio_state *state = space->machine().driver_data<xxmissio_state>();
+	state->paletteram_BBGGRRII_w(*space,offset,data);
 }
 
 /****************************************************************************/

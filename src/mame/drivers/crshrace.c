@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
 	AM_RANGE(0xffc000, 0xffc001) AM_WRITE_LEGACY(crshrace_roz_bank_w)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(crshrace_videoram2_w) AM_BASE(m_videoram2)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1") AM_WRITE_LEGACY(crshrace_gfxctrl_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")

@@ -180,7 +180,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 			memory_set_bankptr(space->machine(), "bank1", &RAM[0x0000]);
 			memory_set_bankptr(space->machine(), "bank2", state->m_rambase_ae00);
 			memory_set_bankptr(space->machine(), "bank3", state->m_rambase_c000);
-			memory_set_bankptr(space->machine(), "bank4", space->machine().generic.paletteram.v);
+			memory_set_bankptr(space->machine(), "bank4", state->m_generic_paletteram_8);
 		}
 	}
 }
@@ -205,7 +205,7 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, wardner_state )
 
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE_LEGACY(wardner_sprite_w) AM_SHARE("spriteram")
 	AM_RANGE(0x9000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xadff) AM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa000, 0xadff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xae00, 0xafff) AM_RAM AM_BASE(m_rambase_ae00)
 	AM_RANGE(0xb000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE(m_rambase_c000) AM_SHARE("share1")	/* Shared RAM with Sound Z80 */

@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( drgnmst_main_map, AS_PROGRAM, 16, drgnmst_state )
 	AM_RANGE(0x800180, 0x800181) AM_WRITE(drgnmst_snd_command_w)
 	AM_RANGE(0x800188, 0x800189) AM_WRITE(drgnmst_snd_flag_w)
 	AM_RANGE(0x8001e0, 0x8001e1) AM_WRITENOP
-	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE_LEGACY(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x904000, 0x907fff) AM_RAM_WRITE_LEGACY(drgnmst_md_videoram_w) AM_BASE(m_md_videoram)
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE_LEGACY(drgnmst_bg_videoram_w) AM_BASE(m_bg_videoram)
 	AM_RANGE(0x90c000, 0x90ffff) AM_RAM_WRITE_LEGACY(drgnmst_fg_videoram_w) AM_BASE(m_fg_videoram)

@@ -1182,7 +1182,7 @@ static ADDRESS_MAP_START( iqblocka_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
 
 //  AM_RANGE(0x200a, 0x200a) AM_WRITENOP
@@ -1292,9 +1292,9 @@ WRITE16_MEMBER(igs017_state::irq2_enable_w)
 
 WRITE16_MEMBER(igs017_state::mgcs_paletteram_w)
 {
-	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
-	int bgr = ((machine().generic.paletteram.u16[offset/2*2+0] & 0xff) << 8) | (machine().generic.paletteram.u16[offset/2*2+1] & 0xff);
+	int bgr = ((m_generic_paletteram_16[offset/2*2+0] & 0xff) << 8) | (m_generic_paletteram_16[offset/2*2+1] & 0xff);
 
 	// bitswap
 	bgr = BITSWAP16(bgr, 7,8,9,2,14,3,13,15,12,11,10,0,1,4,5,6);
@@ -1308,7 +1308,7 @@ static ADDRESS_MAP_START( mgcs, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE( 0x49c000, 0x49c003 ) AM_WRITE(mgcs_magic_w )
 	AM_RANGE( 0x49c002, 0x49c003 ) AM_READ(mgcs_magic_r )
 	AM_RANGE( 0xa02000, 0xa02fff ) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
-	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE(mgcs_paletteram_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE( 0xa03000, 0xa037ff ) AM_RAM_WRITE(mgcs_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0xa04020, 0xa04027 ) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE( 0xa04024, 0xa04025 ) AM_WRITE(video_disable_lsb_w )
 	AM_RANGE( 0xa04028, 0xa04029 ) AM_WRITE(irq2_enable_w )
@@ -1324,9 +1324,9 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(igs017_state::sdmg2_paletteram_w)
 {
-	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
-	int bgr = ((machine().generic.paletteram.u16[offset/2*2+1] & 0xff) << 8) | (machine().generic.paletteram.u16[offset/2*2+0] & 0xff);
+	int bgr = ((m_generic_paletteram_16[offset/2*2+1] & 0xff) << 8) | (m_generic_paletteram_16[offset/2*2+0] & 0xff);
 
 	palette_set_color_rgb(machine(), offset/2, pal5bit(bgr >> 0), pal5bit(bgr >> 5), pal5bit(bgr >> 10));
 }
@@ -1404,7 +1404,7 @@ static ADDRESS_MAP_START( sdmg2, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 	AM_RANGE(0x202000, 0x202fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
-	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0x203000, 0x2037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x204020, 0x204027) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE(0x204024, 0x204025) AM_WRITE(video_disable_lsb_w )
 	AM_RANGE(0x204028, 0x204029) AM_WRITE(irq2_enable_w )
@@ -1524,7 +1524,7 @@ static ADDRESS_MAP_START( mgdha_map, AS_PROGRAM, 16, igs017_state )
 	AM_RANGE(0x876000, 0x876003) AM_WRITE(mgdha_magic_w )
 	AM_RANGE(0x876002, 0x876003) AM_READ(mgdha_magic_r )
 	AM_RANGE(0xa02000, 0xa02fff) AM_READWRITE(spriteram_lsb_r, spriteram_lsb_w ) AM_BASE(m_spriteram)
-	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0xa03000, 0xa037ff) AM_RAM_WRITE(sdmg2_paletteram_w ) AM_SHARE("paletteram")
 //  AM_RANGE(0xa04014, 0xa04015) // written with FF at boot
 	AM_RANGE(0xa04020, 0xa04027) AM_DEVREAD8_LEGACY("ppi8255", ppi8255_r, 0x00ff )
 	AM_RANGE(0xa04024, 0xa04025) AM_WRITE(video_disable_lsb_w )
@@ -1540,8 +1540,8 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(igs017_state::tjsb_paletteram_w)
 {
-	machine().generic.paletteram.u8[offset] = data;
-	int bgr = (machine().generic.paletteram.u8[offset/2*2+1] << 8) | machine().generic.paletteram.u8[offset/2*2+0];
+	m_generic_paletteram_8[offset] = data;
+	int bgr = (m_generic_paletteram_8[offset/2*2+1] << 8) | m_generic_paletteram_8[offset/2*2+0];
 
 	// bitswap
 	bgr = BITSWAP16(bgr, 15, 12,3,6,10,5, 4,2,9,13,8, 7,11,1,0,14);
@@ -1612,7 +1612,7 @@ static ADDRESS_MAP_START( tjsb_io, AS_IO, 8, igs017_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // internal regs
 
 	AM_RANGE( 0x1000, 0x17ff ) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(tjsb_paletteram_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0x1800, 0x1bff ) AM_RAM_WRITE(tjsb_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE( 0x1c00, 0x1fff ) AM_RAM
 
 //  AM_RANGE(0x200a, 0x200a) AM_WRITENOP

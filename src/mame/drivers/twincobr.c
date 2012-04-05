@@ -278,7 +278,7 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16, twincobr_state )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x030000, 0x033fff) AM_RAM		/* 68K and DSP shared RAM */
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x050000, 0x050dff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x050000, 0x050dff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
 	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE8("crtc", mc6845_device, register_w, 0x00ff)
 	AM_RANGE(0x070000, 0x070003) AM_WRITE_LEGACY(twincobr_txscroll_w)	/* text layer scroll */

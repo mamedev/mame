@@ -115,8 +115,9 @@ WRITE16_HANDLER( vindictr_paletteram_w )
 	int c;
 
 	/* first blend the data */
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	data = space->machine().generic.paletteram.u16[offset];
+	vindictr_state *state = space->machine().driver_data<vindictr_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	data = state->m_generic_paletteram_16[offset];
 
 	/* now generate colors at all 16 intensities */
 	for (c = 0; c < 8; c++)

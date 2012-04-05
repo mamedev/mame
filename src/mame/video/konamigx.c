@@ -2497,6 +2497,7 @@ SCREEN_UPDATE_RGB32(konamigx)
 SCREEN_UPDATE_RGB32(konamigx_left)
 {
 	/* the video gets demuxed by a board which plugs into the jamma connector */
+	konamigx_state *state = screen.machine().driver_data<konamigx_state>();
 	konamigx_current_frame^=1;
 
 	if (konamigx_current_frame==1)
@@ -2507,7 +2508,7 @@ SCREEN_UPDATE_RGB32(konamigx_left)
 		{
 			for (offset=0;offset<0x4000/4;offset++)
 			{
-				UINT32 coldat = screen.machine().generic.paletteram.u32[offset];
+				UINT32 coldat = state->m_generic_paletteram_32[offset];
 
 				set_color_555(screen.machine(), offset*2, 0, 5, 10,coldat >> 16);
 				set_color_555(screen.machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);
@@ -2519,9 +2520,9 @@ SCREEN_UPDATE_RGB32(konamigx_left)
 			{
 				int r,g,b;
 
-				r = (screen.machine().generic.paletteram.u32[offset] >>16) & 0xff;
-				g = (screen.machine().generic.paletteram.u32[offset] >> 8) & 0xff;
-				b = (screen.machine().generic.paletteram.u32[offset] >> 0) & 0xff;
+				r = (state->m_generic_paletteram_32[offset] >>16) & 0xff;
+				g = (state->m_generic_paletteram_32[offset] >> 8) & 0xff;
+				b = (state->m_generic_paletteram_32[offset] >> 0) & 0xff;
 
 				palette_set_color(screen.machine(),offset,MAKE_RGB(r,g,b));
 			}
@@ -2585,11 +2586,12 @@ WRITE32_HANDLER( konamigx_palette_w )
 {
 	int r,g,b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	konamigx_state *state = space->machine().driver_data<konamigx_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
 
-	r = (space->machine().generic.paletteram.u32[offset] >>16) & 0xff;
-	g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
-	b = (space->machine().generic.paletteram.u32[offset] >> 0) & 0xff;
+	r = (state->m_generic_paletteram_32[offset] >>16) & 0xff;
+	g = (state->m_generic_paletteram_32[offset] >> 8) & 0xff;
+	b = (state->m_generic_paletteram_32[offset] >> 0) & 0xff;
 
 	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
 }
@@ -2621,9 +2623,10 @@ INLINE void set_color_555(running_machine &machine, pen_t color, int rshift, int
 WRITE32_HANDLER( konamigx_555_palette_w )
 {
 	UINT32 coldat;
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	konamigx_state *state = space->machine().driver_data<konamigx_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
 
-	coldat = space->machine().generic.paletteram.u32[offset];
+	coldat = state->m_generic_paletteram_32[offset];
 
 	set_color_555(space->machine(), offset*2, 0, 5, 10,coldat >> 16);
 	set_color_555(space->machine(), offset*2+1, 0, 5, 10,coldat & 0xffff);

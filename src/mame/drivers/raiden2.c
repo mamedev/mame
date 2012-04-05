@@ -1271,7 +1271,7 @@ static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("mainbank")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000)
@@ -1308,7 +1308,7 @@ static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
     AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_BASE(sprites)
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 
@@ -1338,7 +1338,7 @@ static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
     AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_BASE(sprites)
 
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM

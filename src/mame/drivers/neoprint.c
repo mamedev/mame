@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( neoprint_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(m_npvidram)
-	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE(neoprint_calendar_r,neoprint_calendar_w)
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM") AM_WRITENOP
@@ -233,12 +233,12 @@ WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 {
 	UINT8 r,g,b,i;
 
-	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
-	g = (machine().generic.paletteram.u16[offset & ~1] & 0xf800) >> 8;
-	r = (machine().generic.paletteram.u16[offset & ~1] & 0x00f8) >> 0;
-	i = (machine().generic.paletteram.u16[offset | 1] & 0x1c00) >> 10;
-	b = (machine().generic.paletteram.u16[offset | 1] & 0x00f8) >> 0;
+	g = (m_generic_paletteram_16[offset & ~1] & 0xf800) >> 8;
+	r = (m_generic_paletteram_16[offset & ~1] & 0x00f8) >> 0;
+	i = (m_generic_paletteram_16[offset | 1] & 0x1c00) >> 10;
+	b = (m_generic_paletteram_16[offset | 1] & 0x00f8) >> 0;
 	r |= i;
 	g |= i;
 	b |= i;
@@ -294,7 +294,7 @@ static ADDRESS_MAP_START( nprsp_map, AS_PROGRAM, 16, neoprint_state )
 	AM_RANGE(0x300000, 0x33ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x380000, 0x38ffff) AM_RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(m_npvidram)
-	AM_RANGE(0x500000, 0x57ffff) AM_RAM_WRITE(nprsp_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x500000, 0x57ffff) AM_RAM_WRITE(nprsp_palette_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 /*************************************

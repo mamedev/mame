@@ -224,10 +224,11 @@ static const int pen_color_adjust[16] = {
 
 WRITE16_HANDLER( gaelco2_palette_w )
 {
+	gaelco2_state *state = space->machine().driver_data<gaelco2_state>();
 	int i, color, r, g, b, auxr, auxg, auxb;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	color = space->machine().generic.paletteram.u16[offset];
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	color = state->m_generic_paletteram_16[offset];
 
 	/* extract RGB components */
 	r = (color >> 10) & 0x1f;

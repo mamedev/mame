@@ -1156,6 +1156,7 @@ static void halleys_decode_rgb(running_machine &machine, UINT32 *r, UINT32 *g, U
         00 00 00 00 c5 0b f3 17 fd cf 1f ef df bf 7f ff
         00 00 00 00 01 61 29 26 0b f5 e2 17 57 fb cf f7
 */
+	halleys_state *state = machine.driver_data<halleys_state>();
 	int latch1_273, latch2_273;
 	UINT8 *sram_189;
 	UINT8 *prom_6330;
@@ -1163,7 +1164,7 @@ static void halleys_decode_rgb(running_machine &machine, UINT32 *r, UINT32 *g, U
 	int bit0, bit1, bit2, bit3, bit4;
 
 	// the four 16x4-bit SN74S189 SRAM chips are assumed be the game's 32-byte palette RAM
-	sram_189 = machine.generic.paletteram.u8;
+	sram_189 = state->m_generic_paletteram_8;
 
 	// each of the three 32-byte 6330 PROM is wired to an RGB component output
 	prom_6330 = machine.region("proms")->base();
@@ -1199,7 +1200,7 @@ WRITE8_MEMBER(halleys_state::halleys_paletteram_IIRRGGBB_w)
 	UINT32 d, r, g, b, i, j;
 	UINT32 *pal_ptr = m_internal_palette;
 
-	machine().generic.paletteram.u8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 	d = (UINT32)data;
 	j = d | BG_RGB;
 	pal_ptr[offset] = j;
@@ -1669,7 +1670,7 @@ static ADDRESS_MAP_START( halleys_map, AS_PROGRAM, 8, halleys_state )
 	AM_RANGE(0xff9c, 0xff9c) AM_WRITE(firq_ack_w)
 	AM_RANGE(0xff00, 0xffbf) AM_RAM AM_BASE(m_io_ram) AM_SIZE(m_io_ramsize)	// I/O write fall-through
 
-	AM_RANGE(0xffc0, 0xffdf) AM_RAM_WRITE(halleys_paletteram_IIRRGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xffc0, 0xffdf) AM_RAM_WRITE(halleys_paletteram_IIRRGGBB_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffe0, 0xffff) AM_READ(vector_r)
 ADDRESS_MAP_END
 

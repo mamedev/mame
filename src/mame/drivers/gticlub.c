@@ -262,8 +262,8 @@ public:
 
 WRITE32_MEMBER(gticlub_state::paletteram32_w)
 {
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
-	data = machine().generic.paletteram.u32[offset];
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	data = m_generic_paletteram_32[offset];
 	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
@@ -416,7 +416,7 @@ static MACHINE_START( gticlub )
 static ADDRESS_MAP_START( gticlub_map, AS_PROGRAM, 32, gticlub_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM AM_BASE(m_work_ram)		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(gticlub_k001604_reg_r, gticlub_k001604_reg_w)
-	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x74010000, 0x7401ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(gticlub_k001604_tile_r, gticlub_k001604_tile_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(gticlub_k001604_char_r, gticlub_k001604_char_w)
 	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)

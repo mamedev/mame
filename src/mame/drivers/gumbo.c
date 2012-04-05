@@ -49,7 +49,7 @@ PCB Layout
 static ADDRESS_MAP_START( gumbo_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1b0000, 0x1b03ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
 	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( mspuzzle_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM // main ram
 	AM_RANGE(0x190000, 0x197fff) AM_RAM_WRITE_LEGACY(gumbo_fg_videoram_w) AM_BASE(m_fg_videoram) // fg tilemap
-	AM_RANGE(0x1a0000, 0x1a03ff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1a0000, 0x1a03ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1b0100, 0x1b0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1b0200, 0x1b0201) AM_READ_PORT("DSW")
 	AM_RANGE(0x1b0300, 0x1b0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
@@ -73,7 +73,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dblpoint_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1b0000, 0x1b03ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
 	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)

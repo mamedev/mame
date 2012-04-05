@@ -82,7 +82,7 @@ MACHINE_START( simpsons )
 {
 	simpsons_state *state = machine.driver_data<simpsons_state>();
 
-	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x1000);
+	state->m_generic_paletteram_8.allocate(0x1000);
 	state->m_xtraram = auto_alloc_array_clear(machine, UINT8, 0x1000);
 	state->m_spriteram = auto_alloc_array_clear(machine, UINT16, 0x1000 / 2);
 
@@ -98,7 +98,6 @@ MACHINE_START( simpsons )
 	state->save_item(NAME(state->m_sprite_colorbase));
 	state->save_item(NAME(state->m_layer_colorbase));
 	state->save_item(NAME(state->m_layerpri));
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x1000);
 	state->save_pointer(NAME(state->m_xtraram), 0x1000);
 	state->save_pointer(NAME(state->m_spriteram), 0x1000 / 2);
 	machine.save().register_postload(save_prepost_delegate(FUNC(simpsons_postload), &machine));

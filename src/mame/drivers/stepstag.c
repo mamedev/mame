@@ -63,7 +63,7 @@ static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0x104000, 0x107fff) AM_RAM															// Spare Object RAM
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM															// Work RAM
 	AM_RANGE(0x200000, 0x23ffff) AM_READWRITE8_LEGACY(tetrisp2_priority_r, rockn_priority_w, 0x00ff)		// Priority
-	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE_LEGACY(tetrisp2_palette_w) AM_BASE_GENERIC(paletteram)		// Palette
+	AM_RANGE(0x300000, 0x31ffff) AM_RAM_WRITE_LEGACY(tetrisp2_palette_w) AM_SHARE("paletteram")		// Palette
 	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE_LEGACY(tetrisp2_vram_fg_w) AM_BASE(m_vram_fg)	// Foreground
 	AM_RANGE(0x404000, 0x407fff) AM_RAM_WRITE_LEGACY(tetrisp2_vram_bg_w) AM_BASE(m_vram_bg)	// Background
 	AM_RANGE(0x408000, 0x409fff) AM_RAM															// ???

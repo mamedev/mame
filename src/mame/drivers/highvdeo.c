@@ -364,9 +364,9 @@ WRITE16_MEMBER(highvdeo_state::tv_tcf_paletteram_w)
 {
 	int r, g, b, color;
 
-	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
-	color = machine().generic.paletteram.u16[offset];
+	color = m_generic_paletteram_16[offset];
 	r = (color >> 8) & 0xf8;
 	g = (color >> 3) & 0xf8;
 	b = (color << 3) & 0xf8;
@@ -389,7 +389,7 @@ static ADDRESS_MAP_START( tv_tcf_map, AS_PROGRAM, 16, highvdeo_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
 	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE(m_blit_ram) /*blitter ram*/
-	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE(tv_tcf_paletteram_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE(tv_tcf_paletteram_w ) AM_SHARE("paletteram")
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END

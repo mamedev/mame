@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
 	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_BASE(m_gms_vidram2)
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_BASE(m_gms_vidram)
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
 	AM_RANGE(0xC00000, 0xC00001) AM_READ_PORT("IN0") AM_WRITE(gms_write1)

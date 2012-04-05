@@ -542,7 +542,7 @@ WRITE8_HANDLER( williams2_bank_select_w )
 			space->install_read_bank(0x8000, 0x87ff, "bank4");
 			space->install_legacy_write_handler(0x8000, 0x87ff, FUNC(williams2_paletteram_w));
 			memory_set_bank(space->machine(), "bank1", 1 + ((state->m_vram_bank & 4) >> 1));
-			memory_set_bankptr(space->machine(), "bank4", space->machine().generic.paletteram.v);
+			memory_set_bankptr(space->machine(), "bank4", state->m_generic_paletteram_8);
 			break;
 	}
 }

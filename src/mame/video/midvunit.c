@@ -486,8 +486,9 @@ WRITE32_HANDLER( midvunit_paletteram_w )
 {
 	int newword;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	newword = space->machine().generic.paletteram.u32[offset];
+	midvunit_state *state = space->machine().driver_data<midvunit_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
+	newword = state->m_generic_paletteram_32[offset];
 	palette_set_color_rgb(space->machine(), offset, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 

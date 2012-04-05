@@ -100,8 +100,8 @@ INLINE void pokechmp_set_color(running_machine &machine, pen_t color, int rshift
 
 WRITE8_MEMBER(pokechmp_state::pokechmp_paletteram_w)
 {
-	machine().generic.paletteram.u8[offset] = data;
-	pokechmp_set_color(machine(), offset &0x3ff, 0, 5, 10, (machine().generic.paletteram.u8[offset&0x3ff]<<8) | ( machine().generic.paletteram.u8[ (offset&0x3ff)+0x400 ] )  );
+	m_generic_paletteram_8[offset] = data;
+	pokechmp_set_color(machine(), offset &0x3ff, 0, 5, 10, (m_generic_paletteram_8[offset&0x3ff]<<8) | ( m_generic_paletteram_8[ (offset&0x3ff)+0x400 ] )  );
 }
 
 
@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( pokechmp_map, AS_PROGRAM, 8, pokechmp_state )
 	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW") AM_WRITE(pokechmp_bank_w)
 
 	/* Extra on Poke Champ (not on Pocket Gal) */
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(pokechmp_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(pokechmp_paletteram_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank2")

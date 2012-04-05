@@ -126,10 +126,11 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
 	int r,g,b,d0,d1;
 	int offs = offset & ~1;
 
-	space->machine().generic.paletteram.u8[offset] = data;
+	quizdna_state *state = space->machine().driver_data<quizdna_state>();
+	state->m_generic_paletteram_8[offset] = data;
 
-	d0 = space->machine().generic.paletteram.u8[offs];
-	d1 = space->machine().generic.paletteram.u8[offs+1];
+	d0 = state->m_generic_paletteram_8[offs];
+	d1 = state->m_generic_paletteram_8[offs+1];
 
 	r = ((d1 << 1) & 0x1e) | ((d1 >> 4) & 1);
 	g = ((d0 >> 3) & 0x1e) | ((d1 >> 5) & 1);

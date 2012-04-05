@@ -140,7 +140,8 @@ VIDEO_START( bnj )
 WRITE8_HANDLER( btime_paletteram_w )
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_w(space, offset, ~data);
+	btime_state *state = space->machine().driver_data<btime_state>();
+	state->paletteram_BBGGGRRR_w(*space, offset, ~data);
 }
 
 WRITE8_HANDLER( lnc_videoram_w )

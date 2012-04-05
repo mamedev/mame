@@ -197,7 +197,7 @@ VIDEO_START( segag80r )
 	gfx_element_set_source(machine.gfx[0], &videoram[0x800]);
 
 	/* allocate paletteram */
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x80);
+	state->m_generic_paletteram_8.allocate(0x80);
 
 	/* initialize the particulars for each type of background PCB */
 	switch (state->m_background_pcb)
@@ -227,8 +227,6 @@ VIDEO_START( segag80r )
 	}
 
 	/* register for save states */
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x80);
-
 	state_save_register_global(machine, state->m_video_control);
 	state_save_register_global(machine, state->m_video_flip);
 	state_save_register_global(machine, state->m_vblank_latch);
@@ -263,7 +261,7 @@ WRITE8_HANDLER( segag80r_videoram_w )
 	if ((offset & 0x1000) && (state->m_video_control & 0x02))
 	{
 		offset &= 0x3f;
-		space->machine().generic.paletteram.u8[offset] = data;
+		state->m_generic_paletteram_8[offset] = data;
 		g80_set_palette_entry(space->machine(), offset, data);
 		return;
 	}
@@ -432,7 +430,7 @@ WRITE8_HANDLER( monsterb_videoram_w )
 	if ((offset & 0x1fc0) == 0x1040 && (state->m_video_control & 0x40))
 	{
 		offs_t paloffs = offset & 0x3f;
-		space->machine().generic.paletteram.u8[paloffs | 0x40] = data;
+		state->m_generic_paletteram_8[paloffs | 0x40] = data;
 		g80_set_palette_entry(space->machine(), paloffs | 0x40, data);
 		/* note that since the background board is not integrated with the main board */
 		/* writes here also write through to regular videoram */
@@ -504,7 +502,7 @@ WRITE8_HANDLER( pignewt_videoram_w )
 	if ((offset & 0x1fc0) == 0x1040 && (state->m_video_control & 0x02))
 	{
 		offs_t paloffs = offset & 0x3f;
-		space->machine().generic.paletteram.u8[paloffs | 0x40] = data;
+		state->m_generic_paletteram_8[paloffs | 0x40] = data;
 		g80_set_palette_entry(space->machine(), paloffs | 0x40, data);
 		return;
 	}
@@ -590,7 +588,7 @@ WRITE8_HANDLER( sindbadm_videoram_w )
 	if ((offset & 0x1fc0) == 0x1000 && (state->m_video_control & 0x02))
 	{
 		offs_t paloffs = offset & 0x3f;
-		space->machine().generic.paletteram.u8[paloffs | 0x40] = data;
+		state->m_generic_paletteram_8[paloffs | 0x40] = data;
 		g80_set_palette_entry(space->machine(), paloffs | 0x40, data);
 		return;
 	}
@@ -697,7 +695,7 @@ static void draw_background_spaceod(running_machine &machine, bitmap_ind16 &bitm
 		for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			int effx = ((x + state->m_spaceod_hcounter) ^ flipmask) + xoffset;
-			UINT8 fgpix = machine.generic.paletteram.u8[dst[x]];
+			UINT8 fgpix = state->m_generic_paletteram_8[dst[x]];
 			UINT8 bgpix = src[effx & xmask] & 0x3f;
 
 			/* the background detect flag is set if:

@@ -323,7 +323,8 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 
 static WRITE16_HANDLER( galsnew_paletteram_w )
 {
-	data = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	expro02_state *state = space->machine().driver_data<expro02_state>();
+	data = COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 	palette_set_color_rgb(space->machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
@@ -383,7 +384,7 @@ static ADDRESS_MAP_START( galsnew_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(m_vscroll[1])									//
 	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(m_vscroll[0])									//
 
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galsnew_paletteram_w) AM_BASE_GENERIC(paletteram) // palette?
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galsnew_paletteram_w) AM_SHARE("paletteram") // palette?
 
 	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs) // sprite regs? tileregs?
 
@@ -419,7 +420,7 @@ static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x581000, 0x581fff) AM_RAM_WRITE_LEGACY(kaneko16_vram_0_w) AM_BASE(m_vram[0])	//
 	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(m_vscroll[1])									//
 	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(m_vscroll[0])									//
-	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galsnew_paletteram_w) AM_BASE_GENERIC(paletteram) // palette?
+	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE_LEGACY(galsnew_paletteram_w) AM_SHARE("paletteram") // palette?
 	AM_RANGE(0x680000, 0x68001f) AM_RAM_WRITE_LEGACY(kaneko16_layers_0_regs_w) AM_BASE(m_layers_0_regs) // sprite regs? tileregs?
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_SHARE("spriteram")	 // sprites? 0x72f words tested
 	AM_RANGE(0x780000, 0x78001f) AM_RAM_WRITE_LEGACY(kaneko16_sprites_regs_w) AM_BASE(m_sprites_regs) // sprite regs? tileregs?

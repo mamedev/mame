@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, missb2_state )
 	AM_RANGE(0xc000, 0xdcff) AM_RAM AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0xdd00, 0xdfff) AM_RAM AM_BASE_SIZE(m_objectram, m_objectram_size)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xf9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE_LEGACY(bublbobl_sound_command_w)
 	AM_RANGE(0xfa03, 0xfa03) AM_WRITENOP // sound cpu reset
 	AM_RANGE(0xfa80, 0xfa80) AM_WRITENOP

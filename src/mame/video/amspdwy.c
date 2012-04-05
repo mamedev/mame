@@ -18,8 +18,9 @@
 
 WRITE8_HANDLER( amspdwy_paletteram_w )
 {
+	amspdwy_state *state = space->machine().driver_data<amspdwy_state>();
 	data ^= 0xff;
-	paletteram_BBGGGRRR_w(space, offset, data);
+	state->paletteram_BBGGGRRR_w(*space, offset, data);
 //  paletteram_RRRGGGBB_w(offset, data);
 }
 

@@ -163,7 +163,8 @@ READ16_HANDLER( namcona1_videoram_r )
 static void
 UpdatePalette(running_machine &machine, int offset )
 {
-	UINT16 data = machine.generic.paletteram.u16[offset]; /* -RRRRRGG GGGBBBBB */
+	namcona1_state *state = machine.driver_data<namcona1_state>();
+	UINT16 data = state->m_generic_paletteram_16[offset]; /* -RRRRRGG GGGBBBBB */
 	/**
      * sprites can be configured to use an alternate interpretation of palette ram
      * (used in-game in Emeraldia)
@@ -180,13 +181,14 @@ UpdatePalette(running_machine &machine, int offset )
 
 READ16_HANDLER( namcona1_paletteram_r )
 {
-	return space->machine().generic.paletteram.u16[offset];
+	namcona1_state *state = space->machine().driver_data<namcona1_state>();
+	return state->m_generic_paletteram_16[offset];
 } /* namcona1_paletteram_r */
 
 WRITE16_HANDLER( namcona1_paletteram_w )
 {
 	namcona1_state *state = space->machine().driver_data<namcona1_state>();
-	COMBINE_DATA( &space->machine().generic.paletteram.u16[offset] );
+	COMBINE_DATA( &state->m_generic_paletteram_16[offset] );
 	if( state->m_vreg[0x8e/2] )
 	{ /* graphics enabled; update palette immediately */
 		UpdatePalette(space->machine(), offset );

@@ -69,12 +69,12 @@ static INTERRUPT_GEN( gunbustr_interrupt )
 WRITE32_MEMBER(gunbustr_state::gunbustr_palette_w)
 {
 	int a;
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	a = machine().generic.paletteram.u32[offset] >> 16;
+	a = m_generic_paletteram_32[offset] >> 16;
 	palette_set_color_rgb(machine(),offset*2,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 
-	a = machine().generic.paletteram.u32[offset] &0xffff;
+	a = m_generic_paletteram_32[offset] &0xffff;
 	palette_set_color_rgb(machine(),offset*2+1,pal5bit(a >> 10),pal5bit(a >> 5),pal5bit(a >> 0));
 }
 
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( gunbustr_map, AS_PROGRAM, 32, gunbustr_state )
 	AM_RANGE(0x500000, 0x500003) AM_READWRITE(gunbustr_gun_r, gunbustr_gun_w)						/* gun coord read */
 	AM_RANGE(0x800000, 0x80ffff) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_long_r, tc0480scp_long_w)
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)
-	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE(gunbustr_palette_w) AM_BASE_GENERIC(paletteram)			/* Palette ram */
+	AM_RANGE(0x900000, 0x901fff) AM_RAM_WRITE(gunbustr_palette_w) AM_SHARE("paletteram")			/* Palette ram */
 	AM_RANGE(0xc00000, 0xc03fff) AM_RAM																/* network ram ?? */
 ADDRESS_MAP_END
 

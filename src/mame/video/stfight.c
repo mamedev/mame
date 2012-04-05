@@ -69,11 +69,12 @@ PALETTE_INIT( stfight )
 
 static void set_pens(running_machine &machine)
 {
+	stfight_state *state = machine.driver_data<stfight_state>();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT16 data = machine.generic.paletteram.u8[i] | (machine.generic.paletteram2.u8[i] << 8);
+		UINT16 data = state->m_generic_paletteram_8[i] | (state->m_generic_paletteram2_8[i] << 8);
 		rgb_t color = MAKE_RGB(pal4bit(data >> 4), pal4bit(data >> 0), pal4bit(data >> 8));
 
 		colortable_palette_set_color(machine.colortable, i, color);

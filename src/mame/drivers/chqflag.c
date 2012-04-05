@@ -51,7 +51,7 @@ WRITE8_MEMBER(chqflag_state::chqflag_bankswitch_w)
 	{
 		space.install_read_bank(0x1800, 0x1fff, "bank5");
 		space.install_write_handler(0x1800, 0x1fff, write8_delegate(FUNC(driver_device::paletteram_xBBBBBGGGGGRRRRR_be_w),this));
-		memory_set_bankptr(machine(), "bank5", machine().generic.paletteram.v);
+		memory_set_bankptr(machine(), "bank5", m_generic_paletteram_8);
 
 		if (m_k051316_readroms)
 			space.install_legacy_readwrite_handler(*m_k051316_1, 0x1000, 0x17ff, FUNC(k051316_rom_r), FUNC(k051316_w));	/* 051316 #1 (ROM test) */

@@ -169,9 +169,9 @@ static void vendetta_video_banking( running_machine &machine, int select )
 	if (select & 1)
 	{
 		space->install_read_bank(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, "bank4" );
-		space->install_legacy_write_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, FUNC(paletteram_xBBBBBGGGGGRRRRR_be_w) );
+		space->install_write_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, write8_delegate(FUNC(vendetta_state::paletteram_xBBBBBGGGGGRRRRR_be_w), state) );
 		space->install_legacy_readwrite_handler(*state->m_k053246, state->m_video_banking_base + 0x0000, state->m_video_banking_base + 0x0fff, FUNC(k053247_r), FUNC(k053247_w) );
-		memory_set_bankptr(machine, "bank4", machine.generic.paletteram.v);
+		memory_set_bankptr(machine, "bank4", state->m_generic_paletteram_8);
 	}
 	else
 	{
@@ -464,7 +464,7 @@ static MACHINE_START( vendetta )
 	memory_configure_bank(machine, "bank1", 0, 28, &ROM[0x10000], 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
-	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x1000);
+	state->m_generic_paletteram_8.allocate(0x1000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -478,7 +478,6 @@ static MACHINE_START( vendetta )
 	state->save_item(NAME(state->m_sprite_colorbase));
 	state->save_item(NAME(state->m_layer_colorbase));
 	state->save_item(NAME(state->m_layerpri));
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x1000);
 }
 
 static MACHINE_RESET( vendetta )

@@ -82,9 +82,9 @@ static void updateAceRam(running_machine& machine)
 	for (i=0; i<2048; i++)
 	{
 		/* Lerp palette entry to 'fadept' according to 'fadeps' */
-		b = (machine.generic.paletteram.u32[i] >>16) & 0xff;
-		g = (machine.generic.paletteram.u32[i] >> 8) & 0xff;
-		r = (machine.generic.paletteram.u32[i] >> 0) & 0xff;
+		b = (state->m_generic_paletteram_32[i] >>16) & 0xff;
+		g = (state->m_generic_paletteram_32[i] >> 8) & 0xff;
+		r = (state->m_generic_paletteram_32[i] >> 0) & 0xff;
 
 		if (i>255) /* Screenshots seem to suggest ACE fades do not affect playfield 1 palette (0-255) */
 		{
@@ -107,11 +107,12 @@ WRITE32_HANDLER( deco32_nonbuffered_palette_w )
 {
 	int r,g,b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	deco32_state *state = space->machine().driver_data<deco32_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
 
-	b = (space->machine().generic.paletteram.u32[offset] >>16) & 0xff;
-	g = (space->machine().generic.paletteram.u32[offset] >> 8) & 0xff;
-	r = (space->machine().generic.paletteram.u32[offset] >> 0) & 0xff;
+	b = (state->m_generic_paletteram_32[offset] >>16) & 0xff;
+	g = (state->m_generic_paletteram_32[offset] >> 8) & 0xff;
+	r = (state->m_generic_paletteram_32[offset] >> 0) & 0xff;
 
 	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
 }
@@ -119,7 +120,7 @@ WRITE32_HANDLER( deco32_nonbuffered_palette_w )
 WRITE32_HANDLER( deco32_buffered_palette_w )
 {
 	deco32_state *state = space->machine().driver_data<deco32_state>();
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
 	state->m_dirty_palette[offset]=1;
 }
 
@@ -139,9 +140,9 @@ WRITE32_HANDLER( deco32_palette_dma_w )
 			}
 			else
 			{
-				b = (space->machine().generic.paletteram.u32[i] >>16) & 0xff;
-				g = (space->machine().generic.paletteram.u32[i] >> 8) & 0xff;
-				r = (space->machine().generic.paletteram.u32[i] >> 0) & 0xff;
+				b = (state->m_generic_paletteram_32[i] >>16) & 0xff;
+				g = (state->m_generic_paletteram_32[i] >> 8) & 0xff;
+				r = (state->m_generic_paletteram_32[i] >> 0) & 0xff;
 
 				palette_set_color(space->machine(),i,MAKE_RGB(r,g,b));
 			}

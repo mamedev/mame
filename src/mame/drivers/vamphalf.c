@@ -187,12 +187,12 @@ WRITE32_MEMBER(vamphalf_state::paletteram32_w)
 {
 	UINT16 paldata;
 
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	paldata = machine().generic.paletteram.u32[offset] & 0xffff;
+	paldata = m_generic_paletteram_32[offset] & 0xffff;
 	palette_set_color_rgb(machine(), offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 
-	paldata = (machine().generic.paletteram.u32[offset] >> 16) & 0xffff;
+	paldata = (m_generic_paletteram_32[offset] >> 16) & 0xffff;
 	palette_set_color_rgb(machine(), offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
@@ -320,14 +320,14 @@ WRITE16_MEMBER(vamphalf_state::boonggab_lamps_w)
 static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_wram)
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_tiles)
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( common_32bit_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(m_wram32)
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_tiles32)
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -442,7 +442,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aoh_map, AS_PROGRAM, 32, vamphalf_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(m_wram32)
 	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE(m_tiles32)
-	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x80000000, 0x8000ffff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0x80210000, 0x80210003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x80220000, 0x80220003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("user1",0)

@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM															// WORK RAM-1
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)		// DUAL RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(f1gp_fgvideoram_w) AM_BASE(m_fgvideoram)			// CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// PALETTE
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE_LEGACY(f1gp_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM																// WORK RAM-1
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)			// DUAL RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(f1gp_fgvideoram_w) AM_BASE(m_fgvideoram)				// CHARACTER
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)			// PALETTE
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")			// PALETTE
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE_LEGACY(f1gp2_gfxctrl_w)
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM
 	AM_RANGE(0xffc000, 0xffcfff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(m_sharedram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE_LEGACY(f1gp_fgvideoram_w) AM_BASE(m_fgvideoram)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")

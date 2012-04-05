@@ -245,7 +245,7 @@ DIP locations verified for:
 static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, balsente_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(m_spriteram)
 	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE_LEGACY(balsente_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(balsente_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE_LEGACY(balsente_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9000, 0x9007) AM_WRITE_LEGACY(balsente_adc_select_w)
 	AM_RANGE(0x9400, 0x9401) AM_READ_LEGACY(balsente_adc_data_r)
 	AM_RANGE(0x9800, 0x987f) AM_WRITE_LEGACY(balsente_misc_output_w)

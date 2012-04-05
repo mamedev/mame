@@ -224,7 +224,7 @@ static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16, vmetal_state )
 
 	AM_RANGE(0x160000, 0x16ffff) AM_READ_LEGACY(varia_crom_read) // cgrom read window ..
 
-	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE_LEGACY(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 	AM_RANGE(0x175000, 0x177fff) AM_RAM
 	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE(m_tlookup)

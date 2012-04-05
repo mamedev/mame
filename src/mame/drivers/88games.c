@@ -128,7 +128,7 @@ WRITE8_MEMBER(_88games_state::k052109_051960_w)
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _88games_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE(m_banked_rom) /* banked ROM + palette RAM */
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(m_paletteram_1000)	/* banked ROM + palette RAM */
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE(m_paletteram_1000)	/* banked ROM + palette RAM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x3800, 0x3fff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE(m_ram)
@@ -278,18 +278,18 @@ static KONAMI_SETLINES_CALLBACK( k88games_banking )
 	memcpy(state->m_banked_rom, &RAM[offs], 0x1000);
 	if (lines & 0x08)
 	{
-		if (device->machine().generic.paletteram.u8 != state->m_paletteram_1000)
+		if (state->m_generic_paletteram_8 != state->m_paletteram_1000)
 		{
-			memcpy(state->m_paletteram_1000, device->machine().generic.paletteram.u8, 0x1000);
-			device->machine().generic.paletteram.u8 = state->m_paletteram_1000;
+			memcpy(state->m_paletteram_1000, state->m_generic_paletteram_8, 0x1000);
+			state->m_generic_paletteram_8.set_target(state->m_paletteram_1000, 0x1000);
 		}
 	}
 	else
 	{
-		if (device->machine().generic.paletteram.u8 != &RAM[0x20000])
+		if (state->m_generic_paletteram_8 != &RAM[0x20000])
 		{
-			memcpy(&RAM[0x20000], device->machine().generic.paletteram.u8, 0x1000);
-			device->machine().generic.paletteram.u8 = &RAM[0x20000];
+			memcpy(&RAM[0x20000], state->m_generic_paletteram_8, 0x1000);
+			state->m_generic_paletteram_8.set_target(&RAM[0x20000], 0x01000);
 		}
 		memcpy(state->m_paletteram_1000, &RAM[offs+0x1000], 0x1000);
 	}
@@ -330,7 +330,7 @@ static MACHINE_RESET( 88games )
 	_88games_state *state = machine.driver_data<_88games_state>();
 
 	konami_configure_set_lines(machine.device("maincpu"), k88games_banking);
-	machine.generic.paletteram.u8 = &machine.region("maincpu")->base()[0x20000];
+	state->m_generic_paletteram_8.set_target(&machine.region("maincpu")->base()[0x20000], 0x1000);
 
 	state->m_videobank = 0;
 	state->m_zoomreadroms = 0;

@@ -139,7 +139,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rampart_state )
 	AM_RANGE(0x140000, 0x147fff) AM_MIRROR(0x438000) AM_ROM /* slapstic goes here */
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(m_bitmap)
 	AM_RANGE(0x220000, 0x3bffff) AM_WRITENOP	/* the code blasts right through this when initializing */
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_MIRROR(0x019800) AM_RAM_WRITE_LEGACY(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3c0000, 0x3c07ff) AM_MIRROR(0x019800) AM_RAM_WRITE_LEGACY(atarigen_expanded_666_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_MIRROR(0x010000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3e0800, 0x3e3f3f) AM_MIRROR(0x010000) AM_RAM
 	AM_RANGE(0x3e3f40, 0x3e3f7f) AM_MIRROR(0x010000) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)

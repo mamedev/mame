@@ -207,7 +207,7 @@ READ16_MEMBER(dassault_state::shared_ram_r)
 static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x140004, 0x140007) AM_WRITENOP /* ? */
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(dassault_sound_w)

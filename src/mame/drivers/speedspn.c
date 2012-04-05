@@ -107,7 +107,7 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 
 static ADDRESS_MAP_START( speedspn_map, AS_PROGRAM, 8, speedspn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)	/* RAM COLOUR */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_SHARE("paletteram")	/* RAM COLOUR */
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE_LEGACY(speedspn_attram_w) AM_BASE(m_attram)
 	AM_RANGE(0x9000, 0x9fff) AM_READWRITE_LEGACY(speedspn_vidram_r,speedspn_vidram_w)	/* RAM FIX / RAM OBJECTS (selected by bit 0 of port 17) */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM

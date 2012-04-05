@@ -138,7 +138,7 @@ READ32_MEMBER(simpl156_state::simpl156_inputs_read)
 
 READ32_MEMBER(simpl156_state::simpl156_palette_r)
 {
-	return machine().generic.paletteram.u16[offset]^0xffff0000;
+	return m_generic_paletteram_16[offset]^0xffff0000;
 }
 
 WRITE32_MEMBER(simpl156_state::simpl156_palette_w)
@@ -149,10 +149,10 @@ WRITE32_MEMBER(simpl156_state::simpl156_palette_w)
 	data &= 0x0000ffff;
 	mem_mask &= 0x0000ffff;
 
-	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	color = offset;
 
-	dat = machine().generic.paletteram.u16[offset] & 0xffff;
+	dat = m_generic_paletteram_16[offset] & 0xffff;
 	palette_set_color_rgb(machine(),color,pal5bit(dat >> 0),pal5bit(dat >> 5),pal5bit(dat >> 10));
 }
 

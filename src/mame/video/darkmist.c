@@ -102,13 +102,14 @@ PALETTE_INIT(darkmist)
 
 static void set_pens(running_machine &machine)
 {
+	darkmist_state *state = machine.driver_data<darkmist_state>();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(machine.generic.paletteram.u8[i | 0x200] >> 0);
-		int g = pal4bit(machine.generic.paletteram.u8[i | 0x000] >> 4);
-		int b = pal4bit(machine.generic.paletteram.u8[i | 0x000] >> 0);
+		int r = pal4bit(state->m_generic_paletteram_8[i | 0x200] >> 0);
+		int g = pal4bit(state->m_generic_paletteram_8[i | 0x000] >> 4);
+		int b = pal4bit(state->m_generic_paletteram_8[i | 0x000] >> 0);
 
 		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}

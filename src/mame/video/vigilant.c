@@ -96,14 +96,15 @@ WRITE8_HANDLER( vigilant_paletteram_w )
 	int bank,r,g,b;
 
 
-	space->machine().generic.paletteram.u8[offset] = data;
+	vigilant_state *state = space->machine().driver_data<vigilant_state>();
+	state->m_generic_paletteram_8[offset] = data;
 
 	bank = offset & 0x400;
 	offset &= 0xff;
 
-	r = (space->machine().generic.paletteram.u8[bank + offset + 0x000] << 3) & 0xFF;
-	g = (space->machine().generic.paletteram.u8[bank + offset + 0x100] << 3) & 0xFF;
-	b = (space->machine().generic.paletteram.u8[bank + offset + 0x200] << 3) & 0xFF;
+	r = (state->m_generic_paletteram_8[bank + offset + 0x000] << 3) & 0xFF;
+	g = (state->m_generic_paletteram_8[bank + offset + 0x100] << 3) & 0xFF;
+	b = (state->m_generic_paletteram_8[bank + offset + 0x200] << 3) & 0xFF;
 
 	palette_set_color(space->machine(), (bank >> 2) + offset,MAKE_RGB(r,g,b));
 }
@@ -306,15 +307,15 @@ SCREEN_UPDATE_IND16( vigilant )
 		int r,g,b;
 
 
-		r = (screen.machine().generic.paletteram.u8[0x400 + 16 * state->m_rear_color + i] << 3) & 0xFF;
-		g = (screen.machine().generic.paletteram.u8[0x500 + 16 * state->m_rear_color + i] << 3) & 0xFF;
-		b = (screen.machine().generic.paletteram.u8[0x600 + 16 * state->m_rear_color + i] << 3) & 0xFF;
+		r = (state->m_generic_paletteram_8[0x400 + 16 * state->m_rear_color + i] << 3) & 0xFF;
+		g = (state->m_generic_paletteram_8[0x500 + 16 * state->m_rear_color + i] << 3) & 0xFF;
+		b = (state->m_generic_paletteram_8[0x600 + 16 * state->m_rear_color + i] << 3) & 0xFF;
 
 		palette_set_color(screen.machine(),512 + i,MAKE_RGB(r,g,b));
 
-		r = (screen.machine().generic.paletteram.u8[0x400 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
-		g = (screen.machine().generic.paletteram.u8[0x500 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
-		b = (screen.machine().generic.paletteram.u8[0x600 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
+		r = (state->m_generic_paletteram_8[0x400 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
+		g = (state->m_generic_paletteram_8[0x500 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
+		b = (state->m_generic_paletteram_8[0x600 + 16 * state->m_rear_color + 32 + i] << 3) & 0xFF;
 
 		palette_set_color(screen.machine(),512 + 16 + i,MAKE_RGB(r,g,b));
 	}

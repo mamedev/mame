@@ -29,16 +29,14 @@ static INTERRUPT_GEN( aliens_interrupt )
 
 READ8_MEMBER(aliens_state::bankedram_r)
 {
-
 	if (m_palette_selected)
-		return machine().generic.paletteram.u8[offset];
+		return m_generic_paletteram_8[offset];
 	else
 		return m_ram[offset];
 }
 
 WRITE8_MEMBER(aliens_state::bankedram_w)
 {
-
 	if (m_palette_selected)
 		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
 	else

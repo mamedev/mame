@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
 	AM_RANGE(0x504000, 0x505fff) AM_RAM_WRITE_LEGACY(fuuki16_vram_2_w) AM_BASE(m_vram[2])					//
 	AM_RANGE(0x506000, 0x507fff) AM_RAM_WRITE_LEGACY(fuuki16_vram_3_w) AM_BASE(m_vram[3])					//
 	AM_RANGE(0x600000, 0x601fff) AM_MIRROR(0x008000) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites, mirrored?
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x810000, 0x810001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("DSW")

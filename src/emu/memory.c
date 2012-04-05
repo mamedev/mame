@@ -2475,14 +2475,10 @@ void address_space::locate_memory()
 			*entry->m_baseptr = entry->m_memory;
 		if (entry->m_baseptroffs_plus1 != 0)
 			*(void **)(reinterpret_cast<UINT8 *>(machine().driver_data()) + entry->m_baseptroffs_plus1 - 1) = entry->m_memory;
-		if (entry->m_genbaseptroffs_plus1 != 0)
-			*(void **)((UINT8 *)&machine().generic + entry->m_genbaseptroffs_plus1 - 1) = entry->m_memory;
 		if (entry->m_sizeptr != NULL)
 			*entry->m_sizeptr = entry->m_byteend - entry->m_bytestart + 1;
 		if (entry->m_sizeptroffs_plus1 != 0)
 			*(size_t *)(reinterpret_cast<UINT8 *>(machine().driver_data()) + entry->m_sizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
-		if (entry->m_gensizeptroffs_plus1 != 0)
-			*(size_t *)((UINT8 *)&machine().generic + entry->m_gensizeptroffs_plus1 - 1) = entry->m_byteend - entry->m_bytestart + 1;
 	}
 
 	// once this is done, find the starting bases for the banks
@@ -3224,7 +3220,7 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 bool address_space::needs_backing_store(const address_map_entry *entry)
 {
 	// if we are asked to provide a base pointer, then yes, we do need backing
-	if (entry->m_baseptr != NULL || entry->m_baseptroffs_plus1 != 0 || entry->m_genbaseptroffs_plus1 != 0)
+	if (entry->m_baseptr != NULL || entry->m_baseptroffs_plus1 != 0)
 		return true;
 
 	// if we are sharing, and we don't have a pointer yet, create one

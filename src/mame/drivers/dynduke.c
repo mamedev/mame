@@ -90,7 +90,7 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
 	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE_LEGACY(dynduke_background_w) AM_BASE(m_back_data)
 	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE_LEGACY(dynduke_foreground_w) AM_BASE(m_fore_data)
-	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE_LEGACY(dynduke_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE_LEGACY(dynduke_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0a000, 0x0a001) AM_WRITE_LEGACY(dynduke_gfxbank_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITENOP

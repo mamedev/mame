@@ -51,7 +51,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, galspnbl_state )
 	AM_RANGE(0x905000, 0x907fff) AM_WRITENOP	/* ??? */
 	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE(m_bgvideoram)
 	AM_RANGE(0xa00000, 0xa00fff) AM_WRITENOP	/* more palette ? */
-	AM_RANGE(0xa01000, 0xa017ff) AM_WRITE_LEGACY(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa01000, 0xa017ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xa01800, 0xa027ff) AM_WRITENOP	/* more palette ? */
 	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
 	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)

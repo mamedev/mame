@@ -232,9 +232,8 @@ static void toaplan1_paletteram_alloc(running_machine &machine)
 {
 	toaplan1_state *state = machine.driver_data<toaplan1_state>();
 
-	machine.generic.paletteram.u16 = auto_alloc_array(machine, UINT16, (state->m_colorram1_size + state->m_colorram2_size)/2);
-
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u16, (state->m_colorram1_size + state->m_colorram2_size)/2);
+	UINT32 bytes = (state->m_colorram1_size + state->m_colorram2_size)/2;
+	state->m_generic_paletteram_16.allocate(bytes);
 }
 
 static void toaplan1_vram_alloc(running_machine &machine)
@@ -517,7 +516,7 @@ WRITE16_HANDLER( toaplan1_colorram1_w )
 	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
 	COMBINE_DATA(&state->m_colorram1[offset]);
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
+	state->paletteram16_xBBBBBGGGGGRRRRR_word_w(*space, offset, data, mem_mask);
 }
 
 /* sprite palette */
@@ -533,7 +532,7 @@ WRITE16_HANDLER( toaplan1_colorram2_w )
 	toaplan1_state *state = space->machine().driver_data<toaplan1_state>();
 
 	COMBINE_DATA(&state->m_colorram2[offset]);
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset+(state->m_colorram1_size/2), data, mem_mask);
+	state->paletteram16_xBBBBBGGGGGRRRRR_word_w(*space, offset+(state->m_colorram1_size/2), data, mem_mask);
 }
 
 READ16_HANDLER( toaplan1_spriteram16_r )

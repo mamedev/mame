@@ -409,8 +409,8 @@ WRITE16_HANDLER( gaelco3d_paletteram_w )
 {
 	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
 	state->m_poly->wait("Palette change");
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	state->m_palette[offset] = ((space->machine().generic.paletteram.u16[offset] & 0x7fe0) << 6) | (space->machine().generic.paletteram.u16[offset] & 0x1f);
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	state->m_palette[offset] = ((state->m_generic_paletteram_16[offset] & 0x7fe0) << 6) | (state->m_generic_paletteram_16[offset] & 0x1f);
 }
 
 
@@ -418,9 +418,9 @@ WRITE32_HANDLER( gaelco3d_paletteram_020_w )
 {
 	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
 	state->m_poly->wait("Palette change");
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	state->m_palette[offset*2+0] = ((space->machine().generic.paletteram.u32[offset] & 0x7fe00000) >> 10) | ((space->machine().generic.paletteram.u32[offset] & 0x1f0000) >> 16);
-	state->m_palette[offset*2+1] = ((space->machine().generic.paletteram.u32[offset] & 0x7fe0) << 6) | (space->machine().generic.paletteram.u32[offset] & 0x1f);
+	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
+	state->m_palette[offset*2+0] = ((state->m_generic_paletteram_32[offset] & 0x7fe00000) >> 10) | ((state->m_generic_paletteram_32[offset] & 0x1f0000) >> 16);
+	state->m_palette[offset*2+1] = ((state->m_generic_paletteram_32[offset] & 0x7fe0) << 6) | (state->m_generic_paletteram_32[offset] & 0x1f);
 }
 
 

@@ -258,17 +258,6 @@ private:
 
 
 
-// ======================> generic_pointers
-
-// holds generic pointers that are commonly used
-struct generic_pointers
-{
-	generic_ptr				paletteram;			// palette RAM
-	generic_ptr				paletteram2;		// secondary palette RAM
-};
-
-
-
 // ======================> system_time
 
 // system time description, both local and UTC
@@ -416,9 +405,6 @@ public:
 
 	// debugger-related information
 	UINT32					debug_flags;		// the current debug flags
-
-	// generic pointers
-	generic_pointers		generic;			// generic pointers
 
 	// internal core information
 	memory_private *		memory_data;		// internal data from memory.c
@@ -594,6 +580,14 @@ public:
 	DECLARE_WRITE8_MEMBER( soundlatch2_clear_w );
 	DECLARE_WRITE8_MEMBER( soundlatch3_clear_w );
 	DECLARE_WRITE8_MEMBER( soundlatch4_clear_w );
+	
+	// general palette helpers
+	void set_color_332(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
+	void set_color_444(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
+	void set_color_555(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
+	void set_color_565(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
+	void set_color_888(pen_t color, int rshift, int gshift, int bshift, UINT32 data);
+	void set_color_4444(pen_t color, int ishift, int rshift, int gshift, int bshift, UINT16 data);
 
 	// 3-3-2 RGB palette write handlers
 	DECLARE_WRITE8_MEMBER( paletteram_BBGGGRRR_w );
@@ -679,10 +673,10 @@ protected:
 	virtual void device_reset_after_children();
 
 	// internal helpers
-	inline UINT16 paletteram16_le(offs_t offset) const { return m_generic_paletteram[offset & ~1] | (m_generic_paletteram[offset |  1] << 8); }
-	inline UINT16 paletteram16_be(offs_t offset) const { return m_generic_paletteram[offset |  1] | (m_generic_paletteram[offset & ~1] << 8); }
-	inline UINT16 paletteram16_split(offs_t offset) const { return m_generic_paletteram[offset] | (m_generic_paletteram2[offset] << 8); }
-	inline UINT32 paletteram32_be(offs_t offset) const { return m_generic_paletteram16[offset | 1] | (m_generic_paletteram16[offset & ~1] << 16); }
+	inline UINT16 paletteram16_le(offs_t offset) const { return m_generic_paletteram_8[offset & ~1] | (m_generic_paletteram_8[offset |  1] << 8); }
+	inline UINT16 paletteram16_be(offs_t offset) const { return m_generic_paletteram_8[offset |  1] | (m_generic_paletteram_8[offset & ~1] << 8); }
+	inline UINT16 paletteram16_split(offs_t offset) const { return m_generic_paletteram_8[offset] | (m_generic_paletteram2_8[offset] << 8); }
+	inline UINT32 paletteram32_be(offs_t offset) const { return m_generic_paletteram_16[offset | 1] | (m_generic_paletteram_16[offset & ~1] << 16); }
 
 	// internal state
 	const game_driver *		m_system;					// pointer to the game driver
@@ -690,10 +684,14 @@ protected:
 	legacy_callback_func	m_callbacks[CB_COUNT];		// generic legacy callbacks
 	palette_init_func		m_palette_init;				// one-time palette init callback
 
+public:
 	// generic pointers
-	optional_shared_ptr<UINT8> m_generic_paletteram;
-	optional_shared_ptr<UINT16> m_generic_paletteram16;
-	optional_shared_ptr<UINT8> m_generic_paletteram2;
+	optional_shared_ptr<UINT8> m_generic_paletteram_8;
+	optional_shared_ptr<UINT8> m_generic_paletteram2_8;
+	optional_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_shared_ptr<UINT16> m_generic_paletteram2_16;
+	optional_shared_ptr<UINT32> m_generic_paletteram_32;
+	optional_shared_ptr<UINT32> m_generic_paletteram2_32;
 };
 
 

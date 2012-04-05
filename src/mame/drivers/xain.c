@@ -418,8 +418,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, xain_state )
 	AM_RANGE(0x3a0d, 0x3a0d) AM_WRITE_LEGACY(xain_flipscreen_w)
 	AM_RANGE(0x3a0e, 0x3a0e) AM_WRITE(xain_68705_w)
 	AM_RANGE(0x3a0f, 0x3a0f) AM_WRITE(xainCPUA_bankswitch_w)
-	AM_RANGE(0x3c00, 0x3dff) AM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3e00, 0x3fff) AM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0x3c00, 0x3dff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3e00, 0x3fff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("paletteram2")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

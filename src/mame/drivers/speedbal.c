@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, speedbal_state )
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM AM_SHARE("share1") // shared with SOUND
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM_WRITE_LEGACY(speedbal_background_videoram_w) AM_BASE(m_background_videoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE_LEGACY(speedbal_foreground_videoram_w) AM_BASE(m_foreground_videoram)
-	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE_LEGACY(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf5ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf600, 0xfeff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xff00, 0xffff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
 ADDRESS_MAP_END

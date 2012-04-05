@@ -229,7 +229,8 @@ WRITE8_HANDLER( bullsdrt_sprites_bank_w )
 
 WRITE8_HANDLER( centiped_paletteram_w )
 {
-	space->machine().generic.paletteram.u8[offset] = data;
+	centiped_state *state = space->machine().driver_data<centiped_state>();
+	state->m_generic_paletteram_8[offset] = data;
 
 	/* bit 2 of the output palette RAM is always pulled high, so we ignore */
 	/* any palette changes unless the write is to a palette RAM address */
@@ -407,7 +408,8 @@ static void melliped_mazeinv_set_color(running_machine &machine, offs_t offset, 
 
 WRITE8_HANDLER( milliped_paletteram_w )
 {
-	space->machine().generic.paletteram.u8[offset] = data;
+	centiped_state *state = space->machine().driver_data<centiped_state>();
+	state->m_generic_paletteram_8[offset] = data;
 
 	melliped_mazeinv_set_color(space->machine(), offset, data);
 }
@@ -415,7 +417,8 @@ WRITE8_HANDLER( milliped_paletteram_w )
 
 WRITE8_HANDLER( mazeinv_paletteram_w )
 {
-	space->machine().generic.paletteram.u8[offset] = data;
+	centiped_state *state = space->machine().driver_data<centiped_state>();
+	state->m_generic_paletteram_8[offset] = data;
 
 	/* the value passed in is a look-up index into the color PROM */
 	melliped_mazeinv_set_color(space->machine(), offset, ~space->machine().region("proms")->base()[~data & 0x0f]);

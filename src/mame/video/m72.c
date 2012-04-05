@@ -266,7 +266,8 @@ READ16_HANDLER( m72_palette1_r )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	return space->machine().generic.paletteram.u16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	m72_state *state = space->machine().driver_data<m72_state>();
+	return state->m_generic_paletteram_16[offset] | 0xffe0;	/* only D0-D4 are connected */
 }
 
 READ16_HANDLER( m72_palette2_r )
@@ -274,7 +275,8 @@ READ16_HANDLER( m72_palette2_r )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	return space->machine().generic.paletteram2.u16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	m72_state *state = space->machine().driver_data<m72_state>();
+	return state->m_generic_paletteram2_16[offset] | 0xffe0;	/* only D0-D4 are connected */
 }
 
 INLINE void changecolor(running_machine &machine,int color,int r,int g,int b)
@@ -287,13 +289,14 @@ WRITE16_HANDLER( m72_palette1_w )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	m72_state *state = space->machine().driver_data<m72_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 	offset &= 0x0ff;
 	changecolor(space->machine(),
 			offset,
-			space->machine().generic.paletteram.u16[offset + 0x000],
-			space->machine().generic.paletteram.u16[offset + 0x200],
-			space->machine().generic.paletteram.u16[offset + 0x400]);
+			state->m_generic_paletteram_16[offset + 0x000],
+			state->m_generic_paletteram_16[offset + 0x200],
+			state->m_generic_paletteram_16[offset + 0x400]);
 }
 
 WRITE16_HANDLER( m72_palette2_w )
@@ -301,13 +304,14 @@ WRITE16_HANDLER( m72_palette2_w )
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	COMBINE_DATA(&space->machine().generic.paletteram2.u16[offset]);
+	m72_state *state = space->machine().driver_data<m72_state>();
+	COMBINE_DATA(&state->m_generic_paletteram2_16[offset]);
 	offset &= 0x0ff;
 	changecolor(space->machine(),
 			offset + 256,
-			space->machine().generic.paletteram2.u16[offset + 0x000],
-			space->machine().generic.paletteram2.u16[offset + 0x200],
-			space->machine().generic.paletteram2.u16[offset + 0x400]);
+			state->m_generic_paletteram2_16[offset + 0x000],
+			state->m_generic_paletteram2_16[offset + 0x200],
+			state->m_generic_paletteram2_16[offset + 0x400]);
 }
 
 WRITE16_HANDLER( m72_videoram1_w )

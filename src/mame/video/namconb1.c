@@ -74,6 +74,7 @@ NB2TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
 
 static void namconb1_install_palette(running_machine &machine)
 {
+	namconb1_state *state = machine.driver_data<namconb1_state>();
 	int pen, page, dword_offset, byte_offset;
 	UINT32 r,g,b;
 	UINT32 *pSource;
@@ -85,7 +86,7 @@ static void namconb1_install_palette(running_machine &machine)
 	pen = 0;
 	for( page=0; page<4; page++ )
 	{
-		pSource = &machine.generic.paletteram.u32[page*0x2000/4];
+		pSource = &state->m_generic_paletteram_32[page*0x2000/4];
 		for( dword_offset=0; dword_offset<0x800/4; dword_offset++ )
 		{
 			r = pSource[dword_offset+0x0000/4];
@@ -136,8 +137,9 @@ SCREEN_UPDATE_IND16( namconb1 )
 	/* compute window for custom screen blanking */
 	rectangle clip;
 	//004a 016a 0021 0101 0144 0020 (nebulas ray)
-	UINT32 xclip = screen.machine().generic.paletteram.u32[0x1800/4];
-	UINT32 yclip = screen.machine().generic.paletteram.u32[0x1804/4];
+	namconb1_state *state = screen.machine().driver_data<namconb1_state>();
+	UINT32 xclip = state->m_generic_paletteram_32[0x1800/4];
+	UINT32 yclip = state->m_generic_paletteram_32[0x1804/4];
 	clip.min_x = (xclip>>16)    - 0x4a;
 	clip.max_x = (xclip&0xffff) - 0x4a - 1;
 	clip.min_y = (yclip>>16)    - 0x21;
@@ -174,8 +176,8 @@ SCREEN_UPDATE_IND16( namconb2 )
 	/* compute window for custom screen blanking */
 	rectangle clip;
 	//004a016a 00210101 01440020
-	UINT32 xclip = screen.machine().generic.paletteram.u32[0x1800/4];
-	UINT32 yclip = screen.machine().generic.paletteram.u32[0x1804/4];
+	UINT32 xclip = state->m_generic_paletteram_32[0x1800/4];
+	UINT32 yclip = state->m_generic_paletteram_32[0x1804/4];
 	clip.min_x = (xclip>>16)    - 0x4b;
 	clip.max_x = (xclip&0xffff) - 0x4b - 1;
 	clip.min_y = (yclip>>16)    - 0x21;

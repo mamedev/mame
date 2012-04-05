@@ -2631,18 +2631,18 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	const game_driver *driver;
 	float width, maxwidth;
 	float x1, y1, x2, y2;
-	char tempbuf[5][256];
+	astring tempbuf[5];
 	rgb_t color;
 	int line;
 
 	/* display the current typeahead */
 	if (search[0] != 0)
-		sprintf(&tempbuf[0][0], "Type name or select: %s_", search);
+		tempbuf[0].printf("Type name or select: %s_", search);
 	else
-		sprintf(&tempbuf[0][0], "Type name or select: (random)");
+		tempbuf[0].printf("Type name or select: (random)");
 
 	/* get the size of the text */
-	ui_draw_text_full(container, &tempbuf[0][0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui_draw_text_full(container, tempbuf[0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 					  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
@@ -2663,7 +2663,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	y2 -= UI_BOX_TB_BORDER;
 
 	/* draw the text within it */
-	ui_draw_text_full(container, &tempbuf[0][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui_draw_text_full(container, tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 					  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	/* determine the text to render below */
@@ -2673,21 +2673,21 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		const char *gfxstat, *soundstat;
 
 		/* first line is game name */
-		sprintf(&tempbuf[0][0], "%-.100s", driver->description);
+		tempbuf[0].printf("%-.100s", driver->description);
 
 		/* next line is year, manufacturer */
-		sprintf(&tempbuf[1][0], "%s, %-.100s", driver->year, driver->manufacturer);
+		tempbuf[1].printf("%s, %-.100s", driver->year, driver->manufacturer);
 
 		/* next line source path */
-		sprintf(&tempbuf[2][0], "Driver: %-.100s", strrchr(driver->source_file, '/')+1);
+		tempbuf[2].printf("Driver: %-.100s", core_filename_extract_base(tempbuf[3], driver->source_file).cstr());
 
 		/* next line is overall driver status */
 		if (driver->flags & GAME_NOT_WORKING)
-			strcpy(&tempbuf[3][0], "Overall: NOT WORKING");
+			tempbuf[3].cpy("Overall: NOT WORKING");
 		else if (driver->flags & GAME_UNEMULATED_PROTECTION)
-			strcpy(&tempbuf[3][0], "Overall: Unemulated Protection");
+			tempbuf[3].cpy("Overall: Unemulated Protection");
 		else
-			strcpy(&tempbuf[3][0], "Overall: Working");
+			tempbuf[3].cpy("Overall: Working");
 
 		/* next line is graphics, sound status */
 		if (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS))
@@ -2702,7 +2702,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		else
 			soundstat = "OK";
 
-		sprintf(&tempbuf[4][0], "Gfx: %s, Sound: %s", gfxstat, soundstat);
+		tempbuf[4].printf("Gfx: %s, Sound: %s", gfxstat, soundstat);
 	}
 	else
 	{
@@ -2711,18 +2711,15 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		int col = 0;
 
 		/* first line is version string */
-		sprintf(&tempbuf[line++][0], "%s %s", emulator_info::get_applongname(), build_version);
+		tempbuf[line++].printf("%s %s", emulator_info::get_applongname(), build_version);
 
 		/* output message */
 		while (line < ARRAY_LENGTH(tempbuf))
 		{
 			if (*s == 0 || *s == '\n')
-			{
-				tempbuf[line++][col] = 0;
 				col = 0;
-			}
 			else
-				tempbuf[line][col++] = *s;
+				tempbuf[line].cat(*s);
 
 			if (*s != 0)
 				s++;
@@ -2733,7 +2730,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	maxwidth = origx2 - origx1;
 	for (line = 0; line < 4; line++)
 	{
-		ui_draw_text_full(container, &tempbuf[line][0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		ui_draw_text_full(container, tempbuf[line], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
@@ -2764,7 +2761,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	/* draw all lines */
 	for (line = 0; line < 4; line++)
 	{
-		ui_draw_text_full(container, &tempbuf[line][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		ui_draw_text_full(container, tempbuf[line], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 		y1 += ui_get_line_height(machine());
 	}

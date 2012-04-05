@@ -1448,7 +1448,7 @@ static void tgp_scan(running_machine &machine)
 VIDEO_START(model1)
 {
 	model1_state *state = machine.driver_data<model1_state>();
-	state->m_paletteram16 = machine.generic.paletteram.u16;
+	state->m_paletteram16 = state->m_generic_paletteram_16;
 
 	state->m_view = auto_alloc_clear(machine, struct view);
 

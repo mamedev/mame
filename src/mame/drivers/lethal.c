@@ -242,7 +242,7 @@ READ8_MEMBER(lethal_state::le_4800_r)
 
 	if (m_cur_control2 & 0x10)	// RAM enable
 	{
-		return machine().generic.paletteram.u8[offset];
+		return m_generic_paletteram_8[offset];
 	}
 	else
 	{
@@ -584,7 +584,7 @@ static MACHINE_START( lethalen )
 	memory_configure_bank(machine, "bank1", 0, 0x20, &ROM[0x10000], 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x3800 + 0x02);
+	state->m_generic_paletteram_8.allocate(0x3800 + 0x02);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("soundcpu");
@@ -596,8 +596,6 @@ static MACHINE_START( lethalen )
 	state->save_item(NAME(state->m_cur_control2));
 	state->save_item(NAME(state->m_sprite_colorbase));
 	state->save_item(NAME(state->m_layer_colorbase));
-
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x3800 + 0x02);
 }
 
 static MACHINE_RESET( lethalen )

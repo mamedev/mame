@@ -68,13 +68,13 @@ WRITE8_MEMBER(vroulet_state::vroulet_paletteram_w)
     */
 
 	int i,j,a,b;
-	machine().generic.paletteram.u8[offset]=data;
+	m_generic_paletteram_8[offset]=data;
 	for(i=0;i<32;i++)
 	{
 		for(j=0;j<16;j++)
 		{
-			a=machine().generic.paletteram.u8[((i*8+j)*2)&0xff ];
-			b=machine().generic.paletteram.u8[((i*8+j)*2+1)&0xff ];
+			a=m_generic_paletteram_8[((i*8+j)*2)&0xff ];
+			b=m_generic_paletteram_8[((i*8+j)*2+1)&0xff ];
 			palette_set_color_rgb(machine(),i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
 		}
 	}
@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( vroulet_map, AS_PROGRAM, 8, vroulet_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_BASE(m_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_BASE(m_colorram)
 	AM_RANGE(0xa000, 0xa001) AM_RAM AM_BASE(m_ball)
-	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(vroulet_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(vroulet_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc000, 0xc000) AM_NOP
 ADDRESS_MAP_END
 

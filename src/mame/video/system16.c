@@ -115,8 +115,8 @@ WRITE16_HANDLER( sys16_paletteram_w )
 	segas1x_bootleg_state *state = space->machine().driver_data<segas1x_bootleg_state>();
 	UINT16 newword;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	newword = space->machine().generic.paletteram.u16[offset];
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	newword = state->m_generic_paletteram_16[offset];
 
 	/*  sBGR BBBB GGGG RRRR */
 	/*  x000 4321 4321 4321 */

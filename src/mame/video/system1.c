@@ -324,7 +324,8 @@ WRITE8_HANDLER( system1_paletteram_w )
       accurate to +/- .003K ohms.
     */
 
-	space->machine().generic.paletteram.u8[offset] = data;
+	system1_state *state = space->machine().driver_data<system1_state>();
+	state->m_generic_paletteram_8[offset] = data;
 
 	if (color_prom != NULL)
 	{

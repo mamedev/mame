@@ -131,8 +131,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, iqblock_state )
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split1_w)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE_LEGACY(paletteram_xBBBBBGGGGGRRRRR_split2_w)
+	AM_RANGE(0x2000, 0x23ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w)
+	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w)
 	AM_RANGE(0x6000, 0x603f) AM_WRITE_LEGACY(iqblock_fgscroll_w)
 	AM_RANGE(0x6800, 0x69ff) AM_WRITE_LEGACY(iqblock_fgvideoram_w)	/* initialized up to 6fff... bug or larger tilemap? */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE_LEGACY(iqblock_bgvideoram_w)
@@ -443,8 +443,8 @@ static DRIVER_INIT( iqblock )
 	}
 
 	/* initialize pointers for I/O mapped RAM */
-	machine.generic.paletteram.u8         = rom + 0x12000;
-	machine.generic.paletteram2.u8       = rom + 0x12800;
+	state->m_generic_paletteram_8.set_target(rom + 0x12000, 0x800);
+	state->m_generic_paletteram2_8.set_target(rom + 0x12800, 0x800);
 	state->m_fgvideoram = rom + 0x16800;
 	state->m_bgvideoram = rom + 0x17000;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe26, 0xfe26, write8_delegate(FUNC(iqblock_state::iqblock_prot_w),state));
@@ -466,8 +466,8 @@ static DRIVER_INIT( grndtour )
 	}
 
 	/* initialize pointers for I/O mapped RAM */
-	machine.generic.paletteram.u8         = rom + 0x12000;
-	machine.generic.paletteram2.u8       = rom + 0x12800;
+	state->m_generic_paletteram_8.set_target(rom + 0x12000, 0x800);
+	state->m_generic_paletteram_8.set_target(rom + 0x12800, 0x800);
 	state->m_fgvideoram = rom + 0x16800;
 	state->m_bgvideoram = rom + 0x17000;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe39, 0xfe39, write8_delegate(FUNC(iqblock_state::grndtour_prot_w),state));

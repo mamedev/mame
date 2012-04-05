@@ -157,6 +157,7 @@ static void set_pens(running_machine &machine)
             00 f0 f0 00 b0 00 f0 f0
 */
 	//const UINT8 *color_prom = machine.region( "proms" )->base();
+	tunhunt_state *state = machine.driver_data<tunhunt_state>();
 	int color;
 	int shade;
 	int i;
@@ -164,7 +165,7 @@ static void set_pens(running_machine &machine)
 
 	for( i=0; i<16; i++ )
 	{
-		color = machine.generic.paletteram.u8[i];
+		color = state->m_generic_paletteram_8[i];
 		shade = 0xf^(color>>4);
 
 		color &= 0xf; /* hue select */

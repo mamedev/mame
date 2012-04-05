@@ -133,7 +133,8 @@ VIDEO_START( spyhunt )
 
 WRITE8_HANDLER( mcr3_paletteram_w )
 {
-	space->machine().generic.paletteram.u8[offset] = data;
+	mcr3_state *state = space->machine().driver_data<mcr3_state>();
+	state->m_generic_paletteram_8[offset] = data;
 	offset &= 0x7f;
 
 	/* high bit of red comes from low bit of address */

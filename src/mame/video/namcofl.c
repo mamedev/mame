@@ -48,6 +48,7 @@ nth_byte32( const UINT32 *pSource, int which )
 
 static void namcofl_install_palette(running_machine &machine)
 {
+	namcofl_state *state = machine.driver_data<namcofl_state>();
 	int pen, page, dword_offset, byte_offset;
 	UINT32 r,g,b;
 	UINT32 *pSource;
@@ -58,7 +59,7 @@ static void namcofl_install_palette(running_machine &machine)
 	pen = 0;
 	for( page=0; page<4; page++ )
 	{
-		pSource = &machine.generic.paletteram.u32[page*0x2000/4];
+		pSource = &state->m_generic_paletteram_32[page*0x2000/4];
 		for( dword_offset=0; dword_offset<0x800/4; dword_offset++ )
 		{
 			r = pSource[dword_offset+0x0000/4];

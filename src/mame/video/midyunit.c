@@ -243,8 +243,8 @@ WRITE16_HANDLER( midyunit_paletteram_w )
 	midyunit_state *state = space->machine().driver_data<midyunit_state>();
 	int newword;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	newword = space->machine().generic.paletteram.u16[offset];
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	newword = state->m_generic_paletteram_16[offset];
 	palette_set_color_rgb(space->machine(), offset & state->m_palette_mask, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 

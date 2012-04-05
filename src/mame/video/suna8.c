@@ -101,12 +101,10 @@ static TILE_GET_INFO( get_tile_info )
 #endif
 
 
-READ8_HANDLER( suna8_banked_paletteram_r )
+READ8_MEMBER( suna8_state::banked_paletteram_r )
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
-
-	offset += state->m_palettebank * 0x200;
-	return space->machine().generic.paletteram.u8[offset];
+	offset += m_palettebank * 0x200;
+	return m_generic_paletteram_8[offset];
 }
 
 READ8_HANDLER( suna8_banked_spriteram_r )
@@ -141,15 +139,14 @@ WRITE8_HANDLER( suna8_banked_spriteram_w )
 /*
     Banked Palette RAM. The data is scrambled
 */
-WRITE8_HANDLER( brickzn_banked_paletteram_w )
+WRITE8_MEMBER( suna8_state::brickzn_banked_paletteram_w )
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 	int r,g,b;
 	UINT16 rgb;
 
-	offset += state->m_palettebank * 0x200;
-	space->machine().generic.paletteram.u8[offset] = data;
-	rgb = (space->machine().generic.paletteram.u8[offset&~1] << 8) + space->machine().generic.paletteram.u8[offset|1];
+	offset += m_palettebank * 0x200;
+	m_generic_paletteram_8[offset] = data;
+	rgb = (m_generic_paletteram_8[offset&~1] << 8) + m_generic_paletteram_8[offset|1];
 	r	=	(((rgb & (1<<0xc))?1:0)<<0) |
 			(((rgb & (1<<0xb))?1:0)<<1) |
 			(((rgb & (1<<0xe))?1:0)<<2) |
@@ -163,7 +160,7 @@ WRITE8_HANDLER( brickzn_banked_paletteram_w )
 			(((rgb & (1<<0x6))?1:0)<<2) |
 			(((rgb & (1<<0x7))?1:0)<<3);
 
-	palette_set_color_rgb(space->machine(),offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
+	palette_set_color_rgb(machine(),offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 
@@ -175,7 +172,7 @@ static void suna8_vh_start_common(running_machine &machine, int dim)
 	state->m_text_dim = dim;
 	if (!(state->m_text_dim > 0))
 	{
-		machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200 * 2);
+		state->m_generic_paletteram_8.allocate(0x200 * 2);
 		state->m_spriteram = auto_alloc_array(machine, UINT8, 0x2000 * 2);
 		state->m_spritebank  = 0;
 		state->m_palettebank = 0;

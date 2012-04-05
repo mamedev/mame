@@ -583,8 +583,8 @@ WRITE8_MEMBER(dec8_state::flip_screen_w){ flip_screen_set(machine(), data); }
 
 static ADDRESS_MAP_START( lastmisn_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_SHARE("paletteram")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_SHARE("paletteram2")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
@@ -609,8 +609,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lastmisn_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
@@ -629,8 +629,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_SHARE("paletteram")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_SHARE("paletteram2")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
@@ -653,8 +653,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shackled_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN0")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN1")
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN2")
@@ -680,8 +680,8 @@ static ADDRESS_MAP_START( gondo_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(dec8_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE_LEGACY(dec8_bg_data_r, dec8_bg_data_w) AM_BASE(m_bg_data)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("paletteram2")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram")	/* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")		/* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")		/* Dip 2 */
@@ -703,8 +703,8 @@ static ADDRESS_MAP_START( garyoret_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE_LEGACY(dec8_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x2000, 0x27ff) AM_READWRITE_LEGACY(dec8_bg_data_r, dec8_bg_data_w) AM_BASE(m_bg_data)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0x2800, 0x2bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("paletteram2")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("DSW1")	/* Dip 2 */
@@ -747,8 +747,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3") AM_SHARE("paletteram")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4") AM_SHARE("paletteram2")
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("IN1")
 	AM_RANGE(0x1801, 0x1801) AM_READ_PORT("IN0")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
@@ -772,8 +772,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_sub_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("share3")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("share4")
 	AM_RANGE(0x1803, 0x1803) AM_READ_PORT("IN2")
 	AM_RANGE(0x1804, 0x1804) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1800, 0x1804) AM_WRITE(shackled_int_w)
@@ -793,7 +793,7 @@ static ADDRESS_MAP_START( oscar_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(dec8_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_8bit_r, deco_bac06_pf_data_8bit_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
-	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3c00, 0x3c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x3c01, 0x3c01) AM_READ_PORT("IN1")
 	AM_RANGE(0x3c02, 0x3c02) AM_READ_PORT("IN2")	/* VBL & coins */
@@ -831,8 +831,8 @@ static ADDRESS_MAP_START( srdarwin_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1805, 0x1806) AM_WRITE_LEGACY(srdarwin_control_w) /* Scroll & Bank */
 	AM_RANGE(0x2000, 0x2000) AM_READWRITE(i8751_h_r, dec8_sound_w)	/* Sound */
 	AM_RANGE(0x2001, 0x2001) AM_READWRITE(i8751_l_r, flip_screen_w)		/* Flipscreen */
-	AM_RANGE(0x2800, 0x288f) AM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3000, 0x308f) AM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0x2800, 0x288f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split1_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3000, 0x308f) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_split2_w) AM_SHARE("paletteram2")
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("DSW0")	/* Dip 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN0")	/* Player 1 */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("IN1")	/* Player 2 (cocktail) + VBL */
@@ -848,7 +848,7 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE_LEGACY(dec8_videoram_w) AM_BASE_SIZE(m_videoram, m_videoram_size)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x3200, 0x37ff) AM_WRITEONLY /* Unused */
 	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")	/* Player 1 */
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1")	/* Player 2 */

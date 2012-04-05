@@ -165,9 +165,9 @@ WRITE8_MEMBER(trvmadns_state::trvmadns_gfxram_w)
 WRITE8_MEMBER(trvmadns_state::trvmadns_palette_w)
 {
 	int r,g,b,datax;
-	machine().generic.paletteram.u8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 	offset>>=1;
-	datax=machine().generic.paletteram.u8[offset*2+1]+256*machine().generic.paletteram.u8[offset*2];
+	datax=m_generic_paletteram_8[offset*2+1]+256*m_generic_paletteram_8[offset*2];
 
 	b = (((datax & 0x0007)>>0) | ((datax & 0x0200)>>6)) ^ 0xf;
 	r = (((datax & 0x0038)>>3) | ((datax & 0x0400)>>7)) ^ 0xf;
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, trvmadns_state )
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(trvmadns_gfxram_w) AM_BASE(m_gfxram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(trvmadns_tileram_w) AM_BASE(m_tileram)
-	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(trvmadns_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc000, 0xc01f) AM_RAM_WRITE(trvmadns_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(w2)//NOP
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(w3)//NOP
 ADDRESS_MAP_END

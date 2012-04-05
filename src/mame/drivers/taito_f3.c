@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( f3_map, AS_PROGRAM, 32, taito_f3_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x300000, 0x30007f) AM_WRITE(f3_sound_bankswitch_w)
 	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x20000) AM_RAM AM_BASE(m_f3_ram)
-	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE_LEGACY(f3_palette_24bit_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x440000, 0x447fff) AM_RAM_WRITE_LEGACY(f3_palette_24bit_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
 	AM_RANGE(0x4c0000, 0x4c0003) AM_WRITE16(f3_unk_w,0xffffffff)
 	AM_RANGE(0x600000, 0x60ffff) AM_READWRITE16_LEGACY(f3_spriteram_r,f3_spriteram_w,0xffffffff) //AM_BASE_SIZE(m_spriteram, m_spriteram_size)

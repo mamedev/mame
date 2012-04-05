@@ -568,15 +568,15 @@ WRITE32_MEMBER(coolridr_state::sysh1_txt_blit_w)
 WRITE32_MEMBER(coolridr_state::sysh1_pal_w)
 {
 	int r,g,b;
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	r = ((machine().generic.paletteram.u32[offset] & 0x00007c00) >> 10);
-	g = ((machine().generic.paletteram.u32[offset] & 0x000003e0) >> 5);
-	b = ((machine().generic.paletteram.u32[offset] & 0x0000001f) >> 0);
+	r = ((m_generic_paletteram_32[offset] & 0x00007c00) >> 10);
+	g = ((m_generic_paletteram_32[offset] & 0x000003e0) >> 5);
+	b = ((m_generic_paletteram_32[offset] & 0x0000001f) >> 0);
 	palette_set_color_rgb(machine(),(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
-	r = ((machine().generic.paletteram.u32[offset] & 0x7c000000) >> 26);
-	g = ((machine().generic.paletteram.u32[offset] & 0x03e00000) >> 21);
-	b = ((machine().generic.paletteram.u32[offset] & 0x001f0000) >> 16);
+	r = ((m_generic_paletteram_32[offset] & 0x7c000000) >> 26);
+	g = ((m_generic_paletteram_32[offset] & 0x03e00000) >> 21);
+	b = ((m_generic_paletteram_32[offset] & 0x001f0000) >> 16);
 	palette_set_color_rgb(machine(),offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
@@ -690,7 +690,7 @@ static ADDRESS_MAP_START( system_h1_map, AS_PROGRAM, 32, coolridr_state )
 	AM_RANGE(0x01000000, 0x01ffffff) AM_ROM AM_REGION("gfx_data",0x0000000)
 
 	AM_RANGE(0x03000000, 0x030fffff) AM_RAM AM_BASE(m_h1_vram)//bg vram
-	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x03c00000, 0x03c0ffff) AM_RAM_WRITE(sysh1_pal_w) AM_SHARE("paletteram")
 	AM_RANGE(0x03d00000, 0x03dfffff) AM_RAM_WRITE(sysh1_char_w) AM_BASE(m_h1_charram) //FIXME: half size
 	AM_RANGE(0x03e00000, 0x03efffff) AM_RAM_WRITE(sysh1_dma_w) AM_BASE(m_framebuffer_vram) //FIXME: not all of it
 

@@ -136,7 +136,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 INLINE void changecolor_RRRRGGGGBBBBxxxx( running_machine &machine, int color, int indx )
 {
-	int data = machine.generic.paletteram.u8[2 * indx | 1] | (machine.generic.paletteram.u8[2 * indx] << 8);
+	citycon_state *state = machine.driver_data<citycon_state>();
+	int data = state->m_generic_paletteram_8[2 * indx | 1] | (state->m_generic_paletteram_8[2 * indx] << 8);
 	palette_set_color_rgb(machine, color, pal4bit(data >> 12), pal4bit(data >> 8), pal4bit(data >> 4));
 }
 

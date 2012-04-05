@@ -300,9 +300,10 @@ WRITE16_HANDLER( bigtwin_paletteram_w )
 {
 	int r, g, b, val;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	playmark_state *state = space->machine().driver_data<playmark_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
-	val = space->machine().generic.paletteram.u16[offset];
+	val = state->m_generic_paletteram_16[offset];
 	r = (val >> 11) & 0x1e;
 	g = (val >>  7) & 0x1e;
 	b = (val >>  3) & 0x1e;

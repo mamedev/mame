@@ -129,13 +129,13 @@ WRITE16_HANDLER( m92_videocontrol_w )
 READ16_HANDLER( m92_paletteram_r )
 {
 	m92_state *state = space->machine().driver_data<m92_state>();
-	return space->machine().generic.paletteram.u16[offset + 0x400 * state->m_palette_bank];
+	return state->m_generic_paletteram_16[offset + 0x400 * state->m_palette_bank];
 }
 
 WRITE16_HANDLER( m92_paletteram_w )
 {
 	m92_state *state = space->machine().driver_data<m92_state>();
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset + 0x400 * state->m_palette_bank, data, mem_mask);
+	state->paletteram16_xBBBBBGGGGGRRRRR_word_w(*space, offset + 0x400 * state->m_palette_bank, data, mem_mask);
 }
 
 /*****************************************************************************/
@@ -287,7 +287,7 @@ VIDEO_START( m92 )
 		state_save_register_item_array(machine, "layer", NULL, laynum, layer->control);
 	}
 
-	machine.generic.paletteram.u16 = auto_alloc_array(machine, UINT16, 0x1000/2);
+	state->m_generic_paletteram_16.allocate(0x1000/2);
 
 	memset(state->m_spriteram->live(),0,0x800);
 	memset(state->m_spriteram->buffer(),0,0x800);
@@ -298,8 +298,6 @@ VIDEO_START( m92 )
 	state->save_item(NAME(state->m_raster_irq_position));
 	state->save_item(NAME(state->m_sprite_buffer_busy));
 	state->save_item(NAME(state->m_palette_bank));
-
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u16, 0x1000/2);
 }
 
 VIDEO_START( ppan )

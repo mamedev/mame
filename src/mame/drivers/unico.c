@@ -74,7 +74,7 @@ static ADDRESS_MAP_START( burglarx_map, AS_PROGRAM, 16, unico_state )
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE_LEGACY(unico_vram_w) AM_BASE(m_vram)		// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM														// ? 0
 	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE_LEGACY(unico_palette_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE_LEGACY(unico_palette_w) AM_SHARE("paletteram")	// Palette
 ADDRESS_MAP_END
 
 
@@ -162,7 +162,7 @@ static ADDRESS_MAP_START( zeropnt_map, AS_PROGRAM, 16, unico_state )
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE_LEGACY(unico_vram_w) AM_BASE(m_vram)	// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM	// ? 0
 	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE_LEGACY(unico_palette_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE_LEGACY(unico_palette_w) AM_SHARE("paletteram")	// Palette
 ADDRESS_MAP_END
 
 
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( zeropnt2_map, AS_PROGRAM, 32, unico_state )
 	AM_RANGE(0x904000, 0x90ffff) AM_RAM_WRITE_LEGACY(unico_vram32_w) AM_BASE(m_vram32)	// Layers 1, 2, 0
 	AM_RANGE(0x920000, 0x923fff) AM_RAM											// ? 0
 	AM_RANGE(0x930000, 0x9307ff) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE_LEGACY(unico_palette32_w) AM_BASE_GENERIC(paletteram )	// Palette
+	AM_RANGE(0x940000, 0x947fff) AM_RAM_WRITE_LEGACY(unico_palette32_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM											// RAM
 ADDRESS_MAP_END
 

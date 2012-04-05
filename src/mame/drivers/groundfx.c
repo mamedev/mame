@@ -81,10 +81,10 @@ Extract a standard version of this
 WRITE32_MEMBER(groundfx_state::color_ram_w)
 {
 	int a,r,g,b;
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
 	{
-		a = machine().generic.paletteram.u32[offset];
+		a = m_generic_paletteram_32[offset];
 		r = (a &0xff0000) >> 16;
 		g = (a &0xff00) >> 8;
 		b = (a &0xff);
@@ -227,7 +227,7 @@ static ADDRESS_MAP_START( groundfx_map, AS_PROGRAM, 32, groundfx_state )
 	AM_RANGE(0x830000, 0x83002f) AM_DEVREADWRITE_LEGACY("tc0480scp", tc0480scp_ctrl_long_r, tc0480scp_ctrl_long_w)	// debugging
 	AM_RANGE(0x900000, 0x90ffff) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_long_r, tc0100scn_long_w)	/* piv tilemaps */
 	AM_RANGE(0x920000, 0x92000f) AM_DEVREADWRITE_LEGACY("tc0100scn", tc0100scn_ctrl_long_r, tc0100scn_ctrl_long_w)
-	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_BASE_GENERIC(paletteram) /* palette ram */
+	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM_WRITE(color_ram_w) AM_SHARE("paletteram") /* palette ram */
 	AM_RANGE(0xb00000, 0xb003ff) AM_RAM						// ?? single bytes, blending ??
 	AM_RANGE(0xc00000, 0xc00007) AM_READNOP /* Network? */
 	AM_RANGE(0xd00000, 0xd00003) AM_WRITE(rotate_control_w)	/* perhaps port based rotate control? */

@@ -761,7 +761,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tnzs_state )
 	/* arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM */
 	/* drtoppel writes here anyway! (maybe leftover from tests during development) */
 	/* so the handler is patched out in init_drtopple() */
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu0_type2, AS_PROGRAM, 8, tnzs_state )
@@ -824,7 +824,7 @@ static ADDRESS_MAP_START( tnzsb_cpu1_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf003) AM_READONLY
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kabukiz_cpu1_map, AS_PROGRAM, 8, tnzs_state )
@@ -839,7 +839,7 @@ static ADDRESS_MAP_START( kabukiz_cpu1_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE_LEGACY(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xfbff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnzsb_cpu2_map, AS_PROGRAM, 8, tnzs_state )
@@ -871,11 +871,11 @@ WRITE8_MEMBER(tnzs_state::jpopnics_palette_w)
 {
 	int r, g, b;
 	UINT16 paldata;
-	machine().generic.paletteram.u8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 
 	offset = offset >> 1;
 
-	paldata = (machine().generic.paletteram.u8[offset * 2] << 8) | machine().generic.paletteram.u8[(offset * 2 + 1)];
+	paldata = (m_generic_paletteram_8[offset * 2] << 8) | m_generic_paletteram_8[(offset * 2 + 1)];
 
 	g = (paldata >> 12) & 0x000f;
 	r = (paldata >> 4) & 0x000f;
@@ -897,7 +897,7 @@ static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE_LEGACY(tnzs_bankswitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(tnzs_state::jpopnics_subbankswitch_w)

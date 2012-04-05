@@ -20,15 +20,15 @@ WRITE8_HANDLER( gottlieb_paletteram_w )
 	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	int r, g, b, a, val;
 
-	space->machine().generic.paletteram.u8[offset] = data;
+	state->m_generic_paletteram_8[offset] = data;
 
 	/* blue & green are encoded in the even bytes */
-	val = space->machine().generic.paletteram.u8[offset & ~1];
+	val = state->m_generic_paletteram_8[offset & ~1];
 	g = combine_4_weights(state->m_weights, (val >> 4) & 1, (val >> 5) & 1, (val >> 6) & 1, (val >> 7) & 1);
 	b = combine_4_weights(state->m_weights, (val >> 0) & 1, (val >> 1) & 1, (val >> 2) & 1, (val >> 3) & 1);
 
 	/* red is encoded in the odd bytes */
-	val = space->machine().generic.paletteram.u8[offset | 1];
+	val = state->m_generic_paletteram_8[offset | 1];
 	r = combine_4_weights(state->m_weights, (val >> 0) & 1, (val >> 1) & 1, (val >> 2) & 1, (val >> 3) & 1);
 
 	/* alpha is set to 0 if laserdisc video is enabled */
@@ -88,7 +88,7 @@ WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 
 	/* configure the palette if the laserdisc is enabled */
 	state->m_transparent0 = (data >> 3) & 1;
-	gottlieb_paletteram_w(space, 0, space->machine().generic.paletteram.u8[0]);
+	gottlieb_paletteram_w(space, 0, state->m_generic_paletteram_8[0]);
 }
 
 

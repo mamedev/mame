@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( pirates_map, AS_PROGRAM, 16, pirates_state )
 //  AM_RANGE(0x500800, 0x50080f) AM_WRITENOP
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(pirates_out_w)
 	AM_RANGE(0x700000, 0x700001) AM_WRITEONLY AM_BASE(m_scroll)	// scroll reg
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x900000, 0x90017f) AM_RAM  // more of tilemaps ?
 	AM_RANGE(0x900180, 0x90137f) AM_RAM_WRITE_LEGACY(pirates_tx_tileram_w) AM_BASE(m_tx_tileram)
 	AM_RANGE(0x901380, 0x902a7f) AM_RAM_WRITE_LEGACY(pirates_fg_tileram_w) AM_BASE(m_fg_tileram)

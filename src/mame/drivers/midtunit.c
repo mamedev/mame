@@ -46,7 +46,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midtunit_state )
 	AM_RANGE(0x01400000, 0x0141ffff) AM_READWRITE_LEGACY(midtunit_cmos_r, midtunit_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x01480000, 0x014fffff) AM_WRITE_LEGACY(midtunit_cmos_enable_w)
 	AM_RANGE(0x01600000, 0x0160003f) AM_READ_LEGACY(midtunit_input_r)
-	AM_RANGE(0x01800000, 0x0187ffff) AM_RAM_WRITE_LEGACY(midtunit_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x01800000, 0x0187ffff) AM_RAM_WRITE_LEGACY(midtunit_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x01a80000, 0x01a800ff) AM_READWRITE_LEGACY(midtunit_dma_r, midtunit_dma_w)
 	AM_RANGE(0x01b00000, 0x01b0001f) AM_WRITE_LEGACY(midtunit_control_w)
 /*  AM_RANGE(0x01c00060, 0x01c0007f) AM_WRITE_LEGACY(midtunit_cmos_enable_w) */

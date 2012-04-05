@@ -104,7 +104,7 @@ static PALETTE_INIT( cubeqst )
 WRITE16_MEMBER(cubeqst_state::palette_w)
 {
 	machine().primary_screen->update_now();
-	COMBINE_DATA(&machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 }
 
 /* TODO: This is a simplified version of what actually happens */
@@ -168,7 +168,7 @@ static SCREEN_UPDATE_RGB32( cubeqst )
 				}
 
 				/* Draw the span, testing for depth */
-				pen = state->m_colormap[screen.machine().generic.paletteram.u16[color]];
+				pen = state->m_colormap[state->m_generic_paletteram_16[color]];
 				for (x = h1; x <= h2; ++x)
 				{
 					if (!(state->m_depth_buffer[x] < depth))
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( m68k_program_map, AS_PROGRAM, 16, cubeqst_state )
 	AM_RANGE(0x038002, 0x038003) AM_READWRITE(chop_r, ldaud_w)
 	AM_RANGE(0x038008, 0x038009) AM_READWRITE(line_r, reset_w)
 	AM_RANGE(0x03800e, 0x03800f) AM_READWRITE(laserdisc_r, laserdisc_w)
-	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM_WRITE(palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM_WRITE(palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x03cc00, 0x03cc01) AM_WRITE(control_w)
 	AM_RANGE(0x03e000, 0x03efff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x03f000, 0x03ffff) AM_RAM

@@ -213,8 +213,9 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 
 	int newword, inten, red, green, blue;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	newword = space->machine().generic.paletteram.u16[offset];
+	atarisy2_state *state = space->machine().driver_data<atarisy2_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	newword = state->m_generic_paletteram_16[offset];
 
 	inten = intensity_table[newword & 15];
 	red = (color_table[(newword >> 12) & 15] * inten) >> 4;

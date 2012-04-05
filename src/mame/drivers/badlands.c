@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, badlands_state )
 	AM_RANGE(0xfea000, 0xfebfff) AM_READ_LEGACY(atarigen_sound_upper_r)
 	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE_LEGACY(badlands_pf_bank_w)
 	AM_RANGE(0xfee000, 0xfeffff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
-	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE_LEGACY(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE_LEGACY(atarigen_expanded_666_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE(m_playfield)
 	AM_RANGE(0xfff000, 0xfff1ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_expanded_w)
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM
@@ -658,7 +658,7 @@ static ADDRESS_MAP_START( bootleg_map, AS_PROGRAM, 16, badlands_state )
 
 	AM_RANGE(0xfec000, 0xfedfff) AM_WRITE_LEGACY(badlands_pf_bank_w)
 	AM_RANGE(0xfee000, 0xfeffff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
-	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE_LEGACY(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE_LEGACY(atarigen_expanded_666_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_BASE(m_playfield)
 	AM_RANGE(0xfff000, 0xfff1ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_expanded_w)
 	AM_RANGE(0xfff200, 0xffffff) AM_RAM

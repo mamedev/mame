@@ -154,8 +154,7 @@ VIDEO_START( williams2 )
 	blitter_init(machine, state->m_blitter_config, NULL);
 
 	/* allocate paletteram */
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x400 * 2);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x400 * 2);
+	state->m_generic_paletteram_8.allocate(0x400 * 2);
 
 	/* create the tilemap */
 	state->m_bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_cols,  24,16, 128,16);
@@ -180,7 +179,7 @@ SCREEN_UPDATE_RGB32( williams )
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = state->m_palette_lookup[screen.machine().generic.paletteram.u8[x]];
+		pens[x] = state->m_palette_lookup[state->m_generic_paletteram_8[x]];
 
 	/* loop over rows */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -208,7 +207,7 @@ SCREEN_UPDATE_RGB32( blaster )
 
 	/* precompute the palette */
 	for (x = 0; x < 16; x++)
-		pens[x] = state->m_palette_lookup[screen.machine().generic.paletteram.u8[x]];
+		pens[x] = state->m_palette_lookup[state->m_generic_paletteram_8[x]];
 
 	/* if we're blitting from the top, start with a 0 for color 0 */
 	if (cliprect.min_y == screen.visible_area().min_y || !(state->m_blaster_video_control & 1))
@@ -323,11 +322,12 @@ WRITE8_HANDLER( williams2_paletteram_w )
 	UINT8 entry_lo, entry_hi, i, r, g, b;
 
 	/* set the new value */
-	space->machine().generic.paletteram.u8[offset] = data;
+	williams_state *state = space->machine().driver_data<williams_state>();
+	state->m_generic_paletteram_8[offset] = data;
 
 	/* pull the associated low/high bytes */
-	entry_lo = space->machine().generic.paletteram.u8[offset & ~1];
-	entry_hi = space->machine().generic.paletteram.u8[offset |  1];
+	entry_lo = state->m_generic_paletteram_8[offset & ~1];
+	entry_hi = state->m_generic_paletteram_8[offset |  1];
 
 	/* update the palette entry */
 	i = ztable[(entry_hi >> 4) & 15];

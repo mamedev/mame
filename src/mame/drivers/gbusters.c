@@ -31,7 +31,7 @@ READ8_MEMBER(gbusters_state::bankedram_r)
 {
 
 	if (m_palette_selected)
-		return machine().generic.paletteram.u8[offset];
+		return m_generic_paletteram_8[offset];
 	else
 		return m_ram[offset];
 }
@@ -273,7 +273,7 @@ static MACHINE_START( gbusters )
 	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x2000);
 	memory_set_bank(machine, "bank1", 0);
 
-	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800);
+	state->m_generic_paletteram_8.allocate(0x800);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -283,7 +283,6 @@ static MACHINE_START( gbusters )
 
 	state->save_item(NAME(state->m_palette_selected));
 	state->save_item(NAME(state->m_priority));
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x800);
 }
 
 static MACHINE_RESET( gbusters )

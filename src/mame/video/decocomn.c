@@ -47,12 +47,13 @@ WRITE16_DEVICE_HANDLER( decocomn_nonbuffered_palette_w )
 {
 	int r,g,b;
 
-	COMBINE_DATA(&device->machine().generic.paletteram.u16[offset]);
+	driver_device *state = device->machine().driver_data();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 	if (offset&1) offset--;
 
-	b = (device->machine().generic.paletteram.u16[offset] >> 0) & 0xff;
-	g = (device->machine().generic.paletteram.u16[offset + 1] >> 8) & 0xff;
-	r = (device->machine().generic.paletteram.u16[offset + 1] >> 0) & 0xff;
+	b = (state->m_generic_paletteram_16[offset] >> 0) & 0xff;
+	g = (state->m_generic_paletteram_16[offset + 1] >> 8) & 0xff;
+	r = (state->m_generic_paletteram_16[offset + 1] >> 0) & 0xff;
 
 	palette_set_color(device->machine(), offset / 2, MAKE_RGB(r,g,b));
 }
@@ -61,7 +62,8 @@ WRITE16_DEVICE_HANDLER( decocomn_buffered_palette_w )
 {
 	decocomn_state *decocomn = get_safe_token(device);
 
-	COMBINE_DATA(&device->machine().generic.paletteram.u16[offset]);
+	driver_device *state = device->machine().driver_data();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
 	decocomn->dirty_palette[offset / 2] = 1;
 }
@@ -69,6 +71,7 @@ WRITE16_DEVICE_HANDLER( decocomn_buffered_palette_w )
 WRITE16_DEVICE_HANDLER( decocomn_palette_dma_w )
 {
 	decocomn_state *decocomn = get_safe_token(device);
+	driver_device *state = device->machine().driver_data();
 	const int m = device->machine().total_colors();
 	int r, g, b, i;
 
@@ -78,9 +81,9 @@ WRITE16_DEVICE_HANDLER( decocomn_palette_dma_w )
 		{
 			decocomn->dirty_palette[i] = 0;
 
-			b = (device->machine().generic.paletteram.u16[i * 2] >> 0) & 0xff;
-			g = (device->machine().generic.paletteram.u16[i * 2 + 1] >> 8) & 0xff;
-			r = (device->machine().generic.paletteram.u16[i * 2 + 1] >> 0) & 0xff;
+			b = (state->m_generic_paletteram_16[i * 2] >> 0) & 0xff;
+			g = (state->m_generic_paletteram_16[i * 2 + 1] >> 8) & 0xff;
+			r = (state->m_generic_paletteram_16[i * 2 + 1] >> 0) & 0xff;
 
 			palette_set_color(device->machine(), i, MAKE_RGB(r,g,b));
 		}

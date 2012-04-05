@@ -42,10 +42,11 @@ WRITE8_HANDLER( battlera_palette_w )
 {
 	int pal_word;
 
-	space->machine().generic.paletteram.u8[offset]=data;
+	battlera_state *state = space->machine().driver_data<battlera_state>();
+	state->m_generic_paletteram_8[offset]=data;
 	if (offset%2) offset-=1;
 
-	pal_word=space->machine().generic.paletteram.u8[offset] | (space->machine().generic.paletteram.u8[offset+1]<<8);
+	pal_word=state->m_generic_paletteram_8[offset] | (state->m_generic_paletteram_8[offset+1]<<8);
 	palette_set_color_rgb(space->machine(), offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
 }
 

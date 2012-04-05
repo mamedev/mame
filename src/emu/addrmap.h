@@ -117,8 +117,6 @@ public:
 	void set_sizeptr(size_t *_sizeptr) { m_sizeptr = _sizeptr; }
 	void set_member_baseptr(FPTR offs) { m_baseptroffs_plus1 = offs + 1; }
 	void set_member_sizeptr(FPTR offs) { m_sizeptroffs_plus1 = offs + 1; }
-	void set_generic_baseptr(FPTR offs) { m_genbaseptroffs_plus1 = offs + 1; }
-	void set_generic_sizeptr(FPTR offs) { m_gensizeptroffs_plus1 = offs + 1; }
 
 	// mask setting
 	void set_mask(offs_t _mask);
@@ -153,8 +151,6 @@ public:
 	size_t *				m_sizeptr;				// receives size of area in bytes (optional)
 	UINT32					m_baseptroffs_plus1;	// offset of base pointer within driver_data, plus 1
 	UINT32					m_sizeptroffs_plus1;	// offset of size pointer within driver_data, plus 1
-	UINT32					m_genbaseptroffs_plus1;	// offset of base pointer within generic_pointers, plus 1
-	UINT32					m_gensizeptroffs_plus1;	// offset of size pointer within generic_pointers, plus 1
 	const char *			m_region;				// tag of region containing the memory backing this entry
 	offs_t					m_rgnoffs;				// offset within the region
 
@@ -761,17 +757,11 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_BASE(_member) \
 	curentry->set_member_baseptr(myoffsetof(drivdata_class, _member)); \
 
-#define AM_BASE_GENERIC(_member) \
-	curentry->set_generic_baseptr(myoffsetof(generic_pointers, _member)); \
-
 #define AM_SIZE_LEGACY(_size) \
 	curentry->set_sizeptr(_size); \
 
 #define AM_SIZE(_member) \
 	curentry->set_member_sizeptr(myoffsetof(drivdata_class, _member)); \
-
-#define AM_SIZE_GENERIC(_member) \
-	curentry->set_generic_sizeptr(myoffsetof(generic_pointers, _member##_size)); \
 
 
 // common shortcuts
@@ -788,7 +778,6 @@ void _class :: _name(address_map &map, const device_t &device) \
 #define AM_RAM_DEVWRITE_LEGACY(_tag, _write) AM_READONLY AM_DEVWRITE_LEGACY(_tag, _write)
 	
 #define AM_BASE_SIZE(_base, _size)			AM_BASE(_base) AM_SIZE(_size)
-#define AM_BASE_SIZE_GENERIC(_member)		AM_BASE_GENERIC(_member) AM_SIZE_GENERIC(_member)
 
 
 

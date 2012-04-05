@@ -2562,7 +2562,7 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32, namcos22_state )
 	AM_RANGE(0x810200, 0x8103ff) AM_READWRITE_LEGACY(namcos22s_czram_r, namcos22s_czram_w)
 	AM_RANGE(0x820000, 0x8202ff) AM_WRITENOP /* leftover of old (non-super) video mixer device */
 	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE_LEGACY(namcos22_gamma_r, namcos22_gamma_w) AM_BASE(m_gamma)
-	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE_LEGACY(namcos22_paletteram_r, namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE_LEGACY(namcos22_paletteram_r, namcos22_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x860000, 0x860007) AM_READWRITE_LEGACY(namcos22s_spotram_r, namcos22s_spotram_w)
 	AM_RANGE(0x880000, 0x89dfff) AM_READWRITE_LEGACY(namcos22_cgram_r, namcos22_cgram_w) AM_BASE(m_cgram)
 	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE_LEGACY(namcos22_textram_r, namcos22_textram_w) AM_BASE(m_textram)
@@ -3204,7 +3204,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
      * Mounted position: VIDEO 6B, 7B, 8B (near C305)
      * Note: 0xff00-0xffff are for Tilemap (16 x 16)
      */
-	AM_RANGE(0x90028000, 0x9003ffff) AM_READWRITE_LEGACY(namcos22_paletteram_r, namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x90028000, 0x9003ffff) AM_READWRITE_LEGACY(namcos22_paletteram_r, namcos22_paletteram_w) AM_SHARE("paletteram")
 
 	/**
      * unknown (option)

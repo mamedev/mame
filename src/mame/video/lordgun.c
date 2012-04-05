@@ -48,7 +48,8 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 // xxxxBBBBGGGGRRRR, but repeat ecah color for each priority code (since we stuff it in the high bits of the pen)
 WRITE16_HANDLER( lordgun_paletteram_w )
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	lordgun_state *state = space->machine().driver_data<lordgun_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 	for (int pri = 0; pri < 8; pri++)
 		palette_set_color_rgb(space->machine(), offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 }

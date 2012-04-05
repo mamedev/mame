@@ -123,7 +123,7 @@ WRITE8_MEMBER(senjyo_state::senjyo_paletteram_w)
 	int gg = g|((g!=0)?i:0);
 	int bb = b|((b!=0)?i:0);
 
-	machine().generic.paletteram.u8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 	palette_set_color_rgb(machine(), offset, pal4bit(rr), pal4bit(gg), pal4bit(bb) );
 }
 
@@ -133,7 +133,7 @@ static ADDRESS_MAP_START( senjyo_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(senjyo_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(senjyo_fgcolorram_w) AM_BASE(m_fgcolorram)
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(senjyo_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(senjyo_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9e00, 0x9e1f) AM_RAM AM_BASE(m_fgscroll)
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_BASE(m_scrolly3)
 /*  AM_RANGE(0x9e22, 0x9e23) height of the layer (Senjyo only, fixed at 0x380) */
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( starforb_map, AS_PROGRAM, 8, senjyo_state )
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE_LEGACY(senjyo_fgvideoram_w) AM_BASE(m_fgvideoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE_LEGACY(senjyo_fgcolorram_w) AM_BASE(m_fgcolorram)
 	AM_RANGE(0x9800, 0x987f) AM_RAM AM_BASE_SIZE(m_spriteram, m_spriteram_size)
-	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(senjyo_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x9c00, 0x9dff) AM_RAM_WRITE(senjyo_paletteram_w) AM_SHARE("paletteram")
 	/* The format / use of the ram here is different on the bootleg */
 	AM_RANGE(0x9e20, 0x9e21) AM_RAM AM_BASE(m_scrolly3)
 	AM_RANGE(0x9e25, 0x9e25) AM_RAM AM_BASE(m_scrollx3)

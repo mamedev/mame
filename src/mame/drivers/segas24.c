@@ -1087,14 +1087,14 @@ WRITE16_MEMBER( segas24_state::sys16_io_w )
 
 READ16_MEMBER( segas24_state::sys16_paletteram_r )
 {
-	return machine().generic.paletteram.u16[offset];
+	return m_generic_paletteram_16[offset];
 }
 
 WRITE16_MEMBER( segas24_state::sys16_paletteram_w )
 {
 	int r, g, b;
-	COMBINE_DATA (machine().generic.paletteram.u16 + offset);
-	data = machine().generic.paletteram.u16[offset];
+	COMBINE_DATA (m_generic_paletteram_16 + offset);
+	data = m_generic_paletteram_16[offset];
 
 	r = (data & 0x00f) << 4;
 	if(data & 0x1000)
@@ -1186,7 +1186,7 @@ static ADDRESS_MAP_START( system24_cpu1_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Frame trigger position (XVOUT) */
 	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Synchronization mode */
 	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer, read, write)
 	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_DEVREADWRITE("sprite", segas24_sprite, read, write)
 	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(sys16_io_r, sys16_io_w)
@@ -1227,7 +1227,7 @@ static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Frame trigger position (XVOUT) */
 	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Synchronization mode */
 	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer, read, write)
 	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_DEVREADWRITE("sprite", segas24_sprite, read, write)
 	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(sys16_io_r, sys16_io_w)

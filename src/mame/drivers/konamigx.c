@@ -1188,7 +1188,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type1_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xd4a000, 0xd4a01f) AM_READ(gx6bppspr_r)	// sprite ROM readback
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0xdc0000, 0xdc1fff) AM_RAM			// LAN RAM? (Racin' Force has, Open Golf doesn't)
 	AM_RANGE(0xdd0000, 0xdd00ff) AM_READNOP AM_WRITENOP	// LAN board
 	AM_RANGE(0xdda000, 0xddafff) AM_WRITE_PORT("ADC-WRPORT")
@@ -1208,7 +1208,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gx_type2_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xcc0000, 0xcc0003) AM_WRITE(esc_w)
-	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd90000, 0xd97fff) AM_RAM_WRITE_LEGACY(konamigx_palette_w) AM_SHARE("paletteram")
 	AM_IMPORT_FROM(gx_base_memmap)
 ADDRESS_MAP_END
 
@@ -1219,7 +1219,7 @@ static ADDRESS_MAP_START( gx_type3_map, AS_PROGRAM, 32, konamigx_state )
 	//AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITE_LEGACY(konamigx_type3_psac2_bank_w) AM_BASE_LEGACY(&konamigx_type3_psac2_bank)
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)
-	AM_RANGE(0xe80000, 0xe83fff) AM_RAM AM_BASE_GENERIC(paletteram) 	// main monitor palette
+	AM_RANGE(0xe80000, 0xe83fff) AM_RAM AM_SHARE("paletteram") 	// main monitor palette
 	AM_RANGE(0xea0000, 0xea3fff) AM_RAM AM_BASE_LEGACY(&gx_subpaletteram32)
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)
 	//AM_RANGE(0xf00000, 0xf07fff) AM_RAM
@@ -1233,7 +1233,7 @@ static ADDRESS_MAP_START( gx_type4_map, AS_PROGRAM, 32, konamigx_state )
 	AM_RANGE(0xe20000, 0xe20003) AM_WRITENOP
 	AM_RANGE(0xe40000, 0xe40003) AM_WRITENOP
 	AM_RANGE(0xe60000, 0xe60fff) AM_RAM AM_BASE_LEGACY((UINT32**)&K053936_0_linectrl)  // 29C & 29G (PSAC2 line control)
-	AM_RANGE(0xe80000, 0xe87fff) AM_RAM AM_BASE_GENERIC(paletteram) // 11G/13G/15G (main screen palette RAM)
+	AM_RANGE(0xe80000, 0xe87fff) AM_RAM AM_SHARE("paletteram") // 11G/13G/15G (main screen palette RAM)
 	AM_RANGE(0xea0000, 0xea7fff) AM_RAM AM_BASE_LEGACY(&gx_subpaletteram32) // 5G/7G/9G (sub screen palette RAM)
 	AM_RANGE(0xec0000, 0xec0003) AM_READ(type3_sync_r)		// type 4 polls this too
 	AM_RANGE(0xf00000, 0xf07fff) AM_RAM_WRITE_LEGACY(konamigx_t4_psacmap_w) AM_BASE_LEGACY(&gx_psacram)	// PSAC2 tilemap

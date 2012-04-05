@@ -82,8 +82,8 @@ WRITE16_HANDLER( foodf_paletteram_w )
 	foodf_state *state = space->machine().driver_data<foodf_state>();
 	int newword, r, g, b, bit0, bit1, bit2;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	newword = space->machine().generic.paletteram.u16[offset];
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	newword = state->m_generic_paletteram_16[offset];
 
 	/* only the bottom 8 bits are used */
 	/* red component */

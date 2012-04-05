@@ -255,11 +255,11 @@ WRITE8_MEMBER(skylncr_state::skylncr_paletteram_w)
 	else
 	{
 		int r,g,b;
-		machine().generic.paletteram.u8[m_color] = data;
+		m_generic_paletteram_8[m_color] = data;
 
-		r = machine().generic.paletteram.u8[(m_color/3 * 3) + 0];
-		g = machine().generic.paletteram.u8[(m_color/3 * 3) + 1];
-		b = machine().generic.paletteram.u8[(m_color/3 * 3) + 2];
+		r = m_generic_paletteram_8[(m_color/3 * 3) + 0];
+		g = m_generic_paletteram_8[(m_color/3 * 3) + 1];
+		b = m_generic_paletteram_8[(m_color/3 * 3) + 2];
 		r = (r << 2) | (r >> 4);
 		g = (g << 2) | (g >> 4);
 		b = (b << 2) | (b >> 4);
@@ -279,11 +279,11 @@ WRITE8_MEMBER(skylncr_state::skylncr_paletteram2_w)
 	else
 	{
 		int r,g,b;
-		machine().generic.paletteram2.u8[m_color2] = data;
+		m_generic_paletteram2_8[m_color2] = data;
 
-		r = machine().generic.paletteram2.u8[(m_color2/3 * 3) + 0];
-		g = machine().generic.paletteram2.u8[(m_color2/3 * 3) + 1];
-		b = machine().generic.paletteram2.u8[(m_color2/3 * 3) + 2];
+		r = m_generic_paletteram2_8[(m_color2/3 * 3) + 0];
+		g = m_generic_paletteram2_8[(m_color2/3 * 3) + 1];
+		b = m_generic_paletteram2_8[(m_color2/3 * 3) + 2];
 		r = (r << 2) | (r >> 4);
 		g = (g << 2) | (g >> 4);
 		b = (b << 2) | (b >> 4);
@@ -858,8 +858,9 @@ ROM_END
 
 static DRIVER_INIT( skylncr )
 {
-	machine.generic.paletteram.u8   = auto_alloc_array(machine, UINT8, 0x100 * 3);
-	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x100 * 3);
+	skylncr_state *state = machine.driver_data<skylncr_state>();
+	state->m_generic_paletteram_8.allocate(0x100 * 3);
+	state->m_generic_paletteram2_8.allocate(0x100 * 3);
 }
 
 

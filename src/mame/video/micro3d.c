@@ -111,8 +111,9 @@ WRITE16_HANDLER( micro3d_clut_w )
 {
 	UINT16 word;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	word = space->machine().generic.paletteram.u16[offset];
+	micro3d_state *state = space->machine().driver_data<micro3d_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	word = state->m_generic_paletteram_16[offset];
 	palette_set_color_rgb(space->machine(), offset, pal5bit(word >> 6), pal5bit(word >> 1), pal5bit(word >> 11));
 }
 

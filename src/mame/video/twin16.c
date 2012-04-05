@@ -49,10 +49,11 @@ WRITE16_HANDLER( twin16_text_ram_w )
 
 WRITE16_HANDLER( twin16_paletteram_word_w )
 {	// identical to tmnt_paletteram_w
-	COMBINE_DATA(space->machine().generic.paletteram.u16 + offset);
+	twin16_state *state = space->machine().driver_data<twin16_state>();
+	COMBINE_DATA(state->m_generic_paletteram_16 + offset);
 	offset &= ~1;
 
-	data = ((space->machine().generic.paletteram.u16[offset] & 0xff) << 8) | (space->machine().generic.paletteram.u16[offset + 1] & 0xff);
+	data = ((state->m_generic_paletteram_16[offset] & 0xff) << 8) | (state->m_generic_paletteram_16[offset + 1] & 0xff);
 	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(data >> 0), pal5bit(data >> 5), pal5bit(data >> 10));
 }
 

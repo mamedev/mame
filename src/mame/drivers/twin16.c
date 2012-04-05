@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 //  AM_RANGE(0x044000, 0x04ffff) AM_NOP             // miaj
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(twin16_paletteram_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(twin16_paletteram_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x081000, 0x081fff) AM_WRITENOP
 	AM_RANGE(0x0a0000, 0x0a001b) AM_READ(twin16_input_r)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(twin16_CPUA_register_w)
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_READ_BANK(COMRAM_r) AM_WRITE_BANK(COMRAM_w)
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(twin16_paletteram_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE_LEGACY(twin16_paletteram_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0a0000, 0x0a001b) AM_READ(twin16_input_r)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(fround_CPU_register_w)
 	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(sound_command_w)

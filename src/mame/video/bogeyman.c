@@ -70,7 +70,8 @@ WRITE8_HANDLER( bogeyman_colorram2_w )
 WRITE8_HANDLER( bogeyman_paletteram_w )
 {
 	/* RGB output is inverted */
-	paletteram_BBGGGRRR_w(space, offset, ~data);
+	bogeyman_state *state = space->machine().driver_data<bogeyman_state>();
+	state->paletteram_BBGGGRRR_w(*space, offset, ~data);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

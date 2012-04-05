@@ -25,15 +25,16 @@ WRITE8_HANDLER( nbmj8991_palette_type1_w )
 {
 	int r, g, b;
 
-	space->machine().generic.paletteram.u8[offset] = data;
+	nbmj8991_state *state = space->machine().driver_data<nbmj8991_state>();
+	state->m_generic_paletteram_8[offset] = data;
 
 	if (!(offset & 1)) return;
 
 	offset &= 0x1fe;
 
-	r = ((space->machine().generic.paletteram.u8[offset + 0] & 0x0f) >> 0);
-	g = ((space->machine().generic.paletteram.u8[offset + 1] & 0xf0) >> 4);
-	b = ((space->machine().generic.paletteram.u8[offset + 1] & 0x0f) >> 0);
+	r = ((state->m_generic_paletteram_8[offset + 0] & 0x0f) >> 0);
+	g = ((state->m_generic_paletteram_8[offset + 1] & 0xf0) >> 4);
+	b = ((state->m_generic_paletteram_8[offset + 1] & 0x0f) >> 0);
 
 	palette_set_color_rgb(space->machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
@@ -42,15 +43,16 @@ WRITE8_HANDLER( nbmj8991_palette_type2_w )
 {
 	int r, g, b;
 
-	space->machine().generic.paletteram.u8[offset] = data;
+	nbmj8991_state *state = space->machine().driver_data<nbmj8991_state>();
+	state->m_generic_paletteram_8[offset] = data;
 
 	if (!(offset & 1)) return;
 
 	offset &= 0x1fe;
 
-	r = ((space->machine().generic.paletteram.u8[offset + 0] & 0x7c) >> 2);
-	g = (((space->machine().generic.paletteram.u8[offset + 0] & 0x03) << 3) | ((space->machine().generic.paletteram.u8[offset + 1] & 0xe0) >> 5));
-	b = ((space->machine().generic.paletteram.u8[offset + 1] & 0x1f) >> 0);
+	r = ((state->m_generic_paletteram_8[offset + 0] & 0x7c) >> 2);
+	g = (((state->m_generic_paletteram_8[offset + 0] & 0x03) << 3) | ((state->m_generic_paletteram_8[offset + 1] & 0xe0) >> 5));
+	b = ((state->m_generic_paletteram_8[offset + 1] & 0x1f) >> 0);
 
 	palette_set_color_rgb(space->machine(), (offset / 2), pal5bit(r), pal5bit(g), pal5bit(b));
 }
@@ -59,15 +61,16 @@ WRITE8_HANDLER( nbmj8991_palette_type3_w )
 {
 	int r, g, b;
 
-	space->machine().generic.paletteram.u8[offset] = data;
+	nbmj8991_state *state = space->machine().driver_data<nbmj8991_state>();
+	state->m_generic_paletteram_8[offset] = data;
 
 	if (!(offset & 1)) return;
 
 	offset &= 0x1fe;
 
-	r = ((space->machine().generic.paletteram.u8[offset + 1] & 0x0f) >> 0);
-	g = ((space->machine().generic.paletteram.u8[offset + 0] & 0xf0) >> 4);
-	b = ((space->machine().generic.paletteram.u8[offset + 0] & 0x0f) >> 0);
+	r = ((state->m_generic_paletteram_8[offset + 1] & 0x0f) >> 0);
+	g = ((state->m_generic_paletteram_8[offset + 0] & 0xf0) >> 4);
+	b = ((state->m_generic_paletteram_8[offset + 0] & 0x0f) >> 0);
 
 	palette_set_color_rgb(space->machine(), (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }

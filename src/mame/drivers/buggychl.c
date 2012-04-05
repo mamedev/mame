@@ -154,7 +154,7 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 //  AM_RANGE(0xd60b, 0xd60b) // other inputs, not used?
 	AM_RANGE(0xd610, 0xd610) AM_WRITE(sound_command_w)
 	AM_RANGE(0xd618, 0xd618) AM_WRITENOP	/* accelerator clear */
-	AM_RANGE(0xd700, 0xd7ff) AM_WRITE_LEGACY(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd700, 0xd7ff) AM_WRITE(paletteram_xxxxRRRRGGGGBBBB_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd840, 0xd85f) AM_WRITEONLY AM_BASE(m_scrollv)
 	AM_RANGE(0xdb00, 0xdbff) AM_WRITEONLY AM_BASE(m_scrollh)
 	AM_RANGE(0xdc04, 0xdc04) AM_WRITEONLY /* should be fg scroll */

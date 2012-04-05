@@ -88,8 +88,8 @@ WRITE32_MEMBER(djmain_state::paletteram32_w)
 {
 	int r,g,b;
 
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
-	data = machine().generic.paletteram.u32[offset];
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	data = m_generic_paletteram_32[offset];
 
 	r = (data >>  0) & 0xff;
 	g = (data >>  8) & 0xff;
@@ -435,7 +435,7 @@ static ADDRESS_MAP_START( memory_map, AS_PROGRAM, 32, djmain_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM							// PRG ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM							// WORK RAM
 	AM_RANGE(0x480000, 0x48443f) AM_RAM_WRITE(paletteram32_w)		// COLOR RAM
-	                             AM_BASE_GENERIC(paletteram)
+	                             AM_SHARE("paletteram")
 	AM_RANGE(0x500000, 0x57ffff) AM_READWRITE(sndram_r, sndram_w)				// SOUND RAM
 	AM_RANGE(0x580000, 0x58003f) AM_DEVREADWRITE_LEGACY("k056832", k056832_long_r, k056832_long_w)		// VIDEO REG (tilemap)
 	AM_RANGE(0x590000, 0x590007) AM_WRITE(unknown590000_w)					// ??

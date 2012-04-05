@@ -477,11 +477,11 @@ static SCREEN_UPDATE_IND16(rabbit)
 WRITE32_MEMBER(rabbit_state::rabbit_paletteram_dword_w)
 {
 	int r,g,b;
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	b = ((machine().generic.paletteram.u32[offset] & 0x000000ff) >>0);
-	r = ((machine().generic.paletteram.u32[offset] & 0x0000ff00) >>8);
-	g = ((machine().generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	b = ((m_generic_paletteram_32[offset] & 0x000000ff) >>0);
+	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
+	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
 
 	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
@@ -769,7 +769,7 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x488000, 0x48bfff) AM_READWRITE(rabbit_tilemap2_r,rabbit_tilemap2_w)
 	AM_RANGE(0x48c000, 0x48ffff) AM_READWRITE(rabbit_tilemap3_r,rabbit_tilemap3_w)
 	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_BASE(m_spriteram) // sprites?
-	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_WRITE(rabbit_paletteram_dword_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_WRITE(rabbit_paletteram_dword_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 

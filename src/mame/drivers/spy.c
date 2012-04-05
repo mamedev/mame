@@ -39,7 +39,7 @@ READ8_MEMBER(spy_state::spy_bankedram1_r)
 
 	if (m_rambank & 1)
 	{
-		return machine().generic.paletteram.u8[offset];
+		return m_generic_paletteram_8[offset];
 	}
 	else if (m_rambank & 2)
 	{
@@ -502,7 +502,7 @@ static MACHINE_START( spy )
 
 	memory_configure_bank(machine, "bank1", 0, 12, &ROM[0x10000], 0x2000);
 
-	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x800);
+	state->m_generic_paletteram_8.allocate(0x800);
 	memset(state->m_pmcram, 0, sizeof(state->m_pmcram));
 
 	state->m_maincpu = machine.device("maincpu");
@@ -516,7 +516,6 @@ static MACHINE_START( spy )
 	state->save_item(NAME(state->m_pmcbank));
 	state->save_item(NAME(state->m_video_enable));
 	state->save_item(NAME(state->m_old_3f90));
-	state->save_pointer(NAME(machine.generic.paletteram.u8), 0x800);
 	state->save_item(NAME(state->m_pmcram));
 }
 

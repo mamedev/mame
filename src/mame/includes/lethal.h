@@ -10,9 +10,6 @@ public:
 	lethal_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
-	/* memory pointers */
-//  UINT8 *    m_paletteram;    // currently this uses generic palette handling
-
 	/* video-related */
 	int        m_layer_colorbase[4];
 	int        m_sprite_colorbase;

@@ -617,11 +617,11 @@ INPUT_PORTS_END
 WRITE32_MEMBER(tmmjprd_state::tmmjprd_paletteram_dword_w)
 {
 	int r,g,b;
-	COMBINE_DATA(&machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	b = ((machine().generic.paletteram.u32[offset] & 0x000000ff) >>0);
-	r = ((machine().generic.paletteram.u32[offset] & 0x0000ff00) >>8);
-	g = ((machine().generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	b = ((m_generic_paletteram_32[offset] & 0x000000ff) >>0);
+	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
+	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
 
 	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
@@ -693,7 +693,7 @@ static ADDRESS_MAP_START( tmmjprd_map, AS_PROGRAM, 32, tmmjprd_state )
 	AM_RANGE(0x28c000, 0x28ffff) AM_READWRITE(tmmjprd_tilemap3_r,tmmjprd_tilemap3_w)
 	/* ?? is palette ram shared with sprites in this case or just a different map */
 	AM_RANGE(0x290000, 0x29bfff) AM_RAM AM_BASE(m_spriteram)
-	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_WRITE(tmmjprd_paletteram_dword_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x29c000, 0x29ffff) AM_RAM_WRITE(tmmjprd_paletteram_dword_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x400000, 0x400003) AM_READ(tmmjprd_mux_r) AM_DEVWRITE_LEGACY("eeprom", tmmjprd_eeprom_write)
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM

@@ -1788,9 +1788,9 @@ static void UpdatePalette(running_machine &machine)
 			for( j=0; j<4; j++ )
 			{
 				int which = i*4+j;
-				int r = nthbyte(machine.generic.paletteram.u32,which+0x00000);
-				int g = nthbyte(machine.generic.paletteram.u32,which+0x08000);
-				int b = nthbyte(machine.generic.paletteram.u32,which+0x10000);
+				int r = nthbyte(state->m_generic_paletteram_32,which+0x00000);
+				int g = nthbyte(state->m_generic_paletteram_32,which+0x08000);
+				int b = nthbyte(state->m_generic_paletteram_32,which+0x10000);
 				palette_set_color( machine,which,MAKE_RGB(r,g,b) );
 			}
 			state->m_dirtypal[i] = 0;
@@ -2721,13 +2721,14 @@ WRITE32_HANDLER( namcos22_cgram_w )
 
 READ32_HANDLER( namcos22_paletteram_r )
 {
-	return space->machine().generic.paletteram.u32[offset];
+	namcos22_state *state = space->machine().driver_data<namcos22_state>();
+	return state->m_generic_paletteram_32[offset];
 }
 
 WRITE32_HANDLER( namcos22_paletteram_w )
 {
 	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA( &space->machine().generic.paletteram.u32[offset] );
+	COMBINE_DATA( &state->m_generic_paletteram_32[offset] );
 	state->m_dirtypal[offset&(0x7fff/4)] = 1;
 }
 

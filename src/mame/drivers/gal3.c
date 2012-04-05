@@ -171,14 +171,15 @@ static VIDEO_START(gal3)
 
 static void update_palette( running_machine &machine )
 {
+	gal3_state *state = machine.driver_data<gal3_state>();
 	int i;
 	INT16 data1,data2;
 	int r,g,b;
 
 	for( i=0; i<NAMCOS21_NUM_COLORS; i++ )
 	{
-		data1 = machine.generic.paletteram.u16[0x00000/2+i];
-		data2 = machine.generic.paletteram.u16[0x10000/2+i];
+		data1 = state->m_generic_paletteram_16[0x00000/2+i];
+		data2 = state->m_generic_paletteram_16[0x10000/2+i];
 
 		r = data1>>8;
 		g = data1&0xff;
@@ -305,17 +306,17 @@ WRITE32_MEMBER(gal3_state::led_slv_w)
 READ32_MEMBER(gal3_state::paletteram32_r)
 {
 	offset *= 2;
-	return (machine().generic.paletteram.u16[offset]<<16)|machine().generic.paletteram.u16[offset+1];
+	return (m_generic_paletteram_16[offset]<<16)|m_generic_paletteram_16[offset+1];
 }
 
 WRITE32_MEMBER(gal3_state::paletteram32_w)
 {
 	UINT32 v;
 	offset *= 2;
-	v = (machine().generic.paletteram.u16[offset]<<16)|machine().generic.paletteram.u16[offset+1];
+	v = (m_generic_paletteram_16[offset]<<16)|m_generic_paletteram_16[offset+1];
 	COMBINE_DATA( &v );
-	machine().generic.paletteram.u16[offset+0] = v>>16;
-	machine().generic.paletteram.u16[offset+1] = v&0xffff;
+	m_generic_paletteram_16[offset+0] = v>>16;
+	m_generic_paletteram_16[offset+1] = v&0xffff;
 }
 
 READ32_MEMBER(gal3_state::namcos21_video_enable_r)
@@ -388,13 +389,13 @@ static ADDRESS_MAP_START( cpu_slv_map, AS_PROGRAM, 32, gal3_state )
 /// AM_RANGE(0xf1480000, 0xf14807ff) AM_READWRITE_LEGACY(namcos21_depthcue_r,namcos21_depthcue_w)
 	AM_RANGE(0xf1700000, 0xf170ffff) AM_READWRITE_LEGACY(namco_obj32_r,namco_obj32_w)
 	AM_RANGE(0xf1720000, 0xf1720007) AM_READWRITE_LEGACY(namco_spritepos32_r,namco_spritepos32_w)
-	AM_RANGE(0xf1740000, 0xf175ffff) AM_READWRITE(paletteram32_r,paletteram32_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf1740000, 0xf175ffff) AM_READWRITE(paletteram32_r,paletteram32_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf1760000, 0xf1760003) AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 
 	AM_RANGE(0xf2200000, 0xf220ffff) AM_RAM
 	AM_RANGE(0xf2700000, 0xf270ffff) AM_RAM	//AM_READWRITE_LEGACY(namco_obj16_r,namco_obj16_w)
 	AM_RANGE(0xf2720000, 0xf2720007) AM_RAM	//AM_READWRITE_LEGACY(namco_spritepos16_r,namco_spritepos16_w)
-	AM_RANGE(0xf2740000, 0xf275ffff) AM_RAM	//AM_READWRITE_LEGACY(paletteram16_r,paletteram16_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf2740000, 0xf275ffff) AM_RAM	//AM_READWRITE(paletteram16_r,paletteram16_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf2760000, 0xf2760003) AM_RAM	//AM_READWRITE(namcos21_video_enable_r,namcos21_video_enable_w)
 ADDRESS_MAP_END
 

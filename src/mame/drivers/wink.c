@@ -144,7 +144,7 @@ WRITE8_MEMBER(wink_state::prot_w)
 
 static ADDRESS_MAP_START( wink_io, AS_IO, 8, wink_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x1f) AM_RAM_WRITE_LEGACY(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_BASE_GENERIC(paletteram) //0x10-0x1f is likely to be something else
+	AM_RANGE(0x00, 0x1f) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_le_w) AM_SHARE("paletteram") //0x10-0x1f is likely to be something else
 //  AM_RANGE(0x20, 0x20) AM_WRITENOP                //??? seems unused..
 	AM_RANGE(0x21, 0x21) AM_WRITE(player_mux_w)		//??? no mux on the pcb.
 	AM_RANGE(0x22, 0x22) AM_WRITE(tile_banking_w)

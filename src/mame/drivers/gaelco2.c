@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM																				/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE_LEGACY(gaelco2_vram_w) AM_SHARE("spriteram")		/* Video RAM */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)								/* Palette */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_SHARE("paletteram")								/* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE(m_vregs)														/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")																/* DSW #1 + Input 1P */
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")																/* DSW #2 + Input 2P */
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( bang_map, AS_PROGRAM, 16, gaelco2_state )
     AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
     AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
     AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE_LEGACY(gaelco2_vram_w) AM_SHARE("spriteram")	/* Video RAM */
-    AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)							/* Palette */
+    AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_SHARE("paletteram")							/* Palette */
     AM_RANGE(0x218004, 0x218009) AM_READONLY																/* Video Registers */
 	AM_RANGE(0x218004, 0x218007) AM_WRITEONLY AM_BASE(m_vregs)										/* Video Registers */
 	AM_RANGE(0x218008, 0x218009) AM_WRITENOP																	/* CLR INT Video */
@@ -433,7 +433,7 @@ static ADDRESS_MAP_START( alighunt_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																				/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)		/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE_LEGACY(gaelco2_vram_w) AM_SHARE("spriteram")		/* Video RAM */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)								/* Palette */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_SHARE("paletteram")								/* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE(m_vregs)														/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")																/* DSW #1 + Input 1P */
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")																/* DSW #2 + Input 2P */
@@ -644,7 +644,7 @@ static ADDRESS_MAP_START( touchgo_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																					/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)			/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE_LEGACY(gaelco2_vram_w) AM_SHARE("spriteram")			/* Video RAM */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)									/* Palette */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_SHARE("paletteram")									/* Palette */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE(m_vregs)															/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")																	/* DSW #1 + Input 1P */
 	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")																	/* DSW #2 + Input 2P */
@@ -908,7 +908,7 @@ static ADDRESS_MAP_START( snowboar_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																						/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)				/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE_LEGACY(gaelco2_vram_w) AM_SHARE("spriteram")				/* Video RAM */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)										/* Palette */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_SHARE("paletteram")										/* Palette */
 	AM_RANGE(0x212000, 0x213fff) AM_RAM																						/* Extra RAM */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE(m_vregs)																/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1")
@@ -1093,7 +1093,7 @@ static ADDRESS_MAP_START( wrally2_map, AS_PROGRAM, 16, gaelco2_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																			/* ROM */
 	AM_RANGE(0x202890, 0x2028ff) AM_DEVREADWRITE_LEGACY("gaelco", gaelcosnd_r, gaelcosnd_w)	/* Sound Registers */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM_WRITE_LEGACY(gaelco2_vram_w) AM_SHARE("spriteram")	/* Video RAM */
-	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_BASE_GENERIC(paletteram)							/* Palette */
+	AM_RANGE(0x210000, 0x211fff) AM_RAM_WRITE_LEGACY(gaelco2_palette_w) AM_SHARE("paletteram")							/* Palette */
 	AM_RANGE(0x212000, 0x213fff) AM_RAM																			/* Extra RAM */
 	AM_RANGE(0x218004, 0x218009) AM_RAM AM_BASE(m_vregs)													/* Video Registers */
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")															/* DIPSW #2 + Inputs 1P */

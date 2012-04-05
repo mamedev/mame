@@ -21,24 +21,27 @@ WRITE16_HANDLER( dec0_update_sprites_w )
 
 static void update_24bitcol(running_machine &machine, int offset)
 {
+	dec0_state *state = machine.driver_data<dec0_state>();
 	int r,g,b;
 
-	r = (machine.generic.paletteram.u16[offset] >> 0) & 0xff;
-	g = (machine.generic.paletteram.u16[offset] >> 8) & 0xff;
-	b = (machine.generic.paletteram2.u16[offset] >> 0) & 0xff;
+	r = (state->m_generic_paletteram_16[offset] >> 0) & 0xff;
+	g = (state->m_generic_paletteram_16[offset] >> 8) & 0xff;
+	b = (state->m_generic_paletteram2_16[offset] >> 0) & 0xff;
 
 	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( dec0_paletteram_rg_w )
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	dec0_state *state = space->machine().driver_data<dec0_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 	update_24bitcol(space->machine(), offset);
 }
 
 WRITE16_HANDLER( dec0_paletteram_b_w )
 {
-	COMBINE_DATA(&space->machine().generic.paletteram2.u16[offset]);
+	dec0_state *state = space->machine().driver_data<dec0_state>();
+	COMBINE_DATA(&state->m_generic_paletteram2_16[offset]);
 	update_24bitcol(space->machine(), offset);
 }
 

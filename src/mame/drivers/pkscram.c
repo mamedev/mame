@@ -103,7 +103,7 @@ static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16, pkscram_state )
 	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(pkscramble_mdtilemap_w) AM_BASE(m_pkscramble_mdtilemap_ram) // md tilemap (just a copy of fg?)
 	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(pkscramble_bgtilemap_w) AM_BASE(m_pkscramble_bgtilemap_ram) // bg tilemap
 	AM_RANGE(0x047000, 0x047fff) AM_RAM // unused
-	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE_LEGACY(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x049000, 0x049001) AM_READ_PORT("DSW")
 	AM_RANGE(0x049004, 0x049005) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x049008, 0x049009) AM_WRITE(pkscramble_output_w)
