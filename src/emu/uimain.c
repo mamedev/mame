@@ -2708,7 +2708,6 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	{
 		const char *s = emulator_info::get_copyright();
 		line = 0;
-		int col = 0;
 
 		/* first line is version string */
 		tempbuf[line++].printf("%s %s", emulator_info::get_applongname(), build_version);
@@ -2716,9 +2715,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		/* output message */
 		while (line < ARRAY_LENGTH(tempbuf))
 		{
-			if (*s == 0 || *s == '\n')
-				col = 0;
-			else
+			if (!(*s == 0 || *s == '\n'))
 				tempbuf[line].cat(*s);
 
 			if (*s != 0)
