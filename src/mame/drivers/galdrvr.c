@@ -6544,7 +6544,7 @@ GAME( 19??, aracnis,   scorpion,mooncrst, aracnis,  scorpnmc, ROT90,  "bootleg",
 /* SF-X hardware; based on Scramble with extra Z80 and 8255 driving a DAC-based sample player */
 GAME( 1983, sfx,      0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu", "SF-X", GAME_SUPPORTS_SAVE )
 GAME( 1983, skelagon, sfx,      sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nichibutsu USA", "Skelagon", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE)
-GAME( 1982, monsterz, 0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nihon Game", "Monster Zero", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1982, monsterz, 0,        monsterz, sfx,      sfx,      ORIENTATION_FLIP_X, "Nihon Game", "Monster Zero", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 
 /*

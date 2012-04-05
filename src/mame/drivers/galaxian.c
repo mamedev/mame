@@ -820,6 +820,81 @@ static const ppi8255_interface sfx_ppi8255_2_intf =
 
 /*************************************
  *
+ *  Monster Zero I/O
+ *
+ *************************************/
+
+/* Preliminary protection notes (based on z80 disasm):
+
+    The initial protection routine is on the maincpu at $c591-$c676.
+    It accesses the 8255, expects an irq, and reads $d800 256 times which is xored against data
+    starting at $0100 to confirm a checksum stored in $0011-$0019. Then it reads the (presumably)same
+    block to store it in RAM at $3800-$3fff. 9 blocks in total.
+    It is presumed that this data comes from another ROM, and scrambled/encrypted a bit.
+    The data(code) in the extra RAM is later jumped/called to in many parts of the game.
+*/
+
+static READ8_HANDLER( monsterz_protection_r )
+{
+	galaxian_state *state = space->machine().driver_data<galaxian_state>();
+	return state->m_protection_result;
+}
+
+
+static void monsterz_set_latch(running_machine &machine)
+{
+	// read from a rom (which one?? "a-3e.k3" from audiocpu ($2700-$2fff) looks very suspicious)
+	galaxian_state *state = machine.driver_data<galaxian_state>();
+	UINT8 *rom = machine.region("audiocpu")->base();
+	state->m_protection_result = rom[0x2000 | (state->m_protection_state & 0x1fff)]; // probably needs a BITSWAP8
+	
+	// and an irq on the main z80 afterwards
+	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE );
+}
+
+
+static WRITE8_DEVICE_HANDLER( monsterz_porta_1_w )
+{
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
+
+	// d7 high: set latch + advance address high bits (and reset low bits?)
+	if (data & 0x80)
+	{
+		monsterz_set_latch(device->machine());
+		state->m_protection_state = (state->m_protection_state + 0x100) & 0xff00;
+	}
+}
+
+static WRITE8_DEVICE_HANDLER( monsterz_portb_1_w )
+{
+	galaxian_state *state = device->machine().driver_data<galaxian_state>();
+
+	// d3 high: set latch + advance address low bits
+	if (data & 0x08)
+	{
+		monsterz_set_latch(device->machine());
+		state->m_protection_state = ((state->m_protection_state + 1) & 0x00ff) | (state->m_protection_state & 0xff00);
+	}
+}
+
+static WRITE8_DEVICE_HANDLER( monsterz_portc_1_w )
+{
+}
+
+static const ppi8255_interface monsterz_ppi8255_1_intf =
+{
+	DEVCB_NULL,												/* Port A read */
+	DEVCB_NULL,												/* Port B read */
+	DEVCB_INPUT_PORT("IN3"),								/* Port C read */
+	DEVCB_HANDLER(monsterz_porta_1_w),						/* Port A write */
+	DEVCB_HANDLER(monsterz_portb_1_w),						/* Port B write */
+	DEVCB_HANDLER(monsterz_portc_1_w)						/* Port C write */
+};
+
+
+
+/*************************************
+ *
  *  Frogger I/O
  *
  *************************************/
@@ -1599,6 +1674,26 @@ static ADDRESS_MAP_START( sfx_map, AS_PROGRAM, 8, galaxian_state )
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_LEGACY(theend_ppi8255_r, theend_ppi8255_w)
 	AM_RANGE(0xc000, 0xefff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( monsterz_map, AS_PROGRAM, 8, galaxian_state )
+	AM_RANGE(0x0000, 0x37ff) AM_ROM
+	AM_RANGE(0x3800, 0x3fff) AM_RAM // extra RAM used by protection
+	AM_RANGE(0x4000, 0x47ff) AM_RAM
+	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE_LEGACY(galaxian_videoram_w) AM_BASE(m_videoram)
+	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE_LEGACY(galaxian_objram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(scramble_background_red_w)
+	AM_RANGE(0x6801, 0x6801) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(irq_enable_w)
+	AM_RANGE(0x6802, 0x6802) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(coin_count_0_w)
+	AM_RANGE(0x6803, 0x6803) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(scramble_background_blue_w)
+	AM_RANGE(0x6804, 0x6804) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_stars_enable_w)
+	AM_RANGE(0x6805, 0x6805) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(scramble_background_green_w)
+	AM_RANGE(0x6806, 0x6806) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_flip_screen_x_w)
+	AM_RANGE(0x6807, 0x6807) AM_MIRROR(0x07f8) AM_WRITE_LEGACY(galaxian_flip_screen_y_w)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_LEGACY(theend_ppi8255_r, theend_ppi8255_w)
+	AM_RANGE(0xc000, 0xd7ff) AM_ROM
+	AM_RANGE(0xd800, 0xd800) AM_READ_LEGACY(monsterz_protection_r)
 ADDRESS_MAP_END
 
 
@@ -2384,6 +2479,19 @@ static MACHINE_CONFIG_DERIVED( sfx, galaxian_base )
 	/* DAC for the sample player */
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( monsterz, sfx )
+
+	/* alternate memory map */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(monsterz_map)
+
+	MCFG_PPI8255_RECONFIG( "ppi8255_1", monsterz_ppi8255_1_intf )
+	
+	/* there are likely other differences too, but those can wait until after protection is sorted out */
+
 MACHINE_CONFIG_END
 
 
