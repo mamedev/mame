@@ -4842,10 +4842,10 @@ GAME( 1986, wboy,       0,        sys1pio,  wboy,      wboy,     ROT0,   "Escape
 GAME( 1986, wboyo,      wboy,     sys1pio,  wboy,      wboyo,    ROT0,   "Escape (Sega license)", "Wonder Boy (set 1, 315-5135)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy3,      wboy,     sys1pio,  wboy3,     wboyo,    ROT0,   "Escape (Sega license)", "Wonder Boy (set 3, 315-5135)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboy4,      wboy,     sys1pio,  wboy,      4dwarrio, ROT0,   "Escape (Sega license)", "Wonder Boy (315-5162, 4-D Warriors Conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1986, wboy5,      wboy,     sys1pio,  wboy3,     wboyo,    ROT0,   "Escape (Sega license)", "Wonder Boy (set 5, bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1986, wboyu,      wboy,     sys1pio,  wboyu,     bank00,   ROT0,   "Escape (Sega license)", "Wonder Boy (prototype?)", GAME_SUPPORTS_SAVE ) // appears to be a very early / unfinished version.
-GAME( 1986, wboyub,     wboy,     sys1pio,  wboy,      wboyo,    ROT0,   "bootleg", "Wonder Boy (US bootleg)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1987, blockgal,   0,        sys1pio,  blockgal,  blockgal, ROT90,  "Sega / Vic Tokai", "Block Gal (MC-8123B, 317-0029)", GAME_SUPPORTS_SAVE)
+GAME( 1986, wboy5,      wboy,     sys1pio,  wboy3,     wboyo,    ROT0,   "bootleg",         "Wonder Boy (set 5, bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1986, wboyub,     wboy,     sys1pio,  wboy,      wboyo,    ROT0,   "bootleg",         "Wonder Boy (US bootleg)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1987, blockgal,   0,        sys1pio,  blockgal,  blockgal, ROT90,  "Sega / Vic Tokai","Block Gal (MC-8123B, 317-0029)", GAME_SUPPORTS_SAVE)
 
 /* PIO-based System 1 with ROM banking */
 GAME( 1985, hvymetal,   0,        sys1pio,  hvymetal,  hvymetal, ROT0,   "Sega",            "Heavy Metal (315-5135)", GAME_SUPPORTS_SAVE )
